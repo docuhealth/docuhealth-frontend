@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Welcome from "./WelcomePage/welcome";
+import Welcome from "./WelcomePage/Welcome";
 import HLP from "./Hospital Login Page/HLP";
 import HSI from "./Hospital Login Page/Hospital Sign In/HSI";
 import ULP from "./User Login Page/ULP";
