@@ -7,6 +7,7 @@ import FP from "./Hospital Login Page/Forgot Passoword/FP";
 import NotFound from './Not Found/NotFound' // Import the NotFound component
 import VerifyOTP from "./Hospital Login Page/OTP/VerifyOTP";
 import NP from "./Hospital Login Page/NewPassword/NP";
+import ConfirmAcct from "./WelcomePage/ConfirmAcct";
 
 function App() {
   return (
@@ -14,6 +15,9 @@ function App() {
       <Routes>
         {/* Route for the Welcome page */}
         <Route path="/" element={<Welcome />} />
+
+        {/* Route for the Confirm Account page */}
+        <Route path="/confirm-account" element={<ConfirmAcct />} />
 
         {/* Route for the Hospital Create Account Page */}
         <Route path="/hospital-create-account" element={<HLP />} />

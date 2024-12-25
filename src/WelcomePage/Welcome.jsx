@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Welcome = () => {
   const [accountType, setAccountType] = useState(""); // State to track dropdown value
@@ -15,23 +16,11 @@ const Welcome = () => {
       if(accountType === 'Individual') {
         navigate('/user-login ')
       } else if(accountType === 'Hospital') {
-        navigate('/hospital-create-account')
+        navigate('/hospital-login')
       }
     }
   };
 
-  const handleCreateAccount = () => {
-    if (!accountType) {
-      setError("Please select an account type before creating an account.");
-    } else {
-      setError("");
-      if(accountType === 'Individual') {
-        navigate('/user-login')
-      } else if(accountType === 'Hospital') {
-        navigate('/hospital-create-account')
-      }
-    }
-  };
 
   return (
     <div
@@ -54,17 +43,35 @@ const Welcome = () => {
           <p className="text-sm sm:text-md text-gray-500 pb-2">
             Select your account type below to Login
           </p>
-          <div className="max-w-6xl">
+          <div className="w-full">
             {/* Dropdown */}
-            <select
-              className="border border-gray-300 p-2 rounded w-full  focus:border-blue-600 outline-none"
-              value={accountType}
-              onChange={(e) => setAccountType(e.target.value)}
-            >
-              <option value="">Select Account Type</option>
-              <option value="Individual">Individual</option>
-              <option value="Hospital">Hospital</option>
-            </select>
+            <div className="relative w-full">
+                <select
+                  className="border border-gray-300 px-4 py-2 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                  value={accountType}
+                  onChange={(e) => setAccountType(e.target.value)}
+                >
+                  <option value="">Select Account Type</option>
+                  <option value="Individual">Individual</option>
+                  <option value="Hospital">Hospital</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
             {/* Proceed Button */}
             <button
               className={`mt-4 px-4 py-2 rounded-full w-full  ${accountType
@@ -81,15 +88,12 @@ const Welcome = () => {
 
           <p className="mt-4">
             Don't have an account yet?{" "}
-            <span
-              className={`${accountType
-                  ? "text-[#0000FF]  cursor-pointer"
-                  : "text-gray-400 cursor-not-allowed"
-                }`}
-              onClick={handleCreateAccount}
+            <Link
+              className={`text-[#0000FF]  cursor-pointer`}
+              to='/confirm-account'
             >
               Create a new account
-            </span>
+            </Link>
           </p>
         </div>
       </div>

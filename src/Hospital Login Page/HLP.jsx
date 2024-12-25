@@ -363,7 +363,7 @@ const HLP = () => {
           }}
         >
           <div className="">
-            <p className="text-white font-semibold text-2xl pb-1">
+            <p className="text-white font-semibold text-xl sm:text-2xl pb-1">
               The simplest way to manage <br /> medical records
             </p>
             <p className="text-white font-light">
