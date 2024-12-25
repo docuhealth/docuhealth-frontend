@@ -27,7 +27,7 @@ const HLP = () => {
     if (isMobile) {
       const timer = setTimeout(() => {
         setNotificationVisible(true);
-      }, 3000); // 3 seconds delay
+      }, 2000); // 2 seconds delay
 
       return () => clearTimeout(timer); // Cleanup on component unmount
     }

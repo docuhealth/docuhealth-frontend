@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../../assets/logo.png";
 import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React Icons
 import dashb from "../../assets/dashb.png";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const NP = () => {
   const [password, setPassword] = useState("");
@@ -10,6 +10,19 @@ const NP = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [notification, setNotification] = useState(false);
+
+  const [notificationVisible, setNotificationVisible] = useState(false);
+
+  useEffect(() => {
+    const isMobile = window.innerWidth <= 768; // Adjust breakpoint as needed
+    if (isMobile) {
+      const timer = setTimeout(() => {
+        setNotificationVisible(true);
+      }, 2000); // 2 seconds delay
+
+      return () => clearTimeout(timer); // Cleanup on component unmount
+    }
+  }, []);
 
   const navigate = useNavigate();
 
@@ -28,26 +41,32 @@ const NP = () => {
 
     setError("");
     setNotification(true);
+    setNotificationVisible(false);
+
+    
   };
 
   const handleNavigation = () => {
     setNotification(false);
-    navigate('/hospital-login');
-  }
+    navigate("/hospital-login");
+  };
 
   return (
     <div>
       <div className="min-h-screen">
         <div className="flex">
           {/* Left Side */}
-          <div className="flex-1 h-screen flex items-center justify-center">
+          <div className=" hidden sm:flex flex-1 h-screen  items-center justify-center">
             <div className="w-3/4" id="temp">
               <div className="pb-10">
                 <img src={logo} alt="Logo" className="" />
               </div>
-              <h2 className="text-2xl font-bold mb-2 ">Set Up A New Password</h2>
+              <h2 className="text-2xl font-bold mb-2 ">
+                Set Up A New Password
+              </h2>
               <p className="text-gray-600 mb-6">
-                Try to set up a password you won’t forget for easy access to your dashboard.
+                Try to set up a password you won’t forget for easy access to
+                your dashboard.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -121,7 +140,7 @@ const NP = () => {
 
           {/* Right Side */}
           <div
-            className="flex-1 h-screen flex flex-col justify-center items-center"
+            className="flex-1 h-screen flex flex-col justify-center items-center p-4"
             style={{
               background: "linear-gradient(to bottom, #0000FF, #718FCC)",
             }}
@@ -174,6 +193,98 @@ const NP = () => {
                 >
                   Go To SignIn
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {notificationVisible && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="fixed bottom-0 left-0 right-0 bg-white text-black  py-4 rounded-t-3xl shadow-md animate-slide-up ">
+              <div className="flex justify-center items-center gap-1 pb-4">
+                <div>
+                  <img src={logo} alt="DocuHealth Logo" />
+                </div>
+                <h1 className="text-[#0000FF] text-3xl font-bold">
+                  DocuHealth
+                </h1>
+              </div>
+              <div className="px-5" id="temp">
+               
+                <h2 className="text-xl sm:text-2xl  mb-2 ">
+                  Set Up A New Password
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Try to set up a password you won’t forget for easy access to
+                  your dashboard.
+                </p>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Password Input */}
+                  <div className="relative">
+                    <p className="pb-1">Password:</p>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                      <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                      >
+                        {showPassword ? (
+                          <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                        ) : (
+                          <FaEye className="h-4 w-4 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Confirm Password Input */}
+                  <div className="relative">
+                    <p className="pb-1">Confirm Password:</p>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Confirm your password"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                      />
+                      <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                      >
+                        {showPassword ? (
+                          <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                        ) : (
+                          <FaEye className="h-4 w-4 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Error Message */}
+                  {error && <p className="text-red-500 text-sm">{error}</p>}
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
+                  >
+                    Reset Password
+                  </button>
+                </form>
               </div>
             </div>
           </div>
