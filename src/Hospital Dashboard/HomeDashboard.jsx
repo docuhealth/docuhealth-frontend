@@ -6,7 +6,7 @@ const HomeDashboard = () => {
     <div>
       <div className="min-h-screen bg-gray-100 flex">
         {/* Sidebar */}
-        <aside className="w-60 bg-white shadow-lg border">
+        <aside className=" hidden sm:block w-60 bg-white shadow-lg border">
           <div className="p-4 flex justify-start items-start gap-2">
             <img src={logo} alt="" />
             <h1 className="text-xl font-bold text-blue-600">DocuHealth</h1>
@@ -141,7 +141,7 @@ const HomeDashboard = () => {
         {/* Main Content */}
         <main className="flex-1">
           {/* Header */}
-          <header className="bg-white py-4 px-8 flex justify-between items-center border">
+          <header className="hidden bg-white py-4 px-8 sm:flex justify-between items-center border">
             <h2 className="text-xl font-semibold">
               Welcome back Jarus Hospital! 👋
             </h2>
@@ -155,6 +155,47 @@ const HomeDashboard = () => {
               <div className="flex items-center">
                 <div className="w-8 h-8 rounded-full bg-gray-300"></div>
                 <span className="ml-2 text-sm font-medium">Jarus hospital</span>
+              </div>
+            </div>
+          </header>
+
+          <header className=" sm:hidden bg-white shadow py-4 flex justify-between items-center px-4 ">
+            <div className="text-sm font-semibold flex items-center gap-2">
+            <p>☰</p>
+              <p>
+                {" "}
+            
+                <span className="font-light">Welcome back,</span> <br />
+                Jarus Hospital!{" "}
+              </p>
+              <p className="text-md">👋</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                  1
+                </span>
+                <button className="p-2 bg-gray-200 rounded-full">🔔</button>
+              </div>
+              <div className="flex justify-center items-center">
+                <div className="w-8 h-8 rounded-full bg-gray-300"></div>
+                <p>
+                  <svg
+                    width="24"
+                    height="25"
+                    viewBox="0 0 24 25"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M6.00684 9.95215L11.2997 15.245C11.6331 15.5784 11.7997 15.745 12.0068 15.745C12.2139 15.745 12.3806 15.5784 12.7139 15.245L18.0068 9.95215"
+                      stroke="#647284"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </p>
               </div>
             </div>
           </header>
