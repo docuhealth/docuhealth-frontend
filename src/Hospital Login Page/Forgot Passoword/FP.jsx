@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import logo from "../../assets/logo.png";
-import { FaLock, FaEye, FaEyeSlash} from "react-icons/fa";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash} from "react-icons/fa";
 import dashb from "../../assets/dashb.png";
 
 

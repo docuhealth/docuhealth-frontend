@@ -89,6 +89,14 @@ const ConfirmAcct = () => {
           </div>
         </div>
       </div>
+      <div className="absolute z-10 bottom-0 right-0 hidden lg:block">
+        <svg width="1000" height="268" viewBox="0 0 1322 268" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 168.259C0.000161026 73.3496 887.159 7.57711 1322 0V288.946C894.697 297.226 -0.000197914 284.91 0 168.259Z" fill="#C8CAE7" fill-opacity="0.05" />
+          <rect x="71.9761" y="110" width="147.548" height="135.07" />
+        </svg>
+        
+
+      </div>
     </div>
   );
 };

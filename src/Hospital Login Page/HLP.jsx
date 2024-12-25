@@ -46,6 +46,7 @@ const HLP = () => {
       image
     );
     setnotification(true);
+    setNotificationVisible(false);
   };
 
   const handleNextStep = () => {
@@ -357,7 +358,7 @@ const HLP = () => {
 
         {/* Right Side */}
         <div
-          className="flex-1 min-h-screen flex flex-col justify-center items-center p-3"
+          className="flex-1 min-h-screen flex flex-col justify-center items-center p-4"
           style={{
             background: "linear-gradient(to bottom, #0000FF, #718FCC)",
           }}
@@ -415,15 +416,287 @@ const HLP = () => {
         </div>
       )}
       {notificationVisible && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-    <div className="fixed bottom-0 left-0 right-0 bg-white text-black text-center py-4 rounded-t-3xl shadow-md animate-slide-up h-3/5">
-      <p className="text-center font-bold">
-        Welcome to our mobile experience!
-      </p>
-    </div>
-  </div>
-)}
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="fixed bottom-0 left-0 right-0 bg-white text-black  py-4 rounded-t-3xl shadow-md animate-slide-up ">
+            <div className="flex justify-center items-center gap-1 pb-4">
+              <div>
+                <img src={logo} alt="DocuHealth Logo" />
+              </div>
+              <h1 className="text-[#0000FF] text-3xl font-bold">DocuHealth</h1>
+            </div>
+            <div
+              className="px-5"
+              id="temp"
+              style={{ display: step === 1 ? "block" : "none" }}
+            >
+              <h2 className="text-xl sm:text-2xl  mb-1 ">
+                Create Your Account
+              </h2>
+              <p className="text-gray-600  mb-6">
+                Create your account with your correct credentials to get started
+              </p>
 
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Email Input */}
+                <div className="relative">
+                  <p className="pb-1">Email :</p>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                    <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  </div>
+                </div>
+
+                {/* Password Input */}
+                <div className="relative">
+                  <p className="pb-1">Password:</p>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder=""
+                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                    <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                    >
+                      {showPassword ? (
+                        <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <FaEye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Confirm Password Input */}
+                <div className="relative">
+                  <p className="pb-1">Confirm Password:</p>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder=""
+                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
+                    <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                    >
+                      {showPassword ? (
+                        <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <FaEye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Error Message */}
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+
+                {/* Move to next step button */}
+                <button
+                  type="button"
+                  onClick={handleNextStep}
+                  className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
+                >
+                  Move to Step 2 / 3
+                </button>
+              </form>
+
+              {/* Sign-In Prompt */}
+              <p className="text-center text-sm text-gray-600 mt-4">
+                Already have an account?{" "}
+                <Link
+                  to="/hospital-login"
+                  className="text-[#0000FF] hover:underline"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
+            <div
+              className=" px-5"
+              id="temp"
+              style={{ display: step === 2 ? "block" : "none" }}
+            >
+              <h2 className="text-xl sm:text-2xl mb-2 ">Create Your Account</h2>
+              <p className="text-gray-600  mb-6">
+                Create your account with your correct credentials to get started
+              </p>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Email Input */}
+                <div className="relative">
+                  <p className="pb-1">Name Of Hospital :</p>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      className="w-full px-4 py-3 border rounded-lg pl-4 outline-none focus:border-blue-500"
+                      value={hospitalName}
+                      placeholder="Jarus Hospital"
+                      onChange={(e) => sethospitalName(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="relative">
+                  <p className=" pb-1">Hospital Address :</p>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      className="w-full px-4 py-3 border rounded-lg pl-4 outline-none focus:border-blue-500"
+                      value={hospitalAddress}
+                      onChange={(e) => sethospitalAddress(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="relative">
+                  <p className="pb-1">Number Of Doctors :</p>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      className="w-full px-4 py-3 border rounded-lg pl-4 outline-none focus:border-blue-500"
+                      value={doctors}
+                      onChange={(e) => setdoctors(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="relative">
+                  <p className="pb-1">
+                    Number Of Other Medical Personnel :
+                  </p>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      className="w-full px-4 py-3 border rounded-lg pl-4 outline-none focus:border-blue-500"
+                      value={medpersonnel}
+                      onChange={(e) => setmedpersonnel(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Error Message */}
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+
+                {/* Move to next step button */}
+                <button
+                  type="button"
+                  onClick={handleLastStep}
+                  className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
+                >
+                  Move to Step 3 / 3
+                </button>
+              </form>
+
+              {/* Sign-In Prompt */}
+              <p className="text-center text-sm text-gray-600 mt-4">
+                Already have an account?{" "}
+                <Link
+                  to="/hospital-login"
+                  className="text-[#0000FF] hover:underline"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
+            <div
+            className="px-5"
+            id="temp"
+            style={{ display: step === 3 ? "block" : "none" }}
+          >
+           
+            <h2 className="text-xl sm:text-2xl font-bold mb-2 ">
+              Upload Hospital Logo/Picture
+            </h2>
+            <div className="flex flex-col justify-center items-center">
+              <p className="text-gray-600  mb-6">
+                Add up a picture or logo of your hospital to complete your sign
+                up process
+              </p>
+
+              <div className="pb-5">
+                <form onSubmit={handleSubmit}>
+                  <div className="relative">
+                    <label htmlFor="image-upload" className="cursor-pointer">
+                      <div className="w-64 h-64 bg-gray-200 flex justify-center items-center rounded-full relative">
+                        {image ? (
+                          <img
+                            src={image}
+                            alt="Uploaded preview"
+                            className="w-full h-full object-cover rounded-full "
+                          />
+                        ) : (
+                          <div className="text-3xl text-gray-500">
+                            <svg
+                              width="115"
+                              height="103"
+                              viewBox="0 0 115 103"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M45.3344 11.9671L33.9984 23.3031H12.2989V91.319H102.987V23.3031H81.2874L69.9514 11.9671H45.3344ZM40.6388 0.631104H74.6468L85.9828 11.9671H108.655C111.785 11.9671 114.323 14.5048 114.323 17.6351V96.987C114.323 100.117 111.785 102.655 108.655 102.655H6.63088C3.50056 102.655 0.962891 100.117 0.962891 96.987V17.6351C0.962891 14.5048 3.50056 11.9671 6.63088 11.9671H29.3029L40.6388 0.631104ZM57.6428 85.651C40.4259 85.651 26.4689 71.6941 26.4689 54.477C26.4689 37.2601 40.4259 23.3031 57.6428 23.3031C74.8599 23.3031 88.8168 37.2601 88.8168 54.477C88.8168 71.6941 74.8599 85.651 57.6428 85.651ZM57.6428 74.315C68.599 74.315 77.4808 65.4333 77.4808 54.477C77.4808 43.5208 68.599 34.6391 57.6428 34.6391C46.6866 34.6391 37.8048 43.5208 37.8048 54.477C37.8048 65.4333 46.6866 74.315 57.6428 74.315Z"
+                                fill="white"
+                              />
+                            </svg>
+                            <span className="absolute right-0 text-white bg-[#0000FF] w-8 h-8 flex items-center justify-center rounded-full">
+                              +
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </label>
+                    <input
+                      id="image-upload"
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </div>
+                </form>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
+              >
+                Sign Up Now
+              </button>
+              <p className="text-center text-sm text-gray-600 mt-4">
+                Already have an account?{" "}
+                <Link
+                  to="/hospital-login"
+                  className="text-[#0000FF] hover:underline"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
