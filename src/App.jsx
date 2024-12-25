@@ -8,6 +8,11 @@ import NotFound from './Not Found/NotFound' // Import the NotFound component
 import VerifyOTP from "./Hospital Login Page/OTP/VerifyOTP";
 import NP from "./Hospital Login Page/NewPassword/NP";
 import ConfirmAcct from "./WelcomePage/ConfirmAcct";
+import HomeDashboard from "./Hospital Dashboard/HomeDashboard";
+import PatientsDashboard from "./Hospital Dashboard/PatientsDashboard";
+import SettingsDashboard from "./Hospital Dashboard/SettingsDashboard";
+import SubscriptionsDashboard from "./Hospital Dashboard/SubscriptionsDashboard";
+import LogOutDashboard from "./Hospital Dashboard/LogOutDashboard";
 
 function App() {
   return (
@@ -33,6 +38,21 @@ function App() {
 
         {/* Route for the Hospital Set New Password Page */}
         <Route path="/hospital-set-new-password" element={<NP />} />
+
+        {/* Route for the Hospital Home Dashboard Page */}
+        <Route path="/hospital-home-dashboard" element={<HomeDashboard />} />
+
+        {/* Route for the Hospital Patients Dashboard Page */}
+        <Route path="/hospital-patients-dashboard" element={<PatientsDashboard />} />
+
+        {/* Route for the Hospital Settings Dashboard Page */}
+        <Route path="/hospital-settings-dashboard" element={<SettingsDashboard />} />
+
+        {/* Route for the Hospital Subscriptions Dashboard Page */}
+        <Route path="/hospital-subscriptions-dashboard" element={<SubscriptionsDashboard />} />
+
+        {/* Route for the Hospital Log Out Dashboard Page */}
+        <Route path="/hospital-logout-dashboard" element={<LogOutDashboard />} />
 
         {/* Route for the User Login Page */}
         <Route path="/user-login" element={<ULP />} />
