@@ -1,20 +1,64 @@
-import React from "react";
+import React, {useState} from "react";
 import logo from "../assets/logo.png";
 import { Link } from "react-router-dom";
 
 const SettingsDashboard = () => {
+const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
   return (
     <div>
       <div className="min-h-screen bg-gray-100 flex">
         {/* Sidebar */}
-        <aside className="w-60 bg-white shadow-lg border">
-          <div className="p-4 flex justify-start items-start gap-2">
-            <img src={logo} alt="" />
-            <h1 className="text-xl font-bold text-blue-600">DocuHealth</h1>
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-10"
+            onClick={closeSidebar}
+          ></div>
+        )}
+
+        <aside
+          className={`fixed top-0 left-0 h-screen w-60 bg-white shadow-lg border z-20 transform ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } transition-transform duration-300 sm:translate-x-0 sm:static sm:block`}
+        >
+          <div className="p-4 flex justify-between items-center  ">
+            <div className="flex justify-start items-start gap-2">
+              <img src={logo} alt="" />
+              <h1 className="text-xl font-bold text-blue-600">DocuHealth</h1>
+            </div>
+            <div className=" sm:hidden " onClick={closeSidebar}>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.9994 15L9 9M9.00064 15L15 9"
+                  stroke="#1B2B40"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z"
+                  stroke="#1B2B40"
+                  stroke-width="1.5"
+                />
+              </svg>
+            </div>
           </div>
           <nav className="mt-4">
             <ul>
-              <Link to="/hospital-home-dashboard">
+              <Link to="/hospital-home-dashboard" onClick={closeSidebar}>
                 <div className="px-4 my-4">
                   <li className="group px-4 py-2 text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start">
                     <span>
@@ -38,7 +82,7 @@ const SettingsDashboard = () => {
                   </li>
                 </div>
               </Link>
-              <Link to="/hospital-patients-dashboard">
+              <Link to="/hospital-patients-dashboard" onClick={closeSidebar}>
                 <div className="px-4 my-4">
                   <li className="group px-4 py-2 rounded-lg text-gray-700 hover:bg-[#0000FF] hover:text-white flex items-center gap-2 justify-start">
                     <span>
@@ -61,7 +105,7 @@ const SettingsDashboard = () => {
                   </li>
                 </div>
               </Link>
-              <Link to="/hospital-settings-dashboard">
+              <Link to="/hospital-settings-dashboard" onClick={closeSidebar}>
                 <div className="px-4 my-4">
                   <li className="group px-4 py-2 rounded-lg text-gray-700 hover:bg-[#0000FF] hover:text-white flex items-center gap-2 justify-start">
                     <span>
@@ -91,7 +135,10 @@ const SettingsDashboard = () => {
                   </li>
                 </div>
               </Link>
-              <Link to="/hospital-subscriptions-dashboard">
+              <Link
+                to="/hospital-subscriptions-dashboard"
+                onClick={closeSidebar}
+              >
                 <div className="px-4 my-4">
                   <li className=" group px-4 py-2 rounded-lg text-gray-700 hover:bg-[#0000FF] hover:text-white flex items-center gap-2 justify-start">
                     <span>
@@ -114,7 +161,7 @@ const SettingsDashboard = () => {
                   </li>
                 </div>
               </Link>
-              <Link to="/hospital-logout-dashboard">
+              <Link to="/hospital-logout-dashboard" onClick={closeSidebar}>
                 <div className="px-4 my-4">
                   <li className=" group px-4 py-2  rounded-lg text-gray-700 hover:bg-[#0000FF] hover:text-white flex items-center gap-2 justify-start">
                     <svg
@@ -138,7 +185,6 @@ const SettingsDashboard = () => {
             </ul>
           </nav>
         </aside>
-
         {/* Main Content */}
         <main className="flex-1">
           {/* Header */}
@@ -168,7 +214,7 @@ const SettingsDashboard = () => {
 
           <header className=" sm:hidden bg-white shadow py-4 flex justify-between items-center px-4 ">
             <div className="text-sm font-semibold flex items-center gap-2">
-              <p>
+              <p onClick={toggleSidebar}>
                 <i class="bx bx-menu text-2xl"></i>
               </p>
               <p>
