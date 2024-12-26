@@ -13,6 +13,7 @@ import PatientsDashboard from "./Hospital Dashboard/PatientsDashboard";
 import SettingsDashboard from "./Hospital Dashboard/SettingsDashboard";
 import SubscriptionsDashboard from "./Hospital Dashboard/SubscriptionsDashboard";
 import LogOutDashboard from "./Hospital Dashboard/LogOutDashboard";
+import USI from "./User Login Page/User Sign In/USI";
 
 function App() {
   return (
@@ -54,8 +55,11 @@ function App() {
         {/* Route for the Hospital Log Out Dashboard Page */}
         <Route path="/hospital-logout-dashboard" element={<LogOutDashboard />} />
 
+        {/* Route for the User Create Account Page */}
+        <Route path="/user-create-account" element={<ULP />} />
+
         {/* Route for the User Login Page */}
-        <Route path="/user-login" element={<ULP />} />
+        <Route path="/user-login" element={<USI />} />
 
         {/* Catch-all route for unmatched paths */}
         <Route path="*" element={<NotFound />} />

@@ -1,9 +1,20 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import logo from "../assets/logo.png";
 import { Link } from "react-router-dom";
+import profilepic from "../assets/profile.png";
+import TabComponents from "./Tabs/TabComponent";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React Icons
 
 const SettingsDashboard = () => {
-const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [password, setPassword] = useState("");
+  const [newpassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [isEmailEnabled, setIsEmailEnabled] = useState(false);
+  const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
+  const [isDashboardEnabled, setIsDashboardEnabled] = useState(false);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -12,6 +23,469 @@ const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const closeSidebar = () => {
     setIsSidebarOpen(false);
   };
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    doctors: "",
+    otherPersonnel: "",
+    address: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Form submitted:", formData);
+    // Add your submission logic here
+  };
+
+  const handleCancel = () => {
+    setFormData({
+      name: "",
+      email: "",
+      doctors: "",
+      otherPersonnel: "",
+      address: "",
+    });
+  };
+
+  const handleSecurityCancel = () => {
+    setPassword("");
+    setConfirmPassword("");
+    setNewPassword("");
+  };
+
+  const [isConfirmed, setIsConfirmed] = useState(false);
+
+  const handleDelete = () => {
+    console.log("Account deletion confirmed");
+    // Add deletion logic here
+  };
+
+  const tabs = [
+    {
+      title: "Accounts Setting",
+      content: (
+        <div className="space-y-4">
+          <div className="w-full  mx-auto ">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {/* Name Input */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Full Hospital Name
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none "
+                  />
+                </div>
+
+                {/* Email Input */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Email Address
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                </div>
+
+                {/* Number of Doctors Input */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="doctors"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Number of Doctors
+                  </label>
+                  <input
+                    id="doctors"
+                    name="doctors"
+                    type="number"
+                    value={formData.doctors}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                </div>
+
+                {/* Other Medical Personnel Input */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="otherPersonnel"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Other Medical Personnel
+                  </label>
+                  <input
+                    id="otherPersonnel"
+                    name="otherPersonnel"
+                    type="number"
+                    value={formData.otherPersonnel}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                </div>
+
+                {/* Address Input - Spans full width */}
+                <div className=" space-y-2">
+                  <label
+                    htmlFor="address"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Hospital Address
+                  </label>
+
+                  <input
+                    id="address"
+                    name="address"
+                    type="text"
+                    value={formData.address}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex flex-row-revers justify-start space-x-4">
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
+                >
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
+                >
+                  Cancel Changes
+                </button>
+              </div>
+            </form>
+          </div>
+          <div>
+            <div className="w-full max-w-md p-4 space-y-4">
+              <h3 className="text-red-600 font-medium">Delete Account</h3>
+
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={isConfirmed}
+                  onChange={(e) => setIsConfirmed(e.target.checked)}
+                  className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                />
+                <span className="text-sm text-gray-700">
+                  I confirm account deactivation
+                </span>
+              </label>
+
+              <button
+                onClick={handleDelete}
+                disabled={!isConfirmed}
+                className={` px-5 py-2 text-sm font-medium text-white rounded-full 
+          ${
+            isConfirmed
+              ? "bg-red-600 hover:bg-red-700"
+              : "bg-gray-300 cursor-not-allowed"
+          }
+        `}
+              >
+                Deactivate Account
+              </button>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Security Settings",
+      content: (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Account Settings</h3>
+          <div className=" grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="relative">
+              <p className="pb-1">Password:</p>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder=""
+                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                >
+                  {showPassword ? (
+                    <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <FaEye className="h-4 w-4 text-gray-400" />
+                  )}
+                </button>
+              </div>
+            </div>
+            <div className="relative">
+              <p className="pb-1"> New Password:</p>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder=""
+                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                  value={newpassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+                <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                >
+                  {showPassword ? (
+                    <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <FaEye className="h-4 w-4 text-gray-400" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm Password Input */}
+            <div className="relative">
+              <p className="pb-1">Confirm Password:</p>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder=""
+                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                >
+                  {showPassword ? (
+                    <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <FaEye className="h-4 w-4 text-gray-400" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+          {/* Buttons */}
+          <div className="flex flex-row-revers justify-start space-x-4 pt-5">
+            <button
+              type="submit"
+              className="px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
+            >
+              Save Changes
+            </button>
+            <button
+              type="button"
+              onClick={handleSecurityCancel}
+              className="px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
+            >
+              Cancel Changes
+            </button>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Notification Settings",
+      content: (
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row justify-start sm:items-center ">
+            <div className="max-w-[300px]"> 
+              <h3 className="pb-1 font-semibold">Accont Sign-In</h3>
+              <p className="text-sm">
+                You'll get notified when a medical personnel log into the
+                dashboard
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 py-4">
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setIsEmailEnabled(!isEmailEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+          ${isEmailEnabled ? "bg-blue-600" : "bg-gray-200"}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+            ${isEmailEnabled ? "translate-x-6" : "translate-x-1"}`}
+                  />
+                </button>
+                <span className="text-sm text-gray-700">Email</span>
+              </div>
+              <div className="flex items-center space-x-3 ">
+                <button
+                  onClick={() => setIsNotificationEnabled(!isNotificationEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+          ${isNotificationEnabled ? "bg-blue-600" : "bg-gray-200"}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+            ${isNotificationEnabled ? "translate-x-6" : "translate-x-1"}`}
+                  />
+                </button>
+                <span className="text-sm text-gray-700">Push Notification</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setIsDashboardEnabled(!isDashboardEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+          ${isDashboardEnabled ? "bg-blue-600" : "bg-gray-200"}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+            ${isDashboardEnabled ? "translate-x-6" : "translate-x-1"}`}
+                  />
+                </button>
+                <span className="text-sm text-gray-700">Dashboard</span>
+              </div>
+            </div>
+          </div>
+          <hr /> 
+          <div className="flex flex-col sm:flex-row justify-start sm:items-center py-4">
+            <div className="max-w-[300px]"> 
+              <h3 className="pb-1 font-semibold">Accont Sign-In</h3>
+              <p className="text-sm">
+                You'll get notified when a medical personnel log into the
+                dashboard
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 py-4">
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setIsEmailEnabled(!isEmailEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+          ${isEmailEnabled ? "bg-blue-600" : "bg-gray-200"}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+            ${isEmailEnabled ? "translate-x-6" : "translate-x-1"}`}
+                  />
+                </button>
+                <span className="text-sm text-gray-700">Email</span>
+              </div>
+              <div className="flex items-center space-x-3 ">
+                <button
+                  onClick={() => setIsNotificationEnabled(!isNotificationEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+          ${isNotificationEnabled ? "bg-blue-600" : "bg-gray-200"}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+            ${isNotificationEnabled ? "translate-x-6" : "translate-x-1"}`}
+                  />
+                </button>
+                <span className="text-sm text-gray-700">Push Notification</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setIsDashboardEnabled(!isDashboardEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+          ${isDashboardEnabled ? "bg-blue-600" : "bg-gray-200"}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+            ${isDashboardEnabled ? "translate-x-6" : "translate-x-1"}`}
+                  />
+                </button>
+                <span className="text-sm text-gray-700">Dashboard</span>
+              </div>
+            </div>
+          </div>
+          <hr />
+          
+          <div className="flex flex-col sm:flex-row justify-start sm:items-center py-4">
+            <div className="max-w-[300px]"> 
+              <h3 className="pb-1 font-semibold">Accont Sign-In</h3>
+              <p className="text-sm">
+                You'll get notified when a medical personnel log into the
+                dashboard
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 py-4">
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setIsEmailEnabled(!isEmailEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+          ${isEmailEnabled ? "bg-blue-600" : "bg-gray-200"}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+            ${isEmailEnabled ? "translate-x-6" : "translate-x-1"}`}
+                  />
+                </button>
+                <span className="text-sm text-gray-700">Email</span>
+              </div>
+              <div className="flex items-center space-x-3 ">
+                <button
+                  onClick={() => setIsNotificationEnabled(!isNotificationEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+          ${isNotificationEnabled ? "bg-blue-600" : "bg-gray-200"}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+            ${isNotificationEnabled ? "translate-x-6" : "translate-x-1"}`}
+                  />
+                </button>
+                <span className="text-sm text-gray-700">Push Notification</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setIsDashboardEnabled(!isDashboardEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+          ${isDashboardEnabled ? "bg-blue-600" : "bg-gray-200"}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+            ${isDashboardEnabled ? "translate-x-6" : "translate-x-1"}`}
+                  />
+                </button>
+                <span className="text-sm text-gray-700">Dashboard</span>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div>
       <div className="min-h-screen bg-gray-100 flex">
@@ -24,7 +498,7 @@ const [isSidebarOpen, setIsSidebarOpen] = useState(false);
         )}
 
         <aside
-          className={`fixed top-0 left-0 h-screen w-60 bg-white shadow-lg border z-20 transform ${
+          className={`fixed top-0 left-0 min-h-screen w-60 bg-white shadow-lg border z-20 transform ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           } transition-transform duration-300 sm:translate-x-0 sm:static sm:block`}
         >
@@ -247,53 +721,22 @@ const [isSidebarOpen, setIsSidebarOpen] = useState(false);
           </header>
 
           {/* Content */}
-          <section className="p-8">
-            <div className="bg-white shadow-md rounded-md p-6">
-              <h3 className="text-lg font-semibold border-b pb-2">
-                Account Settings
-              </h3>
-              <div className="grid grid-cols-2 gap-4 mt-4">
+          <section className="p-0 sm:p-8 ">
+            <div className="p-5 sm:p-0">
+              <p className="text-gray-500">Monday 25th, 2024</p>
+            </div>
+            <hr className="sm:hidden" />
+
+            <div className=" sm:border my-5 px-5 py-5 sm:rounded-3xl bg-white">
+              <div className="flex items-center gap-3">
+                <img src={profilepic} alt="" className="w-14" />
                 <div>
-                  <label className="block text-sm font-medium">
-                    Hospital Name
-                  </label>
-                  <p className="text-gray-700">Jarus Hospital</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">
-                    Email Address
-                  </label>
-                  <p className="text-gray-700">jarus@example.com</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">
-                    Number of Doctors
-                  </label>
-                  <p className="text-gray-700">10</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">
-                    Other Medical Personnel
-                  </label>
-                  <p className="text-gray-700">18</p>
-                </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium">
-                    Hospital Address
-                  </label>
-                  <p className="text-gray-700">
-                    No. 40 Health center street, off block road, Port Harcourt,
-                    Rivers State, Nigeria
-                  </p>
+                  <p>Jarus Hospital</p>
+                  <p className="text-gray-500 text-sm">jarus@gmail.com</p>
                 </div>
               </div>
-              <div className="flex justify-end mt-6">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-md">
-                  Save changes
-                </button>
-                <button className="ml-4 bg-gray-300 px-4 py-2 rounded-md">
-                  Cancel changes
-                </button>
+              <div>
+                <TabComponents tabs={tabs} />
               </div>
             </div>
           </section>

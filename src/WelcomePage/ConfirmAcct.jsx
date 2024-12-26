@@ -13,7 +13,7 @@ const ConfirmAcct = () => {
     } else {
       setError("");
       if (accountType === "Individual") {
-        navigate("/user-login");
+        navigate("/user-create-account");
       } else if (accountType === "Hospital") {
         navigate("/hospital-create-account");
       }
