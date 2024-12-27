@@ -76,7 +76,7 @@ const HLP = () => {
     <div className="min-h-screen">
       <div className="flex">
         {/* Left Side */}
-        <div className="hidden sm:flex flex-1 h-screen  items-center justify-center ">
+        <div className="hidden sm:flex flex-1 min-h-screen  items-center justify-center ">
           <div
             className="w-3/4"
             id="temp"
@@ -190,7 +190,7 @@ const HLP = () => {
             id="temp"
             style={{ display: step === 2 ? "block" : "none" }}
           >
-            <div className="pb-3">
+            <div className="pb-10">
               <img src={logo} alt="Logo" className="" />
             </div>
             <h2 className="text-2xl font-bold mb-2 ">Create Your Account</h2>

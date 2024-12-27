@@ -268,16 +268,16 @@ const SubscriptionsDashboard = () => {
                         className="text-sm text-gray-600"
                         style={{
                           color:
-                            index === 1 || index === 2 ? "#FE9000" : "inherit",
+                            index === 1 || index === 2 ? "#FE9000 " : "inherit",
+                          paddingBottom:
+                            index === 1 || index === 2 ? "10px" : "inherit",
                         }}
                       >
                         {data.name}
                       </p>
                       {data.check === true ? (
                         <i className="bx bx-check text-[#0000FF] text-2xl"></i>
-                      ) : (
-                        <i className="bx bx-x text-2xl text-red-600"></i>
-                      )}
+                      ) : ""}
                     </div>
                     <div className="pb-4">
                       <p className="text-2xl font-semibold pb-1">
