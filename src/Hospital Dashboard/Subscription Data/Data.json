@@ -1,0 +1,41 @@
+[
+  {
+    "name": "Basic Plan",
+    "amount": "0.00",
+    "details": "The Monthly Premium plan is a paid, interesting and complete plan. It has all the features missing from the basic plan",
+    "duration": "Monthly",
+    "check": true,
+    "smallcheck": false,
+    "det1" :  "Access to statistics",
+    "det2" :  "Unlimited account information update",
+    "det3" :  "Access to Assessment/Diagnosis",
+    "det4" :  "Exporting files as PDF",
+    "button": "Activated"
+  },
+  {
+    "name": "Mothly Premium Plan",
+    "amount": "6000.00",
+    "duration": "Monthly",
+    "details": "The Monthly Premium plan is a paid, interesting and complete plan. It has all the features missing from the basic plan",
+    "check": false,
+    "smallcheck": true,
+    "det1" :  "Access to statistics",
+    "det2" :  "Unlimited account information update",
+    "det3" :  "Unlimited account information update",
+    "det4" :  "Exporting files as PDF",
+    "button": "Upgarde to Monthly Plan"
+  },
+  {
+    "name": "Yearly Premium Plan",
+    "amount": "6000.00",
+    "duration": "Yearly",
+    "details": "The Yearly Premium plan is a paid, interesting and complete plan. It has all the features missing from the basic plan",
+    "check": false,
+    "smallcheck": true,
+    "det1" :  "Access to statistics",
+    "det2" :  "Unlimited account information update",
+    "det3" :  "Access to Assessment/Diagnosis",
+    "det4" :  "Exporting files as PDF",
+    "button": "Upgarde to Yearly Plan"
+  }
+]

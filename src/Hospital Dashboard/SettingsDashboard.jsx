@@ -172,14 +172,14 @@ const SettingsDashboard = () => {
               <div className="flex flex-row-revers justify-start space-x-4">
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
+                  className="px-2 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
                 >
                   Save Changes
                 </button>
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
+                  className="px-2 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
                 >
                   Cancel Changes
                 </button>
@@ -308,14 +308,14 @@ const SettingsDashboard = () => {
           <div className="flex flex-row-revers justify-start space-x-4 pt-5">
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
+              className="px-2 sm:px-4 py-2  text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
             >
               Save Changes
             </button>
             <button
               type="button"
               onClick={handleSecurityCancel}
-              className="px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
+              className="px-2 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
             >
               Cancel Changes
             </button>
@@ -328,7 +328,7 @@ const SettingsDashboard = () => {
       content: (
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row justify-start sm:items-center ">
-            <div className="max-w-[300px]"> 
+            <div className="max-w-[300px]">
               <h3 className="pb-1 font-semibold">Accont Sign-In</h3>
               <p className="text-sm">
                 You'll get notified when a medical personnel log into the
@@ -351,58 +351,9 @@ const SettingsDashboard = () => {
               </div>
               <div className="flex items-center space-x-3 ">
                 <button
-                  onClick={() => setIsNotificationEnabled(!isNotificationEnabled)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-          ${isNotificationEnabled ? "bg-blue-600" : "bg-gray-200"}`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-            ${isNotificationEnabled ? "translate-x-6" : "translate-x-1"}`}
-                  />
-                </button>
-                <span className="text-sm text-gray-700">Push Notification</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => setIsDashboardEnabled(!isDashboardEnabled)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-          ${isDashboardEnabled ? "bg-blue-600" : "bg-gray-200"}`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-            ${isDashboardEnabled ? "translate-x-6" : "translate-x-1"}`}
-                  />
-                </button>
-                <span className="text-sm text-gray-700">Dashboard</span>
-              </div>
-            </div>
-          </div>
-          <hr /> 
-          <div className="flex flex-col sm:flex-row justify-start sm:items-center py-4">
-            <div className="max-w-[300px]"> 
-              <h3 className="pb-1 font-semibold">Accont Sign-In</h3>
-              <p className="text-sm">
-                You'll get notified when a medical personnel log into the
-                dashboard
-              </p>
-            </div>
-            <div className="flex flex-col gap-3 py-4">
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => setIsEmailEnabled(!isEmailEnabled)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-          ${isEmailEnabled ? "bg-blue-600" : "bg-gray-200"}`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-            ${isEmailEnabled ? "translate-x-6" : "translate-x-1"}`}
-                  />
-                </button>
-                <span className="text-sm text-gray-700">Email</span>
-              </div>
-              <div className="flex items-center space-x-3 ">
-                <button
-                  onClick={() => setIsNotificationEnabled(!isNotificationEnabled)}
+                  onClick={() =>
+                    setIsNotificationEnabled(!isNotificationEnabled)
+                  }
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
           ${isNotificationEnabled ? "bg-blue-600" : "bg-gray-200"}`}
                 >
@@ -429,13 +380,12 @@ const SettingsDashboard = () => {
             </div>
           </div>
           <hr />
-          
           <div className="flex flex-col sm:flex-row justify-start sm:items-center py-4">
-            <div className="max-w-[300px]"> 
-              <h3 className="pb-1 font-semibold">Accont Sign-In</h3>
+            <div className="max-w-[300px]">
+              <h3 className="pb-1 font-semibold">Accont Information Changes</h3>
               <p className="text-sm">
-                You'll get notified when a medical personnel log into the
-                dashboard
+                You'll get notified when an account information is updated int
+                the dashboard
               </p>
             </div>
             <div className="flex flex-col gap-3 py-4">
@@ -454,7 +404,9 @@ const SettingsDashboard = () => {
               </div>
               <div className="flex items-center space-x-3 ">
                 <button
-                  onClick={() => setIsNotificationEnabled(!isNotificationEnabled)}
+                  onClick={() =>
+                    setIsNotificationEnabled(!isNotificationEnabled)
+                  }
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
           ${isNotificationEnabled ? "bg-blue-600" : "bg-gray-200"}`}
                 >
@@ -480,7 +432,60 @@ const SettingsDashboard = () => {
               </div>
             </div>
           </div>
-          
+          <hr />
+
+          <div className="flex flex-col sm:flex-row justify-start sm:items-center py-4">
+            <div className="max-w-[300px]">
+              <h3 className="pb-1 font-semibold">Assessment & Diagnosis</h3>
+              <p className="text-sm">
+                You'll get notified when an Assessment/Diagnosis is carried out
+                successfully in the dashboard
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 py-4">
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setIsEmailEnabled(!isEmailEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+          ${isEmailEnabled ? "bg-blue-600" : "bg-gray-200"}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+            ${isEmailEnabled ? "translate-x-6" : "translate-x-1"}`}
+                  />
+                </button>
+                <span className="text-sm text-gray-700">Email</span>
+              </div>
+              <div className="flex items-center space-x-3 ">
+                <button
+                  onClick={() =>
+                    setIsNotificationEnabled(!isNotificationEnabled)
+                  }
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+          ${isNotificationEnabled ? "bg-blue-600" : "bg-gray-200"}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+            ${isNotificationEnabled ? "translate-x-6" : "translate-x-1"}`}
+                  />
+                </button>
+                <span className="text-sm text-gray-700">Push Notification</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setIsDashboardEnabled(!isDashboardEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+          ${isDashboardEnabled ? "bg-blue-600" : "bg-gray-200"}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+            ${isDashboardEnabled ? "translate-x-6" : "translate-x-1"}`}
+                  />
+                </button>
+                <span className="text-sm text-gray-700">Dashboard</span>
+              </div>
+            </div>
+          </div>
         </div>
       ),
     },
