@@ -14,6 +14,9 @@ import SettingsDashboard from "./Hospital Dashboard/SettingsDashboard";
 import SubscriptionsDashboard from "./Hospital Dashboard/SubscriptionsDashboard";
 import LogOutDashboard from "./Hospital Dashboard/LogOutDashboard";
 import USI from "./User Login Page/User Sign In/USI";
+import FPU from "./User Login Page/Forget Password/FPU";
+import VerifyOTPUser from './User Login Page/Verify OTP/VerifyOTPUser'
+import NPU from "./User Login Page/NewPassword/NPU";
 
 function App() {
   return (
@@ -60,6 +63,16 @@ function App() {
 
         {/* Route for the User Login Page */}
         <Route path="/user-login" element={<USI />} />
+
+        {/* Route for the User Forgot Password Page */}
+        <Route path="/user-forgot-password" element={<FPU />} />
+
+        {/* Route for the User Verify OTP Page */}
+        <Route path="/user-verify-otp" element={<VerifyOTPUser />} />
+
+
+        {/* Route for the User Set New Password Page */}
+        <Route path="/user-set-new-password" element={<NPU />} />
 
         {/* Catch-all route for unmatched paths */}
         <Route path="*" element={<NotFound />} />

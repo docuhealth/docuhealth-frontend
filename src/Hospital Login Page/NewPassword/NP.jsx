@@ -183,7 +183,7 @@ const NP = () => {
                   />
                 </svg>
               </div>
-              <p className="text-[#15C621] mb-4">
+              <p className="text-[#15C621] mb-4 text-sm sm:text-base">
                 You have successfully reset your password!
               </p>
               <div className="flex justify-center w-full">

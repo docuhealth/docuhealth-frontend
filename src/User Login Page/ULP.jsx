@@ -16,6 +16,7 @@ const ULP = () => {
   const [name, setName] = useState("");
   const [nin, setNin] = useState("");
   const [dob, setDob] = useState("");
+  const [sor, setSor] = useState("");
 
   const [notification, setnotification] = useState(false);
 
@@ -34,7 +35,7 @@ const ULP = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(email, password, number, confirmPassword, name, nin, dob);
+    console.log(email, password, number, confirmPassword, name, nin, sor, dob);
     setEmail("");
     setPassword("");
     setNumber("");
@@ -42,6 +43,7 @@ const ULP = () => {
     setDob("");
     setName("");
     setNin("");
+    setSor("");
     setnotification(true);
     setNotificationVisible(false);
   };
@@ -50,7 +52,8 @@ const ULP = () => {
     // Check if the form is completed before allowing to move to next step
     if (
       email &&
-      number && number.length > 10 &&
+      number &&
+      number.length > 10 &&
       password &&
       confirmPassword &&
       password === confirmPassword
@@ -238,6 +241,41 @@ const ULP = () => {
                   />
                 </div>
               </div>
+              <div className="relative">
+              <p className="font-semibold">State Of Residence :</p>
+              <div className="relative w-full">
+                <select
+                  className="border border-gray-300 px-4 py-2 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                  value={sor}
+                  onChange={(e) => setSor(e.target.value)}
+                  required
+                >
+                  <option value=""> Select your State</option>
+                  <option value="Ibadan">Ibadan</option>
+                    <option value="Ekiti">Ekiti</option>
+                    <option value="Lagos">Lagos</option>
+                    <option value="Abeokuta">Abeokuta</option>
+                    <option value="Abuja">Abuja</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              </div>
+             
 
               {/* Error Message */}
               {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -308,7 +346,7 @@ const ULP = () => {
                 />
               </svg>
             </div>
-            <p className="text-[#15C621] mb-4 text-sm sm:text-xl">
+            <p className="text-[#15C621] mb-4 text-sm sm:text-base">
               You have successfully signed up
             </p>
             <div className="flex justify-center w-full">
@@ -522,6 +560,43 @@ const ULP = () => {
                     />
                   </div>
                 </div>
+
+                <div className="relative">
+              <p className="font-semibold">State Of Residence :</p>
+              <div className="relative w-full">
+                <select
+                  className="border border-gray-300 px-4 py-2 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                  value={sor}
+                  onChange={(e) => setSor(e.target.value)}
+                  required
+                >
+                  <option value=""> Select your State</option>
+                  <option value="Ibadan">Ibadan</option>
+                    <option value="Ekiti">Ekiti</option>
+                    <option value="Lagos">Lagos</option>
+                    <option value="Abeokuta">Abeokuta</option>
+                    <option value="Abuja">Abuja</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              </div>
+             
+
 
                 {/* Error Message */}
                 {error && <p className="text-red-500 text-sm">{error}</p>}

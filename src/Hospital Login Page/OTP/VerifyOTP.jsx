@@ -162,7 +162,7 @@ const VerifyOTP = () => {
                       value={digit}
                       onChange={(e) => handleChange(e.target.value, index)}
                       onKeyDown={(e) => handleKeyDown(e, index)}
-                      className="w-12 h-12 text-center border-b-2  outline-none focus:border-[#0000FF] border-gray-400"
+                      className="w-8 h-12 text-center border-b-2  outline-none focus:border-[#0000FF] border-gray-400"
                       onBlur={(e) => {
                         if (e.target.value) {
                           e.target.classList.remove("border-blue-500");

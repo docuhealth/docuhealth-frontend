@@ -399,7 +399,7 @@ const HLP = () => {
                 />
               </svg>
             </div>
-            <p className="text-[#15C621] mb-4 text-sm sm:text-xl">
+            <p className="text-[#15C621] mb-4 text-sm sm:text-base">
               You have successfully signed up
             </p>
             <div className="flex justify-center w-full">
