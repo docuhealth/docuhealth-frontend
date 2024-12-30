@@ -17,6 +17,9 @@ import USI from "./User Login Page/User Sign In/USI";
 import FPU from "./User Login Page/Forget Password/FPU";
 import VerifyOTPUser from './User Login Page/Verify OTP/VerifyOTPUser'
 import NPU from "./User Login Page/NewPassword/NPU";
+import UserHomeDashboard from "./User Dashboard/UserHomeDashboard";
+import UserSubscriptionsDashboard from "./User Dashboard/UserSubscriptionsDashboard";
+import UserLogoutDashboard from './User Dashboard/UserLogoutDasboard'
 
 function App() {
   return (
@@ -72,7 +75,17 @@ function App() {
 
 
         {/* Route for the User Set New Password Page */}
-        <Route path="/user-set-new-password" element={<NPU />} />
+        <Route path="/user-set-new-password" element={<NPU/>} />
+
+
+        {/* Route for the User Home Dashboard Page */}
+        <Route path="/user-home-dashboard" element={<UserHomeDashboard/>} />
+
+        {/* Route for the User Subscription Dashboard Page */}
+        <Route path="/user-subscriptions-dashboard" element={<UserSubscriptionsDashboard/>} />
+
+        {/* Route for the User Logout Dashboard Page */}
+        <Route path="/user-logout-dashboard" element={< UserLogoutDashboard />} />
 
         {/* Catch-all route for unmatched paths */}
         <Route path="*" element={<NotFound />} />

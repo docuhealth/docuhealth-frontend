@@ -1,36 +1,35 @@
-import React, {useState} from "react";
-import logo from "../assets/logo.png";
+import React, { useState } from "react";
+import UserDashHead from "./Dashboard Part/UserDashHead";
+import Data from "./UserSubscriptionData/UserData.json";
+import logo from '../assets/logo.png'
 import { Link, useLocation } from "react-router-dom";
-import DashHead from "./Dashboard Part/DashHead";
 
-const PatientsDashboard = () => {
- const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+const UserSubscriptionsDashboard = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const location = useLocation();
+  
+  const isActive = (path = "/user-home-dashboard") => location.pathname === path;
 
- const location = useLocation();
- 
- const isActive = (path = '/hospital-home-dashboard') => location.pathname === path;
- 
- 
-   const toggleSidebar = () => {
-     setIsSidebarOpen(!isSidebarOpen);
-   };
- 
-   const closeSidebar = () => {
-     setIsSidebarOpen(false);
-   };
-   return (
-     <div>
-       <div className="min-h-screen bg-gray-100 flex">
-         {/* Sidebar */}
-         {isSidebarOpen && (
-           <div
-             className="fixed inset-0 bg-black bg-opacity-50 z-10"
-             onClick={closeSidebar}
-           ></div>
-         )}
- 
-       <aside
-                 className={`fixed top-0 left-0 min-h-screen w-60 bg-white shadow-lg border z-20 transform ${
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+  return (
+    <div>
+      <div className="min-h-screen bg-gray-100 flex">
+        {/* Sidebar */}
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-10"
+            onClick={closeSidebar}
+          ></div>
+        )}
+
+        <aside
+                 className={`fixed top-0 left-0 min-h-screen w-64 bg-white shadow-lg border z-20 transform ${
                    isSidebarOpen ? "translate-x-0" : "-translate-x-full"
                  } transition-transform duration-300 sm:translate-x-0 sm:static sm:block`}
                >
@@ -64,13 +63,15 @@ const PatientsDashboard = () => {
                  </div>
                  <nav className="mt-4">
                    <ul>
-                     <Link to="/hospital-home-dashboard" onClick={closeSidebar}>
+                     <Link to="/user-home-dashboard" onClick={closeSidebar}>
                        <div className="px-4 my-4">
-                         <li className={`group px-4 py-2   ${
-                       isActive("/hospital-home-dashboard")
-                         ? "bg-[#0000FF] text-white"
-                         : "text-gray-700"
-                     } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
+                         <li
+                           className={`group px-4 py-2   ${
+                             isActive("/user-home-dashboard")
+                               ? "bg-[#0000FF] text-white"
+                               : "text-gray-700"
+                           } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                         >
                            <span>
                              <svg
                                width="20"
@@ -80,30 +81,32 @@ const PatientsDashboard = () => {
                                xmlns="http://www.w3.org/2000/svg"
                                id="svg"
                                className={`group-hover:fill-white ${
-                                 isActive("/hospital-home-dashboard") ? "fill-white" : ""
+                                 isActive("/user-home-dashboard") ? "fill-white" : ""
                                }`}
                              >
                                <path
                                  d="M2.5 10C2.5 10.4602 2.8731 10.8333 3.33333 10.8333H8.33333C8.79358 10.8333 9.16667 10.4602 9.16667 10V3.33333C9.16667 2.8731 8.79358 2.5 8.33333 2.5H3.33333C2.8731 2.5 2.5 2.8731 2.5 3.33333V10ZM2.5 16.6667C2.5 17.1269 2.8731 17.5 3.33333 17.5H8.33333C8.79358 17.5 9.16667 17.1269 9.16667 16.6667V13.3333C9.16667 12.8731 8.79358 12.5 8.33333 12.5H3.33333C2.8731 12.5 2.5 12.8731 2.5 13.33333V16.6667ZM10.8333 16.6667C10.8333 17.1269 11.2064 17.5 11.6667 17.5H16.6667C17.1269 17.5 17.5 17.1269 17.5 16.6667V10C17.5 9.53975 17.1269 9.16667 16.6667 9.16667H11.6667C11.2064 9.16667 10.8333 9.53975 10.8333 10V16.6667ZM11.6667 2.5C11.2064 2.5 10.8333 2.8731 10.8333 3.33333V6.66667C10.8333 7.1269 11.2064 7.5 11.6667 7.5H16.6667C17.1269 7.5 17.5 7.1269 17.5 6.66667V3.33333C17.5 2.8731 17.1269 2.5 16.6667 2.5H11.6667Z"
                                  className={`group-hover:fill-white ${
-                                   isActive("/hospital-home-dashboard")
+                                   isActive("/user-home-dashboard")
                                      ? "fill-white"
                                      : "fill-[#647284]"
                                  }`}
                                />
                              </svg>
                            </span>
-                           Overview
+                           My Medical Record
                          </li>
                        </div>
                      </Link>
-                     <Link to="/hospital-patients-dashboard" onClick={closeSidebar}>
+                     <Link to="/user-sub-account" onClick={closeSidebar}>
                        <div className="px-4 my-4">
-                         <li className={`group px-4 py-2   ${
-                       isActive("/hospital-patients-dashboard")
-                         ? "bg-[#0000FF] text-white"
-                         : "text-gray-700"
-                     } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
+                         <li
+                           className={`group px-4 py-2   ${
+                             isActive("/user-sub-account")
+                               ? "bg-[#0000FF] text-white"
+                               : "text-gray-700"
+                           } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                         >
                            <span>
                              <svg
                                width="20"
@@ -112,32 +115,34 @@ const PatientsDashboard = () => {
                                fill="none"
                                xmlns="http://www.w3.org/2000/svg"
                                className={`group-hover:fill-white ${
-                                 isActive("/hospital-patients-dashboard")
+                                 isActive("/user-sub-account")
                                    ? "fill-white"
                                    : "fill-[#647284]"
                                }`}
                              >
                                <path
-                                 d="M2.50004 5.00016H17.5V15.0002H2.50004V5.00016ZM1.66671 3.3335C1.20647 3.3335 0.833374 3.7066 0.833374 4.16683V15.8335C0.833374 16.2937 1.20647 16.6668 1.66671 16.6668H18.3334C18.7936 16.6668 19.1667 16.2937 19.1667 15.8335V4.16683C19.1667 3.7066 18.7936 3.3335 18.3334 3.3335H1.66671ZM10.8334 6.66683H15.8334V8.3335H10.8334V6.66683ZM15 10.0002H10.8334V11.6668H15V10.0002ZM8.75004 8.3335C8.75004 9.48408 7.8173 10.4168 6.66671 10.4168C5.51612 10.4168 4.58337 9.48408 4.58337 8.3335C4.58337 7.1829 5.51612 6.25016 6.66671 6.25016C7.8173 6.25016 8.75004 7.1829 8.75004 8.3335ZM6.66671 11.2502C5.05587 11.2502 3.75004 12.556 3.75004 14.1668H9.58337C9.58337 12.556 8.27754 11.2502 6.66671 11.2502Z"
+                                 d="M1.66675 18.3333C1.66675 14.6514 4.65151 11.6667 8.33341 11.6667C12.0153 11.6667 15.0001 14.6514 15.0001 18.3333H13.3334C13.3334 15.5719 11.0948 13.3333 8.33341 13.3333C5.57199 13.3333 3.33341 15.5719 3.33341 18.3333H1.66675ZM8.33341 10.8333C5.57091 10.8333 3.33341 8.59583 3.33341 5.83333C3.33341 3.07083 5.57091 0.833333 8.33341 0.833333C11.0959 0.833333 13.3334 3.07083 13.3334 5.83333C13.3334 8.59583 11.0959 10.8333 8.33341 10.8333ZM8.33341 9.16667C10.1751 9.16667 11.6667 7.675 11.6667 5.83333C11.6667 3.99167 10.1751 2.5 8.33341 2.5C6.49175 2.5 5.00008 3.99167 5.00008 5.83333C5.00008 7.675 6.49175 9.16667 8.33341 9.16667ZM15.2365 12.2523C17.5537 13.2967 19.1667 15.6267 19.1667 18.3333H17.5001C17.5001 16.3033 16.2903 14.5559 14.5524 13.7726L15.2365 12.2523ZM14.6636 2.84434C16.3287 3.53086 17.5001 5.16967 17.5001 7.08333C17.5001 9.47517 15.6702 11.4377 13.3334 11.648V9.9705C14.7473 9.7685 15.8334 8.55333 15.8334 7.08333C15.8334 5.93279 15.1681 4.93836 14.2009 4.46362L14.6636 2.84434Z"
                                  className={`group-hover:fill-white ${
-                                   isActive("/hospital-patients-dashboard")
+                                   isActive("/user-sub-account")
                                      ? "fill-white"
                                      : "fill-[#647284]"
                                  }`}
                                />
                              </svg>
                            </span>
-                           Patients
+                           Sub-Accounts
                          </li>
                        </div>
                      </Link>
-                     <Link to="/hospital-settings-dashboard" onClick={closeSidebar}>
+                     <Link to="/user-settings-dashboard" onClick={closeSidebar}>
                        <div className="px-4 my-4">
-                         <li className={`group px-4 py-2   ${
-                       isActive("/hospital-settings-dashboard")
-                         ? "bg-[#0000FF] text-white"
-                         : "text-gray-700"
-                     } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
+                         <li
+                           className={`group px-4 py-2   ${
+                             isActive("/user-settings-dashboard")
+                               ? "bg-[#0000FF] text-white"
+                               : "text-gray-700"
+                           } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                         >
                            <span>
                              <svg
                                width="20"
@@ -146,7 +151,7 @@ const PatientsDashboard = () => {
                                fill="none"
                                xmlns="http://www.w3.org/2000/svg"
                                className={`group-hover:fill-white ${
-                                 isActive("/hospital-settings-dashboard")
+                                 isActive("/user-settings-dashboard")
                                    ? "fill-white"
                                    : "fill-[#647284]"
                                }`}
@@ -172,16 +177,13 @@ const PatientsDashboard = () => {
                          </li>
                        </div>
                      </Link>
-                     <Link
-                       to="/hospital-subscriptions-dashboard"
-                       onClick={closeSidebar}
-                     >
+                     <Link to="/user-subscriptions-dashboard" onClick={closeSidebar}>
                        <div className="px-4 my-4">
                          <li className={`group px-4 py-2   ${
-                       isActive("/hospital-subscriptions-dashboard")
-                         ? "bg-[#0000FF] text-white"
-                         : "text-gray-700"
-                     } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
+                             isActive("/user-subscriptions-dashboard")
+                               ? "bg-[#0000FF] text-white"
+                               : "text-gray-700"
+                           } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                            <span>
                              <svg
                                width="20"
@@ -190,15 +192,15 @@ const PatientsDashboard = () => {
                                fill="none"
                                xmlns="http://www.w3.org/2000/svg"
                                className={`group-hover:fill-white ${
-                                 isActive("/hospital-subscriptions-dashboard")
+                                 isActive("/user-subscriptions-dashboard")
                                    ? "fill-white"
                                    : "fill-[#647284]"
-                               }`} class="group-hover:fill-white"
+                               }`}
                              >
                                <path
                                  d="M2.50411 2.50244H17.5041C17.9644 2.50244 18.3375 2.87553 18.3375 3.33577V16.6691C18.3375 17.1293 17.9644 17.5024 17.5041 17.5024H2.50411C2.04388 17.5024 1.67078 17.1293 1.67078 16.6691V3.33577C1.67078 2.87553 2.04388 2.50244 2.50411 2.50244ZM3.33744 4.16911V15.8357H16.6708V4.16911H3.33744ZM7.08744 11.6691H11.6708C11.9009 11.6691 12.0875 11.4826 12.0875 11.2524C12.0875 11.0223 11.9009 10.8357 11.6708 10.8357H8.33746C7.18685 10.8357 6.25411 9.90307 6.25411 8.7524C6.25411 7.60184 7.18685 6.66911 8.33746 6.66911H9.17079V5.00244H10.8375V6.66911H12.9208V8.33573H8.33746C8.10733 8.33573 7.92078 8.52232 7.92078 8.7524C7.92078 8.98257 8.10733 9.16907 8.33746 9.16907H11.6708C12.8214 9.16907 13.7541 10.1018 13.7541 11.2524C13.7541 12.4031 12.8214 13.3357 11.6708 13.3357H10.8375V15.0024H9.17079V13.3357H7.08744V11.6691Z"
                                  className={`group-hover:fill-white ${
-                                   isActive("/hospital-subscriptions-dashboard")
+                                   isActive("/user-subscriptions-dashboard")
                                      ? "fill-white"
                                      : "fill-[#647284]"
                                  }`}
@@ -209,13 +211,13 @@ const PatientsDashboard = () => {
                          </li>
                        </div>
                      </Link>
-                     <Link to="/hospital-logout-dashboard" onClick={closeSidebar}>
+                     <Link to="/user-logout-dashboard" onClick={closeSidebar}>
                        <div className="px-4 my-4">
                          <li className={`group px-4 py-2   ${
-                       isActive("/hospital-logout-dashboard")
-                         ? "bg-[#0000FF] text-white"
-                         : "text-gray-700"
-                     } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
+                             isActive("/user-logout-dashboard")
+                               ? "bg-[#0000FF] text-white"
+                               : "text-gray-700"
+                           } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                            <svg
                              width="20"
                              height="20"
@@ -223,7 +225,7 @@ const PatientsDashboard = () => {
                              fill="none"
                              xmlns="http://www.w3.org/2000/svg"
                              className={`group-hover:fill-white ${
-                               isActive("/hospital-logout-dashboard")
+                               isActive("/user-logout-dashboard")
                                  ? "fill-white"
                                  : "fill-[#647284]"
                              }`}
@@ -231,7 +233,7 @@ const PatientsDashboard = () => {
                              <path
                                d="M3.33329 12.4998H4.99996V16.6665H15V3.33317H4.99996V7.49984H3.33329V2.49984C3.33329 2.0396 3.70639 1.6665 4.16663 1.6665H15.8333C16.2935 1.6665 16.6666 2.0396 16.6666 2.49984V17.4998C16.6666 17.9601 16.2935 18.3332 15.8333 18.3332H4.16663C3.70639 18.3332 3.33329 17.9601 3.33329 17.4998V12.4998ZM8.33329 9.1665V6.6665L12.5 9.99984L8.33329 13.3332V10.8332H1.66663V9.1665H8.33329Z"
                                className={`group-hover:fill-white ${
-                                 isActive("/hospital-logout-dashboard")
+                                 isActive("/user-logout-dashboard")
                                    ? "fill-white"
                                    : "fill-[#647284]"
                                }`}
@@ -247,56 +249,119 @@ const PatientsDashboard = () => {
         {/* Main Content */}
         <main className="flex-1">
           {/* Header */}
-          <DashHead isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} closeSidebar= {closeSidebar} />
+          <UserDashHead
+            isSidebarOpen={isSidebarOpen}
+            toggleSidebar={toggleSidebar}
+            closeSidebar={closeSidebar}
+          />
 
           {/* Content */}
-          <section className="p-8">
-            <div className="bg-white shadow-md rounded-md p-6">
-              <h3 className="text-lg font-semibold border-b pb-2">
-                Account Settings
-              </h3>
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div>
-                  <label className="block text-sm font-medium">
-                    Hospital Name
-                  </label>
-                  <p className="text-gray-700">Jarus Hospital</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">
-                    Email Address
-                  </label>
-                  <p className="text-gray-700">jarus@example.com</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">
-                    Number of Doctors
-                  </label>
-                  <p className="text-gray-700">10</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">
-                    Other Medical Personnel
-                  </label>
-                  <p className="text-gray-700">18</p>
-                </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium">
-                    Hospital Address
-                  </label>
-                  <p className="text-gray-700">
-                    No. 40 Health center street, off block road, Port Harcourt,
-                    Rivers State, Nigeria
-                  </p>
-                </div>
-              </div>
-              <div className="flex justify-end mt-6">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-md">
-                  Save changes
-                </button>
-                <button className="ml-4 bg-gray-300 px-4 py-2 rounded-md">
-                  Cancel changes
-                </button>
+          <section className="p-0 sm:p-8">
+            <div className="p-5 sm:p-0">
+              <p className="text-gray-500">Monday 25th, 2024</p>
+            </div>
+            <div className=" sm:border my-5 px-5 py-5 sm:rounded-3xl bg-white">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Data.map((data, index) => (
+                  <div
+                    key={index}
+                    className={`p-4 rounded-xl  ${
+                      index === 0
+                        ? "bg-[#F5F8F8]"
+                        : "bg-gradient-to-b from-[#ECFAFF] to-[#EEEEFD]"
+                    }`}
+                  >
+                    <div className="flex justify-between items-center ">
+                      <p
+                        className="text-sm text-gray-600"
+                        style={{
+                          color:
+                            index === 1 || index === 2 ? "#FE9000 " : "inherit",
+                          paddingBottom:
+                            index === 1 || index === 2 ? "10px" : "inherit",
+                        }}
+                      >
+                        {data.name}
+                      </p>
+                      {data.check === true ? (
+                        <i className="bx bx-check text-[#0000FF] text-2xl"></i>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                    <div className="pb-4">
+                      <p className="text-2xl font-semibold pb-1">
+                      ₦{data.amount}{" "}
+                        <span className="text-sm font-normal">
+                          /{data.duration}
+                        </span>
+                      </p>
+                      <p className="text-sm text-gray-600 leading-6">
+                        {data.details}
+                      </p>
+                    </div>
+                    <hr />
+                    <div className="py-5">
+                      <p className="flex items-center text-[12px]">
+                        {index === 0 || index === 2 ? (
+                          <i className="bx bx-check text-[#0000FF] text-2xl"></i>
+                        ) : data.smallcheck === true ? (
+                          <i className="bx bx-check text-[#0000FF] text-2xl"></i>
+                        ) : (
+                          <i className="bx bx-x text-2xl text-red-600"></i>
+                        )}
+                        {data.det1}
+                      </p>
+                      <p className="flex items-center text-[12px]">
+                        {data.smallcheck === true ? (
+                          <i className="bx bx-check text-[#0000FF] text-2xl"></i>
+                        ) : (
+                          <i className="bx bx-x text-2xl text-red-600"></i>
+                        )}
+                        {data.det2}
+                      </p>
+                      <p className="flex items-center text-[12px]">
+                        {index === 0 || index === 2 ? (
+                          <i className="bx bx-check text-[#0000FF] text-2xl"></i>
+                        ) : data.smallcheck === true ? (
+                          <i className="bx bx-check text-[#0000FF] text-2xl"></i>
+                        ) : (
+                          <i className="bx bx-x text-2xl text-red-600"></i>
+                        )}
+                        {data.det3}
+                      </p>
+                      <p className="flex items-center text-[12px]">
+                        {data.smallcheck === true ? (
+                          <i className="bx bx-check text-[#0000FF] text-2xl"></i>
+                        ) : (
+                          <i className="bx bx-x text-2xl text-red-600"></i>
+                        )}
+                        {data.det4}
+                      </p>
+                      <p className="flex items-center text-[12px]">
+                        {data.smallcheck === true ? (
+                          <i className="bx bx-check text-[#0000FF] text-2xl"></i>
+                        ) : (
+                          <i className="bx bx-x text-2xl text-red-600"></i>
+                        )}
+                        {data.det5}
+                      </p>
+                    </div>
+                    <div
+                      className={` rounded-full my-4 ${
+                        index === 0
+                          ? "font-semibold" // No background or border for the first div
+                          : index === 1
+                          ? "border border-[#0000FF] text-[#0000FF] font-semibold // Border for the second div"
+                          : "bg-[#0000FF] text-white font-semibold" // Background color and white text for the third div
+                      }`}
+                    >
+                      <div className="py-3">
+                        <p className="text-sm text-center">{data.button}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </section>
@@ -306,4 +371,4 @@ const PatientsDashboard = () => {
   );
 };
 
-export default PatientsDashboard;
+export default UserSubscriptionsDashboard;
