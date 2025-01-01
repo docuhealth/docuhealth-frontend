@@ -18,8 +18,11 @@ import FPU from "./User Login Page/Forget Password/FPU";
 import VerifyOTPUser from './User Login Page/Verify OTP/VerifyOTPUser'
 import NPU from "./User Login Page/NewPassword/NPU";
 import UserHomeDashboard from "./User Dashboard/UserHomeDashboard";
+import UserSubAcctDashboard from './User Dashboard/UserSubAcctDashboard'
+import UserSettingsDashboard from "./User Dashboard/UserSettingsDashboard";
 import UserSubscriptionsDashboard from "./User Dashboard/UserSubscriptionsDashboard";
 import UserLogoutDashboard from './User Dashboard/UserLogoutDasboard'
+
 
 function App() {
   return (
@@ -80,6 +83,12 @@ function App() {
 
         {/* Route for the User Home Dashboard Page */}
         <Route path="/user-home-dashboard" element={<UserHomeDashboard/>} />
+
+        {/* Route for the User Sub Account Dashboard Page */}
+        <Route path="/user-sub-account" element={<UserSubAcctDashboard/>} />
+
+        {/* Route for the User Settings Dashboard Page */}
+        <Route path="/user-settings-dashboard" element={<UserSettingsDashboard/>} />
 
         {/* Route for the User Subscription Dashboard Page */}
         <Route path="/user-subscriptions-dashboard" element={<UserSubscriptionsDashboard/>} />

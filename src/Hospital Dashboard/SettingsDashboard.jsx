@@ -175,17 +175,17 @@ const SettingsDashboard = () => {
               </div>
 
               {/* Buttons */}
-              <div className="flex flex-row-revers justify-start space-x-4">
+              <div className="flex flex-row justify-around sm:justify-start  space-x-4">
                 <button
                   type="submit"
-                  className="px-2 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
+                  className="px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
                 >
                   Save Changes
                 </button>
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="px-2 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
+                  className="px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
                 >
                   Cancel Changes
                 </button>
