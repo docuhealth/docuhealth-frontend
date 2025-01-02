@@ -70,7 +70,7 @@ const ULP = () => {
         {/* Left Side */}
         <div className="hidden sm:flex flex-1 min-h-screen  items-center justify-center ">
           <div
-            className="w-3/4"
+            className="w-3/4 py-10"
             id="temp"
             style={{ display: step === 1 ? "block" : "none" }}
           >
@@ -85,7 +85,7 @@ const ULP = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email Input */}
               <div className="relative">
-                <p className="font-semibold">Email :</p>
+                <p className="font-semibold pb-1">Email :</p>
                 <div className="relative">
                   <input
                     type="email"
@@ -99,7 +99,7 @@ const ULP = () => {
               </div>
 
               <div className="relative">
-                <p className="font-semibold">Phone Number (Mandantory) :</p>
+                <p className="font-semibold pb-1">Phone Number (Mandantory) :</p>
                 <div className="relative">
                   <input
                     type="number"
@@ -113,7 +113,7 @@ const ULP = () => {
 
               {/* Password Input */}
               <div className="relative">
-                <p className="font-semibold">Password:</p>
+                <p className="font-semibold pb-1">Password:</p>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -140,7 +140,7 @@ const ULP = () => {
 
               {/* Confirm Password Input */}
               <div className="relative">
-                <p className="font-semibold">Confirm Password:</p>
+                <p className="font-semibold pb-1">Confirm Password:</p>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -188,7 +188,7 @@ const ULP = () => {
           </div>
 
           <div
-            className="w-3/4"
+            className="w-3/4 py-10"
             id="temp"
             style={{ display: step === 2 ? "block" : "none" }}
           >
@@ -202,7 +202,7 @@ const ULP = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="relative">
-                <p className="font-semibold">
+                <p className="font-semibold pb-1">
                   Full Name (should correspond with NIN) :
                 </p>
                 <div className="relative">
@@ -217,7 +217,7 @@ const ULP = () => {
               </div>
 
               <div className="relative">
-                <p className="font-semibold">NIN:</p>
+                <p className="font-semibold pb-1">NIN:</p>
                 <div className="relative">
                   <input
                     type="number"
@@ -230,7 +230,7 @@ const ULP = () => {
               </div>
 
               <div className="relative">
-                <p className="font-semibold">Date Of Birth:</p>
+                <p className="font-semibold pb-1">Date Of Birth:</p>
                 <div className="relative">
                   <input
                     type="date"
@@ -242,7 +242,7 @@ const ULP = () => {
                 </div>
               </div>
               <div className="relative">
-              <p className="font-semibold">State Of Residence :</p>
+              <p className="font-semibold pb-1">State Of Residence :</p>
               <div className="relative w-full">
                 <select
                   className="border border-gray-300 px-4 py-2 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"

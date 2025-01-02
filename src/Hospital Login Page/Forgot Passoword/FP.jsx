@@ -38,7 +38,7 @@ const FP = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Email Input */}
                 <div className="relative">
-                  <p className="font-semibold">Hospital Email Address :</p>
+                  <p className="font-semibold pb-1">Hospital Email Address :</p>
                   <div className="relative">
                     <input
                       type="email"

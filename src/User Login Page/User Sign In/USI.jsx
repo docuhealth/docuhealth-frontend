@@ -144,7 +144,7 @@ const USI = () => {
                     <p className="text-center text-sm text-gray-600 mt-4">
                       Haven't Registered Yet?{" "}
                       <Link
-                        to="/user-login"
+                        to="/user-create-account"
                         className="text-[#0000FF] hover:underline"
                       >
                         Sign Up

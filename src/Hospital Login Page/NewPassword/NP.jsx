@@ -72,7 +72,7 @@ const NP = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Password Input */}
                 <div className="relative">
-                  <p className="font-semibold">Password:</p>
+                  <p className="font-semibold pb-1">Password:</p>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
@@ -99,7 +99,7 @@ const NP = () => {
 
                 {/* Confirm Password Input */}
                 <div className="relative">
-                  <p className="font-semibold">Confirm Password:</p>
+                  <p className="font-semibold pb-1">Confirm Password:</p>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}

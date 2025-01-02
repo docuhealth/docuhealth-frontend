@@ -93,7 +93,7 @@ const HLP = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email Input */}
               <div className="relative">
-                <p className="font-semibold">Email :</p>
+                <p className="font-semibold pb-1">Email :</p>
                 <div className="relative">
                   <input
                     type="email"
@@ -108,7 +108,7 @@ const HLP = () => {
 
               {/* Password Input */}
               <div className="relative">
-                <p className="font-semibold">Password:</p>
+                <p className="font-semibold pb-1">Password:</p>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -135,7 +135,7 @@ const HLP = () => {
 
               {/* Confirm Password Input */}
               <div className="relative">
-                <p className="font-semibold">Confirm Password:</p>
+                <p className="font-semibold pb-1">Confirm Password:</p>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -186,7 +186,7 @@ const HLP = () => {
           </div>
 
           <div
-            className="w-3/4"
+            className="w-3/4 py-10"
             id="temp"
             style={{ display: step === 2 ? "block" : "none" }}
           >
@@ -201,7 +201,7 @@ const HLP = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email Input */}
               <div className="relative">
-                <p className="font-semibold">Name Of Hospital :</p>
+                <p className="font-semibold pb-1">Name Of Hospital :</p>
                 <div className="relative">
                   <input
                     type="text"
@@ -214,7 +214,7 @@ const HLP = () => {
                 </div>
               </div>
               <div className="relative">
-                <p className="font-semibold">Hospital Address :</p>
+                <p className="font-semibold pb-1">Hospital Address :</p>
                 <div className="relative">
                   <input
                     type="text"
@@ -226,7 +226,7 @@ const HLP = () => {
                 </div>
               </div>
               <div className="relative">
-                <p className="font-semibold">Number Of Doctors :</p>
+                <p className="font-semibold pb-1">Number Of Doctors :</p>
                 <div className="relative">
                   <input
                     type="number"
@@ -238,7 +238,7 @@ const HLP = () => {
                 </div>
               </div>
               <div className="relative">
-                <p className="font-semibold">
+                <p className="font-semibold pb-1">
                   Number Of Other Medical Personnel :
                 </p>
                 <div className="relative">
