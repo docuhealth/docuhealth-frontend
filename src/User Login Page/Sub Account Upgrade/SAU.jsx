@@ -16,8 +16,18 @@ const SAU = () => {
 
   const [notificationVisible, setNotificationVisible] = useState(false);
 
+  const isFormValid = name && nin && email && number && password;
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!name || !nin || !email || !number || !password) {
+      setError("All fields must be filled before submission.");
+      return;
+    }
+
+    setError("");
+
     console.log(email, password, number, name, nin);
     setEmail("");
     setPassword("");
@@ -49,7 +59,8 @@ const SAU = () => {
             </div>
             <h2 className="text-2xl font-bold mb-2 "> Account Upgrade</h2>
             <p className="text-gray-600  mb-6">
-            Simply upgrade this account to a standard with the necessary information below
+              Simply upgrade this account to a standard with the necessary
+              information below
             </p>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="relative">
@@ -105,48 +116,50 @@ const SAU = () => {
                     onChange={(e) => setNumber(e.target.value)}
                     required
                   />
-              </div>
+                </div>
 
                 {/* Password Input */}
-                
               </div>
 
               <div className="relative">
-                  <p className="font-semibold pb-1">Password:</p>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      placeholder=""
-                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                    <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute top-1/2 right-3 transform -translate-y-1/2"
-                    >
-                      {showPassword ? (
-                        <FaEyeSlash className="h-4 w-4 text-gray-400" />
-                      ) : (
-                        <FaEye className="h-4 w-4 text-gray-400" />
-                      )}
-                    </button>
-                  </div>
+                <p className="font-semibold pb-1">Password:</p>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder=""
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <FaEye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
                 </div>
+              </div>
               {/* Error Message */}
               {error && <p className="text-red-500 text-sm">{error}</p>}
 
-              {/* Move to next step button */}
               <button
-                type="button"
-                onClick={handleSubmit}
-                className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
-              >
-                Upgrade Now
-              </button>
+                  type="submit"
+                  className={`w-full py-3 rounded-full ${
+                    isFormValid
+                      ? "bg-[#0000FF] text-white hover:bg-blue-700"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
+                  disabled={!isFormValid}
+                >
+                  Upgrade Now
+                </button>
             </form>
           </div>
         </div>
@@ -211,61 +224,50 @@ const SAU = () => {
       )}
       {notificationVisible && (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div
-            className="fixed bottom-0 left-0 right-0 bg-white text-black py-4 rounded-t-3xl shadow-md animate-slide-up 
-                    min-h-screen max-h-screen overflow-y-auto"
-          >
-            <div className="flex justify-center items-center gap-1 pb-4">
-              <div>
-                <img src={logo} alt="DocuHealth Logo" />
+          <div className="fixed bottom-0 left-0 right-0 bg-white text-black py-4 rounded-t-3xl shadow-md animate-slide-up">
+            <div className="flex justify-center items-center px-5 pb-4">
+              <div className="flex items-center gap-1">
+                <img src={logo} alt="DocuHealth Logo" className="h-8" />
+                <h1 className="text-[#0000FF] text-3xl font-bold">
+                  DocuHealth
+                </h1>
               </div>
-              <h1 className="text-[#0000FF] text-3xl font-bold">DocuHealth</h1>
             </div>
-            <div className="px-5" id="temp">
-              <h2 className="text-xl sm:text-2xl mb-1"> Account Upgrade</h2>
+
+            <div className="px-5">
+              <h2 className="text-xl sm:text-2xl mb-2">Upgrade Your Account</h2>
               <p className="text-gray-600 mb-6">
-                Simply upgrade this account to a standard with the necessary
-                information below
+                Fill in all details correctly before proceeding.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Full Name */}
                 <div className="relative">
-                  <p className="font-semibold pb-1">
-                    Full Name (should correspond with existing name) :
-                  </p>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                  </div>
+                  <p className="font-semibold pb-1">Full Name:</p>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
                 </div>
+
+                {/* NIN */}
                 <div className="relative">
                   <p className="font-semibold pb-1">NIN:</p>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                      value={nin}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value.length <= 20) {
-                          setNin(value);
-                        }
-                      }}
-                      required
-                      minLength={20}
-                      maxLength={20}
-                      min="10000000000000000000" // Minimum number with 20 digits
-                      max="99999999999999999999" // Maximum number with 20 digits
-                    />
-                  </div>
+                  <input
+                    type="number"
+                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500"
+                    value={nin}
+                    onChange={(e) => setNin(e.target.value)}
+                    required
+                  />
                 </div>
+
+                {/* Email */}
                 <div className="relative">
-                  <p className="font-semibold pb-1">Email :</p>
+                  <p className="font-semibold pb-1">Email:</p>
                   <div className="relative">
                     <input
                       type="email"
@@ -277,32 +279,25 @@ const SAU = () => {
                     <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   </div>
                 </div>
+
+                {/* Phone Number */}
                 <div className="relative">
-                  <p className="font-semibold pb-1">Phone Number (Mandantory) :</p>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                      value={number}
-                      onChange={(e) => {
-                        const value = setNumber(e.target.value);
-                      
-                      }}
-                      required
-                      minLength={11}
-                      maxLength={12}
-                      min="11111111111" // Minimum number with 11 digits
-                      max="999999999999" // Maximum number with 11 digits
-                    />
-                  </div>
+                  <p className="font-semibold pb-1">Phone Number:</p>
+                  <input
+                    type="number"
+                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500"
+                    value={number}
+                    onChange={(e) => setNumber(e.target.value)}
+                    required
+                  />
                 </div>
 
+                {/* Password */}
                 <div className="relative">
-                  <p className="font-semibold">Password:</p>
+                  <p className="font-semibold pb-1">Password:</p>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
-                      placeholder=""
                       className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -326,12 +321,16 @@ const SAU = () => {
                 {/* Error Message */}
                 {error && <p className="text-red-500 text-sm">{error}</p>}
 
-                {/* Move to next step button */}
                 <button
-                    onClick={handleSubmit}
-                  className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
+                  type="submit"
+                  className={`w-full py-3 rounded-full ${
+                    isFormValid
+                      ? "bg-[#0000FF] text-white hover:bg-blue-700"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
+                  disabled={!isFormValid}
                 >
-                  Upgrade now
+                  Upgrade Now
                 </button>
               </form>
             </div>
