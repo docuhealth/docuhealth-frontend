@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import UserDashHead from "./Dashboard Part/UserDashHead";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
@@ -7,7 +7,8 @@ const UserHomeDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
 
-  const isActive = (path = "/user-home-dashboard") => location.pathname === path;
+  const isActive = (path = "/user-home-dashboard") =>
+    location.pathname === path;
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -16,6 +17,33 @@ const UserHomeDashboard = () => {
   const closeSidebar = () => {
     setIsSidebarOpen(false);
   };
+
+  const [noticeDisplay, setNoticeDisplay] = useState(false);
+
+  useEffect(() => {
+    // Show notice immediately when the dashboard loads
+    setNoticeDisplay(true);
+
+    // Then show the notice every 24 hours (1 day)
+    const interval = setInterval(() => {
+      setNoticeDisplay(true);
+    }, 86400000); // 86,400,000 ms = 24 hours
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, []);
+
+  const closeNoticeMessage = () => {
+    setNoticeDisplay(false);
+  };
+
+  const noticeMessage = [
+    {
+      title: "Health Identification Number (HIN)",
+      details:
+        "Your Health Identification Number (HIN) is your personal information which can be accessed by you alone on your dashboard. Protect it at all cost because it is the key to easily accessing your medical history. Dont share it with anyone except with a trusted medical personnel.",
+      by: "Docu Health (admin)",
+    },
+  ];
   return (
     <div>
       <div className="min-h-screen bg-gray-100 flex">
@@ -177,11 +205,13 @@ const UserHomeDashboard = () => {
               </Link>
               <Link to="/user-subscriptions-dashboard" onClick={closeSidebar}>
                 <div className="px-4 my-4">
-                  <li className={`group px-4 py-2   ${
+                  <li
+                    className={`group px-4 py-2   ${
                       isActive("/user-subscriptions-dashboard")
                         ? "bg-[#0000FF] text-white"
                         : "text-gray-700"
-                    } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
+                    } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                  >
                     <span>
                       <svg
                         width="20"
@@ -211,11 +241,13 @@ const UserHomeDashboard = () => {
               </Link>
               <Link to="/user-logout-dashboard" onClick={closeSidebar}>
                 <div className="px-4 my-4">
-                  <li className={`group px-4 py-2   ${
+                  <li
+                    className={`group px-4 py-2   ${
                       isActive("/user-logout-dashboard")
                         ? "bg-[#0000FF] text-white"
                         : "text-gray-700"
-                    } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
+                    } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                  >
                     <svg
                       width="20"
                       height="20"
@@ -256,6 +288,37 @@ const UserHomeDashboard = () => {
 
           {/* Content */}
           <section className="p-8">
+            {noticeDisplay && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative max-h-[80vh] overflow-y-auto">
+                  {noticeMessage.map((message, index) => (
+                    <div key={index} className="">
+                      {" "}
+                      <div className="flex justify-between items-center gap-2 pb-2">
+                        <div className="flex justify-start items-center gap-2 ">
+                          <p>
+                            <i className="bx bx-info-circle text-3xl"></i>
+                          </p>
+                          <p className="font-semibold">Health Identification <br /> Number (HIN)</p>
+                        </div>
+                        <div>
+                        <i class='bx bx-x text-2xl cursor-pointer' onClick={closeNoticeMessage}></i>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600 pb-4">
+                          {message.details}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-normal">{message.by}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="bg-white shadow-md rounded-md p-6">
               <h3 className="text-lg font-semibold border-b pb-2">
                 Account Settings

@@ -57,14 +57,64 @@ const UserSubAcctDashboard = () => {
   };
 
   const [subAccounts, setSubAccounts] = useState([]);
+  const [error, SetError] = useState(false);
 
   useEffect(() => {
     // Fetch data from JSON file
     fetch("data.json")
       .then((response) => response.json())
       .then((data) => setSubAccounts(data))
-      .catch((error) => console.error("Error fetching data:", error));
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        SetError(true);
+      });
   }, []);
+
+  const [noticeDisplay, setNoticeDisplay] = useState(false);
+
+  useEffect(() => {
+    // Show notice immediately when the dashboard loads
+    setNoticeDisplay(true);
+
+    // Then show the notice every 24 hours (1 day)
+    const interval = setInterval(() => {
+      setNoticeDisplay(true);
+    }, 86400000); // 86,400,000 ms = 24 hours
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, []);
+
+  const closeNoticeMessageToCreateAcct = () => {
+    setNoticeDisplay(false);
+    setShowOverlay(true);
+  }
+    const closeNoticeMessage = () => {
+    setNoticeDisplay(false);
+  }
+
+
+  const noticeMessage = [
+    {
+      title: "Sub Account",
+      instruction: "Read about the sub account feature below",
+      benefitTitle: "Benefits of SUB Account :",
+      benefit1:
+        "Store and track your child's medical history, including vaccinations, allergies, and illnesses.",
+      benefit2:
+        " Easily access and share medical information with healthcare providers.",
+      benefit3:
+        " Transfer ownership to your child when they turn 18 and obtain their National Identification Number (NIN) with all their medical records/history intact and safe.",
+      workTitle: "How it Works:",
+      work1:
+        " Create a SUB account for your child, providing their basic information.",
+      work2:
+        " View and easily get access to all of  their medical information when needed.",
+      work3:
+        "  When your child turns 18 and obtains their NIN, they can take ownership of their account and manage their own medical information.",
+      lastMessage:
+        "By using our SUB account feature, you can ensure your child's medical history is accurate, up-to-date, and easily accessible – giving you peace of mind and empowering your child to take control of their health as they grow older.",
+    },
+  ];
 
   return (
     <div>
@@ -309,7 +359,7 @@ const UserSubAcctDashboard = () => {
           />
 
           {/* Content */}
-          <section className="pt-6 px-8 ">
+          <section className="pt-6 px-8 w-full relative bg-white shadow min-h-screen">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-10">
               <div className="pb-3 sm:p-0 w-full sm:w-auto">
                 <p className="text-gray-500">Monday 25th, 2024</p>
@@ -424,10 +474,52 @@ const UserSubAcctDashboard = () => {
               </div>
             )}
 
-            {/* <div className="py-8 px-6 border rounded-2xl">
+{noticeDisplay && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full relative max-h-[80vh] overflow-y-auto">
+      {noticeMessage.map((message, index) => (
+        <div key={index} className="">
+          <div className="flex justify-start items-center gap-2 pb-1">
+            <p><i className='bx bx-info-circle text-3xl'></i></p>
+            <p className="font-semibold">{message.benefitTitle}</p>
+          </div>
+          <div className="pb-3">
+            <p className="text-sm font-medium">{message.instruction}</p>
+          </div>
+          <div className="text-sm text-gray-600 pb-4">
+            <p className="pb-1">{message.benefitTitle}</p>
+            <p className="pb-1">- {message.benefit1}</p>
+            <p className="pb-1">- {message.benefit2}</p>
+            <p className="pb-1">- {message.benefit3}</p>
+          </div>
+          <div className="text-sm text-gray-600 pb-4">
+            <p className="pb-1">{message.workTitle}</p>
+            <p className="pb-1">1 {message.work1}</p>
+            <p className="pb-1">2 {message.work2}</p>
+            <p className="pb-1">3 {message.work3}</p>
+          </div>
+          <p className="pb-4">
+            <p className="text-sm text-gray-600">{message.lastMessage}</p>
+          </p>
+          <div className="text-sm flex justify-start items-center gap-4">
+              <button className="bg-[#0000FF] text-white py-2 px-3 rounded-full" onClick={closeNoticeMessageToCreateAcct}>
+                Create a sub account 
+              </button>
+              <button className="border border-[#0000FF] text-[#0000FF] py-2 px-3 rounded-full" onClick={closeNoticeMessage}>
+                Close
+              </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+
+            <div className=" hidden sm:block py-8 px-6 border rounded-2xl">
               <h1 className="text-xl font-semibold mb-4">Sub-Accounts</h1>
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
+              <div className="">
+                <table className="min-w-full ">
                   <thead className="text-left text-gray-500 ">
                     <tr>
                       <th className="px-4 py-2 font-normal">Name</th>
@@ -437,6 +529,7 @@ const UserSubAcctDashboard = () => {
                       <th className="px-4 py-2 font-normal">Date Created</th>
                     </tr>
                   </thead>
+
                   <tbody>
                     {subAccounts.map((account, index) => (
                       <tr key={index}>
@@ -460,8 +553,46 @@ const UserSubAcctDashboard = () => {
                     ))}
                   </tbody>
                 </table>
+                {error === true && (
+                  <p className="text-center py-10 text-red-700 font-semibold">
+                    {" "}
+                    Error Fetching Data
+                  </p>
+                )}
               </div>
-            </div> */}
+            </div>
+
+            <div className=" py-5 border-t-2 sm:hidden">
+              <p className="font-semibold">Sub accounts</p>
+              {subAccounts.map((account, index) => (
+                <div key={index} className="bg-white shadow px-4 py-2 my-3">
+                  <div className=" flex justify-between items-center py-3 ">
+                    <p>HIN : {account.HIN}</p>
+                    <p>
+                      <i className="bx bx-dots-vertical-rounded"></i>
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-5 py-3">
+                    <div className="flex flex-col">
+                      <p className="text-gray-500">Name</p>
+                      <p>{account.name}</p>
+                    </div>
+                    <div className="flex flex-col">
+                      <p className="text-gray-500">Date Of Birth</p>
+                      <p>{account.dateOfBirth}</p>
+                    </div>
+                    <div className="flex flex-col">
+                      <p className="text-gray-500">Sex</p>
+                      <p>{account.sex}</p>
+                    </div>
+                    <div className="flex flex-col">
+                      <p className="text-gray-500">Name</p>
+                      <p>{account.dateCreated}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </section>
         </main>
       </div>

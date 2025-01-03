@@ -10,3 +10,10 @@
     box-sizing: border-box;
     font-family: "Montserrat", serif;
 }
+
+.table-container {
+    overflow: hidden; /* Prevents overflow */
+    width: 100%;      /* Fits the container to the page */
+    position: relative;
+     
+  }

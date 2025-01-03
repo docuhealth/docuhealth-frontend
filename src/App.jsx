@@ -19,6 +19,7 @@ import VerifyOTPUser from './User Login Page/Verify OTP/VerifyOTPUser'
 import NPU from "./User Login Page/NewPassword/NPU";
 import UserHomeDashboard from "./User Dashboard/UserHomeDashboard";
 import UserSubAcctDashboard from './User Dashboard/UserSubAcctDashboard'
+import SAU from "./User Login Page/Sub Account Upgrade/SAU";
 import UserSettingsDashboard from "./User Dashboard/UserSettingsDashboard";
 import UserSubscriptionsDashboard from "./User Dashboard/UserSubscriptionsDashboard";
 import UserLogoutDashboard from './User Dashboard/UserLogoutDasboard'
@@ -87,6 +88,9 @@ function App() {
         {/* Route for the User Sub Account Dashboard Page */}
         <Route path="/user-sub-account" element={<UserSubAcctDashboard/>} />
 
+        {/* Route for the User Sub Account Upgrade Page */}
+        <Route path="/user-sub-account-upgrade" element={<SAU/>} />
+
         {/* Route for the User Settings Dashboard Page */}
         <Route path="/user-settings-dashboard" element={<UserSettingsDashboard/>} />
 
@@ -95,6 +99,7 @@ function App() {
 
         {/* Route for the User Logout Dashboard Page */}
         <Route path="/user-logout-dashboard" element={< UserLogoutDashboard />} />
+
 
         {/* Catch-all route for unmatched paths */}
         <Route path="*" element={<NotFound />} />
