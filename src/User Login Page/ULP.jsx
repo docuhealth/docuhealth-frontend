@@ -510,7 +510,7 @@ const ULP = () => {
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Email Input */}
+              
                 <div className="relative">
                   <p className="font-semibold">
                     Full Name (should correspond with NIN) :

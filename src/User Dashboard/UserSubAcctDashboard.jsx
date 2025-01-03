@@ -87,11 +87,16 @@ const UserSubAcctDashboard = () => {
   const closeNoticeMessageToCreateAcct = () => {
     setNoticeDisplay(false);
     setShowOverlay(true);
-  }
-    const closeNoticeMessage = () => {
+  };
+  const closeNoticeMessage = () => {
     setNoticeDisplay(false);
-  }
+  };
 
+  const [openPopover, setOpenPopover] = useState(null);
+
+  const togglePopover = (index) => {
+    setOpenPopover(openPopover === index ? null : index);
+  };
 
   const noticeMessage = [
     {
@@ -474,53 +479,64 @@ const UserSubAcctDashboard = () => {
               </div>
             )}
 
-{noticeDisplay && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full relative max-h-[80vh] overflow-y-auto">
-      {noticeMessage.map((message, index) => (
-        <div key={index} className="">
-          <div className="flex justify-start items-center gap-2 pb-1">
-            <p><i className='bx bx-info-circle text-3xl'></i></p>
-            <p className="font-semibold">{message.benefitTitle}</p>
-          </div>
-          <div className="pb-3">
-            <p className="text-sm font-medium">{message.instruction}</p>
-          </div>
-          <div className="text-sm text-gray-600 pb-4">
-            <p className="pb-1">{message.benefitTitle}</p>
-            <p className="pb-1">- {message.benefit1}</p>
-            <p className="pb-1">- {message.benefit2}</p>
-            <p className="pb-1">- {message.benefit3}</p>
-          </div>
-          <div className="text-sm text-gray-600 pb-4">
-            <p className="pb-1">{message.workTitle}</p>
-            <p className="pb-1">1 {message.work1}</p>
-            <p className="pb-1">2 {message.work2}</p>
-            <p className="pb-1">3 {message.work3}</p>
-          </div>
-          <p className="pb-4">
-            <p className="text-sm text-gray-600">{message.lastMessage}</p>
-          </p>
-          <div className="text-sm flex justify-start items-center gap-4">
-              <button className="bg-[#0000FF] text-white py-2 px-3 rounded-full" onClick={closeNoticeMessageToCreateAcct}>
-                Create a sub account 
-              </button>
-              <button className="border border-[#0000FF] text-[#0000FF] py-2 px-3 rounded-full" onClick={closeNoticeMessage}>
-                Close
-              </button>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+            {noticeDisplay && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full relative max-h-[80vh] overflow-y-auto">
+                  {noticeMessage.map((message, index) => (
+                    <div key={index} className="">
+                      <div className="flex justify-start items-center gap-2 pb-1">
+                        <p>
+                          <i className="bx bx-info-circle text-3xl"></i>
+                        </p>
+                        <p className="font-semibold">{message.benefitTitle}</p>
+                      </div>
+                      <div className="pb-3">
+                        <p className="text-sm font-medium">
+                          {message.instruction}
+                        </p>
+                      </div>
+                      <div className="text-sm text-gray-600 pb-4">
+                        <p className="pb-1">{message.benefitTitle}</p>
+                        <p className="pb-1">- {message.benefit1}</p>
+                        <p className="pb-1">- {message.benefit2}</p>
+                        <p className="pb-1">- {message.benefit3}</p>
+                      </div>
+                      <div className="text-sm text-gray-600 pb-4">
+                        <p className="pb-1">{message.workTitle}</p>
+                        <p className="pb-1">1 {message.work1}</p>
+                        <p className="pb-1">2 {message.work2}</p>
+                        <p className="pb-1">3 {message.work3}</p>
+                      </div>
+                      <p className="pb-4">
+                        <p className="text-sm text-gray-600">
+                          {message.lastMessage}
+                        </p>
+                      </p>
+                      <div className="text-sm flex justify-start items-center gap-4">
+                        <button
+                          className="bg-[#0000FF] text-white py-2 px-3 rounded-full"
+                          onClick={closeNoticeMessageToCreateAcct}
+                        >
+                          Create a sub account
+                        </button>
+                        <button
+                          className="border border-[#0000FF] text-[#0000FF] py-2 px-3 rounded-full"
+                          onClick={closeNoticeMessage}
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-
-            <div className=" hidden sm:block py-8 px-6 border rounded-2xl">
+            <div className="hidden sm:block py-8 px-6 border rounded-2xl">
               <h1 className="text-xl font-semibold mb-4">Sub-Accounts</h1>
-              <div className="">
-                <table className="min-w-full ">
-                  <thead className="text-left text-gray-500 ">
+              <div className="relative">
+                <table className="min-w-full">
+                  <thead className="text-left text-gray-500">
                     <tr>
                       <th className="px-4 py-2 font-normal">Name</th>
                       <th className="px-4 py-2 font-normal">HIN</th>
@@ -532,7 +548,7 @@ const UserSubAcctDashboard = () => {
 
                   <tbody>
                     {subAccounts.map((account, index) => (
-                      <tr key={index}>
+                      <tr key={index} className="relative">
                         <td className="border-b border-gray-300 px-4 pb-3 pt-3">
                           {account.name}
                         </td>
@@ -545,17 +561,41 @@ const UserSubAcctDashboard = () => {
                         <td className="border-b border-gray-300 px-4 pb-3 pt-3">
                           {account.sex}
                         </td>
-                        <td className="border-b border-gray-300 px-4 pb-3 pt-3">
-                          {account.dateCreated}{" "}
-                          <i className="bx bx-dots-vertical-rounded"></i>
+                        <td className="border-b border-gray-300 px-4 pb-3 pt-3 relative">
+                          {account.dateCreated}
+                          <i
+                            className={`bx bx-dots-vertical-rounded ml-3  p-2 ${
+                              openPopover === index
+                                ? "bg-slate-300 p-2 rounded-full"
+                                : ""
+                            }`}
+                            onClick={() => togglePopover(index)}
+                          ></i>
+
+                          {openPopover === index && (
+                            <div className="absolute right-0 mt-2 bg-white border shadow-md rounded-lg p-2 w-52 text-center z-30">
+                              <Link to="">
+                                <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer">
+                                  Check Medical History
+                                </p>
+                              </Link>
+
+                              <Link to="/user-sub-account-upgrade">
+                                {" "}
+                                <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer">
+                                  Upgrade Sub Account
+                                </p>
+                              </Link>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+
                 {error === true && (
                   <p className="text-center py-10 text-red-700 font-semibold">
-                    {" "}
                     Error Fetching Data
                   </p>
                 )}
@@ -566,11 +606,34 @@ const UserSubAcctDashboard = () => {
               <p className="font-semibold">Sub accounts</p>
               {subAccounts.map((account, index) => (
                 <div key={index} className="bg-white shadow px-4 py-2 my-3">
-                  <div className=" flex justify-between items-center py-3 ">
+                  <div className=" flex justify-between items-center py-3 relative ">
                     <p>HIN : {account.HIN}</p>
                     <p>
-                      <i className="bx bx-dots-vertical-rounded"></i>
+                    <i
+                            className={`bx bx-dots-vertical-rounded ml-3  p-2 ${
+                              openPopover === index
+                                ? "bg-slate-300 p-2 rounded-full"
+                                : ""
+                            }`}
+                            onClick={() => togglePopover(index)}
+                          ></i>
                     </p>
+                    {openPopover === index && (
+                      <div className="absolute right-0 top-10  mt-2 bg-white border shadow-md rounded-lg p-2 w-52 text-center z-30">
+                        <Link to="">
+                          <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer">
+                            Check Medical History
+                          </p>
+                        </Link>
+
+                        <Link to="/user-sub-account-upgrade">
+                          {" "}
+                          <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer">
+                            Upgrade Sub Account
+                          </p>
+                        </Link>
+                      </div>
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-5 py-3">
                     <div className="flex flex-col">
