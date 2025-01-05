@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 
-const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-
-  const togglePopover = () => {
-    setIsPopoverOpen(!isPopoverOpen);
-  };
+const AdminHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+    
+      const togglePopover = () => {
+        setIsPopoverOpen(!isPopoverOpen);
+      };
   return (
     <div>
-      {/* Header */}
+        {/* Header */}
       <header className="hidden bg-white py-4 px-8 sm:flex justify-between items-center border">
         <h2 className="text-xl font-semibold">
           Welcome back Jarus Hospital! 👋
@@ -29,8 +29,8 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
               />
             </div>
             <div className="flex flex-col items-start">
-              <p className="ml-2 text-sm font-medium">Jarus Hospital</p>
-              <p className="ml-2 text-sm text-gray-500">Worker</p>
+              <p className="ml-2 text-sm font-medium">Ameifa Obed</p>
+              <p className="ml-2 text-sm text-gray-500">Admin</p>
             </div>
           </div>
         </div>
@@ -79,7 +79,7 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
                   Jarus Hospital
                 </li>
                 <li className="pb-1 px-3 hover:bg-gray-100 cursor-pointer">
-                  Worker
+                  Admin
                 </li>
               </ul>
             </div>
@@ -87,7 +87,7 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
         </div>
       </header>
     </div>
-  );
-};
+  )
+}
 
-export default DashHead;
+export default AdminHead

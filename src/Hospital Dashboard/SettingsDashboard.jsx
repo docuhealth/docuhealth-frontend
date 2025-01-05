@@ -393,7 +393,7 @@ const SettingsDashboard = () => {
             <div className="max-w-[300px]">
               <h3 className="pb-1 font-semibold">Accont Information Changes</h3>
               <p className="text-sm">
-                You'll get notified when an account information is updated int
+                You'll get notified when an account information is updated in
                 the dashboard
               </p>
             </div>

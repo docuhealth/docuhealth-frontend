@@ -23,6 +23,12 @@ import SAU from "./User Login Page/Sub Account Upgrade/SAU";
 import UserSettingsDashboard from "./User Dashboard/UserSettingsDashboard";
 import UserSubscriptionsDashboard from "./User Dashboard/UserSubscriptionsDashboard";
 import UserLogoutDashboard from './User Dashboard/UserLogoutDasboard'
+import AdminHomeDashboard from "./Admin Dashboard/AdminHomeDashboard";
+import AdminUsersDashboard from './Admin Dashboard/AdminUsersDashboard'
+import AdminSettingsDashboard from './Admin Dashboard/AdminSettingsDashboard'
+import AdminSubscriptionDashboard from './Admin Dashboard/AdminSubscriptionsdashboard'
+import AdminLogoutDashboard from "./Admin Dashboard/AdminLogoutDashboard";
+
 
 
 function App() {
@@ -99,6 +105,22 @@ function App() {
 
         {/* Route for the User Logout Dashboard Page */}
         <Route path="/user-logout-dashboard" element={< UserLogoutDashboard />} />
+
+
+        {/* Route for the Admin Home Dashboard Page */}
+        <Route path="/admin-home-dashboard" element={< AdminHomeDashboard />} />
+        
+        {/* Route for the Admin Users Dashboard Page */}
+        <Route path="/admin-users-dashboard" element={< AdminUsersDashboard />} />
+
+        {/* Route for the Admin Settings Dashboard Page */}
+        <Route path="/admin-settings-dashboard" element={< AdminSettingsDashboard />} />
+
+        {/* Route for the Admin Subscriptions Dashboard Page */}
+        <Route path="/admin-subscriptions-dashboard" element={< AdminSubscriptionDashboard />} />
+
+        {/* Route for the Admin Logout Dashboard Page */}
+        <Route path="/admin-logout-dashboard" element={< AdminLogoutDashboard />} />
 
 
         {/* Catch-all route for unmatched paths */}
