@@ -27,7 +27,7 @@ import AdminHomeDashboard from "./Admin Dashboard/AdminHomeDashboard";
 import AdminUsersDashboard from './Admin Dashboard/AdminUsersDashboard'
 import AdminSettingsDashboard from './Admin Dashboard/AdminSettingsDashboard'
 import AdminSubscriptionDashboard from './Admin Dashboard/AdminSubscriptionsdashboard'
-import AdminLogoutDashboard from "./Admin Dashboard/AdminLogoutDashboard";
+import AdminLogoutDashboard from "./Admin Dashboard/AdminLogOutDashboard";
 
 
 
