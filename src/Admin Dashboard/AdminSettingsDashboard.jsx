@@ -451,7 +451,7 @@ const AdminSettingsDashboard = () => {
           <div className="p-4 flex justify-between items-center  ">
             <div className="flex justify-start items-start gap-2">
               <img src={logo} alt="" />
-              <h1 className="text-xl font-bold text-blue-600">DocuHealth</h1>
+              <h1 className="text-xl font-bold text-blue-600">DocHealth</h1>
             </div>
             <div className=" sm:hidden " onClick={closeSidebar}>
               <svg
