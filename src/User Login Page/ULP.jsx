@@ -14,7 +14,7 @@ const ULP = () => {
   const [step, setStep] = useState(1); // To manage steps
 
   const [name, setName] = useState("");
-  const [nin, setNin] = useState("");
+  const [sex, setSex] = useState("");
   const [dob, setDob] = useState("");
   const [sor, setSor] = useState("");
 
@@ -42,7 +42,7 @@ const ULP = () => {
     setConfirmPassword("");
     setDob("");
     setName("");
-    setNin("");
+    setSex("");
     setSor("");
     setnotification(true);
     setNotificationVisible(false);
@@ -99,7 +99,9 @@ const ULP = () => {
               </div>
 
               <div className="relative">
-                <p className="font-semibold pb-1">Phone Number (Mandantory) :</p>
+                <p className="font-semibold pb-1">
+                  Phone Number (Mandantory) :
+                </p>
                 <div className="relative">
                   <input
                     type="number"
@@ -217,19 +219,6 @@ const ULP = () => {
               </div>
 
               <div className="relative">
-                <p className="font-semibold pb-1">NIN:</p>
-                <div className="relative">
-                  <input
-                    type="number"
-                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                    value={nin}
-                    onChange={(e) => setNin(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="relative">
                 <p className="font-semibold pb-1">Date Of Birth:</p>
                 <div className="relative">
                   <input
@@ -242,40 +231,75 @@ const ULP = () => {
                 </div>
               </div>
               <div className="relative">
-              <p className="font-semibold pb-1">State Of Residence :</p>
-              <div className="relative w-full">
-                <select
-                  className="border border-gray-300 px-4 py-2 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
-                  value={sor}
-                  onChange={(e) => setSor(e.target.value)}
-                  required
-                >
-                  <option value=""> Select your State</option>
-                  <option value="Ibadan">Ibadan</option>
+                <p className="font-semibold pb-1">State Of Residence :</p>
+                <div className="relative w-full">
+                  <select
+                    className="border border-gray-300 px-4 py-3 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                    value={sor}
+                    onChange={(e) => setSor(e.target.value)}
+                    required
+                  >
+                    <option value=""> Select your State</option>
+                    <option value="Ibadan">Ibadan</option>
                     <option value="Ekiti">Ekiti</option>
                     <option value="Lagos">Lagos</option>
                     <option value="Abeokuta">Abeokuta</option>
                     <option value="Abuja">Abuja</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <svg
-                    className="w-4 h-4 text-gray-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg
+                      className="w-4 h-4 text-gray-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
                 </div>
               </div>
+
+              <div className="relative">
+                <p className="font-semibold pb-1">Sex:</p>
+                <div className="relative">
+                  <select
+                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+                    value={sex}
+                    onChange={(e) => setSex(e.target.value)}
+                    required
+                  >
+                    <option value="" disabled>
+                      Select Sex
+                    </option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+
+                  {/* Custom dropdown arrow */}
+                  <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                    <svg
+                      className="w-5 h-5 text-gray-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
               </div>
-             
 
               {/* Error Message */}
               {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -510,7 +534,6 @@ const ULP = () => {
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-              
                 <div className="relative">
                   <p className="font-semibold">
                     Full Name (should correspond with NIN) :
@@ -526,7 +549,7 @@ const ULP = () => {
                   </div>
                 </div>
 
-                <div className="relative">
+                {/* <div className="relative">
                   <p className="font-semibold">NIN:</p>
                   <div className="relative">
                     <input
@@ -546,7 +569,7 @@ const ULP = () => {
                       max="99999999999999999999" // Maximum number with 20 digits
                     />
                   </div>
-                </div>
+                </div> */}
 
                 <div className="relative">
                   <p className="font-semibold">Date Of Birth:</p>
@@ -562,41 +585,75 @@ const ULP = () => {
                 </div>
 
                 <div className="relative">
-              <p className="font-semibold">State Of Residence :</p>
-              <div className="relative w-full">
-                <select
-                  className="border border-gray-300 px-4 py-2 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
-                  value={sor}
-                  onChange={(e) => setSor(e.target.value)}
-                  required
-                >
-                  <option value=""> Select your State</option>
-                  <option value="Ibadan">Ibadan</option>
-                    <option value="Ekiti">Ekiti</option>
-                    <option value="Lagos">Lagos</option>
-                    <option value="Abeokuta">Abeokuta</option>
-                    <option value="Abuja">Abuja</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <svg
-                    className="w-4 h-4 text-gray-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                  <p className="font-semibold">State Of Residence :</p>
+                  <div className="relative w-full">
+                    <select
+                      className="border border-gray-300 px-4 py-3 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                      value={sor}
+                      onChange={(e) => setSor(e.target.value)}
+                      required
+                    >
+                      <option value=""> Select your State</option>
+                      <option value="Ibadan">Ibadan</option>
+                      <option value="Ekiti">Ekiti</option>
+                      <option value="Lagos">Lagos</option>
+                      <option value="Abeokuta">Abeokuta</option>
+                      <option value="Abuja">Abuja</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg
+                        className="w-4 h-4 text-gray-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="relative">
+                <p className="font-semibold pb-1">Sex:</p>
+                <div className="relative">
+                  <select
+                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+                    value={sex}
+                    onChange={(e) => setSex(e.target.value)}
+                    required
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                    <option value="" disabled>
+                      Select Sex
+                    </option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+
+                  {/* Custom dropdown arrow */}
+                  <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                    <svg
+                      className="w-5 h-5 text-gray-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
                 </div>
               </div>
-              </div>
-             
-
 
                 {/* Error Message */}
                 {error && <p className="text-red-500 text-sm">{error}</p>}

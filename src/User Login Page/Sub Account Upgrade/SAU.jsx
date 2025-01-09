@@ -63,7 +63,7 @@ const SAU = () => {
               information below
             </p>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="relative">
+              {/* <div className="relative">
                 <p className="font-semibold pb-1">
                   Full Name (should correspond with existing name) :
                 </p>
@@ -76,8 +76,8 @@ const SAU = () => {
                     required
                   />
                 </div>
-              </div>
-              <div className="relative">
+              </div> */}
+              {/* <div className="relative">
                 <p className="font-semibold pb-1">NIN:</p>
                 <div className="relative">
                   <input
@@ -88,7 +88,7 @@ const SAU = () => {
                     required
                   />
                 </div>
-              </div>
+              </div> */}
               {/* Email Input */}
               <div className="relative">
                 <p className="font-semibold pb-1">Email :</p>
@@ -242,7 +242,7 @@ const SAU = () => {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Full Name */}
-                <div className="relative">
+                {/* <div className="relative">
                   <p className="font-semibold pb-1">Full Name:</p>
                   <input
                     type="text"
@@ -251,10 +251,10 @@ const SAU = () => {
                     onChange={(e) => setName(e.target.value)}
                     required
                   />
-                </div>
+                </div> */}
 
                 {/* NIN */}
-                <div className="relative">
+                {/* <div className="relative">
                   <p className="font-semibold pb-1">NIN:</p>
                   <input
                     type="number"
@@ -263,7 +263,7 @@ const SAU = () => {
                     onChange={(e) => setNin(e.target.value)}
                     required
                   />
-                </div>
+                </div> */}
 
                 {/* Email */}
                 <div className="relative">
