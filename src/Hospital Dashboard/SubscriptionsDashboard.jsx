@@ -333,6 +333,14 @@ const SubscriptionsDashboard = () => {
                         )}
                         {data.det4}
                       </p>
+                      <p className="flex items-center text-[12px]">
+                        {data.smallcheck === true ? (
+                          <i className="bx bx-check text-[#0000FF] text-2xl"></i>
+                        ) : (
+                          <i className="bx bx-x text-2xl text-red-600"></i>
+                        )}
+                        {data.det5}
+                      </p>
                     </div>
                     <div
                       className={` rounded-full my-4 ${

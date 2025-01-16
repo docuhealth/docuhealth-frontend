@@ -1,10 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Welcome from "./WelcomePage/Welcome";
 import HLP from "./Hospital Login Page/HLP";
 import HSI from "./Hospital Login Page/Hospital Sign In/HSI";
 import ULP from "./User Login Page/ULP";
 import FP from "./Hospital Login Page/Forgot Passoword/FP";
-import NotFound from './Not Found/NotFound' // Import the NotFound component
+import NotFound from './Not Found/NotFound'; 
 import VerifyOTP from "./Hospital Login Page/OTP/VerifyOTP";
 import NP from "./Hospital Login Page/NewPassword/NP";
 import ConfirmAcct from "./WelcomePage/ConfirmAcct";
@@ -15,115 +18,55 @@ import SubscriptionsDashboard from "./Hospital Dashboard/SubscriptionsDashboard"
 import LogOutDashboard from "./Hospital Dashboard/LogOutDashboard";
 import USI from "./User Login Page/User Sign In/USI";
 import FPU from "./User Login Page/Forget Password/FPU";
-import VerifyOTPUser from './User Login Page/Verify OTP/VerifyOTPUser'
+import VerifyOTPUser from './User Login Page/Verify OTP/VerifyOTPUser';
 import NPU from "./User Login Page/NewPassword/NPU";
 import UserHomeDashboard from "./User Dashboard/UserHomeDashboard";
-import UserSubAcctDashboard from './User Dashboard/UserSubAcctDashboard'
+import UserSubAcctDashboard from './User Dashboard/UserSubAcctDashboard';
 import SAU from "./User Login Page/Sub Account Upgrade/SAU";
 import UserSettingsDashboard from "./User Dashboard/UserSettingsDashboard";
 import UserSubscriptionsDashboard from "./User Dashboard/UserSubscriptionsDashboard";
-import UserLogoutDashboard from './User Dashboard/UserLogoutDasboard'
+import UserLogoutDashboard from './User Dashboard/UserLogoutDasboard';
 import AdminHomeDashboard from "./Admin Dashboard/AdminHomeDashboard";
-import AdminUsersDashboard from './Admin Dashboard/AdminUsersDashboard'
-import AdminSettingsDashboard from './Admin Dashboard/AdminSettingsDashboard'
-import AdminSubscriptionDashboard from './Admin Dashboard/AdminSubscriptionsdashboard'
+import AdminUsersDashboard from './Admin Dashboard/AdminUsersDashboard';
+import AdminSettingsDashboard from './Admin Dashboard/AdminSettingsDashboard';
+import AdminSubscriptionDashboard from './Admin Dashboard/AdminSubscriptionsdashboard';
 import AdminLogoutDashboard from "./Admin Dashboard/AdminLogOutDashboard";
-
-
 
 function App() {
   return (
     <Router>
+      {/* Toast Notification Container */}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnHover draggable />
+
       <Routes>
-        {/* Route for the Welcome page */}
         <Route path="/" element={<Welcome />} />
-
-        {/* Route for the Confirm Account page */}
         <Route path="/confirm-account" element={<ConfirmAcct />} />
-
-        {/* Route for the Hospital Create Account Page */}
         <Route path="/hospital-create-account" element={<HLP />} />
-
-        {/* Route for the Hospital Login Page */}
         <Route path="/hospital-login" element={<HSI />} />
-
-        {/* Route for the Hospital Forgot Password Page */}
         <Route path="/hospital-forgot-password" element={<FP />} />
-
-        {/* Route for the Hospital Verify Otp Page */}
         <Route path="/hospital-verify-otp" element={<VerifyOTP />} />
-
-        {/* Route for the Hospital Set New Password Page */}
         <Route path="/hospital-set-new-password" element={<NP />} />
-
-        {/* Route for the Hospital Home Dashboard Page */}
         <Route path="/hospital-home-dashboard" element={<HomeDashboard />} />
-
-        {/* Route for the Hospital Patients Dashboard Page */}
         <Route path="/hospital-patients-dashboard" element={<PatientsDashboard />} />
-
-        {/* Route for the Hospital Settings Dashboard Page */}
         <Route path="/hospital-settings-dashboard" element={<SettingsDashboard />} />
-
-        {/* Route for the Hospital Subscriptions Dashboard Page */}
         <Route path="/hospital-subscriptions-dashboard" element={<SubscriptionsDashboard />} />
-
-        {/* Route for the Hospital Log Out Dashboard Page */}
         <Route path="/hospital-logout-dashboard" element={<LogOutDashboard />} />
-
-        {/* Route for the User Create Account Page */}
         <Route path="/user-create-account" element={<ULP />} />
-
-        {/* Route for the User Login Page */}
         <Route path="/user-login" element={<USI />} />
-
-        {/* Route for the User Forgot Password Page */}
         <Route path="/user-forgot-password" element={<FPU />} />
-
-        {/* Route for the User Verify OTP Page */}
         <Route path="/user-verify-otp" element={<VerifyOTPUser />} />
-
-
-        {/* Route for the User Set New Password Page */}
-        <Route path="/user-set-new-password" element={<NPU/>} />
-
-
-        {/* Route for the User Home Dashboard Page */}
-        <Route path="/user-home-dashboard" element={<UserHomeDashboard/>} />
-
-        {/* Route for the User Sub Account Dashboard Page */}
-        <Route path="/user-sub-account" element={<UserSubAcctDashboard/>} />
-
-        {/* Route for the User Sub Account Upgrade Page */}
-        <Route path="/user-sub-account-upgrade" element={<SAU/>} />
-
-        {/* Route for the User Settings Dashboard Page */}
-        <Route path="/user-settings-dashboard" element={<UserSettingsDashboard/>} />
-
-        {/* Route for the User Subscription Dashboard Page */}
-        <Route path="/user-subscriptions-dashboard" element={<UserSubscriptionsDashboard/>} />
-
-        {/* Route for the User Logout Dashboard Page */}
+        <Route path="/user-set-new-password" element={<NPU />} />
+        <Route path="/user-home-dashboard" element={<UserHomeDashboard />} />
+        <Route path="/user-sub-account" element={<UserSubAcctDashboard />} />
+        <Route path="/user-sub-account-upgrade" element={<SAU />} />
+        <Route path="/user-settings-dashboard" element={<UserSettingsDashboard />} />
+        <Route path="/user-subscriptions-dashboard" element={<UserSubscriptionsDashboard />} />
         <Route path="/user-logout-dashboard" element={< UserLogoutDashboard />} />
-
-
-        {/* Route for the Admin Home Dashboard Page */}
         <Route path="/admin-home-dashboard" element={< AdminHomeDashboard />} />
-        
-        {/* Route for the Admin Users Dashboard Page */}
         <Route path="/admin-users-dashboard" element={< AdminUsersDashboard />} />
-
-        {/* Route for the Admin Settings Dashboard Page */}
         <Route path="/admin-settings-dashboard" element={< AdminSettingsDashboard />} />
-
-        {/* Route for the Admin Subscriptions Dashboard Page */}
         <Route path="/admin-subscriptions-dashboard" element={< AdminSubscriptionDashboard />} />
-
-        {/* Route for the Admin Logout Dashboard Page */}
         <Route path="/admin-logout-dashboard" element={< AdminLogoutDashboard />} />
-
-
-        {/* Catch-all route for unmatched paths */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

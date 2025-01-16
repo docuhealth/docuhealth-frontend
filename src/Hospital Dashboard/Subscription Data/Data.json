@@ -8,8 +8,9 @@
     "smallcheck": false,
     "det1" :  "Access to statistics",
     "det2" :  "Unlimited account information update",
-    "det3" :  "Access to Assessment/Diagnosis",
+    "det3" :  "Access to Diagnosis Summary",
     "det4" :  "Exporting files as PDF",
+    "det5" : "Image/medical document upload",
     "button": "Activated"
   },
   {
@@ -23,6 +24,7 @@
     "det2" :  "Unlimited account information update",
     "det3" :  "Unlimited account information update",
     "det4" :  "Exporting files as PDF",
+    "det5" : "Image/medical document upload",
     "button": "Upgarde to Monthly Plan"
   },
   {
@@ -34,8 +36,9 @@
     "smallcheck": true,
     "det1" :  "Access to statistics",
     "det2" :  "Unlimited account information update",
-    "det3" :  "Access to Assessment/Diagnosis",
+    "det3" :  "Access to Diagnosis Summary",
     "det4" :  "Exporting files as PDF",
+    "det5" : "Image/medical document upload",
     "button": "Upgarde to Yearly Plan"
   }
 ]

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import logo from "../assets/logo.png";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React Icons
 import dashb from "../assets/dashb.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const HLP = () => {
   const [email, setEmail] = useState("");
@@ -21,6 +23,8 @@ const HLP = () => {
   const [notification, setnotification] = useState(false);
 
   const [notificationVisible, setNotificationVisible] = useState(false);
+  const [signUp, setSignUp] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const isMobile = window.innerWidth <= 768; // Adjust breakpoint as needed
@@ -33,9 +37,12 @@ const HLP = () => {
     }
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    setSignUp("Submitting...");
     e.preventDefault();
-    console.log(
+
+    // Construct hospital info as a JSON object
+    const hospitalInfo = {
       email,
       password,
       confirmPassword,
@@ -43,10 +50,43 @@ const HLP = () => {
       hospitalAddress,
       doctors,
       medpersonnel,
-      image
-    );
-    setnotification(true);
-    setNotificationVisible(false);
+    };
+
+    // Convert JSON object to a string for the query parameter
+    const infoQueryString = encodeURIComponent(JSON.stringify(hospitalInfo));
+
+    // Create FormData object
+    const formData = new FormData();
+    if (image) {
+      formData.append("image", image);
+    }
+
+    try {
+      const response = await axios.post(
+        `https://docuhealth-backend.onrender.com/api/hospital/register?info=${infoQueryString}`, // Add JSON data in query
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Response:", response.data);
+      toast.success(response.data.message || "Registration successful!");
+      setnotification(true);
+      setNotificationVisible(false);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
+      console.error(
+        "Error submitting data:",
+        error.response?.data || error.message
+      );
+      setSignUp("Sign Up Now");
+    }
   };
 
   const handleNextStep = () => {
@@ -54,7 +94,7 @@ const HLP = () => {
     if (email && password && confirmPassword && password === confirmPassword) {
       setStep(2); // Move to Step 2
     } else {
-      setError("Please fill all fields correctly.");
+      toast.error("Please fill all fields correctly.");
     }
   };
   const handleLastStep = () => {
@@ -62,7 +102,7 @@ const HLP = () => {
     if (hospitalName && hospitalAddress && doctors && medpersonnel) {
       setStep(3);
     } else {
-      setError("Please fill all fields correctly.");
+      toast.error("Please fill all fields correctly.");
     }
   };
   const handleFileChange = (e) => {
@@ -78,7 +118,7 @@ const HLP = () => {
         {/* Left Side */}
         <div className="hidden sm:flex flex-1 min-h-screen  items-center justify-center ">
           <div
-            className="w-3/4"
+            className="w-3/4 "
             id="temp"
             style={{ display: step === 1 ? "block" : "none" }}
           >
@@ -160,9 +200,6 @@ const HLP = () => {
                 </div>
               </div>
 
-              {/* Error Message */}
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-
               {/* Move to next step button */}
               <button
                 type="button"
@@ -186,7 +223,7 @@ const HLP = () => {
           </div>
 
           <div
-            className="w-3/4 py-10"
+            className="w-3/4 py-10 "
             id="temp"
             style={{ display: step === 2 ? "block" : "none" }}
           >
@@ -252,9 +289,6 @@ const HLP = () => {
                 </div>
               </div>
 
-              {/* Error Message */}
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-
               {/* Move to next step button */}
               <button
                 type="button"
@@ -277,7 +311,7 @@ const HLP = () => {
             </p>
           </div>
           <div
-            className="w-3/4"
+            className="w-3/4  "
             id="temp"
             style={{ display: step === 3 ? "block" : "none" }}
           >
@@ -341,8 +375,9 @@ const HLP = () => {
                 onClick={handleSubmit}
                 className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
               >
-                Sign Up Now
+                {signUp ? signUp : "Sign Up Now"}
               </button>
+
               <p className="text-center text-sm text-gray-600 mt-4">
                 Already have an account?{" "}
                 <Link
@@ -382,7 +417,7 @@ const HLP = () => {
         </div>
       </div>
       {notification && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
           <div className="bg-white py-6 px-14 rounded-lg shadow-lg flex flex-col justify-center items-center">
             <div className="pb-2">
               <svg
@@ -407,6 +442,7 @@ const HLP = () => {
                 className="bg-[#0000FF] w-full rounded-full text-white px-4 py-2 "
                 onClick={() => {
                   setnotification(false);
+                  navigate("/hospital-home-dashboard");
                 }}
               >
                 Go To Dashboard
@@ -506,9 +542,7 @@ const HLP = () => {
                   </div>
                 </div>
 
-                {/* Error Message */}
-                {error && <p className="text-red-500 text-sm">{error}</p>}
-
+               
                 {/* Move to next step button */}
                 <button
                   type="button"
@@ -580,9 +614,7 @@ const HLP = () => {
                   </div>
                 </div>
                 <div className="relative">
-                  <p className="pb-1">
-                    Number Of Other Medical Personnel :
-                  </p>
+                  <p className="pb-1">Number Of Other Medical Personnel :</p>
                   <div className="relative">
                     <input
                       type="number"
@@ -594,9 +626,7 @@ const HLP = () => {
                   </div>
                 </div>
 
-                {/* Error Message */}
-                {error && <p className="text-red-500 text-sm">{error}</p>}
-
+               
                 {/* Move to next step button */}
                 <button
                   type="button"
@@ -619,81 +649,81 @@ const HLP = () => {
               </p>
             </div>
             <div
-            className="px-5"
-            id="temp"
-            style={{ display: step === 3 ? "block" : "none" }}
-          >
-           
-            <h2 className="text-xl sm:text-2xl font-bold mb-2 ">
-              Upload Hospital Logo/Picture
-            </h2>
-            <div className="flex flex-col justify-center items-center">
-              <p className="text-gray-600  mb-6">
-                Add up a picture or logo of your hospital to complete your sign
-                up process
-              </p>
+              className="px-5 "
+              id="temp"
+              style={{ display: step === 3 ? "block" : "none" }}
+            >
+              <h2 className="text-xl sm:text-2xl font-bold mb-2 ">
+                Upload Hospital Logo/Picture
+              </h2>
+              <div className="flex flex-col justify-center items-center">
+                <p className="text-gray-600  mb-6">
+                  Add up a picture or logo of your hospital to complete your
+                  sign up process
+                </p>
 
-              <div className="pb-5">
-                <form onSubmit={handleSubmit}>
-                  <div className="relative">
-                    <label htmlFor="image-upload" className="cursor-pointer">
-                      <div className="w-64 h-64 bg-gray-200 flex justify-center items-center rounded-full relative">
-                        {image ? (
-                          <img
-                            src={image}
-                            alt="Uploaded preview"
-                            className="w-full h-full object-cover rounded-full "
-                          />
-                        ) : (
-                          <div className="text-3xl text-gray-500">
-                            <svg
-                              width="115"
-                              height="103"
-                              viewBox="0 0 115 103"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M45.3344 11.9671L33.9984 23.3031H12.2989V91.319H102.987V23.3031H81.2874L69.9514 11.9671H45.3344ZM40.6388 0.631104H74.6468L85.9828 11.9671H108.655C111.785 11.9671 114.323 14.5048 114.323 17.6351V96.987C114.323 100.117 111.785 102.655 108.655 102.655H6.63088C3.50056 102.655 0.962891 100.117 0.962891 96.987V17.6351C0.962891 14.5048 3.50056 11.9671 6.63088 11.9671H29.3029L40.6388 0.631104ZM57.6428 85.651C40.4259 85.651 26.4689 71.6941 26.4689 54.477C26.4689 37.2601 40.4259 23.3031 57.6428 23.3031C74.8599 23.3031 88.8168 37.2601 88.8168 54.477C88.8168 71.6941 74.8599 85.651 57.6428 85.651ZM57.6428 74.315C68.599 74.315 77.4808 65.4333 77.4808 54.477C77.4808 43.5208 68.599 34.6391 57.6428 34.6391C46.6866 34.6391 37.8048 43.5208 37.8048 54.477C37.8048 65.4333 46.6866 74.315 57.6428 74.315Z"
-                                fill="white"
-                              />
-                            </svg>
-                            <span className="absolute right-0 text-white bg-[#0000FF] w-8 h-8 flex items-center justify-center rounded-full">
-                              +
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </label>
-                    <input
-                      id="image-upload"
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                    />
-                  </div>
-                </form>
-              </div>
+                <div className="pb-5">
+                  <form onSubmit={handleSubmit}>
+                    <div className="relative">
+                      <label htmlFor="image-upload" className="cursor-pointer">
+                        <div className="w-64 h-64 bg-gray-200 flex justify-center items-center rounded-full relative">
+                          {image ? (
+                            <img
+                              src={image}
+                              alt="Uploaded preview"
+                              className="w-full h-full object-cover rounded-full "
+                            />
+                          ) : (
+                            <div className="text-3xl text-gray-500">
+                              <svg
+                                width="115"
+                                height="103"
+                                viewBox="0 0 115 103"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M45.3344 11.9671L33.9984 23.3031H12.2989V91.319H102.987V23.3031H81.2874L69.9514 11.9671H45.3344ZM40.6388 0.631104H74.6468L85.9828 11.9671H108.655C111.785 11.9671 114.323 14.5048 114.323 17.6351V96.987C114.323 100.117 111.785 102.655 108.655 102.655H6.63088C3.50056 102.655 0.962891 100.117 0.962891 96.987V17.6351C0.962891 14.5048 3.50056 11.9671 6.63088 11.9671H29.3029L40.6388 0.631104ZM57.6428 85.651C40.4259 85.651 26.4689 71.6941 26.4689 54.477C26.4689 37.2601 40.4259 23.3031 57.6428 23.3031C74.8599 23.3031 88.8168 37.2601 88.8168 54.477C88.8168 71.6941 74.8599 85.651 57.6428 85.651ZM57.6428 74.315C68.599 74.315 77.4808 65.4333 77.4808 54.477C77.4808 43.5208 68.599 34.6391 57.6428 34.6391C46.6866 34.6391 37.8048 43.5208 37.8048 54.477C37.8048 65.4333 46.6866 74.315 57.6428 74.315Z"
+                                  fill="white"
+                                />
+                              </svg>
+                              <span className="absolute right-0 text-white bg-[#0000FF] w-8 h-8 flex items-center justify-center rounded-full">
+                                +
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </label>
+                      <input
+                        id="image-upload"
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                      />
+                    </div>
+                  </form>
+                </div>
 
+                
               <button
                 type="button"
                 onClick={handleSubmit}
                 className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
               >
-                Sign Up Now
+                {signUp ? signUp : "Sign Up Now"}
               </button>
-              <p className="text-center text-sm text-gray-600 mt-4">
-                Already have an account?{" "}
-                <Link
-                  to="/hospital-login"
-                  className="text-[#0000FF] hover:underline"
-                >
-                  Sign in
-                </Link>
-              </p>
+                <p className="text-center text-sm text-gray-600 mt-4">
+                  Already have an account?{" "}
+                  <Link
+                    to="/hospital-login"
+                    className="text-[#0000FF] hover:underline"
+                  >
+                    Sign in
+                  </Link>
+                </p>
+              </div>
             </div>
-          </div>
           </div>
         </div>
       )}
