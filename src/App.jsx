@@ -31,6 +31,7 @@ import AdminUsersDashboard from './Admin Dashboard/AdminUsersDashboard';
 import AdminSettingsDashboard from './Admin Dashboard/AdminSettingsDashboard';
 import AdminSubscriptionDashboard from './Admin Dashboard/AdminSubscriptionsdashboard';
 import AdminLogoutDashboard from "./Admin Dashboard/AdminLogOutDashboard";
+import ProtectedRouteHospital from "./Protected Route/ProtectedRouteHospital";
 
 function App() {
   return (
@@ -46,11 +47,27 @@ function App() {
         <Route path="/hospital-forgot-password" element={<FP />} />
         <Route path="/hospital-verify-otp" element={<VerifyOTP />} />
         <Route path="/hospital-set-new-password" element={<NP />} />
-        <Route path="/hospital-home-dashboard" element={<HomeDashboard />} />
-        <Route path="/hospital-patients-dashboard" element={<PatientsDashboard />} />
-        <Route path="/hospital-settings-dashboard" element={<SettingsDashboard />} />
-        <Route path="/hospital-subscriptions-dashboard" element={<SubscriptionsDashboard />} />
-        <Route path="/hospital-logout-dashboard" element={<LogOutDashboard />} />
+        <Route path="/hospital-home-dashboard" element={
+          <ProtectedRouteHospital>
+          <HomeDashboard />
+          </ProtectedRouteHospital> } />
+        <Route path="/hospital-patients-dashboard" element={
+           <ProtectedRouteHospital>
+          <PatientsDashboard />
+          </ProtectedRouteHospital>} />
+        <Route path="/hospital-settings-dashboard" element={
+          <ProtectedRouteHospital>
+          <SettingsDashboard />
+          </ProtectedRouteHospital> } />
+        <Route path="/hospital-subscriptions-dashboard" element={
+          <ProtectedRouteHospital>
+          <SubscriptionsDashboard />
+          </ProtectedRouteHospital>} />
+        <Route path="/hospital-logout-dashboard" element={
+          <ProtectedRouteHospital>
+          <LogOutDashboard />
+          </ProtectedRouteHospital>
+        } />
         <Route path="/user-create-account" element={<ULP />} />
         <Route path="/user-login" element={<USI />} />
         <Route path="/user-forgot-password" element={<FPU />} />

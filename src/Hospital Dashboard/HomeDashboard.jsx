@@ -1,13 +1,55 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../assets/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import DashHead from "./Dashboard Part/DashHead";
 
 const HomeDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+
   const location = useLocation();
   
-    const isActive = (path = '/hospital-home-dashboard') => location.pathname === path;
+  const isActive = (path = '/hospital-home-dashboard') => location.pathname === path;
+  
+
+
+
+   useEffect(() => {
+    
+    const fetchData = async () => {
+      const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+
+      if (!token) {
+        alert("Authentication token is missing.");
+        setLoading(false);
+        return;
+      }
+
+      console.log(token)
+
+      // try {
+      //   const response = await axios.get("https://docuhealth-backend.onrender.com/api/hospital/dashboard", {
+      //     headers: {
+      //       Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+      //       "Content-Type": "application/json", // Additional headers if needed
+      //     },
+      //   });
+        
+      //   console.log(response.data)
+      //   setData(response.data); // Save the API response in state
+       
+      //   setLoading(false);
+      // } catch (err) {
+      //   setError(err.response?.data?.message || "Error fetching data");
+      //   setLoading(false);
+      // }
+    };
+
+    fetchData();
+  }, []); // Runs only on component mount
   
 
   const toggleSidebar = () => {
@@ -17,6 +59,8 @@ const HomeDashboard = () => {
   const closeSidebar = () => {
     setIsSidebarOpen(false);
   };
+
+ 
 
   return (
     <div>
@@ -247,7 +291,7 @@ const HomeDashboard = () => {
         {/* Main Content */}
         <main className="flex-1">
           {/* Header */}
-         <DashHead  isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} closeSidebar= {closeSidebar} />
+         <DashHead isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} closeSidebar= {closeSidebar} />
 
           {/* Content */}
           <section className="p-8">

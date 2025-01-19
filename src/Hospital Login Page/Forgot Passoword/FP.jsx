@@ -2,10 +2,42 @@ import React, { useState, useEffect } from "react";
 import logo from "../../assets/logo.png";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import dashb from "../../assets/dashb.png";
+import axios from "axios";
+import { toast } from "react-toastify";
+
 
 const FP = () => {
   const [email, setEmail] = useState("");
-  const handleSubmit = () => {};
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent form from reloading
+
+    // if (!email) {
+    //   alert("Please enter your email!");
+    //   return;
+    // }
+
+    // setLoading(true); // Show loading state
+
+    // try {
+    //   const response = await axios.post(
+    //     "https://docuhealth-backend.onrender.com/api/auth/forgot_password",
+    //     { email } // Send email as JSON payload
+    //   );
+
+    //   if (response.status === 200) {
+    //     alert("OTP sent successfully! ✅");
+    //   } else {
+    //     alert("Failed to send OTP ❌: " + response.data.message);
+    //   }
+    // } catch (error) {
+    //   console.error("Error sending OTP:", error);
+    //   alert("An error occurred. Please try again.");
+    // } finally {
+    //   setLoading(false); // Hide loading state
+    // }
+  };
 
   const [notificationVisible, setNotificationVisible] = useState(false);
 
@@ -57,8 +89,9 @@ const FP = () => {
                   className={`w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
                     
                   `}
+                  disabled={loading}
                 >
-                  Send OTP
+                     {loading ? "Sending OTP..." : "Send OTP"}
                 </button>
               </form>
             </div>

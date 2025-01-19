@@ -3,16 +3,24 @@ import logo from "../../assets/logo.png";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import dashb from "../../assets/dashb.png";
 import { Link } from "react-router-dom";
+import axios from "axios";
+
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
+
 
 const HSI = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const[role, setRole] = useState('hospital')
+   const [Login, setLogin] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
 
   const [notificationVisible, setNotificationVisible] = useState(false);
-
+  const navigate = useNavigate(); // React Router for navigation
   useEffect(() => {
     const isMobile = window.innerWidth <= 768; // Adjust breakpoint as needed
     if (isMobile) {
@@ -27,16 +35,56 @@ const HSI = () => {
   const isFormValid =
     email.trim() !== "" && password.trim().length >= 6 && rememberMe;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isFormValid) {
-      console.log("Form Submitted");
-    } else {
-      setError(
-        "Please ensure all fields are correct and 'Remember me' is checked."
-      );
+    const handleSubmit = async (e) => {
+      setLogin('Logging In')
+      e.preventDefault();
+    
+      if (isFormValid) {
+        const userData = {
+          email,
+          password,
+          role
+        };
+    
+        try {
+          const response = await axios.post(
+            "https://docuhealth-backend.onrender.com/api/auth/login",
+            userData, // Send data in the request body
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+           const token = response.data.access_token;
+            localStorage.setItem("jwtToken", token);
+
+            const detailLogin = 'loggedIn'
+            localStorage.setItem('login', detailLogin)
+            
+    
+
+    
+          toast.success("Login successful");
+          console.log(response.data)
+          setLogin('Next')
+          setEmail("")
+          setPassword("")
+
+          setTimeout(() => {
+            navigate("/hospital-home-dashboard");
+          }, 1000);
+          // Handle success (e.g., save token, redirect user)
+        } catch (error) {
+          console.error("Error:", error.response?.data || error.message);
+          toast.error(error.response?.data?.message || "Login failed. Please try again.");
+          setLogin('Next')
+        }
+      } else {
+        toast.error("Please ensure all fields are correct and 'Remember me' is checked.");
+      }
     }
-  };
 
   return (
     <div>
@@ -127,6 +175,7 @@ const HSI = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
+                  onClick={handleSubmit}
                   className={`w-full py-3 rounded-full ${
                     isFormValid
                       ? "bg-[#0000FF] text-white hover:bg-blue-700"
@@ -134,7 +183,7 @@ const HSI = () => {
                   }`}
                   disabled={!isFormValid}
                 >
-                  Next
+                  {Login ? Login : 'Next'}
                 </button>
               </form>
 
@@ -266,6 +315,7 @@ const HSI = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
+                   onClick={handleSubmit}
                   className={`w-full py-3 rounded-full ${
                     isFormValid
                       ? "bg-[#0000FF] text-white hover:bg-blue-700"
@@ -273,7 +323,7 @@ const HSI = () => {
                   }`}
                   disabled={!isFormValid}
                 >
-                  Next
+                  {Login ? Login : 'Next'}
                 </button>
               </form>
 

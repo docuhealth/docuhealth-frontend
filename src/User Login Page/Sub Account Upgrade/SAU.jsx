@@ -4,8 +4,7 @@ import dashb from "../../assets/dashb.png";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const SAU = () => {
-  const [name, setName] = useState("");
-  const [nin, setNin] = useState("");
+
   const [email, setEmail] = useState("");
   const [number, setNumber] = useState("");
   const [password, setPassword] = useState("");
@@ -21,19 +20,18 @@ const SAU = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!name || !nin || !email || !number || !password) {
+    if ( !email || !number || !password) {
       setError("All fields must be filled before submission.");
       return;
     }
 
     setError("");
 
-    console.log(email, password, number, name, nin);
+    console.log(email, password, number);
     setEmail("");
     setPassword("");
     setNumber("");
-    setName("");
-    setNin("");
+   
     setnotification(true);
     setNotificationVisible(false);
   };
@@ -63,33 +61,6 @@ const SAU = () => {
               information below
             </p>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* <div className="relative">
-                <p className="font-semibold pb-1">
-                  Full Name (should correspond with existing name) :
-                </p>
-                <div className="relative">
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </div>
-              </div> */}
-              {/* <div className="relative">
-                <p className="font-semibold pb-1">NIN:</p>
-                <div className="relative">
-                  <input
-                    type="number"
-                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                    value={nin}
-                    onChange={(e) => setNin(e.target.value)}
-                    required
-                  />
-                </div>
-              </div> */}
-              {/* Email Input */}
               <div className="relative">
                 <p className="font-semibold pb-1">Email :</p>
                 <div className="relative">

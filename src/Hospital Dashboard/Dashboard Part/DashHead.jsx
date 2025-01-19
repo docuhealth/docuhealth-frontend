@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, {useEffect, useState } from "react";
 
-const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
+
+const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const togglePopover = () => {
     setIsPopoverOpen(!isPopoverOpen);
   };
+
+ 
   return (
     <div>
       {/* Header */}
@@ -30,7 +33,7 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
             </div>
             <div className="flex flex-col items-start">
               <p className="ml-2 text-sm font-medium">Jarus Hospital</p>
-              <p className="ml-2 text-sm text-gray-500">Worker</p>
+              <p className="ml-2 text-sm text-gray-500"></p>
             </div>
           </div>
         </div>
@@ -79,7 +82,7 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
                   Jarus Hospital
                 </li>
                 <li className="pb-1 px-3 hover:bg-gray-100 cursor-pointer">
-                  Worker
+                
                 </li>
               </ul>
             </div>
