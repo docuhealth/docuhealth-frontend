@@ -3,24 +3,28 @@ import logo from "../assets/logo.png";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React Icons
 import dashb from "../assets/dashb.png";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const ULP = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [number, setNumber] = useState("");
+  const [phone_num, setPhone_Num] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [step, setStep] = useState(1); // To manage steps
 
-  const [name, setName] = useState("");
+  const [fullname, setFullName] = useState("");
   const [sex, setSex] = useState("");
-  const [dob, setDob] = useState("");
-  const [sor, setSor] = useState("");
-
+  const [DOB, setDOB] = useState("");
+  const [state, setState] = useState("");
+ const [signUp, setSignUp] = useState("");
   const [notification, setnotification] = useState(false);
 
   const [notificationVisible, setNotificationVisible] = useState(false);
+   const navigate = useNavigate();
 
   useEffect(() => {
     const isMobile = window.innerWidth <= 768; // Adjust breakpoint as needed
@@ -33,34 +37,81 @@ const ULP = () => {
     }
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    setSignUp("Submitting...");
     e.preventDefault();
-    console.log(email, password, number, confirmPassword, name, nin, sor, dob);
+   
+
+    const userData = {
+      fullname,
+      password,
+      email,
+      phone_num,
+      state,
+      sex,
+      DOB,
+    };
+    try {
+      const response = await axios.post(
+        "https://docuhealth-backend.onrender.com/api/patient/register",
+        userData, // Send data in the request body
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      toast.success(response.data.message || "Registration successful!");
+      console.log(response.data.message);
+      setnotification(true);
+      setNotificationVisible(false);
+
+    } catch (error) {
+      console.error("Error:", error.response?.data || error.message);
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Please refresh and try again."
+      );
+
+      setSignUp("Sign Up Now");
+
+    }
+
+     console.log(
+      email,
+      password,
+      phone_num,
+      confirmPassword,
+      fullname,
+      state,
+      DOB
+    );
+
     setEmail("");
     setPassword("");
-    setNumber("");
+    setPhone_Num("");
     setConfirmPassword("");
-    setDob("");
-    setName("");
+    setDOB("");
+    setFullName("");
     setSex("");
-    setSor("");
-    setnotification(true);
-    setNotificationVisible(false);
+    setState("");
+   
   };
 
   const handleNextStep = () => {
     // Check if the form is completed before allowing to move to next step
     if (
       email &&
-      number &&
-      number.length > 10 &&
+      phone_num &&
+      phone_num.length > 10 &&
       password &&
       confirmPassword &&
       password === confirmPassword
     ) {
       setStep(2); // Move to Step 2
     } else {
-      setError("Please fill all fields correctly.");
+      toast.error("Please fill all fields correctly.");
     }
   };
 
@@ -106,8 +157,8 @@ const ULP = () => {
                   <input
                     type="number"
                     className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                    value={number}
-                    onChange={(e) => setNumber(e.target.value)}
+                    value={phone_num}
+                    onChange={(e) => setPhone_Num(e.target.value)}
                     required
                   />
                 </div>
@@ -211,8 +262,8 @@ const ULP = () => {
                   <input
                     type="text"
                     className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={fullname}
+                    onChange={(e) => setFullName(e.target.value)}
                     required
                   />
                 </div>
@@ -224,8 +275,8 @@ const ULP = () => {
                   <input
                     type="date"
                     className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                    value={dob}
-                    onChange={(e) => setDob(e.target.value)}
+                    value={DOB}
+                    onChange={(e) => setDOB(e.target.value)}
                     required
                   />
                 </div>
@@ -235,8 +286,8 @@ const ULP = () => {
                 <div className="relative w-full">
                   <select
                     className="border border-gray-300 px-4 py-3 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
-                    value={sor}
-                    onChange={(e) => setSor(e.target.value)}
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
                     required
                   >
                     <option value=""> Select your State</option>
@@ -310,7 +361,7 @@ const ULP = () => {
                 onClick={handleSubmit}
                 className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
               >
-                Sign Up Now
+               {signUp ? signUp : "Sign Up Now"}
               </button>
             </form>
 
@@ -377,7 +428,7 @@ const ULP = () => {
               <button
                 className="bg-[#0000FF] w-full rounded-full text-white px-4 py-2 "
                 onClick={() => {
-                  setnotification(false);
+                  navigate("/user-home-dashboard");
                 }}
               >
                 Go To Dashboard
@@ -429,11 +480,11 @@ const ULP = () => {
                     <input
                       type="number"
                       className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                      value={number}
+                      value={phone_num}
                       onChange={(e) => {
                         const value = e.target.value;
                         if (value.length <= 11) {
-                          setNumber(value);
+                          setPhone_Num(value);
                         }
                       }}
                       required
@@ -542,34 +593,12 @@ const ULP = () => {
                     <input
                       type="text"
                       className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      value={fullname}
+                      onChange={(e) => setFullName(e.target.value)}
                       required
                     />
                   </div>
                 </div>
-
-                {/* <div className="relative">
-                  <p className="font-semibold">NIN:</p>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                      value={nin}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value.length <= 20) {
-                          setNin(value);
-                        }
-                      }}
-                      required
-                      minLength={20}
-                      maxLength={20}
-                      min="10000000000000000000" // Minimum number with 20 digits
-                      max="99999999999999999999" // Maximum number with 20 digits
-                    />
-                  </div>
-                </div> */}
 
                 <div className="relative">
                   <p className="font-semibold">Date Of Birth:</p>
@@ -577,8 +606,8 @@ const ULP = () => {
                     <input
                       type="date"
                       className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                      value={dob}
-                      onChange={(e) => setDob(e.target.value)}
+                      value={DOB}
+                      onChange={(e) => setDOB(e.target.value)}
                       required
                     />
                   </div>
@@ -589,8 +618,8 @@ const ULP = () => {
                   <div className="relative w-full">
                     <select
                       className="border border-gray-300 px-4 py-3 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
-                      value={sor}
-                      onChange={(e) => setSor(e.target.value)}
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
                       required
                     >
                       <option value=""> Select your State</option>
@@ -620,40 +649,40 @@ const ULP = () => {
                 </div>
 
                 <div className="relative">
-                <p className="font-semibold pb-1">Sex:</p>
-                <div className="relative">
-                  <select
-                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
-                    value={sex}
-                    onChange={(e) => setSex(e.target.value)}
-                    required
-                  >
-                    <option value="" disabled>
-                      Select Sex
-                    </option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                  </select>
-
-                  {/* Custom dropdown arrow */}
-                  <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                    <svg
-                      className="w-5 h-5 text-gray-400"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                  <p className="font-semibold pb-1">Sex:</p>
+                  <div className="relative">
+                    <select
+                      className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+                      value={sex}
+                      onChange={(e) => setSex(e.target.value)}
+                      required
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
+                      <option value="" disabled>
+                        Select Sex
+                      </option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+
+                    {/* Custom dropdown arrow */}
+                    <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
                   </div>
                 </div>
-              </div>
 
                 {/* Error Message */}
                 {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -664,7 +693,7 @@ const ULP = () => {
                   onClick={handleSubmit}
                   className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
                 >
-                  Sign Up Now
+                 {signUp ? signUp : "Sign Up Now"}
                 </button>
               </form>
 

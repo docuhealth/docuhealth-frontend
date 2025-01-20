@@ -542,7 +542,6 @@ const HLP = () => {
                   </div>
                 </div>
 
-               
                 {/* Move to next step button */}
                 <button
                   type="button"
@@ -626,7 +625,6 @@ const HLP = () => {
                   </div>
                 </div>
 
-               
                 {/* Move to next step button */}
                 <button
                   type="button"
@@ -705,14 +703,13 @@ const HLP = () => {
                   </form>
                 </div>
 
-                
-              <button
-                type="button"
-                onClick={handleSubmit}
-                className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
-              >
-                {signUp ? signUp : "Sign Up Now"}
-              </button>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
+                >
+                  {signUp ? signUp : "Sign Up Now"}
+                </button>
                 <p className="text-center text-sm text-gray-600 mt-4">
                   Already have an account?{" "}
                   <Link
