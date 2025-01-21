@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import logo from "../assets/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import DashHead from "./Dashboard Part/DashHead";
-
+import axios from "axios";
 const HomeDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [data, setData] = useState(null);
@@ -17,39 +17,41 @@ const HomeDashboard = () => {
 
 
 
-   useEffect(() => {
-    
+  useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
-
+      console.log("Token:", token);
+  
       if (!token) {
-        alert("Authentication token is missing.");
+        console.log("Token not found. Please log in again.");
         setLoading(false);
         return;
       }
-
-      console.log(token)
-
-      // try {
-      //   const response = await axios.get("https://docuhealth-backend.onrender.com/api/hospital/dashboard", {
-      //     headers: {
-      //       Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-      //       "Content-Type": "application/json", // Additional headers if needed
-      //     },
-      //   });
-        
-      //   console.log(response.data)
-      //   setData(response.data); // Save the API response in state
-       
-      //   setLoading(false);
-      // } catch (err) {
-      //   setError(err.response?.data?.message || "Error fetching data");
-      //   setLoading(false);
-      // }
+  
+      try {
+        console.log("Fetching data...");
+        const response = await axios.get(
+          "https://docuhealth-backend.onrender.com/api/hospital/dashboard",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+              "Content-Type": "application/json",
+            },
+          }
+        );
+  
+        console.log("API Response:", response.data);
+        setData(response.data); // Save the API response in state
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        console.log(err.response?.data?.message || "Error fetching data");
+        setLoading(false);
+      }
     };
-
+  
     fetchData();
-  }, []); // Runs only on component mount
+  }, []);
   
 
   const toggleSidebar = () => {
@@ -291,7 +293,7 @@ const HomeDashboard = () => {
         {/* Main Content */}
         <main className="flex-1">
           {/* Header */}
-         <DashHead isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} closeSidebar= {closeSidebar} />
+         <DashHead data = {data} isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} closeSidebar= {closeSidebar} />
 
           {/* Content */}
           <section className="p-8">

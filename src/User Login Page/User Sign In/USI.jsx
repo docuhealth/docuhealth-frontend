@@ -50,8 +50,10 @@ const USI = () => {
   };
 
   const isFormValid =
-    email.trim() !== "" ||
-    (phone_num.trim() !== " " && password.trim().length >= 6 && rememberMe);
+  (email.trim() !== "" || phone_num.trim() !== "") &&
+  password.trim().length >= 6 &&
+  rememberMe;
+
 
   const handleSubmit = async (e) => {
     setLogin("Submitting...");
@@ -79,7 +81,7 @@ const USI = () => {
         localStorage.setItem("jwtToken", token);
 
         const detailLogin = "UserloggedIn";
-        localStorage.setItem("login", detailLogin);
+        localStorage.setItem("userlogin", detailLogin);
 
         toast.success("Login successful");
         console.log(response.data);

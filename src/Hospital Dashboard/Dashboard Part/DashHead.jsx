@@ -1,7 +1,7 @@
 import React, {useEffect, useState } from "react";
 
 
-const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
+const DashHead = ({ data, isSidebarOpen, toggleSidebar, closeSidebar }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const togglePopover = () => {
@@ -33,7 +33,7 @@ const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
             </div>
             <div className="flex flex-col items-start">
               <p className="ml-2 text-sm font-medium">Jarus Hospital</p>
-              <p className="ml-2 text-sm text-gray-500"></p>
+              <p className="ml-2 text-sm text-gray-500">{data.hospital.email}</p>
             </div>
           </div>
         </div>

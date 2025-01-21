@@ -32,6 +32,7 @@ import AdminSettingsDashboard from './Admin Dashboard/AdminSettingsDashboard';
 import AdminSubscriptionDashboard from './Admin Dashboard/AdminSubscriptionsdashboard';
 import AdminLogoutDashboard from "./Admin Dashboard/AdminLogOutDashboard";
 import ProtectedRouteHospital from "./Protected Route/ProtectedRouteHospital";
+import UserProtectedRoute from "./User Protected Route/UserProtectedRoute";
 
 function App() {
   return (
@@ -68,17 +69,39 @@ function App() {
           <LogOutDashboard />
           </ProtectedRouteHospital>
         } />
+
+
         <Route path="/user-create-account" element={<ULP />} />
         <Route path="/user-login" element={<USI />} />
         <Route path="/user-forgot-password" element={<FPU />} />
         <Route path="/user-verify-otp" element={<VerifyOTPUser />} />
         <Route path="/user-set-new-password" element={<NPU />} />
-        <Route path="/user-home-dashboard" element={<UserHomeDashboard />} />
-        <Route path="/user-sub-account" element={<UserSubAcctDashboard />} />
-        <Route path="/user-sub-account-upgrade" element={<SAU />} />
-        <Route path="/user-settings-dashboard" element={<UserSettingsDashboard />} />
-        <Route path="/user-subscriptions-dashboard" element={<UserSubscriptionsDashboard />} />
-        <Route path="/user-logout-dashboard" element={< UserLogoutDashboard />} />
+
+
+        <Route path="/user-home-dashboard" element={
+          <UserProtectedRoute>
+          <UserHomeDashboard />
+          </UserProtectedRoute>} />
+        <Route path="/user-sub-account" element={
+          <UserProtectedRoute>
+          <UserSubAcctDashboard />
+          </UserProtectedRoute>} />
+        <Route path="/user-sub-account-upgrade" element={
+          <UserProtectedRoute>
+          <SAU />
+          </UserProtectedRoute>} />
+        <Route path="/user-settings-dashboard" element={
+          <UserProtectedRoute>
+          <UserSettingsDashboard />
+          </UserProtectedRoute>} />
+        <Route path="/user-subscriptions-dashboard" element={
+          <UserProtectedRoute>
+          <UserSubscriptionsDashboard />
+          </UserProtectedRoute>} />
+        <Route path="/user-logout-dashboard" element={
+          <UserProtectedRoute>
+          < UserLogoutDashboard />
+          </UserProtectedRoute>} />
         <Route path="/admin-home-dashboard" element={< AdminHomeDashboard />} />
         <Route path="/admin-users-dashboard" element={< AdminUsersDashboard />} />
         <Route path="/admin-settings-dashboard" element={< AdminSettingsDashboard />} />
