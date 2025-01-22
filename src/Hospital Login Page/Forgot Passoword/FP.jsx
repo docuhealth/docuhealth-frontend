@@ -8,35 +8,32 @@ import { toast } from "react-toastify";
 
 const FP = () => {
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState('');
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent form from reloading
+    setLoading('Sending Otp')
+    e.preventDefault(); 
+    
 
-    // if (!email) {
-    //   alert("Please enter your email!");
-    //   return;
-    // }
+    try {
+      const response = await fetch("https://docuhealth-backend.onrender.com/api/auth/forgot_password", {
+        method: "POST", // Use POST method for sending data
+        headers: {
+          "Content-Type": "application/json", // Indicate the payload format
+        },
+        body: JSON.stringify({ email }), // Send the email as JSON
+      });
 
-    // setLoading(true); // Show loading state
-
-    // try {
-    //   const response = await axios.post(
-    //     "https://docuhealth-backend.onrender.com/api/auth/forgot_password",
-    //     { email } // Send email as JSON payload
-    //   );
-
-    //   if (response.status === 200) {
-    //     alert("OTP sent successfully! ✅");
-    //   } else {
-    //     alert("Failed to send OTP ❌: " + response.data.message);
-    //   }
-    // } catch (error) {
-    //   console.error("Error sending OTP:", error);
-    //   alert("An error occurred. Please try again.");
-    // } finally {
-    //   setLoading(false); // Hide loading state
-    // }
+      if (response.ok) {
+        toast.success("Email sent successfully!");
+      } else {
+        toast.error(`Failed to send email`);
+        setLoading('Send Otp')
+      }
+    } catch (error) {
+     console.error(`Error: ${error.message}`);
+     setLoading('Send Otp')
+    }
   };
 
   const [notificationVisible, setNotificationVisible] = useState(false);
@@ -86,12 +83,15 @@ const FP = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className={`w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
-                    
-                  `}
-                  disabled={loading}
+                  className={`w-full py-3 rounded-full text-white ${
+                    email
+                      ? "bg-[#0000FF] hover:bg-blue-700"
+                      : "bg-gray-400 cursor-not-allowed"
+                  }`}
+                  disabled={!email}
+                  onClick={handleSubmit}
                 >
-                     {loading ? "Sending OTP..." : "Send OTP"}
+                     {loading ? loading: "Send Otp"}
                 </button>
               </form>
             </div>
@@ -158,13 +158,17 @@ const FP = () => {
 
                 {/* Submit Button */}
                 <button
-                  type="submit"
-                  className={`w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
-                    
-                  `}
-                >
-                  Send OTP
-                </button>
+                        type="submit"
+                        className={`w-full py-3 rounded-full text-white ${
+                          email
+                            ? "bg-[#0000FF] hover:bg-blue-700"
+                            : "bg-gray-400 cursor-not-allowed"
+                        }`}
+                        disabled={!email}
+                        onClick={handleSubmit}
+                      >
+                           {loading ? loading: "Send Otp"}
+                      </button>
               </form>
             </div>
           </div>

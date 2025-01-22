@@ -1,13 +1,56 @@
 import React, {useEffect, useState } from "react";
+import axios from "axios";
 
 
-const DashHead = ({ data, isSidebarOpen, toggleSidebar, closeSidebar }) => {
+const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+   const [data, setData] = useState(null);
+    const[email, setEmail] = useState('fetching...')
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
   const togglePopover = () => {
     setIsPopoverOpen(!isPopoverOpen);
   };
-
+  
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+      console.log("Token:", token);
+  
+      if (!token) {
+        console.log("Token not found. Please log in again.");
+        setLoading(false);
+        return;
+      }
+  
+      try {
+        console.log("Fetching data...");
+        const response = await axios.get(
+          "https://docuhealth-backend.onrender.com/api/hospital/dashboard",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+              "Content-Type": "application/json",
+            },
+          }
+        );
+  
+        console.log("API Response:", response.data);
+        setData(response.data); // Save the API response in state
+        setLoading(false);
+        setEmail(response.data.hospital.email)
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        console.log(err.response?.data?.message || "Error fetching data");
+        setLoading(false);
+        setEmail('error, refresh')
+      }
+    };
+  
+    fetchData();
+  }, []);
  
   return (
     <div>
@@ -33,7 +76,7 @@ const DashHead = ({ data, isSidebarOpen, toggleSidebar, closeSidebar }) => {
             </div>
             <div className="flex flex-col items-start">
               <p className="ml-2 text-sm font-medium">Jarus Hospital</p>
-              <p className="ml-2 text-sm text-gray-500">{data.hospital.email}</p>
+              <p className="ml-2 text-sm text-gray-500"> {email}</p>
             </div>
           </div>
         </div>
@@ -76,13 +119,13 @@ const DashHead = ({ data, isSidebarOpen, toggleSidebar, closeSidebar }) => {
             </p>
           </div>
           {isPopoverOpen && (
-            <div className="absolute top-20 right-4 bg-white shadow-md rounded-lg w-40 p-2 z-50">
+            <div className="absolute top-20 right-4 bg-white shadow-md rounded-lg  p-2 z-50">
               <ul className="text-sm text-gray-700">
                 <li className="py-1 px-3 hover:bg-gray-100 cursor-pointer font-semibold">
                   Jarus Hospital
                 </li>
-                <li className="pb-1 px-3 hover:bg-gray-100 cursor-pointer">
-                
+                <li className="pb-1 px-3 hover:bg-gray-100 cursor-pointer text-sm">
+                  {email}
                 </li>
               </ul>
             </div>

@@ -2,9 +2,14 @@ import React, { useState, useEffect } from "react";
 import UserDashHead from "./Dashboard Part/UserDashHead";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
+import axios from "axios";
 
 const UserHomeDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+   const [data, setData] = useState(null);
+   const[dataEmail, setDataEmail] = useState(null)
+     const [loading, setLoading] = useState(true);
+   
   const location = useLocation();
 
   const isActive = (path = "/user-home-dashboard") =>
@@ -30,6 +35,44 @@ const UserHomeDashboard = () => {
     }, 86400000); // 86,400,000 ms = 24 hours
 
     return () => clearInterval(interval); // Cleanup interval on unmount
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+      console.log("Token:", token);
+  
+      if (!token) {
+        console.log("Token not found. Please log in again.");
+        setLoading(false);
+        return;
+      }
+  
+      try {
+        console.log("Fetching data...");
+        const response = await axios.get(
+          "https://docuhealth-backend.onrender.com/api/patient/dashboard",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+              "Content-Type": "application/json",
+            },
+          }
+        );
+  
+        console.log("API Response:", response.data);
+        setData(response.data); // Save the API response in state
+        console.log(response.data)
+        
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        console.log(err.response?.data?.message || "Error fetching data");
+        setLoading(false);
+      }
+    };
+  
+    fetchData();
   }, []);
 
   const closeNoticeMessage = () => {

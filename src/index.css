@@ -17,3 +17,9 @@
     position: relative;
      
   }
+
+  @media (max-width: 768px) {
+    .break-word {
+      word-break: break-word;
+    }
+  }

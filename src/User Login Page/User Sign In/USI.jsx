@@ -56,7 +56,7 @@ const USI = () => {
 
 
   const handleSubmit = async (e) => {
-    setLogin("Submitting...");
+    setLogin("Logging In...");
     e.preventDefault();
     if (isFormValid) {
       console.log("Form Submitted");
