@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
 import logo from "../../assets/logo.png";
 import dashb from "../../assets/dashb.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const VerifyOTP = () => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [notificationVisible, setNotificationVisible] = useState(false);
+  const [role, setRole] = useState("hospital");
+  const [loading, setLoading] = useState("");
+
+  const location = useLocation();
+  const { email } = location.state || {}; // Retrieve email from state
 
   useEffect(() => {
     const isMobile = window.innerWidth <= 768; // Adjust breakpoint as needed
@@ -36,13 +43,65 @@ const VerifyOTP = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    setLoading("Verifying Otp");
     e.preventDefault();
-    console.log("Entered OTP:", otp.join(""));
+
+    try {
+      // Combine the OTP array into a single string
+      const enteredOtp = otp.join("");
+      console.log("Entered OTP:", enteredOtp, email);
+
+      // Send the OTP and email to the API
+      const response = await axios.post(
+        "https://docuhealth-backend.onrender.com/api/auth/verify_otp",
+        {
+          otp: enteredOtp,
+          email: email,
+        }
+      );
+
+      // Check if the request was successful
+      if (response.status === 200) {
+        console.log("OTP verified successfully:", response.data);
+        setLoading("Proceed");
+        // Perform further actions based on response
+        toast.success(response.data.message || "OTP Verified!");
+      } else {
+        console.error("OTP verification failed:", response.data);
+        setLoading("Proceed");
+        toast.error("OTP Verification Failed.");
+      }
+    } catch (error) {
+      console.error("Error during OTP verification:", error.message);
+      setLoading("Proceed");
+      toast.error("OTP Verification Failed, Try Again");
+    }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     console.log("Resend OTP");
+
+    try {
+      const response = await fetch(
+        "https://docuhealth-backend.onrender.com/api/auth/forgot_password",
+        {
+          method: "POST", // Use POST method for sending data
+          headers: {
+            "Content-Type": "application/json", // Indicate the payload format
+          },
+          body: JSON.stringify({ email, role }), // Send the email as JSON
+        }
+      );
+
+      if (response.ok) {
+        toast.success("Email sent successfully!");
+      } else {
+        toast.error(`Failed to send email, try again`);
+      }
+    } catch (error) {
+      console.error(`Error: ${error.message}`);
+    }
   };
 
   return (
@@ -102,7 +161,7 @@ const VerifyOTP = () => {
                   type="submit"
                   className="w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
                 >
-                  Proceed
+                  {loading ? loading : "Proceed"}
                 </button>
               </form>
             </div>
@@ -191,7 +250,7 @@ const VerifyOTP = () => {
                   type="submit"
                   className="w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
                 >
-                  Proceed
+                  {loading ? loading : "Proceed"}
                 </button>
               </form>
             </div>

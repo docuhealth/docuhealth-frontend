@@ -5,6 +5,8 @@ import profilepic from "../assets/profile.png";
 import TabComponents from "./Tabs/TabComponent";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React Icons
 import DashHead from "./Dashboard Part/DashHead";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const SettingsDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -45,10 +47,50 @@ const SettingsDashboard = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-    // Add your submission logic here
+    try {
+      // Retrieve token from local storage
+      const token = localStorage.getItem("jwtToken");
+      const role = "hospital"; // Example role
+
+      if (!token) {
+        console.error("No token found. Please log in again.");
+        return;
+      }
+
+      // Format the data to match the API requirements
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        password: "account", // Replace with actual password if needed
+        address: formData.address,
+        doctors: parseInt(formData.doctors, 10) || 0,
+        others: parseInt(formData.otherPersonnel, 10) || 0,
+      };
+
+      console.log("Payload:", payload);
+
+      // Send the PATCH request
+      const response = await axios.patch(
+        "https://docuhealth-backend.onrender.com/api/hospital/settings/update_hospital_info", // Replace with your API URL
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include JWT token
+            "Content-Type": "application/json",
+            Role: role, // Add role to the headers
+          },
+        }
+      );
+
+      console.log("API Response:", response.data);
+      alert("Form submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting the form:", error.message);
+      alert("An error occurred. Please try again.");
+    }
   };
 
   const handleCancel = () => {
@@ -178,6 +220,7 @@ const SettingsDashboard = () => {
               <div className="flex flex-row justify-around sm:justify-start  space-x-4">
                 <button
                   type="submit"
+                  onClick={handleSubmit}
                   className="px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
                 >
                   Save Changes
@@ -311,24 +354,23 @@ const SettingsDashboard = () => {
             </div>
           </div>
           {/* Buttons */}
-          
 
-            {/* Buttons */}
-            <div className="flex flex-row justify-around sm:justify-start  space-x-4">
-                <button
-                  type="submit"
-                  className="px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
-                >
-                  Save Changes
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSecurityCancel}
-                  className="px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
-                >
-                  Cancel Changes
-                </button>
-              </div>
+          {/* Buttons */}
+          <div className="flex flex-row justify-around sm:justify-start  space-x-4">
+            <button
+              type="submit"
+              className="px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
+            >
+              Save Changes
+            </button>
+            <button
+              type="button"
+              onClick={handleSecurityCancel}
+              className="px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
+            >
+              Cancel Changes
+            </button>
+          </div>
         </div>
       ),
     },

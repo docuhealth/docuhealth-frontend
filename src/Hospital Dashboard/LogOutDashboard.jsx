@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import DashHead from "./Dashboard Part/DashHead";
 
 const LogOutDashboard = () => {
+  
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ const LogOutDashboard = () => {
   // }
 
   const handleLogOut = async () => {
-   
+    const role = "hospital"; // Replace with the appropriate role dynamically if needed
   
     try {
       // Make the POST request to the API
@@ -55,6 +56,7 @@ const LogOutDashboard = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`, // Include token if required
         },
+        body: JSON.stringify({ role }), // Add the role variable in the body
       });
   
       // Check if the response is successful
@@ -78,6 +80,7 @@ const LogOutDashboard = () => {
       alert("An error occurred. Please try again later.");
     }
   };
+  
 
   const closeSidebar = () => {
     setIsSidebarOpen(false);

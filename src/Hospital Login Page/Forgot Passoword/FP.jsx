@@ -3,12 +3,16 @@ import logo from "../../assets/logo.png";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import dashb from "../../assets/dashb.png";
 import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 
 const FP = () => {
   const [email, setEmail] = useState("");
+  const [role, setRole] = useState("hospital");
   const [loading, setLoading] = useState('');
+
+   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     setLoading('Sending Otp')
@@ -21,13 +25,17 @@ const FP = () => {
         headers: {
           "Content-Type": "application/json", // Indicate the payload format
         },
-        body: JSON.stringify({ email }), // Send the email as JSON
+        body: JSON.stringify({ email, role }), // Send the email as JSON
       });
 
       if (response.ok) {
         toast.success("Email sent successfully!");
+        setLoading('Send Otp')
+        setTimeout(() => {
+          navigate("/hospital-verify-otp",  { state: { email } });
+        }, 1000);
       } else {
-        toast.error(`Failed to send email`);
+        toast.error(`Failed to send email, try again`);
         setLoading('Send Otp')
       }
     } catch (error) {

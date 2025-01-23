@@ -38,56 +38,68 @@ const HLP = () => {
   }, []);
 
   const handleSubmit = async (e) => {
-    setSignUp("Submitting...");
-    e.preventDefault();
+  setSignUp("Submitting...");
+  e.preventDefault();
 
-    // Construct hospital info as a JSON object
-    const hospitalInfo = {
-      email,
-      password,
-      confirmPassword,
-      hospitalName,
-      hospitalAddress,
-      doctors,
-      medpersonnel,
-    };
-
-    // Convert JSON object to a string for the query parameter
-    const infoQueryString = encodeURIComponent(JSON.stringify(hospitalInfo));
-
-    // Create FormData object
-    const formData = new FormData();
-    if (image) {
-      formData.append("image", image);
-    }
-
-    try {
-      const response = await axios.post(
-        `https://docuhealth-backend.onrender.com/api/hospital/register?info=${infoQueryString}`, // Add JSON data in query
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      console.log("Response:", response.data);
-      toast.success(response.data.message || "Registration successful!");
-      setnotification(true);
-      setNotificationVisible(false);
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-          "Something went wrong. Please try again."
-      );
-      console.error(
-        "Error submitting data:",
-        error.response?.data || error.message
-      );
-      setSignUp("Sign Up Now");
-    }
+  // Construct hospital info as a JSON object
+  const hospitalInfo = {
+    email,
+    password,
+    hospitalName,
+    hospitalAddress,
+    doctors,
+    medpersonnel,
   };
+
+  const formattedHospitalInfo = {
+    email: hospitalInfo.email,
+    password: hospitalInfo.password,
+    name: hospitalInfo.hospitalName,
+    address: hospitalInfo.hospitalAddress,
+    doctors: hospitalInfo.doctors,
+    others: hospitalInfo.medpersonnel,
+  };
+
+  // Convert JSON object to a string for the query parameter
+  const infoQueryString = encodeURIComponent(JSON.stringify(formattedHospitalInfo));
+
+  // Create FormData object
+  const formData = new FormData();
+  if (image) {
+    formData.append("image_msg", image); // Ensure `image` is validated if needed
+  }
+
+  try {
+    const response = await axios.post(
+      `https://docuhealth-backend.onrender.com/api/hospital/register?info=${infoQueryString}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    console.log("Response:", response.data);
+    toast.success(response.data.message || "Registration successful!");
+    setnotification(true); // Assuming this manages a notification state
+    setNotificationVisible(false); // Assuming this hides the notification
+  } catch (error) {
+    // Error handling
+    toast.error(
+      error.response?.data?.message ||
+        "Something went wrong. Please try again."
+    );
+    console.error(
+      "Error submitting data:",
+      error.response?.data || error.message
+    );
+  } finally {
+    // Reset the submit button state
+    setSignUp("Sign Up Now");
+  }
+};
+
 
   const handleNextStep = () => {
     // Check if the form is completed before allowing to move to next step

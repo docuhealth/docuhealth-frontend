@@ -3,10 +3,41 @@ import logo from "../assets/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import DashHead from "./Dashboard Part/DashHead";
 import axios from "axios";
+import {
+  Chart as ChartJS,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+
+ChartJS.register(
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
+
 const HomeDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [data, setData] = useState(null);
-  const [totalPatients, setTotalPatients] = useState("...");
+  const [totalHIN, setTotalHIN] = useState("...");
+  const [assDiag, setAssDiag] = useState("...");
+  const [totalDoctors, setTotalDoctors] = useState("...");
+  const [others, setOthers] = useState("...");
+  const [totalHINPercent, setTotalHINPercent] = useState("...");
+  const [assDiagPercent, setAssDiagPercent] = useState("...");
+  const [totalDoctorsPercent, setTotalDoctorsPercent] = useState("...");
+  const [othersPercent, setOthersPercent] = useState("...");
   const [loading, setLoading] = useState(true);
 
   const location = useLocation();
@@ -39,7 +70,15 @@ const HomeDashboard = () => {
 
         console.log("API Response:", response.data);
         setData(response.data); // Save the API response in state
-        setTotalPatients(response.data.hospital.total_patients.length || "0");
+        // setTotalHIN(response.data.hospital.total_patients.latest.value)
+        // setTotalHINPercent(response.data.hospital.total_patients.change)
+        // setAssDiag(response.data.hospital.accessments_diagnosis.latest.value)
+        // setAssDiagPercent(response.data.hospital.accessments_diagnosis.change)
+        setTotalDoctors(response.data.hospital.doctors.latest.value);
+        setTotalDoctorsPercent(response.data.hospital.doctors.change);
+        setOthers(response.data.hospital.others.latest.value);
+        setOthersPercent(response.data.hospital.others.change);
+
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -57,6 +96,48 @@ const HomeDashboard = () => {
 
   const closeSidebar = () => {
     setIsSidebarOpen(false);
+  };
+
+  const chartData = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], // Months
+    datasets: [
+      {
+        label: "Assessment/Diagnosis Created",
+        data: [70, 80, 90, 110, 120, 100], // Hardcoded values
+        borderColor: "red",
+        backgroundColor: "rgba(255, 99, 132, 0.2)", // Fill color under the line
+        fill: true, // Enable area fill under the line
+        tension: 0.4, // Smooth curves
+      },
+    ],
+  };
+  const chartDataTwo = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], // Months
+    datasets: [
+      {
+        label: "Patients HIN Checked",
+        data: [100, 120, 150, 200, 250, 220], // Hardcoded values
+        borderColor: "blue",
+        backgroundColor: "rgba(54, 162, 235, 0.2)",
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true, // Show the legend
+        position: "top", // Position of the legend
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true, // Y-axis starts at 0
+      },
+    },
   };
 
   return (
@@ -330,12 +411,10 @@ const HomeDashboard = () => {
                         />
                       </svg>
                     </div>
-                    <span className="text-sm">Total Patients</span>
+                    <span className="text-sm">Total HIN checked</span>
                   </div>
                   <div>
-                    <p className="py-2 text-xl text-[#647284]">
-                      {totalPatients}
-                    </p>
+                    <p className="py-2 text-xl text-[#647284]">{totalHIN}</p>
                   </div>
                   <div className="text-sm flex justify-start items-center">
                     <span>
@@ -353,8 +432,10 @@ const HomeDashboard = () => {
                       </svg>
                     </span>
                     <p>
-                      <span className="text-[#72E128]">19% </span>increase from
-                      last month
+                      <span className="text-[#72E128]">
+                        {totalHINPercent}%{" "}
+                      </span>
+                      increase from last month
                     </p>
                   </div>
                 </div>
@@ -380,7 +461,7 @@ const HomeDashboard = () => {
                   </div>
                   <div>
                     <p className="py-2 text-xl text-[#647284]">
-                      {totalPatients}
+                      {totalDoctors}
                     </p>
                   </div>
                   <div className="text-sm flex justify-start items-center">
@@ -399,8 +480,10 @@ const HomeDashboard = () => {
                       </svg>
                     </span>
                     <p>
-                      <span className="text-[#72E128]">19% </span>increase from
-                      last month
+                      <span className="text-[#72E128]">
+                        {totalDoctorsPercent}%{" "}
+                      </span>
+                      increase from last month
                     </p>
                   </div>
                 </div>
@@ -409,7 +492,7 @@ const HomeDashboard = () => {
                 <div className="bg-white py-4 px-2 border rounded-md">
                   <div className="flex justify-start gap-3 items-center ">
                     <div className="bg-[#FFB849] bg-opacity-10 p-2 rounded-sm">
-                    <svg
+                      <svg
                         width="24"
                         height="24"
                         viewBox="0 0 24 24"
@@ -421,14 +504,11 @@ const HomeDashboard = () => {
                           fill="#FFB849"
                         />
                       </svg>
-                     
                     </div>
-                    <span className="text-sm">Assessment/Diagnosis</span>
+                    <span className="text-sm">Assessment / Diagnosis</span>
                   </div>
                   <div>
-                    <p className="py-2 text-xl text-[#647284]">
-                      {totalPatients}
-                    </p>
+                    <p className="py-2 text-xl text-[#647284]">{assDiag}</p>
                   </div>
                   <div className="text-sm flex justify-start items-center">
                     <span>
@@ -446,13 +526,13 @@ const HomeDashboard = () => {
                       </svg>
                     </span>
                     <p>
-                      <span className="text-[#72E128]">19% </span>increase from
-                      last month
+                      <span className="text-[#72E128]">{assDiagPercent}% </span>
+                      increase from last month
                     </p>
                   </div>
                 </div>
               </div>
-            
+
               <div className="col-span-2 sm:col-auto">
                 <div className="bg-white py-4 px-2 border rounded-md">
                   <div className="flex justify-start gap-3 items-center ">
@@ -473,9 +553,7 @@ const HomeDashboard = () => {
                     <span className="text-sm">Other Medical Personnel</span>
                   </div>
                   <div>
-                    <p className="py-2 text-xl text-[#647284]">
-                      {totalPatients}
-                    </p>
+                    <p className="py-2 text-xl text-[#647284]">{others}</p>
                   </div>
                   <div className="text-sm flex justify-start items-center">
                     <span>
@@ -493,11 +571,20 @@ const HomeDashboard = () => {
                       </svg>
                     </span>
                     <p>
-                      <span className="text-[#72E128]">19% </span>increase from
-                      last month
+                      <span className="text-[#72E128]">{othersPercent}% </span>
+                      increase from last month
                     </p>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 w-full ">
+              <div className=" lg:max-w-[700px]">
+               
+                <Line data={chartData} options={chartOptions} />
+              </div>
+              <div className="lg:max-w-[700px]">
+                <Line data={chartDataTwo} options={chartOptions} />
               </div>
             </div>
           </section>

@@ -6,6 +6,7 @@ const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
    const [data, setData] = useState(null);
     const[email, setEmail] = useState('fetching...')
+    const[name, setName] = useState('fetching...')
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -40,11 +41,14 @@ const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
         console.log("API Response:", response.data);
         setData(response.data); // Save the API response in state
         setLoading(false);
+        setName(response.data.hospital.name)
         setEmail(response.data.hospital.email)
+
       } catch (err) {
         console.error("Error fetching data:", err);
         console.log(err.response?.data?.message || "Error fetching data");
         setLoading(false);
+        setName('error, refresh')
         setEmail('error, refresh')
       }
     };
@@ -57,7 +61,7 @@ const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
       {/* Header */}
       <header className="hidden bg-white py-4 px-8 sm:flex justify-between items-center border">
         <h2 className="text-xl font-semibold">
-          Welcome back Jarus Hospital! 👋
+          Welcome back {name} Hospital! 👋
         </h2>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -75,7 +79,7 @@ const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
               />
             </div>
             <div className="flex flex-col items-start">
-              <p className="ml-2 text-sm font-medium">Jarus Hospital</p>
+              <p className="ml-2 text-sm font-medium">{name} Hospital</p>
               <p className="ml-2 text-sm text-gray-500"> {email}</p>
             </div>
           </div>
@@ -90,7 +94,7 @@ const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
           <p>
             {" "}
             <span className="font-light">Welcome back,</span> <br />
-            Jarus Hospital!{" "}
+            {name} Hospital!{" "}
           </p>
           <p className="text-md">👋</p>
         </div>
@@ -122,7 +126,7 @@ const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
             <div className="absolute top-20 right-4 bg-white shadow-md rounded-lg  p-2 z-50">
               <ul className="text-sm text-gray-700">
                 <li className="py-1 px-3 hover:bg-gray-100 cursor-pointer font-semibold">
-                  Jarus Hospital
+                  {name} Hospital
                 </li>
                 <li className="pb-1 px-3 hover:bg-gray-100 cursor-pointer text-sm">
                   {email}
