@@ -454,7 +454,7 @@ const HLP = () => {
                 className="bg-[#0000FF] w-full rounded-full text-white px-4 py-2 "
                 onClick={() => {
                   setnotification(false);
-                  navigate("/hospital-home-dashboard");
+                  navigate("/hospital-login");
                 }}
               >
                 Go To Dashboard

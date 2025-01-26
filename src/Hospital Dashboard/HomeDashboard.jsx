@@ -3,29 +3,7 @@ import logo from "../assets/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import DashHead from "./Dashboard Part/DashHead";
 import axios from "axios";
-import {
-  Chart as ChartJS,
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from "chart.js";
-import { Line } from "react-chartjs-2";
-
-ChartJS.register(
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
+import ReactApexChart from "react-apexcharts";
 
 const HomeDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -44,29 +22,6 @@ const HomeDashboard = () => {
 
   const isActive = (path = "/hospital-home-dashboard") =>
     location.pathname === path;
-
-  // const dataTab = Array.from({ length: 50 }, (_, index) => ({
-  //   name: "Amiefa Obed",
-  //   date: "28/08/2024",
-  //   time: "9:45AM",
-  //   diagnosis: "Typhoid and malaria",
-  //   hin: `54658***************${index + 1}`,
-  //   sex: "Male",
-  // }));
-
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const rowsPerPage = 8;
-
-  // const totalPages = Math.ceil(dataTab.length / rowsPerPage);
-
-  // const handleClick = (page) => {
-  //   setCurrentPage(page);
-  // };
-
-  // const paginatedData = dataTab.slice(
-  //   (currentPage - 1) * rowsPerPage,
-  //   currentPage * rowsPerPage
-  // );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,7 +56,7 @@ const HomeDashboard = () => {
         setTotalDoctorsPercent(response.data.hospital.doctors.change);
         setOthers(response.data.hospital.others.latest.value);
         setOthersPercent(response.data.hospital.others.change);
-        console.log(response.data.hospital.image)
+        console.log(response.data.hospital.image);
 
         setLoading(false);
       } catch (err) {
@@ -122,47 +77,69 @@ const HomeDashboard = () => {
     setIsSidebarOpen(false);
   };
 
-  const chartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], // Months
-    datasets: [
-      {
-        label: "Assessment/Diagnosis Created",
-        data: [70, 80, 90, 110, 120, 100], // Hardcoded values
-        borderColor: "red",
-        backgroundColor: "rgba(255, 99, 132, 0.2)", // Fill color under the line
-        fill: true, // Enable area fill under the line
-        tension: 0.4, // Smooth curves
-      },
-    ],
-  };
-  const chartDataTwo = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], // Months
-    datasets: [
-      {
-        label: "Patients HIN Checked",
-        data: [100, 120, 150, 200, 250, 220], // Hardcoded values
-        borderColor: "blue",
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-        fill: true,
-        tension: 0.4,
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: true, // Show the legend
-        position: "top", // Position of the legend
+  const chart1Options = {
+    chart: {
+      type: "area",
+      toolbar: { show: false },
+    },
+    colors: ["#FF4D4D"],
+    fill: {
+      type: "gradient",
+      gradient: {
+        shade: "light",
+        type: "vertical",
+        gradientToColors: ["#FFA3A3"],
+        stops: [0, 100],
       },
     },
-    scales: {
-      y: {
-        beginAtZero: true, // Y-axis starts at 0
+    dataLabels: { enabled: false },
+    stroke: { curve: "smooth" },
+    xaxis: {
+      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    },
+    yaxis: { labels: { formatter: (value) => `${value}` } },
+    grid: { borderColor: "#E5E7EB" },
+  };
+  
+  const chart1Series = [
+    {
+      name: "Assessment/diagnosis created",
+      data: [80, 90, 100, 120, 110, 95, 105, 115, 120, 125, 130, 140], // Data for 12 months
+    },
+  ];
+  
+  // Data and options for the second chart
+  const chart2Options = {
+    chart: {
+      type: "area",
+      toolbar: { show: false },
+    },
+    colors: ["#6A5ACD"],
+    fill: {
+      type: "gradient",
+      gradient: {
+        shade: "light",
+        type: "vertical",
+        gradientToColors: ["#B0C4DE"],
+        stops: [0, 100],
       },
     },
+    dataLabels: { enabled: false },
+    stroke: { curve: "smooth" },
+    xaxis: {
+      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    },
+    yaxis: { labels: { formatter: (value) => `${value}` } },
+    grid: { borderColor: "#E5E7EB" },
   };
+  
+  const chart2Series = [
+    {
+      name: "Patients HIN checked",
+      data: [100, 120, 150, 200, 220, 190, 210, 240, 260, 270, 280, 300], // Data for 12 months
+    },
+  ];
+  
 
   return (
     <div>
@@ -529,7 +506,7 @@ const HomeDashboard = () => {
                         />
                       </svg>
                     </div>
-                    <span className="text-sm">Assessment / Diagnosis</span>
+                    <span className="text-sm">Summary of Diagnosis / Treatment</span>
                   </div>
                   <div>
                     <p className="py-2 text-xl text-[#647284]">{assDiag}</p>
@@ -602,91 +579,34 @@ const HomeDashboard = () => {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 w-full ">
-              <div className=" lg:max-w-[700px]">
-                <Line data={chartData} options={chartOptions} />
-              </div>
-              <div className="lg:max-w-[700px]">
-                <Line data={chartDataTwo} options={chartOptions} />
-              </div>
-            </div>
-            {/* <div className="p-4">
-              <div className="">
-                <table className="table-auto w-full text-left border-collapse border border-gray-200">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="border border-gray-200 px-4 py-2">
-                        Patient's Name
-                      </th>
-                      <th className="border border-gray-200 px-4 py-2">Date</th>
-                      <th className="border border-gray-200 px-4 py-2">Time</th>
-                      <th className="border border-gray-200 px-4 py-2">
-                        Diagnosis
-                      </th>
-                      <th className="border border-gray-200 px-4 py-2">
-                        Health Identity Number (HIN)
-                      </th>
-                      <th className="border border-gray-200 px-4 py-2">Sex</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedData.map((row, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
-                        <td className="border border-gray-200 px-4 py-2">
-                          {row.name}
-                        </td>
-                        <td className="border border-gray-200 px-4 py-2">
-                          {row.date}
-                        </td>
-                        <td className="border border-gray-200 px-4 py-2">
-                          {row.time}
-                        </td>
-                        <td className="border border-gray-200 px-4 py-2">
-                          {row.diagnosis}
-                        </td>
-                        <td className="border border-gray-200 px-4 py-2">
-                          {row.hin}
-                        </td>
-                        <td className="border border-gray-200 px-4 py-2">
-                          {row.sex}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+
+            <div className="py-3 grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* First Chart */}
+              <div className="bg-white p-4 rounded-2xl shadow-md">
+                <h3 className=" font-semibold mb-4">
+                Summary of Diagnosis / Treatment
+                </h3>
+                <ReactApexChart
+                  options={chart1Options}
+                  series={chart1Series}
+                  type="area"
+                  height={300}
+                />
               </div>
 
-           
-              <div className="flex justify-center mt-4 space-x-2">
-                <button
-                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-                  onClick={() => handleClick(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </button>
-                {Array.from({ length: totalPages }, (_, index) => (
-                  <button
-                    key={index}
-                    className={`px-4 py-2 rounded ${
-                      currentPage === index + 1
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 hover:bg-gray-300"
-                    }`}
-                    onClick={() => handleClick(index + 1)}
-                  >
-                    {index + 1}
-                  </button>
-                ))}
-                <button
-                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-                  onClick={() => handleClick(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </button>
+              {/* Second Chart */}
+              <div className="bg-white p-4 rounded-2xl shadow-md">
+                <h3 className=" font-semibold mb-4">
+                  Patients HIN Checked
+                </h3>
+                <ReactApexChart
+                  options={chart2Options}
+                  series={chart2Series}
+                  type="area"
+                  height={300}
+                />
               </div>
-            </div> */}
+            </div>
           </section>
         </main>
       </div>

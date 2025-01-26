@@ -218,8 +218,7 @@ const ULP = () => {
                 </div>
               </div>
 
-              {/* Error Message */}
-              {error && <p className="text-red-500 text-sm">{error}</p>}
+          
 
               {/* Move to next step button */}
               <button
@@ -352,9 +351,7 @@ const ULP = () => {
                 </div>
               </div>
 
-              {/* Error Message */}
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-
+          
               {/* Move to next step button */}
               <button
                 type="button"
@@ -369,7 +366,7 @@ const ULP = () => {
             <p className="text-center text-sm text-gray-600 mt-4">
               Already have an account?{" "}
               <Link
-                to="//user-login"
+                to="/user-login"
                 className="text-[#0000FF] hover:underline"
               >
                 Sign in
@@ -428,7 +425,7 @@ const ULP = () => {
               <button
                 className="bg-[#0000FF] w-full rounded-full text-white px-4 py-2 "
                 onClick={() => {
-                  navigate("/user-home-dashboard");
+                  navigate("/user-login");
                 }}
               >
                 Go To Dashboard
@@ -550,9 +547,7 @@ const ULP = () => {
                   </div>
                 </div>
 
-                {/* Error Message */}
-                {error && <p className="text-red-500 text-sm">{error}</p>}
-
+          
                 {/* Move to next step button */}
                 <button
                   type="button"
@@ -567,7 +562,7 @@ const ULP = () => {
               <p className="text-center text-sm text-gray-600 mt-4">
                 Already have an account?{" "}
                 <Link
-                  to="/hospital-login"
+                  to="/user-login"
                   className="text-[#0000FF] hover:underline"
                 >
                   Sign in
@@ -684,9 +679,7 @@ const ULP = () => {
                   </div>
                 </div>
 
-                {/* Error Message */}
-                {error && <p className="text-red-500 text-sm">{error}</p>}
-
+         
                 {/* Move to next step button */}
                 <button
                   type="button"
@@ -701,7 +694,7 @@ const ULP = () => {
               <p className="text-center text-sm text-gray-600 mt-4">
                 Already have an account?{" "}
                 <Link
-                  to="/hospital-login"
+                  to="/user-login"
                   className="text-[#0000FF] hover:underline"
                 >
                   Sign in
