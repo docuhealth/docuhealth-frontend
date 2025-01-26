@@ -2,17 +2,19 @@ import React, { useState, useEffect } from "react";
 import logo from "../../assets/logo.png";
 import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React Icons
 import dashb from "../../assets/dashb.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const NP = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState("");
   const [notification, setNotification] = useState(false);
 
   const [notificationVisible, setNotificationVisible] = useState(false);
-
+  const [role, setRole] = useState("hospital");
   useEffect(() => {
     const isMobile = window.innerWidth <= 768; // Adjust breakpoint as needed
     if (isMobile) {
@@ -25,25 +27,64 @@ const NP = () => {
   }, []);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleSubmit = (e) => {
+  const { email } = location.state || {}; // Retrieve email from state
+
+  const handleSubmit = async (e) => {
+    setLoading("Resetting Password");
     e.preventDefault();
 
+    // Validate password and confirmPassword match
     if (password !== confirmPassword) {
-      setError("Passwords do not match. Please try again.");
+      toast.error("Passwords do not match. Please try again.");
+      setLoading("Reset Password");
       return;
     }
 
+    // Validate password length
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+      toast.error("Password must be at least 6 characters long.");
+      setLoading("Reset Password");
       return;
     }
 
-    setError("");
-    setNotification(true);
-    setNotificationVisible(false);
+    try {
+      // Prepare data payload
+      const payload = {
+        email, // Replace with the user's email
+        new_password: password, // New password entered by the user
+        role: role, // Replace with dynamic role if applicable
+      };
 
-    
+      // Make the POST request
+      const response = await fetch(
+        "https://docuhealth-backend.onrender.com/api/auth/reset_password",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload), // Send payload as JSON
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        toast.success("Password reset successful!"); // Success toast
+        setLoading("Reset Password");
+        setNotification(true); // Trigger any other notification logic
+        setNotificationVisible(false);
+      } else {
+        const errorData = await response.json();
+        setLoading("Reset Password");
+        toast.error(`Error: ${errorData.message}`); // Error toast
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again later."); // Network or unexpected error toast
+      console.error("Error resetting password:", error);
+      setLoading("Reset Password");
+    }
   };
 
   const handleNavigation = () => {
@@ -124,15 +165,12 @@ const NP = () => {
                   </div>
                 </div>
 
-                {/* Error Message */}
-                {error && <p className="text-red-500 text-sm">{error}</p>}
-
                 {/* Submit Button */}
                 <button
                   type="submit"
                   className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
                 >
-                  Reset Password
+                  {loading ? loading : "Reset Password"}
                 </button>
               </form>
             </div>
@@ -210,7 +248,6 @@ const NP = () => {
                 </h1>
               </div>
               <div className="px-5" id="temp">
-               
                 <h2 className="text-xl sm:text-2xl  mb-2 ">
                   Set Up A New Password
                 </h2>
@@ -274,15 +311,12 @@ const NP = () => {
                     </div>
                   </div>
 
-                  {/* Error Message */}
-                  {error && <p className="text-red-500 text-sm">{error}</p>}
-
                   {/* Submit Button */}
                   <button
                     type="submit"
                     className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
                   >
-                    Reset Password
+                    {loading ? loading : "Reset Password"}
                   </button>
                 </form>
               </div>

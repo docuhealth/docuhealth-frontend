@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import logo from "../../assets/logo.png";
 import dashb from "../../assets/dashb.png";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -12,6 +12,7 @@ const VerifyOTP = () => {
   const [loading, setLoading] = useState("");
 
   const location = useLocation();
+    const navigate = useNavigate();
   const { email } = location.state || {}; // Retrieve email from state
 
   useEffect(() => {
@@ -58,6 +59,7 @@ const VerifyOTP = () => {
         {
           otp: enteredOtp,
           email: email,
+          role: role
         }
       );
 
@@ -67,6 +69,9 @@ const VerifyOTP = () => {
         setLoading("Proceed");
         // Perform further actions based on response
         toast.success(response.data.message || "OTP Verified!");
+        setTimeout(() => {
+          navigate("/hospital-set-new-password",  { state: { email } });
+        }, 1000);
       } else {
         console.error("OTP verification failed:", response.data);
         setLoading("Proceed");

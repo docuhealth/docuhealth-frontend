@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import logo from "../assets/logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import DashHead from "./Dashboard Part/DashHead";
+import axios from "axios";
 
 const LogOutDashboard = () => {
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState('');
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,40 +46,52 @@ const LogOutDashboard = () => {
   //   localStorage.removeItem('login'); 
   //   navigate('/hospital-login')
   // }
-
   const handleLogOut = async () => {
-    const role = "hospital"; // Replace with the appropriate role dynamically if needed
-  
+    setLoading('Logging Out')
+
+    const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+      console.log("Token:", token);
+
+      if (!token) {
+        console.log("Token not found. Please log in again.");
+        setLoading(false);
+        return;
+      }
     try {
       // Make the POST request to the API
-      const response = await fetch("https://docuhealth-backend.onrender.com/api/auth/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Include token if required
-        },
-        body: JSON.stringify({ role }), // Add the role variable in the body
-      });
+      const response = await axios.post(
+        "https://docuhealth-backend.onrender.com/api/auth/logout",
+        {}, // No body needed for this request
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include token if required
+          },
+        }
+      );
   
       // Check if the response is successful
-      if (response.ok) {
-        const data = await response.json(); // Parse the response JSON
-        console.log("Logout successful:", data.message);
-  
+      if (response.status === 200) {
+        console.log("Logout successful:", response.data.message);
+        
+        setLoading('Yes I am sure, Log Out')
         // Perform logout logic
+        localStorage.removeItem("jwtToken"); // Remove token if applicable
         localStorage.removeItem("login"); // Remove login data
-        localStorage.removeItem("token"); // Remove token if applicable
         navigate("/hospital-login"); // Redirect to the login page
-      } else {
-        // Handle error response
-        const errorData = await response.json();
-        console.error("Logout failed:", errorData.message);
-        alert("Logout failed. Please try again.");
       }
     } catch (error) {
-      // Handle network or unexpected errors
-      console.error("An error occurred during logout:", error.message);
-      alert("An error occurred. Please try again later.");
+      // Handle error response
+      if (error.response) {
+        console.error("Logout failed:", error.response.data.message);
+        alert("Logout failed. Please try again.");
+        setLoading('Yes I am sure, Log Out')
+      } else {
+        // Handle network or unexpected errors
+        console.error("An error occurred during logout:", error.message);
+        alert("An error occurred. Please try again later.");
+        setLoading('Yes I am sure, Log Out')
+      }
     }
   };
   
@@ -366,7 +380,7 @@ const LogOutDashboard = () => {
                         </p>
                       </div>
                       <div className="text-center bg-[#0000FF] text-white py-2 rounded-full">
-                        <p className="font-normal cursor-pointer" onClick={handleLogOut}>{message.by}</p>
+                        <p className="font-normal cursor-pointer" onClick={handleLogOut}> {loading ? loading: message.by}</p>
                       </div>
                     </div>
                   ))}

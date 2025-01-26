@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from "react";
 import logo from "../../assets/logo.png";
 import dashb from "../../assets/dashb.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const VerifyOTP = () => {
 
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
       const [notificationVisible, setNotificationVisible] = useState(false);
+     const [role, setRole] = useState("patient");
+      const [loading, setLoading] = useState("");
+    
+      const location = useLocation();
+        const navigate = useNavigate();
+        const { email, phone_num } = location.state || {};
     
       useEffect(() => {
         const isMobile = window.innerWidth <= 768; // Adjust breakpoint as needed
@@ -37,15 +45,88 @@ const VerifyOTP = () => {
         }
       };
     
-      const handleSubmit = (e) => {
+      const handleSubmit = async (e) => {
+        setLoading("Verifying Otp");
         e.preventDefault();
-        console.log("Entered OTP:", otp.join(""));
+      
+        try {
+          // Combine the OTP array into a single string
+          const enteredOtp = otp.join("");
+          console.log("Entered OTP:", enteredOtp, email || phone_num);
+      
+          // Dynamically determine which field to send (email or phone_num)
+          const payload = {
+            otp: enteredOtp,
+            ...(email ? { email } : { phone_num }), // Send either email or phone_num
+            role: role, // Include the role in the request
+          };
+      
+          // Send the request to the API
+          const response = await axios.post(
+            "https://docuhealth-backend.onrender.com/api/auth/verify_otp",
+            payload
+          );
+      
+          // Handle the response
+          if (response.status === 200) {
+            console.log("OTP verified successfully:", response.data);
+            setLoading("Proceed");
+      
+            // Display success message
+            toast.success(response.data.message || "OTP Verified!");
+      
+            // Navigate and pass the appropriate data
+            const navigateData = email ? { email } : { phone_num };
+            setTimeout(() => {
+              navigate("/user-set-new-password", { state: navigateData });
+            }, 1000);
+          } else {
+            console.error("OTP verification failed:", response.data);
+            setLoading("Proceed");
+            toast.error("OTP Verification Failed.");
+          }
+        } catch (error) {
+          console.error("Error during OTP verification:", error.message);
+          setLoading("Proceed");
+          toast.error("OTP Verification Failed, Try Again");
+        }
       };
+      
     
-      const handleResend = () => {
+      const handleResend = async () => {
         console.log("Resend OTP");
+      
+        try {
+          // Prepare the payload dynamically
+          const payload = {
+            role, // Include the role
+            ...(email ? { email } : { phone_num }), // Dynamically add email or phone_num
+          };
+      
+          // Make the POST request
+          const response = await fetch(
+            "https://docuhealth-backend.onrender.com/api/auth/forgot_password",
+            {
+              method: "POST", // Use POST method for sending data
+              headers: {
+                "Content-Type": "application/json", // Indicate the payload format
+              },
+              body: JSON.stringify(payload), // Send the payload
+            }
+          );
+      
+          if (response.ok) {
+            toast.success("OTP sent successfully!");
+          } else {
+            const errorData = await response.json();
+            toast.error(errorData.message || "Failed to resend OTP, try again.");
+          }
+        } catch (error) {
+          console.error(`Error: ${error.message}`);
+          toast.error("An error occurred. Please try again later.");
+        }
       };
-    
+      
   return (
     <div>
        <div className="min-h-screen">
@@ -103,7 +184,7 @@ const VerifyOTP = () => {
                         type="submit"
                         className="w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
                       >
-                        Proceed
+                        {loading ? loading : "Proceed"}
                       </button>
                     </form>
                   </div>
@@ -192,7 +273,7 @@ const VerifyOTP = () => {
                         type="submit"
                         className="w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
                       >
-                        Proceed
+                        {loading ? loading : "Proceed"}
                       </button>
                     </form>
                   </div>

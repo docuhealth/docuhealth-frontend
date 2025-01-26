@@ -66,7 +66,7 @@ const HLP = () => {
   // Create FormData object
   const formData = new FormData();
   if (image) {
-    formData.append("image_msg", image); // Ensure `image` is validated if needed
+    formData.append("image", image); // Ensure `image` is validated if needed
   }
 
   try {

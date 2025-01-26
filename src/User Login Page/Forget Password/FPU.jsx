@@ -2,12 +2,84 @@ import React, { useState, useEffect } from "react";
 import logo from "../../assets/logo.png";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import dashb from "../../assets/dashb.png";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+
 
 
 const FP = () => {
      const [email, setEmail] = useState("");
-      const handleSubmit = () => {};
-    
+       const [role, setRole] = useState("patient");
+       const [loading, setLoading] = useState('');
+
+        const navigate = useNavigate();
+
+     
+
+
+        const handleSubmit = async (e) => {
+          setLoading("Sending Otp");
+          e.preventDefault();
+        
+          // Check if input is an email or phone number
+          const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+          const isPhoneNumber = /^\d+$/.test(email); // Checks if input contains only digits
+        
+          if (!isEmail && !isPhoneNumber) {
+            toast.error("Please enter a valid email or phone number.");
+            setLoading("Send Otp");
+            return;
+          }
+        
+          try {
+            // Prepare the payload
+            const payload = {
+              role, // Add the appropriate role
+              ...(isEmail ? { email } : { phone_num: email }), // Dynamically add email or phone
+            };
+        
+            // Make the POST request
+            const response = await fetch(
+              "https://docuhealth-backend.onrender.com/api/auth/forgot_password",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+              }
+            );
+        
+            // Handle the response
+            if (response.ok) {
+              const data = await response.json();
+              setLoading("Send Otp");
+              toast.success(data.message || "OTP sent successfully!");
+              
+              // Navigate with appropriate data
+              const navigateData = isEmail ? { email } : { phone_num: email };
+              setTimeout(() => {
+                navigate("/user-verify-otp", { state: navigateData });
+              }, 1000);
+            } else {
+              const errorData = await response.json().catch(() => null); // Safely parse response
+              const errorMessage = errorData?.message || "Failed to send OTP. Please try again.";
+              toast.error(errorMessage);
+              setLoading("Send Otp");
+            }
+          } catch (error) {
+            // Handle unexpected errors
+            console.error("An error occurred:", error);
+            toast.error("An error occurred. Please try again later.");
+            setLoading("Send Otp");
+          }
+        };
+        
+
+
+
       const [notificationVisible, setNotificationVisible] = useState(false);
     
       useEffect(() => {
@@ -41,7 +113,7 @@ const FP = () => {
                         <p className="font-semibold pb-1">Enter Email / Phone Number :</p>
                         <div className="relative">
                           <input
-                            type="email"
+                            type="text"
                             className="w-full px-4 py-3 border rounded-lg pl-5 outline-none focus:border-blue-500"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -58,7 +130,8 @@ const FP = () => {
                           
                         `}
                       >
-                        Send OTP
+                       
+                     {loading ? loading: "Send Otp"}
                       </button>
                     </form>
                   </div>
@@ -129,7 +202,8 @@ const FP = () => {
                           
                         `}
                       >
-                        Send OTP
+                      
+                     {loading ? loading: "Send Otp"}
                       </button>
                     </form>
                   </div>

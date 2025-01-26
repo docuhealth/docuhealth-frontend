@@ -45,6 +45,29 @@ const HomeDashboard = () => {
   const isActive = (path = "/hospital-home-dashboard") =>
     location.pathname === path;
 
+  // const dataTab = Array.from({ length: 50 }, (_, index) => ({
+  //   name: "Amiefa Obed",
+  //   date: "28/08/2024",
+  //   time: "9:45AM",
+  //   diagnosis: "Typhoid and malaria",
+  //   hin: `54658***************${index + 1}`,
+  //   sex: "Male",
+  // }));
+
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const rowsPerPage = 8;
+
+  // const totalPages = Math.ceil(dataTab.length / rowsPerPage);
+
+  // const handleClick = (page) => {
+  //   setCurrentPage(page);
+  // };
+
+  // const paginatedData = dataTab.slice(
+  //   (currentPage - 1) * rowsPerPage,
+  //   currentPage * rowsPerPage
+  // );
+
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
@@ -78,6 +101,7 @@ const HomeDashboard = () => {
         setTotalDoctorsPercent(response.data.hospital.doctors.change);
         setOthers(response.data.hospital.others.latest.value);
         setOthersPercent(response.data.hospital.others.change);
+        console.log(response.data.hospital.image)
 
         setLoading(false);
       } catch (err) {
@@ -580,13 +604,89 @@ const HomeDashboard = () => {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 w-full ">
               <div className=" lg:max-w-[700px]">
-               
                 <Line data={chartData} options={chartOptions} />
               </div>
               <div className="lg:max-w-[700px]">
                 <Line data={chartDataTwo} options={chartOptions} />
               </div>
             </div>
+            {/* <div className="p-4">
+              <div className="">
+                <table className="table-auto w-full text-left border-collapse border border-gray-200">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="border border-gray-200 px-4 py-2">
+                        Patient's Name
+                      </th>
+                      <th className="border border-gray-200 px-4 py-2">Date</th>
+                      <th className="border border-gray-200 px-4 py-2">Time</th>
+                      <th className="border border-gray-200 px-4 py-2">
+                        Diagnosis
+                      </th>
+                      <th className="border border-gray-200 px-4 py-2">
+                        Health Identity Number (HIN)
+                      </th>
+                      <th className="border border-gray-200 px-4 py-2">Sex</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedData.map((row, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="border border-gray-200 px-4 py-2">
+                          {row.name}
+                        </td>
+                        <td className="border border-gray-200 px-4 py-2">
+                          {row.date}
+                        </td>
+                        <td className="border border-gray-200 px-4 py-2">
+                          {row.time}
+                        </td>
+                        <td className="border border-gray-200 px-4 py-2">
+                          {row.diagnosis}
+                        </td>
+                        <td className="border border-gray-200 px-4 py-2">
+                          {row.hin}
+                        </td>
+                        <td className="border border-gray-200 px-4 py-2">
+                          {row.sex}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+           
+              <div className="flex justify-center mt-4 space-x-2">
+                <button
+                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                  onClick={() => handleClick(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <button
+                    key={index}
+                    className={`px-4 py-2 rounded ${
+                      currentPage === index + 1
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 hover:bg-gray-300"
+                    }`}
+                    onClick={() => handleClick(index + 1)}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+                <button
+                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                  onClick={() => handleClick(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </div>
+            </div> */}
           </section>
         </main>
       </div>
