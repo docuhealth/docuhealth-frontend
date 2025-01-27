@@ -28,20 +28,32 @@ const VerifyOTP = () => {
       }, []);
     
       const handleChange = (value, index) => {
-        if (isNaN(value)) return; // Ensure only numbers are entered
+        // Allow only numeric values
+        if (!/^\d?$/.test(value)) return;
+      
         const updatedOtp = [...otp];
         updatedOtp[index] = value;
         setOtp(updatedOtp);
-    
-        // Move focus to the next input if value is entered
+      
+        // Move focus to the next input if a digit is entered
         if (value && index < otp.length - 1) {
-          document.getElementById(`otp-${index + 1}`).focus();
+          const nextInput = document.getElementById(`otp-${index + 1}`);
+          if (nextInput) nextInput.focus();
         }
       };
-    
+      
       const handleKeyDown = (e, index) => {
-        if (e.key === "Backspace" && !otp[index] && index > 0) {
-          document.getElementById(`otp-${index - 1}`).focus();
+        if (e.key === "Backspace") {
+          if (!otp[index] && index > 0) {
+            // Move focus to the previous input if the current one is empty
+            const previousInput = document.getElementById(`otp-${index - 1}`);
+            if (previousInput) previousInput.focus();
+          } else {
+            // Clear the current input value
+            const updatedOtp = [...otp];
+            updatedOtp[index] = "";
+            setOtp(updatedOtp);
+          }
         }
       };
     

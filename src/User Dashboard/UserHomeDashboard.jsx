@@ -38,41 +38,58 @@ const UserHomeDashboard = () => {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
-      console.log("Token:", token);
-  
-      if (!token) {
-        console.log("Token not found. Please log in again.");
-        setLoading(false);
-        return;
-      }
-  
+    const fetchPatientDashboard = async (page = 1, size = 10) => {
+      // Retrieve the JWT token from localStorage
+      const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+      const role = "patient"; // Replace with the required role
+    
       try {
-        console.log("Fetching data...");
-        const response = await axios.get(
-          "https://docuhealth-backend.onrender.com/api/patient/dashboard",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-              "Content-Type": "application/json",
-            },
-          }
-        );
-  
-        console.log("API Response:", response.data);
-        setData(response.data); // Save the API response in state
-        console.log(response.data)
-        
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        console.log(err.response?.data?.message || "Error fetching data");
-        setLoading(false);
+        // Construct the URL with query parameters
+        const url = `https://docuhealth-backend.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
+    
+        // Make the GET request
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+            Role: role, // Add role to the headers
+          },
+        });
+    
+        // Handle the response
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Patient Dashboard Data:", data);
+    
+          // Display a success message or process the data as needed
+          return data;
+        } else {
+          const errorData = await response.json();
+          console.error("Failed to fetch dashboard data:", errorData);
+    
+          // Handle errors with a message from the API
+          throw new Error(errorData.message || "Failed to fetch dashboard data.");
+        }
+      } catch (error) {
+        console.error("An unexpected error occurred:", error);
+    
+        // Handle unexpected errors
+        throw error;
       }
     };
-  
-    fetchData();
+    
+    // Example Usage
+    fetchPatientDashboard(1, 10)
+      .then((data) => {
+        // Process the dashboard data
+        console.log("Dashboard Data:", data);
+      })
+      .catch((error) => {
+        // Handle errors
+        console.error("Error:", error.message);
+      });
+    
   }, []);
 
   const closeNoticeMessage = () => {

@@ -349,9 +349,6 @@ const LogOutDashboard = () => {
           />
           {/* Content */}
           <section className="p-8">
-            <div className=" ">
-              <div className="flex justify-center items-center"></div>
-            </div>
             {noticeDisplay && (
               <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50 ">
                 <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative max-h-[80vh] overflow-y-auto mx-5">

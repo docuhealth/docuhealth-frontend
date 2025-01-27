@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import UserDashHead from "./Dashboard Part/UserDashHead";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
+import { toast } from "react-toastify";
 
 const UserSubAcctDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -39,21 +40,70 @@ const UserSubAcctDashboard = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault(); // Prevents page reload
-    console.log("Form Submitted:", formData);
-    // Add your submission logic here (e.g., send data to a backend or Firebase)
 
-    // Close the overlay after submission
-    setShowOverlay(false);
+    // Prepare the data to send
+    const requestBody = {
+      firstname: formData.firstName,
+      lastname: formData.lastName,
+      DOB: formData.dateOfBirth,
+      sex: formData.sex,
+    };
 
-    // Reset form data
-    setFormData({
-      firstName: "",
-      lastName: "",
-      dateOfBirth: "",
-      sex: "",
-    });
+    // Retrieve JWT token and role from localStorage
+    const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your actual token key
+    const role = "patient"; // Replace "role" with your actual role key
+
+    try {
+      const response = await fetch(
+        "https://docuhealth-backend.onrender.com/api/patient/subaccounts/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`, // Add the JWT token to the Authorization header
+            role: role, // Add the role to the headers
+          },
+          body: JSON.stringify(requestBody), // Convert the request body to JSON
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Form Submitted Successfully:", result);
+
+        // Show success toast
+        toast.success("Form submitted successfully!");
+
+        // Close the overlay after successful submission
+        setShowOverlay(false);
+
+        // Reset form data
+        setFormData({
+          firstName: "",
+          lastName: "",
+          dateOfBirth: "",
+          sex: "",
+        });
+      } else {
+        console.error(
+          "Failed to submit the form:",
+          response.status,
+          response.statusText
+        );
+        const errorData = await response.json();
+        console.error("Error Details:", errorData);
+
+        // Show error toast with message from the API or generic message
+        toast.error("An error occurred while submitting the form.");
+      }
+    } catch (error) {
+      console.error("An error occurred while submitting the form:", error);
+
+      // Show error toast for unexpected errors
+      toast.error("An unexpected error occurred. Please try again later.");
+    }
   };
 
   const [subAccounts, setSubAccounts] = useState([]);
@@ -472,7 +522,9 @@ const UserSubAcctDashboard = () => {
                       </div>
                     </div>
                     <div className="col-span-2 text-center bg-[#0000FF] text-white py-3 px-4 rounded-full">
-                      <button type="submit">Create Account</button>
+                      <button type="submit" onClick={handleChange}>
+                        Create Account
+                      </button>
                     </div>
                   </form>
                 </div>
@@ -609,14 +661,14 @@ const UserSubAcctDashboard = () => {
                   <div className=" flex justify-between items-center py-3 relative ">
                     <p>HIN : {account.HIN}</p>
                     <p>
-                    <i
-                            className={`bx bx-dots-vertical-rounded ml-3  p-2 ${
-                              openPopover === index
-                                ? "bg-slate-300 p-2 rounded-full"
-                                : ""
-                            }`}
-                            onClick={() => togglePopover(index)}
-                          ></i>
+                      <i
+                        className={`bx bx-dots-vertical-rounded ml-3  p-2 ${
+                          openPopover === index
+                            ? "bg-slate-300 p-2 rounded-full"
+                            : ""
+                        }`}
+                        onClick={() => togglePopover(index)}
+                      ></i>
                     </p>
                     {openPopover === index && (
                       <div className="absolute right-0 top-10  mt-2 bg-white border shadow-md rounded-lg p-2 w-52 text-center z-30">
