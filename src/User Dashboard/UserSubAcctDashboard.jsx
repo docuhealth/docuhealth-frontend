@@ -53,7 +53,6 @@ const UserSubAcctDashboard = () => {
 
     // Retrieve JWT token and role from localStorage
     const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your actual token key
-    const role = "patient"; // Replace "role" with your actual role key
 
     try {
       const response = await fetch(
@@ -63,7 +62,6 @@ const UserSubAcctDashboard = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${jwtToken}`, // Add the JWT token to the Authorization header
-            role: role, // Add the role to the headers
           },
           body: JSON.stringify(requestBody), // Convert the request body to JSON
         }

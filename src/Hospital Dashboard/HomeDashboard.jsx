@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import DashHead from "./Dashboard Part/DashHead";
 import axios from "axios";
 import ReactApexChart from "react-apexcharts";
+import DynamicDate from "../Dynamic Date/DynamicDate";
 
 const HomeDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -392,7 +393,7 @@ const HomeDashboard = () => {
           {/* Content */}
           <section className="p-8">
             <div className=" sm:p-0">
-              <p className="text-gray-500">Monday 25th, 2024</p>
+              <DynamicDate />
             </div>
             <div className="  my-5 grid grid-cols-2  lg:grid-cols-4 gap-2">
               <div>

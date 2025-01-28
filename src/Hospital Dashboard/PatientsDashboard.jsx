@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import logo from "../assets/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import DashHead from "./Dashboard Part/DashHead";
+import DynamicDate from "../Dynamic Date/DynamicDate";
 
 const PatientsDashboard = () => {
   const [isOverlayVisible, setOverlayVisible] = useState(false);
@@ -277,7 +278,7 @@ const PatientsDashboard = () => {
           <section className="p-8">
             <div className="flex flex-col md:flex-row justify-start items-start md:justify-between md:items-center gap-3">
               <div className=" sm:p-0">
-                <p className="text-gray-500">Monday 25th, 2024</p>
+               <DynamicDate />
               </div>
               <div>
                 <button

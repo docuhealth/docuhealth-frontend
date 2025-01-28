@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../assets/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import profilepic from "../assets/profile.png";
@@ -7,19 +7,62 @@ import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React
 import DashHead from "./Dashboard Part/DashHead";
 import axios from "axios";
 import { toast } from "react-toastify";
+import DynamicDate from "../Dynamic Date/DynamicDate";
+import { useNavigate } from "react-router-dom";
 
 const SettingsDashboard = () => {
+  const [email, setEmail] = useState("fetching...");
+  const [name, setName] = useState("fetching...");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [newpassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+   const [loading, setLoading] = useState('');
+   const [deactivate, setDeactivate] = useState('');
 
   const [isEmailEnabled, setIsEmailEnabled] = useState(false);
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
   const [isDashboardEnabled, setIsDashboardEnabled] = useState(false);
 
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+      console.log("Token:", token);
+
+      if (!token) {
+        console.log("Token not found. Please log in again.");
+
+        return;
+      }
+
+      try {
+        console.log("Fetching data...");
+        const response = await axios.get(
+          "https://docuhealth-backend.onrender.com/api/hospital/dashboard",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        setName(response.data.hospital.name);
+        setEmail(response.data.hospital.email);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        console.log(err.response?.data?.message || "Error fetching data");
+        setName("error, refresh");
+        setEmail("error, refresh");
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const isActive = (path = "/hospital-home-dashboard") =>
     location.pathname === path;
@@ -53,7 +96,6 @@ const SettingsDashboard = () => {
     try {
       // Retrieve token from local storage
       const token = localStorage.getItem("jwtToken");
-      const role = "hospital"; // Example role
 
       if (!token) {
         console.error("No token found. Please log in again.");
@@ -64,7 +106,6 @@ const SettingsDashboard = () => {
       const payload = {
         name: formData.name,
         email: formData.email,
-        password: "account", // Replace with actual password if needed
         address: formData.address,
         doctors: parseInt(formData.doctors, 10) || 0,
         others: parseInt(formData.otherPersonnel, 10) || 0,
@@ -80,7 +121,6 @@ const SettingsDashboard = () => {
           headers: {
             Authorization: `Bearer ${token}`, // Include JWT token
             "Content-Type": "application/json",
-            Role: role, // Add role to the headers
           },
         }
       );
@@ -104,6 +144,7 @@ const SettingsDashboard = () => {
   };
 
   const handleSecurityCancel = () => {
+
     setPassword("");
     setConfirmPassword("");
     setNewPassword("");
@@ -111,10 +152,248 @@ const SettingsDashboard = () => {
 
   const [isConfirmed, setIsConfirmed] = useState(false);
 
-  const handleDelete = () => {
-    console.log("Account deletion confirmed");
-    // Add deletion logic here
+ 
+
+  const handlePasswordUpdate = async (e) => {
+    setLoading('Saving Changes')
+    e.preventDefault();
+
+      // Validate input fields
+  if (!password || !newpassword || !confirmPassword) {
+    toast.error("All fields are required!"); // Show error toast
+    setLoading("Save Changes");
+    return;
+  }
+
+  if (newpassword !== confirmPassword) {
+    toast.error("New password and confirm password do not match!"); // Show error toast
+    setLoading("Save Changes");
+    return;
+  }
+  
+    try {
+      const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+      console.log("Token:", token);
+  
+      if (!token) {
+        console.log("Token not found. Please log in again.");
+        toast.error("Token not found. Please log in again."); // Show error toast
+      
+        return;
+      }
+  
+      const payloadinfo = {
+        old_password: password,
+        new_password: newpassword,
+      };
+  
+      // Send the PATCH request
+      const response = await axios.patch(
+        "https://docuhealth-backend.onrender.com/api/hospital/settings/update_hospital_password", // Replace with your API URL
+        payloadinfo,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include JWT token
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      // Display success notification
+      if (response.status === 200) {
+        console.log("API Response:", response.data);
+        toast.success("Password updated successfully!"); // Show success toast
+        setLoading('Save Changes')
+        setPassword('')
+        setNewPassword('')
+        setConfirmPassword('')
+        
+      } else {
+        toast.warning("Password update encountered an issue. Please try again.");
+        setLoading('Save Changes')
+        setPassword('')
+        setNewPassword('')
+        setConfirmPassword('')
+      }
+    } catch (error) {
+      // Handle error and display notification
+      if (error.response) {
+        console.error("API Error Response:", error.response.data);
+        toast.error(
+          error.response.data.message ||  "Failed to update password. Please try again."
+        );
+
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+        toast.error("No response from the server. Please check your connection.");
+      } else {
+        console.error("Error:", error.message);
+        toast.error(`An error occurred: ${error.message}`);
+      }
+      setLoading('Save Changes')
+      setPassword('')
+        setNewPassword('')
+        setConfirmPassword('')
+    }
   };
+
+
+  const handleNotificationUpdate = async (e) => {
+    setLoading('Saving Changes')
+    e.preventDefault();
+  
+    const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+    console.log("Token:", token);
+
+    if (!token) {
+      console.log("Token not found. Please log in again.");
+      setLoading(false);
+      return;
+    }
+    // Prepare the payload data
+    const payload = {
+      sign_in: {
+        email: isEmailEnabled ? "true" : "false",
+        push: isNotificationEnabled ? "true" : "false",
+        dashboard: isDashboardEnabled ? "true" : "false",
+      },
+      info_change: {
+        email: isEmailEnabled ? "true" : "false",
+        push: isNotificationEnabled ? "true" : "false",
+        dashboard: isDashboardEnabled ? "true" : "false",
+      },
+      accessment_diagnosis: {
+        email: isEmailEnabled ? "true" : "false",
+        push: isNotificationEnabled ? "true" : "false",
+        dashboard: isDashboardEnabled ? "true" : "false",
+      },
+    };
+  
+   
+    // Check if any toggle button is changed
+    const isAnyOptionChanged = Object.values(payload).some((section) =>
+      Object.values(section).includes("true")
+    );
+  
+    if (!isAnyOptionChanged) {
+      toast.error("No changes detected. Please toggle at least one option.");
+      setLoading('Save Changes')
+      return;
+    }
+  
+    
+  
+    try {
+      // Send the payload to the API
+      const response = await axios.patch(
+        "https://docuhealth-backend.onrender.com/api/hospital/settings/update_hospital_notification_settings", // Replace with your API endpoint
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      // Handle success
+      if (response.status === 200) {
+        toast.success("Notification preferences updated successfully!");
+        setLoading('Save Changes')
+        setIsEmailEnabled(false)
+        setIsDashboardEnabled(false)
+        setIsNotificationEnabled(false)
+      } else {
+        toast.warning("Unexpected response from the server.");
+        setLoading('Save Changes')
+        setIsEmailEnabled(false)
+        setIsDashboardEnabled(false)
+        setIsNotificationEnabled(false)
+      }
+    } catch (error) {
+      // Handle error
+      if (error.response) {
+        console.error("API Error Response:", error.response.data);
+        toast.error(error.response.data.message || "Failed to update preferences.");
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+        toast.error("No response from the server. Please check your connection.");
+      } else {
+        console.error("Error:", error.message);
+        toast.error(`An error occurred: ${error.message}`);
+        setIsEmailEnabled(false)
+        setIsDashboardEnabled(false)
+        setIsNotificationEnabled(false)
+      }
+    } finally {
+      setLoading('Save Changes')
+      setIsEmailEnabled(false)
+      setIsDashboardEnabled(false)
+      setIsNotificationEnabled(false)
+    }
+  };
+
+  const handleNotificationCancel = () => {
+    setIsEmailEnabled(false)
+    setIsDashboardEnabled(false)
+    setIsNotificationEnabled(false)
+  }
+
+  const handleAccountDeactivation = async () => {
+    setDeactivate('Deactivatting Account')
+
+    try {
+      // Make the DELETE request to the API
+      const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+      if (!token) {
+        toast.error("Authentication failed. Please log in again.");
+        return;
+      }
+  
+      const response = await axios.delete(
+        "https://docuhealth-backend.onrender.com/api/hospital/delete", // Replace with your API endpoint
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include JWT token
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      // Check if the response is successful
+      if (response.status === 200) {
+        // Remove token and login from localStorage
+        localStorage.removeItem("jwtToken");
+        localStorage.removeItem("login");
+  
+        setDeactivate('Deactivate Account')
+        // Navigate to hospital-login
+        toast.success("Account successfully deactivated.");
+        navigate("/hospital-login");
+
+      } else {
+        // If the API responds with an error
+        toast.error(response.data.message || "Failed to deactivate account. Please try again.");
+         setDeactivate('Deactivate Account')
+      }
+    } catch (error) {
+      // Handle errors
+      if (error.response) {
+        console.error("API Error Response:", error.response.data);
+        toast.error(error.response.data.message || "An error occurred. Please try again.");
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+        toast.error("No response from the server. Please check your internet connection.");
+      } else {
+        console.error("Error:", error.message);
+        toast.error(`An error occurred: ${error.message}`);
+      }
+    } finally{
+       setDeactivate('Deactivate Account')
+    }
+  };
+
+
 
   const tabs = [
     {
@@ -252,7 +531,7 @@ const SettingsDashboard = () => {
               </label>
 
               <button
-                onClick={handleDelete}
+                onClick={handleAccountDeactivation}
                 disabled={!isConfirmed}
                 className={` px-5 py-2 text-sm font-medium text-white rounded-full 
           ${
@@ -262,7 +541,7 @@ const SettingsDashboard = () => {
           }
         `}
               >
-                Deactivate Account
+              {deactivate ? deactivate : "Deactivate Account"}
               </button>
             </div>
           </div>
@@ -360,8 +639,9 @@ const SettingsDashboard = () => {
             <button
               type="submit"
               className="px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
+              onClick={handlePasswordUpdate}
             >
-              Save Changes
+              {loading ? loading: "Save Changes"}
             </button>
             <button
               type="button"
@@ -536,6 +816,24 @@ const SettingsDashboard = () => {
                 <span className="text-sm text-gray-700">Dashboard</span>
               </div>
             </div>
+          </div>
+
+            {/* Buttons */}
+            <div className="flex flex-row justify-around sm:justify-start  space-x-4">
+            <button
+              type="submit"
+              className="px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
+              onClick={handleNotificationUpdate}
+            >
+              {loading ? loading: "Save Changes"}
+            </button>
+            <button
+              type="button"
+              onClick={handleNotificationCancel}
+              className="px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
+            >
+              Cancel Changes
+            </button>
           </div>
         </div>
       ),
@@ -793,7 +1091,7 @@ const SettingsDashboard = () => {
           {/* Content */}
           <section className="p-0 sm:p-8 ">
             <div className="p-5 sm:p-0">
-              <p className="text-gray-500">Monday 25th, 2024</p>
+              <DynamicDate />
             </div>
             <hr className="sm:hidden" />
 
@@ -801,8 +1099,8 @@ const SettingsDashboard = () => {
               <div className="flex items-center gap-3">
                 <img src={profilepic} alt="" className="w-14" />
                 <div>
-                  <p>Jarus Hospital</p>
-                  <p className="text-gray-500 text-sm">jarus@gmail.com</p>
+                  <p>{name} Hospital</p>
+                  <p className="text-gray-500 text-sm">{email}</p>
                 </div>
               </div>
               <div>

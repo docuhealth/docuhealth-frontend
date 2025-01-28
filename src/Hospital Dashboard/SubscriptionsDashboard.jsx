@@ -3,6 +3,7 @@ import logo from "../assets/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import Data from "./Subscription Data/Data.json";
 import DashHead from "./Dashboard Part/DashHead";
+import DynamicDate from "../Dynamic Date/DynamicDate";
 
 
 const SubscriptionsDashboard = () => {
@@ -252,8 +253,8 @@ const SubscriptionsDashboard = () => {
 
           {/* Content */}
           <section className="p-0 sm:p-8">
-            <div className="py-7 px-8 sm:p-0">
-              <p className="text-gray-500">Monday 25th, 2024</p>
+            <div className="py-10 px-8 sm:p-0 sm:pb-5">
+              <DynamicDate />
             </div>
             <div className=" sm:border mb-5 px-5 py-5 sm:rounded-3xl bg-white">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
