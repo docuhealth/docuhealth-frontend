@@ -2,39 +2,101 @@ import React, { useState, useEffect } from "react";
 import logo from "../../assets/logo.png";
 import dashb from "../../assets/dashb.png";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const SAU = () => {
-
   const [email, setEmail] = useState("");
+  const [hin, setHin] = useState("");
+  const [state, setState] = useState("");
   const [number, setNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const[loading, setLoading] = useState("")
 
   const [notification, setnotification] = useState(false);
 
   const [notificationVisible, setNotificationVisible] = useState(false);
 
-  const isFormValid = name && nin && email && number && password;
+  const isFormValid = email && number && password;
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+
+  //   if (!hin || !state || !email || !number || !password) {
+  //     toast.error("All fields must be filled before submission.");
+  //     return;
+  //   }
+
+
+  //   console.log(hin, state, email, password, number);
+  //   setEmail("");
+  //   setPassword("");
+  //   setNumber("");
+
+  //   setnotification(true);
+  //   setNotificationVisible(false);
+  // };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+  setLoading('Upgrading sub account')
 
-    if ( !email || !number || !password) {
-      setError("All fields must be filled before submission.");
+    if (!hin || !state || !email || !number || !password) {
+      toast.error("All fields must be filled before submission.");
       return;
     }
+  
+    const requestData = {
+      subaccount_HIN: hin,
+      subacount_email: email,
+      subaccount_phone_num: number,
+      subaccount_password: password,
+      subaccount_state: state,
+    };
 
-    setError("");
-
-    console.log(email, password, number);
-    setEmail("");
-    setPassword("");
-    setNumber("");
-   
-    setnotification(true);
-    setNotificationVisible(false);
+    console.log(requestData)
+  
+    try {
+      const response = await axios.post("https://docuhealth-backend.onrender.com/api/patient/subaccounts/upgrade", requestData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (response.status === 200 || response.status === 201) {
+        toast.success("subaccount upgraded successfully!");
+        setEmail("");
+        setPassword("");
+        setNumber("");
+        setHin("");
+        setState("");
+  
+        setLoading('Upgrade Now')
+        setnotification(true);
+        setNotificationVisible(false);
+      }
+    } catch (error) {
+      console.error("Error upgrading subaccount:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to upgrading subaccount. Try again."
+      );
+    }finally{
+      
+      setLoading('Upgrade Now')
+      setEmail("");
+      setPassword("");
+      setNumber("");
+      setHin("");
+      setState("");
+    }
   };
+ 
+ 
   useEffect(() => {
     const isMobile = window.innerWidth <= 768; // Adjust breakpoint as needed
     if (isMobile) {
@@ -76,9 +138,20 @@ const SAU = () => {
               </div>
 
               <div className="relative">
-                <p className="font-semibold pb-1">
-                  Phone Number (Mandantory) :
-                </p>
+                <p className="font-semibold pb-1">HIN (Mandatory) :</p>
+                <div className="relative">
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                    value={hin}
+                    onChange={(e) => setHin(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="relative">
+                <p className="font-semibold pb-1">Phone Number (Mandatory) :</p>
                 <div className="relative">
                   <input
                     type="number"
@@ -117,20 +190,86 @@ const SAU = () => {
                   </button>
                 </div>
               </div>
-              {/* Error Message */}
-              {error && <p className="text-red-500 text-sm">{error}</p>}
+
+              <div className="relative">
+                <p className="font-semibold pb-1">State Of Residence :</p>
+                <div className="relative w-full">
+                  <select
+                    className="border border-gray-300 px-4 py-3 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    required
+                  >
+                    <option value=""> Select your State</option>
+                    <option value="Abia">Abia</option>
+                    <option value="Adamawa">Adamawa</option>
+                    <option value="Akwa Ibom">Akwa Ibom</option>
+                    <option value="Anambra">Anambra</option>
+                    <option value="Bauchi">Bauchi</option>
+                    <option value="Bayelsa">Bayelsa</option>
+                    <option value="Benue">Benue</option>
+                    <option value="Borno">Borno</option>
+                    <option value="Cross River">Cross River</option>
+                    <option value="Delta">Delta</option>
+                    <option value="Ebonyi">Ebonyi</option>
+                    <option value="Edo">Edo</option>
+                    <option value="Ekiti">Ekiti</option>
+                    <option value="Enugu">Enugu</option>
+                    <option value="Gombe">Gombe</option>
+                    <option value="Imo">Imo</option>
+                    <option value="Jigawa">Jigawa</option>
+                    <option value="Kaduna">Kaduna</option>
+                    <option value="Kano">Kano</option>
+                    <option value="Katsina">Katsina</option>
+                    <option value="Kebbi">Kebbi</option>
+                    <option value="Kogi">Kogi</option>
+                    <option value="Kwara">Kwara</option>
+                    <option value="Lagos">Lagos</option>
+                    <option value="Nasarawa">Nasarawa</option>
+                    <option value="Niger">Niger</option>
+                    <option value="Ogun">Ogun</option>
+                    <option value="Ondo">Ondo</option>
+                    <option value="Osun">Osun</option>
+                    <option value="Oyo">Oyo</option>
+                    <option value="Plateau">Plateau</option>
+                    <option value="Rivers">Rivers</option>
+                    <option value="Sokoto">Sokoto</option>
+                    <option value="Taraba">Taraba</option>
+                    <option value="Yobe">Yobe</option>
+                    <option value="Zamfara">Zamfara</option>
+                    <option value="Abuja">Abuja (FCT)</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg
+                      className="w-4 h-4 text-gray-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
 
               <button
-                  type="submit"
-                  className={`w-full py-3 rounded-full ${
-                    isFormValid
-                      ? "bg-[#0000FF] text-white hover:bg-blue-700"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
-                  disabled={!isFormValid}
-                >
-                  Upgrade Now
-                </button>
+                type="submit"
+                className={`w-full py-3 rounded-full ${
+                  isFormValid
+                    ? "bg-[#0000FF] text-white hover:bg-blue-700"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+                onClick={handleSubmit}
+                disabled={!isFormValid}
+              >
+                {loading ? loading : 'Upgrade Now'}
+              </button>
             </form>
           </div>
         </div>
@@ -184,7 +323,8 @@ const SAU = () => {
               <button
                 className="bg-[#0000FF] w-full rounded-full text-white px-4 py-2 "
                 onClick={() => {
-                  setnotification(false);
+                  setnotification(false)
+                  navigate('/user-login')
                 }}
               >
                 Go To Dashboard
@@ -194,7 +334,7 @@ const SAU = () => {
         </div>
       )}
       {notificationVisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className=" fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 ">
           <div className="fixed bottom-0 left-0 right-0 bg-white text-black py-4 rounded-t-3xl shadow-md animate-slide-up">
             <div className="flex justify-center items-center px-5 pb-4">
               <div className="flex items-center gap-1">
@@ -212,86 +352,140 @@ const SAU = () => {
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Full Name */}
-                {/* <div className="relative">
-                  <p className="font-semibold pb-1">Full Name:</p>
+              <div className="relative">
+                <p className="font-semibold pb-1">Email :</p>
+                <div className="relative">
+                  <input
+                    type="email"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                </div>
+              </div>
+
+              <div className="relative">
+                <p className="font-semibold pb-1">HIN (Mandatory) :</p>
+                <div className="relative">
                   <input
                     type="text"
-                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                    value={hin}
+                    onChange={(e) => setHin(e.target.value)}
                     required
                   />
-                </div> */}
-
-                {/* NIN */}
-                {/* <div className="relative">
-                  <p className="font-semibold pb-1">NIN:</p>
-                  <input
-                    type="number"
-                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500"
-                    value={nin}
-                    onChange={(e) => setNin(e.target.value)}
-                    required
-                  />
-                </div> */}
-
-                {/* Email */}
-                <div className="relative">
-                  <p className="font-semibold pb-1">Email:</p>
-                  <div className="relative">
-                    <input
-                      type="email"
-                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                    <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  </div>
                 </div>
+              </div>
 
-                {/* Phone Number */}
+              <div className="relative">
+                <p className="font-semibold pb-1">Phone Number (Mandatory) :</p>
                 <div className="relative">
-                  <p className="font-semibold pb-1">Phone Number:</p>
                   <input
                     type="number"
-                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
                     value={number}
                     onChange={(e) => setNumber(e.target.value)}
                     required
                   />
                 </div>
 
-                {/* Password */}
+                {/* Password Input */}
+              </div>
+
+              <div className="relative">
+                <p className="font-semibold pb-1">Password:</p>
                 <div className="relative">
-                  <p className="font-semibold pb-1">Password:</p>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                    <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder=""
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <FaEye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="relative">
+                <p className="font-semibold pb-1">State Of Residence :</p>
+                <div className="relative w-full">
+                  <select
+                    className="border border-gray-300 px-4 py-3 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    required
+                  >
+                    <option value=""> Select your State</option>
+                    <option value="Abia">Abia</option>
+                    <option value="Adamawa">Adamawa</option>
+                    <option value="Akwa Ibom">Akwa Ibom</option>
+                    <option value="Anambra">Anambra</option>
+                    <option value="Bauchi">Bauchi</option>
+                    <option value="Bayelsa">Bayelsa</option>
+                    <option value="Benue">Benue</option>
+                    <option value="Borno">Borno</option>
+                    <option value="Cross River">Cross River</option>
+                    <option value="Delta">Delta</option>
+                    <option value="Ebonyi">Ebonyi</option>
+                    <option value="Edo">Edo</option>
+                    <option value="Ekiti">Ekiti</option>
+                    <option value="Enugu">Enugu</option>
+                    <option value="Gombe">Gombe</option>
+                    <option value="Imo">Imo</option>
+                    <option value="Jigawa">Jigawa</option>
+                    <option value="Kaduna">Kaduna</option>
+                    <option value="Kano">Kano</option>
+                    <option value="Katsina">Katsina</option>
+                    <option value="Kebbi">Kebbi</option>
+                    <option value="Kogi">Kogi</option>
+                    <option value="Kwara">Kwara</option>
+                    <option value="Lagos">Lagos</option>
+                    <option value="Nasarawa">Nasarawa</option>
+                    <option value="Niger">Niger</option>
+                    <option value="Ogun">Ogun</option>
+                    <option value="Ondo">Ondo</option>
+                    <option value="Osun">Osun</option>
+                    <option value="Oyo">Oyo</option>
+                    <option value="Plateau">Plateau</option>
+                    <option value="Rivers">Rivers</option>
+                    <option value="Sokoto">Sokoto</option>
+                    <option value="Taraba">Taraba</option>
+                    <option value="Yobe">Yobe</option>
+                    <option value="Zamfara">Zamfara</option>
+                    <option value="Abuja">Abuja (FCT)</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg
+                      className="w-4 h-4 text-gray-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
                     >
-                      {showPassword ? (
-                        <FaEyeSlash className="h-4 w-4 text-gray-400" />
-                      ) : (
-                        <FaEye className="h-4 w-4 text-gray-400" />
-                      )}
-                    </button>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
                   </div>
                 </div>
-
-                {/* Error Message */}
-                {error && <p className="text-red-500 text-sm">{error}</p>}
-
+              </div>
                 <button
                   type="submit"
                   className={`w-full py-3 rounded-full ${
@@ -300,8 +494,9 @@ const SAU = () => {
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                   disabled={!isFormValid}
+                  onClick={handleSubmit}
                 >
-                  Upgrade Now
+                 {loading ? loading : 'Upgrade Now'}
                 </button>
               </form>
             </div>

@@ -166,8 +166,8 @@ const SettingsDashboard = () => {
         name: formData.name,
         email: formData.email,
         address: formData.address,
-        doctors: parseInt(formData.doctors, 10) || 0,
-        others: parseInt(formData.otherPersonnel, 10) || 0,
+        doctors: parseInt(formData.doctors, 10) ,
+        others: parseInt(formData.otherPersonnel, 10),
       };
 
       console.log("Payload:", payload);

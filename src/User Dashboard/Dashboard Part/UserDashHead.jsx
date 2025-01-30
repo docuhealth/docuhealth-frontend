@@ -1,17 +1,76 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 
 const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+   const [datainfo, setDataInfo] = useState("")
 
   const togglePopover = () => {
     setIsPopoverOpen(!isPopoverOpen);
   };
 
+    useEffect(() => {
+        const fetchPatientDashboard = async (page = 1, size = 10) => {
+          // Retrieve the JWT token from localStorage
+          const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+          const role = "patient"; // Replace with the required role
+        
+          try {
+            // Construct the URL with query parameters
+            const url = `https://docuhealth-backend.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
+        
+            // Make the GET request
+            const response = await fetch(url, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+                Role: role, // Add role to the headers
+              },
+            });
+        
+            // Handle the response
+            if (response.ok) {
+              const data = await response.json();
+              console.log("Patient Dashboard Data:", data);
+              setDataInfo(data)
+        
+              // Display a success message or process the data as needed
+              return data;
+            } else {
+              const errorData = await response.json();
+              console.error("Failed to fetch dashboard data:", errorData);
+        
+              // Handle errors with a message from the API
+              throw new Error(errorData.message || "Failed to fetch dashboard data.");
+            }
+          } catch (error) {
+            console.error("An unexpected error occurred:", error);
+        
+            // Handle unexpected errors
+            throw error;
+          }finally{
+            console.log(datainfo)
+          }
+        };
+        
+        // Example Usage
+        fetchPatientDashboard(1, 10)
+          .then((data) => {
+            // Process the dashboard data
+            console.log("Dashboard Data:", data);
+          })
+          .catch((error) => {
+            // Handle errors
+            console.error("Error:", error.message);
+          });
+        
+      }, []);
+
   return (
     <div>
       {/* Header */}
       <header className="hidden bg-white py-4 px-8 sm:flex justify-between items-center border">
-        <h2 className="text-xl font-semibold">Welcome back Ameifa Obed! 👋</h2>
+        <h2 className="text-xl font-semibold">Welcome back {datainfo.fullname}! 👋</h2>
         <div className="flex items-center gap-4">
           <div className="relative">
             <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
@@ -28,7 +87,7 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
               />
             </div>
             <div className="flex flex-col items-start">
-              <p className="ml-2 text-sm font-medium">Ameifa Obed</p>
+              <p className="ml-2 text-sm font-medium">{datainfo.fullname}</p>
               <p className="ml-2 text-sm text-gray-500">Patient</p>
             </div>
           </div>

@@ -181,7 +181,7 @@ const FP = () => {
                     <form onSubmit={handleSubmit} className="space-y-4">
                       {/* Email Input */}
                       <div className="relative">
-                        <p className="pb-1">Enter Email / Password :</p>
+                        <p className="pb-1">Enter Email / Phone Number :</p>
                         <div className="relative">
                           <input
                             type="email"

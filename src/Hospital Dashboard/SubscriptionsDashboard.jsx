@@ -311,95 +311,99 @@ const SubscriptionsDashboard = () => {
               <DynamicDate />
             </div>
             <div className="sm:border mb-5 px-5 py-5 sm:rounded-3xl bg-white">
-      {loading ? (
-        // Show loading state when data is being fetched
-        <div className="flex justify-center items-center py-10">
-          <p className="text-gray-500 text-lg font-semibold">Loading plans...</p>
-        </div>
-      ) : (
-        // Render plans once data is loaded
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {plans.map((plan, index) => (
-            <div
-              key={plan._id}
-              className={`p-4 rounded-xl ${
-                index === 0
-                  ? "bg-[#F5F8F8]"
-                  : "bg-gradient-to-b from-[#ECFAFF] to-[#EEEEFD]"
-              }`}
-            >
-              {/* Plan Title and Price */}
-              <div className="flex justify-between items-center">
-                <p
-                  className="text-sm text-gray-600"
-                  style={{
-                    color:
-                      index === 1 || index === 2 ? "#FE9000 " : "inherit",
-                    paddingBottom:
-                      index === 1 || index === 2 ? "10px" : "inherit",
-                  }}
-                >
-                  {plan.title}
-                </p>
-                {index === 0 && (
-                  <i className="bx bx-check text-[#0000FF] text-2xl"></i>
-                )}
-              </div>
-              <div className="pb-4">
-                <p className="text-2xl font-semibold pb-1">
-                  ₦{plan.price}{" "}
-                  <span className="text-sm font-normal">
-                    /{plan.duration}
-                  </span>
-                </p>
-                <p className="text-sm text-gray-600 leading-6">
-                  {plan.description}
-                </p>
-              </div>
-              <hr />
-
-              {/* Plan Features */}
-              <div className="py-5">
-                {plan.features.map((feature, featureIndex) => (
-                  <p
-                    key={featureIndex}
-                    className="flex items-center text-[12px]"
-                  >
-                    {feature.status === "on" ? (
-                      <i className="bx bx-check text-[#0000FF] text-2xl"></i>
-                    ) : (
-                      <i className="bx bx-x text-2xl text-red-600"></i>
-                    )}
-                    {feature.feature}
-                  </p>
-                ))}
-              </div>
-
-              {/* Plan Button */}
-              <div
-                className={`rounded-full my-4 ${
-                  index === 0
-                    ? "font-semibold" // No background or border for the first div
-                    : index === 1
-                    ? "border border-[#0000FF] text-[#0000FF] font-semibold" // Border for the second div
-                    : "bg-[#0000FF] text-white font-semibold" // Background color and white text for the third div
-                }`}
-              >
-                <div className="py-3">
-                  <p className="text-sm text-center">
-                    {index === 0
-                      ? "Free"
-                      : index === 1
-                      ? "Subscribe Now"
-                      : "Subscribe Yearly"}
+              {loading ? (
+                // Show loading state when data is being fetched
+                <div className="flex justify-center items-center py-10">
+                  <p className="text-gray-500 text-lg font-semibold">
+                    Loading plans...
                   </p>
                 </div>
-              </div>
+              ) : (
+                // Render plans once data is loaded
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {plans.map((plan, index) => (
+                    <div
+                      key={plan._id}
+                      className={`p-4 rounded-xl ${
+                        index === 0
+                          ? "bg-[#F5F8F8]"
+                          : "bg-gradient-to-b from-[#ECFAFF] to-[#EEEEFD]"
+                      }`}
+                    >
+                      {/* Plan Title and Price */}
+                      <div className="flex justify-between items-center">
+                        <p
+                          className="text-sm text-gray-600"
+                          style={{
+                            color:
+                              index === 1 || index === 2
+                                ? "#FE9000 "
+                                : "inherit",
+                            paddingBottom:
+                              index === 1 || index === 2 ? "10px" : "inherit",
+                          }}
+                        >
+                          {plan.title}
+                        </p>
+                        {index === 0 && (
+                          <i className="bx bx-check text-[#0000FF] text-2xl"></i>
+                        )}
+                      </div>
+                      <div className="pb-4">
+                        <p className="text-2xl font-semibold pb-1">
+                          ₦{plan.price}{" "}
+                          <span className="text-sm font-normal">
+                            /{plan.duration}
+                          </span>
+                        </p>
+                        <p className="text-sm text-gray-600 leading-6">
+                          {plan.description}
+                        </p>
+                      </div>
+                      <hr />
+
+                      {/* Plan Features */}
+                      <div className="py-5">
+                        {plan.features.map((feature, featureIndex) => (
+                          <p
+                            key={featureIndex}
+                            className="flex items-center text-[12px]"
+                          >
+                            {feature.status === "on" ? (
+                              <i className="bx bx-check text-[#0000FF] text-2xl"></i>
+                            ) : (
+                              <i className="bx bx-x text-2xl text-red-600"></i>
+                            )}
+                            {feature.feature}
+                          </p>
+                        ))}
+                      </div>
+
+                      {/* Plan Button */}
+                      <div
+                        className={`rounded-full my-4 ${
+                          index === 0
+                            ? "font-semibold" // No background or border for the first div
+                            : index === 1
+                            ? "border border-[#0000FF] text-[#0000FF] font-semibold" // Border for the second div
+                            : "bg-[#0000FF] text-white font-semibold" // Background color and white text for the third div
+                        }`}
+                      >
+                        <div className="py-3">
+                          <p className="text-sm text-center">
+                            {index === 0
+                              ? "Free"
+                              : index === 1
+                              ? "Subscribe Now"
+                              : "Subscribe Yearly"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          ))}
-        </div>
-      )}
-    </div>
           </section>
         </main>
       </div>

@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { toast } from "react-toastify";
 import axios from "axios";
+import DynamicDate from "../Dynamic Date/DynamicDate";
 const UserSubAcctDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
@@ -459,7 +460,7 @@ const UserSubAcctDashboard = () => {
           <section className="pt-6 px-8 w-full relative bg-white shadow min-h-screen">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-10">
               <div className="pb-3 sm:p-0 w-full sm:w-auto">
-                <p className="text-gray-500">Monday 25th, 2024</p>
+               <DynamicDate />
               </div>
               <div className="w-full sm:w-auto">
                 <button
