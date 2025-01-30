@@ -18,6 +18,7 @@ const HomeDashboard = () => {
   const [totalDoctorsPercent, setTotalDoctorsPercent] = useState("...");
   const [othersPercent, setOthersPercent] = useState("...");
   const [loading, setLoading] = useState(true);
+  const [patientRecord, setPatientRecord] = useState(false);
 
   const location = useLocation();
 
@@ -96,19 +97,32 @@ const HomeDashboard = () => {
     dataLabels: { enabled: false },
     stroke: { curve: "smooth" },
     xaxis: {
-      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      categories: [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ],
     },
     yaxis: { labels: { formatter: (value) => `${value}` } },
     grid: { borderColor: "#E5E7EB" },
   };
-  
+
   const chart1Series = [
     {
       name: "Assessment/diagnosis created",
       data: [80, 90, 100, 120, 110, 95, 105, 115, 120, 125, 130, 140], // Data for 12 months
     },
   ];
-  
+
   // Data and options for the second chart
   const chart2Options = {
     chart: {
@@ -128,19 +142,31 @@ const HomeDashboard = () => {
     dataLabels: { enabled: false },
     stroke: { curve: "smooth" },
     xaxis: {
-      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      categories: [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ],
     },
     yaxis: { labels: { formatter: (value) => `${value}` } },
     grid: { borderColor: "#E5E7EB" },
   };
-  
+
   const chart2Series = [
     {
       name: "Patients HIN checked",
       data: [100, 120, 150, 200, 220, 190, 210, 240, 260, 270, 280, 300], // Data for 12 months
     },
   ];
-  
 
   return (
     <div>
@@ -395,8 +421,8 @@ const HomeDashboard = () => {
             <div className=" sm:p-0">
               <DynamicDate />
             </div>
-            <div className="  my-5 grid grid-cols-2  lg:grid-cols-4 gap-2">
-              <div>
+            <div className="  my-5 grid grid-cols-1  lg:grid-cols-4 gap-2">
+              <div className="col-span-2 sm:col-auto">
                 <div className="bg-white py-4 px-2 border rounded-md">
                   <div className="flex justify-start gap-3 items-center ">
                     <div className="bg-[#3380FF] bg-opacity-10 p-2 rounded-sm">
@@ -442,7 +468,7 @@ const HomeDashboard = () => {
                   </div>
                 </div>
               </div>
-              <div>
+              <div className="col-span-2 sm:col-auto">
                 <div className="bg-white py-4 px-2 border rounded-md">
                   <div className="flex justify-start gap-3 items-center ">
                     <div className="bg-[#9181DB] bg-opacity-10 p-2 rounded-sm">
@@ -483,7 +509,7 @@ const HomeDashboard = () => {
                     </span>
                     <p>
                       <span className="text-[#72E128]">
-                        {totalDoctorsPercent}%{" "}
+                      {parseFloat(totalDoctorsPercent).toFixed(2)}%{" "}
                       </span>
                       increase from last month
                     </p>
@@ -507,7 +533,9 @@ const HomeDashboard = () => {
                         />
                       </svg>
                     </div>
-                    <span className="text-sm">Summary of Diagnosis / Treatment</span>
+                    <span className="text-sm">
+                      Summary of Diagnosis / Treatment
+                    </span>
                   </div>
                   <div>
                     <p className="py-2 text-xl text-[#647284]">{assDiag}</p>
@@ -573,7 +601,7 @@ const HomeDashboard = () => {
                       </svg>
                     </span>
                     <p>
-                      <span className="text-[#72E128]">{othersPercent}% </span>
+                      <span className="text-[#72E128]">{parseFloat(othersPercent).toFixed(2)}% </span>
                       increase from last month
                     </p>
                   </div>
@@ -585,7 +613,7 @@ const HomeDashboard = () => {
               {/* First Chart */}
               <div className="bg-white p-4 rounded-2xl shadow-md">
                 <h3 className=" font-semibold mb-4">
-                Summary of Diagnosis / Treatment
+                  Summary of Diagnosis / Treatment
                 </h3>
                 <ReactApexChart
                   options={chart1Options}
@@ -597,9 +625,7 @@ const HomeDashboard = () => {
 
               {/* Second Chart */}
               <div className="bg-white p-4 rounded-2xl shadow-md">
-                <h3 className=" font-semibold mb-4">
-                  Patients HIN Checked
-                </h3>
+                <h3 className=" font-semibold mb-4">Patients HIN Checked</h3>
                 <ReactApexChart
                   options={chart2Options}
                   series={chart2Series}
@@ -608,6 +634,14 @@ const HomeDashboard = () => {
                 />
               </div>
             </div>
+
+            {patientRecord ? (
+              <p>Loading...</p>
+            ) : (
+              <div className="text-center pt-5">
+                <p>No Medical Records To Show</p>
+              </div>
+            )}
           </section>
         </main>
       </div>

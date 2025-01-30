@@ -3,10 +3,12 @@ import UserDashHead from "./Dashboard Part/UserDashHead";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { toast } from "react-toastify";
-
+import axios from "axios";
 const UserSubAcctDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
+  const [loading, setLoading] = useState("");
+  const [subaccounts, setSubaccounts] = useState([]);
 
   const isActive = (path = "/user-home-dashboard") =>
     location.pathname === path;
@@ -42,6 +44,7 @@ const UserSubAcctDashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevents page reload
+    setLoading("Creating Sub Account");
 
     // Prepare the data to send
     const requestBody = {
@@ -70,9 +73,10 @@ const UserSubAcctDashboard = () => {
       if (response.ok) {
         const result = await response.json();
         console.log("Form Submitted Successfully:", result);
+        setLoading("Create Sub Account");
 
         // Show success toast
-        toast.success("Form submitted successfully!");
+        toast.success("sub-account created successfully!");
 
         // Close the overlay after successful submission
         setShowOverlay(false);
@@ -101,6 +105,8 @@ const UserSubAcctDashboard = () => {
 
       // Show error toast for unexpected errors
       toast.error("An unexpected error occurred. Please try again later.");
+    } finally {
+      setLoading("Create Sub Account");
     }
   };
 
@@ -168,6 +174,44 @@ const UserSubAcctDashboard = () => {
         "By using our SUB account feature, you can ensure your child's medical history is accurate, up-to-date, and easily accessible – giving you peace of mind and empowering your child to take control of their health as they grow older.",
     },
   ];
+
+  const fetchSubaccounts = async (page = 1, size = 100) => {
+    try {
+      // setLoading(true);
+
+      // Retrieve JWT token
+      const token = localStorage.getItem("jwtToken");
+      if (!token) {
+        toast.error("No token found. Please log in again.");
+        return;
+      }
+
+      // Make the GET request
+      const response = await axios.get(
+        "https://docuhealth-backend.onrender.com/api/patient/subaccounts/get_subaccounts",
+        {
+          params: { page, size },
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token in the header
+          },
+        }
+      );
+
+      // Success: Update state and show toast
+      setSubaccounts(response.data.subaccounts || []);
+      console.log(response.data.subaccounts);
+      // toast.success("Subaccounts fetched successfully!");
+    } catch (error) {
+      console.error("Error fetching subaccounts:", error.message);
+      // toast.error("Failed to fetch subaccounts. Please try again.");
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSubaccounts(); // Default to page 1, size 5
+  }, []);
 
   return (
     <div>
@@ -521,7 +565,7 @@ const UserSubAcctDashboard = () => {
                     </div>
                     <div className="col-span-2 text-center bg-[#0000FF] text-white py-3 px-4 rounded-full">
                       <button type="submit" onClick={handleChange}>
-                        Create Account
+                        {loading ? loading : "Create Sub Account"}
                       </button>
                     </div>
                   </form>
@@ -597,22 +641,22 @@ const UserSubAcctDashboard = () => {
                   </thead>
 
                   <tbody>
-                    {subAccounts.map((account, index) => (
+                    {subaccounts.map((subaccount, index) => (
                       <tr key={index} className="relative">
                         <td className="border-b border-gray-300 px-4 pb-3 pt-3">
-                          {account.name}
+                          {subaccount.firstname + " " + subaccount.lastname}
                         </td>
                         <td className="border-b border-gray-300 px-4 pb-3 pt-3">
-                          {account.HIN}
+                          {subaccount.HIN}
                         </td>
                         <td className="border-b border-gray-300 px-4 pb-3 pt-3">
-                          {account.dateOfBirth}
+                          {subaccount.DOB}
                         </td>
                         <td className="border-b border-gray-300 px-4 pb-3 pt-3">
-                          {account.sex}
+                          {subaccount.sex}
                         </td>
                         <td className="border-b border-gray-300 px-4 pb-3 pt-3 relative">
-                          {account.dateCreated}
+                        {subaccount.date_created.split("T")[0]}
                           <i
                             className={`bx bx-dots-vertical-rounded ml-3  p-2 ${
                               openPopover === index
@@ -654,10 +698,10 @@ const UserSubAcctDashboard = () => {
 
             <div className=" py-5 border-t-2 sm:hidden">
               <p className="font-semibold">Sub accounts</p>
-              {subAccounts.map((account, index) => (
+              {subaccounts.map((subaccount, index) => (
                 <div key={index} className="bg-white shadow px-4 py-2 my-3">
                   <div className=" flex justify-between items-center py-3 relative ">
-                    <p>HIN : {account.HIN}</p>
+                    <p>HIN : {subaccount.HIN}</p>
                     <p>
                       <i
                         className={`bx bx-dots-vertical-rounded ml-3  p-2 ${
@@ -688,19 +732,19 @@ const UserSubAcctDashboard = () => {
                   <div className="grid grid-cols-2 gap-5 py-3">
                     <div className="flex flex-col">
                       <p className="text-gray-500">Name</p>
-                      <p>{account.name}</p>
+                      <p>  {subaccount.firstname + " " + subaccount.lastname}</p>
                     </div>
                     <div className="flex flex-col">
                       <p className="text-gray-500">Date Of Birth</p>
-                      <p>{account.dateOfBirth}</p>
+                      <p>{subaccount.DOB}</p>
                     </div>
                     <div className="flex flex-col">
                       <p className="text-gray-500">Sex</p>
-                      <p>{account.sex}</p>
+                      <p>{subaccount.sex}</p>
                     </div>
                     <div className="flex flex-col">
                       <p className="text-gray-500">Name</p>
-                      <p>{account.dateCreated}</p>
+                      <p>   {subaccount.date_created.split("T")[0]}</p>
                     </div>
                   </div>
                 </div>
