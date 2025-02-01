@@ -38,7 +38,7 @@ const Welcome = () => {
         </div>
         <div className="flex flex-col justify-center items-center">
           <h2 className="text-xl font-semibold text-gray-950 py-2">
-            Welcome to Docu Health 👋
+            Welcome to DocuHealth 👋
           </h2>
           <p className="text-sm sm:text-md text-gray-500 pb-2">
             Select your account type below to Login

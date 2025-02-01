@@ -1,31 +1,30 @@
-import React, {useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-
-const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
+const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-   const [data, setData] = useState(null);
-    const[email, setEmail] = useState('fetching...')
-    const[name, setName] = useState('fetching...')
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const[data, setData] = useState(null)
+  const [email, setEmail] = useState("fetching...");
+  const [name, setName] = useState("fetching...");
+  const [imageUrl, setImageUrl] = useState(null); // State for hospital image URL
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const togglePopover = () => {
     setIsPopoverOpen(!isPopoverOpen);
   };
-  
-  
+
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
       console.log("Token:", token);
-  
+
       if (!token) {
         console.log("Token not found. Please log in again.");
         setLoading(false);
         return;
       }
-  
+
       try {
         console.log("Fetching data...");
         const response = await axios.get(
@@ -37,25 +36,31 @@ const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
             },
           }
         );
-  
-        console.log("API Response:", response.data);
-        setData(response.data); // Save the API response in state
-        setLoading(false);
-        setName(response.data.hospital.name)
-        setEmail(response.data.hospital.email)
 
+        console.log("API Response:", response.data);
+     
+        setLoading(false);
+        setData(response.data)
+        // Extract and save specific data
+        setName(response.data.hospital.name);
+        setEmail(response.data.hospital.email);
+        setImageUrl(response.data.hospital.image.secure_url)
+      
       } catch (err) {
         console.error("Error fetching data:", err);
         console.log(err.response?.data?.message || "Error fetching data");
         setLoading(false);
-        setName('error, refresh')
-        setEmail('error, refresh')
+
+        // Handle errors gracefully
+        setName("Error, refresh");
+        setEmail("Error, refresh");
+     
       }
     };
-  
+
     fetchData();
   }, []);
- 
+
   return (
     <div>
       {/* Header */}
@@ -73,23 +78,23 @@ const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
           <div className="flex items-center">
             <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden">
               <img
-                src="https://img.freepik.com/free-vector/minimalist-geometric-judith-s-tiktok-profile-picture_742173-12131.jpg?ga=GA1.1.384133121.1729851340&semt=ais_hybrid"
-                alt="description"
+                src={imageUrl}
+                alt="Hospital Logo"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="flex flex-col items-start">
               <p className="ml-2 text-sm font-medium">{name} Hospital</p>
-              <p className="ml-2 text-sm text-gray-500"> {email}</p>
+              <p className="ml-2 text-sm text-gray-500">{email}</p>
             </div>
           </div>
         </div>
       </header>
 
-      <header className=" sm:hidden bg-white shadow py-4 flex justify-between items-center px-4 ">
+      <header className="sm:hidden bg-white shadow py-4 flex justify-between items-center px-4">
         <div className="text-sm font-semibold flex items-center gap-2">
           <p onClick={toggleSidebar}>
-            <i class="bx bx-menu text-2xl"></i>
+            <i className="bx bx-menu text-2xl"></i>
           </p>
           <p>
             {" "}
@@ -108,8 +113,8 @@ const DashHead = ({  isSidebarOpen, toggleSidebar, closeSidebar }) => {
           <div className="flex justify-center items-center">
             <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden">
               <img
-                src="https://img.freepik.com/free-vector/minimalist-geometric-judith-s-tiktok-profile-picture_742173-12131.jpg?ga=GA1.1.384133121.1729851340&semt=ais_hybrid"
-                alt="description"
+                src={imageUrl}
+                alt="Hospital Logo"
                 className="w-full h-full object-cover"
               />
             </div>

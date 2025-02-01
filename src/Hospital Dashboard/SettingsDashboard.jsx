@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 const SettingsDashboard = () => {
   const [email, setEmail] = useState("fetching...");
   const [name, setName] = useState("fetching...");
+  const [imageUrl, setImageUrl] = useState(null); // State for hospital image URL
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [newpassword, setNewPassword] = useState("");
@@ -28,7 +29,7 @@ const SettingsDashboard = () => {
   const [isDashboardEnabled, setIsDashboardEnabled] = useState(false);
 
   const [selectedFile, setSelectedFile] = useState(null);
-  const [previewImage, setPreviewImage] = useState(profilepic); // Initial image preview
+  const [previewImage, setPreviewImage] = useState(null); // Initial image preview
   const [loadingImg, setLoadingImg] = useState(false);
 
   const handleImageChange = (e) => {
@@ -148,10 +149,46 @@ const SettingsDashboard = () => {
     }));
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+      console.log("Token:", token);
+
+      if (!token) {
+        console.log("Token not found. Please log in again.");
+
+        return;
+      }
+
+      try {
+        console.log("Fetching data...");
+        const response = await axios.get(
+          "https://docuhealth-backend.onrender.com/api/hospital/dashboard",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("API Response:", response.data);
+
+        setImageUrl(response.data.hospital.image.secure_url);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        console.log(err.response?.data?.message || "Error fetching data");
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoadingInfo('Saving Changes')
+    setLoadingInfo("Saving Changes");
     console.log("Form submitted:", formData);
+
     try {
       // Retrieve token from local storage
       const token = localStorage.getItem("jwtToken");
@@ -161,24 +198,38 @@ const SettingsDashboard = () => {
         return;
       }
 
-      // Format the data to match the API requirements
-      const payload = {
-        name: formData.name,
-        email: formData.email,
-        address: formData.address,
-        doctors: parseInt(formData.doctors, 10) ,
-        others: parseInt(formData.otherPersonnel, 10),
-      };
+      // Create payload by filtering out empty values
+      const payload = {};
+
+      Object.keys(formData).forEach((key) => {
+        if (
+          formData[key] !== "" &&
+          formData[key] !== null &&
+          formData[key] !== undefined
+        ) {
+          payload[key] =
+            key === "doctors" || key === "otherPersonnel"
+              ? parseInt(formData[key], 10)
+              : formData[key];
+        }
+      });
+
+      // Ensure there's at least one field to update
+      if (Object.keys(payload).length === 0) {
+        console.warn("No fields to update.");
+        toast.warning("Please fill at least one field before submitting.");
+        return;
+      }
 
       console.log("Payload:", payload);
 
       // Send the PATCH request
       const response = await axios.patch(
-        "https://docuhealth-backend.onrender.com/api/hospital/settings/update_hospital_info", // Replace with your API URL
+        "https://docuhealth-backend.onrender.com/api/hospital/settings/update_hospital_info",
         payload,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Include JWT token
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -189,16 +240,15 @@ const SettingsDashboard = () => {
     } catch (error) {
       console.error("Error submitting the form:", error.message);
       toast.error("An error occurred. Please try again.");
-    }finally{
-      setLoadingInfo('Save Changes')
+    } finally {
+      setLoadingInfo("Save Changes");
       setFormData({
         name: "",
         email: "",
-        address: "",
         doctors: "",
         otherPersonnel: "",
+        address: "",
       });
-      
     }
   };
 
@@ -590,7 +640,7 @@ const SettingsDashboard = () => {
                   onClick={handleSubmit}
                   className="px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
                 >
-                {loadingInfo ? loadingInfo : 'Save Changes'}
+                  {loadingInfo ? loadingInfo : "Save Changes"}
                 </button>
                 <button
                   type="button"
@@ -1191,7 +1241,7 @@ const SettingsDashboard = () => {
                   {/* Profile Image with Upload Icon */}
                   <div className="relative">
                     <img
-                      src={previewImage}
+                      src={previewImage ? previewImage : imageUrl}
                       alt="Profile"
                       className="w-14 h-14 rounded-full object-cover"
                     />

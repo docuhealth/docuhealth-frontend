@@ -15,6 +15,7 @@ const HLP = () => {
   const [step, setStep] = useState(1); // To manage steps
 
   const [image, setImage] = useState(null);
+  const [imagepreview, setImagePreview] = useState(null);
 
   const [hospitalName, sethospitalName] = useState("");
   const [hospitalAddress, sethospitalAddress] = useState("");
@@ -38,68 +39,73 @@ const HLP = () => {
   }, []);
 
   const handleSubmit = async (e) => {
-  setSignUp("Submitting...");
-  e.preventDefault();
+    setSignUp("Submitting...");
+    e.preventDefault();
+    // Construct hospital info as a JSON object
+    const hospitalInfo = {
+      email,
+      password,
+      hospitalName,
+      hospitalAddress,
+      doctors,
+      medpersonnel,
+    };
 
-  // Construct hospital info as a JSON object
-  const hospitalInfo = {
-    email,
-    password,
-    hospitalName,
-    hospitalAddress,
-    doctors,
-    medpersonnel,
+    // Reformat hospital info to match API requirements
+    const formattedHospitalInfo = {
+      email: hospitalInfo.email,
+      name: hospitalInfo.hospitalName,
+      password: hospitalInfo.password,
+      address: hospitalInfo.hospitalAddress,
+      doctors: hospitalInfo.doctors,
+      others: hospitalInfo.medpersonnel,
+    };
+
+    console.log(formattedHospitalInfo)
+
+    // Create FormData object
+    const formData = new FormData();
+
+    // Append the JSON stringified object with a key
+    formData.append("info", JSON.stringify(formattedHospitalInfo));
+
+    // Append the image if provided
+    if (image) {
+      formData.append("image", image); // Validate image if necessary
+    }
+    
+    console.log(image)
+    console.log(imagepreview)
+    try {
+      const response = await axios.post(
+        `https://docuhealth-backend.onrender.com/api/hospital/register`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Response:", response.data);
+      toast.success(response.data.message || "Registration successful!");
+      setnotification(true); // Assuming this manages a notification state
+      setNotificationVisible(false); // Assuming this hides the notification
+    } catch (error) {
+      // Error handling
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
+      console.error(
+        "Error submitting data:",
+        error.response?.data || error.message
+      );
+    } finally {
+      // Reset the submit button state
+      setSignUp("Sign Up Now");
+    }
   };
-
-  const formattedHospitalInfo = {
-    email: hospitalInfo.email,
-    password: hospitalInfo.password,
-    name: hospitalInfo.hospitalName,
-    address: hospitalInfo.hospitalAddress,
-    doctors: hospitalInfo.doctors,
-    others: hospitalInfo.medpersonnel,
-  };
-
-  // Convert JSON object to a string for the query parameter
-  const infoQueryString = encodeURIComponent(JSON.stringify(formattedHospitalInfo));
-
-  // Create FormData object
-  const formData = new FormData();
-  if (image) {
-    formData.append("image", image); // Ensure `image` is validated if needed
-  }
-
-  try {
-    const response = await axios.post(
-      `https://docuhealth-backend.onrender.com/api/hospital/register?info=${infoQueryString}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    console.log("Response:", response.data);
-    toast.success(response.data.message || "Registration successful!");
-    setnotification(true); // Assuming this manages a notification state
-    setNotificationVisible(false); // Assuming this hides the notification
-  } catch (error) {
-    // Error handling
-    toast.error(
-      error.response?.data?.message ||
-        "Something went wrong. Please try again."
-    );
-    console.error(
-      "Error submitting data:",
-      error.response?.data || error.message
-    );
-  } finally {
-    // Reset the submit button state
-    setSignUp("Sign Up Now");
-  }
-};
-
 
   const handleNextStep = () => {
     // Check if the form is completed before allowing to move to next step
@@ -120,7 +126,8 @@ const HLP = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file)); // Preview the selected image
+      setImage(file); // Preview the selected image
+      setImagePreview(URL.createObjectURL(file))
     }
   };
 
@@ -346,7 +353,7 @@ const HLP = () => {
                       <div className="w-64 h-64 bg-gray-200 flex justify-center items-center rounded-full relative">
                         {image ? (
                           <img
-                            src={image}
+                            src={imagepreview}
                             alt="Uploaded preview"
                             className="w-full h-full object-cover rounded-full "
                           />
@@ -679,7 +686,7 @@ const HLP = () => {
                         <div className="w-64 h-64 bg-gray-200 flex justify-center items-center rounded-full relative">
                           {image ? (
                             <img
-                              src={image}
+                              src={imagepreview}
                               alt="Uploaded preview"
                               className="w-full h-full object-cover rounded-full "
                             />

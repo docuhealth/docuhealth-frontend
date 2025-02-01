@@ -118,39 +118,57 @@ const UserSettingsDashboard = () => {
     e.preventDefault();
     setLoadingInfo("Saving Changes");
     console.log("Form submitted:", formData);
+  
     try {
       // Retrieve token from local storage
       const token = localStorage.getItem("jwtToken");
-
+  
       if (!token) {
         console.error("No token found. Please log in again.");
+        toast.error("Authentication token is missing. Please log in.");
         return;
       }
-
-      // Format the data to match the API requirements
-      const payload = {
-        firstname: formData.fname,
-        email: formData.email,
-        lastname: formData.lname,
-        phone_num: formData.phone,
-      };
-
+  
+      // Create payload by filtering only filled fields
+      const payload = {};
+  
+      Object.keys(formData).forEach((key) => {
+        if (formData[key] && formData[key].trim() !== "") {
+          // Map form field names to API field names
+          payload[key === "fname" ? "firstname" : key === "lname" ? "lastname" : key] =
+            formData[key].trim();
+        }
+      });
+  
+      // Ensure there's at least one field to update
+      if (Object.keys(payload).length === 0) {
+        console.warn("No fields to update.");
+        toast.warning("Please fill at least one field before submitting.");
+        return;
+      }
+  
       console.log("Payload:", payload);
-
-      // Send the PATCH request
-      const response = await axios.patch(
-        "https://docuhealth-backend.onrender.com/api/hospital/settings/update_patient_info", // Replace with your API URL
-        payload,
+  
+      // Send the PATCH request using fetch
+      const response = await fetch(
+        "https://docuhealth-backend.onrender.com/api/patient/settings/update_patient_info",
         {
+          method: "PATCH",
           headers: {
-            Authorization: `Bearer ${token}`, // Include JWT token
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
+          body: JSON.stringify(payload),
         }
       );
-
-      console.log("API Response:", response.data);
-      toast.success("Hospital Info Updated Successfully");
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const responseData = await response.json();
+      console.log("API Response:", responseData);
+      toast.success("Patient Info Updated Successfully");
     } catch (error) {
       console.error("Error submitting the form:", error.message);
       toast.error("An error occurred. Please try again.");
@@ -162,9 +180,10 @@ const UserSettingsDashboard = () => {
         lname: "",
         phone: "",
       });
+     
     }
-    // Add your submission logic here
   };
+  
 
   const handleCancel = () => {
     setFormData({
@@ -299,7 +318,7 @@ const UserSettingsDashboard = () => {
 
       // Send the PATCH request
       const response = await axios.patch(
-        "https://docuhealth-backend.onrender.com/api/hospital/settings/update_patient_password", // Replace with your API URL
+        "https://docuhealth-backend.onrender.com/api/patient/settings/update_patient_password", // Replace with your API URL
         payloadinfo,
         {
           headers: {
@@ -396,7 +415,7 @@ const UserSettingsDashboard = () => {
     try {
       // Send the payload to the API
       const response = await axios.patch(
-        "https://docuhealth-backend.onrender.com/api/hospital/settings/update_patient_notification_settings", // Replace with your API endpoint
+        "https://docuhealth-backend.onrender.com/api/patient/settings/update_patient_notification_settings", // Replace with your API endpoint
         payload,
         {
           headers: {

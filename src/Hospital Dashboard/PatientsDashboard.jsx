@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../assets/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import DashHead from "./Dashboard Part/DashHead";
 import DynamicDate from "../Dynamic Date/DynamicDate";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const PatientsDashboard = () => {
   const [isOverlayVisible, setOverlayVisible] = useState(false);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const[hin, setHin] = useState('')
 
   const location = useLocation();
 
@@ -25,6 +28,48 @@ const PatientsDashboard = () => {
 
   const closeSidebar = () => {
     setIsSidebarOpen(false);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate the HIN length
+    if (!/^\d+$/.test(hin)) {
+      toast.error("HIN must be a 16-digit number.");
+      return;
+    }
+
+    try {
+      // Fetch JWT token from local storage
+        const token = localStorage.getItem("jwtToken");
+                 if (!token) {
+                   toast.error("Authentication error. Please log in again.");
+                   return;
+                 }
+      // Make the POST request
+      const response = await axios.post(
+        "https://docuhealth-backend.onrender.com/api/hospital/patients/get_patient_info",
+        {
+          patient_HIN: hin,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include token in headers
+          },
+        }
+      );
+
+      // Notify the user of success
+      toast.success("Patient information retrieved successfully!");
+      console.log("Response:", response.data); // Log the patient data
+    } catch (error) {
+      // Handle errors
+      const errorMessage =
+        error.response?.data?.message || "Failed to retrieve patient info. Try again.";
+      toast.error(errorMessage);
+      console.error("Error fetching patient info:", errorMessage);
+    }
   };
   return (
     <div>
@@ -304,14 +349,17 @@ const PatientsDashboard = () => {
                     </button>
                   </div>
                   {/* Form */}
-                  <form>
+                  <form onSubmit={handleSubmit}>
                     <input
                       type="text"
                       placeholder="XXXX-XXX-XXXX"
+                      value={hin}
+                      onChange={(e) => setHin(e.target.value)}
                       className="w-full border border-gray-300 rounded-lg py-2 px-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#0000FF] focus:border-transparent"
                     />
                     <button
                       type="submit"
+                      onClick={handleSubmit}
                       className="w-full bg-[#0000FF] text-white py-2 px-4 rounded-full hover:bg-blue-700 transition duration-200"
                     >
                       Proceed

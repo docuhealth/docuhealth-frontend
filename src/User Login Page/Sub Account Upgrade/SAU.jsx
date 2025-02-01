@@ -13,14 +13,14 @@ const SAU = () => {
   const [number, setNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+
   const[loading, setLoading] = useState("")
 
   const [notification, setnotification] = useState(false);
 
   const [notificationVisible, setNotificationVisible] = useState(false);
 
-  const isFormValid = email && number && password;
+  const isFormValid = hin && state && email && number && password;
 
   const navigate = useNavigate();
 
@@ -50,10 +50,12 @@ const SAU = () => {
       toast.error("All fields must be filled before submission.");
       return;
     }
+
+ 
   
     const requestData = {
       subaccount_HIN: hin,
-      subacount_email: email,
+      subaccount_email: email,
       subaccount_phone_num: number,
       subaccount_password: password,
       subaccount_state: state,
@@ -62,8 +64,15 @@ const SAU = () => {
     console.log(requestData)
   
     try {
+         const token = localStorage.getItem("jwtToken");
+            if (!token) {
+              toast.error("Authentication error. Please log in again.");
+              return;
+            }
+
       const response = await axios.post("https://docuhealth-backend.onrender.com/api/patient/subaccounts/upgrade", requestData, {
         headers: {
+          Authorization: `Bearer ${token}`, 
           "Content-Type": "application/json",
         },
       });
@@ -77,6 +86,8 @@ const SAU = () => {
         setState("");
   
         setLoading('Upgrade Now')
+        localStorage.removeItem('jwtToken')
+        localStorage.removeItem('userlogin')
         setnotification(true);
         setNotificationVisible(false);
       }
