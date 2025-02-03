@@ -5,12 +5,14 @@ import DashHead from "./Dashboard Part/DashHead";
 import DynamicDate from "../Dynamic Date/DynamicDate";
 import axios from "axios";
 import { toast } from "react-toastify";
+import PatientHospitalInfo from "./Tabs/PatientHospitalInfo";
 
 const PatientsDashboard = () => {
   const [isOverlayVisible, setOverlayVisible] = useState(false);
-
+  const [patientData, setPatientData] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const[hin, setHin] = useState('')
+  const [hin, setHin] = useState("");
+  const[loading, setLoading]= useState('')
 
   const location = useLocation();
 
@@ -31,21 +33,23 @@ const PatientsDashboard = () => {
   };
 
   const handleSubmit = async (e) => {
+    setLoading('Fetching Patient Details')
     e.preventDefault();
 
     // Validate the HIN length
     if (!/^\d+$/.test(hin)) {
-      toast.error("HIN must be a 16-digit number.");
+      toast.error("HIN must be a number.");
+      setLoading('Proceed')
       return;
     }
 
     try {
       // Fetch JWT token from local storage
-        const token = localStorage.getItem("jwtToken");
-                 if (!token) {
-                   toast.error("Authentication error. Please log in again.");
-                   return;
-                 }
+      const token = localStorage.getItem("jwtToken");
+      if (!token) {
+        toast.error("Authentication error. Please log in again.");
+        return;
+      }
       // Make the POST request
       const response = await axios.post(
         "https://docuhealth-backend.onrender.com/api/hospital/patients/get_patient_info",
@@ -63,14 +67,29 @@ const PatientsDashboard = () => {
       // Notify the user of success
       toast.success("Patient information retrieved successfully!");
       console.log("Response:", response.data); // Log the patient data
+      setOverlayVisible(false);
+      setLoading('Proceed')
+      // setHin("");
+      setPatientData(response.data);
     } catch (error) {
       // Handle errors
       const errorMessage =
-        error.response?.data?.message || "Failed to retrieve patient info. Try again.";
+        error.response?.data?.message ||
+        "Failed to retrieve patient info. Try again.";
       toast.error(errorMessage);
       console.error("Error fetching patient info:", errorMessage);
+    }finally{
+      setLoading('Proceed')
     }
   };
+
+
+
+
+
+
+
+  
   return (
     <div>
       <div className="min-h-screen bg-gray-100 flex">
@@ -323,7 +342,7 @@ const PatientsDashboard = () => {
           <section className="p-8">
             <div className="flex flex-col md:flex-row justify-start items-start md:justify-between md:items-center gap-3">
               <div className=" sm:p-0">
-               <DynamicDate />
+                <DynamicDate />
               </div>
               <div>
                 <button
@@ -345,7 +364,7 @@ const PatientsDashboard = () => {
                       className="text-gray-500 hover:text-gray-800"
                       onClick={toggleOverlay}
                     >
-                   <i class='bx bx-x text-2xl text-black'></i>
+                      <i class="bx bx-x text-2xl text-black"></i>
                     </button>
                   </div>
                   {/* Form */}
@@ -362,12 +381,21 @@ const PatientsDashboard = () => {
                       onClick={handleSubmit}
                       className="w-full bg-[#0000FF] text-white py-2 px-4 rounded-full hover:bg-blue-700 transition duration-200"
                     >
-                      Proceed
+                      {loading ? loading : 'Proceed'}
                     </button>
                   </form>
                 </div>
               </div>
             )}
+            {patientData ? (
+              <PatientHospitalInfo patientData={patientData} hin={hin} />
+            ) : (
+              <div className="py-5">
+                <p>No patient data available</p>
+              </div>
+            )}
+
+
           </section>
         </main>
       </div>

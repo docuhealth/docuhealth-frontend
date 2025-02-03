@@ -170,7 +170,7 @@ const UserSubAcctDashboard = () => {
       work2:
         " View and easily get access to all of  their medical information when needed.",
       work3:
-        "  When your child turns 18 and obtains their NIN, they can take ownership of their account and manage their own medical information.",
+        "  When your child turns 18, they can take ownership of their account and manage their own medical information.",
       lastMessage:
         "By using our SUB account feature, you can ensure your child's medical history is accurate, up-to-date, and easily accessible – giving you peace of mind and empowering your child to take control of their health as they grow older.",
     },

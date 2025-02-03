@@ -111,7 +111,7 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
             <button className="p-2 bg-gray-200 rounded-full">🔔</button>
           </div>
           <div className="flex justify-center items-center">
-            <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden">
+            <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden">
               <img
                 src={imageUrl}
                 alt="Hospital Logo"

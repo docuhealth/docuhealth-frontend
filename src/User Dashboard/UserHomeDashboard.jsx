@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import UserDashHead from "./Dashboard Part/UserDashHead";
 import { Link, useLocation } from "react-router-dom";
+import DynamicDate from "../Dynamic Date/DynamicDate";
 import logo from "../assets/logo.png";
 import axios from "axios";
 
 const UserHomeDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-   const [data, setData] = useState(null);
-   const[dataEmail, setDataEmail] = useState(null)
-     const [loading, setLoading] = useState(true);
-   
+  const[hin, setHin] = useState('Loading..')
+  const [loading, setLoading] = useState(true);
+
   const location = useLocation();
 
   const isActive = (path = "/user-home-dashboard") =>
@@ -42,11 +42,11 @@ const UserHomeDashboard = () => {
       // Retrieve the JWT token from localStorage
       const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
       const role = "patient"; // Replace with the required role
-    
+
       try {
         // Construct the URL with query parameters
         const url = `https://docuhealth-backend.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
-    
+
         // Make the GET request
         const response = await fetch(url, {
           method: "GET",
@@ -56,29 +56,31 @@ const UserHomeDashboard = () => {
             Role: role, // Add role to the headers
           },
         });
-    
+
         // Handle the response
         if (response.ok) {
           const data = await response.json();
           console.log("Patient Dashboard Data:", data);
-    
+          setHin(data.HIN)
           // Display a success message or process the data as needed
           return data;
         } else {
           const errorData = await response.json();
           console.error("Failed to fetch dashboard data:", errorData);
-    
+
           // Handle errors with a message from the API
-          throw new Error(errorData.message || "Failed to fetch dashboard data.");
+          throw new Error(
+            errorData.message || "Failed to fetch dashboard data."
+          );
         }
       } catch (error) {
         console.error("An unexpected error occurred:", error);
-    
+
         // Handle unexpected errors
         throw error;
       }
     };
-    
+
     // Example Usage
     fetchPatientDashboard(1, 10)
       .then((data) => {
@@ -89,7 +91,6 @@ const UserHomeDashboard = () => {
         // Handle errors
         console.error("Error:", error.message);
       });
-    
   }, []);
 
   const closeNoticeMessage = () => {
@@ -359,10 +360,15 @@ const UserHomeDashboard = () => {
                           <p>
                             <i className="bx bx-info-circle text-3xl"></i>
                           </p>
-                          <p className="font-semibold">Health Identification <br /> Number (HIN)</p>
+                          <p className="font-semibold">
+                            Health Identification <br /> Number (HIN)
+                          </p>
                         </div>
                         <div>
-                        <i class='bx bx-x text-2xl cursor-pointer' onClick={closeNoticeMessage}></i>
+                          <i
+                            class="bx bx-x text-2xl cursor-pointer"
+                            onClick={closeNoticeMessage}
+                          ></i>
                         </div>
                       </div>
                       <div>
@@ -378,55 +384,15 @@ const UserHomeDashboard = () => {
                 </div>
               </div>
             )}
-
-            <div className="bg-white shadow-md rounded-md p-6">
-              <h3 className="text-lg font-semibold border-b pb-2">
-                Account Settings
-              </h3>
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div>
-                  <label className="block text-sm font-medium">
-                    Hospital Name
-                  </label>
-                  <p className="text-gray-700">Jarus Hospital</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">
-                    Email Address
-                  </label>
-                  <p className="text-gray-700">jarus@example.com</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">
-                    Number of Doctors
-                  </label>
-                  <p className="text-gray-700">10</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">
-                    Other Medical Personnel
-                  </label>
-                  <p className="text-gray-700">18</p>
-                </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium">
-                    Hospital Address
-                  </label>
-                  <p className="text-gray-700">
-                    No. 40 Health center street, off block road, Port Harcourt,
-                    Rivers State, Nigeria
-                  </p>
-                </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-10">
+              <div className="pb-3 sm:p-0 w-full sm:w-auto">
+               <DynamicDate />
               </div>
-              <div className="flex justify-end mt-6">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-md">
-                  Save changes
-                </button>
-                <button className="ml-4 bg-gray-300 px-4 py-2 rounded-md">
-                  Cancel changes
-                </button>
+              <div className="w-full sm:w-auto">
+              <p>HIN : {hin}</p>
               </div>
             </div>
+    
           </section>
         </main>
       </div>

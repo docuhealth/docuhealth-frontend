@@ -70,7 +70,7 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
     <div>
       {/* Header */}
       <header className="hidden bg-white py-4 px-8 sm:flex justify-between items-center border">
-        <h2 className="text-xl font-semibold">Welcome back {datainfo.fullname}! 👋</h2>
+        <h2 className="text-xl font-semibold">Welcome back {datainfo.fullname || 'Loading..'}! 👋</h2>
         <div className="flex items-center gap-4">
           <div className="relative">
             <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
@@ -87,7 +87,7 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
               />
             </div>
             <div className="flex flex-col items-start">
-              <p className="ml-2 text-sm font-medium">{datainfo.fullname}</p>
+              <p className="ml-2 text-sm font-medium">{datainfo.fullname || 'Loading..'}</p>
               <p className="ml-2 text-sm text-gray-500">Patient</p>
             </div>
           </div>

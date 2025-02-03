@@ -247,7 +247,7 @@ const ULP = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="relative">
                 <p className="font-semibold pb-1">
-                  Full Name (should correspond with NIN) :
+                  Full Name:
                 </p>
                 <div className="relative">
                   <input
@@ -601,7 +601,7 @@ const ULP = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="relative">
                   <p className="font-semibold">
-                    Full Name (should correspond with NIN) :
+                    Full Name :
                   </p>
                   <div className="relative">
                     <input
