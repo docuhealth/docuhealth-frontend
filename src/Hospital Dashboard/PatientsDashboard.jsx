@@ -69,7 +69,7 @@ const PatientsDashboard = () => {
       console.log("Response:", response.data); // Log the patient data
       setOverlayVisible(false);
       setLoading('Proceed')
-      // setHin("");
+      setHin("");
       setPatientData(response.data);
     } catch (error) {
       // Handle errors

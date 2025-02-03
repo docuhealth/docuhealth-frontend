@@ -802,8 +802,7 @@ const SettingsDashboard = () => {
             <div className="max-w-[300px]">
               <h3 className="pb-1 font-semibold">Accont Sign-In</h3>
               <p className="text-sm">
-                You'll get notified when a medical personnel log into the
-                dashboard
+                You'll get notified when a hospital view your profile via your HIN.
               </p>
             </div>
             <div className="flex flex-col gap-3 py-4">
@@ -856,7 +855,7 @@ const SettingsDashboard = () => {
               <h3 className="pb-1 font-semibold">Accont Information Changes</h3>
               <p className="text-sm">
                 You'll get notified when an account information is updated in
-                the dashboard
+                the dashboard.
               </p>
             </div>
             <div className="flex flex-col gap-3 py-4">
@@ -909,8 +908,7 @@ const SettingsDashboard = () => {
             <div className="max-w-[300px]">
               <h3 className="pb-1 font-semibold">Assessment & Diagnosis</h3>
               <p className="text-sm">
-                You'll get notified when an Assessment/Diagnosis is carried out
-                successfully in the dashboard
+                You'll get notified when the summary of a diagnosis/treatment is carried out on your profile by any hospital visited.
               </p>
             </div>
             <div className="flex flex-col gap-3 py-4">

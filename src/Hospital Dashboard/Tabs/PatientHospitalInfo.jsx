@@ -3,17 +3,218 @@ import TabComponents from "./TabComponent";
 import profilepic from "../../assets/profile.png";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { jsPDF } from "jspdf";
 
 const PatientHospitalInfo = ({ patientData, hin }) => {
   const [records, setRecords] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [upload, setUploading] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [popoverVisible, setPopoverVisible] = useState(null);
+  const [name, setName] = useState("fetching...");
 
-  const patientHIN = "1144132965389"; // Replace with dynamic patient HIN if necessary
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    patient_HIN: hin,
+    pulse_rate: 0,
+    blood_pressure: "",
+    temperature: 0,
+    diagnosis: "",
+    respiratory_rate: 0,
+    weight: 0,
+    summary: "",
+    medical_personnel: "",
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const validateStepOne = () => {
+    const {
+      pulse_rate,
+      temperature,
+      respiratory_rate,
+      blood_pressure,
+      weight,
+      diagnosis,
+    } = formData;
+    return (
+      pulse_rate &&
+      temperature &&
+      respiratory_rate &&
+      blood_pressure &&
+      weight &&
+      diagnosis
+    );
+  };
+
+  const handleNext = () => {
+    if (step === 1 && !validateStepOne()) {
+      toast.warning("Please fill in all fields before proceeding!");
+      return;
+    }
+    setStep(step + 1);
+  };
+
+  const handlePrevious = () => {
+    setStep(step - 1);
+  };
+
+  const patientHIN = hin; // Replace with dynamic patient HIN if necessary
   const itemsPerPage = 10;
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    // Add a header with decoration
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor("#1E90FF"); // Blue color
+    doc.text(`Medical Record Summary Details`, 105, 15, { align: "center" });
+
+    doc.setLineWidth(0.5);
+    doc.setDrawColor("#1E90FF"); // Blue color
+    doc.line(20, 20, 190, 20); // Horizontal line below the header
+
+    // Add Sub-header for Record Details
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor("#333333"); // Gray color
+    doc.text(`${name} Hospital`, 20, 30);
+
+    // Add Patient and Record Information
+    doc.setFontSize(12);
+    doc.text(
+      `Date: ${new Date(selectedRecord.date).toLocaleDateString("en-GB")}`,
+      20,
+      40
+    );
+    doc.text(
+      `Time: ${(() => {
+        const time = new Date(`${selectedRecord.date}T${selectedRecord.time}`);
+        const hours = time.getHours();
+        const minutes = time.getMinutes().toString().padStart(2, "0");
+        const period = hours >= 12 ? "PM" : "AM";
+        const formattedHours = hours % 12 || 12;
+        return `${formattedHours}:${minutes} ${period}`;
+      })()}`,
+      20,
+      45
+    );
+
+    doc.text(
+      `Name of Patient: ${selectedRecord.patient_info.fullname}`,
+      20,
+      55
+    );
+    doc.text(`Gender: ${selectedRecord.patient_info.sex}`, 20, 60);
+
+    // Add Medical Details Section
+    doc.setFontSize(14);
+    doc.setTextColor("#1E90FF");
+    doc.text("Medical Details", 20, 70);
+    doc.setDrawColor("#1E90FF");
+    doc.line(20, 72, 190, 72); // Line below section title
+
+    doc.setFontSize(12);
+    doc.setTextColor("#333333");
+    doc.text(`Pulse Rate: ${selectedRecord.basic_info.pulse_rate}`, 20, 80);
+    doc.text(`Temperature: ${selectedRecord.basic_info.temperature}`, 20, 85);
+    doc.text(
+      `Respiratory Rate: ${selectedRecord.basic_info.respiratory_rate}`,
+      20,
+      90
+    );
+    doc.text(`Weight: ${selectedRecord.basic_info.weight}`, 20, 95);
+    doc.text(
+      `Blood Pressure: ${selectedRecord.basic_info.blood_pressure} MM HG`,
+      20,
+      100
+    );
+
+    // Add Summary Section
+    doc.setFontSize(14);
+    doc.setTextColor("#1E90FF");
+    doc.text("Summary of Diagnosis/Treatment", 20, 115);
+    doc.setDrawColor("#1E90FF");
+    doc.line(20, 117, 190, 117);
+
+    doc.setFontSize(12);
+    doc.setTextColor("#333333");
+
+    // Dynamically adjust vertical spacing for summary
+    const summaryLines = doc.splitTextToSize(selectedRecord.summary, 170);
+    const summaryYStart = 125;
+    doc.text(summaryLines, 20, summaryYStart);
+
+    // Add Doctor and Hospital Details below the summary
+    const afterSummaryY = summaryYStart + summaryLines.length * 6; // Adjust spacing based on summary length
+    doc.text(
+      `Attended to by: ${selectedRecord.hospital_info.medical_personnel}`,
+      20,
+      afterSummaryY + 10
+    );
+    doc.text(`Hospital: ${name} Hospital`, 20, afterSummaryY + 20);
+    doc.text(
+      `Hospital Address: ${selectedRecord.hospital_info.address}`,
+      20,
+      afterSummaryY + 30
+    );
+
+    // Add Footer
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor("#808080"); // Light gray
+    doc.text(
+      "Generated by DocuHealth Records System. Confidential and for authorized use only.",
+      105,
+      290,
+      { align: "center" }
+    );
+
+    // Save the PDF
+    doc.save(`${name}-hospital-record.pdf`);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+      console.log("Token:", token);
+
+      if (!token) {
+        console.log("Token not found. Please log in again.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        console.log("Fetching data...");
+        const response = await axios.get(
+          "https://docuhealth-backend.onrender.com/api/hospital/dashboard",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("API Response Here:", response.data);
+
+        setName(response.data.hospital.name);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        console.log(err.response?.data?.message || "Error fetching data");
+
+        setName("Error, refresh");
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const fetchPatientMedicalRecords = async () => {
     setLoading(true);
@@ -43,6 +244,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
       setRecords(response.data.records);
       setTotalPages(response.data.total_pages);
       console.log(response.data.records);
+      console.log(response.data);
       toast.success("Patient medical records retrieved successfully!");
     } catch (error) {
       toast.error(
@@ -54,6 +256,8 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
     }
   };
 
+
+  
   const togglePopover = (recordId) => {
     setPopoverVisible((prev) => (prev === recordId ? null : recordId));
     setSelectedRecord(records.find((r) => r._id === recordId) || null);
@@ -62,6 +266,65 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
   useEffect(() => {
     fetchPatientMedicalRecords();
   }, [currentPage]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setUploading('Uploading')
+
+    // Validate that all fields are filled
+    for (const [key, value] of Object.entries(formData)) {
+      if (!value) {
+        toast.error(`Please fill in the ${key.replace("_", " ")}`);
+        setUploading('Upload')
+        return;
+      }
+    }
+
+    try {
+      const token = localStorage.getItem("jwtToken");
+      if (!token) {
+        toast.error("Authentication error. Please log in again.");
+        setUploading('Upload')
+        return;
+      }
+      console.log(formData)
+      const response = await axios.post(
+        "https://docuhealth-backend.onrender.com/api/hospital/patients/create_medical_record",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status === 200 || response.status === 201) {
+        toast.success("Medical record created successfully!");
+        setUploading('Upload')
+        setFormData({
+          patient_HIN: "",
+          pulse_rate: 0,
+          blood_pressure: "",
+          temperature: 0,
+          diagnosis: "",
+          respiratory_rate: 0,
+          weight: 0,
+          summary: "",
+          medical_personnel: "",
+        });
+      } else {
+        toast.error("Failed to create medical record. Please try again.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred while creating the medical record."
+      );
+    } finally {
+      setUploading('Upload')
+    }
+  };
 
   const tabs = [
     {
@@ -190,7 +453,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                       {/* Hospital Name */}
                       <div className="text-gray-700  truncate">
                         <span className="font-medium">Name of Hospital:</span>
-                        <p>{record.hospital_info.address}</p>
+                        <p>{name}</p>
                       </div>
 
                       {/* Vertical Divider */}
@@ -219,63 +482,207 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                         onClick={() => togglePopover(record._id)}
                       >
                         <p>
-                          <i class="bx bx-dots-vertical-rounded"></i>
+                          <i class="bx bx-dots-vertical-rounded cursor-pointer"></i>
                         </p>
                       </div>
 
                       {popoverVisible === record._id && (
-                        <div className="absolute right-0 top-10 bg-white shadow-lg rounded-lg p-3 w-72 z-10">
-                          <p className="font-semibold text-lg">
-                            Record Details {record._id}
-                          </p>
-                          <hr className="my-2" />
+                        <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm z-50">
+                          <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto  ">
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <p className="font-semibold text-md">
+                                  {name} Hospital
+                                </p>
+                                <div className="text-[12px] flex items-center gap-1 text-gray-400">
+                                  <p>
+                                    <span className="font-medium"></span>{" "}
+                                    {new Date(
+                                      selectedRecord.date
+                                    ).toLocaleDateString("en-GB")}
+                                  </p>
+                                  <p>
+                                    <span className="font-medium"></span>{" "}
+                                    {(() => {
+                                      const time = new Date(
+                                        `${selectedRecord.date}T${selectedRecord.time}`
+                                      );
+                                      const hours = time.getHours();
+                                      const minutes = time
+                                        .getMinutes()
+                                        .toString()
+                                        .padStart(2, "0");
+                                      const period = hours >= 12 ? "PM" : "AM";
+                                      const formattedHours = hours % 12 || 12;
+                                      return `${formattedHours}:${minutes} ${period}`;
+                                    })()}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer"
+                                  onClick={exportToPDF}
+                                >
+                                  Export as pdf
+                                </button>
+                                <p onClick={() => setPopoverVisible(null)}>
+                                  <i className="bx bx-x text-2xl text-black cursor-pointer"></i>
+                                </p>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 p-4">
+                              {/* Pulse Rate */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Pulse Rate
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord.basic_info.pulse_rate}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
 
-                          <p>
-                            <span className="font-medium">Date:</span>{" "}
-                            {new Date(selectedRecord.date).toLocaleDateString(
-                              "en-GB"
-                            )}
-                          </p>
-                          <p>
-                            <span className="font-medium">Time:</span>{" "}
-                            {(() => {
-                              const time = new Date(
-                                `${selectedRecord.date}T${selectedRecord.time}`
-                              );
-                              const hours = time.getHours();
-                              const minutes = time
-                                .getMinutes()
-                                .toString()
-                                .padStart(2, "0");
-                              const period = hours >= 12 ? "PM" : "AM";
-                              const formattedHours = hours % 12 || 12;
-                              return `${formattedHours}:${minutes} ${period}`;
-                            })()}
-                          </p>
-                          <p>
-                            <span className="font-medium">Diagnosis:</span>{" "}
-                            {selectedRecord.basic_info.diagnosis}
-                          </p>
-                          <p>
-                            <span className="font-medium">Hospital:</span>{" "}
-                            {selectedRecord.hospital_info.address}
-                          </p>
-                          <p>
-                            <span className="font-medium">Doctor:</span>{" "}
-                            {selectedRecord.hospital_info.medical_personnel}
-                          </p>
-                          <p>
-                            <span className="font-medium">Summary:</span>{" "}
-                            {selectedRecord.summary}
-                          </p>
+                              {/* Temperature */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Temperature
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord.basic_info.temperature}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
 
-                          {/* Close Popover Button */}
-                          <button
-                            onClick={() => setPopoverVisible(null)}
-                            className="mt-3 text-sm text-red-600 hover:text-red-800"
-                          >
-                            Close
-                          </button>
+                              {/* Respiratory Rate */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Respiratory Rate (RR)
+                                </label>
+                                <input
+                                  type="text"
+                                  value={
+                                    selectedRecord.basic_info.respiratory_rate
+                                  }
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Weight */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Weight
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord.basic_info.weight}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Blood Pressure */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Blood Pressure
+                                </label>
+                                <input
+                                  type="text"
+                                  value={
+                                    selectedRecord.basic_info.blood_pressure +
+                                    "MM HG"
+                                  }
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Diagnosis */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Diagnosis
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord.basic_info.diagnosis}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Summary/Treatment Plan */}
+                              <div className="col-span-2">
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Summary/Treatment Plan
+                                </label>
+                                <textarea
+                                  value={selectedRecord.summary}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-none"
+                                ></textarea>
+                              </div>
+
+                              {/* Name of Patient */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Name of Patient
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord.patient_info.fullname}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Gender */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Gender
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord.patient_info.sex}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Name of Medical Personnel */}
+                              <div className="col-span-2">
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Name of Medical Personnel
+                                </label>
+                                <input
+                                  type="text"
+                                  value={
+                                    selectedRecord.hospital_info
+                                      .medical_personnel
+                                  }
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Attachment */}
+                              <div className="col-span-2">
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Attachment
+                                </label>
+                                <input
+                                  type="text"
+                                  value="NIL"
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -284,79 +691,303 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
               )}
             </div>
 
-            <div className=" block lg:hidden space-y-4">
-              {records.map((record) => (
-                <div
-                  key={record._id}
-                  className="bg-white shadow-md rounded-lg p-4 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:space-x-4 "
-                >
-                  {/* Date and Time */}
-                  <div className="text-gray-700">
-                    <span className="font-semibold text-lg">
-                      {new Date(record.date).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </span>
-                    <p className="text-sm text-gray-500">
-                      {(() => {
-                        const time = new Date(`${record.date}T${record.time}`);
-                        const hours = time.getHours();
-                        const minutes = time
-                          .getMinutes()
-                          .toString()
-                          .padStart(2, "0");
-                        const period = hours >= 12 ? "PM" : "AM";
-                        const formattedHours = hours % 12 || 12;
-                        return `${formattedHours}:${minutes} ${period}`;
-                      })()}
-                    </p>
+            <div className="block lg:hidden space-y-4">
+              {loading ? (
+                <p className="text-gray-500 text-center">
+                  Loading medical records...
+                </p>
+              ) : records.length > 0 ? (
+                records.map((record) => (
+                  <div
+                    key={record._id}
+                    className="bg-white shadow-md rounded-lg p-4 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:space-x-4"
+                  >
+                    <div className="flex justify-between">
+                      {/* Date and Time */}
+                      <div className="text-gray-700">
+                        <span className="font-semibold text-lg">
+                          {new Date(record.date).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </span>
+                        <p className="text-sm text-gray-500">
+                          {(() => {
+                            const time = new Date(
+                              `${record.date}T${record.time}`
+                            );
+                            const hours = time.getHours();
+                            const minutes = time
+                              .getMinutes()
+                              .toString()
+                              .padStart(2, "0");
+                            const period = hours >= 12 ? "PM" : "AM";
+                            const formattedHours = hours % 12 || 12;
+                            return `${formattedHours}:${minutes} ${period}`;
+                          })()}
+                        </p>
+                      </div>
+
+                      <div className="text-gray-700  max-w-xs">
+                        <p>
+                          <i
+                            class="bx bx-dots-vertical-rounded cursor-pointer"
+                            onClick={() => {
+                              togglePopover(record._id);
+                            }}
+                          ></i>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-y-2 sm:flex sm:space-x-4 sm:items-center">
+                      {/* Name of Hospital */}
+                      <div>
+                        <span className="text-gray-500 block text-sm">
+                          Name of Hospital
+                        </span>
+                        <p className="text-gray-700 font-medium">
+                          {record.hospital_info.address}
+                        </p>
+                      </div>
+
+                      {/* Diagnosis */}
+                      <div>
+                        <span className="text-gray-500 block text-sm">
+                          Diagnosis
+                        </span>
+                        <p className="text-gray-700 font-medium">
+                          {record.basic_info.diagnosis}
+                        </p>
+                      </div>
+
+                      {/* Medical Personnel */}
+                      <div>
+                        <span className="text-gray-500 block text-sm">
+                          Medical Personnel
+                        </span>
+                        <p className="text-gray-700 font-medium">
+                          {record.hospital_info.medical_personnel}
+                        </p>
+                      </div>
+
+                      {/* Summary */}
+                      <div>
+                        <span className="text-gray-500 block text-sm">
+                          Summary/Treatment
+                        </span>
+                        <p className="text-gray-700 font-medium truncate">
+                          {record.summary}
+                        </p>
+                      </div>
+                    </div>
+                    {popoverVisible === record._id && (
+                      <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm z-50">
+                        <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto w-[90%] sm:w-[60%]">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="font-semibold text-md">
+                                {name} Hospital
+                              </p>
+                              <div className="text-[12px] flex items-center gap-1 text-gray-400">
+                                <p>
+                                  <span className="font-medium"></span>{" "}
+                                  {new Date(
+                                    selectedRecord.date
+                                  ).toLocaleDateString("en-GB")}
+                                </p>
+                                <p>
+                                  <span className="font-medium"></span>{" "}
+                                  {(() => {
+                                    const time = new Date(
+                                      `${selectedRecord.date}T${selectedRecord.time}`
+                                    );
+                                    const hours = time.getHours();
+                                    const minutes = time
+                                      .getMinutes()
+                                      .toString()
+                                      .padStart(2, "0");
+                                    const period = hours >= 12 ? "PM" : "AM";
+                                    const formattedHours = hours % 12 || 12;
+                                    return `${formattedHours}:${minutes} ${period}`;
+                                  })()}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <button
+                                className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer"
+                                onClick={exportToPDF}
+                              >
+                                Export as pdf
+                              </button>
+                              <p onClick={() => setPopoverVisible(null)}>
+                                <i className="bx bx-x text-2xl text-black cursor-pointer"></i>
+                              </p>
+                            </div>
+                          </div>
+                          {/* Responsive Grid Layout */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+                            {/* Pulse Rate */}
+                            <div>
+                              <label className="block text-gray-600 text-sm font-medium">
+                                Pulse Rate
+                              </label>
+                              <input
+                                type="text"
+                                value={selectedRecord.basic_info.pulse_rate}
+                                readOnly
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              />
+                            </div>
+
+                            {/* Temperature */}
+                            <div>
+                              <label className="block text-gray-600 text-sm font-medium">
+                                Temperature
+                              </label>
+                              <input
+                                type="text"
+                                value={selectedRecord.basic_info.temperature}
+                                readOnly
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              />
+                            </div>
+
+                            {/* Respiratory Rate */}
+                            <div>
+                              <label className="block text-gray-600 text-sm font-medium">
+                                Respiratory Rate (RR)
+                              </label>
+                              <input
+                                type="text"
+                                value={
+                                  selectedRecord.basic_info.respiratory_rate
+                                }
+                                readOnly
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              />
+                            </div>
+
+                            {/* Weight */}
+                            <div>
+                              <label className="block text-gray-600 text-sm font-medium">
+                                Weight
+                              </label>
+                              <input
+                                type="text"
+                                value={selectedRecord.basic_info.weight}
+                                readOnly
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              />
+                            </div>
+
+                            {/* Blood Pressure */}
+                            <div>
+                              <label className="block text-gray-600 text-sm font-medium">
+                                Blood Pressure
+                              </label>
+                              <input
+                                type="text"
+                                value={
+                                  selectedRecord.basic_info.blood_pressure +
+                                  "MM HG"
+                                }
+                                readOnly
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              />
+                            </div>
+
+                            {/* Diagnosis */}
+                            <div>
+                              <label className="block text-gray-600 text-sm font-medium">
+                                Diagnosis
+                              </label>
+                              <input
+                                type="text"
+                                value={selectedRecord.basic_info.diagnosis}
+                                readOnly
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              />
+                            </div>
+
+                            {/* Summary/Treatment Plan */}
+                            <div className="col-span-1 sm:col-span-2">
+                              <label className="block text-gray-600 text-sm font-medium">
+                                Summary/Treatment Plan
+                              </label>
+                              <textarea
+                                value={selectedRecord.summary}
+                                readOnly
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-none"
+                              ></textarea>
+                            </div>
+
+                            {/* Name of Patient */}
+                            <div>
+                              <label className="block text-gray-600 text-sm font-medium">
+                                Name of Patient
+                              </label>
+                              <input
+                                type="text"
+                                value={selectedRecord.patient_info.fullname}
+                                readOnly
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              />
+                            </div>
+
+                            {/* Gender */}
+                            <div>
+                              <label className="block text-gray-600 text-sm font-medium">
+                                Gender
+                              </label>
+                              <input
+                                type="text"
+                                value={selectedRecord.patient_info.sex}
+                                readOnly
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              />
+                            </div>
+
+                            {/* Name of Medical Personnel */}
+                            <div className="col-span-1 sm:col-span-2">
+                              <label className="block text-gray-600 text-sm font-medium">
+                                Name of Medical Personnel
+                              </label>
+                              <input
+                                type="text"
+                                value={
+                                  selectedRecord.hospital_info.medical_personnel
+                                }
+                                readOnly
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              />
+                            </div>
+
+                            {/* Attachment */}
+                            <div className="col-span-1 sm:col-span-2">
+                              <label className="block text-gray-600 text-sm font-medium">
+                                Attachment
+                              </label>
+                              <input
+                                type="text"
+                                value="NIL"
+                                readOnly
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-
-                  <div className="grid grid-cols-1 gap-y-2 sm:flex sm:space-x-4 sm:items-center">
-                    {/* Name of Hospital */}
-                    <div>
-                      <span className="text-gray-500 block text-sm">
-                        Name of Hospital
-                      </span>
-                      <p className="text-gray-700 font-medium">
-                        {record.hospital_info.address}
-                      </p>
-                    </div>
-
-                    {/* Diagnosis */}
-                    <div>
-                      <span className="text-gray-500 block text-sm">
-                        Diagnosis
-                      </span>
-                      <p className="text-gray-700 font-medium">
-                        {record.basic_info.diagnosis}
-                      </p>
-                    </div>
-
-                    {/* Medical Personnel */}
-                    <div>
-                      <span className="text-gray-500 block text-sm">
-                        Medical Personnel
-                      </span>
-                      <p className="text-gray-700 font-medium">
-                        {record.hospital_info.medical_personnel}
-                      </p>
-                    </div>
-
-                    {/* Summary */}
-                    <div>
-                      <span className="text-gray-500 block text-sm">
-                        Summary/Treatment
-                      </span>
-                      <p className="text-gray-700 font-medium truncate">
-                        {record.summary}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-gray-500 text-center">
+                  Medical records not found.
+                </p>
+              )}
             </div>
 
             {/* Pagination Controls */}
@@ -422,7 +1053,159 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
     },
     {
       title: "Diagnosis & Treatment",
-      content: <div className="space-y-4"></div>,
+      content: (
+        <div className="">
+          <div className="p-3">
+            {step === 1 && (
+              <form className=" grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                {/* Pulse Rate */}
+                <div>
+                  <label className="block text-gray-700 pb-1">Pulse Rate</label>
+                  <input
+                    type="text"
+                    name="pulse_rate"
+                    value={formData.pulse_rate}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                  />
+                </div>
+
+                {/* Temperature */}
+                <div>
+                  <label className="block text-gray-700 pb-1">Temperature</label>
+                  <input
+                    type="text"
+                    name="temperature"
+                    value={formData.temperature}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                  />
+                </div>
+
+                {/* Respiratory Rate */}
+                <div>
+                  <label className="block text-gray-700 pb-1">
+                    Respiratory Rate (RR)
+                  </label>
+                  <input
+                    type="text"
+                    name="respiratory_rate"
+                    value={formData.respiratory_rate}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                  />
+                </div>
+
+                {/* Blood Pressure */}
+                <div>
+                  <label className="block text-gray-700 pb-1">Blood Pressure</label>
+                  <input
+                    type="text"
+                    name="blood_pressure"
+                    value={formData.blood_pressure}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                  />
+                </div>
+
+                {/* Weight */}
+                <div>
+                  <label className="block text-gray-700 pb-1">Weight</label>
+                  <input
+                    type="text"
+                    name="weight"
+                    value={formData.weight}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                  />
+                </div>
+
+                {/* Diagnosis */}
+                <div>
+                  <label className="block text-gray-700 pb-1">Diagnosis</label>
+                  <input
+                    type="text"
+                    name="diagnosis"
+                    value={formData.diagnosis}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                  />
+                </div>
+
+                {/* Button */}
+                <div className="col-span-full flex justify-start space-x-4">
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="bg-[#0000FF] hover:bg-blue-600 text-white px-6 py-2 rounded-full transition duration-200"
+                  >
+                    Next
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {step === 2 && (
+              <form className="space-y-4">
+                <div>
+                  <label className="block text-gray-700 pb-1">
+                    Summary / Treatment
+                  </label>
+                  <textarea
+                    name="summary"
+                    value={formData.summary}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-5 h-[200px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                  ></textarea>
+                </div>
+                {/* <div>
+                  <label className="block text-gray-700">
+                    Add Photo/PDF (Optional)
+                  </label>
+                  <input
+                    type="file"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div> */}
+                <div className="max-w-[600px]">
+                  <label className="block text-gray-700 pb-1">
+                    Name of Medical Personnel
+                  </label>
+                  <input
+                    type="text"
+                    name="medical_personnel"
+                    value={formData.medical_personnel}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                  />
+                  <p className="text-sm text-gray-500 py-2">
+                    Info: We prioritize the privacy and security of patient's
+                    information. Every diagnosis and treatment record is end to
+                    end encrypted. No third party can view or tamper with.
+                  </p>
+                </div>
+
+                <div className="flex justify-start space-x-4">
+                  <button
+                    type="button"
+                    onClick={handlePrevious}
+                    className="border border-[#0000FF] text-[#0000FF] px-4 py-2 rounded-full"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-[#0000FF] text-white px-4 py-2 rounded-full"
+                    onClick={handleSubmit}
+                  >
+                    {upload ? upload : 'Upload'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      ),
     },
   ];
 
