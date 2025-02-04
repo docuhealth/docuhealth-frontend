@@ -163,14 +163,14 @@ const UserSubAcctDashboard = () => {
       benefit2:
         " Easily access and share medical information with healthcare providers.",
       benefit3:
-        " Transfer ownership to your child when they turn 18 and obtain their National Identification Number (NIN) with all their medical records/history intact and safe.",
+        " Transfer ownership to your child when they start using their own mobile device.",
       workTitle: "How it Works:",
       work1:
         " Create a SUB account for your child, providing their basic information.",
       work2:
         " View and easily get access to all of  their medical information when needed.",
       work3:
-        "  When your child turns 18, they can take ownership of their account and manage their own medical information.",
+        "  When your child start using his/her own device, they can take ownership of their own account and start keeping their own health record summary without your permission.",
       lastMessage:
         "By using our SUB account feature, you can ensure your child's medical history is accurate, up-to-date, and easily accessible – giving you peace of mind and empowering your child to take control of their health as they grow older.",
     },

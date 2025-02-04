@@ -136,7 +136,7 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
             </div>
           </div>
         </div>
-        {showNotifications && (
+        {/* {showNotifications && (
         <div className="absolute top-20 right-0 mt-2 w-80 bg-white shadow-lg rounded-lg overflow-auto z-10">
           <div className="p-4 border-b">
             <h3 className="text-lg font-semibold">Notifications</h3>
@@ -155,7 +155,7 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
             )}
           </ul>
         </div>
-      )}
+      )} */}
       </header>
 
       <header className="sm:hidden bg-white shadow py-4 flex justify-between items-center px-4">

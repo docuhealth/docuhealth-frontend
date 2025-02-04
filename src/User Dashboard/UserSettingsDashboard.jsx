@@ -826,7 +826,7 @@ const UserSettingsDashboard = () => {
 
           <div className="flex flex-col sm:flex-row justify-start sm:items-center py-4">
             <div className="max-w-[300px]">
-              <h3 className="pb-1 font-semibold">Assessment & Diagnosis</h3>
+              <h3 className="pb-1 font-semibold">Summary Of Diagnosis & Treatment</h3>
               <p className="text-sm">
               You'll get notified when the summary of a diagnosis/treatment is carried out on your profile by any hospital visited.
               </p>

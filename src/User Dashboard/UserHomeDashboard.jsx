@@ -102,7 +102,7 @@ const UserHomeDashboard = () => {
       title: "Health Identification Number (HIN)",
       details:
         "Your Health Identification Number (HIN) is your personal information which can be accessed by you alone on your dashboard. Protect it at all cost because it is the key to easily accessing your medical history. Dont share it with anyone except with a trusted medical personnel.",
-      by: "Docu Health (admin)",
+      by: "DocuHealth (admin)",
     },
   ];
   return (

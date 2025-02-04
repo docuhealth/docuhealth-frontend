@@ -12,7 +12,7 @@ const PatientsDashboard = () => {
   const [patientData, setPatientData] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hin, setHin] = useState("");
-  const[loading, setLoading]= useState('')
+  const [loading, setLoading] = useState("");
 
   const location = useLocation();
 
@@ -33,13 +33,13 @@ const PatientsDashboard = () => {
   };
 
   const handleSubmit = async (e) => {
-    setLoading('Fetching Patient Details')
+    setLoading("Fetching Patient Details");
     e.preventDefault();
 
     // Validate the HIN length
     if (!/^\d+$/.test(hin)) {
       toast.error("HIN must be a number.");
-      setLoading('Proceed')
+      setLoading("Proceed");
       return;
     }
 
@@ -68,9 +68,10 @@ const PatientsDashboard = () => {
       toast.success("Patient information retrieved successfully!");
       console.log("Response:", response.data); // Log the patient data
       setOverlayVisible(false);
-      setLoading('Proceed')
+      setLoading("Proceed");
       // setHin("");
       setPatientData(response.data);
+      setPatientRecord(false);
     } catch (error) {
       // Handle errors
       const errorMessage =
@@ -78,18 +79,64 @@ const PatientsDashboard = () => {
         "Failed to retrieve patient info. Try again.";
       toast.error(errorMessage);
       console.error("Error fetching patient info:", errorMessage);
-    }finally{
-      setLoading('Proceed')
+    } finally {
+      setLoading("Proceed");
     }
   };
 
+  const [records, setRecords] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [patientRecord, setPatientRecord] = useState(false);
 
+  const itemsPerPage = 10;
 
+  const fetchPatientMedicalRecords = async () => {
+    setLoading(true);
 
+    try {
+      const token = localStorage.getItem("jwtToken");
+      if (!token) {
+        toast.error("Token not found. Please log in again.");
+        setLoading(false);
+        return;
+      }
 
+      const response = await axios.get(
+        "https://docuhealth-backend.onrender.com/api/hospital/patients/get_hospital_recent_medical_records",
 
+        {
+          params: {
+            page: currentPage,
+            size: itemsPerPage,
+          },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-  
+      setRecords(response.data.records);
+      setTotalPages(response.data.total_pages);
+      setPatientRecord(true);
+      console.log(response.data.records);
+      console.log("gotte" + response.data);
+      toast.success("Patient medical records retrieved successfully!");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to fetch patient medical records."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPatientMedicalRecords();
+  }, [currentPage]);
+
   return (
     <div>
       <div className="min-h-screen bg-gray-100 flex">
@@ -371,7 +418,7 @@ const PatientsDashboard = () => {
                   <form onSubmit={handleSubmit}>
                     <input
                       type="text"
-                      placeholder="XXXX-XXX-XXXX"
+                      placeholder="HIN Number"
                       value={hin}
                       onChange={(e) => setHin(e.target.value)}
                       className="w-full border border-gray-300 rounded-lg py-2 px-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#0000FF] focus:border-transparent"
@@ -381,12 +428,13 @@ const PatientsDashboard = () => {
                       onClick={handleSubmit}
                       className="w-full bg-[#0000FF] text-white py-2 px-4 rounded-full hover:bg-blue-700 transition duration-200"
                     >
-                      {loading ? loading : 'Proceed'}
+                      {loading ? loading : "Proceed"}
                     </button>
                   </form>
                 </div>
               </div>
             )}
+
             {patientData ? (
               <PatientHospitalInfo patientData={patientData} hin={hin} />
             ) : (
@@ -395,7 +443,237 @@ const PatientsDashboard = () => {
               </div>
             )}
 
+            {patientRecord ? (
+              <div>
+                <div className="p-6 bg-white rounded-xl shadow-lg my-4">
+                  <div className="hidden lg:block">
+                  <h2 className="text-lg font-semibold mb-4">
+                    Patients Attendance History
+                  </h2>
+                  {loading ? (
+                    <p>Loading records...</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full border-collapse border border-gray-200">
+                        <thead>
+                          <tr className="bg-gray-100">
+                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                              Patient's Name
+                            </th>
+                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                              Date
+                            </th>
+                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                              Time
+                            </th>
+                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                              Diagnosis
+                            </th>
+                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                              Health Identity Number (HIN)
+                            </th>
+                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                              Sex
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {records.map((record) => (
+                            <tr
+                              key={record.record_id}
+                              className="hover:bg-gray-50"
+                            >
+                              <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
+                                {record.patient_name}
+                              </td>
+                              <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
+                                {record.date}
+                              </td>
+                              <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
+                                {record.time}
+                              </td>
+                              <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
+                                {record.diagnosis}
+                              </td>
+                              <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
+                                {record.patient_HIN_truncated}************
+                              </td>
+                              <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
+                                {record.sex}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                  </div>
 
+                  <div className="block lg:hidden space-y-4">
+                    <h2 className="text-lg font-semibold mb-4">
+                      Recent Patients Attended To
+                    </h2>
+                    {loading ? (
+                      <p className="text-gray-500 text-center">
+                        Loading medical records...
+                      </p>
+                    ) : records.length > 0 ? (
+                      records.map((record) => (
+                        <div
+                          key={record.record_id}
+                          className="bg-white shadow-md rounded-lg p-4 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:space-x-4"
+                        >
+                          <div className="flex justify-between">
+                            {/* Date and Time */}
+                            <div className="text-gray-700">
+                              <span className="font-semibold">
+                                {new Date(record.date)
+                                  .toLocaleDateString("en-GB", {
+                                    day: "2-digit",
+                                    month: "long",
+                                    year: "numeric",
+                                  })
+                                  .replace(/^\d{2}/, (day) =>
+                                    day.padStart(2, "0")
+                                  )}
+                              </span>
+                              <p className="text-sm text-gray-500">
+                                {(() => {
+                                  const time = new Date(
+                                    `${record.date}T${record.time}`
+                                  );
+                                  const hours = time.getHours();
+                                  const minutes = time
+                                    .getMinutes()
+                                    .toString()
+                                    .padStart(2, "0");
+                                  const period = hours >= 12 ? "PM" : "AM";
+                                  const formattedHours = hours % 12 || 12;
+                                  return `${formattedHours}:${minutes} ${period}`;
+                                })()}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-y-2 sm:flex sm:space-x-4 sm:items-center">
+                            {/* Patient Name */}
+                            <div className="col-span-2">
+                              <span className="text-gray-500 block text-sm">
+                                Patient's Name
+                              </span>
+                              <p className="text-gray-700 font-medium">
+                                {record.patient_name}
+                              </p>
+                            </div>
+
+                            {/* Diagnosis */}
+                            <div className="col-span-2">
+                              <span className="text-gray-500 block text-sm">
+                                Diagnosis
+                              </span>
+                              <p className="text-gray-700 font-medium">
+                                {record.diagnosis}
+                              </p>
+                            </div>
+
+                            {/* HIN & Sex aligned beside each other */}
+                            <div className="flex items-center space-x-6 col-span-2">
+                              {/* Health Identity Number */}
+                              <div className="flex items-center">
+                                <span className="text-gray-500 text-sm mr-1">
+                                  HIN:
+                                </span>
+                                <p className="text-gray-700 font-medium">
+                                  {record.patient_HIN_truncated}************
+                                </p>
+                              </div>
+
+                              {/* Sex */}
+                              <div className="flex items-center">
+                                <span className="text-gray-500 text-sm mr-1">
+                                  Sex:
+                                </span>
+                                <p className="text-gray-700 font-medium">
+                                  {record.sex}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500 text-center">
+                        Medical records not found.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Pagination Controls */}
+                  {totalPages > 1 && (
+                    <div className="flex flex-col md:flex-row gap-3 justify-between items-center my-4">
+                      {/* Pagination Info */}
+                      <span className="text-gray-500 text-sm">
+                        Showing page {currentPage} of {totalPages} entries
+                      </span>
+
+                      {/* Pagination Buttons */}
+                      <div className="flex items-center">
+                        {/* Previous Button */}
+                        <button
+                          className={`px-3 py-1 mx-1 rounded-full ${
+                            currentPage === 1
+                              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                              : "bg-gray-300 hover:bg-gray-400"
+                          }`}
+                          onClick={() =>
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                          }
+                          disabled={currentPage === 1}
+                        >
+                          &lt;
+                        </button>
+
+                        {/* Page Numbers */}
+                        {Array.from({ length: totalPages }, (_, i) => (
+                          <button
+                            key={i + 1}
+                            className={`px-3 py-1 mx-1 rounded-full ${
+                              currentPage === i + 1
+                                ? "bg-[#0000FF] text-white"
+                                : "bg-gray-300 hover:bg-gray-400"
+                            }`}
+                            onClick={() => setCurrentPage(i + 1)}
+                          >
+                            {i + 1}
+                          </button>
+                        ))}
+
+                        {/* Next Button */}
+                        <button
+                          className={`px-3 py-1 mx-1 rounded-full ${
+                            currentPage === totalPages
+                              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                              : "bg-gray-300 hover:bg-gray-400"
+                          }`}
+                          onClick={() =>
+                            setCurrentPage((prev) =>
+                              Math.min(prev + 1, totalPages)
+                            )
+                          }
+                          disabled={currentPage === totalPages}
+                        >
+                          &gt;
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center pt-5">
+                {/* <p>No Medical Records To Show</p> */}
+              </div>
+            )}
           </section>
         </main>
       </div>

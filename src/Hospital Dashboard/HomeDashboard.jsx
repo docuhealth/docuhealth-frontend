@@ -221,6 +221,36 @@ const HomeDashboard = () => {
     fetchPatientMedicalRecords();
   }, [currentPage]);
 
+
+   const [noticeDisplay, setNoticeDisplay] = useState(false);
+  
+    useEffect(() => {
+      // Show notice immediately when the dashboard loads
+      setNoticeDisplay(true);
+  
+      // Then show the notice every 24 hours (1 day)
+      const interval = setInterval(() => {
+        setNoticeDisplay(true);
+      }, 86400000); // 86,400,000 ms = 24 hours
+  
+      return () => clearInterval(interval); // Cleanup interval on unmount
+    }, []);
+
+    const closeNoticeMessage = () => {
+      setNoticeDisplay(false);
+    };
+
+    const noticeMessage = [
+      {
+        title: "Important Notice: Upload Only A Summary",
+        details:
+          "Hospitals should upload only a brief summary of the patient's diagnosis / treatment, and the test results. Full clerking details, patient history, and internal hospital notes are not allowed.",
+        warning: 'DocuHealth is designed for easy patient access to medical summaries. Uploading of full clerking details violates platform guidlines.',
+        by: "DocuHealth (admin)",
+      },
+    ];
+  
+
   return (
     <div>
       <div className="min-h-screen bg-gray-100 flex">
@@ -471,6 +501,46 @@ const HomeDashboard = () => {
 
           {/* Content */}
           <section className="p-8">
+          {noticeDisplay && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ">
+                <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative max-h-[80vh] overflow-y-auto mx-5">
+                  {noticeMessage.map((message, index) => (
+                    <div key={index} className="">
+                      {" "}
+                      <div className="flex justify-between items-center gap-2 pb-2">
+                        <div className="flex justify-start items-center gap-2 ">
+                          <p>
+                            <i className="bx bx-info-circle text-3xl"></i>
+                          </p>
+                          <p className="font-semibold">
+                          Important Notice: Upload Only A Summary
+                          </p>
+                        </div>
+                        <div>
+                          <i
+                            class="bx bx-x text-2xl cursor-pointer"
+                            onClick={closeNoticeMessage}
+                          ></i>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600 pb-4">
+                          {message.details}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-red-600 font-semibold pb-4">
+                          {message.warning}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-normal">{message.by}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className=" sm:p-0">
               <DynamicDate />
             </div>
@@ -692,67 +762,168 @@ const HomeDashboard = () => {
 
             {patientRecord ? (
               <div>
-                <div className="p-6 bg-white rounded-xl shadow-lg my-4">
-                  <h2 className="text-lg font-semibold mb-4">
-                    Recent Patients Attended To
-                  </h2>
-                  {loading ? (
-                    <p>Loading records...</p>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full border-collapse border border-gray-200">
-                        <thead>
-                          <tr className="bg-gray-100">
-                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
-                              Patient's Name
-                            </th>
-                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
-                              Date
-                            </th>
-                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
-                              Time
-                            </th>
-                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
-                              Diagnosis
-                            </th>
-                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
-                              Health Identity Number (HIN)
-                            </th>
-                            <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
-                              Sex
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {records.map((record) => (
-                            <tr
-                              key={record.record_id}
-                              className="hover:bg-gray-50"
-                            >
-                              <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
-                                {record.patient_name}
-                              </td>
-                              <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
-                                {record.date}
-                              </td>
-                              <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
-                                {record.time}
-                              </td>
-                              <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
-                                {record.diagnosis}
-                              </td>
-                              <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
-                                {record.patient_HIN_truncated}************
-                              </td>
-                              <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
-                                {record.sex}
-                              </td>
+                <div className="bg-white p-6  rounded-xl shadow-lg my-4">
+                  <div className="hidden lg:block">
+                    <h2 className="text-lg font-semibold mb-4">
+                      Recent Patients Attended To
+                    </h2>
+                    {loading ? (
+                      <p>Loading records...</p>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full border-collapse border border-gray-200">
+                          <thead>
+                            <tr className="bg-gray-100">
+                              <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                                Patient's Name
+                              </th>
+                              <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                                Date
+                              </th>
+                              <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                                Time
+                              </th>
+                              <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                                Diagnosis
+                              </th>
+                              <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                                Health Identity Number (HIN)
+                              </th>
+                              <th className="border border-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                                Sex
+                              </th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
+                          </thead>
+                          <tbody>
+                            {records.map((record) => (
+                              <tr
+                                key={record.record_id}
+                                className="hover:bg-gray-50"
+                              >
+                                <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
+                                  {record.patient_name}
+                                </td>
+                                <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
+                                  {record.date}
+                                </td>
+                                <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
+                                  {record.time}
+                                </td>
+                                <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
+                                  {record.diagnosis}
+                                </td>
+                                <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
+                                  {record.patient_HIN_truncated}************
+                                </td>
+                                <td className="border border-gray-200 px-4 py-2 text-sm text-gray-800">
+                                  {record.sex}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="block lg:hidden space-y-4">
+                    <h2 className="text-lg font-semibold mb-4">
+                      Recent Patients Attended To
+                    </h2>
+                    {loading ? (
+                      <p className="text-gray-500 text-center">
+                        Loading medical records...
+                      </p>
+                    ) : records.length > 0 ? (
+                      records.map((record) => (
+                        <div
+                          key={record.record_id}
+                          className="bg-white shadow-md rounded-lg p-4 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:space-x-4"
+                        >
+                          <div className="flex justify-between">
+                            {/* Date and Time */}
+                            <div className="text-gray-700">
+                              <span className="font-semibold">
+                                {new Date(record.date)
+                                  .toLocaleDateString("en-GB", {
+                                    day: "2-digit",
+                                    month: "long",
+                                    year: "numeric",
+                                  })
+                                  .replace(/^\d{2}/, (day) =>
+                                    day.padStart(2, "0")
+                                  )}
+                              </span>
+                              <p className="text-sm text-gray-500">
+                                {(() => {
+                                  const time = new Date(
+                                    `${record.date}T${record.time}`
+                                  );
+                                  const hours = time.getHours();
+                                  const minutes = time
+                                    .getMinutes()
+                                    .toString()
+                                    .padStart(2, "0");
+                                  const period = hours >= 12 ? "PM" : "AM";
+                                  const formattedHours = hours % 12 || 12;
+                                  return `${formattedHours}:${minutes} ${period}`;
+                                })()}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-y-2 sm:flex sm:space-x-4 sm:items-center">
+                            {/* Patient Name */}
+                            <div className="col-span-2">
+                              <span className="text-gray-500 block text-sm">
+                                Patient's Name
+                              </span>
+                              <p className="text-gray-700 font-medium">
+                                {record.patient_name}
+                              </p>
+                            </div>
+
+                            {/* Diagnosis */}
+                            <div className="col-span-2">
+                              <span className="text-gray-500 block text-sm">
+                                Diagnosis
+                              </span>
+                              <p className="text-gray-700 font-medium">
+                                {record.diagnosis}
+                              </p>
+                            </div>
+
+                            {/* HIN & Sex aligned beside each other */}
+                            <div className="flex items-center space-x-6 col-span-2">
+                              {/* Health Identity Number */}
+                              <div className="flex items-center">
+                                <span className="text-gray-500 text-sm mr-1">
+                                  HIN:
+                                </span>
+                                <p className="text-gray-700 font-medium">
+                                  {record.patient_HIN_truncated}************
+                                </p>
+                              </div>
+
+                              {/* Sex */}
+                              <div className="flex items-center">
+                                <span className="text-gray-500 text-sm mr-1">
+                                  Sex:
+                                </span>
+                                <p className="text-gray-700 font-medium">
+                                  {record.sex}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500 text-center">
+                        Medical records not found.
+                      </p>
+                    )}
+                  </div>
 
                   {/* Pagination Controls */}
                   {totalPages > 1 && (

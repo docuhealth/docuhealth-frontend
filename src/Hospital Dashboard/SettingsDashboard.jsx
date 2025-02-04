@@ -803,7 +803,7 @@ const SettingsDashboard = () => {
             <div className="max-w-[300px]">
               <h3 className="pb-1 font-semibold">Accont Sign-In</h3>
               <p className="text-sm">
-                You'll get notified when a hospital view your profile via your HIN.
+                You'll get notified when a medical personnel log into the dashboard.
               </p>
             </div>
             <div className="flex flex-col gap-3 py-4">
@@ -907,9 +907,9 @@ const SettingsDashboard = () => {
 
           <div className="flex flex-col sm:flex-row justify-start sm:items-center py-4">
             <div className="max-w-[300px]">
-              <h3 className="pb-1 font-semibold">Assessment & Diagnosis</h3>
+              <h3 className="pb-1 font-semibold">Summary Of Diagnosis & Treatment</h3>
               <p className="text-sm">
-                You'll get notified when the summary of a diagnosis/treatment is carried out on your profile by any hospital visited.
+                You'll get notified when the summary of a diagnosis/treatment is carried out successfully in the dashboard.
               </p>
             </div>
             <div className="flex flex-col gap-3 py-4">

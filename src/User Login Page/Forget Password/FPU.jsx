@@ -104,13 +104,13 @@ const FP = () => {
                     </div>
                     <h2 className="text-2xl font-bold mb-2">Forgot Password</h2>
                     <p className="text-gray-600 mb-6">
-                    Input your registered Email / Phone Number below to receieve an OTP to help you reset your password.
+                    Input your registered Email below to receieve an OTP to help you reset your password.
                     </p>
       
                     <form onSubmit={handleSubmit} className="space-y-4">
                       {/* Email Input */}
                       <div className="relative">
-                        <p className="font-semibold pb-1">Enter Email / Phone Number :</p>
+                        <p className="font-semibold pb-1">Enter Email :</p>
                         <div className="relative">
                           <input
                             type="text"
@@ -175,13 +175,13 @@ const FP = () => {
                   <div className="px-5" id="temp">
                     <h2 className=" text-xl sm:text-2xl  mb-2">Forgot Password ?</h2>
                     <p className="text-gray-600 mb-6">
-                      Input your registered Email / Phone Number below to receieve an OTP to help you reset your password.
+                      Input your registered Email below to receieve an OTP to help you reset your password.
                     </p>
       
                     <form onSubmit={handleSubmit} className="space-y-4">
                       {/* Email Input */}
                       <div className="relative">
-                        <p className="pb-1">Enter Email / Phone Number :</p>
+                        <p className="pb-1">Enter Email :</p>
                         <div className="relative">
                           <input
                             type="email"

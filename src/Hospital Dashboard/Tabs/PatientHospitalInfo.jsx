@@ -88,18 +88,27 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
     // Add Patient and Record Information
     doc.setFontSize(12);
     doc.text(
-      `Date: ${new Date(selectedRecord.date).toLocaleDateString("en-GB")}`,
+      `Date: ${new Date(records.created_at)
+        .toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        })
+        .replace(/^\d{2}/, (day) => day.padStart(2, "0"))}`,
       20,
       40
     );
     doc.text(
       `Time: ${(() => {
-        const time = new Date(`${selectedRecord.date}T${selectedRecord.time}`);
-        const hours = time.getHours();
-        const minutes = time.getMinutes().toString().padStart(2, "0");
-        const period = hours >= 12 ? "PM" : "AM";
-        const formattedHours = hours % 12 || 12;
-        return `${formattedHours}:${minutes} ${period}`;
+        const time = new Date(`${records.created_at}`); // Combine date and time
+        const hours = time.getHours(); // Extract hours
+        const minutes = time
+          .getMinutes()
+          .toString()
+          .padStart(2, "0"); // Extract and format minutes
+        const period = hours >= 12 ? "PM" : "AM"; // Determine AM or PM
+        const formattedHours = hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
+        return `${formattedHours}:${minutes} ${period}`; // Return formatted time
       })()}`,
       20,
       45
@@ -133,6 +142,11 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
       `Blood Pressure: ${selectedRecord.basic_info.blood_pressure} MM HG`,
       20,
       100
+    );
+    doc.text(
+      `Diagnosis: ${selectedRecord.basic_info.diagnosis}`,
+      20,
+      105
     );
 
     // Add Summary Section
@@ -326,6 +340,8 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
       setUploading("Upload");
     }
   };
+
+ 
 
   const tabs = [
     {
@@ -1160,7 +1176,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
               <form className="space-y-4">
                 <div>
                   <label className="block text-gray-700 pb-1">
-                    Summary / Treatment
+                    Summary of Diagnosis / Treatment
                   </label>
                   <textarea
                     name="summary"

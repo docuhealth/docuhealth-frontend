@@ -146,7 +146,7 @@ const ULP = () => {
               </div>
 
               <div className="relative">
-                <p className="font-semibold pb-1">Phone Number (Mandatory) :</p>
+                <p className="font-semibold pb-1">Phone Number :</p>
                 <div className="relative">
                   <input
                     type="number"
@@ -492,7 +492,7 @@ const ULP = () => {
                 </div>
 
                 <div className="relative">
-                  <p className="font-semibold">Phone Number (Mandatory) :</p>
+                  <p className="font-semibold">Phone Number :</p>
                   <div className="relative">
                     <input
                       type="number"
