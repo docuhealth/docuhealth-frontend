@@ -13,6 +13,7 @@ const PatientsDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hin, setHin] = useState("");
   const [loading, setLoading] = useState("");
+   const [name, setName] = useState("fetching...");
 
   const location = useLocation();
 
@@ -23,6 +24,43 @@ const PatientsDashboard = () => {
   const toggleOverlay = () => {
     setOverlayVisible(!isOverlayVisible);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+      console.log("Token:", token);
+
+      if (!token) {
+        console.log("Token not found. Please log in again.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        console.log("Fetching data...");
+        const response = await axios.get(
+          "https://docuhealth-backend.onrender.com/api/hospital/dashboard",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("API Response Here:", response.data);
+
+        setName(response.data.hospital.name);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        console.log(err.response?.data?.message || "Error fetching data");
+
+        setName("Error, refresh");
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
