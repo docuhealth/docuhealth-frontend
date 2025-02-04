@@ -3,12 +3,18 @@ import axios from "axios";
 
 const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const[data, setData] = useState(null)
+  const [data, setData] = useState(null);
   const [email, setEmail] = useState("fetching...");
   const [name, setName] = useState("fetching...");
   const [imageUrl, setImageUrl] = useState(null); // State for hospital image URL
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [notifications, setNotifications] = useState("Loading..");
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const toggleNotifications = () => {
+    setShowNotifications((prev) => !prev);
+  };
 
   const togglePopover = () => {
     setIsPopoverOpen(!isPopoverOpen);
@@ -38,14 +44,13 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
         );
 
         console.log("API Response:", response.data);
-     
+
         setLoading(false);
-        setData(response.data)
+        setData(response.data);
         // Extract and save specific data
         setName(response.data.hospital.name);
         setEmail(response.data.hospital.email);
-        setImageUrl(response.data.hospital.image.secure_url)
-      
+        setImageUrl(response.data.hospital.image.secure_url);
       } catch (err) {
         console.error("Error fetching data:", err);
         console.log(err.response?.data?.message || "Error fetching data");
@@ -54,12 +59,51 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
         // Handle errors gracefully
         setName("Error, refresh");
         setEmail("Error, refresh");
-     
       }
     };
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+        console.log("Token:", token);
+
+        if (!token) {
+          console.log("Token not found. Please log in again.");
+          setLoading(false);
+          return;
+        }
+        console.log("Fetching hospital notifications...");
+
+        // Make the GET request
+        const response = await axios.get(
+          "https://docuhealth-backend.onrender.com/api/hospital/get_notifications", // Replace with your actual API URL
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Replace with a valid JWT token
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        // Success notification
+        setNotifications(response.data.notifications);
+        console.log("Notifications retrieved successfully:", response.data);
+      } catch (error) {
+        // Error notification
+        console.error(
+          "Error retrieving hospital notifications:",
+          error.response?.data || error.message
+        );
+      }
+    };
+
+    // Call the function inside useEffect
+    fetchNotifications();
+  }, []); // Empty dependency array ensures it runs only once when the component mounts
 
   return (
     <div>
@@ -69,11 +113,14 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
           Welcome back {name} Hospital! 👋
         </h2>
         <div className="flex items-center gap-4">
-          <div className="relative">
-            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              1
-            </span>
-            <button className="p-2 bg-gray-200 rounded-full">🔔</button>
+          <div
+            className="relative p-2 w-11 h-11 rounded-full bg-gray-100 flex justify-center items-center"
+            onClick={toggleNotifications}
+          >
+            <span className="absolute top-2 right-2 bg-red-500 text-white text-xs rounded-full w-2 h-2 flex items-center justify-center"></span>
+            <button className="">
+              <i class="bx bxs-bell text-yellow-400 text-2xl"></i>
+            </button>
           </div>
           <div className="flex items-center">
             <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden">
@@ -89,6 +136,26 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
             </div>
           </div>
         </div>
+        {showNotifications && (
+        <div className="absolute top-20 right-0 mt-2 w-80 bg-white shadow-lg rounded-lg overflow-auto z-10">
+          <div className="p-4 border-b">
+            <h3 className="text-lg font-semibold">Notifications</h3>
+          </div>
+          <ul className="divide-y">
+            {notifications.length > 0 ? (
+              notifications.map((notification) => (
+                <li key={notification._id} className="p-4 hover:bg-gray-50">
+                  <h4 className="text-sm font-medium text-gray-800">{notification.message.title}</h4>
+                  <p className="text-xs text-gray-600">{notification.message.body}</p>
+                  <span className="text-xs text-gray-500">{new Date(notification.created_at).toLocaleString()}</span>
+                </li>
+              ))
+            ) : (
+              <div className="p-4 text-sm text-gray-500">No notifications available.</div>
+            )}
+          </ul>
+        </div>
+      )}
       </header>
 
       <header className="sm:hidden bg-white shadow py-4 flex justify-between items-center px-4">
@@ -104,11 +171,20 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
           <p className="text-md">👋</p>
         </div>
         <div className="flex items-center gap-4">
-          <div className="relative">
+          {/* <div className="relative">
             <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
               1
             </span>
             <button className="p-2 bg-gray-200 rounded-full">🔔</button>
+          </div> */}
+
+          <div className="relative p-2 w-11 h-11 rounded-full bg-gray-100 flex justify-center items-center">
+            {/* <span className="absolute top-2 right-2 bg-red-500 text-white text-xs rounded-full w-2 h-2 flex items-center justify-center">
+              
+            </span> */}
+            <button className="">
+              <i class="bx bxs-bell text-yellow-400 text-2xl"></i>
+            </button>
           </div>
           <div className="flex justify-center items-center">
             <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden">
@@ -139,6 +215,7 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
               </ul>
             </div>
           )}
+          
         </div>
       </header>
     </div>

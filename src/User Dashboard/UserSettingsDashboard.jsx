@@ -559,14 +559,14 @@ const UserSettingsDashboard = () => {
                 <button
                   type="submit"
                   onClick={handleSubmit}
-                  className="px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
+                  className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
                 >
                   {loadingInfo ? loadingInfo : "Save Changes"}
                 </button>
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
+                  className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
                 >
                   Cancel Changes
                 </button>
@@ -699,14 +699,14 @@ const UserSettingsDashboard = () => {
             <button
               type="submit"
               onClick={handlePasswordUpdate}
-              className="px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
+              className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
             >
             {loading ? loading : "Save Changes"}
             </button>
             <button
               type="button"
               onClick={handleSecurityCancel}
-              className="px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
+              className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
             >
               Cancel Changes
             </button>
@@ -880,7 +880,7 @@ const UserSettingsDashboard = () => {
            <div className="flex flex-row justify-around sm:justify-start  space-x-4">
             <button
               type="submit"
-              className="px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
+              className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
               onClick={handleNotificationUpdate}
             >
               {loading ? loading : "Save Changes"}
@@ -888,7 +888,7 @@ const UserSettingsDashboard = () => {
             <button
               type="button"
               onClick={handleNotificationCancel}
-              className="px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
+              className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
             >
               Cancel Changes
             </button>

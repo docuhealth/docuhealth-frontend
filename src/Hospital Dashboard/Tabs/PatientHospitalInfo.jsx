@@ -218,6 +218,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
 
   const fetchPatientMedicalRecords = async () => {
     setLoading(true);
+
     try {
       const token = localStorage.getItem("jwtToken");
       if (!token) {
@@ -226,9 +227,11 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
         return;
       }
 
+      console.log(patientHIN);
+
       const response = await axios.post(
         "https://docuhealth-backend.onrender.com/api/hospital/patients/get_patient_medical_records",
-        { patient_HIN: patientHIN },
+        { patient_HIN: hin },
         {
           params: {
             page: currentPage,
@@ -256,8 +259,6 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
     }
   };
 
-
-  
   const togglePopover = (recordId) => {
     setPopoverVisible((prev) => (prev === recordId ? null : recordId));
     setSelectedRecord(records.find((r) => r._id === recordId) || null);
@@ -269,13 +270,13 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setUploading('Uploading')
+    setUploading("Uploading");
 
     // Validate that all fields are filled
     for (const [key, value] of Object.entries(formData)) {
       if (!value) {
         toast.error(`Please fill in the ${key.replace("_", " ")}`);
-        setUploading('Upload')
+        setUploading("Upload");
         return;
       }
     }
@@ -284,10 +285,10 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
       const token = localStorage.getItem("jwtToken");
       if (!token) {
         toast.error("Authentication error. Please log in again.");
-        setUploading('Upload')
+        setUploading("Upload");
         return;
       }
-      console.log(formData)
+      console.log(formData);
       const response = await axios.post(
         "https://docuhealth-backend.onrender.com/api/hospital/patients/create_medical_record",
         formData,
@@ -300,7 +301,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
       );
       if (response.status === 200 || response.status === 201) {
         toast.success("Medical record created successfully!");
-        setUploading('Upload')
+        setUploading("Upload");
         setFormData({
           patient_HIN: "",
           pulse_rate: 0,
@@ -322,7 +323,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
           "An error occurred while creating the medical record."
       );
     } finally {
-      setUploading('Upload')
+      setUploading("Upload");
     }
   };
 
@@ -414,26 +415,26 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                     >
                       {/* Date and Time */}
                       <div className="text-gray-700">
-                        <span className="font-semibold ">
-                          {new Date(record.date).toLocaleDateString("en-GB", {
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                          })}
+                        <span className="font-semibold">
+                          {new Date(record.created_at)
+                            .toLocaleDateString("en-GB", {
+                              day: "2-digit",
+                              month: "long",
+                              year: "numeric",
+                            })
+                            .replace(/^\d{2}/, (day) => day.padStart(2, "0"))}
                         </span>
                         <p className="text-sm text-gray-500">
                           {(() => {
-                            const time = new Date(
-                              `${record.date}T${record.time}`
-                            ); // Combine date and time
-                            const hours = time.getHours();
+                            const time = new Date(`${record.created_at}`); // Combine date and time
+                            const hours = time.getHours(); // Extract hours
                             const minutes = time
                               .getMinutes()
                               .toString()
-                              .padStart(2, "0");
-                            const period = hours >= 12 ? "PM" : "AM";
-                            const formattedHours = hours % 12 || 12; // Convert 24-hour time to 12-hour time
-                            return `${formattedHours}:${minutes} ${period}`;
+                              .padStart(2, "0"); // Extract and format minutes
+                            const period = hours >= 12 ? "PM" : "AM"; // Determine AM or PM
+                            const formattedHours = hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
+                            return `${formattedHours}:${minutes} ${period}`; // Return formatted time
                           })()}
                         </p>
                       </div>
@@ -496,25 +497,31 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                 </p>
                                 <div className="text-[12px] flex items-center gap-1 text-gray-400">
                                   <p>
-                                    <span className="font-medium"></span>{" "}
-                                    {new Date(
-                                      selectedRecord.date
-                                    ).toLocaleDateString("en-GB")}
+                                  <span className="">
+                                    {new Date(record.created_at)
+                                      .toLocaleDateString("en-GB", {
+                                        day: "2-digit",
+                                        month: "long",
+                                        year: "numeric",
+                                      })
+                                      .replace(/^\d{2}/, (day) =>
+                                        day.padStart(2, "0")
+                                      )}
+                                  </span>
                                   </p>
-                                  <p>
-                                    <span className="font-medium"></span>{" "}
+                                  <p className=" text-gray-500">
                                     {(() => {
                                       const time = new Date(
-                                        `${selectedRecord.date}T${selectedRecord.time}`
-                                      );
-                                      const hours = time.getHours();
+                                        `${record.created_at}`
+                                      ); // Combine date and time
+                                      const hours = time.getHours(); // Extract hours
                                       const minutes = time
                                         .getMinutes()
                                         .toString()
-                                        .padStart(2, "0");
-                                      const period = hours >= 12 ? "PM" : "AM";
-                                      const formattedHours = hours % 12 || 12;
-                                      return `${formattedHours}:${minutes} ${period}`;
+                                        .padStart(2, "0"); // Extract and format minutes
+                                      const period = hours >= 12 ? "PM" : "AM"; // Determine AM or PM
+                                      const formattedHours = hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
+                                      return `${formattedHours}:${minutes} ${period}`; // Return formatted time
                                     })()}
                                   </p>
                                 </div>
@@ -705,26 +712,26 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                     <div className="flex justify-between">
                       {/* Date and Time */}
                       <div className="text-gray-700">
-                        <span className="font-semibold text-lg">
-                          {new Date(record.date).toLocaleDateString("en-GB", {
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                          })}
+                      <span className="font-semibold">
+                          {new Date(record.created_at)
+                            .toLocaleDateString("en-GB", {
+                              day: "2-digit",
+                              month: "long",
+                              year: "numeric",
+                            })
+                            .replace(/^\d{2}/, (day) => day.padStart(2, "0"))}
                         </span>
                         <p className="text-sm text-gray-500">
                           {(() => {
-                            const time = new Date(
-                              `${record.date}T${record.time}`
-                            );
-                            const hours = time.getHours();
+                            const time = new Date(`${record.created_at}`); // Combine date and time
+                            const hours = time.getHours(); // Extract hours
                             const minutes = time
                               .getMinutes()
                               .toString()
-                              .padStart(2, "0");
-                            const period = hours >= 12 ? "PM" : "AM";
-                            const formattedHours = hours % 12 || 12;
-                            return `${formattedHours}:${minutes} ${period}`;
+                              .padStart(2, "0"); // Extract and format minutes
+                            const period = hours >= 12 ? "PM" : "AM"; // Determine AM or PM
+                            const formattedHours = hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
+                            return `${formattedHours}:${minutes} ${period}`; // Return formatted time
                           })()}
                         </p>
                       </div>
@@ -1072,7 +1079,9 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
 
                 {/* Temperature */}
                 <div>
-                  <label className="block text-gray-700 pb-1">Temperature</label>
+                  <label className="block text-gray-700 pb-1">
+                    Temperature
+                  </label>
                   <input
                     type="text"
                     name="temperature"
@@ -1098,7 +1107,9 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
 
                 {/* Blood Pressure */}
                 <div>
-                  <label className="block text-gray-700 pb-1">Blood Pressure</label>
+                  <label className="block text-gray-700 pb-1">
+                    Blood Pressure
+                  </label>
                   <input
                     type="text"
                     name="blood_pressure"
@@ -1198,7 +1209,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                     className="bg-[#0000FF] text-white px-4 py-2 rounded-full"
                     onClick={handleSubmit}
                   >
-                    {upload ? upload : 'Upload'}
+                    {upload ? upload : "Upload"}
                   </button>
                 </div>
               </form>

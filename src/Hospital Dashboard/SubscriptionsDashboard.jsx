@@ -394,8 +394,8 @@ const SubscriptionsDashboard = () => {
                             {index === 0
                               ? "Free"
                               : index === 1
-                              ? "Subscribe Now"
-                              : "Subscribe Yearly"}
+                              ? `Subscribe ${plan.duration} `
+                              : `Subscribe  ${plan.duration}`}
                           </p>
                         </div>
                       </div>
