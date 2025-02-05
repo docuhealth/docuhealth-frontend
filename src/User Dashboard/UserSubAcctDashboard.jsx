@@ -473,7 +473,7 @@ const UserSubAcctDashboard = () => {
             </div>
 
             {showOverlay && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-5">
                 <div className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full relative">
                   {/* Cancel Icon */}
                   <div className="flex justify-between items-center pb-8">
@@ -689,11 +689,7 @@ const UserSubAcctDashboard = () => {
                   </tbody>
                 </table>
 
-                {error === true && (
-                  <p className="text-center py-10 text-red-700 font-semibold">
-                    Error Fetching Data
-                  </p>
-                )}
+               
               </div>
             </div>
 

@@ -129,7 +129,7 @@ const USI = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Email Input */}
                   <div className="relative">
-                    <p className="font-semibold">Email / Phone Number :</p>
+                    <p className="font-semibold">Email :</p>
                     <div className="relative">
                       <input
                         type="text"
@@ -271,7 +271,7 @@ const USI = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Email Input */}
                   <div className="relative">
-                    <p className="pb-1">Email / Phone Number :</p>
+                    <p className="pb-1">Email :</p>
                     <div className="relative">
                       <input
                         type="text"

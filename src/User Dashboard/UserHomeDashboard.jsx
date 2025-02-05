@@ -3,12 +3,14 @@ import UserDashHead from "./Dashboard Part/UserDashHead";
 import { Link, useLocation } from "react-router-dom";
 import DynamicDate from "../Dynamic Date/DynamicDate";
 import logo from "../assets/logo.png";
+import { toast } from "react-toastify";
 import axios from "axios";
 
 const UserHomeDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const[hin, setHin] = useState('Loading..')
+  const [hin, setHin] = useState("Loading..");
   const [loading, setLoading] = useState(true);
+ const [name, setName] = useState("fetching...");
 
   const location = useLocation();
 
@@ -60,8 +62,8 @@ const UserHomeDashboard = () => {
         // Handle the response
         if (response.ok) {
           const data = await response.json();
-          console.log("Patient Dashboard Data:", data);
-          setHin(data.HIN)
+          // console.log("Patient Dashboard Data:", data);
+          setHin(data.HIN);
           // Display a success message or process the data as needed
           return data;
         } else {
@@ -85,7 +87,7 @@ const UserHomeDashboard = () => {
     fetchPatientDashboard(1, 10)
       .then((data) => {
         // Process the dashboard data
-        console.log("Dashboard Data:", data);
+        // console.log("Dashboard Data:", data);
       })
       .catch((error) => {
         // Handle errors
@@ -93,6 +95,7 @@ const UserHomeDashboard = () => {
       });
   }, []);
 
+ 
   const closeNoticeMessage = () => {
     setNoticeDisplay(false);
   };
@@ -105,6 +108,59 @@ const UserHomeDashboard = () => {
       by: "DocuHealth (admin)",
     },
   ];
+
+  const [records, setRecords] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const itemsPerPage = 10;
+
+  const fetchPatientMedicalRecords = async () => {
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem("jwtToken");
+      if (!token) {
+        toast.error("Token not found. Please log in again.");
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.get(
+        "https://docuhealth-backend.onrender.com/api/patient/dashboard",
+
+        {
+          params: {
+            page: currentPage,
+            size: itemsPerPage,
+          },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setRecords(response.data.records);
+      setTotalPages(response.data.total_pages);
+
+      console.log(response.data.records);
+      console.log(response.data);
+      toast.success("Patient medical records retrieved successfully!");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to fetch patient medical records."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPatientMedicalRecords();
+  }, [currentPage]);
+
   return (
     <div>
       <div className="min-h-screen bg-gray-100 flex">
@@ -384,15 +440,294 @@ const UserHomeDashboard = () => {
                 </div>
               </div>
             )}
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-10">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-10">
               <div className="pb-3 sm:p-0 w-full sm:w-auto">
-               <DynamicDate />
+                <DynamicDate />
               </div>
               <div className="w-full sm:w-auto">
-              <p>HIN : {hin}</p>
+                <p>HIN : {hin}</p>
               </div>
             </div>
-    
+            <div className="space-y-4 text-sm">
+              <div>
+                <div className="hidden lg:block overflow-x-auto mx-3">
+                  {loading ? (
+                    <p className="text-center py-4">Loading...</p>
+                  ) : records.length === 0 ? (
+                    <p className="text-center py-4">
+                      No medical records found.
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      <button
+                        className="bg-[#0000FF] py-2 px-3 text-white rounded-full "
+                        // onClick={handleDownloadPDF}
+                      >
+                        Download Document
+                      </button>
+                      {records.map((record) => (
+                        <div
+                          key={record._id}
+                          className="bg-white shadow-sm rounded-lg p-4 flex items-center justify-between space-x-4"
+                        >
+                          {/* Date and Time */}
+                          <div className="text-gray-700">
+                            <span className="font-semibold">
+                              {new Date(record.created_at)
+                                .toLocaleDateString("en-GB", {
+                                  day: "2-digit",
+                                  month: "long",
+                                  year: "numeric",
+                                })
+                                .replace(/^\d{2}/, (day) =>
+                                  day.padStart(2, "0")
+                                )}
+                            </span>
+                            <p className="text-sm text-gray-500">
+                              {(() => {
+                                const time = new Date(`${record.created_at}`); // Combine date and time
+                                const hours = time.getHours(); // Extract hours
+                                const minutes = time
+                                  .getMinutes()
+                                  .toString()
+                                  .padStart(2, "0"); // Extract and format minutes
+                                const period = hours >= 12 ? "PM" : "AM"; // Determine AM or PM
+                                const formattedHours = hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
+                                return `${formattedHours}:${minutes} ${period}`; // Return formatted time
+                              })()}
+                            </p>
+                          </div>
+
+                          {/* Vertical Divider */}
+                          <div className="border-l h-12 border-gray-300"></div>
+
+                          {/* Diagnosis */}
+                          <div className="text-gray-700  truncate">
+                            <span className="font-medium">Diagnosis:</span>
+                            <p>{record.basic_info.diagnosis}</p>
+                          </div>
+
+                          {/* Vertical Divider */}
+                          <div className="border-l h-12 border-gray-300"></div>
+
+                          {/* Hospital Name */}
+                          <div className="text-gray-700  truncate">
+                            <span className="font-medium">
+                              Name of Hospital:
+                            </span>
+                            <p>{name}</p>
+                          </div>
+
+                          {/* Vertical Divider */}
+                          <div className="border-l h-12 border-gray-300"></div>
+
+                          {/* Medical Personnel */}
+                          <div className="text-gray-700  truncate">
+                            <span className="font-medium">
+                              Medical Personnel:
+                            </span>
+                            <p>{record.hospital_info.medical_personnel}</p>
+                          </div>
+
+                          {/* Vertical Divider */}
+                          <div className="border-l h-12 border-gray-300"></div>
+
+                          {/* Summary */}
+                          <div className="text-gray-700 truncate max-w-xs">
+                            <span className="font-medium">
+                              Summary/Treatment:
+                            </span>
+                            <p>{record.summary}</p>
+                          </div>
+                          {/* Vertical Divider */}
+                          <div className="border-l h-12 border-gray-300"></div>
+
+                          {/* Summary */}
+                          <div
+                            className="text-gray-700  max-w-xs"
+                            // onClick={() => togglePopover(record._id)}
+                          >
+                            <p>
+                              <i class="bx bx-dots-vertical-rounded cursor-pointer"></i>
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="block lg:hidden space-y-4">
+                  {loading ? (
+                    <p className="text-gray-500 text-center">
+                      Loading medical records...
+                    </p>
+                  ) : records.length > 0 ? (
+                    <div>
+                      <button
+                        className="bg-[#0000FF] py-2 px-3 mb-3 text-white rounded-full "
+                        // onClick={handleDownloadPDF}
+                      >
+                        Download Document
+                      </button>
+                      {records.map((record) => (
+                        <div
+                          key={record._id}
+                          className="bg-white shadow-md rounded-lg p-4 flex flex-col mb-4 space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:space-x-4"
+                        >
+                          <div className="flex justify-between">
+                            {/* Date and Time */}
+                            <div className="text-gray-700">
+                              <span className="font-semibold">
+                                {new Date(record.created_at)
+                                  .toLocaleDateString("en-GB", {
+                                    day: "2-digit",
+                                    month: "long",
+                                    year: "numeric",
+                                  })
+                                  .replace(/^\d{2}/, (day) =>
+                                    day.padStart(2, "0")
+                                  )}
+                              </span>
+                              <p className="text-sm text-gray-500">
+                                {(() => {
+                                  const time = new Date(`${record.created_at}`); // Combine date and time
+                                  const hours = time.getHours(); // Extract hours
+                                  const minutes = time
+                                    .getMinutes()
+                                    .toString()
+                                    .padStart(2, "0"); // Extract and format minutes
+                                  const period = hours >= 12 ? "PM" : "AM"; // Determine AM or PM
+                                  const formattedHours = hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
+                                  return `${formattedHours}:${minutes} ${period}`; // Return formatted time
+                                })()}
+                              </p>
+                            </div>
+
+                            <div className="text-gray-700  max-w-xs">
+                              <p>
+                                <i
+                                  class="bx bx-dots-vertical-rounded cursor-pointer"
+                                  onClick={() => {
+                                    togglePopover(record._id);
+                                  }}
+                                ></i>
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-y-2 sm:flex sm:space-x-4 sm:items-center ">
+                            {/* Name of Hospital */}
+                            <div>
+                              <span className="text-gray-500 block text-sm">
+                                Name of Hospital
+                              </span>
+                              <p className="text-gray-700 font-medium">
+                                {name + " Hospital"}
+                              </p>
+                            </div>
+
+                            {/* Diagnosis */}
+                            <div>
+                              <span className="text-gray-500 block text-sm">
+                                Diagnosis
+                              </span>
+                              <p className="text-gray-700 font-medium">
+                                {record.basic_info.diagnosis}
+                              </p>
+                            </div>
+
+                            {/* Medical Personnel */}
+                            <div>
+                              <span className="text-gray-500 block text-sm">
+                                Medical Personnel
+                              </span>
+                              <p className="text-gray-700 font-medium">
+                                {record.hospital_info.medical_personnel}
+                              </p>
+                            </div>
+
+                            {/* Summary */}
+                            <div>
+                              <span className="text-gray-500 block text-sm">
+                                Summary/Treatment
+                              </span>
+                              <p className="text-gray-700 font-medium truncate">
+                                {record.summary}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center">
+                      Medical records not found.
+                    </p>
+                  )}
+                </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex flex-col md:flex-row gap-3 justify-between items-center my-4">
+                    {/* Pagination Info */}
+                    <span className="text-gray-500 text-sm">
+                      Showing page {currentPage} of {totalPages} entries
+                    </span>
+
+                    {/* Pagination Buttons */}
+                    <div className="flex items-center">
+                      {/* Previous Button */}
+                      <button
+                        className={`px-3 py-1 mx-1 rounded-full ${
+                          currentPage === 1
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : "bg-gray-300 hover:bg-gray-400"
+                        }`}
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
+                        disabled={currentPage === 1}
+                      >
+                        &lt;
+                      </button>
+
+                      {/* Page Numbers */}
+                      {Array.from({ length: totalPages }, (_, i) => (
+                        <button
+                          key={i + 1}
+                          className={`px-3 py-1 mx-1 rounded-full ${
+                            currentPage === i + 1
+                              ? "bg-[#0000FF] text-white"
+                              : "bg-gray-300 hover:bg-gray-400"
+                          }`}
+                          onClick={() => setCurrentPage(i + 1)}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+
+                      {/* Next Button */}
+                      <button
+                        className={`px-3 py-1 mx-1 rounded-full ${
+                          currentPage === totalPages
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : "bg-gray-300 hover:bg-gray-400"
+                        }`}
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages)
+                          )
+                        }
+                        disabled={currentPage === totalPages}
+                      >
+                        &gt;
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </section>
         </main>
       </div>

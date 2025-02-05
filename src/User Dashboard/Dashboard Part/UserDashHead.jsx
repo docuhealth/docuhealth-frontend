@@ -1,76 +1,78 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-   const [datainfo, setDataInfo] = useState("")
+  const [datainfo, setDataInfo] = useState("");
 
   const togglePopover = () => {
     setIsPopoverOpen(!isPopoverOpen);
   };
 
-    useEffect(() => {
-        const fetchPatientDashboard = async (page = 1, size = 10) => {
-          // Retrieve the JWT token from localStorage
-          const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
-          const role = "patient"; // Replace with the required role
-        
-          try {
-            // Construct the URL with query parameters
-            const url = `https://docuhealth-backend.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
-        
-            // Make the GET request
-            const response = await fetch(url, {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
-                Role: role, // Add role to the headers
-              },
-            });
-        
-            // Handle the response
-            if (response.ok) {
-              const data = await response.json();
-              console.log("Patient Dashboard Data:", data);
-              setDataInfo(data)
-        
-              // Display a success message or process the data as needed
-              return data;
-            } else {
-              const errorData = await response.json();
-              console.error("Failed to fetch dashboard data:", errorData);
-        
-              // Handle errors with a message from the API
-              throw new Error(errorData.message || "Failed to fetch dashboard data.");
-            }
-          } catch (error) {
-            console.error("An unexpected error occurred:", error);
-        
-            // Handle unexpected errors
-            throw error;
-          }finally{
-            console.log(datainfo)
-          }
-        };
-        
-        // Example Usage
-        fetchPatientDashboard(1, 10)
-          .then((data) => {
-            // Process the dashboard data
-            console.log("Dashboard Data:", data);
-          })
-          .catch((error) => {
-            // Handle errors
-            console.error("Error:", error.message);
-          });
-        
-      }, []);
+  useEffect(() => {
+    const fetchPatientDashboard = async (page = 1, size = 10) => {
+      // Retrieve the JWT token from localStorage
+      const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+      const role = "patient"; // Replace with the required role
+
+      try {
+        // Construct the URL with query parameters
+        const url = `https://docuhealth-backend.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
+
+        // Make the GET request
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+            Role: role, // Add role to the headers
+          },
+        });
+
+        // Handle the response
+        if (response.ok) {
+          const data = await response.json();
+          setDataInfo(data);
+
+          // Display a success message or process the data as needed
+          return data;
+        } else {
+          const errorData = await response.json();
+          console.error("Failed to fetch dashboard data:", errorData);
+
+          // Handle errors with a message from the API
+          throw new Error(
+            errorData.message || "Failed to fetch dashboard data."
+          );
+        }
+      } catch (error) {
+        console.error("An unexpected error occurred:", error);
+
+        // Handle unexpected errors
+        throw error;
+      } finally {
+        console.log(datainfo);
+      }
+    };
+
+    // Example Usage
+    fetchPatientDashboard(1, 10)
+      .then((data) => {
+        // Process the dashboard data
+        console.log("Dashboard Data:", data);
+      })
+      .catch((error) => {
+        // Handle errors
+        console.error("Error:", error.message);
+      });
+  }, []);
 
   return (
     <div>
       {/* Header */}
       <header className="hidden bg-white py-4 px-8 sm:flex justify-between items-center border">
-        <h2 className="text-xl font-semibold">Welcome back {datainfo.fullname || 'Loading..'}! 👋</h2>
+        <h2 className="text-xl font-semibold">
+          Welcome back {datainfo.fullname || "Loading.."} ! 👋
+        </h2>
         <div className="flex items-center gap-4">
           <div className="relative">
             <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
@@ -79,15 +81,18 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
             <button className="p-2 bg-gray-200 rounded-full">🔔</button>
           </div>
           <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden">
-              <img
-                src="https://img.freepik.com/free-vector/minimalist-geometric-judith-s-tiktok-profile-picture_742173-12131.jpg?ga=GA1.1.384133121.1729851340&semt=ais_hybrid"
-                alt="description"
-                className="w-full h-full object-cover"
-              />
+            <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center">
+              {datainfo?.fullname
+                ? datainfo.fullname
+                    .split(" ")
+                    .map((word) => word[0].toUpperCase())
+                    .join("")
+                : ""}
             </div>
             <div className="flex flex-col items-start">
-              <p className="ml-2 text-sm font-medium">{datainfo.fullname || 'Loading..'}</p>
+              <p className="ml-2 text-sm font-medium">
+                {datainfo.fullname || "Loading.."}
+              </p>
               <p className="ml-2 text-sm text-gray-500">Patient</p>
             </div>
           </div>
@@ -102,7 +107,7 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
           <p>
             {" "}
             <span className="font-light">Welcome back,</span> <br />
-            Ameifa Obed!{" "}
+            {datainfo.fullname || "Loading..."} !{" "}
           </p>
           <p className="text-md">👋</p>
         </div>
@@ -114,12 +119,13 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
             <button className="p-2 bg-gray-200 rounded-full">🔔</button>
           </div>
           <div className="flex justify-center items-center">
-            <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden">
-              <img
-                src="https://img.freepik.com/free-vector/minimalist-geometric-judith-s-tiktok-profile-picture_742173-12131.jpg?ga=GA1.1.384133121.1729851340&semt=ais_hybrid"
-                alt="description"
-                className="w-full h-full object-cover"
-              />
+          <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center">
+              {datainfo?.fullname
+                ? datainfo.fullname
+                    .split(" ")
+                    .map((word) => word[0].toUpperCase())
+                    .join("")
+                : ""}
             </div>
             <p onClick={togglePopover} className="cursor-pointer relative">
               <i
@@ -130,10 +136,10 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
             </p>
           </div>
           {isPopoverOpen && (
-            <div className="absolute top-20 right-4 bg-white shadow-md rounded-lg w-40 p-2 z-50">
+            <div className="absolute top-20 right-4 bg-white shadow-md rounded-lg  p-2 z-50">
               <ul className="text-sm text-gray-700">
                 <li className="py-1 px-3 hover:bg-gray-100 cursor-pointer font-semibold">
-                  Jarus Hospital
+                  {datainfo.fullname || "Loading.."}
                 </li>
                 <li className="pb-1 px-3 hover:bg-gray-100 cursor-pointer">
                   Worker
