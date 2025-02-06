@@ -10,7 +10,7 @@ const UserHomeDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hin, setHin] = useState("Loading..");
   const [loading, setLoading] = useState(true);
- const [name, setName] = useState("fetching...");
+  const [name, setName] = useState("fetching...");
 
   const location = useLocation();
 
@@ -95,7 +95,6 @@ const UserHomeDashboard = () => {
       });
   }, []);
 
- 
   const closeNoticeMessage = () => {
     setNoticeDisplay(false);
   };
@@ -453,7 +452,7 @@ const UserHomeDashboard = () => {
                 <div className="hidden lg:block overflow-x-auto mx-3">
                   {loading ? (
                     <p className="text-center py-4">Loading...</p>
-                  ) : records.length === 0 ? (
+                  ) : records === "No medical records" ? (
                     <p className="text-center py-4">
                       No medical records found.
                     </p>
@@ -465,94 +464,98 @@ const UserHomeDashboard = () => {
                       >
                         Download Document
                       </button>
-                      {records.map((record) => (
-                        <div
-                          key={record._id}
-                          className="bg-white shadow-sm rounded-lg p-4 flex items-center justify-between space-x-4"
-                        >
-                          {/* Date and Time */}
-                          <div className="text-gray-700">
-                            <span className="font-semibold">
-                              {new Date(record.created_at)
-                                .toLocaleDateString("en-GB", {
-                                  day: "2-digit",
-                                  month: "long",
-                                  year: "numeric",
-                                })
-                                .replace(/^\d{2}/, (day) =>
-                                  day.padStart(2, "0")
-                                )}
-                            </span>
-                            <p className="text-sm text-gray-500">
-                              {(() => {
-                                const time = new Date(`${record.created_at}`); // Combine date and time
-                                const hours = time.getHours(); // Extract hours
-                                const minutes = time
-                                  .getMinutes()
-                                  .toString()
-                                  .padStart(2, "0"); // Extract and format minutes
-                                const period = hours >= 12 ? "PM" : "AM"; // Determine AM or PM
-                                const formattedHours = hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
-                                return `${formattedHours}:${minutes} ${period}`; // Return formatted time
-                              })()}
-                            </p>
-                          </div>
-
-                          {/* Vertical Divider */}
-                          <div className="border-l h-12 border-gray-300"></div>
-
-                          {/* Diagnosis */}
-                          <div className="text-gray-700  truncate">
-                            <span className="font-medium">Diagnosis:</span>
-                            <p>{record.basic_info.diagnosis}</p>
-                          </div>
-
-                          {/* Vertical Divider */}
-                          <div className="border-l h-12 border-gray-300"></div>
-
-                          {/* Hospital Name */}
-                          <div className="text-gray-700  truncate">
-                            <span className="font-medium">
-                              Name of Hospital:
-                            </span>
-                            <p>{name}</p>
-                          </div>
-
-                          {/* Vertical Divider */}
-                          <div className="border-l h-12 border-gray-300"></div>
-
-                          {/* Medical Personnel */}
-                          <div className="text-gray-700  truncate">
-                            <span className="font-medium">
-                              Medical Personnel:
-                            </span>
-                            <p>{record.hospital_info.medical_personnel}</p>
-                          </div>
-
-                          {/* Vertical Divider */}
-                          <div className="border-l h-12 border-gray-300"></div>
-
-                          {/* Summary */}
-                          <div className="text-gray-700 truncate max-w-xs">
-                            <span className="font-medium">
-                              Summary/Treatment:
-                            </span>
-                            <p>{record.summary}</p>
-                          </div>
-                          {/* Vertical Divider */}
-                          <div className="border-l h-12 border-gray-300"></div>
-
-                          {/* Summary */}
+                      {Array.isArray(records) && records.length > 0 ? (
+                        records.map((record) => (
                           <div
-                            className="text-gray-700  max-w-xs"
-                            // onClick={() => togglePopover(record._id)}
+                            key={record._id}
+                            className="bg-white shadow-sm rounded-lg p-4 flex items-center justify-between space-x-4"
                           >
-                            <p>
-                              <i class="bx bx-dots-vertical-rounded cursor-pointer"></i>
-                            </p>
+                            {/* Date and Time */}
+                            <div className="text-gray-700">
+                              <span className="font-semibold">
+                                {new Date(record.created_at)
+                                  .toLocaleDateString("en-GB", {
+                                    day: "2-digit",
+                                    month: "long",
+                                    year: "numeric",
+                                  })
+                                  .replace(/^\d{2}/, (day) =>
+                                    day.padStart(2, "0")
+                                  )}
+                              </span>
+                              <p className="text-sm text-gray-500">
+                                {(() => {
+                                  const time = new Date(record.created_at);
+                                  const hours = time.getHours();
+                                  const minutes = time
+                                    .getMinutes()
+                                    .toString()
+                                    .padStart(2, "0");
+                                  const period = hours >= 12 ? "PM" : "AM";
+                                  const formattedHours = hours % 12 || 12;
+                                  return `${formattedHours}:${minutes} ${period}`;
+                                })()}
+                              </p>
+                            </div>
+
+                            {/* Vertical Divider */}
+                            <div className="border-l h-12 border-gray-300"></div>
+
+                            {/* Diagnosis */}
+                            <div className="text-gray-700 truncate">
+                              <span className="font-medium">Diagnosis:</span>
+                              <p>{record.basic_info.diagnosis}</p>
+                            </div>
+
+                            {/* Vertical Divider */}
+                            <div className="border-l h-12 border-gray-300"></div>
+
+                            {/* Hospital Name */}
+                            <div className="text-gray-700 truncate">
+                              <span className="font-medium">
+                                Name of Hospital:
+                              </span>
+                              <p>{name}</p>
+                            </div>
+
+                            {/* Vertical Divider */}
+                            <div className="border-l h-12 border-gray-300"></div>
+
+                            {/* Medical Personnel */}
+                            <div className="text-gray-700 truncate">
+                              <span className="font-medium">
+                                Medical Personnel:
+                              </span>
+                              <p>{record.hospital_info.medical_personnel}</p>
+                            </div>
+
+                            {/* Vertical Divider */}
+                            <div className="border-l h-12 border-gray-300"></div>
+
+                            {/* Summary */}
+                            <div className="text-gray-700 truncate max-w-xs">
+                              <span className="font-medium">
+                                Summary/Treatment:
+                              </span>
+                              <p>{record.summary}</p>
+                            </div>
+
+                            {/* Vertical Divider */}
+                            <div className="border-l h-12 border-gray-300"></div>
+
+                            {/* More Options */}
+                            <div className="text-gray-700 max-w-xs">
+                              <p>
+                                <i className="bx bx-dots-vertical-rounded cursor-pointer"></i>
+                              </p>
+                            </div>
                           </div>
+                        ))
+                      ) : (
+                        <div className="text-gray-500 text-center py-4">
+                          No medical records available.
                         </div>
-                      ))}
+                      )}
                     </div>
                   )}
                 </div>
@@ -562,7 +565,11 @@ const UserHomeDashboard = () => {
                     <p className="text-gray-500 text-center">
                       Loading medical records...
                     </p>
-                  ) : records.length > 0 ? (
+                  ) : records === "No medical records" ? (
+                    <p className="text-center py-4">
+                      No medical records found.
+                    </p>
+                  ) : (
                     <div>
                       <button
                         className="bg-[#0000FF] py-2 px-3 mb-3 text-white rounded-full "
@@ -660,10 +667,9 @@ const UserHomeDashboard = () => {
                         </div>
                       ))}
                     </div>
-                  ) : (
-                    <p className="text-gray-500 text-center">
-                      Medical records not found.
-                    </p>
+                    // <p className="text-gray-500 text-center">
+                    //   Medical records not found.
+                    // </p>
                   )}
                 </div>
 
