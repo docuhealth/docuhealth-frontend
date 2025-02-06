@@ -55,15 +55,7 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
     };
 
     // Example Usage
-    fetchPatientDashboard(1, 10)
-      .then((data) => {
-        // Process the dashboard data
-        console.log("Dashboard Data:", data);
-      })
-      .catch((error) => {
-        // Handle errors
-        console.error("Error:", error.message);
-      });
+    fetchPatientDashboard(1, 10);
   }, []);
 
   return (
@@ -85,13 +77,13 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
               {datainfo?.fullname
                 ? datainfo.fullname
                     .split(" ")
-                    .map((word) => word[0].toUpperCase())
+                    .map((word) => (word ? word[0].toUpperCase() : "")) // Add safeguard for empty strings
                     .join("")
                 : ""}
             </div>
             <div className="flex flex-col items-start">
               <p className="ml-2 text-sm font-medium">
-                {datainfo.fullname || "Loading.."}
+                {datainfo?.fullname || "Loading.."}
               </p>
               <p className="ml-2 text-sm text-gray-500">Patient</p>
             </div>
@@ -119,11 +111,11 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
             <button className="p-2 bg-gray-200 rounded-full">🔔</button>
           </div>
           <div className="flex justify-center items-center">
-          <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center">
+            <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center">
               {datainfo?.fullname
                 ? datainfo.fullname
                     .split(" ")
-                    .map((word) => word[0].toUpperCase())
+                    .map((word) => (word ? word[0].toUpperCase() : "")) // Add safeguard for empty strings
                     .join("")
                 : ""}
             </div>
@@ -139,7 +131,7 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
             <div className="absolute top-20 right-4 bg-white shadow-md rounded-lg  p-2 z-50">
               <ul className="text-sm text-gray-700">
                 <li className="py-1 px-3 hover:bg-gray-100 cursor-pointer font-semibold">
-                  {datainfo.fullname || "Loading.."}
+                  {datainfo?.fullname || "Loading.."}
                 </li>
                 <li className="pb-1 px-3 hover:bg-gray-100 cursor-pointer">
                   Worker

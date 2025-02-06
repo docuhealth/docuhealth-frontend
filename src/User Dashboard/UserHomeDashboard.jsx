@@ -85,14 +85,7 @@ const UserHomeDashboard = () => {
 
     // Example Usage
     fetchPatientDashboard(1, 10)
-      .then((data) => {
-        // Process the dashboard data
-        // console.log("Dashboard Data:", data);
-      })
-      .catch((error) => {
-        // Handle errors
-        console.error("Error:", error.message);
-      });
+     
   }, []);
 
   const closeNoticeMessage = () => {
@@ -667,9 +660,7 @@ const UserHomeDashboard = () => {
                         </div>
                       ))}
                     </div>
-                    // <p className="text-gray-500 text-center">
-                    //   Medical records not found.
-                    // </p>
+              
                   )}
                 </div>
 

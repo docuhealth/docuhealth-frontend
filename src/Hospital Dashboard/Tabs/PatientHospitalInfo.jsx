@@ -276,6 +276,9 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
     fetchPatientMedicalRecords();
   }, [currentPage]);
 
+  const createMedicalRecords = new FormData();
+  createMedicalRecords.append("info", JSON.stringify(formData));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUploading("Uploading");
@@ -296,10 +299,10 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
         setUploading("Upload");
         return;
       }
-      console.log(formData);
+      console.log(createMedicalRecords);
       const response = await axios.post(
         "https://docuhealth-backend.onrender.com/api/hospital/patients/create_medical_record",
-        formData,
+        createMedicalRecords,
         {
           headers: {
             Authorization: `Bearer ${token}`,
