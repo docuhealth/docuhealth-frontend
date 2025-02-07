@@ -308,13 +308,10 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
       }
     }
 
-    if (files.length === 0) {
-      toast.error("Please upload at least one file before submitting.");
-      setUploading("Upload");
-      return;
-    } else {
+    if (files.length > 0) {
       files.forEach((file) => createMedicalRecords.append("files", file));
-    }
+      
+    } 
 
     try {
       const token = localStorage.getItem("jwtToken");

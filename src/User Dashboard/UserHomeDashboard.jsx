@@ -5,12 +5,17 @@ import DynamicDate from "../Dynamic Date/DynamicDate";
 import logo from "../assets/logo.png";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const UserHomeDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hin, setHin] = useState("Loading..");
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("fetching...");
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [popoverVisible, setPopoverVisible] = useState(null);
+   const [datainfo, setDataInfo] = useState("");
 
   const location = useLocation();
 
@@ -20,6 +25,56 @@ const UserHomeDashboard = () => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+    useEffect(() => {
+      const fetchPatientDashboard = async (page = 1, size = 10) => {
+        // Retrieve the JWT token from localStorage
+        const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+        const role = "patient"; // Replace with the required role
+  
+        try {
+          // Construct the URL with query parameters
+          const url = `https://docuhealth-backend.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
+  
+          // Make the GET request
+          const response = await fetch(url, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+              Role: role, // Add role to the headers
+            },
+          });
+  
+          // Handle the response
+          if (response.ok) {
+            const data = await response.json();
+            setDataInfo(data);
+  
+            // Display a success message or process the data as needed
+            return data;
+          } else {
+            const errorData = await response.json();
+            console.error("Failed to fetch dashboard data:", errorData);
+  
+            // Handle errors with a message from the API
+            throw new Error(
+              errorData.message || "Failed to fetch dashboard data."
+            );
+          }
+        } catch (error) {
+          console.error("An unexpected error occurred:", error);
+  
+          // Handle unexpected errors
+          throw error;
+        } finally {
+          console.log(datainfo);
+        }
+      };
+  
+      // Example Usage
+      fetchPatientDashboard(1, 10);
+    }, []);
 
   const closeSidebar = () => {
     setIsSidebarOpen(false);
@@ -84,8 +139,7 @@ const UserHomeDashboard = () => {
     };
 
     // Example Usage
-    fetchPatientDashboard(1, 10)
-     
+    fetchPatientDashboard(1, 10);
   }, []);
 
   const closeNoticeMessage = () => {
@@ -152,6 +206,131 @@ const UserHomeDashboard = () => {
   useEffect(() => {
     fetchPatientMedicalRecords();
   }, [currentPage]);
+
+  const togglePopover = (recordId) => {
+    setPopoverVisible((prev) => (prev === recordId ? null : recordId));
+    setSelectedRecord(records.find((r) => r._id === recordId) || null);
+  };
+
+  const exportToPDF = () => {
+    console.log(records);
+    const doc = new jsPDF();
+
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor("#1E90FF"); // Blue color
+    doc.text(`Medical Record Summary Details`, 105, 15, { align: "center" });
+
+    doc.setLineWidth(0.5);
+    doc.setDrawColor("#1E90FF"); // Blue color
+    doc.line(20, 20, 190, 20); // Horizontal line below the header
+
+    // Add Sub-header for Record Details
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor("#333333"); // Gray color
+    doc.text(`${name} Hospital`, 20, 30);
+
+    // Add Patient and Record Information
+    doc.setFontSize(12);
+    doc.text(
+      `Date: ${new Date(selectedRecord.created_at).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      })}`,
+      20,
+      40
+    );
+
+    doc.text(
+      `Time: ${(() => {
+        const time = new Date(selectedRecord.created_at);
+        const hours = time.getHours();
+        const minutes = time.getMinutes().toString().padStart(2, "0");
+        const period = hours >= 12 ? "PM" : "AM";
+        const formattedHours = hours % 12 || 12;
+        return `${formattedHours}:${minutes} ${period}`;
+      })()}`,
+      20,
+      45
+    );
+
+    doc.text(
+      `Name of Patient: ${selectedRecord.patient_info.fullname}`,
+      20,
+      55
+    );
+    doc.text(`Gender: ${selectedRecord.patient_info.sex}`, 20, 60);
+
+    // Add Medical Details Section
+    doc.setFontSize(14);
+    doc.setTextColor("#1E90FF");
+    doc.text("Medical Details", 20, 70);
+
+    doc.setDrawColor("#1E90FF");
+    doc.line(20, 72, 190, 72);
+
+    doc.setFontSize(12);
+    doc.setTextColor("#333333");
+    doc.text(`Pulse Rate: ${selectedRecord.basic_info.pulse_rate}`, 20, 80);
+    doc.text(`Temperature: ${selectedRecord.basic_info.temperature}`, 20, 85);
+    doc.text(
+      `Respiratory Rate: ${selectedRecord.basic_info.respiratory_rate}`,
+      20,
+      90
+    );
+    doc.text(`Weight: ${selectedRecord.basic_info.weight}`, 20, 95);
+    doc.text(
+      `Blood Pressure: ${selectedRecord.basic_info.blood_pressure} MM HG`,
+      20,
+      100
+    );
+    doc.text(`Diagnosis: ${selectedRecord.basic_info.diagnosis}`, 20, 105);
+
+    // Add Summary Section
+    doc.setFontSize(14);
+    doc.setTextColor("#1E90FF");
+    doc.text("Summary of Diagnosis/Treatment", 20, 115);
+    doc.setDrawColor("#1E90FF");
+    doc.line(20, 117, 190, 117);
+
+    doc.setFontSize(12);
+    doc.setTextColor("#333333");
+
+    // Dynamically adjust vertical spacing for summary
+    const summaryLines = doc.splitTextToSize(selectedRecord.summary, 170);
+    const summaryYStart = 125;
+    doc.text(summaryLines, 20, summaryYStart);
+
+    // Add Doctor and Hospital Details below the summary
+    const afterSummaryY = summaryYStart + summaryLines.length * 6;
+    doc.text(
+      `Attended to by: ${selectedRecord.hospital_info.medical_personnel}`,
+      20,
+      afterSummaryY + 10
+    );
+    doc.text(`Hospital: ${name} Hospital`, 20, afterSummaryY + 20);
+    doc.text(
+      `Hospital Address: ${selectedRecord.hospital_info.address}`,
+      20,
+      afterSummaryY + 30
+    );
+
+    // Add Footer
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor("#808080");
+    doc.text(
+      "Generated by DocuHealth Records System. Confidential and for authorized use only.",
+      105,
+      290,
+      { align: "center" }
+    );
+
+    // Save the PDF
+    doc.save(`${name}-hospital-record.pdf`);
+  };
 
   return (
     <div>
@@ -451,12 +630,7 @@ const UserHomeDashboard = () => {
                     </p>
                   ) : (
                     <div className="space-y-4">
-                      <button
-                        className="bg-[#0000FF] py-2 px-3 text-white rounded-full "
-                        // onClick={handleDownloadPDF}
-                      >
-                        Download Document
-                      </button>
+                     
                       {Array.isArray(records) && records.length > 0 ? (
                         records.map((record) => (
                           <div
@@ -537,11 +711,243 @@ const UserHomeDashboard = () => {
                             <div className="border-l h-12 border-gray-300"></div>
 
                             {/* More Options */}
-                            <div className="text-gray-700 max-w-xs">
+                            <div
+                              className="text-gray-700 max-w-xs"
+                              onClick={() => togglePopover(record._id)}
+                            >
                               <p>
                                 <i className="bx bx-dots-vertical-rounded cursor-pointer"></i>
                               </p>
                             </div>
+                            {popoverVisible === record._id && (
+                              <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm z-50">
+                                <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto  ">
+                                  <div className="flex justify-between items-center">
+                                    <div className="flex justify-start items-center gap-2">
+                                      <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center p-1">
+                                       {datainfo?.fullname
+                ? datainfo.fullname
+                    .split(" ")
+                    .map((word) => (word ? word[0].toUpperCase() : "")) // Add safeguard for empty strings
+                    .join("")
+                : ""}
+                                      </div>
+
+                                      <div>
+                                        <p className="font-semibold text-md">
+                                          {name} Hospital
+                                        </p>
+                                        <div className="text-[12px] flex items-center gap-1 text-gray-400">
+                                          <p>
+                                            <span className="">
+                                              {new Date(record.created_at)
+                                                .toLocaleDateString("en-GB", {
+                                                  day: "2-digit",
+                                                  month: "long",
+                                                  year: "numeric",
+                                                })
+                                                .replace(/^\d{2}/, (day) =>
+                                                  day.padStart(2, "0")
+                                                )}
+                                            </span>
+                                          </p>
+                                          <p className=" text-gray-500">
+                                            {(() => {
+                                              const time = new Date(
+                                                `${record.created_at}`
+                                              ); // Combine date and time
+                                              const hours = time.getHours(); // Extract hours
+                                              const minutes = time
+                                                .getMinutes()
+                                                .toString()
+                                                .padStart(2, "0"); // Extract and format minutes
+                                              const period =
+                                                hours >= 12 ? "PM" : "AM"; // Determine AM or PM
+                                              const formattedHours =
+                                                hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
+                                              return `${formattedHours}:${minutes} ${period}`; // Return formatted time
+                                            })()}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <button
+                                        className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer"
+                                        onClick={exportToPDF}
+                                      >
+                                        Export as pdf
+                                      </button>
+                                      <p
+                                        onClick={() => setPopoverVisible(null)}
+                                      >
+                                        <i className="bx bx-x text-2xl text-black cursor-pointer"></i>
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-4 p-4">
+                                    {/* Pulse Rate */}
+                                    <div>
+                                      <label className="block text-gray-600 text-sm font-medium">
+                                        Pulse Rate
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={
+                                          selectedRecord.basic_info.pulse_rate
+                                        }
+                                        readOnly
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                      />
+                                    </div>
+
+                                    {/* Temperature */}
+                                    <div>
+                                      <label className="block text-gray-600 text-sm font-medium">
+                                        Temperature
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={
+                                          selectedRecord.basic_info.temperature
+                                        }
+                                        readOnly
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                      />
+                                    </div>
+
+                                    {/* Respiratory Rate */}
+                                    <div>
+                                      <label className="block text-gray-600 text-sm font-medium">
+                                        Respiratory Rate (RR)
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={
+                                          selectedRecord.basic_info
+                                            .respiratory_rate
+                                        }
+                                        readOnly
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                      />
+                                    </div>
+
+                                    {/* Weight */}
+                                    <div>
+                                      <label className="block text-gray-600 text-sm font-medium">
+                                        Weight
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={selectedRecord.basic_info.weight}
+                                        readOnly
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                      />
+                                    </div>
+
+                                    {/* Blood Pressure */}
+                                    <div>
+                                      <label className="block text-gray-600 text-sm font-medium">
+                                        Blood Pressure
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={
+                                          selectedRecord.basic_info
+                                            .blood_pressure + "MM HG"
+                                        }
+                                        readOnly
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                      />
+                                    </div>
+
+                                    {/* Diagnosis */}
+                                    <div>
+                                      <label className="block text-gray-600 text-sm font-medium">
+                                        Diagnosis
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={
+                                          selectedRecord.basic_info.diagnosis
+                                        }
+                                        readOnly
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                      />
+                                    </div>
+
+                                    {/* Summary/Treatment Plan */}
+                                    <div className="col-span-2">
+                                      <label className="block text-gray-600 text-sm font-medium">
+                                        Summary/Treatment Plan
+                                      </label>
+                                      <textarea
+                                        value={selectedRecord.summary}
+                                        readOnly
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-none"
+                                      ></textarea>
+                                    </div>
+
+                                    {/* Name of Patient */}
+                                    <div>
+                                      <label className="block text-gray-600 text-sm font-medium">
+                                        Name of Patient
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={
+                                          selectedRecord.patient_info.fullname
+                                        }
+                                        readOnly
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                      />
+                                    </div>
+
+                                    {/* Gender */}
+                                    <div>
+                                      <label className="block text-gray-600 text-sm font-medium">
+                                        Gender
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={selectedRecord.patient_info.sex}
+                                        readOnly
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                      />
+                                    </div>
+
+                                    {/* Name of Medical Personnel */}
+                                    <div className="col-span-2">
+                                      <label className="block text-gray-600 text-sm font-medium">
+                                        Name of Medical Personnel
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={
+                                          selectedRecord.hospital_info
+                                            .medical_personnel
+                                        }
+                                        readOnly
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                      />
+                                    </div>
+
+                                    {/* Attachment */}
+                                    <div className="col-span-2">
+                                      <label className="block text-gray-600 text-sm font-medium">
+                                        Attachment
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value="NIL"
+                                        readOnly
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         ))
                       ) : (
@@ -564,12 +970,7 @@ const UserHomeDashboard = () => {
                     </p>
                   ) : (
                     <div>
-                      <button
-                        className="bg-[#0000FF] py-2 px-3 mb-3 text-white rounded-full "
-                        // onClick={handleDownloadPDF}
-                      >
-                        Download Document
-                      </button>
+                      
                       {records.map((record) => (
                         <div
                           key={record._id}
@@ -615,6 +1016,222 @@ const UserHomeDashboard = () => {
                               </p>
                             </div>
                           </div>
+                          {popoverVisible === record._id && (
+                        <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm z-50">
+                          <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto w-[90%] sm:w-[60%]">
+                            <div className="flex justify-between items-center">
+                              <div className="">
+                            <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center p-1">
+                            {datainfo?.fullname
+                ? datainfo.fullname
+                    .split(" ")
+                    .map((word) => (word ? word[0].toUpperCase() : "")) // Add safeguard for empty strings
+                    .join("")
+                : ""}
+                                </div>
+                              <div>
+                                <p className="font-semibold text-md">
+                                  {name} Hospital
+                                </p>
+                                <div className="text-[12px] flex items-center gap-1 text-gray-400">
+                                  <p>
+                                    <span className="font-medium"></span>{" "}
+                                    {new Date(selectedRecord.created_at)
+                                      .toLocaleDateString("en-GB", {
+                                        day: "2-digit",
+                                        month: "long",
+                                        year: "numeric",
+                                      })
+                                      .replace(/^\d{2}/, (day) =>
+                                        day.padStart(2, "0")
+                                      )}
+                                  </p>
+                                  <p>
+                                    <span className="font-medium"></span>{" "}
+                                    {(() => {
+                                      const time = new Date(
+                                        `${record.created_at}`
+                                      ); // Combine date and time
+                                      const hours = time.getHours(); // Extract hours
+                                      const minutes = time
+                                        .getMinutes()
+                                        .toString()
+                                        .padStart(2, "0"); // Extract and format minutes
+                                      const period = hours >= 12 ? "PM" : "AM"; // Determine AM or PM
+                                      const formattedHours = hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
+                                      return `${formattedHours}:${minutes} ${period}`; // Return formatted time
+                                    })()}
+                                  </p>
+                                </div>
+                              </div>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer"
+                                  onClick={exportToPDF}
+                                >
+                                  Export as pdf
+                                </button>
+                                <p onClick={() => setPopoverVisible(null)}>
+                                  <i className="bx bx-x text-2xl text-black cursor-pointer"></i>
+                                </p>
+                              </div>
+                            </div>
+                            {/* Responsive Grid Layout */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+                              {/* Pulse Rate */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Pulse Rate
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord.basic_info.pulse_rate}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Temperature */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Temperature
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord.basic_info.temperature}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Respiratory Rate */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Respiratory Rate (RR)
+                                </label>
+                                <input
+                                  type="text"
+                                  value={
+                                    selectedRecord.basic_info.respiratory_rate
+                                  }
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Weight */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Weight
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord.basic_info.weight}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Blood Pressure */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Blood Pressure
+                                </label>
+                                <input
+                                  type="text"
+                                  value={
+                                    selectedRecord.basic_info.blood_pressure +
+                                    "MM HG"
+                                  }
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Diagnosis */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Diagnosis
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord.basic_info.diagnosis}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Summary/Treatment Plan */}
+                              <div className="col-span-1 sm:col-span-2">
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Summary/Treatment Plan
+                                </label>
+                                <textarea
+                                  value={selectedRecord.summary}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-none"
+                                ></textarea>
+                              </div>
+
+                              {/* Name of Patient */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Name of Patient
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord.patient_info.fullname}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Gender */}
+                              <div>
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Gender
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord.patient_info.sex}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Name of Medical Personnel */}
+                              <div className="col-span-1 sm:col-span-2">
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Name of Medical Personnel
+                                </label>
+                                <input
+                                  type="text"
+                                  value={
+                                    selectedRecord.hospital_info
+                                      .medical_personnel
+                                  }
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+
+                              {/* Attachment */}
+                              <div className="col-span-1 sm:col-span-2">
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Attachment
+                                </label>
+                                <input
+                                  type="text"
+                                  value="NIL"
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                           <div className="grid grid-cols-1 gap-y-2 sm:flex sm:space-x-4 sm:items-center ">
                             {/* Name of Hospital */}
@@ -658,9 +1275,10 @@ const UserHomeDashboard = () => {
                             </div>
                           </div>
                         </div>
+                        
                       ))}
+                      
                     </div>
-              
                   )}
                 </div>
 

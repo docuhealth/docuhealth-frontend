@@ -65,6 +65,10 @@ const HomeDashboard = () => {
         setTotalDoctorsPercent(response.data.hospital.doctors.change);
         setOthers(response.data.hospital.others.latest.value);
         setOthersPercent(response.data.hospital.others.change);
+        setTotalHIN(response.data.hospital.total_patients.latest.value);
+        setTotalHINPercent(response.data.hospital.total_patients.change);
+        setAssDiag(response.data.hospital.accessments_diagnosis.latest.value);
+        setAssDiagPercent(response.data.hospital.accessments_diagnosis.change);
         console.log(response.data.hospital.image);
 
         setLoading(false);
@@ -614,7 +618,7 @@ const HomeDashboard = () => {
                     <span className="text-sm">Total HIN checked</span>
                   </div>
                   <div>
-                    <p className="py-2 text-xl text-[#647284]">{totalHIN}</p>
+                    <p className="py-2 text-xl text-[#647284]">{totalHIN || '0'}</p>
                   </div>
                   <div className="text-sm flex justify-start items-center">
                     <span>
@@ -633,7 +637,7 @@ const HomeDashboard = () => {
                     </span>
                     <p>
                       <span className="text-[#72E128]">
-                        {totalHINPercent}%{" "}
+                      {parseFloat(totalHINPercent).toFixed(2) || '0.00'}%{" "}
                       </span>
                       increase from last month
                     </p>
@@ -661,7 +665,7 @@ const HomeDashboard = () => {
                   </div>
                   <div>
                     <p className="py-2 text-xl text-[#647284]">
-                      {totalDoctors}
+                      {totalDoctors || '0'}
                     </p>
                   </div>
                   <div className="text-sm flex justify-start items-center">
@@ -681,7 +685,7 @@ const HomeDashboard = () => {
                     </span>
                     <p>
                       <span className="text-[#72E128]">
-                        {parseFloat(totalDoctorsPercent).toFixed(2)}%{" "}
+                        {parseFloat(totalDoctorsPercent).toFixed(2) || '0.00'}%{" "}
                       </span>
                       increase from last month
                     </p>
@@ -710,7 +714,7 @@ const HomeDashboard = () => {
                     </span>
                   </div>
                   <div>
-                    <p className="py-2 text-xl text-[#647284]">{assDiag}</p>
+                    <p className="py-2 text-xl text-[#647284]">{assDiag || '0'}</p>
                   </div>
                   <div className="text-sm flex justify-start items-center">
                     <span>
@@ -728,7 +732,7 @@ const HomeDashboard = () => {
                       </svg>
                     </span>
                     <p>
-                      <span className="text-[#72E128]">{assDiagPercent}% </span>
+                      <span className="text-[#72E128]"> {parseFloat(assDiagPercent).toFixed(2) || '0.00'}%{" "}</span>
                       increase from last month
                     </p>
                   </div>
@@ -755,7 +759,7 @@ const HomeDashboard = () => {
                     <span className="text-sm">Other Medical Personnel</span>
                   </div>
                   <div>
-                    <p className="py-2 text-xl text-[#647284]">{others}</p>
+                    <p className="py-2 text-xl text-[#647284]">{others || '0'}</p>
                   </div>
                   <div className="text-sm flex justify-start items-center">
                     <span>
@@ -774,7 +778,7 @@ const HomeDashboard = () => {
                     </span>
                     <p>
                       <span className="text-[#72E128]">
-                        {parseFloat(othersPercent).toFixed(2)}%{" "}
+                      {parseFloat(othersPercent).toFixed(2) || '0.00'}%{" "}
                       </span>
                       increase from last month
                     </p>
