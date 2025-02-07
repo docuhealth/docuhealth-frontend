@@ -160,7 +160,7 @@ const PatientsDashboard = () => {
       setRecords(response.data.records);
       setTotalPages(response.data.total_pages);
       setPatientRecord(true);
-      console.log(response.data.records);
+      console.log(response.data);
       console.log("gotte" + response.data);
       toast.success("Patient medical records retrieved successfully!");
     } catch (error) {

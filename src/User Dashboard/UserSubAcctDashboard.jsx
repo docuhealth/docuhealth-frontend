@@ -559,9 +559,7 @@ const UserSubAcctDashboard = () => {
                         className="text-sm text-gray-500 mt-2 border border-gray-300 rounded-lg p-3
                       "
                       >
-                        Please do note that this account will be on
-                        read-only-mode. This will change once the account is
-                        upgraded once the owner is 18 years old.
+                        Please note that once this account is created, its information cannot be edited. However, you will have the option to update the account details when you upgade the account and transfer ownership to the child.
                       </div>
                     </div>
                     <div className="col-span-2 text-center bg-[#0000FF] text-white py-3 px-4 rounded-full">
