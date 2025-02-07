@@ -635,7 +635,7 @@ const HomeDashboard = () => {
                         />
                       </svg>
                     </span>
-                    <p>
+                    <p className="text-[12px]">
                       <span className="text-[#72E128]">
                       {parseFloat(totalHINPercent).toFixed(2) || '0.00'}%{" "}
                       </span>
@@ -683,7 +683,7 @@ const HomeDashboard = () => {
                         />
                       </svg>
                     </span>
-                    <p>
+                    <p className="text-[12px]">
                       <span className="text-[#72E128]">
                         {parseFloat(totalDoctorsPercent).toFixed(2) || '0.00'}%{" "}
                       </span>
@@ -731,7 +731,7 @@ const HomeDashboard = () => {
                         />
                       </svg>
                     </span>
-                    <p>
+                    <p className="text-[12px]">
                       <span className="text-[#72E128]"> {parseFloat(assDiagPercent).toFixed(2) || '0.00'}%{" "}</span>
                       increase from last month
                     </p>
@@ -776,7 +776,7 @@ const HomeDashboard = () => {
                         />
                       </svg>
                     </span>
-                    <p>
+                    <p className="text-[12px]">
                       <span className="text-[#72E128]">
                       {parseFloat(othersPercent).toFixed(2) || '0.00'}%{" "}
                       </span>

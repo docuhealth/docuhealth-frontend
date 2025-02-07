@@ -134,7 +134,7 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
                   {datainfo?.fullname || "Loading.."}
                 </li>
                 <li className="pb-1 px-3 hover:bg-gray-100 cursor-pointer">
-                  Worker
+                  Patient
                 </li>
               </ul>
             </div>
