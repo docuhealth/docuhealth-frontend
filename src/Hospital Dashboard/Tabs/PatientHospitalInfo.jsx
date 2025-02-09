@@ -32,18 +32,19 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
   const [files, setFiles] = useState([]);
   const [filePreviews, setFilePreviews] = useState([]);
 
-  const handleFileChange = (e) => {
-    const uploadedFiles = Array.from(e.target.files);
-    const newFiles = [...files, ...uploadedFiles];
-    setFiles(newFiles);
-    console.log(newFiles);
+const handleFileChange = (e) => {
+  const uploadedFiles = Array.from(e.target.files);
 
-    // Generate preview URLs for images
-    const newPreviews = uploadedFiles.map((file) =>
+  setFiles((prevFiles) => [...prevFiles, ...uploadedFiles]);
+
+  setFilePreviews((prevPreviews) => [
+    ...prevPreviews,
+    ...uploadedFiles.map((file) =>
       file.type.startsWith("image/") ? URL.createObjectURL(file) : null
-    );
-    setFilePreviews([...filePreviews, ...newPreviews]);
-  };
+    ),
+  ]);
+};
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -327,7 +328,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+       
           },
         }
       );
@@ -806,18 +807,33 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                 />
                               </div>
 
-                              {/* Attachment */}
-                              <div className="col-span-2">
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Attachment
-                                </label>
-                                <input
-                                  type="text"
-                                  value="NIL"
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
-                                />
-                              </div>
+                       
+{/* Attachment */}
+<div className="col-span-2">
+  <label className="block text-gray-600 text-sm font-medium">
+    Attachment
+  </label>
+
+  <div className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-gray-100">
+    {selectedRecord.attachments && selectedRecord.attachments.length > 0 ? (
+      selectedRecord.attachments.map((attachment, index) => (
+        <a
+          key={index}
+          href={attachment.secure_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 underline mr-2"
+        >
+          Image {index + 1}
+        </a>
+      ))
+    ) : (
+      <span>NIL</span>
+    )}
+  </div>
+</div>
+
+
                             </div>
                           </div>
                         </div>
@@ -1127,19 +1143,30 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                   className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
                                 />
                               </div>
+{/* Attachment */}
+<div className="col-span-2">
+  <label className="block text-gray-600 text-sm font-medium">
+    Attachment
+  </label>
 
-                              {/* Attachment */}
-                              <div className="col-span-1 sm:col-span-2">
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Attachment
-                                </label>
-                                <input
-                                  type="text"
-                                  value="NIL"
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
-                                />
-                              </div>
+  <div className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-gray-100">
+    {selectedRecord.attachments && selectedRecord.attachments.length > 0 ? (
+      selectedRecord.attachments.map((attachment, index) => (
+        <a
+          key={index}
+          href={attachment.secure_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 underline mr-2"
+        >
+          Image {index + 1}
+        </a>
+      ))
+    ) : (
+      <span>NIL</span>
+    )}
+  </div>
+</div>
                             </div>
                           </div>
                         </div>
