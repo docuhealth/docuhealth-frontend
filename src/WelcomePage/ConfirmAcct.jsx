@@ -26,7 +26,7 @@ const ConfirmAcct = () => {
         style={{
           background: "linear-gradient(to bottom, #BCBCFF, #4C4CC9)",
         }}
-        className="min-h-screen flex justify-center items-center"
+        className="min-h-screen flex justify-center items-center "
       >
         <div className="bg-white py-6 px-8 rounded-xl z-50 w-full max-w-md">
           <div className="flex justify-center items-center gap-1">

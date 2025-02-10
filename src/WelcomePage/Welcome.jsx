@@ -29,7 +29,7 @@ const Welcome = () => {
       }}
       className="min-h-screen flex justify-center items-center"
     >
-      <div className="bg-white py-6 px-8 rounded-xl z-50">
+      <div className="bg-white py-6 px-8 rounded-xl z-50 mx-3">
         <div className="flex justify-center items-center gap-1">
           <div>
             <img src={logo} alt="DocuHealth Logo" />

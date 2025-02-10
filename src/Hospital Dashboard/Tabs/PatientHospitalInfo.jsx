@@ -32,19 +32,18 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
   const [files, setFiles] = useState([]);
   const [filePreviews, setFilePreviews] = useState([]);
 
-const handleFileChange = (e) => {
-  const uploadedFiles = Array.from(e.target.files);
+  const handleFileChange = (e) => {
+    const uploadedFiles = Array.from(e.target.files);
 
-  setFiles((prevFiles) => [...prevFiles, ...uploadedFiles]);
+    setFiles((prevFiles) => [...prevFiles, ...uploadedFiles]);
 
-  setFilePreviews((prevPreviews) => [
-    ...prevPreviews,
-    ...uploadedFiles.map((file) =>
-      file.type.startsWith("image/") ? URL.createObjectURL(file) : null
-    ),
-  ]);
-};
-
+    setFilePreviews((prevPreviews) => [
+      ...prevPreviews,
+      ...uploadedFiles.map((file) =>
+        file.type.startsWith("image/") ? URL.createObjectURL(file) : null
+      ),
+    ]);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -311,8 +310,7 @@ const handleFileChange = (e) => {
 
     if (files.length > 0) {
       files.forEach((file) => createMedicalRecords.append("files", file));
-      
-    } 
+    }
 
     try {
       const token = localStorage.getItem("jwtToken");
@@ -328,7 +326,6 @@ const handleFileChange = (e) => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-       
           },
         }
       );
@@ -528,7 +525,7 @@ const handleFileChange = (e) => {
                   {records.map((record) => (
                     <div
                       key={record._id}
-                      className="bg-white shadow-sm rounded-lg p-4 flex items-center justify-between space-x-4"
+                      className="bg-white shadow-sm rounded-lg p-4 flex items-center justify-between space-x-2"
                     >
                       {/* Date and Time */}
                       <div className="text-gray-700">
@@ -807,33 +804,33 @@ const handleFileChange = (e) => {
                                 />
                               </div>
 
-                       
-{/* Attachment */}
-<div className="col-span-2">
-  <label className="block text-gray-600 text-sm font-medium">
-    Attachment
-  </label>
+                              {/* Attachment */}
+                              <div className="col-span-2">
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Attachment
+                                </label>
 
-  <div className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-gray-100">
-    {selectedRecord.attachments && selectedRecord.attachments.length > 0 ? (
-      selectedRecord.attachments.map((attachment, index) => (
-        <a
-          key={index}
-          href={attachment.secure_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-500 underline mr-2"
-        >
-          Image {index + 1}
-        </a>
-      ))
-    ) : (
-      <span>NIL</span>
-    )}
-  </div>
-</div>
-
-
+                                <div className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-gray-100">
+                                  {selectedRecord.attachments &&
+                                  selectedRecord.attachments.length > 0 ? (
+                                    selectedRecord.attachments.map(
+                                      (attachment, index) => (
+                                        <a
+                                          key={index}
+                                          href={attachment.secure_url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-blue-500 underline mr-2"
+                                        >
+                                          Image {index + 1}
+                                        </a>
+                                      )
+                                    )
+                                  ) : (
+                                    <span>NIL</span>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -852,7 +849,7 @@ const handleFileChange = (e) => {
               ) : records.length > 0 ? (
                 <div>
                   <button
-                    className="bg-[#0000FF] py-2 px-3 text-white rounded-full "
+                    className="bg-[#0000FF] py-2 px-3 text-white rounded-full mb-2 "
                     onClick={handleDownloadPDF}
                   >
                     Download Document
@@ -860,7 +857,7 @@ const handleFileChange = (e) => {
                   {records.map((record) => (
                     <div
                       key={record._id}
-                      className="bg-white shadow-md rounded-lg p-4 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:space-x-4"
+                      className="bg-white shadow-md rounded-lg p-4 flex flex-col my-4 "
                     >
                       <div className="flex justify-between">
                         {/* Date and Time */}
@@ -947,7 +944,7 @@ const handleFileChange = (e) => {
                           <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto w-[90%] sm:w-[60%]">
                             <div className="flex justify-between items-center">
                               <div className="">
-                            <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center p-1">
+                                <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center p-1">
                                   {patientData?.info.fullname
                                     ? patientData.info.fullname
                                         .split(" ")
@@ -957,41 +954,42 @@ const handleFileChange = (e) => {
                                         .join("")
                                     : ""}
                                 </div>
-                              <div>
-                                <p className="font-semibold text-md">
-                                  {name} Hospital
-                                </p>
-                                <div className="text-[12px] flex items-center gap-1 text-gray-400">
-                                  <p>
-                                    <span className="font-medium"></span>{" "}
-                                    {new Date(selectedRecord.created_at)
-                                      .toLocaleDateString("en-GB", {
-                                        day: "2-digit",
-                                        month: "long",
-                                        year: "numeric",
-                                      })
-                                      .replace(/^\d{2}/, (day) =>
-                                        day.padStart(2, "0")
-                                      )}
+                                <div>
+                                  <p className="font-semibold text-md">
+                                    {name} Hospital
                                   </p>
-                                  <p>
-                                    <span className="font-medium"></span>{" "}
-                                    {(() => {
-                                      const time = new Date(
-                                        `${record.created_at}`
-                                      ); // Combine date and time
-                                      const hours = time.getHours(); // Extract hours
-                                      const minutes = time
-                                        .getMinutes()
-                                        .toString()
-                                        .padStart(2, "0"); // Extract and format minutes
-                                      const period = hours >= 12 ? "PM" : "AM"; // Determine AM or PM
-                                      const formattedHours = hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
-                                      return `${formattedHours}:${minutes} ${period}`; // Return formatted time
-                                    })()}
-                                  </p>
+                                  <div className="text-[12px] flex items-center gap-1 text-gray-400">
+                                    <p>
+                                      <span className="font-medium"></span>{" "}
+                                      {new Date(selectedRecord.created_at)
+                                        .toLocaleDateString("en-GB", {
+                                          day: "2-digit",
+                                          month: "long",
+                                          year: "numeric",
+                                        })
+                                        .replace(/^\d{2}/, (day) =>
+                                          day.padStart(2, "0")
+                                        )}
+                                    </p>
+                                    <p>
+                                      <span className="font-medium"></span>{" "}
+                                      {(() => {
+                                        const time = new Date(
+                                          `${record.created_at}`
+                                        ); // Combine date and time
+                                        const hours = time.getHours(); // Extract hours
+                                        const minutes = time
+                                          .getMinutes()
+                                          .toString()
+                                          .padStart(2, "0"); // Extract and format minutes
+                                        const period =
+                                          hours >= 12 ? "PM" : "AM"; // Determine AM or PM
+                                        const formattedHours = hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
+                                        return `${formattedHours}:${minutes} ${period}`; // Return formatted time
+                                      })()}
+                                    </p>
+                                  </div>
                                 </div>
-                              </div>
                               </div>
                               <div className="flex items-center gap-1">
                                 <button
@@ -1006,10 +1004,10 @@ const handleFileChange = (e) => {
                               </div>
                             </div>
                             {/* Responsive Grid Layout */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+                            <div className=" flex flex-col gap-3 p-4">
                               {/* Pulse Rate */}
                               <div>
-                                <label className="block text-gray-600 text-sm font-medium">
+                                <label className="block  text-gray-600 text-sm font-medium">
                                   Pulse Rate
                                 </label>
                                 <input
@@ -1143,30 +1141,33 @@ const handleFileChange = (e) => {
                                   className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
                                 />
                               </div>
-{/* Attachment */}
-<div className="col-span-2">
-  <label className="block text-gray-600 text-sm font-medium">
-    Attachment
-  </label>
+                              {/* Attachment */}
+                              <div className="col-span-2">
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Attachment
+                                </label>
 
-  <div className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-gray-100">
-    {selectedRecord.attachments && selectedRecord.attachments.length > 0 ? (
-      selectedRecord.attachments.map((attachment, index) => (
-        <a
-          key={index}
-          href={attachment.secure_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-500 underline mr-2"
-        >
-          Image {index + 1}
-        </a>
-      ))
-    ) : (
-      <span>NIL</span>
-    )}
-  </div>
-</div>
+                                <div className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-gray-100">
+                                  {selectedRecord.attachments &&
+                                  selectedRecord.attachments.length > 0 ? (
+                                    selectedRecord.attachments.map(
+                                      (attachment, index) => (
+                                        <a
+                                          key={index}
+                                          href={attachment.secure_url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-blue-500 underline mr-2"
+                                        >
+                                          Image {index + 1}
+                                        </a>
+                                      )
+                                    )
+                                  ) : (
+                                    <span>NIL</span>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>

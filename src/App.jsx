@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import Home from "./LandingPage/Home";
 import Welcome from "./WelcomePage/Welcome";
 import HLP from "./Hospital Login Page/HLP";
 import HSI from "./Hospital Login Page/Hospital Sign In/HSI";
@@ -41,7 +42,8 @@ function App() {
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnHover draggable />
 
       <Routes>
-        <Route path="/" element={<Welcome />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/welcome" element={<Welcome />} />
         <Route path="/confirm-account" element={<ConfirmAcct />} />
         <Route path="/hospital-create-account" element={<HLP />} />
         <Route path="/hospital-login" element={<HSI />} />

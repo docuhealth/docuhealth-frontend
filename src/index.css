@@ -9,17 +9,25 @@
     margin: 0;
     box-sizing: border-box;
     font-family: "Montserrat", serif;
+    scroll-behavior: smooth;
 }
 
-.table-container {
-    overflow: hidden; /* Prevents overflow */
-    width: 100%;      /* Fits the container to the page */
-    position: relative;
-     
-  }
 
-  @media (max-width: 768px) {
-    .break-word {
-      word-break: break-word;
-    }
-  }
+  /* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px; /* Thin scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Light gray track */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #333; /* Darker scroll handle */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Slightly lighter on hover */
+}
