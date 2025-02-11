@@ -36,7 +36,7 @@ const OurServices = () => {
 
           {/* Rotated Tag */}
           <div className="hidden lg:block relative my-20">
-            <div className="bg-white text-center py-3 w-60 transform rotate-45 shadow-md rounded-md mx-auto">
+            <div className="bg-white text-center py-3 w-60 transform rotate-45 shadow rounded-md mx-auto">
               <p className="text-[#FCA400] font-semibold text-sm">Stay up-to date</p>
             </div>
           </div>
@@ -57,7 +57,7 @@ const OurServices = () => {
 
           {/* Rotated Tag */}
           <div className="relative my-20 hidden lg:block">
-            <div className="bg-white text-center py-3 w-60 transform rotate-45 shadow-md rounded-md mx-auto">
+            <div className="bg-white text-center py-3 w-60 transform rotate-45 shadow rounded-md mx-auto">
               <p className="text-[#AECD00] font-semibold text-sm">Quick & easy medical access</p>
             </div>
           </div>
@@ -78,7 +78,7 @@ const OurServices = () => {
 
           {/* Rotated Tag */}
           <div className="relative my-20 hidden lg:block">
-            <div className="bg-white text-center py-3 w-60 transform rotate-45 shadow-md rounded-md mx-auto">
+            <div className="bg-white text-center py-3 w-60 transform rotate-45 shadow rounded-md mx-auto">
               <p className="text-[#3300FF] font-semibold text-sm">Easy collaboration</p>
             </div>
           </div>
@@ -99,7 +99,7 @@ const OurServices = () => {
 
           {/* Rotated Tag */}
           <div className="relative my-20 hidden lg:block">
-            <div className="bg-white text-center py-3 w-60 transform rotate-45 shadow-md rounded-md mx-auto">
+            <div className="bg-white text-center py-3 w-60 transform rotate-45 shadow rounded-md mx-auto">
               <p className="text-[#00C4FF] font-semibold text-sm">Highly encrypted data</p>
             </div>
           </div>
@@ -120,7 +120,7 @@ const OurServices = () => {
 
           {/* Rotated Tag */}
           <div className="relative my-20 hidden lg:block">
-            <div className="bg-white text-center py-3 w-60 transform rotate-45 shadow-md rounded-md mx-auto">
+            <div className="bg-white text-center py-3 w-60 transform rotate-45 shadow rounded-md mx-auto">
               <p className="text-[#CE03BC] font-semibold text-sm">Responsiveness</p>
             </div>
           </div>
@@ -141,7 +141,7 @@ const OurServices = () => {
 
           {/* Rotated Tag */}
           <div className="relative my-20 hidden lg:block">
-            <div className="bg-white text-center py-3 w-60 transform rotate-45 shadow-md rounded-md mx-auto">
+            <div className="bg-white text-center py-3 w-60 transform rotate-45 shadow rounded-md mx-auto">
               <p className=" font-semibold text-sm">Keep track of everyone</p>
             </div>
           </div>
