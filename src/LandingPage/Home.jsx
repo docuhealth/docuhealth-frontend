@@ -4,7 +4,7 @@ import HeroPG from './HeroPG'
 import OurServices from './OurServices'
 import Benefit from './Benefit'
 import Features from './Features'
-import Commendationmsg from './commendationmsg'
+import Commendationmsg from './Commendationmsg'
 import Footer from './Footer'
 
 
