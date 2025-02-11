@@ -14,7 +14,7 @@ const Features = () => {
         </div>
         <div>
           <div className="grid grid-cols-2 lg:grid-cols-4 grid-rows-3 mx-5 lg:mx-28 gap-5">
-            <div className="shadow-md p-4 col-span-2">
+            <div className="shadow rounded-md p-4 col-span-2">
               <div className="py-2">
                 <svg
                   width="20"
@@ -45,7 +45,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow-md p-4">
+            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1">
               <div className="py-2">
                 <svg
                   width="20"
@@ -75,7 +75,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow-md p-4">
+            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1">
               <div className="py-2">
                 <svg
                   width="20"
@@ -104,7 +104,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow-md p-4">
+            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1">
               <div className="py-2">
                 <svg
                   width="20"
@@ -136,7 +136,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow-md p-4">
+            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1">
               <div className="py-2">
                 <svg
                   width="20"
@@ -167,7 +167,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow-md p-4 col-span-2 row-span-2 relative">
+            <div className="shadow rounded-md p-4 col-span-2 row-span-2 relative">
               <div className="py-2">
                 <svg
                   width="20"
@@ -208,7 +208,7 @@ const Features = () => {
                 </div>
               </div>
             </div>
-            <div className="shadow-md p-4">
+            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1">
               <div className="py-2">
                 <svg
                   width="20"
@@ -237,7 +237,7 @@ const Features = () => {
                 </p>
               </div>
             </div>{" "}
-            <div className="shadow-md p-4">
+            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1">
               <div className="py-2">
                 <svg
                   width="20"

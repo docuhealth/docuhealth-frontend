@@ -30,7 +30,7 @@ const OurServices = () => {
             <p className="text-[#8E8EA9] py-2 text-sm">
               Store and organize all your health documents, including
               prescriptions, lab results, X-rays, and doctor’s notes, in one
-              secure place
+              secure place.
             </p>
           </div>
 
@@ -49,11 +49,9 @@ const OurServices = () => {
 
           {/* Title and Description */}
           <div>
-            <h3 className="font-semibold">Centralized Medical Records</h3>
+            <h3 className="font-semibold">Quick & Easy Access</h3>
             <p className="text-[#8E8EA9] py-2 text-sm">
-              Store and organize all your health documents, including
-              prescriptions, lab results, X-rays, and doctor’s notes, in one
-              secure place
+            Access your medical history anytime, anywhere—whether at home, on the go, or at a doctor’s office.
             </p>
           </div>
 
@@ -72,11 +70,9 @@ const OurServices = () => {
 
           {/* Title and Description */}
           <div>
-            <h3 className="font-semibold">Centralized Medical Records</h3>
+            <h3 className="font-semibold">Seamless Doctor Collaboration</h3>
             <p className="text-[#8E8EA9] py-2 text-sm">
-              Store and organize all your health documents, including
-              prescriptions, lab results, X-rays, and doctor’s notes, in one
-              secure place
+            Securely share records with healthcare providers for better diagnosis and treatment without delays.
             </p>
           </div>
 
@@ -95,11 +91,9 @@ const OurServices = () => {
 
           {/* Title and Description */}
           <div>
-            <h3 className="font-semibold">Centralized Medical Records</h3>
+            <h3 className="font-semibold">Bank-Level Security & Privacy</h3>
             <p className="text-[#8E8EA9] py-2 text-sm">
-              Store and organize all your health documents, including
-              prescriptions, lab results, X-rays, and doctor’s notes, in one
-              secure place
+            Your data is encrypted, ensuring top-tier security and privacy compliance. You control who can access your records.
             </p>
           </div>
 
@@ -118,11 +112,9 @@ const OurServices = () => {
 
           {/* Title and Description */}
           <div>
-            <h3 className="font-semibold">Centralized Medical Records</h3>
+            <h3 className="font-semibold">Multi-Device Syncing</h3>
             <p className="text-[#8E8EA9] py-2 text-sm">
-              Store and organize all your health documents, including
-              prescriptions, lab results, X-rays, and doctor’s notes, in one
-              secure place
+            Access your records across all your devices—smartphones, tablets, and desktops—for a seamless experience.
             </p>
           </div>
 
@@ -141,11 +133,9 @@ const OurServices = () => {
 
           {/* Title and Description */}
           <div>
-            <h3 className="font-semibold">Centralized Medical Records</h3>
+            <h3 className="font-semibold">Sub-account creation</h3>
             <p className="text-[#8E8EA9] py-2 text-sm">
-              Store and organize all your health documents, including
-              prescriptions, lab results, X-rays, and doctor’s notes, in one
-              secure place
+            Easily create a sub-account for your children in order to easily keep track of their medical record.
             </p>
           </div>
 

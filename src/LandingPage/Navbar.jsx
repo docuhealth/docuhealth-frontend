@@ -38,7 +38,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      <div>
+      <div className="fixed w-full z-50">
         {/* Top Navigation Bar */}
         <div className="sm:hidden flex justify-between items-center px-3 py-4 bg-white shadow">
           <button onClick={() => setIsOpen(true)}>

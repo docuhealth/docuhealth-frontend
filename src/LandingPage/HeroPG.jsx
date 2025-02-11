@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const HeroPG = () => {
   return (
-    <div className="lg:min-h-screen flex flex-col justify-center items-center py-10 px-5">
+    <div className="min-h-screen lg:min-h-screen flex flex-col justify-center items-center py-28 sm:py-10 px-5">
       <div className="relative sm:p-10  flex flex-col justify-center items-center">
         <div className="hidden sm:block absolute left-0 top-10">
           <svg
@@ -198,7 +198,7 @@ const HeroPG = () => {
               </div>
             </div>
           </div>
-          <div className="flex justify-center items-center py-3">
+          <div className="flex justify-center items-center py-5">
             <div className="bg-[#3535FE] flex justify-center items-center py-2 px-5 rounded-full ">
                <Link to='/welcome'>
               <button className="text-white">Get started for free </button>
