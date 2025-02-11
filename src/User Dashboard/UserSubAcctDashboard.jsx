@@ -11,6 +11,11 @@ const UserSubAcctDashboard = () => {
   const [loading, setLoading] = useState("");
   const [subaccounts, setSubaccounts] = useState([]);
 
+    const [records, setRecords] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [subAcctRecord, setSubAcctRecord] = useState(false);
+
   const isActive = (path = "/user-home-dashboard") =>
     location.pathname === path;
 
@@ -213,6 +218,47 @@ const UserSubAcctDashboard = () => {
   useEffect(() => {
     fetchSubaccounts(); // Default to page 1, size 5
   }, []);
+
+  const itemsPerPage = 10;
+
+  const fetchMedicalHistory = async (subaccountHIN) => {
+    console.log("Fetching medical history for:", subaccountHIN);
+    
+    try {
+      const token = localStorage.getItem("jwtToken");
+      console.log(token)
+      if (!token) {
+        toast.error("Token not found. Please log in again.");
+        return;
+      }
+  
+      const response = await axios.get(
+        "https://docuhealth-backend.onrender.com/api/patient/subaccounts/get_subaccounts_medical_records", {subaccount_HIN : subaccountHIN},
+        {
+          params: {
+            page: currentPage,
+            size: itemsPerPage,
+          },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      setRecords(response.data.records);
+      setTotalPages(response.data.total_pages);
+      setSubAcctRecord(true);
+      console.log("Records:", response.data.records);
+      toast.success("Patient medical records retrieved successfully!");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+        "Failed to fetch patient medical records."
+      );
+    }
+  };
+  
 
   return (
     <div>
@@ -668,7 +714,7 @@ const UserSubAcctDashboard = () => {
                           {openPopover === index && (
                             <div className="absolute right-0 mt-2 bg-white border shadow-md rounded-lg p-2 w-52 text-center z-30">
                               <Link to="">
-                                <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer">
+                                <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"  onClick={() => fetchMedicalHistory(subaccount.HIN)}  >
                                   Check Medical History
                                 </p>
                               </Link>
@@ -691,7 +737,7 @@ const UserSubAcctDashboard = () => {
               </div>
             </div>
 
-            <div className=" py-5 border-t-2 sm:hidden">
+            {/* <div className=" py-5 border-t-2 sm:hidden">
               <p className="font-semibold">Sub accounts</p>
               {subaccounts.map((subaccount, index) => (
                 <div key={index} className="bg-white shadow px-4 py-2 my-3">
@@ -744,7 +790,7 @@ const UserSubAcctDashboard = () => {
                   </div>
                 </div>
               ))}
-            </div>
+            </div> */}
           </section>
         </main>
       </div>

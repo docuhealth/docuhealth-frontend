@@ -16,6 +16,7 @@ const HSI = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
+  const [showToast, setShowToast] = useState(false);
 
   const [notificationVisible, setNotificationVisible] = useState(false);
   const navigate = useNavigate(); // React Router for navigation
@@ -33,8 +34,21 @@ const HSI = () => {
   const isFormValid =
     email.trim() !== "" && password.trim().length >= 6 && rememberMe;
 
+    useEffect(() => {
+      let timer;
+      if (showToast) {
+        timer = setTimeout(() => {
+          toast.success("Kindly exercise patience, while you are being logged in!");
+          setShowToast(false); // Reset state after toast is shown
+        }, 5000);
+      }
+  
+      return () => clearTimeout(timer); // Cleanup timeout on unmount
+    }, [showToast]);
+
   const handleSubmit = async (e) => {
     setLogin("Logging In");
+    setShowToast(true);
     e.preventDefault();
 
     if (isFormValid) {

@@ -22,6 +22,7 @@ const HLP = () => {
   const [doctors, setdoctors] = useState("");
   const [medpersonnel, setmedpersonnel] = useState("");
   const [notification, setnotification] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   const [notificationVisible, setNotificationVisible] = useState(false);
   const [signUp, setSignUp] = useState("");
@@ -37,9 +38,21 @@ const HLP = () => {
       return () => clearTimeout(timer); // Cleanup on component unmount
     }
   }, []);
+   useEffect(() => {
+        let timer;
+        if (showToast) {
+          timer = setTimeout(() => {
+            toast.success("Kindly exercise patience, while your account is being created!");
+            setShowToast(false); // Reset state after toast is shown
+          }, 5000);
+        }
+    
+        return () => clearTimeout(timer); // Cleanup timeout on unmount
+      }, [showToast]);
 
   const handleSubmit = async (e) => {
     setSignUp("Submitting...");
+    setShowToast(true);
     e.preventDefault();
     // Construct hospital info as a JSON object
     const hospitalInfo = {

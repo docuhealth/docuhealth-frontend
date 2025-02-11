@@ -16,12 +16,14 @@ const ULP = () => {
   const [error, setError] = useState("");
   const [step, setStep] = useState(1); // To manage steps
 
+
   const [fullname, setFullName] = useState("");
   const [sex, setSex] = useState("");
   const [DOB, setDOB] = useState("");
   const [state, setState] = useState("");
   const [signUp, setSignUp] = useState("");
   const [notification, setnotification] = useState(false);
+   const [showToast, setShowToast] = useState(false);
 
   const [notificationVisible, setNotificationVisible] = useState(false);
   const navigate = useNavigate();
@@ -37,8 +39,22 @@ const ULP = () => {
     }
   }, []);
 
+     useEffect(() => {
+          let timer;
+          if (showToast) {
+            timer = setTimeout(() => {
+              toast.success("Kindly exercise patience, while your account is being created!");
+              setShowToast(false); // Reset state after toast is shown
+            }, 5000);
+          }
+      
+          return () => clearTimeout(timer); // Cleanup timeout on unmount
+        }, [showToast]);
+  
+
   const handleSubmit = async (e) => {
     setSignUp("Submitting...");
+    setShowToast(true);
     e.preventDefault();
 
     const userData = {

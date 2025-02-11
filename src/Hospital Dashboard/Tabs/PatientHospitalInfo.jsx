@@ -352,7 +352,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
       }
     } catch (error) {
       console.error(error);
-      toast.error(
+      console.log(
         error.response?.data?.message ||
           "An error occurred while creating the medical record."
       );
