@@ -200,10 +200,10 @@ const Features = () => {
               </div>
 
               <div class="hidden lg:flex gap-10 items-center my-20 justify-center text-[#8E8EA9]">
-                <div class="bg-white text-gray-600 px-5 py-3 rounded text-center text-sm shadow-md w-56 transform rotate-45 ">
+                <div class="bg-white text-gray-600 px-5 py-3 rounded text-center text-sm shadow w-56 transform rotate-45 ">
                   Track procedures easily
                 </div>
-                <div class="bg-white text-gray-600 px-5 py-3 rounded text-sm w-56 text-center shadow-md transform rotate-45">
+                <div class="bg-white text-gray-600 px-5 py-3 rounded text-sm w-56 text-center shadow transform rotate-45">
                   Access detailed
                 </div>
               </div>
