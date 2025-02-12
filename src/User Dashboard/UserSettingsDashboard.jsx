@@ -1148,7 +1148,14 @@ const UserSettingsDashboard = () => {
 
             <div className=" sm:border my-5 px-5 py-5 sm:rounded-3xl bg-white">
               <div className="flex items-center gap-3">
-                <img src={profilepic} alt="" className="w-14" />
+              <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center p-1">
+                                       {datainfo?.fullname
+                ? datainfo.fullname
+                    .split(" ")
+                    .map((word) => (word ? word[0].toUpperCase() : "")) // Add safeguard for empty strings
+                    .join("")
+                : ""}
+                                      </div>
                 <div>
                   <p>{datainfo.fullname}</p>
                   <p className="text-gray-500 text-sm">Patient</p>

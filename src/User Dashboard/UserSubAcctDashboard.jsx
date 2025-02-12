@@ -11,10 +11,51 @@ const UserSubAcctDashboard = () => {
   const [loading, setLoading] = useState("");
   const [subaccounts, setSubaccounts] = useState([]);
 
-    const [records, setRecords] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [subAcctRecord, setSubAcctRecord] = useState(false);
+  const [records, setRecords] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [subAcctRecord, setSubAcctRecord] = useState(false);
+
+  const itemsPerPage = 10;
+
+  const fetchMedicalHistory = async (subaccountHIN) => {
+    console.log("Fetching medical history for:", subaccountHIN);
+
+    try {
+      const token = localStorage.getItem("jwtToken");
+      console.log(token);
+      if (!token) {
+        toast.error("Token not found. Please log in again.");
+        return;
+      }
+
+      const response = await axios.get(
+        "https://docuhealth-backend.onrender.com/api/patient/subaccounts/get_subaccounts_medical_records",
+        { subaccount_HIN: subaccountHIN },
+        {
+          params: {
+            page: currentPage,
+            size: itemsPerPage,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      setRecords(response.data.records);
+      setTotalPages(response.data.total_pages);
+      setSubAcctRecord(true);
+      console.log("Records:", response.data.records);
+      toast.success("Patient medical records retrieved successfully!");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to fetch patient medical records."
+      );
+    }
+  };
 
   const isActive = (path = "/user-home-dashboard") =>
     location.pathname === path;
@@ -218,47 +259,6 @@ const UserSubAcctDashboard = () => {
   useEffect(() => {
     fetchSubaccounts(); // Default to page 1, size 5
   }, []);
-
-  const itemsPerPage = 10;
-
-  const fetchMedicalHistory = async (subaccountHIN) => {
-    console.log("Fetching medical history for:", subaccountHIN);
-    
-    try {
-      const token = localStorage.getItem("jwtToken");
-      console.log(token)
-      if (!token) {
-        toast.error("Token not found. Please log in again.");
-        return;
-      }
-  
-      const response = await axios.get(
-        "https://docuhealth-backend.onrender.com/api/patient/subaccounts/get_subaccounts_medical_records", {subaccount_HIN : subaccountHIN},
-        {
-          params: {
-            page: currentPage,
-            size: itemsPerPage,
-          },
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
-      setRecords(response.data.records);
-      setTotalPages(response.data.total_pages);
-      setSubAcctRecord(true);
-      console.log("Records:", response.data.records);
-      toast.success("Patient medical records retrieved successfully!");
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-        "Failed to fetch patient medical records."
-      );
-    }
-  };
-  
 
   return (
     <div>
@@ -506,7 +506,7 @@ const UserSubAcctDashboard = () => {
           <section className="pt-6 px-8 w-full relative bg-white shadow min-h-screen">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-10">
               <div className="pb-3 sm:p-0 w-full sm:w-auto">
-               <DynamicDate />
+                <DynamicDate />
               </div>
               <div className="w-full sm:w-auto">
                 <button
@@ -605,7 +605,10 @@ const UserSubAcctDashboard = () => {
                         className="text-sm text-gray-500 mt-2 border border-gray-300 rounded-lg p-3
                       "
                       >
-                        Please note that once this account is created, its information cannot be edited. However, you will have the option to update the account details when you upgade the account and transfer ownership to the child.
+                        Please note that once this account is created, its
+                        information cannot be edited. However, you will have the
+                        option to update the account details when you upgade the
+                        account and transfer ownership to the child.
                       </div>
                     </div>
                     <div className="col-span-2 text-center bg-[#0000FF] text-white py-3 px-4 rounded-full">
@@ -701,7 +704,7 @@ const UserSubAcctDashboard = () => {
                           {subaccount.sex}
                         </td>
                         <td className="border-b border-gray-300 px-4 pb-3 pt-3 relative">
-                        {subaccount.date_created.split("T")[0]}
+                          {subaccount.date_created.split("T")[0]}
                           <i
                             className={`bx bx-dots-vertical-rounded ml-3  p-2 ${
                               openPopover === index
@@ -714,7 +717,12 @@ const UserSubAcctDashboard = () => {
                           {openPopover === index && (
                             <div className="absolute right-0 mt-2 bg-white border shadow-md rounded-lg p-2 w-52 text-center z-30">
                               <Link to="">
-                                <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"  onClick={() => fetchMedicalHistory(subaccount.HIN)}  >
+                                <p
+                                  className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                                  onClick={() =>
+                                    fetchMedicalHistory(subaccount.HIN)
+                                  }
+                                >
                                   Check Medical History
                                 </p>
                               </Link>
@@ -732,8 +740,6 @@ const UserSubAcctDashboard = () => {
                     ))}
                   </tbody>
                 </table>
-
-               
               </div>
             </div>
 

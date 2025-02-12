@@ -682,7 +682,7 @@ const UserHomeDashboard = () => {
                               <span className="font-medium">
                                 Name of Hospital:
                               </span>
-                              <p>{name}</p>
+                              <p>{record.hospital_info.name + ' Hospital'}</p>
                             </div>
 
                             {/* Vertical Divider */}
@@ -735,7 +735,7 @@ const UserHomeDashboard = () => {
 
                                       <div>
                                         <p className="font-semibold text-md">
-                                          {name} Hospital
+                                          {selectedRecord.hospital_info.name} Hospital
                                         </p>
                                         <div className="text-[12px] flex items-center gap-1 text-gray-400">
                                           <p>
@@ -1031,7 +1031,7 @@ const UserHomeDashboard = () => {
                                 </div>
                               <div>
                                 <p className="font-semibold text-md">
-                                  {name} Hospital
+                                  {selectedRecord.hospital_info.name} Hospital
                                 </p>
                                 <div className="text-[12px] flex items-center gap-1 text-gray-400">
                                   <p>
@@ -1240,7 +1240,7 @@ const UserHomeDashboard = () => {
                                 Name of Hospital
                               </span>
                               <p className="text-gray-700 font-medium">
-                                {name + " Hospital"}
+                                {record.hospital_info.name + " Hospital"}
                               </p>
                             </div>
 

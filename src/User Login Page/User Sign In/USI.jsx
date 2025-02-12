@@ -55,7 +55,7 @@ const USI = () => {
           let timer;
           if (showToast) {
             timer = setTimeout(() => {
-              toast.success("Kindly exercise patience, while you! are being logged in!");
+              toast.success("Kindly exercise patience, while you are being logged in!");
               setShowToast(false); // Reset state after toast is shown
             }, 5000);
           }
