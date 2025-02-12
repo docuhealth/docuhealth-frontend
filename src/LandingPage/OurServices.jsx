@@ -1,24 +1,33 @@
-import React from "react";
+import React, { useEffect }  from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const OurServices = () => {
   return (
     <div>
       <div className="flex flex-col justify-center items-center p-3" id="OurServices">
-        <div className="bg-[#F6FDFF] py-2 px-5 rounded-full">
+        <div className="bg-[#F6FDFF] py-2 px-5 rounded-full"  data-aos="fade-down"
+ >
           <p className="text-sm">Our Services</p>
         </div>
         <div className="text-center">
-          <h2 className="text-xl sm:text-2xl font-semibold py-2">
+          <h2 className="text-xl sm:text-2xl font-semibold py-2"  data-aos="fade-right">
             Why Choose DocuHealth ?
           </h2>
-          <p className="text-[#8E8EA9] text-sm sm:text-base">
+          <p className="hidden sm:block text-[#7B7B93]  text-sm sm:text-base" data-aos="fade-down">
+            At DocuHealth, we go beyond just storing medical records—we empower <br />{" "}
+            you with smart, secure, and seamless healthcare management
+          </p>
+          <p className="sm:hidden text-[#7B7B93]  text-sm sm:text-base" data-aos="fade-down">
             At DocuHealth, we go beyond just storing medical records—we empower{" "}
             you with smart, secure, and seamless healthcare management
           </p>
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-5 mx-5 lg:mx-28 my-5">
-        <div className="bg-[#FFF8EB] rounded-xl px-4 py-5">
+      <div className="transition-transform duration-300 hover:scale-105 sm:px-4 sm:py-5">
+        <div className="bg-[#FFF8EB] rounded-xl px-4 py-5" data-aos="fade-up" 
+  >
           {/* Number Circle */}
           <div className="bg-white w-7 h-7 my-2 flex justify-center items-center font-semibold rounded-full">
             01
@@ -41,7 +50,12 @@ const OurServices = () => {
             </div>
           </div>
         </div>
-        <div className="bg-[#FAFCEF]  rounded-xl px-4 py-5">
+
+        </div>
+  
+        <div className="transition-transform duration-300 hover:scale-105  sm:px-4 sm:py-5">
+        <div className="bg-[#FAFCEF]  rounded-xl  px-4 py-5 " data-aos="fade-up"
+  >
           {/* Number Circle */}
           <div className="bg-white w-7 h-7 my-2 flex justify-center items-center font-semibold rounded-full">
             02
@@ -62,7 +76,11 @@ const OurServices = () => {
             </div>
           </div>
         </div>
-        <div className="bg-[#F7F5FF] rounded-xl px-4 py-5">
+        </div>
+      
+        <div className="transition-transform duration-300 hover:scale-105  sm:px-4  sm:py-5">
+        <div className="bg-[#F7F5FF] rounded-xl  px-4 py-5 " data-aos="fade-up"
+  >
           {/* Number Circle */}
           <div className="bg-white w-7 h-7 my-2 flex justify-center items-center font-semibold rounded-full">
             03
@@ -83,7 +101,11 @@ const OurServices = () => {
             </div>
           </div>
         </div>
-        <div className="bg-[#F2FCFF] rounded-xl px-4 py-5">
+        </div>
+
+        <div className="transition-transform duration-300 hover:scale-105  sm:px-4  sm:py-5 ">
+        <div className="bg-[#F2FCFF] rounded-xl  px-4 py-5 " data-aos="fade-up"
+  >
           {/* Number Circle */}
           <div className="bg-white w-7 h-7 my-2 flex justify-center items-center font-semibold rounded-full">
             04
@@ -104,7 +126,11 @@ const OurServices = () => {
             </div>
           </div>
         </div>
-        <div className="bg-[#FFF4FE] rounded-xl px-4 py-5">
+        </div>
+
+        <div className="transition-transform duration-300 hover:scale-105  sm:px-4  sm:py-5">
+        <div className="bg-[#FFF4FE] rounded-xl  px-4 py-5 " data-aos="fade-up"
+  >
           {/* Number Circle */}
           <div className="bg-white w-7 h-7 my-2 flex justify-center items-center font-semibold rounded-full">
             05
@@ -125,7 +151,11 @@ const OurServices = () => {
             </div>
           </div>
         </div>
-        <div className="bg-[#F9FDF3] rounded-xl px-4 py-5">
+        </div>
+
+        <div className="transition-transform duration-300 hover:scale-105  sm:px-4  sm:py-5">
+        <div className="bg-[#F9FDF3] rounded-xl  px-4 py-5 " data-aos="fade-up"
+  >
           {/* Number Circle */}
           <div className="bg-white w-7 h-7 my-2 flex justify-center items-center font-semibold rounded-full">
             06
@@ -135,7 +165,7 @@ const OurServices = () => {
           <div>
             <h3 className="font-semibold">Sub-account creation</h3>
             <p className="text-[#8E8EA9] py-2 text-sm">
-            Easily create a sub-account for your children in order to easily keep track of their medical record.
+            Easily create a sub-account for your children in order to easily keep track of their medical record anytime.
             </p>
           </div>
 
@@ -145,6 +175,7 @@ const OurServices = () => {
               <p className=" font-semibold text-sm">Keep track of everyone</p>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

@@ -1,8 +1,15 @@
-import React from "react";
+import React, { useEffect }  from "react";
 import overviewPG from "../assets/overview.png";
 import { Link } from "react-router-dom";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const HeroPG = () => {
+
+  useEffect(() => {
+    AOS.init({ duration: 1000 }); // Initialize AOS with a default duration
+  }, []);
+
   return (
     <div className="min-h-screen lg:min-h-screen flex flex-col justify-center items-center py-28 sm:py-10 px-5">
       <div className="relative sm:p-10  flex flex-col justify-center items-center">
@@ -62,7 +69,7 @@ const HeroPG = () => {
             />
           </svg>
         </div>
-        <div className="bg-[#F6FDFF]  flex justify-center items-center gap-1 py-2 px-3 sm:px-5 rounded-full mb-3 text-center ">
+        <div className="bg-[#F6FDFF]  flex justify-center items-center gap-1 py-2 px-3 sm:px-5 rounded-full mb-3 text-center "  data-aos="zoom-in-up">
           <div>
             <svg
               width="17"
@@ -77,12 +84,12 @@ const HeroPG = () => {
               />
             </svg>
           </div>
-          <div className="text-[#8E8EA9] text-sm md:text-md">
+          <div className="text-[#8E8EA9] text-sm md:text-md" >
             Keep track of every health information
           </div>
         </div>
-        <div>
-          <div className=" text-2xl md:text-5xl text-center font-bold text-[#8E8EA9]">
+        <div >
+          <div className=" text-2xl md:text-5xl text-center font-bold text-[#8E8EA9]"  data-aos="zoom-in-up" >
             <h1 className="hidden lg:block">
               DocuHealth - Your Health, Your <br />{" "}
               <span className="text-[#0E0E31]">Records</span>, One Secure Place
@@ -93,7 +100,8 @@ const HeroPG = () => {
             </h1>
           </div>
           <div>
-            <p className="text-[#8E8EA9] text-sm sm:text-base text-center py-4">
+            <p className="text-[#8E8EA9] text-sm sm:text-base text-center py-4" data-aos="fade-up"
+ >
               DocuHealth is your all-in-one digital health companion, making it
               easy to store,
               <br /> access, and manage your medical history—all in one secure
@@ -101,7 +109,7 @@ const HeroPG = () => {
             </p>
           </div>
           <div>
-            <div className="flex justify-center items-center gap-3">
+            <div className="flex justify-center items-center gap-3" data-aos="fade-right">
               <div class="flex -space-x-4 rtl:space-x-reverse">
                 <img
                   class="w-10 h-10 border-2 border-white rounded-full object-cover"
@@ -198,29 +206,29 @@ const HeroPG = () => {
               </div>
             </div>
           </div>
-          <div className="flex justify-center items-center py-5">
-            <div className="bg-[#3535FE] flex justify-center items-center py-2 px-5 rounded-full ">
-               <Link to='/welcome'>
-              <button className="text-white">Get started for free </button>
-              </Link>
-              <svg
-                width="14"
-                height="15"
-                viewBox="0 0 14 15"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M9.33551 5.99162L4.31501 11.0121L3.49005 10.1872L8.51056 5.16667H4.08553V4H10.5022V10.4167H9.33551V5.99162Z"
-                  fill="white"
-                />
-              </svg>
-              
-            </div>
-          </div>
+          <div className="flex justify-center items-center py-5 w-full" data-aos="fade-right">
+  <div className="bg-[#3535FE] py-2 px-5 rounded-full w-full sm:w-auto">
+    <Link to='/welcome' className="w-full">
+      <button className="text-white w-full  flex justify-center items-center gap-1">Get started for free  <svg
+      width="14"
+      height="15"
+      viewBox="0 0 14 15"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9.33551 5.99162L4.31501 11.0121L3.49005 10.1872L8.51056 5.16667H4.08553V4H10.5022V10.4167H9.33551V5.99162Z"
+        fill="white"
+      />
+    </svg></button>
+    </Link>
+   
+  </div>
+</div>
+
         </div>
       </div>
-      <div className="bg-gradient-to-b from-[#CAD1FF] to-[#869799] p-2 sm:p-5 rounded-lg lg:rounded-3xl my-3">
+      <div className="bg-gradient-to-b from-[#CAD1FF] to-[#869799] p-2 sm:p-5 rounded-lg lg:rounded-3xl my-3" data-aos="zoom-in">
         <img src={overviewPG} alt="overview_Img" className="w-[1080px]" />
       </div>
     </div>

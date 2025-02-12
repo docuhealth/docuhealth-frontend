@@ -1,22 +1,24 @@
-import React from "react";
+import React, { useEffect }  from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 import groupImg from '../assets/group.png'
 
 const Benefit = () => {
   return (
     <div>
         <div className="flex flex-col justify-center items-center p-2" id="OurBenefits">
-          <div className="bg-[#F6FDFF] py-3 px-5 rounded-full">
+          <div className="bg-[#F6FDFF] py-3 px-5 rounded-full" data-aos="fade-down">
             <p className="text-sm">Benefit of DocuHealth</p>
           </div>
           <div className="">
-            <h2 className="hidden sm:block sm:text-2xl font-semibold py-2 text-center text-wrap">
+            <h2 className="hidden sm:block sm:text-2xl font-semibold py-2 text-center text-wrap" data-aos="fade-left">
               Exciting Benefits Of DocuHealth ?
             </h2>
-            <h2 className="block sm:hidden text-xl sm:text-2xl font-semibold py-2 text-center text-wrap">
+            <h2 className="block sm:hidden text-xl sm:text-2xl font-semibold py-2 text-center text-wrap" data-aos="fade-up">
               Exciting Benefits Of <br /> DocuHealth ?
             </h2>
           <div className=" sm:hidden grid grid-cols-2 place-items-center gap-2 my-2 p-2 ">
-            <div className="bg-white shadow  rounded-md h-32 p-2 ">
+            <div className="bg-white shadow  rounded-md h-32 p-2 " data-aos="zoom-in-up">
               <div className="py-1">
                 <svg
                   width="20"
@@ -33,12 +35,12 @@ const Benefit = () => {
               </div>
               <div>
                 <h3 className="text-[#70B0C3] text-sm">Instant Access</h3>
-                <p className="text-[#B9B9CA] text-sm">
+                <p className="text-[#7B7B93]  text-sm">
                   View your medical records when needed.
                 </p>
               </div>
             </div>
-            <div className="bg-white shadow p-2 rounded-md  h-32 ">
+            <div className="bg-white shadow p-2 rounded-md  h-32 " data-aos="zoom-in-up">
               <div className="py-1">
                 <svg
                   width="20"
@@ -55,13 +57,13 @@ const Benefit = () => {
               </div>
               <div>
                 <h3 className="text-[#7AACE6] text-sm">No Lost Records</h3>
-                <p className="text-[#B9B9CA] text-sm">
+                <p className="text-[#7B7B93] text-sm">
                   All records are 
                  securely stored.
                 </p>
               </div>
             </div>
-            <div className="bg-white shadow p-2 rounded-md  h-32 ">
+            <div className="bg-white shadow p-2 rounded-md  h-32 " data-aos="zoom-in-up">
               <div className="py-1">
                 <svg
                   width="20"
@@ -78,12 +80,12 @@ const Benefit = () => {
               </div>
               <div>
                 <h3 className="text-[#9E739B] text-sm">Time & Cost Saving</h3>
-                <p className="text-[#B9B9CA] text-sm">
+                <p className="text-[#7B7B93] text-sm">
                   Avoid unnecessary repitition of test.
                 </p>
               </div>
             </div>
-            <div className="bg-white shadow  rounded-md  h-32 p-2">
+            <div className="bg-white shadow  rounded-md  h-32 p-2" data-aos="zoom-in-up">
               <div className="py-1">
                 <svg
                   width="20"
@@ -111,8 +113,8 @@ const Benefit = () => {
                 </svg>
               </div>
               <div>
-                <h3 className="text-[#AFB978] text-sm">Instant Access</h3>
-                <p className="text-[#B9B9CA] text-sm">
+                <h3 className="text-[#AFB978] text-sm">Seamless Sharing</h3>
+                <p className="text-[#7B7B93]  text-sm">
                   Share records with doctors easily.
                 </p>
               </div>
@@ -120,7 +122,7 @@ const Benefit = () => {
           </div>
         
           <div className="hidden sm:grid grid-cols-2 place-items-center gap-4 my-2 p-2 ">
-            <div className="bg-white shadow p-3 sm:p-4 rounded-md sm:w-[230px]">
+            <div className="bg-white shadow p-3 sm:p-4 rounded-md sm:w-[230px] transition-transform duration-300 hover:-rotate-6">
               <div className="py-1">
                 <svg
                   width="20"
@@ -137,12 +139,12 @@ const Benefit = () => {
               </div>
               <div>
                 <h3 className="text-[#70B0C3] text-sm">Instant Access</h3>
-                <p className="text-[#B9B9CA] text-sm">
+                <p className="text-[#7B7B93]  text-sm">
                   View your medical records when needed.
                 </p>
               </div>
             </div>
-            <div className="bg-white shadow p-3 sm:p-4 rounded-md sm:w-[230px]">
+            <div className="bg-white shadow p-3 sm:p-4 rounded-md sm:w-[230px] transition-transform duration-300 hover:rotate-6">
               <div className="py-1">
                 <svg
                   width="20"
@@ -159,13 +161,13 @@ const Benefit = () => {
               </div>
               <div>
                 <h3 className="text-[#7AACE6] text-sm">No Lost Records</h3>
-                <p className="text-[#B9B9CA] text-sm">
+                <p className="text-[#7B7B93] text-sm">
                   All records are 
                  securely stored.
                 </p>
               </div>
             </div>
-            <div className="bg-white shadow p-3 sm:p-4 rounded-md sm:w-[230px]">
+            <div className="bg-white shadow p-3 sm:p-4 rounded-md sm:w-[230px] transition-transform duration-300 hover:-rotate-6">
               <div className="py-1">
                 <svg
                   width="20"
@@ -182,12 +184,12 @@ const Benefit = () => {
               </div>
               <div>
                 <h3 className="text-[#9E739B] text-sm">Time & Cost Saving</h3>
-                <p className="text-[#B9B9CA] text-sm">
+                <p className="text-[#7B7B93]  text-sm">
                   Avoid unnecessary repitition of test.
                 </p>
               </div>
             </div>
-            <div className="bg-white shadow p-3  sm:p-4 rounded-md sm:w-[230px]">
+            <div className="bg-white shadow p-3  sm:p-4 rounded-md sm:w-[230px] transition-transform duration-300 hover:rotate-6">
               <div className="py-1">
                 <svg
                   width="20"
@@ -215,8 +217,8 @@ const Benefit = () => {
                 </svg>
               </div>
               <div>
-                <h3 className="text-[#AFB978] text-sm">Instant Access</h3>
-                <p className="text-[#B9B9CA] text-sm">
+                <h3 className="text-[#AFB978] text-sm">Seamless Sharing</h3>
+                <p className="text-[#7B7B93]  text-sm">
                   Share records with doctors easily.
                 </p>
               </div>
@@ -224,7 +226,7 @@ const Benefit = () => {
           </div>
         
         </div>
-        <div>
+        <div data-aos="zoom-in-up">
             <img src={groupImg} alt="group_Img" />
           </div>
       </div>
