@@ -101,7 +101,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
     doc.setFontSize(14);
     doc.setFont("helvetica", "normal");
     doc.setTextColor("#333333"); // Gray color
-    doc.text(`${name} Hospital`, 20, 30);
+    doc.text(`${selectedRecord.hospital_info.name} Hospital`, 20, 30);
 
     // Add Patient and Record Information
     doc.setFontSize(12);
@@ -163,7 +163,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
     // Add Summary Section
     doc.setFontSize(14);
     doc.setTextColor("#1E90FF");
-    doc.text("Summary of Diagnosis/Treatment", 20, 115);
+    doc.text("Summary of Treatment", 20, 115);
     doc.setDrawColor("#1E90FF");
     doc.line(20, 117, 190, 117);
 
@@ -182,7 +182,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
       20,
       afterSummaryY + 10
     );
-    doc.text(`Hospital: ${name} Hospital`, 20, afterSummaryY + 20);
+    doc.text(`Hospital: ${selectedRecord.hospital_info.name} Hospital`, 20, afterSummaryY + 20);
     doc.text(
       `Hospital Address: ${selectedRecord.hospital_info.address}`,
       20,

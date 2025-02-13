@@ -32,7 +32,7 @@ const HSI = () => {
   }, []);
 
   const isFormValid =
-    email.trim() !== "" && password.trim().length >= 6 && rememberMe;
+    email.trim() !== "" && password.trim().length >= 1;
 
     useEffect(() => {
       let timer;

@@ -66,8 +66,7 @@ const USI = () => {
 
   const isFormValid =
   (email.trim() !== "" || phone_num.trim() !== "") &&
-  password.trim().length >= 6 &&
-  rememberMe;
+  password.trim().length >= 1
 
 
   const handleSubmit = async (e) => {
@@ -190,8 +189,7 @@ const USI = () => {
                         <input
                           type="checkbox"
                           className="mr-2"
-                          checked={rememberMe}
-                          onChange={(e) => setRememberMe(e.target.checked)}
+                        
                         />
                         Remember me
                       </label>
