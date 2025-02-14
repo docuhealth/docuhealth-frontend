@@ -1377,7 +1377,7 @@ const UserSubAcctDashboard = () => {
                     {records.map((record, index) => (
                       <div key={index} className="flex justify-start items-center gap-2">
                         <p>
-                          Full Name:{" "}
+                         
                           {record.patient_info?.fullname || "No Name Available"}
                         </p>
                         <p>(# {record.patient_HIN || "No HIN Available"} )</p>

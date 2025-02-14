@@ -229,7 +229,7 @@ const UserHomeDashboard = () => {
     doc.setFontSize(14);
     doc.setFont("helvetica", "normal");
     doc.setTextColor("#333333"); // Gray color
-    doc.text(`${name} Hospital`, 20, 30);
+    doc.text(`${selectedRecord.hospital_info.name} Hospital`, 20, 30);
 
     // Add Patient and Record Information
     doc.setFontSize(12);
@@ -310,7 +310,7 @@ const UserHomeDashboard = () => {
       20,
       afterSummaryY + 10
     );
-    doc.text(`Hospital: ${name} Hospital`, 20, afterSummaryY + 20);
+    doc.text(`Hospital: ${selectedRecord.hospital_info.name} Hospital`, 20, afterSummaryY + 20);
     doc.text(
       `Hospital Address: ${selectedRecord.hospital_info.address}`,
       20,
@@ -329,7 +329,7 @@ const UserHomeDashboard = () => {
     );
 
     // Save the PDF
-    doc.save(`${name}-hospital-record.pdf`);
+    doc.save(`${selectedRecord.hospital_info.name}-hospital-record.pdf`);
   };
 
   return (
