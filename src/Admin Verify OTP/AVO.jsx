@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
-import logo from "../../assets/logo.png";
-import dashb from "../../assets/dashb.png";
+import logo from "../assets/logo.png";
+import dashb from "../assets/dashb.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-
-const VerifyOTP = () => {
+const AVO = () => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [notificationVisible, setNotificationVisible] = useState(false);
-  const [role, setRole] = useState("patient");
+  const [role, setRole] = useState("admin");
   const [loading, setLoading] = useState("");
 
   const location = useLocation();
@@ -89,7 +88,7 @@ const VerifyOTP = () => {
         // Navigate and pass the appropriate data
         const navigateData = email ? { email } : { phone_num };
         setTimeout(() => {
-          navigate("/user-set-new-password", { state: navigateData });
+          navigate("/admin-set-new-password", { state: navigateData });
         }, 1000);
       } else {
         console.error("OTP verification failed:", response.data);
@@ -294,4 +293,4 @@ const VerifyOTP = () => {
   );
 };
 
-export default VerifyOTP;
+export default AVO;

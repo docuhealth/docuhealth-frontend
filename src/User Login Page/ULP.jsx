@@ -13,9 +13,7 @@ const ULP = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phone_num, setPhone_Num] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
   const [step, setStep] = useState(1); // To manage steps
-
 
   const [fullname, setFullName] = useState("");
   const [sex, setSex] = useState("");
@@ -23,7 +21,7 @@ const ULP = () => {
   const [state, setState] = useState("");
   const [signUp, setSignUp] = useState("");
   const [notification, setnotification] = useState(false);
-   const [showToast, setShowToast] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   const [notificationVisible, setNotificationVisible] = useState(false);
   const navigate = useNavigate();
@@ -39,18 +37,19 @@ const ULP = () => {
     }
   }, []);
 
-     useEffect(() => {
-          let timer;
-          if (showToast) {
-            timer = setTimeout(() => {
-              toast.success("Kindly exercise patience, while your account is being created!");
-              setShowToast(false); // Reset state after toast is shown
-            }, 5000);
-          }
-      
-          return () => clearTimeout(timer); // Cleanup timeout on unmount
-        }, [showToast]);
-  
+  useEffect(() => {
+    let timer;
+    if (showToast) {
+      timer = setTimeout(() => {
+        toast.success(
+          "Kindly exercise patience, while your account is being created!"
+        );
+        setShowToast(false); // Reset state after toast is shown
+      }, 5000);
+    }
+
+    return () => clearTimeout(timer); // Cleanup timeout on unmount
+  }, [showToast]);
 
   const handleSubmit = async (e) => {
     setSignUp("Submitting...");
@@ -262,9 +261,7 @@ const ULP = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="relative">
-                <p className="font-semibold pb-1">
-                  Full Name:
-                </p>
+                <p className="font-semibold pb-1">Full Name:</p>
                 <div className="relative">
                   <input
                     type="text"
@@ -277,35 +274,35 @@ const ULP = () => {
               </div>
 
               <div className="relative">
-  <p className="font-semibold pb-1">Date Of Birth:</p>
-  <div className="relative">
-    <input
-      type="date"
-      className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
-      value={DOB}
-      onChange={(e) => setDOB(e.target.value)}
-      required
-    />
+                <p className="font-semibold pb-1">Date Of Birth:</p>
+                <div className="relative">
+                  <input
+                    type="date"
+                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+                    value={DOB}
+                    onChange={(e) => setDOB(e.target.value)}
+                    required
+                  />
 
-    {/* Custom dropdown arrow */}
-    <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-      <svg
-        className="w-5 h-5 text-gray-400"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M19 9l-7 7-7-7"
-        />
-      </svg>
-    </div>
-  </div>
-</div>
+                  {/* Custom dropdown arrow */}
+                  <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                    <svg
+                      className="w-5 h-5 text-gray-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
 
               <div className="relative">
                 <p className="font-semibold pb-1">State Of Residence :</p>
@@ -410,7 +407,7 @@ const ULP = () => {
                 </div>
               </div>
 
-              {/* Move to next step button */}
+           
               <button
                 type="button"
                 onClick={handleSubmit}
@@ -635,9 +632,7 @@ const ULP = () => {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="relative">
-                  <p className="font-semibold">
-                    Full Name :
-                  </p>
+                  <p className="font-semibold">Full Name :</p>
                   <div className="relative">
                     <input
                       type="text"
@@ -650,36 +645,35 @@ const ULP = () => {
                 </div>
 
                 <div className="relative">
-  <p className="font-semibold pb-1">Date Of Birth:</p>
-  <div className="relative">
-    <input
-      type="date"
-      className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
-      value={DOB}
-      onChange={(e) => setDOB(e.target.value)}
-      required
-    />
+                  <p className="font-semibold pb-1">Date Of Birth:</p>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+                      value={DOB}
+                      onChange={(e) => setDOB(e.target.value)}
+                      required
+                    />
 
-    {/* Custom dropdown arrow */}
-    <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-      <svg
-        className="w-5 h-5 text-gray-400"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M19 9l-7 7-7-7"
-        />
-      </svg>
-    </div>
-  </div>
-</div>
-
+                    {/* Custom dropdown arrow */}
+                    <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
 
                 <div className="relative">
                   <p className="font-semibold">State Of Residence :</p>

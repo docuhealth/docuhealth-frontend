@@ -187,6 +187,7 @@ const UserHomeDashboard = () => {
         }
       );
 
+      console.log(response.json)
       setRecords(response.data.records);
       setTotalPages(response.data.total_pages);
 
