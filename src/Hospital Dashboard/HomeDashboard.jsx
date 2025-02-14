@@ -27,6 +27,12 @@ const HomeDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [hasMetricsData, setHasMetricsData] = useState(true);
+  const [assDiagMetrics, setAssDiagMetrics] = useState([]);
+
+  const [totalPatientsMetrics, setTotalPatientsMetrics] = useState([]);
+  const [hasMetricsDataTP, setHasMetricsDataTP] = useState(true);
+
   const location = useLocation();
 
   const isActive = (path = "/hospital-home-dashboard") =>
@@ -54,6 +60,91 @@ const HomeDashboard = () => {
             },
           }
         );
+
+        // Check if metrics exist
+        if (
+          response.data.hospital.accessments_diagnosis &&
+          response.data.hospital.accessments_diagnosis.metrics &&
+          response.data.hospital.accessments_diagnosis.metrics.length > 0
+        ) {
+          const metrics = response.data.hospital.accessments_diagnosis.metrics;
+
+          // Step 1: Group unique values by month
+          const monthlyUniqueCounts = metrics.reduce((acc, entry) => {
+            const dateObj = new Date(entry.date);
+            const monthKey = `${dateObj.getFullYear()}-${(
+              dateObj.getMonth() + 1
+            )
+              .toString()
+              .padStart(2, "0")}`; // Format: YYYY-MM
+
+            if (!acc[monthKey]) {
+              acc[monthKey] = new Set();
+            }
+            acc[monthKey].add(entry.value); // Add unique values
+
+            return acc;
+          }, {});
+
+          // Step 2: Convert to Array for ApexCharts
+          const formattedMetrics = Object.entries(monthlyUniqueCounts).map(
+            ([month, valuesSet]) => ({
+              x: new Date(month + "-01").toLocaleString("en-US", {
+                month: "short",
+                year: "numeric",
+              }), // Convert YYYY-MM to "MMM YYYY"
+              y: valuesSet.size, // Count unique values
+            })
+          );
+
+          setAssDiagMetrics(formattedMetrics);
+          setHasMetricsData(true);
+        } else {
+          console.log("No hospital assessment available from API.");
+          setHasMetricsData(false);
+        }
+
+        if (
+          response.data.hospital.total_patients &&
+          response.data.hospital.total_patients.metrics &&
+          response.data.hospital.total_patients.metrics.length > 0
+        ) {
+          const metrics = response.data.hospital.total_patients.metrics;
+
+          // Step 1: Group unique values by month
+          const monthlyUniqueCounts = metrics.reduce((acc, entry) => {
+            const dateObj = new Date(entry.date);
+            const monthKey = `${dateObj.getFullYear()}-${(
+              dateObj.getMonth() + 1
+            )
+              .toString()
+              .padStart(2, "0")}`; // Format: YYYY-MM
+
+            if (!acc[monthKey]) {
+              acc[monthKey] = new Set();
+            }
+            acc[monthKey].add(entry.value); // Add unique values
+
+            return acc;
+          }, {});
+
+          // Step 2: Convert to Array for ApexCharts
+          const formattedMetrics = Object.entries(monthlyUniqueCounts).map(
+            ([month, valuesSet]) => ({
+              x: new Date(month + "-01").toLocaleString("en-US", {
+                month: "short",
+                year: "numeric",
+              }), // Convert YYYY-MM to "MMM YYYY"
+              y: valuesSet.size, // Count unique values
+            })
+          );
+
+          setTotalPatientsMetrics(formattedMetrics);
+          setHasMetricsDataTP(true);
+        } else {
+          console.log("No total patients data available from API.");
+          setHasMetricsDataTP(false);
+        }
 
         console.log("API Response:", response.data);
         setData(response.data); // Save the API response in state
@@ -91,10 +182,7 @@ const HomeDashboard = () => {
   };
 
   const chart1Options = {
-    chart: {
-      type: "area",
-      toolbar: { show: false },
-    },
+    chart: { type: "area", toolbar: { show: false } },
     colors: ["#FF4D4D"],
     fill: {
       type: "gradient",
@@ -103,81 +191,52 @@ const HomeDashboard = () => {
         type: "vertical",
         gradientToColors: ["#FFA3A3"],
         stops: [0, 100],
+        opacityFrom: 0.5, // Opacity at the top
+        opacityTo: 0, // Fully transparent at the bottom
       },
     },
     dataLabels: { enabled: false },
     stroke: { curve: "smooth" },
     xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+      type: "category",
+      labels: { rotate: -45 },
     },
     yaxis: { labels: { formatter: (value) => `${value}` } },
     grid: { borderColor: "#E5E7EB" },
   };
 
-  const chart1Series = [
-    {
-      name: "Assessment/diagnosis created",
-      data: [80, 90, 100, 120, 110, 95, 105, 115, 120, 125, 130, 140], // Data for 12 months
-    },
-  ];
+  const chart1Series = hasMetricsData
+    ? [{ name: "Assessment/Diagnosis", data: assDiagMetrics }]
+    : [{ name: "No Data Available", data: [{ x: "No Data", y: 0 }] }];
 
   // Data and options for the second chart
   const chart2Options = {
-    chart: {
-      type: "area",
-      toolbar: { show: false },
-    },
-    colors: ["#6A5ACD"],
+    chart: { type: "area", toolbar: { show: false } },
+    colors: ["#6A5ACD"], // Purple shade
     fill: {
       type: "gradient",
       gradient: {
         shade: "light",
         type: "vertical",
-        gradientToColors: ["#B0C4DE"],
+        gradientToColors: ["#B0C4DE"], // Lighter blue
         stops: [0, 100],
+        opacityFrom: 0.5,
+        opacityTo: 0,
       },
     },
     dataLabels: { enabled: false },
-    stroke: { curve: "smooth" },
+    stroke: { curve: "smooth", width: 3 },
     xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+      type: "category",
+      labels: { rotate: -45 },
     },
     yaxis: { labels: { formatter: (value) => `${value}` } },
     grid: { borderColor: "#E5E7EB" },
   };
 
-  const chart2Series = [
-    {
-      name: "Patients HIN checked",
-      data: [100, 120, 150, 200, 220, 190, 210, 240, 260, 270, 280, 300], // Data for 12 months
-    },
-  ];
+  const chart2Series = hasMetricsDataTP
+    ? [{ name: "Total Patients", data: totalPatientsMetrics }]
+    : [{ name: "No Data Available", data: [{ x: "No Data", y: 0 }] }];
 
   const itemsPerPage = 10;
 
@@ -301,8 +360,6 @@ const HomeDashboard = () => {
 
     doc.save("Patient_Records.pdf");
   };
-
- 
 
   return (
     <div>
@@ -618,7 +675,9 @@ const HomeDashboard = () => {
                     <span className="text-sm">Total HIN checked</span>
                   </div>
                   <div>
-                    <p className="py-2 text-xl text-[#647284]">{totalHIN || '0'}</p>
+                    <p className="py-2 text-xl text-[#647284]">
+                      {totalHIN || "0"}
+                    </p>
                   </div>
                   <div className="text-sm flex justify-start items-center">
                     <span>
@@ -637,7 +696,7 @@ const HomeDashboard = () => {
                     </span>
                     <p className="text-[12px]">
                       <span className="text-[#72E128]">
-                      {parseFloat(totalHINPercent).toFixed(2) || '0.00'}%{" "}
+                        {parseFloat(totalHINPercent).toFixed(2) || "0.00"}%{" "}
                       </span>
                       increase from last month
                     </p>
@@ -665,7 +724,7 @@ const HomeDashboard = () => {
                   </div>
                   <div>
                     <p className="py-2 text-xl text-[#647284]">
-                      {totalDoctors || '0'}
+                      {totalDoctors || "0"}
                     </p>
                   </div>
                   <div className="text-sm flex justify-start items-center">
@@ -685,7 +744,7 @@ const HomeDashboard = () => {
                     </span>
                     <p className="text-[12px]">
                       <span className="text-[#72E128]">
-                        {parseFloat(totalDoctorsPercent).toFixed(2) || '0.00'}%{" "}
+                        {parseFloat(totalDoctorsPercent).toFixed(2) || "0.00"}%{" "}
                       </span>
                       increase from last month
                     </p>
@@ -714,7 +773,9 @@ const HomeDashboard = () => {
                     </span>
                   </div>
                   <div>
-                    <p className="py-2 text-xl text-[#647284]">{assDiag || '0'}</p>
+                    <p className="py-2 text-xl text-[#647284]">
+                      {assDiag || "0"}
+                    </p>
                   </div>
                   <div className="text-sm flex justify-start items-center">
                     <span>
@@ -732,7 +793,10 @@ const HomeDashboard = () => {
                       </svg>
                     </span>
                     <p className="text-[12px]">
-                      <span className="text-[#72E128]"> {parseFloat(assDiagPercent).toFixed(2) || '0.00'}%{" "}</span>
+                      <span className="text-[#72E128]">
+                        {" "}
+                        {parseFloat(assDiagPercent).toFixed(2) || "0.00"}%{" "}
+                      </span>
                       increase from last month
                     </p>
                   </div>
@@ -759,7 +823,9 @@ const HomeDashboard = () => {
                     <span className="text-sm">Other Medical Personnel</span>
                   </div>
                   <div>
-                    <p className="py-2 text-xl text-[#647284]">{others || '0'}</p>
+                    <p className="py-2 text-xl text-[#647284]">
+                      {others || "0"}
+                    </p>
                   </div>
                   <div className="text-sm flex justify-start items-center">
                     <span>
@@ -778,7 +844,7 @@ const HomeDashboard = () => {
                     </span>
                     <p className="text-[12px]">
                       <span className="text-[#72E128]">
-                      {parseFloat(othersPercent).toFixed(2) || '0.00'}%{" "}
+                        {parseFloat(othersPercent).toFixed(2) || "0.00"}%{" "}
                       </span>
                       increase from last month
                     </p>
@@ -789,27 +855,40 @@ const HomeDashboard = () => {
 
             <div className="py-3 grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* First Chart */}
-              <div className="bg-white p-4 rounded-2xl shadow-md">
+              <div className="bg-white p-4 rounded-2xl shadow">
                 <h3 className=" font-semibold mb-4">
                   Summary of Diagnosis / Treatment
                 </h3>
-                <ReactApexChart
-                  options={chart1Options}
-                  series={chart1Series}
-                  type="area"
-                  height={300}
-                />
+                {loading ? (
+                  <p>Loading data...</p>
+                ) : hasMetricsData ? (
+                  <ReactApexChart
+                    options={chart1Options}
+                    series={chart1Series}
+                    type="area"
+                    height={300}
+                  />
+                ) : (
+                  <p className="text-gray-500">
+                    No diagnosis / treatment graph available yet.
+                  </p>
+                )}
               </div>
-
-              {/* Second Chart */}
-              <div className="bg-white p-4 rounded-2xl shadow-md">
+              
+              <div className="bg-white p-4 rounded-2xl shadow">
                 <h3 className=" font-semibold mb-4">Patients HIN Checked</h3>
-                <ReactApexChart
-                  options={chart2Options}
-                  series={chart2Series}
-                  type="area"
-                  height={300}
-                />
+                {loading ? (
+                  <p>Loading data...</p>
+                ) : hasMetricsData ? (
+                  <ReactApexChart
+                    options={chart2Options}
+                    series={chart2Series}
+                    type="area"
+                    height={300}
+                  />
+                ) : (
+                  <p className="text-gray-500">No patient graph available yet.</p>
+                )}
               </div>
             </div>
 
