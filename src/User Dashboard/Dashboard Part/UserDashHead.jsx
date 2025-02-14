@@ -61,7 +61,7 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
   return (
     <div>
       {/* Header */}
-      <header className="hidden bg-white py-4 px-8 sm:flex justify-between items-center border">
+      <header className="hidden bg-white py-4 px-8 sm:flex justify-between items-center border "> 
         <h2 className="text-xl font-semibold">
           Welcome back {datainfo.fullname || "Loading.."} ! 👋
         </h2>

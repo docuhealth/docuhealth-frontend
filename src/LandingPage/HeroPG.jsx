@@ -11,7 +11,7 @@ const HeroPG = () => {
   }, []);
 
   return (
-    <div className="min-h-screen lg:min-h-screen flex flex-col justify-center items-center py-28 sm:py-10 px-5">
+    <div className="min-h-screen lg:min-h-screen flex flex-col justify-center items-center py-28 sm:py-28 px-5">
       <div className="relative sm:p-10  flex flex-col justify-center items-center">
         <div className="hidden sm:block absolute left-0 top-10">
           <svg
@@ -207,7 +207,7 @@ const HeroPG = () => {
             </div>
           </div>
           <div className="flex justify-center items-center py-5 w-full" data-aos="fade-right">
-  <div className="bg-[#3535FE] py-2 px-5 rounded-full w-full sm:w-auto">
+  <div className="bg-[#3535FE]  transition-all hover:bg-[#2626BD] py-2 px-5 rounded-full w-full sm:w-auto">
     <Link to='/welcome' className="w-full">
       <button className="text-white w-full  flex justify-center items-center gap-1">Get started for free  <svg
       width="14"

@@ -1,42 +1,76 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import logo from ".././assets/logo.png";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollTop, setLastScrollTop] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+
+      if (currentScroll > lastScrollTop) {
+        // User is scrolling down → hide navbar after a short delay
+        setIsVisible(false);
+      } else {
+        // User is scrolling up → show navbar
+        setIsVisible(true);
+      }
+
+      // If user scrolls past a certain threshold, make navbar fixed
+      setIsScrolled(currentScroll > 50);
+      setLastScrollTop(currentScroll);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScrollTop]);
+
 
   return (
     <div className="text-[#0E0E31] ">
-      <div className=" hidden sm:flex justify-around items-center py-5">
-        <div className="flex justify-center gap-1 items-center">
-          <div>
-            <img src={logo} alt="DocuHealth Logo" />
-          </div>
-          <div className="font-semibold text-xl">
-            <h1>DocuHealth</h1>
-          </div>
+         <div
+      className={`${
+        isScrolled ? "fixed w-full z-50 bg-white shadow transition-transform" : "absolute w-full"
+      } ${isVisible ? "translate-y-0" : "-translate-y-full"} hidden sm:flex justify-around items-center py-5`}
+      style={{ transition: "transform 0.3s ease-in-out" }}
+    >
+      <div className="flex justify-center gap-1 items-center">
+        <div>
+          <img src={logo} alt="DocuHealth Logo" />
         </div>
-        <div className="flex justify-center items-center gap-5 text-sm">
-          <a href="" className="font-semibold">
-            Home
-          </a>
-          <a href="#OurServices">Our Services</a>
-          <a href="#OurBenefits">Benefits</a>
-          <a href="#OurFeatures">Features</a>
-        </div>
-        <div className="flex justify-center items-center gap-2 text-sm">
-          <Link to="/welcome">
-            <button className="border border-[#0E0E31] rounded-full py-2 px-5">
-              Sign Up
-            </button>
-          </Link>
-          <Link to="/welcome">
-            <button className="border rounded-full py-2 px-5 bg-[#0E0E31] text-white">
-              Sign In
-            </button>
-          </Link>
+        <div className="font-semibold text-xl">
+          <h1>DocuHealth</h1>
         </div>
       </div>
+      <div className="flex justify-center items-center gap-5 text-sm">
+        <a href="#" className="font-semibold">
+          Home
+        </a>
+        <a href="#OurServices" className="text-gray-500 transition-all hover:text-[#34345F] hover:scale-105">Our Services</a>
+        <a href="#OurBenefits" className="text-gray-500 transition-all hover:text-[#34345F] hover:scale-105">Benefits</a>
+        <a href="#OurFeatures" className="text-gray-500 transition-all hover:text-[#34345F] hover:scale-105">Features</a>
+      </div>
+      <div className="flex justify-center items-center gap-2 text-sm">
+        <Link to="/welcome">
+          <button className="border border-[#0E0E31]  transition-all hover:bg-[#0E0E31] hover:text-white rounded-full py-2 px-5">
+            Sign Up
+          </button>
+        </Link>
+        <Link to="/welcome">
+          <button className="border rounded-full py-2 px-5  transition-all hover:bg-[#34345F] bg-[#0E0E31] text-white">
+            Sign In
+          </button>
+        </Link>
+      </div>
+    </div>
+  
 
       <div className="fixed w-full z-50">
         {/* Top Navigation Bar */}

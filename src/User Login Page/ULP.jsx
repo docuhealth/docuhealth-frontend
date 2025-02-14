@@ -277,17 +277,36 @@ const ULP = () => {
               </div>
 
               <div className="relative">
-                <p className="font-semibold pb-1">Date Of Birth:</p>
-                <div className="relative">
-                  <input
-                    type="date"
-                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                    value={DOB}
-                    onChange={(e) => setDOB(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
+  <p className="font-semibold pb-1">Date Of Birth:</p>
+  <div className="relative">
+    <input
+      type="date"
+      className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+      value={DOB}
+      onChange={(e) => setDOB(e.target.value)}
+      required
+    />
+
+    {/* Custom dropdown arrow */}
+    <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+      <svg
+        className="w-5 h-5 text-gray-400"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M19 9l-7 7-7-7"
+        />
+      </svg>
+    </div>
+  </div>
+</div>
+
               <div className="relative">
                 <p className="font-semibold pb-1">State Of Residence :</p>
                 <div className="relative w-full">
@@ -631,17 +650,36 @@ const ULP = () => {
                 </div>
 
                 <div className="relative">
-                  <p className="font-semibold">Date Of Birth:</p>
-                  <div className="relative">
-                    <input
-                      type="date"
-                      className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                      value={DOB}
-                      onChange={(e) => setDOB(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
+  <p className="font-semibold pb-1">Date Of Birth:</p>
+  <div className="relative">
+    <input
+      type="date"
+      className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+      value={DOB}
+      onChange={(e) => setDOB(e.target.value)}
+      required
+    />
+
+    {/* Custom dropdown arrow */}
+    <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+      <svg
+        className="w-5 h-5 text-gray-400"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M19 9l-7 7-7-7"
+        />
+      </svg>
+    </div>
+  </div>
+</div>
+
 
                 <div className="relative">
                   <p className="font-semibold">State Of Residence :</p>
