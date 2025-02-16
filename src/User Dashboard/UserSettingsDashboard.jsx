@@ -203,10 +203,6 @@ const UserSettingsDashboard = () => {
 
   const [isConfirmed, setIsConfirmed] = useState(false);
 
-  const handleDelete = () => {
-    console.log("Account deletion confirmed");
-    // Add deletion logic here
-  };
 
   const [noticeDisplay, setNoticeDisplay] = useState(false);
 
