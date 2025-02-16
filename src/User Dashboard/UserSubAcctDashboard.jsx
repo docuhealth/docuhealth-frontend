@@ -1345,7 +1345,7 @@ const UserSubAcctDashboard = () => {
                       <p>{subaccount.sex}</p>
                     </div>
                     <div className="flex flex-col">
-                      <p className="text-gray-500">Name</p>
+                      <p className="text-gray-500">Date Created</p>
                       <p>   {subaccount.date_created.split("T")[0]}</p>
                     </div>
                   </div>
