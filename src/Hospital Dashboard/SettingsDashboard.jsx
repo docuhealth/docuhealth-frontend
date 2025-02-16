@@ -137,7 +137,7 @@ const SettingsDashboard = () => {
     name: "",
     email: "",
     doctors: "",
-    otherPersonnel: "",
+    others: "",
     address: "",
   });
 
@@ -208,7 +208,7 @@ const SettingsDashboard = () => {
           formData[key] !== undefined
         ) {
           payload[key] =
-            key === "doctors" || key === "otherPersonnel"
+            key === "doctors" || key === "others"
               ? parseInt(formData[key], 10)
               : formData[key];
         }
@@ -246,7 +246,7 @@ const SettingsDashboard = () => {
         name: "",
         email: "",
         doctors: "",
-        otherPersonnel: "",
+        others: "",
         address: "",
       });
     }
@@ -604,10 +604,10 @@ const SettingsDashboard = () => {
                     Other Medical Personnel
                   </label>
                   <input
-                    id="otherPersonnel"
-                    name="otherPersonnel"
+                    id="others"
+                    name="others"
                     type="number"
-                    value={formData.otherPersonnel}
+                    value={formData.others}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
                   />

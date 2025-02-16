@@ -781,57 +781,7 @@ const AdminSettingsDashboard = () => {
           </div>
         </div>
       ),
-    },
-    {
-      title: "Control Panel",
-      content: (
-        <div className="space-y-4">
-          <div className="w-full mx-auto">
-            <div className="max-w-[300px]">
-              <h3 className="pb-1 font-semibold">Subscriptions Management</h3>
-              <p className="text-sm">
-                You can easily toggle on and toggle off all subscription plans
-              </p>
-              <div className="py-3">
-                <button
-                  onClick={() =>
-                    setIsSubscriptionEnabled(!isSubscriptionEnabled)
-                  }
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-                  ${isSubscriptionEnabled ? "bg-[#0000FF]" : "bg-gray-200"}`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-                    ${
-                      isSubscriptionEnabled ? "translate-x-6" : "translate-x-1"
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
-            <hr />
-
-            {/* Buttons Section */}
-            <div className="flex gap-2 py-5">
-              <button className="px-4 py-2 bg-[#0000FF] text-white rounded-full">
-                Save Changes
-              </button>
-              <button
-                className={`px-4 py-2 rounded-full transition-opacity ${
-                  isSubscriptionEnabled
-                    ? "border border-[#0000FF] text-[#0000FF] cursor-pointer rounded-full"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed rounded-full"
-                }`}
-                onClick={() => setIsSubscriptionEnabled(!isSubscriptionEnabled)}
-                disabled={!isSubscriptionEnabled}
-              >
-                Cancel Changes
-              </button>
-            </div>
-          </div>
-        </div>
-      ),
-    },
+    }
   ];
 
   return (
