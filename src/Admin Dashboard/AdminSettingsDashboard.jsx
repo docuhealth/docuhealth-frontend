@@ -11,12 +11,11 @@ import axios from "axios";
 
 const AdminSettingsDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-   const [datainfo, setDataInfo] = useState("")
+  const [datainfo, setDataInfo] = useState("");
   const [password, setPassword] = useState("");
   const [newpassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  
 
   const [isEmailEnabled, setIsEmailEnabled] = useState(false);
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
@@ -48,63 +47,64 @@ const AdminSettingsDashboard = () => {
     email: "",
   });
 
-    useEffect(() => {
-        const fetchPatientDashboard = async (page = 1, size = 10) => {
-          // Retrieve the JWT token from localStorage
-          const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
-          const role = "admin"; // Replace with the required role
-        
-          try {
-            // Construct the URL with query parameters
-            const url = `https://docuhealth-backend.onrender.com/api/admin/dashboard?page=${page}&size=${size}`;
-        
-            // Make the GET request
-            const response = await fetch(url, {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
-                Role: role, // Add role to the headers
-              },
-            });
-        
-            // Handle the response
-            if (response.ok) {
-              const data = await response.json();
-              console.log("Admin Dashboard Data:", data);
-              setDataInfo(data)
-        
-              // Display a success message or process the data as needed
-              return data;
-            } else {
-              const errorData = await response.json();
-              console.error("Failed to fetch dashboard data:", errorData);
-        
-              // Handle errors with a message from the API
-              throw new Error(errorData.message || "Failed to fetch dashboard data.");
-            }
-          } catch (error) {
-            console.error("An unexpected error occurred:", error);
-        
-            // Handle unexpected errors
-            throw error;
-          }finally{
-            console.log(datainfo)
-          }
-        };
-        
-        // Example Usage
-        fetchPatientDashboard(1, 10)
-          .then((data) => {
-            // Process the dashboard data
-            console.log("Dashboard Data:", data);
-          })
-          .catch((error) => {
-            // Handle errors
-            console.error("Error:", error.message);
-          });
-        
-      }, []);
+  useEffect(() => {
+    const fetchPatientDashboard = async (page = 1, size = 10) => {
+      // Retrieve the JWT token from localStorage
+      const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+      const role = "admin"; // Replace with the required role
+
+      try {
+        // Construct the URL with query parameters
+        const url = `https://docuhealth-backend.onrender.com/api/admin/dashboard?page=${page}&size=${size}`;
+
+        // Make the GET request
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+            Role: role, // Add role to the headers
+          },
+        });
+
+        // Handle the response
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Admin Dashboard Data:", data);
+          setDataInfo(data);
+
+          // Display a success message or process the data as needed
+          return data;
+        } else {
+          const errorData = await response.json();
+          console.error("Failed to fetch dashboard data:", errorData);
+
+          // Handle errors with a message from the API
+          throw new Error(
+            errorData.message || "Failed to fetch dashboard data."
+          );
+        }
+      } catch (error) {
+        console.error("An unexpected error occurred:", error);
+
+        // Handle unexpected errors
+        throw error;
+      } finally {
+        console.log(datainfo);
+      }
+    };
+
+    // Example Usage
+    fetchPatientDashboard(1, 10)
+      .then((data) => {
+        // Process the dashboard data
+        console.log("Dashboard Data:", data);
+      })
+      .catch((error) => {
+        // Handle errors
+        console.error("Error:", error.message);
+      });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -265,7 +265,6 @@ const AdminSettingsDashboard = () => {
     }
   };
 
-
   const handlePasswordUpdate = async (e) => {
     setLoading("Saving Changes");
     e.preventDefault();
@@ -375,7 +374,7 @@ const AdminSettingsDashboard = () => {
         email: isEmailEnabled ? "true" : "false",
         push: isNotificationEnabled ? "true" : "false",
         dashboard: isDashboardEnabled ? "true" : "false",
-      }
+      },
     };
 
     // Check if any toggle button is changed
@@ -448,7 +447,6 @@ const AdminSettingsDashboard = () => {
     setIsDashboardEnabled(false);
     setIsNotificationEnabled(false);
   };
-
 
   const tabs = [
     {
@@ -642,7 +640,7 @@ const AdminSettingsDashboard = () => {
               onClick={handlePasswordUpdate}
               className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
             >
-            {loading ? loading : "Save Changes"}
+              {loading ? loading : "Save Changes"}
             </button>
             <button
               type="button"
@@ -763,8 +761,8 @@ const AdminSettingsDashboard = () => {
               </div>
             </div>
           </div>
-            {/* Buttons */}
-            <div className="flex flex-row justify-around sm:justify-start  space-x-4">
+          {/* Buttons */}
+          <div className="flex flex-row justify-around sm:justify-start  space-x-4">
             <button
               type="submit"
               className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
@@ -782,7 +780,7 @@ const AdminSettingsDashboard = () => {
           </div>
         </div>
       ),
-    }
+    },
   ];
 
   return (
@@ -1037,8 +1035,8 @@ const AdminSettingsDashboard = () => {
 
             <div className=" sm:border my-5 px-5 py-5 sm:rounded-3xl bg-white">
               <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center p-1">
-                  {datainfo?.metrics.name
+                <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center p-1">
+                  {datainfo?.metrics?.name
                     ? datainfo.metrics.name
                         .split(" ")
                         .map((word) => (word ? word[0].toUpperCase() : "")) // Add safeguard for empty strings
@@ -1046,7 +1044,8 @@ const AdminSettingsDashboard = () => {
                     : ""}
                 </div>
                 <div>
-                  <p>{datainfo.metrics.name}</p>
+                  <p>{datainfo?.metrics?.name || "loading..."}
+                  </p>
                   <p className="text-gray-500 text-sm">Admin</p>
                 </div>
               </div>
