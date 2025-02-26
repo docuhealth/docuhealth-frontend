@@ -16,7 +16,7 @@ const UserSettingsDashboard = () => {
   const [newpassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [datainfo, setDataInfo] = useState("")
+  const [datainfo, setDataInfo] = useState("");
 
   const [isEmailEnabled, setIsEmailEnabled] = useState(false);
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
@@ -24,72 +24,71 @@ const UserSettingsDashboard = () => {
 
   const [loadingInfo, setLoadingInfo] = useState("");
   const [deactivate, setDeactivate] = useState("");
-    const [loading, setLoading] = useState("");
+  const [loading, setLoading] = useState("");
 
   const location = useLocation();
 
   const isActive = (path = "/user-home-dashboard") =>
     location.pathname === path;
 
+  useEffect(() => {
+    const fetchPatientDashboard = async (page = 1, size = 10) => {
+      // Retrieve the JWT token from localStorage
+      const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+      const role = "patient"; // Replace with the required role
 
-   useEffect(() => {
-      const fetchPatientDashboard = async (page = 1, size = 10) => {
-        // Retrieve the JWT token from localStorage
-        const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
-        const role = "patient"; // Replace with the required role
-      
-        try {
-          // Construct the URL with query parameters
-          const url = `https://docuhealth-backend.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
-      
-          // Make the GET request
-          const response = await fetch(url, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
-              Role: role, // Add role to the headers
-            },
-          });
-      
-          // Handle the response
-          if (response.ok) {
-            const data = await response.json();
-            console.log("Patient Dashboard Data:", data);
-            setDataInfo(data)
-      
-            // Display a success message or process the data as needed
-            return data;
-          } else {
-            const errorData = await response.json();
-            console.error("Failed to fetch dashboard data:", errorData);
-      
-            // Handle errors with a message from the API
-            throw new Error(errorData.message || "Failed to fetch dashboard data.");
-          }
-        } catch (error) {
-          console.error("An unexpected error occurred:", error);
-      
-          // Handle unexpected errors
-          throw error;
-        }finally{
-          console.log(datainfo)
-        }
-      };
-      
-      // Example Usage
-      fetchPatientDashboard(1, 10)
-        .then((data) => {
-          // Process the dashboard data
-          console.log("Dashboard Data:", data);
-        })
-        .catch((error) => {
-          // Handle errors
-          console.error("Error:", error.message);
+      try {
+        // Construct the URL with query parameters
+        const url = `https://docuhealth-backend.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
+
+        // Make the GET request
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+            Role: role, // Add role to the headers
+          },
         });
-      
-    }, []);
-  
+
+        // Handle the response
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Patient Dashboard Data:", data);
+          setDataInfo(data);
+
+          // Display a success message or process the data as needed
+          return data;
+        } else {
+          const errorData = await response.json();
+          console.error("Failed to fetch dashboard data:", errorData);
+
+          // Handle errors with a message from the API
+          throw new Error(
+            errorData.message || "Failed to fetch dashboard data."
+          );
+        }
+      } catch (error) {
+        console.error("An unexpected error occurred:", error);
+
+        // Handle unexpected errors
+        throw error;
+      } finally {
+        console.log(datainfo);
+      }
+    };
+
+    // Example Usage
+    fetchPatientDashboard(1, 10)
+      .then((data) => {
+        // Process the dashboard data
+        console.log("Dashboard Data:", data);
+      })
+      .catch((error) => {
+        // Handle errors
+        console.error("Error:", error.message);
+      });
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -118,37 +117,38 @@ const UserSettingsDashboard = () => {
     e.preventDefault();
     setLoadingInfo("Saving Changes");
     console.log("Form submitted:", formData);
-  
+
     try {
       // Retrieve token from local storage
       const token = localStorage.getItem("jwtToken");
-  
+
       if (!token) {
         console.error("No token found. Please log in again.");
         toast.error("Authentication token is missing. Please log in.");
         return;
       }
-  
+
       // Create payload by filtering only filled fields
       const payload = {};
-  
+
       Object.keys(formData).forEach((key) => {
         if (formData[key] && formData[key].trim() !== "") {
           // Map form field names to API field names
-          payload[key === "fname" ? "firstname" : key === "lname" ? "lastname" : key] =
-            formData[key].trim();
+          payload[
+            key === "fname" ? "firstname" : key === "lname" ? "lastname" : key
+          ] = formData[key].trim();
         }
       });
-  
+
       // Ensure there's at least one field to update
       if (Object.keys(payload).length === 0) {
         console.warn("No fields to update.");
         toast.warning("Please fill at least one field before submitting.");
         return;
       }
-  
+
       console.log("Payload:", payload);
-  
+
       // Send the PATCH request using fetch
       const response = await fetch(
         "https://docuhealth-backend.onrender.com/api/patient/settings/update_patient_info",
@@ -161,11 +161,11 @@ const UserSettingsDashboard = () => {
           body: JSON.stringify(payload),
         }
       );
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
+
       const responseData = await response.json();
       console.log("API Response:", responseData);
       toast.success("Patient Info Updated Successfully");
@@ -180,10 +180,8 @@ const UserSettingsDashboard = () => {
         lname: "",
         phone: "",
       });
-     
     }
   };
-  
 
   const handleCancel = () => {
     setFormData({
@@ -202,7 +200,6 @@ const UserSettingsDashboard = () => {
   };
 
   const [isConfirmed, setIsConfirmed] = useState(false);
-
 
   const [noticeDisplay, setNoticeDisplay] = useState(false);
 
@@ -278,7 +275,7 @@ const UserSettingsDashboard = () => {
       setDeactivate("Deactivate Account");
     }
   };
-  
+
   const handlePasswordUpdate = async (e) => {
     setLoading("Saving Changes");
     e.preventDefault();
@@ -364,7 +361,6 @@ const UserSettingsDashboard = () => {
       setConfirmPassword("");
     }
   };
-
 
   const handleNotificationUpdate = async (e) => {
     setLoading("Saving Changes");
@@ -467,7 +463,6 @@ const UserSettingsDashboard = () => {
     setIsDashboardEnabled(false);
     setIsNotificationEnabled(false);
   };
-
 
   const tabs = [
     {
@@ -697,7 +692,7 @@ const UserSettingsDashboard = () => {
               onClick={handlePasswordUpdate}
               className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
             >
-            {loading ? loading : "Save Changes"}
+              {loading ? loading : "Save Changes"}
             </button>
             <button
               type="button"
@@ -718,7 +713,8 @@ const UserSettingsDashboard = () => {
             <div className="max-w-[300px]">
               <h3 className="pb-1 font-semibold">Accont Sign-In</h3>
               <p className="text-sm">
-                You'll get notified when an hospital view your profile via your HIN.
+                You'll get notified when an hospital view your profile via your
+                HIN.
               </p>
             </div>
             <div className="flex flex-col gap-3 py-4">
@@ -822,9 +818,12 @@ const UserSettingsDashboard = () => {
 
           <div className="flex flex-col sm:flex-row justify-start sm:items-center py-4">
             <div className="max-w-[300px]">
-              <h3 className="pb-1 font-semibold">Summary Of Diagnosis & Treatment</h3>
+              <h3 className="pb-1 font-semibold">
+                Summary Of Diagnosis & Treatment
+              </h3>
               <p className="text-sm">
-              You'll get notified when the summary of a diagnosis/treatment is carried out on your profile by any hospital visited.
+                You'll get notified when the summary of a diagnosis/treatment is
+                carried out on your profile by any hospital visited.
               </p>
             </div>
             <div className="flex flex-col gap-3 py-4">
@@ -872,8 +871,8 @@ const UserSettingsDashboard = () => {
             </div>
           </div>
 
-           {/* Buttons */}
-           <div className="flex flex-row justify-around sm:justify-start  space-x-4">
+          {/* Buttons */}
+          <div className="flex flex-row justify-around sm:justify-start  space-x-4">
             <button
               type="submit"
               className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
@@ -1144,14 +1143,14 @@ const UserSettingsDashboard = () => {
 
             <div className=" sm:border my-5 px-5 py-5 sm:rounded-3xl bg-white">
               <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center p-1">
-                                       {datainfo?.fullname
-                ? datainfo.fullname
-                    .split(" ")
-                    .map((word) => (word ? word[0].toUpperCase() : "")) // Add safeguard for empty strings
-                    .join("")
-                : ""}
-                                      </div>
+                <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center p-1">
+                  {datainfo?.fullname
+                    ? datainfo.fullname
+                        .split(" ")
+                        .map((word) => (word ? word[0].toUpperCase() : "")) // Add safeguard for empty strings
+                        .join("")
+                    : ""}
+                </div>
                 <div>
                   <p>{datainfo.fullname}</p>
                   <p className="text-gray-500 text-sm">Patient</p>
