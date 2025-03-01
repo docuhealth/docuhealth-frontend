@@ -5,6 +5,7 @@ import AdminHead from "./Admin Part/AdminHead";
 import DynamicDate from "../Dynamic Date/DynamicDate";
 import { toast } from "react-toastify";
 import axios from "axios";
+import ReactApexChart from "react-apexcharts";
 
 const AdminHomeDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -17,7 +18,27 @@ const AdminHomeDashboard = () => {
   const [totalRegInd, setTotalRegInd] = useState("...");
   const [totalRegIndPercent, setTotalRegIndPercent] = useState("...");
 
+  const [chartData, setChartData] = useState({ categories: [], series: [] });
+
   const [loading, setLoading] = useState(true);
+
+  const [hasData, setHasData] = useState(false); // Track if data exists
+
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
   const location = useLocation();
 
   const isActive = (path = "/admin-home-dashboard") =>
@@ -62,6 +83,29 @@ const AdminHomeDashboard = () => {
 
         setTotalRegInd(response.data.metrics.total_patients);
 
+        const patientMetrics = response.data.metrics?.patient_metrics || [];
+
+        if (patientMetrics.length === 0) {
+          console.log("No patient data available.");
+          setHasData(false);
+        } else {
+          setHasData(true);
+          // Sort data by _id (month order)
+          const sortedMetrics = patientMetrics.sort((a, b) => a._id - b._id);
+
+          // Extract categories (months) and series (user_count values)
+          const categories = sortedMetrics.map(
+            (item) => monthNames[item._id - 1]
+          ); // Convert month number to name
+          const userCounts = sortedMetrics.map((item) => item.user_count);
+
+          // Set chart data
+          setChartData({
+            categories,
+            series: [{ name: "Patients", data: userCounts }],
+          });
+        }
+
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -72,6 +116,32 @@ const AdminHomeDashboard = () => {
 
     fetchData();
   }, []);
+
+  const chart1Options = {
+    chart: { type: "area", toolbar: { show: false } },
+    colors: ["#FF4D4D"], // Red gradient color
+    fill: {
+      type: "gradient",
+      gradient: {
+        shade: "light",
+        type: "vertical",
+        gradientToColors: ["#FFA3A3"], // Lighter red at the bottom
+        stops: [0, 100],
+        opacityFrom: 0.5, // Semi-transparent at the top
+        opacityTo: 0, // Fully transparent at the bottom
+      },
+    },
+    dataLabels: { enabled: false },
+    stroke: { curve: "smooth" },
+    xaxis: {
+      categories: chartData.categories,
+      type: "category",
+      labels: { rotate: -45 },
+    },
+    yaxis: { labels: { formatter: (value) => `${value}` } },
+    grid: { borderColor: "#E5E7EB" },
+  };
+
   return (
     <div>
       <div className="min-h-screen bg-gray-100 flex">
@@ -361,64 +431,57 @@ const AdminHomeDashboard = () => {
                       </svg>
                     </span>
                     <p className="text-[12px]">
-                      <span className="text-[#72E128]">
-                        {"0"}%{" "}
-                      </span>
+                      <span className="text-[#72E128]">{"0"}% </span>
                       increase from last month
                     </p>
                   </div>
                 </div>
-              
               </div>
               <div className="col-span-2 sm:col-auto">
-                  <div className="bg-white py-4 px-2 border rounded-md">
-                    <div className="flex justify-start gap-3 items-center ">
-                      <div className="bg-[#9181DB] bg-opacity-10 p-2 rounded-sm">
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M11 7H13V17H11V7ZM15 11H17V17H15V11ZM7 13H9V17H7V13ZM15 4H5V20H19V8H15V4ZM3 2.9918C3 2.44405 3.44749 2 3.9985 2H16L20.9997 7L21 20.9925C21 21.5489 20.5551 22 20.0066 22H3.9934C3.44476 22 3 21.5447 3 21.0082V2.9918Z"
-                            fill="#9181DB"
-                          />
-                        </svg>
-                      </div>
-                      <span className="text-sm">Total revenue generated</span>
+                <div className="bg-white py-4 px-2 border rounded-md">
+                  <div className="flex justify-start gap-3 items-center ">
+                    <div className="bg-[#9181DB] bg-opacity-10 p-2 rounded-sm">
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M11 7H13V17H11V7ZM15 11H17V17H15V11ZM7 13H9V17H7V13ZM15 4H5V20H19V8H15V4ZM3 2.9918C3 2.44405 3.44749 2 3.9985 2H16L20.9997 7L21 20.9925C21 21.5489 20.5551 22 20.0066 22H3.9934C3.44476 22 3 21.5447 3 21.0082V2.9918Z"
+                          fill="#9181DB"
+                        />
+                      </svg>
                     </div>
-                    <div>
-                      <p className="py-2 text-xl text-[#647284]">
-                        {"0"}
-                      </p>
-                    </div>
-                    <div className="text-sm flex justify-start items-center">
-                      <span>
-                        <svg
-                          width="14"
-                          height="15"
-                          viewBox="0 0 14 15"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M9.3357 5.99162L4.31519 11.0121L3.49023 10.1872L8.51075 5.16667H4.08571V4H10.5024V10.4167H9.3357V5.99162Z"
-                            fill="#72E128"
-                          />
-                        </svg>
-                      </span>
-                      <p className="text-[12px]">
-                        <span className="text-[#72E128]">
-                          {"0"}%{" "}
-                        </span>
-                        increase from last month
-                      </p>
-                    </div>
+                    <span className="text-sm">Total revenue generated</span>
+                  </div>
+                  <div>
+                    <p className="py-2 text-xl text-[#647284]">{"0"}</p>
+                  </div>
+                  <div className="text-sm flex justify-start items-center">
+                    <span>
+                      <svg
+                        width="14"
+                        height="15"
+                        viewBox="0 0 14 15"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M9.3357 5.99162L4.31519 11.0121L3.49023 10.1872L8.51075 5.16667H4.08571V4H10.5024V10.4167H9.3357V5.99162Z"
+                          fill="#72E128"
+                        />
+                      </svg>
+                    </span>
+                    <p className="text-[12px]">
+                      <span className="text-[#72E128]">{"0"}% </span>
+                      increase from last month
+                    </p>
                   </div>
                 </div>
-                <div className="col-span-2 sm:col-auto">
+              </div>
+              <div className="col-span-2 sm:col-auto">
                 <div className="bg-white py-4 px-2 border rounded-md">
                   <div className="flex justify-start gap-3 items-center ">
                     <div className="bg-[#FFB849] bg-opacity-10 p-2 rounded-sm">
@@ -435,9 +498,7 @@ const AdminHomeDashboard = () => {
                         />
                       </svg>
                     </div>
-                    <span className="text-sm">
-                      Total Registered Hospital
-                    </span>
+                    <span className="text-sm">Total Registered Hospital</span>
                   </div>
                   <div>
                     <p className="py-2 text-xl text-[#647284]">
@@ -460,10 +521,7 @@ const AdminHomeDashboard = () => {
                       </svg>
                     </span>
                     <p className="text-[12px]">
-                      <span className="text-[#72E128]">
-                        {" "}
-                        {"0"}%{" "}
-                      </span>
+                      <span className="text-[#72E128]"> {"0"}% </span>
                       increase from last month
                     </p>
                   </div>
@@ -509,13 +567,56 @@ const AdminHomeDashboard = () => {
                       </svg>
                     </span>
                     <p className="text-[12px]">
-                      <span className="text-[#72E128]">
-                        {"0"}%{" "}
-                      </span>
+                      <span className="text-[#72E128]">{"0"}% </span>
                       increase from last month
                     </p>
                   </div>
                 </div>
+              </div>
+            </div>
+            {/* <div>
+      {loading ? (
+        <p>Loading chart data...</p>
+      ) : hasData ? (
+        <ReactApexChart options={chart1Options} series={chartData.series} type="area" height={300} />
+      ) : (
+        <p>No patient data available.</p>
+      )}
+    </div> */}
+            <div className="py-3 grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="bg-white p-4 rounded-2xl shadow">
+                <h3 className=" font-semibold mb-4">
+                  Revenue Generated Overview (demo-- no revenue yet)
+                </h3>
+                {loading ? (
+                  <p>Loading chart data...</p>
+                ) : hasData ? (
+                  <ReactApexChart
+                    options={chart1Options}
+                    series={chartData.series}
+                    type="area"
+                    height={300}
+                  />
+                ) : (
+                  <p>No revenue data available.</p>
+                )}
+              </div>
+              <div className="bg-white p-4 rounded-2xl shadow">
+                <h3 className=" font-semibold mb-4">
+                  Total Registered Users
+                </h3>
+                {loading ? (
+                  <p>Loading chart data...</p>
+                ) : hasData ? (
+                  <ReactApexChart
+                    options={chart1Options}
+                    series={chartData.series}
+                    type="area"
+                    height={300}
+                  />
+                ) : (
+                  <p>No total users registered data available.</p>
+                )}
               </div>
             </div>
           </section>
