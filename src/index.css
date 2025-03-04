@@ -31,3 +31,18 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555; /* Slightly lighter on hover */
 }
+
+
+
+@media (max-width: 600px) {
+  .apexcharts-legend {
+    display:none
+ 
+  }
+  .apexcharts-legend-series {
+    display: none;
+  }
+  .apexcharts-legend-text {
+    display: none;
+  }
+}

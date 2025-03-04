@@ -24,6 +24,24 @@ const AdminHomeDashboard = () => {
 
   const [hasData, setHasData] = useState(false); // Track if data exists
 
+
+
+  const [subscribedChartData, setSubscribedChartData] = useState({
+    categories: [],
+    series: [],
+  });
+
+  const [chartDataS, setChartDataS] = useState({
+    series: [{ name: "Registered Users", data: [] }],
+    options: {
+      chart: { type: "bar", height: 350 },
+      plotOptions: { bar: { horizontal: true, barHeight: "50%" } },
+      dataLabels: { enabled: true },
+      xaxis: { categories: [] },
+      colors: ["#1E90FF"], // Blue color for bars
+    },
+  });
+
   const monthNames = [
     "Jan",
     "Feb",
@@ -39,6 +57,9 @@ const AdminHomeDashboard = () => {
     "Dec",
   ];
 
+  const [patientsWithSub, setPatientsWithSub] = useState(0);
+  const [pieChartData, setPieChartData] = useState({ series: [], labels: [] });
+
   const location = useLocation();
 
   const isActive = (path = "/admin-home-dashboard") =>
@@ -51,6 +72,7 @@ const AdminHomeDashboard = () => {
   const closeSidebar = () => {
     setIsSidebarOpen(false);
   };
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,10 +100,30 @@ const AdminHomeDashboard = () => {
         console.log("API Response:", response.data);
 
         setTotalUsers(response.data.metrics.total_users);
+        setTotalUsersPercent(response.data.metrics.users_percentage_increase);
 
         setRegHosp(response.data.metrics.total_hospitals);
+        setRegHospPercent(response.data.metrics.hospital_percentage_increase);
 
         setTotalRegInd(response.data.metrics.total_patients);
+        setTotalRegIndPercent(
+          response.data.metrics.patient_percentage_increase
+        );
+
+  
+
+        const users = response.data.metrics.total_users;
+        const patientsSub = response.data.metrics.patients_with_subaccounts;
+
+        // Calculate percentages
+        const withSubPercent = Math.round((patientsSub / users) * 100);
+        const withoutSubPercent = 100 - withSubPercent;
+
+        // Update pie chart data
+        setPieChartData({
+          series: [withSubPercent, withoutSubPercent],
+          labels: ["Patients with Subaccounts", "Patients without Subaccounts"],
+        });
 
         const patientMetrics = response.data.metrics?.patient_metrics || [];
 
@@ -106,6 +148,52 @@ const AdminHomeDashboard = () => {
           });
         }
 
+        const subscribedMetrics =
+          response.data.metrics?.subscribed_users_metrics || [];
+
+        if (subscribedMetrics.length === 0) {
+          console.log("No subscribed users data available.");
+          setHasData(false);
+        } else {
+          setHasData(true);
+
+          // Sort data by _id (month order)
+          const sortedSubscribedMetrics = subscribedMetrics.sort(
+            (a, b) => a._id - b._id
+          );
+
+          // Extract categories (months) and series (user_count values)
+          const subscribedCategories = sortedSubscribedMetrics.map(
+            (item) => monthNames[item._id - 1]
+          );
+          const subscribedUserCounts = sortedSubscribedMetrics.map(
+            (item) => item.user_count
+          );
+
+          setSubscribedChartData({
+            categories: subscribedCategories,
+            series: [{ name: "Subscribed Users", data: subscribedUserCounts }],
+          });
+        }
+
+         // Extract state metrics data
+         const stateMetrics = response.data.metrics?.state_metrics || [];
+
+         // Filter and sort data
+         const filteredMetrics = stateMetrics.filter((item) => item._id);
+         const sortedMetrics = filteredMetrics
+           .sort((a, b) => b.count - a.count)
+           .slice(0, 6); // Get top 6 states
+ 
+         // Prepare chart data
+         const categories = sortedMetrics.map((item) => item._id);
+         const seriesData = sortedMetrics.map((item) => item.count);
+ 
+         setChartDataS((prev) => ({
+           ...prev,
+           series: [{ name: "Registered Users", data: seriesData }],
+           options: { ...prev.options, xaxis: { categories } },
+         }));
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -141,6 +229,52 @@ const AdminHomeDashboard = () => {
     yaxis: { labels: { formatter: (value) => `${value}` } },
     grid: { borderColor: "#E5E7EB" },
   };
+
+  const pieChartOptions = {
+    chart: { type: "donut" },
+    labels: pieChartData.labels,
+    colors: ["#2EC388", "#FAFAFA"], // Green for with subaccounts, White for without
+    legend: { position: "bottom" },
+    dataLabels: {
+      enabled: true,
+      formatter: (val, { seriesIndex }) => `${val.toFixed(0)}%`,
+      style: {
+        fontSize: "14px",
+        fontWeight: "bold",
+        colors: ["#FFFFFF", "#1B2B40"], // White for "5%", Dark Blue (#1B2B40) for "95%"
+      },
+      dropShadow: {
+        enabled: false, // Removes shadow effect
+      },
+    },
+  };
+
+  const subscribedChartOptions = {
+    chart: { type: "area", toolbar: { show: false } },
+    colors: ["#4D79FF"], // Blue gradient color
+    fill: {
+      type: "gradient",
+      gradient: {
+        shade: "light",
+        type: "vertical",
+        gradientToColors: ["#A3C0FF"], // Lighter blue at the bottom
+        stops: [0, 100],
+        opacityFrom: 0.5,
+        opacityTo: 0,
+      },
+    },
+    dataLabels: { enabled: false },
+    stroke: { curve: "smooth" },
+    xaxis: {
+      categories: subscribedChartData.categories,
+      type: "category",
+      labels: { rotate: -45 },
+    },
+    yaxis: { labels: { formatter: (value) => `${value}` } },
+    grid: { borderColor: "#E5E7EB" },
+  };
+
+
 
   return (
     <div>
@@ -431,7 +565,11 @@ const AdminHomeDashboard = () => {
                       </svg>
                     </span>
                     <p className="text-[12px]">
-                      <span className="text-[#72E128]">{"0"}% </span>
+                      <span className="text-[#72E128]">
+                        {Math.round(parseFloat(totalUsersPercent).toFixed(2)) ||
+                          "0"}
+                        %{" "}
+                      </span>
                       increase from last month
                     </p>
                   </div>
@@ -521,7 +659,12 @@ const AdminHomeDashboard = () => {
                       </svg>
                     </span>
                     <p className="text-[12px]">
-                      <span className="text-[#72E128]"> {"0"}% </span>
+                      <span className="text-[#72E128]">
+                        {" "}
+                        {Math.round(parseFloat(regHospPercent).toFixed(2)) ||
+                          "0"}
+                        %{" "}
+                      </span>
                       increase from last month
                     </p>
                   </div>
@@ -567,22 +710,19 @@ const AdminHomeDashboard = () => {
                       </svg>
                     </span>
                     <p className="text-[12px]">
-                      <span className="text-[#72E128]">{"0"}% </span>
+                      <span className="text-[#72E128]">
+                        {Math.round(
+                          parseFloat(totalRegIndPercent).toFixed(2)
+                        ) || "0"}
+                        %{" "}
+                      </span>
                       increase from last month
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-            {/* <div>
-      {loading ? (
-        <p>Loading chart data...</p>
-      ) : hasData ? (
-        <ReactApexChart options={chart1Options} series={chartData.series} type="area" height={300} />
-      ) : (
-        <p>No patient data available.</p>
-      )}
-    </div> */}
+
             <div className="py-3 grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="bg-white p-4 rounded-2xl shadow">
                 <h3 className=" font-semibold mb-4">
@@ -602,9 +742,7 @@ const AdminHomeDashboard = () => {
                 )}
               </div>
               <div className="bg-white p-4 rounded-2xl shadow">
-                <h3 className=" font-semibold mb-4">
-                  Total Registered Users
-                </h3>
+                <h3 className=" font-semibold mb-4">Total Registered Users</h3>
                 {loading ? (
                   <p>Loading chart data...</p>
                 ) : hasData ? (
@@ -619,6 +757,51 @@ const AdminHomeDashboard = () => {
                 )}
               </div>
             </div>
+
+            <div className="py-3 grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="bg-white p-4 rounded-2xl shadow grid grid-cols-1 ">
+                <h3 className="font-semibold mb-4">Total Subscribed Users</h3>
+                {loading ? (
+                  <p>Loading chart data...</p>
+                ) : hasData ? (
+                  <ReactApexChart
+                    options={subscribedChartOptions}
+                    series={subscribedChartData.series}
+                    type="area"
+                    height={300}
+                  />
+                ) : (
+                  <p>No subscribed users data available.</p>
+                )}
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl shadow grid grid-cols-1 place-items-center">
+                <h3 className="font-semibold mb-4 text-left w-full">
+                  Users with sub account
+                </h3>
+                <div>
+                  {loading ? (
+                    <p>Loading chart data...</p>
+                  ) : hasData ? (
+                    <ReactApexChart
+                      options={pieChartOptions}
+                      series={pieChartData.series}
+                      type="pie"
+                      width={400}
+                    />
+                  ) : (
+                    <p>No patient subscription data available.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-white rounded-lg shadow-md">
+      <h2 className="text-lg font-semibold mb-2">Top Selling States</h2>
+      <p className="text-sm text-gray-500 mb-4">Top 6 states with the most registered users</p>
+      <ReactApexChart options={chartDataS.options} series={chartDataS.series} type="bar" height={350} />
+    </div>
+
           </section>
         </main>
       </div>

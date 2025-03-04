@@ -696,7 +696,7 @@ const HomeDashboard = () => {
                     </span>
                     <p className="text-[12px]">
                       <span className="text-[#72E128]">
-                        {parseFloat(totalHINPercent).toFixed(2) || "0"}%{" "}
+                        {Math.round(parseFloat(totalHINPercent).toFixed(2)) || "0"}%{" "}
                       </span>
                       increase from last month
                     </p>
@@ -744,7 +744,7 @@ const HomeDashboard = () => {
                     </span>
                     <p className="text-[12px]">
                       <span className="text-[#72E128]">
-                        {parseFloat(totalDoctorsPercent).toFixed(2) || "0"}%{" "}
+                        {Math.round(parseFloat(totalDoctorsPercent).toFixed(2)) || "0"}%{" "}
                       </span>
                       increase from last month
                     </p>
@@ -795,7 +795,7 @@ const HomeDashboard = () => {
                     <p className="text-[12px]">
                       <span className="text-[#72E128]">
                         {" "}
-                        {parseFloat(assDiagPercent).toFixed(2) || "0"}%{" "}
+                        {Math.round(parseFloat(assDiagPercent).toFixed(2)) || "0"}%{" "}
                       </span>
                       increase from last month
                     </p>
@@ -844,7 +844,7 @@ const HomeDashboard = () => {
                     </span>
                     <p className="text-[12px]">
                       <span className="text-[#72E128]">
-                        {parseFloat(othersPercent).toFixed(2) || "0"}%{" "}
+                        {Math.round(parseFloat(othersPercent).toFixed(2)) || "0"}%{" "}
                       </span>
                       increase from last month
                     </p>
