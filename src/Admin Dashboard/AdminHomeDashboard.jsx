@@ -24,8 +24,6 @@ const AdminHomeDashboard = () => {
 
   const [hasData, setHasData] = useState(false); // Track if data exists
 
-
-
   const [subscribedChartData, setSubscribedChartData] = useState({
     categories: [],
     series: [],
@@ -72,7 +70,6 @@ const AdminHomeDashboard = () => {
   const closeSidebar = () => {
     setIsSidebarOpen(false);
   };
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -109,8 +106,6 @@ const AdminHomeDashboard = () => {
         setTotalRegIndPercent(
           response.data.metrics.patient_percentage_increase
         );
-
-  
 
         const users = response.data.metrics.total_users;
         const patientsSub = response.data.metrics.patients_with_subaccounts;
@@ -176,24 +171,24 @@ const AdminHomeDashboard = () => {
           });
         }
 
-         // Extract state metrics data
-         const stateMetrics = response.data.metrics?.state_metrics || [];
+        // Extract state metrics data
+        const stateMetrics = response.data.metrics?.state_metrics || [];
 
-         // Filter and sort data
-         const filteredMetrics = stateMetrics.filter((item) => item._id);
-         const sortedMetrics = filteredMetrics
-           .sort((a, b) => b.count - a.count)
-           .slice(0, 6); // Get top 6 states
- 
-         // Prepare chart data
-         const categories = sortedMetrics.map((item) => item._id);
-         const seriesData = sortedMetrics.map((item) => item.count);
- 
-         setChartDataS((prev) => ({
-           ...prev,
-           series: [{ name: "Registered Users", data: seriesData }],
-           options: { ...prev.options, xaxis: { categories } },
-         }));
+        // Filter and sort data
+        const filteredMetrics = stateMetrics.filter((item) => item._id);
+        const sortedMetrics = filteredMetrics
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 6); // Get top 6 states
+
+        // Prepare chart data
+        const categories = sortedMetrics.map((item) => item._id);
+        const seriesData = sortedMetrics.map((item) => item.count);
+
+        setChartDataS((prev) => ({
+          ...prev,
+          series: [{ name: "Registered Users", data: seriesData }],
+          options: { ...prev.options, xaxis: { categories } },
+        }));
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -273,8 +268,6 @@ const AdminHomeDashboard = () => {
     yaxis: { labels: { formatter: (value) => `${value}` } },
     grid: { borderColor: "#E5E7EB" },
   };
-
-
 
   return (
     <div>
@@ -797,11 +790,17 @@ const AdminHomeDashboard = () => {
             </div>
 
             <div className="p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-lg font-semibold mb-2">Top Selling States</h2>
-      <p className="text-sm text-gray-500 mb-4">Top 6 states with the most registered users</p>
-      <ReactApexChart options={chartDataS.options} series={chartDataS.series} type="bar" height={350} />
-    </div>
-
+              <h2 className="text-lg font-semibold mb-2">Top Selling States</h2>
+              <p className="text-sm text-gray-500 mb-4">
+                Top 6 states with the most registered users
+              </p>
+              <ReactApexChart
+                options={chartDataS.options}
+                series={chartDataS.series}
+                type="bar"
+                height={350}
+              />
+            </div>
           </section>
         </main>
       </div>
