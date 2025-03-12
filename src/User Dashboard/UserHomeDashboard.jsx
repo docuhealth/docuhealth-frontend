@@ -15,7 +15,9 @@ const UserHomeDashboard = () => {
   const [name, setName] = useState("fetching...");
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [popoverVisible, setPopoverVisible] = useState(null);
-   const [datainfo, setDataInfo] = useState("");
+  const [datainfo, setDataInfo] = useState("");
+  const [generateIDCard, setGenerateIDCard] = useState(false);
+  const [generateIDCardForm, setGenerateIDCardForm] = useState(false);
 
   const location = useLocation();
 
@@ -26,55 +28,66 @@ const UserHomeDashboard = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-    useEffect(() => {
-      const fetchPatientDashboard = async (page = 1, size = 10) => {
-        // Retrieve the JWT token from localStorage
-        const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
-        const role = "patient"; // Replace with the required role
-  
-        try {
-          // Construct the URL with query parameters
-          const url = `https://docuhealth-backend.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
-  
-          // Make the GET request
-          const response = await fetch(url, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
-              Role: role, // Add role to the headers
-            },
-          });
-  
-          // Handle the response
-          if (response.ok) {
-            const data = await response.json();
-            setDataInfo(data);
-  
-            // Display a success message or process the data as needed
-            return data;
-          } else {
-            const errorData = await response.json();
-            console.error("Failed to fetch dashboard data:", errorData);
-  
-            // Handle errors with a message from the API
-            throw new Error(
-              errorData.message || "Failed to fetch dashboard data."
-            );
-          }
-        } catch (error) {
-          console.error("An unexpected error occurred:", error);
-  
-          // Handle unexpected errors
-          throw error;
-        } finally {
-          console.log(datainfo);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    firstEmergency: "",
+    secondEmergency: "",
+    emergencyAddress: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  useEffect(() => {
+    const fetchPatientDashboard = async (page = 1, size = 10) => {
+      // Retrieve the JWT token from localStorage
+      const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+      const role = "patient"; // Replace with the required role
+
+      try {
+        // Construct the URL with query parameters
+        const url = `https://docuhealth-backend.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
+
+        // Make the GET request
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+            Role: role, // Add role to the headers
+          },
+        });
+
+        // Handle the response
+        if (response.ok) {
+          const data = await response.json();
+          setDataInfo(data);
+
+          // Display a success message or process the data as needed
+          return data;
+        } else {
+          const errorData = await response.json();
+          console.error("Failed to fetch dashboard data:", errorData);
+
+          // Handle errors with a message from the API
+          throw new Error(
+            errorData.message || "Failed to fetch dashboard data."
+          );
         }
-      };
-  
-      // Example Usage
-      fetchPatientDashboard(1, 10);
-    }, []);
+      } catch (error) {
+        console.error("An unexpected error occurred:", error);
+
+        // Handle unexpected errors
+        throw error;
+      } finally {
+        console.log(datainfo);
+      }
+    };
+
+    // Example Usage
+    fetchPatientDashboard(1, 10);
+  }, []);
 
   const closeSidebar = () => {
     setIsSidebarOpen(false);
@@ -150,7 +163,7 @@ const UserHomeDashboard = () => {
     {
       title: "Health Identification Number (HIN)",
       details:
-        "Your Health Identification Number (HIN) is your personal information which can be accessed by you alone on your dashboard. Protect it at all cost because it is the key to easily accessing your medical history. Dont share it with anyone except with a trusted medical personnel.",
+        "We're excited to announce the latest innovation in digital health: Virtual Identity Card, now available on DocuHealth! This game-changing feature provides you with a printable, digital ID card that stores your essential personal information, including your HIN number incase of an emergency.",
       by: "DocuHealth (admin)",
     },
   ];
@@ -187,7 +200,7 @@ const UserHomeDashboard = () => {
         }
       );
 
-      console.log(response.json)
+      console.log(response.json);
       setRecords(response.data.records);
       setTotalPages(response.data.total_pages);
 
@@ -311,7 +324,11 @@ const UserHomeDashboard = () => {
       20,
       afterSummaryY + 10
     );
-    doc.text(`Hospital: ${selectedRecord.hospital_info.name} Hospital`, 20, afterSummaryY + 20);
+    doc.text(
+      `Hospital: ${selectedRecord.hospital_info.name} Hospital`,
+      20,
+      afterSummaryY + 20
+    );
     doc.text(
       `Hospital Address: ${selectedRecord.hospital_info.address}`,
       20,
@@ -604,7 +621,15 @@ const UserHomeDashboard = () => {
                           {message.details}
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className=" bg-[#0000FF]  text-center text-white rounded-full py-2 cursor-pointer"
+                      onClick={() => {
+                        closeNoticeMessage(); // Call the function properly
+                        setGenerateIDCardForm(true);
+                      }}
+                      >
+                        <p>Get Identity Card</p>
+                      </div>
+                      <div className="text-right pt-4">
                         <p className="font-normal">{message.by}</p>
                       </div>
                     </div>
@@ -616,10 +641,101 @@ const UserHomeDashboard = () => {
               <div className="pb-3 sm:p-0 w-full sm:w-auto">
                 <DynamicDate />
               </div>
-              <div className="w-full sm:w-auto">
-                <p>HIN : {hin}</p>
+              <div className="flex justify-center flex-col sm:flex-row gap-3 sm:gap-5 items-start sm:items-center">
+                <div className="w-full sm:w-auto">
+                  <p>HIN : {hin}</p>
+                </div>
+                <div
+                  className="border border-[#0000FF] py-2 px-6 rounded-full text-[#0000FF] cursor-pointer"
+                  onClick={() => setGenerateIDCardForm(true)}
+                >
+                  <p>Get Identity Card</p>
+                </div>
               </div>
             </div>
+            {generateIDCardForm && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  ">
+                <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative max-h-[80vh] overflow-y-auto mx-5">
+                  <div className="flex justify-between items-center gap-2 pb-2">
+                    <div className="flex justify-start items-center gap-2 ">
+                      <p>
+                        <i className="bx bx-info-circle text-3xl"></i>
+                      </p>
+                      <p className="font-semibold">Create Your ID Card</p>
+                    </div>
+                    <div>
+                      <i
+                        class="bx bx-x text-2xl cursor-pointer"
+                        onClick={() => setGenerateIDCardForm(false)}
+                      ></i>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="bg-white max-w-96 py-3">
+                      <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-medium mb-1">
+                          Full name
+                        </label>
+                        <input
+                          type="text"
+                          name="fullName"
+                          value={formData.fullName}
+                          onChange={handleChange}
+                          placeholder="Enter full name"
+                          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+
+                      <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-medium mb-1">
+                          Input first emergency number
+                        </label>
+                        <input
+                          type="text"
+                          name="firstEmergency"
+                          value={formData.firstEmergency}
+                          onChange={handleChange}
+                          placeholder="Enter first emergency number"
+                          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+
+                      <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-medium mb-1">
+                          Input second emergency number
+                        </label>
+                        <input
+                          type="text"
+                          name="secondEmergency"
+                          value={formData.secondEmergency}
+                          onChange={handleChange}
+                          placeholder="Enter second emergency number"
+                          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+
+                      <div className="mb-4">
+  <label className="block text-gray-700 text-sm font-medium mb-1">
+    Input an emergency address
+  </label>
+  <textarea
+    name="emergencyAddress"
+    value={formData.emergencyAddress}
+    onChange={handleChange}
+    placeholder="Enter emergency address"
+    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-24 resize-none"
+  ></textarea>
+</div>
+
+                    </div>
+                  </div>
+                  <div className=" bg-[#0000FF]  text-center text-white rounded-full py-2">
+                    <p>Generate ID Card</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-4 text-sm">
               <div>
                 <div className="hidden lg:block overflow-x-auto mx-3">
@@ -631,7 +747,6 @@ const UserHomeDashboard = () => {
                     </p>
                   ) : (
                     <div className="space-y-4">
-                     
                       {Array.isArray(records) && records.length > 0 ? (
                         records.map((record) => (
                           <div
@@ -683,7 +798,7 @@ const UserHomeDashboard = () => {
                               <span className="font-medium">
                                 Name of Hospital:
                               </span>
-                              <p>{record.hospital_info.name + ' Hospital'}</p>
+                              <p>{record.hospital_info.name + " Hospital"}</p>
                             </div>
 
                             {/* Vertical Divider */}
@@ -726,17 +841,22 @@ const UserHomeDashboard = () => {
                                   <div className="flex justify-between items-center">
                                     <div className="flex justify-start items-center gap-2">
                                       <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center p-1">
-                                       {datainfo?.fullname
-                ? datainfo.fullname
-                    .split(" ")
-                    .map((word) => (word ? word[0].toUpperCase() : "")) // Add safeguard for empty strings
-                    .join("")
-                : ""}
+                                        {datainfo?.fullname
+                                          ? datainfo.fullname
+                                              .split(" ")
+                                              .map((word) =>
+                                                word
+                                                  ? word[0].toUpperCase()
+                                                  : ""
+                                              ) // Add safeguard for empty strings
+                                              .join("")
+                                          : ""}
                                       </div>
 
                                       <div>
                                         <p className="font-semibold text-md">
-                                          {selectedRecord.hospital_info.name} Hospital
+                                          {selectedRecord.hospital_info.name}{" "}
+                                          Hospital
                                         </p>
                                         <div className="text-[12px] flex items-center gap-1 text-gray-400">
                                           <p>
@@ -971,7 +1091,6 @@ const UserHomeDashboard = () => {
                     </p>
                   ) : (
                     <div>
-                      
                       {records.map((record) => (
                         <div
                           key={record._id}
@@ -1018,221 +1137,235 @@ const UserHomeDashboard = () => {
                             </div>
                           </div>
                           {popoverVisible === record._id && (
-                        <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm z-50">
-                          <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto w-[90%] sm:w-[60%]">
-                            <div className="flex justify-between items-center">
-                              <div className="">
-                            <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center p-1">
-                            {datainfo?.fullname
-                ? datainfo.fullname
-                    .split(" ")
-                    .map((word) => (word ? word[0].toUpperCase() : "")) // Add safeguard for empty strings
-                    .join("")
-                : ""}
+                            <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm z-50">
+                              <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto w-[90%] sm:w-[60%]">
+                                <div className="flex justify-between items-center">
+                                  <div className="">
+                                    <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center p-1">
+                                      {datainfo?.fullname
+                                        ? datainfo.fullname
+                                            .split(" ")
+                                            .map((word) =>
+                                              word ? word[0].toUpperCase() : ""
+                                            ) // Add safeguard for empty strings
+                                            .join("")
+                                        : ""}
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold text-md">
+                                        {selectedRecord.hospital_info.name}{" "}
+                                        Hospital
+                                      </p>
+                                      <div className="text-[12px] flex items-center gap-1 text-gray-400">
+                                        <p>
+                                          <span className="font-medium"></span>{" "}
+                                          {new Date(selectedRecord.created_at)
+                                            .toLocaleDateString("en-GB", {
+                                              day: "2-digit",
+                                              month: "long",
+                                              year: "numeric",
+                                            })
+                                            .replace(/^\d{2}/, (day) =>
+                                              day.padStart(2, "0")
+                                            )}
+                                        </p>
+                                        <p>
+                                          <span className="font-medium"></span>{" "}
+                                          {(() => {
+                                            const time = new Date(
+                                              `${record.created_at}`
+                                            ); // Combine date and time
+                                            const hours = time.getHours(); // Extract hours
+                                            const minutes = time
+                                              .getMinutes()
+                                              .toString()
+                                              .padStart(2, "0"); // Extract and format minutes
+                                            const period =
+                                              hours >= 12 ? "PM" : "AM"; // Determine AM or PM
+                                            const formattedHours =
+                                              hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
+                                            return `${formattedHours}:${minutes} ${period}`; // Return formatted time
+                                          })()}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer"
+                                      onClick={exportToPDF}
+                                    >
+                                      Export as pdf
+                                    </button>
+                                    <p onClick={() => setPopoverVisible(null)}>
+                                      <i className="bx bx-x text-2xl text-black cursor-pointer"></i>
+                                    </p>
+                                  </div>
                                 </div>
-                              <div>
-                                <p className="font-semibold text-md">
-                                  {selectedRecord.hospital_info.name} Hospital
-                                </p>
-                                <div className="text-[12px] flex items-center gap-1 text-gray-400">
-                                  <p>
-                                    <span className="font-medium"></span>{" "}
-                                    {new Date(selectedRecord.created_at)
-                                      .toLocaleDateString("en-GB", {
-                                        day: "2-digit",
-                                        month: "long",
-                                        year: "numeric",
-                                      })
-                                      .replace(/^\d{2}/, (day) =>
-                                        day.padStart(2, "0")
-                                      )}
-                                  </p>
-                                  <p>
-                                    <span className="font-medium"></span>{" "}
-                                    {(() => {
-                                      const time = new Date(
-                                        `${record.created_at}`
-                                      ); // Combine date and time
-                                      const hours = time.getHours(); // Extract hours
-                                      const minutes = time
-                                        .getMinutes()
-                                        .toString()
-                                        .padStart(2, "0"); // Extract and format minutes
-                                      const period = hours >= 12 ? "PM" : "AM"; // Determine AM or PM
-                                      const formattedHours = hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
-                                      return `${formattedHours}:${minutes} ${period}`; // Return formatted time
-                                    })()}
-                                  </p>
+                                {/* Responsive Grid Layout */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+                                  {/* Pulse Rate */}
+                                  <div>
+                                    <label className="block text-gray-600 text-sm font-medium">
+                                      Pulse Rate
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={
+                                        selectedRecord.basic_info.pulse_rate
+                                      }
+                                      readOnly
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    />
+                                  </div>
+
+                                  {/* Temperature */}
+                                  <div>
+                                    <label className="block text-gray-600 text-sm font-medium">
+                                      Temperature
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={
+                                        selectedRecord.basic_info.temperature
+                                      }
+                                      readOnly
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    />
+                                  </div>
+
+                                  {/* Respiratory Rate */}
+                                  <div>
+                                    <label className="block text-gray-600 text-sm font-medium">
+                                      Respiratory Rate (RR)
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={
+                                        selectedRecord.basic_info
+                                          .respiratory_rate
+                                      }
+                                      readOnly
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    />
+                                  </div>
+
+                                  {/* Weight */}
+                                  <div>
+                                    <label className="block text-gray-600 text-sm font-medium">
+                                      Weight
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={selectedRecord.basic_info.weight}
+                                      readOnly
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    />
+                                  </div>
+
+                                  {/* Blood Pressure */}
+                                  <div>
+                                    <label className="block text-gray-600 text-sm font-medium">
+                                      Blood Pressure
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={
+                                        selectedRecord.basic_info
+                                          .blood_pressure + "MM HG"
+                                      }
+                                      readOnly
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    />
+                                  </div>
+
+                                  {/* Diagnosis */}
+                                  <div>
+                                    <label className="block text-gray-600 text-sm font-medium">
+                                      Diagnosis
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={
+                                        selectedRecord.basic_info.diagnosis
+                                      }
+                                      readOnly
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    />
+                                  </div>
+
+                                  {/* Summary/Treatment Plan */}
+                                  <div className="col-span-1 sm:col-span-2">
+                                    <label className="block text-gray-600 text-sm font-medium">
+                                      Summary/Treatment Plan
+                                    </label>
+                                    <textarea
+                                      value={selectedRecord.summary}
+                                      readOnly
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-none"
+                                    ></textarea>
+                                  </div>
+
+                                  {/* Name of Patient */}
+                                  <div>
+                                    <label className="block text-gray-600 text-sm font-medium">
+                                      Name of Patient
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={
+                                        selectedRecord.patient_info.fullname
+                                      }
+                                      readOnly
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    />
+                                  </div>
+
+                                  {/* Gender */}
+                                  <div>
+                                    <label className="block text-gray-600 text-sm font-medium">
+                                      Gender
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={selectedRecord.patient_info.sex}
+                                      readOnly
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    />
+                                  </div>
+
+                                  {/* Name of Medical Personnel */}
+                                  <div className="col-span-1 sm:col-span-2">
+                                    <label className="block text-gray-600 text-sm font-medium">
+                                      Name of Medical Personnel
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={
+                                        selectedRecord.hospital_info
+                                          .medical_personnel
+                                      }
+                                      readOnly
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    />
+                                  </div>
+
+                                  {/* Attachment */}
+                                  <div className="col-span-1 sm:col-span-2">
+                                    <label className="block text-gray-600 text-sm font-medium">
+                                      Attachment
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value="NIL"
+                                      readOnly
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    />
+                                  </div>
                                 </div>
-                              </div>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <button
-                                  className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer"
-                                  onClick={exportToPDF}
-                                >
-                                  Export as pdf
-                                </button>
-                                <p onClick={() => setPopoverVisible(null)}>
-                                  <i className="bx bx-x text-2xl text-black cursor-pointer"></i>
-                                </p>
                               </div>
                             </div>
-                            {/* Responsive Grid Layout */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
-                              {/* Pulse Rate */}
-                              <div>
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Pulse Rate
-                                </label>
-                                <input
-                                  type="text"
-                                  value={selectedRecord.basic_info.pulse_rate}
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
-                                />
-                              </div>
-
-                              {/* Temperature */}
-                              <div>
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Temperature
-                                </label>
-                                <input
-                                  type="text"
-                                  value={selectedRecord.basic_info.temperature}
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
-                                />
-                              </div>
-
-                              {/* Respiratory Rate */}
-                              <div>
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Respiratory Rate (RR)
-                                </label>
-                                <input
-                                  type="text"
-                                  value={
-                                    selectedRecord.basic_info.respiratory_rate
-                                  }
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
-                                />
-                              </div>
-
-                              {/* Weight */}
-                              <div>
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Weight
-                                </label>
-                                <input
-                                  type="text"
-                                  value={selectedRecord.basic_info.weight}
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
-                                />
-                              </div>
-
-                              {/* Blood Pressure */}
-                              <div>
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Blood Pressure
-                                </label>
-                                <input
-                                  type="text"
-                                  value={
-                                    selectedRecord.basic_info.blood_pressure +
-                                    "MM HG"
-                                  }
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
-                                />
-                              </div>
-
-                              {/* Diagnosis */}
-                              <div>
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Diagnosis
-                                </label>
-                                <input
-                                  type="text"
-                                  value={selectedRecord.basic_info.diagnosis}
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
-                                />
-                              </div>
-
-                              {/* Summary/Treatment Plan */}
-                              <div className="col-span-1 sm:col-span-2">
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Summary/Treatment Plan
-                                </label>
-                                <textarea
-                                  value={selectedRecord.summary}
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-none"
-                                ></textarea>
-                              </div>
-
-                              {/* Name of Patient */}
-                              <div>
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Name of Patient
-                                </label>
-                                <input
-                                  type="text"
-                                  value={selectedRecord.patient_info.fullname}
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
-                                />
-                              </div>
-
-                              {/* Gender */}
-                              <div>
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Gender
-                                </label>
-                                <input
-                                  type="text"
-                                  value={selectedRecord.patient_info.sex}
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
-                                />
-                              </div>
-
-                              {/* Name of Medical Personnel */}
-                              <div className="col-span-1 sm:col-span-2">
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Name of Medical Personnel
-                                </label>
-                                <input
-                                  type="text"
-                                  value={
-                                    selectedRecord.hospital_info
-                                      .medical_personnel
-                                  }
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
-                                />
-                              </div>
-
-                              {/* Attachment */}
-                              <div className="col-span-1 sm:col-span-2">
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Attachment
-                                </label>
-                                <input
-                                  type="text"
-                                  value="NIL"
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                          )}
 
                           <div className="grid grid-cols-1 gap-y-2 sm:flex sm:space-x-4 sm:items-center ">
                             {/* Name of Hospital */}
@@ -1276,9 +1409,7 @@ const UserHomeDashboard = () => {
                             </div>
                           </div>
                         </div>
-                        
                       ))}
-                      
                     </div>
                   )}
                 </div>
