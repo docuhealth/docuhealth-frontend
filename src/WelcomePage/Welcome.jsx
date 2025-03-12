@@ -29,7 +29,7 @@ const Welcome = () => {
       }}
       className="min-h-screen flex justify-center items-center"
     >
-      <div className="bg-white py-6 px-8 rounded-xl z-50 mx-3">
+      <div className="bg-white py-6 px-8 rounded-xl z-50 mx-2">
         <div className="flex justify-center items-center gap-1">
           <div>
             <img src={logo} alt="DocuHealth Logo" />
@@ -104,6 +104,12 @@ const Welcome = () => {
         </svg>
         
 
+      </div>
+      <div className='text-center text-white  sm:py-3 fixed bottom-0 w-screen'>
+          <p className='hidden sm:block text-sm'>  &copy; {new Date().getFullYear()} Docuhealth Services Limited. All rights reserved.  
+          Designed and  developed <br /> by Docuhealth Tech Team.</p>
+          <p className='block sm:hidden p-3 text-[10px]'>  &copy; {new Date().getFullYear()} Docuhealth Services Limited. All rights reserved.  
+          Designed and  developed by Docuhealth Tech Team.</p>
       </div>
     </div>
   );
