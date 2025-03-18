@@ -14,7 +14,7 @@ import html2canvas from "html2canvas";
 import { saveAs } from "file-saver";
 
 const downloadIDCard = () => {
-  toast.success('Feature Coming Soon')
+  toast.success("Feature Coming Soon");
 };
 
 const UserHomeDashboard = () => {
@@ -199,6 +199,7 @@ const UserHomeDashboard = () => {
           const data = await response.json();
           // console.log("Patient Dashboard Data:", data);
           setHin(data.HIN);
+          setName(data.fullname);
           // Display a success message or process the data as needed
           return data;
         } else {
@@ -759,15 +760,14 @@ const UserHomeDashboard = () => {
                     <div className="bg-white max-w-96 py-3">
                       <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-medium mb-1">
-                          Full name
+                          Full Name
                         </label>
                         <input
                           type="text"
                           name="fullName"
-                          value={formData.fullName}
-                          onChange={handleChange}
-                          placeholder="Enter full name"
-                          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value={name}
+                          readOnly
+                          className="w-full px-3 py-2 border rounded-md bg-gray-100 text-gray-500 cursor-not-allowed"
                         />
                       </div>
 
@@ -856,14 +856,14 @@ const UserHomeDashboard = () => {
                     </div>
                     <div
                       onClick={() => setGenerateIDCard(false)}
-                      className="cursor-pointer">
+                      className="cursor-pointer"
+                    >
                       <svg
                         width="30"
                         height="30"
                         viewBox="0 0 30 30"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
-                      
                       >
                         <circle
                           cx="15"
@@ -883,7 +883,7 @@ const UserHomeDashboard = () => {
                   {/* First ID Card */}
                   <div
                     style={{ backgroundImage: `url(${TIDF})` }}
-                    className="bg-cover bg-center h-80 w-full sm:w-[450px] rounded-md "
+                    className="bg-cover bg-center  w-full sm:w-[450px] rounded-md "
                   >
                     <div className="p-4 ">
                       <div className="flex justify-between items-center">
@@ -896,8 +896,8 @@ const UserHomeDashboard = () => {
                       </div>
                       <div className=" text-center">
                         <div className="w-16 h-16 mx-auto mb-2 border-2 border-[#1C1CFE] rounded-full flex items-center justify-center text-[#1C1CFE] text-lg font-bold">
-                          {formData.fullName
-                            ? formData.fullName
+                          {name
+                            ? name
                                 .split(" ")
                                 .filter((word) => word.trim() !== "") // Remove empty entries
                                 .map((word) => word[0].toUpperCase())
@@ -908,7 +908,7 @@ const UserHomeDashboard = () => {
                         <h2 className="text-gray-700 font-bold text-lg">
                           {hin}
                         </h2>
-                        <p className="text-gray-600">{formData.fullName}</p>
+                        <p className="text-gray-600">{name}</p>
                         <p className="text-gray-500 text-sm">
                           {new Date().toLocaleDateString()}
                         </p>
@@ -918,30 +918,35 @@ const UserHomeDashboard = () => {
                             <h3 className="font-semibold text-[#313131]">
                               Emergency Numbers
                             </h3>
-                            <p className="text-[#313131]">
-                              {formData.firstEmergency}
+                            <p className="text-[#313131] text-[10px]">
+                              {formData.firstEmergency || ''}
                             </p>
-                            <p className="text-[#313131]">
-                              {formData.secondEmergency}
+                            <p className="text-[#313131] text-[10px]">
+                              {formData.secondEmergency || ''}
                             </p>
                           </div>
                           <div>
                             <h3 className="font-semibold text-[#313131]">
                               Emergency Address
                             </h3>
-                            <p className="text-[#313131] max-w-24">
-                              {formData.emergencyAddress}
+                            <p className="text-[#313131] max-w-28 break-words text-[10px]">
+                              {formData.emergencyAddress || ''}
                             </p>
                           </div>
                         </div>
+
+                       
                       </div>
+                      <div>
+                          <p className="text-[#313131] text-[11px] text-center pt-4">www.docuhealthservices.com</p>
+                        </div>
                     </div>
                   </div>
 
-                  {/* Second ID Card */}
+                
                   <div
                     style={{ backgroundImage: `url(${TIDB})` }}
-                    className="bg-cover bg-center h-80  w-full sm:w-[450px]   rounded-md text-white text-[13px] font-bold p-4 "
+                    className="bg-cover bg-center   w-full sm:w-[450px]   rounded-md text-white text-[13px] font-bold p-4 "
                   >
                     <div className="flex justify-between items-center ">
                       <div>
@@ -980,6 +985,9 @@ const UserHomeDashboard = () => {
                         </p>
                       </div>
                     </div>
+                    <div>
+                          <p className="text-[#313131] text-[11px] text-center ">Health is wealth, and a healthy Nigeria is a stronger Nigeria</p>
+                        </div>
                   </div>
                 </div>
               </div>
