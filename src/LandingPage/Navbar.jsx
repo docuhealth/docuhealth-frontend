@@ -132,6 +132,13 @@ const Navbar = () => {
             >
               Features
             </a>
+            <a
+              href="#"
+              className="text-lg text-gray-400"
+              onClick={() => setIsOpen(false)}
+            >
+              Guest Mode
+            </a>
           </nav>
 
           {/* Sign In / Sign Up Buttons */}

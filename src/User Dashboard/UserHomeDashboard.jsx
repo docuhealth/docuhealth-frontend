@@ -418,6 +418,31 @@ const UserHomeDashboard = () => {
     doc.save(`${selectedRecord.hospital_info.name}-hospital-record.pdf`);
   };
 
+  const handleToggleEmergencyMode = async () => {
+   
+  setEmergencyModeEnabled(!isEmergencyModeEnabled)
+  
+    try {
+      const response = await fetch("https://docuhealth-backend.onrender.com/api/patient/emergency/toggle_emergency_mode", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to update emergency mode");
+      }
+  
+      console.log("Emergency mode updated successfully");
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  
+
+
   return (
     <div>
       <div className="min-h-screen bg-gray-100 flex">
@@ -655,7 +680,8 @@ const UserHomeDashboard = () => {
 
             <div className="flex items-center space-x-3">
               <button
-                onClick={() => setEmergencyModeEnabled(!isEmergencyModeEnabled)}
+                  onClick={handleToggleEmergencyMode}
+                
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
             ${isEmergencyModeEnabled ? "bg-black" : "bg-gray-200"}`}
               >
