@@ -829,7 +829,7 @@ const UserHomeDashboard = () => {
                 id="id-card-container"
               >
                 <div
-                  className="grid grid-cols-2  gap-6 relative py-10 "
+                  className="grid grid-cols-1 sm:grid-cols-2 place-items-center gap-2 mx-2  sm:gap-6 relative py-10 "
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="absolute top-0 right-0 z-50 flex justify-center items-center gap-2">
@@ -883,7 +883,7 @@ const UserHomeDashboard = () => {
                   {/* First ID Card */}
                   <div
                     style={{ backgroundImage: `url(${TIDF})` }}
-                    className="bg-cover bg-center h-80 w-[450px] rounded-md "
+                    className="bg-cover bg-center h-80 w-full sm:w-[450px] rounded-md "
                   >
                     <div className="p-4 ">
                       <div className="flex justify-between items-center">
@@ -941,7 +941,7 @@ const UserHomeDashboard = () => {
                   {/* Second ID Card */}
                   <div
                     style={{ backgroundImage: `url(${TIDB})` }}
-                    className="bg-cover bg-center h-80 w-[450px] rounded-md text-white text-[13px] font-bold p-4 "
+                    className="bg-cover bg-center h-80  w-full sm:w-[450px]   rounded-md text-white text-[13px] font-bold p-4 "
                   >
                     <div className="flex justify-between items-center ">
                       <div>
