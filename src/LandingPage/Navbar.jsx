@@ -56,6 +56,7 @@ const Navbar = () => {
         <a href="#OurServices" className="text-gray-500 transition-all hover:text-[#34345F] hover:scale-105">Our Services</a>
         <a href="#OurBenefits" className="text-gray-500 transition-all hover:text-[#34345F] hover:scale-105">Benefits</a>
         <a href="#OurFeatures" className="text-gray-500 transition-all hover:text-[#34345F] hover:scale-105">Features</a>
+        <a href="" className="text-gray-500 transition-all hover:text-[#34345F] hover:scale-105">Guest Mode</a>
       </div>
       <div className="flex justify-center items-center gap-2 text-sm">
         <Link to="/welcome">

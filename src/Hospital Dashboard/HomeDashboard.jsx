@@ -563,7 +563,7 @@ const HomeDashboard = () => {
                   </li>
                 </div>
               </Link>
-              <Link to="/hospital-logout-dashboard" onClick={closeSidebar}>
+              <Link to="/hospital-logout-dashboard" className="" onClick={closeSidebar}>
                 <div className="px-4 my-4">
                   <li
                     className={`group px-4 py-2   ${
@@ -597,7 +597,10 @@ const HomeDashboard = () => {
                   </li>
                 </div>
               </Link>
+
+          
             </ul>
+        
           </nav>
         </aside>
         {/* Main Content */}

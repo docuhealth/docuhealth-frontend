@@ -6,7 +6,8 @@ import axios from "axios";
 
 const UserLogoutDasboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState('');
+  const [loading, setLoading] = useState("");
+  const [isEmergencyModeEnabled, setEmergencyModeEnabled] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,77 +23,73 @@ const UserLogoutDasboard = () => {
     setIsSidebarOpen(false);
   };
 
+  const [noticeDisplay, setNoticeDisplay] = useState(false);
 
-   const [noticeDisplay, setNoticeDisplay] = useState(false);
+  useEffect(() => {
+    // Show notice immediately when the dashboard loads
+    setNoticeDisplay(true);
+  }, []);
 
-     
-     useEffect(() => {
-       // Show notice immediately when the dashboard loads
-       setNoticeDisplay(true);
-   
-     }, []);
-   
-     const closeNoticeMessage = () => {
-       setNoticeDisplay(false);
-       navigate('/user-home-dashboard')
-     };
-     const noticeMessage = [
-       {
-         title: "Health Identification Number (HIN)",
-         details:
-           "Are you sure you want to log out ?",
-         by: "Yes I am sure, Log Out",
-       },
-     ];
-   
-     const handleLogOut = async () => {
-      setLoading('Logging Out')
-  
-      const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
-        console.log("Token:", token);
-  
-        if (!token) {
-          console.log("Token not found. Please log in again.");
-          setLoading(false);
-          return;
+  const closeNoticeMessage = () => {
+    setNoticeDisplay(false);
+    navigate("/user-home-dashboard");
+  };
+  const noticeMessage = [
+    {
+      title: "Health Identification Number (HIN)",
+      details: "Are you sure you want to log out ?",
+      by: "Yes I am sure, Log Out",
+    },
+  ];
+
+  const handleLogOut = async () => {
+    setLoading("Logging Out");
+
+    const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+    console.log("Token:", token);
+
+    if (!token) {
+      console.log("Token not found. Please log in again.");
+      setLoading(false);
+      return;
+    }
+    try {
+      // Make the POST request to the API
+      const response = await axios.post(
+        "https://docuhealth-backend.onrender.com/api/auth/logout",
+        {}, // No body needed for this request
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include token if required
+          },
         }
-      try {
-        // Make the POST request to the API
-        const response = await axios.post(
-          "https://docuhealth-backend.onrender.com/api/auth/logout",
-          {}, // No body needed for this request
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Include token if required
-            },
-          }
-        );
-    
-        // Check if the response is successful
-        if (response.status === 200) {
-          console.log("Logout successful:", response.data.message);
-          
-          setLoading('Yes I am sure, Log Out')
-          // Perform logout logic
-          localStorage.removeItem("jwtToken"); // Remove token if applicable
-          localStorage.removeItem("userlogin"); // Remove login data
-          navigate("/user-login"); // Redirect to the login page
-        }
-      } catch (error) {
-        // Handle error response
-        if (error.response) {
-          console.error("Logout failed:", error.response.data.message);
-          alert("Logout failed. Please try again.");
-          setLoading('Yes I am sure, Log Out')
-        } else {
-          // Handle network or unexpected errors
-          console.error("An error occurred during logout:", error.message);
-          alert("An error occurred. Please try again later.");
-          setLoading('Yes I am sure, Log Out')
-        }
+      );
+
+      // Check if the response is successful
+      if (response.status === 200) {
+        console.log("Logout successful:", response.data.message);
+
+        setLoading("Yes I am sure, Log Out");
+        // Perform logout logic
+        localStorage.removeItem("jwtToken"); // Remove token if applicable
+        localStorage.removeItem("userlogin"); // Remove login data
+        navigate("/user-login"); // Redirect to the login page
       }
-    };
+    } catch (error) {
+      // Handle error response
+      if (error.response) {
+        console.error("Logout failed:", error.response.data.message);
+        alert("Logout failed. Please try again.");
+        setLoading("Yes I am sure, Log Out");
+      } else {
+        // Handle network or unexpected errors
+        console.error("An error occurred during logout:", error.message);
+        alert("An error occurred. Please try again later.");
+        setLoading("Yes I am sure, Log Out");
+      }
+    }
+  };
 
   return (
     <div>
@@ -325,6 +322,23 @@ const UserLogoutDasboard = () => {
               </Link>
             </ul>
           </nav>
+          <hr />
+          <div className="flex justify-center items-center py-3 gap-2 text-gray-700 cursor-pointer">
+            <p>Emergency Mode</p>
+
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => setEmergencyModeEnabled(!isEmergencyModeEnabled)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+            ${isEmergencyModeEnabled ? "bg-black" : "bg-gray-200"}`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+              ${isEmergencyModeEnabled ? "translate-x-6" : "translate-x-1"}`}
+                />
+              </button>
+            </div>
+          </div>
         </aside>
         {/* Main Content */}
         <main className="flex-1">
@@ -336,7 +350,7 @@ const UserLogoutDasboard = () => {
           />
           {/* Content */}
           <section className="p-8">
-          {noticeDisplay && (
+            {noticeDisplay && (
               <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50 ">
                 <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative max-h-[80vh] overflow-y-auto mx-5">
                   {noticeMessage.map((message, index) => (
@@ -347,9 +361,7 @@ const UserLogoutDasboard = () => {
                           <p>
                             <i className="bx bx-info-circle text-3xl text-red-600"></i>
                           </p>
-                          <p className="font-semibold">
-                            Confirm Log Out
-                          </p>
+                          <p className="font-semibold">Confirm Log Out</p>
                         </div>
                         <div>
                           <i
@@ -364,7 +376,13 @@ const UserLogoutDasboard = () => {
                         </p>
                       </div>
                       <div className="text-center bg-[#0000FF] text-white py-2 rounded-full">
-                        <p className="font-normal cursor-pointer" onClick={handleLogOut}> {loading ? loading: message.by}</p>
+                        <p
+                          className="font-normal cursor-pointer"
+                          onClick={handleLogOut}
+                        >
+                          {" "}
+                          {loading ? loading : message.by}
+                        </p>
                       </div>
                     </div>
                   ))}

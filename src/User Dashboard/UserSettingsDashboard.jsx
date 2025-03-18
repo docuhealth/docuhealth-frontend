@@ -21,6 +21,7 @@ const UserSettingsDashboard = () => {
   const [isEmailEnabled, setIsEmailEnabled] = useState(false);
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
   const [isDashboardEnabled, setIsDashboardEnabled] = useState(false);
+    const [isEmergencyModeEnabled, setEmergencyModeEnabled] = useState(false);
 
   const [loadingInfo, setLoadingInfo] = useState("");
   const [deactivate, setDeactivate] = useState("");
@@ -1123,6 +1124,23 @@ const UserSettingsDashboard = () => {
               </Link>
             </ul>
           </nav>
+          <hr />
+          <div className="flex justify-center items-center py-3 gap-2 text-gray-700 cursor-pointer">
+            <p>Emergency Mode</p>
+
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => setEmergencyModeEnabled(!isEmergencyModeEnabled)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+            ${isEmergencyModeEnabled ? "bg-black" : "bg-gray-200"}`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+              ${isEmergencyModeEnabled ? "translate-x-6" : "translate-x-1"}`}
+                />
+              </button>
+            </div>
+          </div>
         </aside>
 
         {/* Main Content */}
