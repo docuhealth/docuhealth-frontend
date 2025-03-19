@@ -743,7 +743,7 @@ const UserSubAcctDashboard = () => {
               </Link>
             </ul>
           </nav>
-          <hr />
+          {/* <hr />
           <div className="flex justify-center items-center py-3 gap-2 text-gray-700 cursor-pointer">
             <p>Emergency Mode</p>
 
@@ -759,7 +759,7 @@ const UserSubAcctDashboard = () => {
                 />
               </button>
             </div>
-          </div>
+          </div> */}
         </aside>
 
         {/* Main Content */}

@@ -420,8 +420,11 @@ const UserHomeDashboard = () => {
     doc.save(`${selectedRecord.hospital_info.name}-hospital-record.pdf`);
   };
 
+  const[emergencyNotice, setEmergencyNotice] = useState(false)
+
   const handleToggleEmergencyMode = async () => {
     setEmergencyModeEnabled(!isEmergencyModeEnabled);
+    setEmergencyNotice(true)
 
     const jwtToken = localStorage.getItem("jwtToken");
     try {
@@ -753,6 +756,48 @@ const UserHomeDashboard = () => {
                   ))}
                 </div>
               </div>
+            )}
+
+            {emergencyNotice && (
+               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ">
+               <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative max-h-[80vh] overflow-y-auto mx-5">
+                 {noticeMessage.map((message, index) => (
+                   <div key={index} className="">
+                     {" "}
+                     <div className="flex justify-between items-center gap-2 pb-2">
+                       <div className="flex justify-start items-center gap-2 ">
+                         <p>
+                           <i className="bx bx-info-circle text-3xl"></i>
+                         </p>
+                         <p className="font-semibold">
+                           Emergency mode toggle
+                         </p>
+                       </div>
+                       <div>
+                         <i
+                           class="bx bx-x text-2xl cursor-pointer"
+                           onClick={() => setEmergencyNotice(false)}
+                         ></i>
+                       </div>
+                     </div>
+                     <div>
+                       <p className="text-sm text-gray-600 pb-4">
+                       Toggling on emergency mode would enable others access your medical summary using your Health Identification Number (HIN) through the guest mode. Always keep your HIN safe.
+                       </p>
+                     </div>
+                     <div
+                       className=" bg-[#0000FF]  text-center text-white rounded-full py-2 cursor-pointer"
+                       onClick={() => setEmergencyNotice(false)}
+                     >
+                       Proceed
+                     </div>
+                     <div className="text-right pt-4">
+                       <p className="font-normal">{message.by}</p>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             </div>
             )}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-10">
               <div className="pb-3 sm:p-0 w-full sm:w-auto">
