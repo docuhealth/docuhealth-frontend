@@ -434,6 +434,7 @@ const UserSubAcctDashboard = () => {
         first_emergency_contact: formData.firstEmergency,
         second_emergency_contact: formData.secondEmergency,
         emergency_address: formData.emergencyAddress,
+        subaccount_HIN: selectedUserHIN
       };
   
       // Retrieve JWT token and role from localStorage
@@ -441,7 +442,7 @@ const UserSubAcctDashboard = () => {
   
       try {
         const response = await fetch(
-          "https://docuhealth-backend.onrender.com/api/patient/emergency/create_id_card",
+          "https://docuhealth-backend.onrender.com/api/patient/emergency/create_subaccount_id_card",
           {
             method: "POST",
             headers: {
@@ -483,34 +484,34 @@ const UserSubAcctDashboard = () => {
     };
 
 
-    const handleToggleEmergencyMode = async () => {
-      setEmergencyModeEnabled(!isEmergencyModeEnabled);
+    // const handleToggleEmergencyMode = async () => {
+    //   setEmergencyModeEnabled(!isEmergencyModeEnabled);
   
-      const jwtToken = localStorage.getItem("jwtToken");
-      try {
-        const response = await fetch(
-          "https://docuhealth-backend.onrender.com/api/patient/emergency/toggle_emergency_mode",
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwtToken}`,
-            },
-          }
-        );
+    //   const jwtToken = localStorage.getItem("jwtToken");
+    //   try {
+    //     const response = await fetch(
+    //       "https://docuhealth-backend.onrender.com/api/patient/emergency/toggle_emergency_mode",
+    //       {
+    //         method: "PATCH",
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //           Authorization: `Bearer ${jwtToken}`,
+    //         },
+    //       }
+    //     );
   
-        if (!response.ok) {
-          throw new Error("Failed to update emergency mode");
-        }
+    //     if (!response.ok) {
+    //       throw new Error("Failed to update emergency mode");
+    //     }
   
-        const responseData = await response.json();
+    //     const responseData = await response.json();
   
-        toast.success(responseData.message);
-        // toast.success(responseData.message)
-      } catch (error) {
-        console.error("Error:", error.message);
-      }
-    };
+    //     toast.success(responseData.message);
+    //     // toast.success(responseData.message)
+    //   } catch (error) {
+    //     console.error("Error:", error.message);
+    //   }
+    // };
   
   return (
     <div>

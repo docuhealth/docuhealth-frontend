@@ -202,6 +202,8 @@ const UserHomeDashboard = () => {
           setHin(data.HIN);
           setName(data.fullname);
           setDob(data.DOB);
+          localStorage.setItem("toggleState", data.emergency)
+          setEmergencyModeEnabled(data.emergency)
           // Display a success message or process the data as needed
           return data;
         } else {
@@ -273,6 +275,7 @@ const UserHomeDashboard = () => {
       console.log(response.json);
       setRecords(response.data.records);
       setTotalPages(response.data.total_pages);
+      
 
       console.log(response.data.records);
       console.log(response.data);
@@ -421,13 +424,7 @@ const UserHomeDashboard = () => {
   };
 
 
-   // Check local storage on mount
-   useEffect(() => {
-    const storedState = localStorage.getItem("toggleState");
-    if (storedState === "true") {
-      setEmergencyModeEnabled(true);
-    }
-  }, []);
+   
 
   const [emergencyNotice, setEmergencyNotice] = useState(false);
 
