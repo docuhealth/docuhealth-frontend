@@ -1454,7 +1454,7 @@ const UserSubAcctDashboard = () => {
                         ></i>
                       </p>
                       {openPopover === index && (
-                        <div className="absolute right-0 top-10  mt-2 bg-white border shadow-md rounded-lg p-2 w-52 text-center z-30">
+                        <div className="absolute right-0 top-10  mt-2 bg-white border shadow-md rounded-lg p-2 w-52  z-30">
                           <Link
                             to=""
                             onClick={() => fetchMedicalHistory(subaccount.HIN)}
