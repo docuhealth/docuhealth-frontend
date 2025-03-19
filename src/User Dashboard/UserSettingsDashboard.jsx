@@ -893,6 +893,37 @@ const UserSettingsDashboard = () => {
       ),
     },
   ];
+
+
+  const handleToggleEmergencyMode = async () => {
+    setEmergencyModeEnabled(!isEmergencyModeEnabled);
+
+    const jwtToken = localStorage.getItem("jwtToken");
+    try {
+      const response = await fetch(
+        "https://docuhealth-backend.onrender.com/api/patient/emergency/toggle_emergency_mode",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update emergency mode");
+      }
+
+      const responseData = await response.json();
+
+      toast.success(responseData.message);
+      // toast.success(responseData.message)
+    } catch (error) {
+      console.error("Error:", error.message);
+    }
+  };
+
   return (
     <div>
       <div className="min-h-screen bg-gray-100 flex">
@@ -1130,7 +1161,7 @@ const UserSettingsDashboard = () => {
 
             <div className="flex items-center space-x-3">
               <button
-                onClick={() => setEmergencyModeEnabled(!isEmergencyModeEnabled)}
+                onClick={() => handleToggleEmergencyMode()}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
             ${isEmergencyModeEnabled ? "bg-black" : "bg-gray-200"}`}
               >

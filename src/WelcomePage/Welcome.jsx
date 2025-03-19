@@ -83,16 +83,24 @@ const Welcome = () => {
             >
               Proceed to Login
             </button>
+            <Link to= '/confirm-account'>
+            <button
+                className={`mt-2 px-4 py-2 rounded-full w-full text-[#0000FF] border border-[#0000FF]`}
+              >
+                Create an account
+              </button>
+
+              </Link>
             {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
           </div>
 
-          <p className="mt-4">
-            Don't have an account yet?{" "}
+          <p className="mt-4 text-sm">
+            You can login as a visitor too{" "}
             <Link
               className={`text-[#0000FF]  cursor-pointer`}
-              to='/confirm-account'
+              to='/'
             >
-              Create a new account
+              Use Guest Mode
             </Link>
           </p>
         </div>

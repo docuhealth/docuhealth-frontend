@@ -22,6 +22,7 @@ const UserHomeDashboard = () => {
   const [hin, setHin] = useState("Loading..");
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("fetching...");
+  const [dob, setDob] = useState("fetching...");
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [popoverVisible, setPopoverVisible] = useState(null);
   const [datainfo, setDataInfo] = useState("");
@@ -200,6 +201,7 @@ const UserHomeDashboard = () => {
           // console.log("Patient Dashboard Data:", data);
           setHin(data.HIN);
           setName(data.fullname);
+          setDob(data.DOB);
           // Display a success message or process the data as needed
           return data;
         } else {
@@ -419,29 +421,33 @@ const UserHomeDashboard = () => {
   };
 
   const handleToggleEmergencyMode = async () => {
-   
-  setEmergencyModeEnabled(!isEmergencyModeEnabled)
-  
-    try {
-      const response = await fetch("https://docuhealth-backend.onrender.com/api/patient/emergency/toggle_emergency_mode", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    setEmergencyModeEnabled(!isEmergencyModeEnabled);
 
-      });
-  
+    const jwtToken = localStorage.getItem("jwtToken");
+    try {
+      const response = await fetch(
+        "https://docuhealth-backend.onrender.com/api/patient/emergency/toggle_emergency_mode",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      );
+
       if (!response.ok) {
         throw new Error("Failed to update emergency mode");
       }
-  
-      console.log("Emergency mode updated successfully");
+
+      const responseData = await response.json();
+
+      toast.success(responseData.message);
+      // toast.success(responseData.message)
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error:", error.message);
     }
   };
-  
-
 
   return (
     <div>
@@ -680,8 +686,7 @@ const UserHomeDashboard = () => {
 
             <div className="flex items-center space-x-3">
               <button
-                  onClick={handleToggleEmergencyMode}
-                
+                onClick={handleToggleEmergencyMode}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
             ${isEmergencyModeEnabled ? "bg-black" : "bg-gray-200"}`}
               >
@@ -855,7 +860,7 @@ const UserHomeDashboard = () => {
                 id="id-card-container"
               >
                 <div
-                  className="grid grid-cols-1 sm:grid-cols-2 place-items-center gap-2 mx-2  sm:gap-6 relative py-10 "
+                  className="grid grid-cols-1 sm:grid-cols-2 place-items-center gap-2 mx-2  sm:gap-6 relative py-10 items-stretch "
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="absolute top-0 right-0 z-50 flex justify-center items-center gap-2">
@@ -909,7 +914,7 @@ const UserHomeDashboard = () => {
                   {/* First ID Card */}
                   <div
                     style={{ backgroundImage: `url(${TIDF})` }}
-                    className="bg-cover bg-center  w-full sm:w-[450px] rounded-md "
+                    className="bg-cover bg-center  w-full sm:w-[450px] rounded-md min-h-[320px] "
                   >
                     <div className="p-4 ">
                       <div className="flex justify-between items-center">
@@ -935,9 +940,7 @@ const UserHomeDashboard = () => {
                           {hin}
                         </h2>
                         <p className="text-gray-600">{name}</p>
-                        <p className="text-gray-500 text-sm">
-                          {new Date().toLocaleDateString()}
-                        </p>
+                        <p className="text-gray-500 text-sm">{dob}</p>
 
                         <div className="flex justify-between text-left text-[13px] mt-4 w-full ">
                           <div>
@@ -945,10 +948,10 @@ const UserHomeDashboard = () => {
                               Emergency Numbers
                             </h3>
                             <p className="text-[#313131] text-[10px]">
-                              {formData.firstEmergency || ''}
+                              {formData.firstEmergency || ""}
                             </p>
                             <p className="text-[#313131] text-[10px]">
-                              {formData.secondEmergency || ''}
+                              {formData.secondEmergency || ""}
                             </p>
                           </div>
                           <div>
@@ -956,23 +959,22 @@ const UserHomeDashboard = () => {
                               Emergency Address
                             </h3>
                             <p className="text-[#313131] max-w-28 break-words text-[10px]">
-                              {formData.emergencyAddress || ''}
+                              {formData.emergencyAddress || ""}
                             </p>
                           </div>
                         </div>
-
-                       
                       </div>
                       <div>
-                          <p className="text-[#313131] text-[11px] text-center pt-4">www.docuhealthservices.com</p>
-                        </div>
+                        <p className="text-[#313131] text-[11px] text-center pt-12">
+                          www.docuhealthservices.com
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                
                   <div
                     style={{ backgroundImage: `url(${TIDB})` }}
-                    className="bg-cover bg-center   w-full sm:w-[450px]   rounded-md text-white text-[13px] font-bold p-4 "
+                    className="bg-cover bg-center   w-full sm:w-[450px]   rounded-md text-white text-[13px]  min-h-[320px] font-bold p-4 "
                   >
                     <div className="flex justify-between items-center ">
                       <div>
@@ -998,9 +1000,7 @@ const UserHomeDashboard = () => {
                         </p>
                       </div>
                       <div className="text-center pt-5 ">
-                        <h3 className=" text-[#313131]  pb-1">
-                          Basic instruction
-                        </h3>
+                        <h3 className=" text-[#313131]  pb-1">Warning!!!</h3>
                         <p className="text-[#313131] text-[10px]">
                           This card belongs to the registered patient. If found,
                           please return it to the nearest hospital or contact
@@ -1012,8 +1012,11 @@ const UserHomeDashboard = () => {
                       </div>
                     </div>
                     <div>
-                          <p className="text-[#313131] text-[11px] text-center ">Health is wealth, and a healthy Nigeria is a stronger Nigeria</p>
-                        </div>
+                      <p className="text-[#313131] text-[11px] text-center pt-4 ">
+                        Health is wealth, and a healthy Nigeria is a stronger
+                        Nigeria
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
