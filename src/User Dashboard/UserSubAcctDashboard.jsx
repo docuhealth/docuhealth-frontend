@@ -2031,7 +2031,7 @@ const UserSubAcctDashboard = () => {
                         </h2>
                         <p className="text-gray-600">{selectedUser}</p>
                         <p className="text-gray-500 text-sm">
-                          {selectedUserDOB}
+                        { selectedUserDOB.split("-").reverse().join("-") }
                         </p>
 
                         <div className="flex justify-between text-left text-[13px] mt-4 w-full ">

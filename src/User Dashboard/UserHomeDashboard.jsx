@@ -420,13 +420,26 @@ const UserHomeDashboard = () => {
     doc.save(`${selectedRecord.hospital_info.name}-hospital-record.pdf`);
   };
 
-  const[emergencyNotice, setEmergencyNotice] = useState(false)
 
-  const handleToggleEmergencyMode = async () => {
-    setEmergencyModeEnabled(!isEmergencyModeEnabled);
-    setEmergencyNotice(true)
+   // Check local storage on mount
+   useEffect(() => {
+    const storedState = localStorage.getItem("toggleState");
+    if (storedState === "true") {
+      setEmergencyModeEnabled(true);
+    }
+  }, []);
+
+  const [emergencyNotice, setEmergencyNotice] = useState(false);
+
+ const handleToggleEmergencyMode = async () => {
+    const newState = !isEmergencyModeEnabled;
+    setEmergencyModeEnabled(newState);
+    setEmergencyNotice(false);
+
+    localStorage.setItem("toggleState", newState.toString()); // Update local storage
 
     const jwtToken = localStorage.getItem("jwtToken");
+
     try {
       const response = await fetch(
         "https://docuhealth-backend.onrender.com/api/patient/emergency/toggle_emergency_mode",
@@ -444,13 +457,13 @@ const UserHomeDashboard = () => {
       }
 
       const responseData = await response.json();
-
       toast.success(responseData.message);
-      // toast.success(responseData.message)
+      console.log(responseData);
     } catch (error) {
       console.error("Error:", error.message);
     }
   };
+
 
   return (
     <div>
@@ -689,7 +702,7 @@ const UserHomeDashboard = () => {
 
             <div className="flex items-center space-x-3">
               <button
-                onClick={handleToggleEmergencyMode}
+                onClick={() => setEmergencyNotice(true)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
             ${isEmergencyModeEnabled ? "bg-black" : "bg-gray-200"}`}
               >
@@ -759,45 +772,46 @@ const UserHomeDashboard = () => {
             )}
 
             {emergencyNotice && (
-               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ">
-               <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative max-h-[80vh] overflow-y-auto mx-5">
-                 {noticeMessage.map((message, index) => (
-                   <div key={index} className="">
-                     {" "}
-                     <div className="flex justify-between items-center gap-2 pb-2">
-                       <div className="flex justify-start items-center gap-2 ">
-                         <p>
-                           <i className="bx bx-info-circle text-3xl"></i>
-                         </p>
-                         <p className="font-semibold">
-                           Emergency mode toggle
-                         </p>
-                       </div>
-                       <div>
-                         <i
-                           class="bx bx-x text-2xl cursor-pointer"
-                           onClick={() => setEmergencyNotice(false)}
-                         ></i>
-                       </div>
-                     </div>
-                     <div>
-                       <p className="text-sm text-gray-600 pb-4">
-                       Toggling on emergency mode would enable others access your medical summary using your Health Identification Number (HIN) through the guest mode. Always keep your HIN safe.
-                       </p>
-                     </div>
-                     <div
-                       className=" bg-[#0000FF]  text-center text-white rounded-full py-2 cursor-pointer"
-                       onClick={() => setEmergencyNotice(false)}
-                     >
-                       Proceed
-                     </div>
-                     <div className="text-right pt-4">
-                       <p className="font-normal">{message.by}</p>
-                     </div>
-                   </div>
-                 ))}
-               </div>
-             </div>
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ">
+                <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative max-h-[80vh] overflow-y-auto mx-5">
+                  {noticeMessage.map((message, index) => (
+                    <div key={index} className="">
+                      {" "}
+                      <div className="flex justify-between items-center gap-2 pb-2">
+                        <div className="flex justify-start items-center gap-2 ">
+                          <p>
+                            <i className="bx bx-info-circle text-3xl"></i>
+                          </p>
+                          <p className="font-semibold">Emergency mode toggle</p>
+                        </div>
+                        <div>
+                          <i
+                            class="bx bx-x text-2xl cursor-pointer"
+                            onClick={() => setEmergencyNotice(false)}
+                          ></i>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600 pb-4">
+                          Toggling on emergency mode would enable others access
+                          your medical summary using your Health Identification
+                          Number (HIN) through the guest mode. Always keep your
+                          HIN safe.
+                        </p>
+                      </div>
+                      <div
+                        className=" bg-[#0000FF]  text-center text-white rounded-full py-2 cursor-pointer"
+                        onClick={handleToggleEmergencyMode}
+                      >
+                        Proceed
+                      </div>
+                      <div className="text-right pt-4">
+                        <p className="font-normal">{message.by}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-10">
               <div className="pb-3 sm:p-0 w-full sm:w-auto">
@@ -985,7 +999,7 @@ const UserHomeDashboard = () => {
                           {hin}
                         </h2>
                         <p className="text-gray-600">{name}</p>
-                        <p className="text-gray-500 text-sm">{dob}</p>
+                        <p className="text-gray-500 text-sm">{ dob.split("-").reverse().join("-") }</p>
 
                         <div className="flex justify-between text-left text-[13px] mt-4 w-full ">
                           <div>
