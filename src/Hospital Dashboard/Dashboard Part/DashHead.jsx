@@ -110,7 +110,7 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
       {/* Header */}
       <header className="hidden bg-white py-4 px-8 sm:flex justify-between items-center border">
         <h2 className="text-xl font-semibold">
-          Welcome back {name} Hospital! 👋
+          Welcome back {name}! 👋
         </h2>
         <div className="flex items-center gap-4">
           <div
