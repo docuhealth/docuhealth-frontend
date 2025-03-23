@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import logo from ".././assets/logo.png";
 import { Link } from "react-router-dom";
 import axios from "axios";
-
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,7 +10,12 @@ const Navbar = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollTop, setLastScrollTop] = useState(0);
   const [guestModeForm, setGuestModeForm] = useState(false);
-  const[loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [records, setRecords] = useState([]);
+  const [isMedicalRecord, setisMedicalRecord] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [popoverVisible, setPopoverVisible] = useState(null);
+  const [name, setName] = useState("...");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,26 +59,31 @@ const Navbar = () => {
     }
   };
 
-
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true)
+    setLoading(true);
     if (!formData.hin) {
       toast.warning("Please enter the HIN.");
       return;
     }
     try {
-      const response = await axios.get(`https://docuhealth-backend.onrender.com/api/patient/emergency/get_medical_records`, {
-        params: { patient_HIN: formData.hin },
-      });
+      const response = await axios.get(
+        `https://docuhealth-backend.onrender.com/api/patient/emergency/get_medical_records`,
+        {
+          params: { patient_HIN: formData.hin },
+        }
+      );
       console.log("Medical Records:", response.data);
+      setName(response.data.records[0].patient_info.fullname);
+      setRecords(response.data.records);
+      setGuestModeForm(false);
+      setisMedicalRecord(true);
     } catch (error) {
-      console.error("Error fetching medical records:", error);
-    }finally{
-      setLoading(false)
+      toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
-
 
   return (
     <div className="text-[#0E0E31] ">
@@ -119,7 +129,7 @@ const Navbar = () => {
           </a>
           <button
             href=""
-            className="text-gray-500 transition-all hover:text-[#34345F] hover:scale-105"
+            className=" transition-all hover:text-[#34345F] hover:scale-105 font-bold"
             onClick={() => setGuestModeForm(true)}
           >
             Guest Mode
@@ -208,10 +218,208 @@ const Navbar = () => {
                 }`}
                 onClick={step === 1 ? handleNextStep : handleSubmit}
               >
-                <p>{loading ? "Loading..." : step === 1 ? "Enter HIN" : "Proceed"}</p>
+                <p>
+                  {loading
+                    ? "Loading..."
+                    : step === 1
+                    ? "Enter HIN"
+                    : "Proceed"}
+                </p>
               </div>
             </div>
           </div>
+        </div>
+      )}
+      {isMedicalRecord && (
+        <div className="hidden overflow-x-auto  fixed inset-0 bg-black bg-opacity-60 lg:flex items-start justify-center z-50">
+          {loading ? (
+            <p className="text-center py-4">Loading...</p>
+          ) : records === "No medical records" ? (
+            <p className="text-center py-4">No medical records found.</p>
+          ) : (
+            <div className="space-y-4 mt-20 bg-white p-4">
+              <div className="flex justify-between items-center">
+                <p className="pl-4 text-2xl font-semibold">{name}</p>
+                <i
+                  className="bx bx-x text-2xl text-black cursor-pointer pr-4"
+                  onClick={() => setisMedicalRecord(false)}
+                ></i>
+              </div>
+              {Array.isArray(records) && records.length > 0 ? (
+                records.map((record) => (
+                  <div
+                    key={record._id}
+                    className="bg-white shadow-sm rounded-lg p-4 flex items-center justify-between space-x-4"
+                  >
+                    {/* Date and Time */}
+                    <div className="text-gray-700">
+                      <span className="font-semibold">
+                        {new Date(record.created_at)
+                          .toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                          })
+                          .replace(/^\d{2}/, (day) => day.padStart(2, "0"))}
+                      </span>
+                      <p className="text-sm text-gray-500">
+                        {(() => {
+                          const time = new Date(record.created_at);
+                          const hours = time.getHours();
+                          const minutes = time
+                            .getMinutes()
+                            .toString()
+                            .padStart(2, "0");
+                          const period = hours >= 12 ? "PM" : "AM";
+                          const formattedHours = hours % 12 || 12;
+                          return `${formattedHours}:${minutes} ${period}`;
+                        })()}
+                      </p>
+                    </div>
+
+                    {/* Vertical Divider */}
+                    <div className="border-l h-12 border-gray-300"></div>
+
+                    {/* Diagnosis */}
+                    <div className="text-gray-700 truncate">
+                      <span className="font-medium">Diagnosis:</span>
+                      <p>{record.basic_info.diagnosis} </p>
+                    </div>
+
+                    {/* Vertical Divider */}
+                    <div className="border-l h-12 border-gray-300"></div>
+
+                    {/* Hospital Name */}
+                    <div className="text-gray-700 truncate">
+                      <span className="font-medium">Name of Hospital:</span>
+                      <p>{record.hospital_info.name + " Hospital"}</p>
+                    </div>
+
+                    {/* Vertical Divider */}
+                    <div className="border-l h-12 border-gray-300"></div>
+
+                    {/* Medical Personnel */}
+                    <div className="text-gray-700 truncate">
+                      <span className="font-medium">Medical Personnel:</span>
+                      <p>{record.hospital_info.medical_personnel}</p>
+                    </div>
+
+                    {/* Vertical Divider */}
+                    <div className="border-l h-12 border-gray-300"></div>
+
+                    {/* Summary */}
+                    <div className="text-gray-700 truncate max-w-xs">
+                      <span className="font-medium">Summary/Treatment:</span>
+                      <p>{record.summary}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-gray-500 text-center py-4">
+                  No medical records available.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+      {isMedicalRecord && (
+        <div className=" lg:hidden space-y-4 overflow-x-auto  fixed inset-0 bg-black bg-opacity-60 z-50 pt-20">
+          {loading ? (
+            <p className="text-gray-500 text-center">
+              Loading medical records...
+            </p>
+          ) : records === "No medical records" ? (
+            <p className="text-center py-4">No medical records found.</p>
+          ) : (
+            <div className="mx-3 z-50 bg-white p-3">
+              <div className="flex justify-between items-center">
+                <p className="pl-3 text-xl font-semibold">{name}</p>
+                <i
+                  className="bx bx-x text-2xl text-black cursor-pointer "
+                  onClick={() => setisMedicalRecord(false)}
+                ></i>
+              </div>
+              {records.map((record) => (
+                <div
+                  key={record._id}
+                  className="bg-white shadow-md  p-4 flex flex-col mb-4 space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:space-x-4"
+                >
+                  <div className="flex justify-between">
+                    {/* Date and Time */}
+                    <div className="text-gray-700">
+                      <span className="font-semibold">
+                        {new Date(record.created_at)
+                          .toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                          })
+                          .replace(/^\d{2}/, (day) => day.padStart(2, "0"))}
+                      </span>
+                      <p className="text-sm text-gray-500">
+                        {(() => {
+                          const time = new Date(`${record.created_at}`); // Combine date and time
+                          const hours = time.getHours(); // Extract hours
+                          const minutes = time
+                            .getMinutes()
+                            .toString()
+                            .padStart(2, "0"); // Extract and format minutes
+                          const period = hours >= 12 ? "PM" : "AM"; // Determine AM or PM
+                          const formattedHours = hours % 12 || 12; // Convert to 12-hour format (midnight = 12)
+                          return `${formattedHours}:${minutes} ${period}`; // Return formatted time
+                        })()}
+                      </p>
+                    </div>
+
+                  
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-y-2 sm:flex sm:space-x-4 sm:items-center ">
+                    {/* Name of Hospital */}
+                    <div>
+                      <span className="text-gray-500 block text-sm">
+                        Name of Hospital
+                      </span>
+                      <p className="text-gray-700 font-medium">
+                        {record.hospital_info.name + " Hospital"}
+                      </p>
+                    </div>
+
+                    {/* Diagnosis */}
+                    <div>
+                      <span className="text-gray-500 block text-sm">
+                        Diagnosis
+                      </span>
+                      <p className="text-gray-700 font-medium">
+                        {record.basic_info.diagnosis}
+                      </p>
+                    </div>
+
+                    {/* Medical Personnel */}
+                    <div>
+                      <span className="text-gray-500 block text-sm">
+                        Medical Personnel
+                      </span>
+                      <p className="text-gray-700 font-medium">
+                        {record.hospital_info.medical_personnel}
+                      </p>
+                    </div>
+
+                    {/* Summary */}
+                    <div>
+                      <span className="text-gray-500 block text-sm">
+                        Summary/Treatment
+                      </span>
+                      <p className="text-gray-700 font-medium truncate">
+                        {record.summary}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -276,7 +484,7 @@ const Navbar = () => {
             </a>
             <p
               href=""
-              className="text-lg text-gray-400"
+              className="text-lg font-medium"
               onClick={() => {
                 setIsOpen(false);
                 setGuestModeForm(true);

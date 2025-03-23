@@ -11,6 +11,7 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
   const [error, setError] = useState(null);
   const [notifications, setNotifications] = useState("Loading..");
   const [showNotifications, setShowNotifications] = useState(false);
+  
 
   const toggleNotifications = () => {
     setShowNotifications((prev) => !prev);
