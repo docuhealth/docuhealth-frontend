@@ -361,7 +361,7 @@ const Welcome = () => {
         </div>
       )}
       {isMedicalRecord && (
-        <div className=" lg:hidden space-y-4 overflow-x-auto  fixed inset-0 bg-black bg-opacity-60 z-50 pt-20">
+        <div className=" lg:hidden space-y-4 overflow-x-auto  fixed inset-0 bg-black bg-opacity-60 z-50 py`-20">
           {loading ? (
             <p className="text-gray-500 text-center">
               Loading medical records...

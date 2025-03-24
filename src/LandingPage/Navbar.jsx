@@ -129,7 +129,7 @@ const Navbar = () => {
           </a>
           <button
             href=""
-            className=" transition-all hover:text-[#34345F] hover:scale-105 font-bold"
+            className=" text-gray-500 transition-all hover:text-[#34345F] hover:scale-105 "
             onClick={() => setGuestModeForm(true)}
           >
             Guest Mode
@@ -324,7 +324,7 @@ const Navbar = () => {
         </div>
       )}
       {isMedicalRecord && (
-        <div className=" lg:hidden space-y-4 overflow-x-auto  fixed inset-0 bg-black bg-opacity-60 z-50 pt-20">
+        <div className=" lg:hidden space-y-4 overflow-x-auto  fixed inset-0 bg-black bg-opacity-60 z-50 py-20">
           {loading ? (
             <p className="text-gray-500 text-center">
               Loading medical records...
@@ -484,7 +484,7 @@ const Navbar = () => {
             </a>
             <p
               href=""
-              className="text-lg font-medium"
+              className="text-lg text-gray-400"
               onClick={() => {
                 setIsOpen(false);
                 setGuestModeForm(true);
