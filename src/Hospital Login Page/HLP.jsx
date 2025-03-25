@@ -91,7 +91,7 @@ const HLP = () => {
     console.log(imagepreview)
     try {
       const response = await axios.post(
-        `https://docuhealth-backend.onrender.com/api/hospital/register`,
+        `https://docuhealth-backend-h03u.onrender.com/api/hospital/register`,
         formData,
         {
           headers: {

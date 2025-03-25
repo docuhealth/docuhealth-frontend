@@ -58,7 +58,7 @@ const Welcome = () => {
     }
     try {
       const response = await axios.get(
-        `https://docuhealth-backend.onrender.com/api/patient/emergency/get_medical_records`,
+        `https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/get_medical_records`,
         {
           params: { patient_HIN: formData.hin },
         }

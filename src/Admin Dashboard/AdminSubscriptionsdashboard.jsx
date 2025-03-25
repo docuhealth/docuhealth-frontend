@@ -42,7 +42,7 @@ const AdminSubscriptionsdashboard = () => {
 
       try {
         // Construct the URL with query parameters
-        const url = `https://docuhealth-backend.onrender.com/api/admin/dashboard?page=${page}&size=${size}`;
+        const url = `https://docuhealth-backend-h03u.onrender.com/api/admin/dashboard?page=${page}&size=${size}`;
 
         // Make the GET request
         const response = await fetch(url, {
@@ -104,7 +104,7 @@ const AdminSubscriptionsdashboard = () => {
       }
 
       const response = await axios.get(
-        "https://docuhealth-backend.onrender.com/api/admin/subscriptions/get_all_plans",
+        "https://docuhealth-backend-h03u.onrender.com/api/admin/subscriptions/get_all_plans",
         {
           headers: {
             Authorization: `Bearer ${token}`, // Add JWT token in the header
@@ -146,7 +146,7 @@ const AdminSubscriptionsdashboard = () => {
   
       // Make the DELETE request to the API with JSON body
       const response = await axios.delete(
-        "https://docuhealth-backend.onrender.com/api/admin/subscriptions/delete", // Replace with your API endpoint
+        "https://docuhealth-backend-h03u.onrender.com/api/admin/subscriptions/delete", // Replace with your API endpoint
         {
           headers: {
             Authorization: `Bearer ${token}`, // Include JWT token

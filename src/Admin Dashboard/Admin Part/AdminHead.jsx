@@ -16,7 +16,7 @@ const AdminHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
 
       try {
         // Construct the URL with query parameters
-        const url = `https://docuhealth-backend.onrender.com/api/admin/dashboard?page=${page}&size=${size}`;
+        const url = `https://docuhealth-backend-h03u.onrender.com/api/admin/dashboard?page=${page}&size=${size}`;
 
         // Make the GET request
         const response = await fetch(url, {

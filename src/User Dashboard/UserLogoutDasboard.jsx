@@ -56,7 +56,7 @@ const UserLogoutDasboard = () => {
     try {
       // Make the POST request to the API
       const response = await axios.post(
-        "https://docuhealth-backend.onrender.com/api/auth/logout",
+        "https://docuhealth-backend-h03u.onrender.com/api/auth/logout",
         {}, // No body needed for this request
         {
           headers: {

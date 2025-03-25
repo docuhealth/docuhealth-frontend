@@ -85,7 +85,7 @@ const AdminHomeDashboard = () => {
       try {
         console.log("Fetching data...");
         const response = await axios.get(
-          "https://docuhealth-backend.onrender.com/api/admin/dashboard",
+          "https://docuhealth-backend-h03u.onrender.com/api/admin/dashboard",
           {
             headers: {
               Authorization: `Bearer ${token}`, // Include the token in the Authorization header

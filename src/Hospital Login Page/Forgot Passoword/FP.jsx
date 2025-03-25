@@ -20,7 +20,7 @@ const FP = () => {
     
 
     try {
-      const response = await fetch("https://docuhealth-backend.onrender.com/api/auth/forgot_password", {
+      const response = await fetch("https://docuhealth-backend-h03u.onrender.com/api/auth/forgot_password", {
         method: "POST", // Use POST method for sending data
         headers: {
           "Content-Type": "application/json", // Indicate the payload format

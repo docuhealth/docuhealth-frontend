@@ -73,7 +73,7 @@ const AVO = () => {
 
       // Send the request to the API
       const response = await axios.post(
-        "https://docuhealth-backend.onrender.com/api/auth/verify_otp",
+        "https://docuhealth-backend-h03u.onrender.com/api/auth/verify_otp",
         payload
       );
 
@@ -114,7 +114,7 @@ const AVO = () => {
 
       // Make the POST request
       const response = await fetch(
-        "https://docuhealth-backend.onrender.com/api/auth/forgot_password",
+        "https://docuhealth-backend-h03u.onrender.com/api/auth/forgot_password",
         {
           method: "POST", // Use POST method for sending data
           headers: {

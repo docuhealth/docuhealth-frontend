@@ -63,7 +63,7 @@ const NPU = () => {
 
     // Make the PATCH request
     const response = await fetch(
-      "https://docuhealth-backend.onrender.com/api/auth/reset_password",
+      "https://docuhealth-backend-h03u.onrender.com/api/auth/reset_password",
       {
         method: "PATCH",
         headers: {

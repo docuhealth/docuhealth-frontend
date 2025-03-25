@@ -64,7 +64,7 @@ const SettingsDashboard = () => {
       formData.append("image", selectedFile);
 
       const response = await axios.patch(
-        "https://docuhealth-backend.onrender.com/api/hospital/settings/update_hospital_image",
+        "https://docuhealth-backend-h03u.onrender.com/api/hospital/settings/update_hospital_image",
         formData,
         {
           headers: {
@@ -101,7 +101,7 @@ const SettingsDashboard = () => {
       try {
         console.log("Fetching data...");
         const response = await axios.get(
-          "https://docuhealth-backend.onrender.com/api/hospital/dashboard",
+          "https://docuhealth-backend-h03u.onrender.com/api/hospital/dashboard",
           {
             headers: {
               Authorization: `Bearer ${token}`, // Include the token in the Authorization header
@@ -163,7 +163,7 @@ const SettingsDashboard = () => {
       try {
         console.log("Fetching data...");
         const response = await axios.get(
-          "https://docuhealth-backend.onrender.com/api/hospital/dashboard",
+          "https://docuhealth-backend-h03u.onrender.com/api/hospital/dashboard",
           {
             headers: {
               Authorization: `Bearer ${token}`, // Include the token in the Authorization header
@@ -225,7 +225,7 @@ const SettingsDashboard = () => {
 
       // Send the PATCH request
       const response = await axios.patch(
-        "https://docuhealth-backend.onrender.com/api/hospital/settings/update_hospital_info",
+        "https://docuhealth-backend-h03u.onrender.com/api/hospital/settings/update_hospital_info",
         payload,
         {
           headers: {
@@ -305,7 +305,7 @@ const SettingsDashboard = () => {
 
       // Send the PATCH request
       const response = await axios.patch(
-        "https://docuhealth-backend.onrender.com/api/hospital/settings/update_hospital_password", // Replace with your API URL
+        "https://docuhealth-backend-h03u.onrender.com/api/hospital/settings/update_hospital_password", // Replace with your API URL
         payloadinfo,
         {
           headers: {
@@ -401,7 +401,7 @@ const SettingsDashboard = () => {
     try {
       // Send the payload to the API
       const response = await axios.patch(
-        "https://docuhealth-backend.onrender.com/api/hospital/settings/update_hospital_notification_settings", // Replace with your API endpoint
+        "https://docuhealth-backend-h03u.onrender.com/api/hospital/settings/update_hospital_notification_settings", // Replace with your API endpoint
         payload,
         {
           headers: {
@@ -471,7 +471,7 @@ const SettingsDashboard = () => {
       }
 
       const response = await axios.delete(
-        "https://docuhealth-backend.onrender.com/api/hospital/delete", // Replace with your API endpoint
+        "https://docuhealth-backend-h03u.onrender.com/api/hospital/delete", // Replace with your API endpoint
         {
           headers: {
             Authorization: `Bearer ${token}`, // Include JWT token

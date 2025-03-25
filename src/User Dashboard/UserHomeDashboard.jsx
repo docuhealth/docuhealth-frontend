@@ -62,7 +62,7 @@ const UserHomeDashboard = () => {
 
     try {
       const response = await fetch(
-        "https://docuhealth-backend.onrender.com/api/patient/emergency/create_id_card",
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/create_id_card",
         {
           method: "POST",
           headers: {
@@ -115,7 +115,7 @@ const UserHomeDashboard = () => {
 
       try {
         // Construct the URL with query parameters
-        const url = `https://docuhealth-backend.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
+        const url = `https://docuhealth-backend-h03u.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
 
         // Make the GET request
         const response = await fetch(url, {
@@ -183,7 +183,7 @@ const UserHomeDashboard = () => {
 
       try {
         // Construct the URL with query parameters
-        const url = `https://docuhealth-backend.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
+        const url = `https://docuhealth-backend-h03u.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
 
         // Make the GET request
         const response = await fetch(url, {
@@ -258,7 +258,7 @@ const UserHomeDashboard = () => {
       }
 
       const response = await axios.get(
-        "https://docuhealth-backend.onrender.com/api/patient/dashboard",
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/dashboard",
 
         {
           params: {
@@ -439,7 +439,7 @@ const UserHomeDashboard = () => {
 
     try {
       const response = await fetch(
-        "https://docuhealth-backend.onrender.com/api/patient/emergency/toggle_emergency_mode",
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/toggle_emergency_mode",
         {
           method: "PATCH",
           headers: {

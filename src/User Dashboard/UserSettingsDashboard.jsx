@@ -40,7 +40,7 @@ const UserSettingsDashboard = () => {
 
       try {
         // Construct the URL with query parameters
-        const url = `https://docuhealth-backend.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
+        const url = `https://docuhealth-backend-h03u.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
 
         // Make the GET request
         const response = await fetch(url, {
@@ -152,7 +152,7 @@ const UserSettingsDashboard = () => {
 
       // Send the PATCH request using fetch
       const response = await fetch(
-        "https://docuhealth-backend.onrender.com/api/patient/settings/update_patient_info",
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/settings/update_patient_info",
         {
           method: "PATCH",
           headers: {
@@ -229,7 +229,7 @@ const UserSettingsDashboard = () => {
       }
 
       const response = await axios.delete(
-        "https://docuhealth-backend.onrender.com/api/patient/delete", // Replace with your API endpoint
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/delete", // Replace with your API endpoint
         {
           headers: {
             Authorization: `Bearer ${token}`, // Include JWT token
@@ -312,7 +312,7 @@ const UserSettingsDashboard = () => {
 
       // Send the PATCH request
       const response = await axios.patch(
-        "https://docuhealth-backend.onrender.com/api/patient/settings/update_patient_password", // Replace with your API URL
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/settings/update_patient_password", // Replace with your API URL
         payloadinfo,
         {
           headers: {
@@ -408,7 +408,7 @@ const UserSettingsDashboard = () => {
     try {
       // Send the payload to the API
       const response = await axios.patch(
-        "https://docuhealth-backend.onrender.com/api/patient/settings/update_patient_notification_settings", // Replace with your API endpoint
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/settings/update_patient_notification_settings", // Replace with your API endpoint
         payload,
         {
           headers: {
@@ -901,7 +901,7 @@ const UserSettingsDashboard = () => {
     const jwtToken = localStorage.getItem("jwtToken");
     try {
       const response = await fetch(
-        "https://docuhealth-backend.onrender.com/api/patient/emergency/toggle_emergency_mode",
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/toggle_emergency_mode",
         {
           method: "PATCH",
           headers: {

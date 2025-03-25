@@ -58,7 +58,7 @@ const UserSubAcctDashboard = () => {
       }
 
       const response = await axios.get(
-        "https://docuhealth-backend.onrender.com/api/patient/subaccounts/get_subaccounts_medical_records",
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/subaccounts/get_subaccounts_medical_records",
 
         {
           params: {
@@ -137,7 +137,7 @@ const UserSubAcctDashboard = () => {
 
     try {
       const response = await fetch(
-        "https://docuhealth-backend.onrender.com/api/patient/subaccounts/create",
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/subaccounts/create",
         {
           method: "POST",
           headers: {
@@ -266,7 +266,7 @@ const UserSubAcctDashboard = () => {
 
       // Make the GET request
       const response = await axios.get(
-        "https://docuhealth-backend.onrender.com/api/patient/subaccounts/get_subaccounts",
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/subaccounts/get_subaccounts",
         {
           params: { page, size },
           headers: {
@@ -442,7 +442,7 @@ const UserSubAcctDashboard = () => {
   
       try {
         const response = await fetch(
-          "https://docuhealth-backend.onrender.com/api/patient/emergency/create_subaccount_id_card",
+          "https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/create_subaccount_id_card",
           {
             method: "POST",
             headers: {

@@ -47,7 +47,7 @@ const AFP = () => {
 
       // Make the POST request
       const response = await fetch(
-        "https://docuhealth-backend.onrender.com/api/auth/forgot_password",
+        "https://docuhealth-backend-h03u.onrender.com/api/auth/forgot_password",
         {
           method: "POST",
           headers: {

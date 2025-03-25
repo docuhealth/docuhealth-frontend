@@ -35,7 +35,7 @@ const SubscriptionsDashboard = () => {
       }
 
       const response = await axios.get(
-        "https://docuhealth-backend.onrender.com/api/hospital/subscriptions/get_all_plans",
+        "https://docuhealth-backend-h03u.onrender.com/api/hospital/subscriptions/get_all_plans",
         {
           headers: {
             Authorization: `Bearer ${token}`, // Add JWT token in the header

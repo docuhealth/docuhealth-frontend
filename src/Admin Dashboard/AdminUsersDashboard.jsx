@@ -47,7 +47,7 @@ const AdminUsersDashbaord = () => {
       }
 
       const response = await axios.get(
-        "https://docuhealth-backend.onrender.com/api/admin/users/get_all",
+        "https://docuhealth-backend-h03u.onrender.com/api/admin/users/get_all",
         {
           params: {
             page: currentPage,

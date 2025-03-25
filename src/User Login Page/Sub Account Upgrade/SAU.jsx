@@ -70,7 +70,7 @@ const SAU = () => {
               return;
             }
 
-      const response = await axios.post("https://docuhealth-backend.onrender.com/api/patient/subaccounts/upgrade", requestData, {
+      const response = await axios.post("https://docuhealth-backend-h03u.onrender.com/api/patient/subaccounts/upgrade", requestData, {
         headers: {
           Authorization: `Bearer ${token}`, 
           "Content-Type": "application/json",

@@ -67,7 +67,7 @@ const VerifyOTP = () => {
 
       // Send the OTP and email to the API
       const response = await axios.post(
-        "https://docuhealth-backend.onrender.com/api/auth/verify_otp",
+        "https://docuhealth-backend-h03u.onrender.com/api/auth/verify_otp",
         {
           otp: enteredOtp,
           email: email,
@@ -101,7 +101,7 @@ const VerifyOTP = () => {
 
     try {
       const response = await fetch(
-        "https://docuhealth-backend.onrender.com/api/auth/forgot_password",
+        "https://docuhealth-backend-h03u.onrender.com/api/auth/forgot_password",
         {
           method: "POST", // Use POST method for sending data
           headers: {

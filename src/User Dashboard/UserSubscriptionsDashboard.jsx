@@ -35,7 +35,7 @@ const UserSubscriptionsDashboard = () => {
       }
 
       const response = await axios.get(
-        "https://docuhealth-backend.onrender.com/api/patient/subscriptions/get_all_plans",
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/subscriptions/get_all_plans",
         {
           headers: {
             Authorization: `Bearer ${token}`, // Add JWT token in the header
@@ -65,7 +65,7 @@ const UserSubscriptionsDashboard = () => {
     const jwtToken = localStorage.getItem("jwtToken");
     try {
       const response = await fetch(
-        "https://docuhealth-backend.onrender.com/api/patient/emergency/toggle_emergency_mode",
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/toggle_emergency_mode",
         {
           method: "PATCH",
           headers: {

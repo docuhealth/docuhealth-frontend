@@ -55,7 +55,7 @@ const AdminSettingsDashboard = () => {
 
       try {
         // Construct the URL with query parameters
-        const url = `https://docuhealth-backend.onrender.com/api/admin/dashboard?page=${page}&size=${size}`;
+        const url = `https://docuhealth-backend-h03u.onrender.com/api/admin/dashboard?page=${page}&size=${size}`;
 
         // Make the GET request
         const response = await fetch(url, {
@@ -148,7 +148,7 @@ const AdminSettingsDashboard = () => {
 
       // Send the PATCH request using fetch
       const response = await fetch(
-        "https://docuhealth-backend.onrender.com/api/admin/settings/update_admin_info",
+        "https://docuhealth-backend-h03u.onrender.com/api/admin/settings/update_admin_info",
         {
           method: "PATCH",
           headers: {
@@ -217,7 +217,7 @@ const AdminSettingsDashboard = () => {
       }
 
       const response = await axios.delete(
-        "https://docuhealth-backend.onrender.com/api/admin/delete", // Replace with your API endpoint
+        "https://docuhealth-backend-h03u.onrender.com/api/admin/delete", // Replace with your API endpoint
         {
           headers: {
             Authorization: `Bearer ${token}`, // Include JWT token
@@ -300,7 +300,7 @@ const AdminSettingsDashboard = () => {
 
       // Send the PATCH request
       const response = await axios.patch(
-        "https://docuhealth-backend.onrender.com/api/admin/settings/update_admin_password", // Replace with your API URL
+        "https://docuhealth-backend-h03u.onrender.com/api/admin/settings/update_admin_password", // Replace with your API URL
         payloadinfo,
         {
           headers: {
@@ -391,7 +391,7 @@ const AdminSettingsDashboard = () => {
     try {
       // Send the payload to the API
       const response = await axios.patch(
-        "https://docuhealth-backend.onrender.com/api/admin/settings/update_admin_notification_settings", // Replace with your API endpoint
+        "https://docuhealth-backend-h03u.onrender.com/api/admin/settings/update_admin_notification_settings", // Replace with your API endpoint
         payload,
         {
           headers: {

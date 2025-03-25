@@ -63,7 +63,7 @@ const ACA = () => {
 
     try {
       const response = await axios.post(
-        "https://docuhealth-backend.onrender.com/api/admin/register",
+        "https://docuhealth-backend-h03u.onrender.com/api/admin/register",
         userData, // Send data in the request body
         {
           headers: {

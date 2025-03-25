@@ -35,7 +35,7 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
       try {
         console.log("Fetching data...");
         const response = await axios.get(
-          "https://docuhealth-backend.onrender.com/api/hospital/dashboard",
+          "https://docuhealth-backend-h03u.onrender.com/api/hospital/dashboard",
           {
             headers: {
               Authorization: `Bearer ${token}`, // Include the token in the Authorization header
@@ -81,7 +81,7 @@ const DashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
 
         // Make the GET request
         const response = await axios.get(
-          "https://docuhealth-backend.onrender.com/api/hospital/get_notifications", // Replace with your actual API URL
+          "https://docuhealth-backend-h03u.onrender.com/api/hospital/get_notifications", // Replace with your actual API URL
           {
             headers: {
               Authorization: `Bearer ${token}`, // Replace with a valid JWT token

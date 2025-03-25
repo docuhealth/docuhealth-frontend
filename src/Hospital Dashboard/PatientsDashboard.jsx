@@ -41,7 +41,7 @@ const PatientsDashboard = () => {
       try {
         console.log("Fetching data...");
         const response = await axios.get(
-          "https://docuhealth-backend.onrender.com/api/hospital/dashboard",
+          "https://docuhealth-backend-h03u.onrender.com/api/hospital/dashboard",
           {
             headers: {
               Authorization: `Bearer ${token}`, // Include the token in the Authorization header
@@ -92,7 +92,7 @@ const PatientsDashboard = () => {
       }
       // Make the POST request
       const response = await axios.post(
-        "https://docuhealth-backend.onrender.com/api/hospital/patients/get_patient_info",
+        "https://docuhealth-backend-h03u.onrender.com/api/hospital/patients/get_patient_info",
         {
           patient_HIN: hin,
         },
@@ -143,7 +143,7 @@ const PatientsDashboard = () => {
       }
 
       const response = await axios.get(
-        "https://docuhealth-backend.onrender.com/api/hospital/patients/get_hospital_recent_medical_records",
+        "https://docuhealth-backend-h03u.onrender.com/api/hospital/patients/get_hospital_recent_medical_records",
 
         {
           params: {
