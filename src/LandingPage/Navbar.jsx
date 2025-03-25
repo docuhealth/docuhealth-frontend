@@ -72,7 +72,7 @@ const Navbar = () => {
         `https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/get_medical_records`,
         {
           params: { patient_HIN: formData.hin,
-            guest_name: formData.firstEmergency
+            guest_name: formData.name
            },
         }
       );
