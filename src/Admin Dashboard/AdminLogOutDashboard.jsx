@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import logo from '../assets/logo.png'
+import logo from '../assets/img/logo.png'
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AdminHead from "./Admin Part/AdminHead";
 import axios from "axios";

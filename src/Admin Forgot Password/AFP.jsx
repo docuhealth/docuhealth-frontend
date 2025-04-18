@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import logo from "../assets/logo.png";
-import dashb from "../assets/dashb.png";
+import logo from "../assets/img/logo.png";
+import dashb from "../assets/img/dashb.png";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 

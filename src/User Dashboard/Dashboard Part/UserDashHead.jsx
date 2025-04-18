@@ -62,7 +62,7 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
     <div>
       {/* Header */}
       <header className="hidden bg-white py-4 px-8 sm:flex justify-between items-center border "> 
-        <h2 className="text-xl font-semibold">
+        <h2 className="text-md font-semibold">
           Welcome back {datainfo.fullname || "Loading.."} ! 👋
         </h2>
         <div className="flex items-center gap-4">
@@ -73,7 +73,7 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
             <button className="p-2 bg-gray-200 rounded-full">🔔</button>
           </div>
           <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center">
+            <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center text-sm">
               {datainfo?.fullname
                 ? datainfo.fullname
                     .split(" ")

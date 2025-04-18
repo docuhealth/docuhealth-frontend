@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import logo from "../assets/logo.png";
+import logo from "../assets/img/logo.png";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React Icons
-import dashb from "../assets/dashb.png";
+import dashb from "../assets/img/dashb.png";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";

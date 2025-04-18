@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TabComponents from "./TabComponent";
-import profilepic from "../../assets/profile.png";
+import profilepic from "../../assets/img/profile.png";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { jsPDF } from "jspdf";

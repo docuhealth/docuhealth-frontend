@@ -2,8 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import Home from "./LandingPage/Home";
-import Welcome from "./WelcomePage/Welcome";
+import Home from "./pages/LandingPage/Home";
+import Welcome from "./pages/WelcomePageRoute/WelcomePageRoute";
+import ConfirmAcct from './pages/WelcomePageRoute/ConfirmAcct'
 import HLP from "./Hospital Login Page/HLP";
 import HSI from "./Hospital Login Page/Hospital Sign In/HSI";
 import ULP from "./User Login Page/ULP";
@@ -11,7 +12,7 @@ import FP from "./Hospital Login Page/Forgot Passoword/FP";
 import NotFound from "./Not Found/NotFound";
 import VerifyOTP from "./Hospital Login Page/OTP/VerifyOTP";
 import NP from "./Hospital Login Page/NewPassword/NP";
-import ConfirmAcct from "./WelcomePage/ConfirmAcct";
+
 import HomeDashboard from "./Hospital Dashboard/HomeDashboard";
 import PatientsDashboard from "./Hospital Dashboard/PatientsDashboard";
 import SettingsDashboard from "./Hospital Dashboard/SettingsDashboard";
@@ -37,9 +38,9 @@ import AdminUsersDashboard from "./Admin Dashboard/AdminUsersDashboard";
 import AdminSettingsDashboard from "./Admin Dashboard/AdminSettingsDashboard";
 import AdminSubscriptionDashboard from "./Admin Dashboard/AdminSubscriptionsdashboard";
 import AdminLogoutDashboard from "./Admin Dashboard/AdminLogOutDashboard";
-import ProtectedRouteHospital from "./Protected Route/ProtectedRouteHospital";
-import UserProtectedRoute from "./User Protected Route/UserProtectedRoute";
-import AdminProtectedRoute from './Admin Protected Route/AdminProtectedRoute'
+import ProtectedRouteHospital from "./Components/Hospital Protected Route/ProtectedRouteHospital";
+import UserProtectedRoute from "./Components/User Protected Route/UserProtectedRoute";
+import AdminProtectedRoute from './Components/Admin Protected Route/AdminProtectedRoute'
 
 function App() {
   return (

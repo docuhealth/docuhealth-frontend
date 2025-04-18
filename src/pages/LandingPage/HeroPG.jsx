@@ -1,5 +1,5 @@
 import React, { useEffect }  from "react";
-import overviewPG from "../assets/overview.png";
+import overviewPG from "../../assets/img/overview.png";
 import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";

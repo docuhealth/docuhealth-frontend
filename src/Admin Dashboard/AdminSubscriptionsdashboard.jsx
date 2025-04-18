@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import logo from "../assets/logo.png";
+import logo from "../assets/img/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import AdminHead from "./Admin Part/AdminHead";
 import axios from "axios";
 import { toast } from "react-toastify";
-import DynamicDate from "../Dynamic Date/DynamicDate";
+import DynamicDate from "../Components/Dynamic Date/DynamicDate";
 import { ChevronDown } from "lucide-react";
 
 const AdminSubscriptionsdashboard = () => {

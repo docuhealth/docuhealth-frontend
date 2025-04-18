@@ -1,7 +1,7 @@
 import React, { useEffect }  from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import groupImg from '../assets/group.png'
+import groupImg from '../../assets/img/group.png'
 
 const Benefit = () => {
   return (

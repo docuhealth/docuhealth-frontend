@@ -1,5 +1,5 @@
 import React from 'react'
-import footerImg from '../assets/footerImg.png'
+import footerImg from '../../assets/img/footerImg.png'
 
 const Footer = () => {
   return (

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import logo from "../assets/logo.png";
+import logo from "../assets/img/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import DashHead from "./Dashboard Part/DashHead";
 import axios from "axios";
 import ReactApexChart from "react-apexcharts";
-import DynamicDate from "../Dynamic Date/DynamicDate";
+import DynamicDate from "../Components/Dynamic Date/DynamicDate";
 import { toast } from "react-toastify";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import logo from "../assets/logo.png";
+import logo from "../assets/img//logo.png";
 import { Link, useLocation } from "react-router-dom";
 import Data from "./Subscription Data/Data.json";
 import DashHead from "./Dashboard Part/DashHead";
-import DynamicDate from "../Dynamic Date/DynamicDate";
+import DynamicDate from "../Components/Dynamic Date/DynamicDate";
 import axios from "axios";
 import { toast } from "react-toastify";
 
