@@ -3,7 +3,7 @@ import logo from "../../assets/img/logo.png";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import EmergencyModeForm from "../../Emergency Mode Feature/emergencymodeform";
+import EmergencyModeForm from "../../Emergency Mode Feature/EmergencyModeForm";
 import EmergencyModeRecords from "../../Emergency Mode Feature/EmergencyModeRecords";
 import EmergencyModeRecordsMobile from '../../Emergency Mode Feature/EmergencyModeRecordsMobile'
 import PharmacyModal from "../../Components/Pharmacy Mode/PharmacyModal";

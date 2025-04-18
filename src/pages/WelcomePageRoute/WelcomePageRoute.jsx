@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import logo from "../../assets/img/logo.png";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import EmergencyModeForm from "../../Emergency Mode Feature/emergencymodeform";
+import EmergencyModeForm from "../../Emergency Mode Feature/EmergencyModeForm";
 import EmergencyModeRecords from "../../Emergency Mode Feature/EmergencyModeRecords";
 import EmergencyModeRecordsMobile from "../../Emergency Mode Feature/EmergencyModeRecordsMobile";
 
