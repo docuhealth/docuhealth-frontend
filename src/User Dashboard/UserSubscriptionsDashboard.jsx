@@ -44,6 +44,7 @@ const UserSubscriptionsDashboard = () => {
           },
         }
       );
+      console.log(response.data)
 
       setPlans(response.data.subscriptionPlans || []); // Assuming response.data.plans contains the plans
       // console.log(response.data.subscriptionPlans);
@@ -238,9 +239,7 @@ const UserSubscriptionsDashboard = () => {
                         <div className="pb-4">
                           <p className="text-2xl font-semibold pb-1">
                             ₦
-                            {parseFloat(
-                              plan.price.replace(",", "")
-                            ).toLocaleString()}{" "}
+                            {plan.price}
                             <span className="text-sm font-normal">
                               /{plan.duration}
                             </span>

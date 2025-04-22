@@ -70,7 +70,7 @@ const AdminHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
     <div>
       {/* Header */}
       <header className="hidden bg-white py-4 px-8 sm:flex justify-between items-center border">
-        <h2 className="text-xl font-semibold">
+        <h2 className="text-md font-semibold">
           Welcome back {datainfo?.metrics?.name || "loading..."}! 👋
         </h2>
         <div className="flex items-center gap-4">

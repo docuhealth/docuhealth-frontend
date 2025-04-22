@@ -26,7 +26,7 @@ const DynamicDate = () => {
   const dayWithOrdinal = getOrdinal(currentDate.getDate());
   const dynamicDate = `${formattedDate.split(" ")[0]} ${dayWithOrdinal}, ${currentDate.getFullYear()}`;
 
-  return <p className="text-gray-500">{dynamicDate}</p>;
+  return <p className="text-gray-500 text-sm">{dynamicDate}</p>;
 };
 
 export default DynamicDate;
