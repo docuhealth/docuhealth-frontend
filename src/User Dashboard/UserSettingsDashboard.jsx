@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import DynamicDate from "../Components/Dynamic Date/DynamicDate";
 import { useNavigate } from "react-router-dom";
 import UserSideBar from "../Components/UserSideBar/UserSideBar";
+import EmergencyNotice from "../Components/EmergencyNotice/EmergencyNotice";
 
 const UserSettingsDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -870,10 +871,69 @@ const UserSettingsDashboard = () => {
     },
   ];
 
+  useEffect(() => {
+    const fetchPatientDashboard = async (page = 1, size = 10) => {
+      // Retrieve the JWT token from localStorage
+      const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+      const role = "patient"; // Replace with the required role
+
+      try {
+        // Construct the URL with query parameters
+        const url = `https://docuhealth-backend-h03u.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
+
+        // Make the GET request
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+            Role: role, // Add role to the headers
+          },
+        });
+
+        // Handle the response
+        if (response.ok) {
+          const data = await response.json();
+          // console.log("Patient Dashboard Data:", data);
+          // setHin(data.HIN);
+          // setName(data.fullname);
+          // setDob(data.DOB);
+          localStorage.setItem("toggleState", data.emergency);
+          setEmergencyModeEnabled(data.emergency);
+          // Display a success message or process the data as needed
+          return data;
+        } else {
+          const errorData = await response.json();
+          console.error("Failed to fetch dashboard data:", errorData);
+
+          // Handle errors with a message from the API
+          throw new Error(
+            errorData.message || "Failed to fetch dashboard data."
+          );
+        }
+      } catch (error) {
+        console.error("An unexpected error occurred:", error);
+
+        // Handle unexpected errors
+        throw error;
+      }
+    };
+
+    // Example Usage
+    fetchPatientDashboard(1, 10);
+  }, []);
+
+  const [emergencyNotice, setEmergencyNotice] = useState(false);
+
   const handleToggleEmergencyMode = async () => {
-    setEmergencyModeEnabled(!isEmergencyModeEnabled);
+    const newState = !isEmergencyModeEnabled;
+    setEmergencyModeEnabled(newState);
+    setEmergencyNotice(false);
+
+    localStorage.setItem("toggleState", newState.toString()); // Update local storage
 
     const jwtToken = localStorage.getItem("jwtToken");
+
     try {
       const response = await fetch(
         "https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/toggle_emergency_mode",
@@ -891,9 +951,8 @@ const UserSettingsDashboard = () => {
       }
 
       const responseData = await response.json();
-
       toast.success(responseData.message);
-      // toast.success(responseData.message)
+      // console.log(responseData);
     } catch (error) {
       console.error("Error:", error.message);
     }
@@ -909,14 +968,14 @@ const UserSettingsDashboard = () => {
             onClick={closeSidebar}
           ></div>
         )}
-         <UserSideBar
-      
-      isSidebarOpen={isSidebarOpen}
-      toggleSidebar={toggleSidebar}
-      closeSidebar={closeSidebar}
-      isEmergencyModeEnabled={isEmergencyModeEnabled}
-      isActive={isActive}
-      />
+        <UserSideBar
+          isSidebarOpen={isSidebarOpen}
+          toggleSidebar={toggleSidebar}
+          closeSidebar={closeSidebar}
+          isEmergencyModeEnabled={isEmergencyModeEnabled}
+          setEmergencyNotice={setEmergencyNotice}
+          isActive={isActive}
+        />
 
         {/* Main Content */}
         <main className="flex-1">
@@ -925,6 +984,12 @@ const UserSettingsDashboard = () => {
             isSidebarOpen={isSidebarOpen}
             toggleSidebar={toggleSidebar}
             closeSidebar={closeSidebar}
+          />
+
+          <EmergencyNotice
+            emergencyNotice={emergencyNotice}
+            setEmergencyNotice={setEmergencyNotice}
+            handleToggleEmergencyMode={handleToggleEmergencyMode}
           />
 
           {/* Content */}

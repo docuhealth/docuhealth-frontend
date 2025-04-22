@@ -33,7 +33,7 @@ const UserHomeDashboard = () => {
   const [datainfo, setDataInfo] = useState("");
   const [generateIDCard, setGenerateIDCard] = useState(false);
   const [generateIDCardForm, setGenerateIDCardForm] = useState(false);
-  const [isEmergencyModeEnabled, setEmergencyModeEnabled] = useState(false);
+
 
   const location = useLocation();
 
@@ -419,6 +419,7 @@ const UserHomeDashboard = () => {
   };
 
   const [emergencyNotice, setEmergencyNotice] = useState(false);
+  const [isEmergencyModeEnabled, setEmergencyModeEnabled] = useState(false);
 
   const handleToggleEmergencyMode = async () => {
     const newState = !isEmergencyModeEnabled;
