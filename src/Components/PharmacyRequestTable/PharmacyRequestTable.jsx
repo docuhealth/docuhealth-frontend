@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Check, X, Phone } from 'lucide-react';
 import { pharmacyRequests } from './PharmacyData/PharmacyRequests';
 import PharmacyTablePagination from './PharmacyTablePagination/PharmacyTablePagination';
 
@@ -28,27 +27,10 @@ const PharmacyRequestTable = () => {
     setSelectedRows(newSelection);
   };
 
-  const handleDeclineAll = () => {
-    console.log("Declining all selected requests:", Array.from(selectedRows));
-    setSelectedRows(new Set());
-  };
-
-  const handleApprove = (request) => {
-    console.log("Approving request:", request);
-  };
-
-  const handleDeny = (request) => {
-    console.log("Denying request:", request);
-  };
-
-  const handleCopyPhone = (phone) => {
-    console.log("Copying phone number:", phone);
-    // navigator.clipboard.writeText(phone); // Uncomment in real implementation
-  };
 
   return (
     <div className="relative">
-      {selectedRows.size > 0 && (
+      {/* {selectedRows.size > 0 && (
         <div className="sticky top-0 z-10 w-full p-3 bg-red-50 border-b border-red-200 flex justify-end">
           <button 
             className="px-4 py-1.5 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
@@ -57,28 +39,28 @@ const PharmacyRequestTable = () => {
             Decline all selected
           </button>
         </div>
-      )}
+      )} */}
       
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 border-none">
-          <thead className=" border-none">
-            <tr>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">
+      <div className="overflow-x-auto ">
+        <table className="w-full bg-gray-200  ">
+          <thead className=" border-none  ">
+            <tr className=''>
+              <th className="px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">
                 <span className="sr-only">Select</span>
               </th>
-              <th className="px-3 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+              <th className="px-3 py-4 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
                 Name of pharmacy
               </th>
-              <th className="px-3 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+              <th className="px-3 py-4 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
                 Email address
               </th>
-              <th className="px-3 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+              <th className="px-3 py-4 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
                 Phone number
               </th>
-              <th className="px-3 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+              <th className="px-3 py-4 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
                 Pharmacy address
               </th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+              <th className="px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
                 <span className="sr-only">Actions</span>
               </th>
             </tr>
@@ -110,39 +92,10 @@ const PharmacyRequestTable = () => {
                 </td>
                 <td className="px-3 py-3.5 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex space-x-2 justify-end">
-                    {request.status === 'approved' ? (
-                      <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-md">
-                        Approved
-                      </span>
-                    ) : request.status === 'denied' ? (
-                      <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-md">
-                        Denied
-                      </span>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => handleApprove(request)}
-                          className="text-green-500 hover:text-green-700"
-                          title="Approve request"
-                        >
-                          <Check size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDeny(request)}
-                          className="text-red-500 hover:text-red-700"
-                          title="Deny request"
-                        >
-                          <X size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleCopyPhone(request.phone)}
-                          className="text-blue-500 hover:text-blue-700"
-                          title="Copy phone number"
-                        >
-                          <Phone size={18} />
-                        </button>
-                      </>
-                    )}
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 6C11.45 6 11 6.45 11 7C11 7.55 11.45 8 12 8C12.55 8 13 7.55 13 7C13 6.45 12.55 6 12 6ZM12 16C11.45 16 11 16.45 11 17C11 17.55 11.45 18 12 18C12.55 18 13 17.55 13 17C13 16.45 12.55 16 12 16ZM12 11C11.45 11 11 11.45 11 12C11 12.55 11.45 13 12 13C12.55 13 13 12.55 13 12C13 11.45 12.55 11 12 11Z" fill="#717473"/>
+</svg>
+
                   </div>
                 </td>
               </tr>

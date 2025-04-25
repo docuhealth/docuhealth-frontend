@@ -31,7 +31,7 @@ const PharmacyTablePagination = ({ currentPage, totalPages, onPageChange }) => {
   const pageNumbers = getPageNumbers();
 
   return (
-    <nav className="inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+    <nav className="inline-flex  rounded-md shadow-sm" aria-label="Pagination">
       <button
         onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -59,7 +59,7 @@ const PharmacyTablePagination = ({ currentPage, totalPages, onPageChange }) => {
           <button
             key={page}
             onClick={() => onPageChange(page)}
-            className={`relative inline-flex items-center px-4 py-2 text-sm font-medium ${
+            className={`relative inline-flex items-center px-4 py-2 text-sm font-medium   ${
               currentPage === page
                 ? 'bg-blue-600 text-white'
                 : 'text-gray-700 bg-white hover:bg-gray-50'

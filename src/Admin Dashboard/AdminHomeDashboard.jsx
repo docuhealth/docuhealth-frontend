@@ -320,7 +320,7 @@ const AdminHomeDashboard = () => {
             </div>
 
             {isPharmCodeToggled ? (
-              <div className="py-4 px-5 border rounded-2xl my-5">
+              <div className="my-5">
                 <PharmacyTableHead />
                 <PharmacyRequestTable />
               </div>

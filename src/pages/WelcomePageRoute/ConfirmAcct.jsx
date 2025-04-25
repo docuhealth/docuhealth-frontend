@@ -39,14 +39,14 @@ const ConfirmAcct = () => {
             <h2 className="text-xl font-semibold text-gray-950 py-2">
               Welcome to DocuHealth 👋
             </h2>
-            <p className="text-sm sm:text-md text-gray-500 pb-4">
+            <p className="text-sm text-gray-500 pb-4">
               What type of account would you like to create?
             </p>
             <div className="w-full">
               {/* Dropdown */}
               <div className="relative w-full">
                 <select
-                  className="border border-gray-300 px-4 py-2 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                  className="border border-gray-300 px-4 py-2 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10 text-sm"
                   value={accountType}
                   onChange={(e) => setAccountType(e.target.value)}
                 >
@@ -74,7 +74,7 @@ const ConfirmAcct = () => {
 
               {/* Proceed Button */}
               <button
-                className={`mt-4 px-4 py-2 rounded-full w-full ${
+                className={`mt-4 px-4 py-2 rounded-full w-full text-sm ${
                   accountType
                     ? "bg-[#0000FF] text-white hover:bg-blue-600"
                     : "bg-gray-300 text-gray-600 cursor-not-allowed"
