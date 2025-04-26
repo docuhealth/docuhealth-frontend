@@ -9,7 +9,7 @@ import AdminSmallTabs from "../Components/AdminSmalllTabs/AdminSmallTabs";
 import AdminSellingStates from "../Components/AdminSellingStates/AdminSellingStates";
 import AdminGridLayout1 from "../Components/AdminGridLayout1/AdminGridLayout1";
 import AdminGridLayout2 from "../Components/AdminGridLayout2/AdminGridLayout2";
-import PharmacyTableHead from "../Components/PharmacyRequestTable/PharmacyTableHead/PharmacyTableHead";
+
 import PharmacyRequestTable from "../Components/PharmacyRequestTable/PharmacyRequestTable";
 
 const AdminHomeDashboard = () => {
@@ -320,8 +320,7 @@ const AdminHomeDashboard = () => {
             </div>
 
             {isPharmCodeToggled ? (
-              <div className="my-5">
-                <PharmacyTableHead />
+              <div className="my-5 md:w-full">
                 <PharmacyRequestTable />
               </div>
             ) : (

@@ -802,7 +802,7 @@ const UserSubAcctDashboard = () => {
                             {subaccount.firstname + " " + subaccount.lastname}
                           </td>
                           <td className="border-b border-gray-300 px-4 pb-3 pt-3">
-                            {subaccount.HIN}
+                            {subaccount.HIN.slice(0, 4) + '*'.repeat(subaccount.HIN.length - 5)}
                           </td>
                           <td className="border-b border-gray-300 px-4 pb-3 pt-3">
                             {subaccount.DOB}
