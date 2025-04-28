@@ -150,6 +150,7 @@ const UserSubscriptionsDashboard = () => {
     };
 
     const handlePayment = async (planId) => {
+      toast.success("Redirecting to payment page...");
       console.log("Plan ID:", planId); // Log the planId to see if it's being passed correctly
       try {
         const token = localStorage.getItem("jwtToken");
