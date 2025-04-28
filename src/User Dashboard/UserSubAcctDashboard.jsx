@@ -191,6 +191,7 @@ const UserSubAcctDashboard = () => {
   };
 
   const [subAccounts, setSubAccounts] = useState([]);
+  const [paymentStatus, setPaymentStatus] = useState(false);
   const [error, SetError] = useState(false);
 
   useEffect(() => {
@@ -417,162 +418,161 @@ const UserSubAcctDashboard = () => {
     doc.save(`${selectedRecord.hospital_info.name}-hospital-record.pdf`);
   };
 
-  const handleOpenForm = (name,hin,dob) => {
+  const handleOpenForm = (name, hin, dob) => {
     setSelectedUser(name); // Store the clicked user
-    setSelectedUserHIN(hin)
-    setSelectedUserDOB(dob)
+    setSelectedUserHIN(hin);
+    setSelectedUserDOB(dob);
 
-    console.log(name)
+    console.log(name);
     setGenerateIDCardForm(true); // Open the form
   };
 
-  const[loadingCard, setLoadingCard] = useState(null)
-    const handleIDCreation = async (e) => {
-      e.preventDefault(); // Prevents page reload
-      setLoadingCard("Generating");
-  
-      // Prepare the data to send
-      const requestBody = {
-        first_emergency_contact: formData.firstEmergency,
-        second_emergency_contact: formData.secondEmergency,
-        emergency_address: formData.emergencyAddress,
-        subaccount_HIN: selectedUserHIN
-      };
-  
-      // Retrieve JWT token and role from localStorage
-      const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your actual token key
-  
-      try {
-        const response = await fetch(
-          "https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/create_subaccount_id_card",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwtToken}`, // Add the JWT token to the Authorization header
-            },
-            body: JSON.stringify(requestBody), // Convert the request body to JSON
-          }
+  const [loadingCard, setLoadingCard] = useState(null);
+  const handleIDCreation = async (e) => {
+    e.preventDefault(); // Prevents page reload
+    setLoadingCard("Generating");
+
+    // Prepare the data to send
+    const requestBody = {
+      first_emergency_contact: formData.firstEmergency,
+      second_emergency_contact: formData.secondEmergency,
+      emergency_address: formData.emergencyAddress,
+      subaccount_HIN: selectedUserHIN,
+    };
+
+    // Retrieve JWT token and role from localStorage
+    const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your actual token key
+
+    try {
+      const response = await fetch(
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/create_subaccount_id_card",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`, // Add the JWT token to the Authorization header
+          },
+          body: JSON.stringify(requestBody), // Convert the request body to JSON
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        // console.log("Form Submitted Successfully:", result);
+
+        // Show success toast
+        toast.success("Generated ID Card");
+        setGenerateIDCard(true);
+        setGenerateIDCardForm(false);
+      } else {
+        console.error(
+          "Failed to submit the form:",
+          response.status,
+          response.statusText
         );
-  
+        const errorData = await response.json();
+        console.error("Error Details:", errorData);
+
+        // Show error toast with message from the API or generic message
+        toast.error("An error occurred while submitting the form.");
+      }
+    } catch (error) {
+      console.error("An error occurred while submitting the form:", error);
+
+      // Show error toast for unexpected errors
+      toast.error("An unexpected error occurred. Please try again later.");
+    } finally {
+      setLoadingCard("Generate ID Card");
+    }
+  };
+
+  useEffect(() => {
+    const fetchPatientDashboard = async (page = 1, size = 10) => {
+      // Retrieve the JWT token from localStorage
+      const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+      const role = "patient"; // Replace with the required role
+
+      try {
+        // Construct the URL with query parameters
+        const url = `https://docuhealth-backend-h03u.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
+
+        // Make the GET request
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+            Role: role, // Add role to the headers
+          },
+        });
+
+        // Handle the response
         if (response.ok) {
-          const result = await response.json();
-          // console.log("Form Submitted Successfully:", result);
-  
-          // Show success toast
-          toast.success("Generated ID Card");
-          setGenerateIDCard(true);
-          setGenerateIDCardForm(false);
+          const data = await response.json();
+
+          if (data.is_subscribed) {
+            setPaymentStatus(true);
+          }
+          localStorage.setItem("toggleState", data.emergency);
+          setEmergencyModeEnabled(data.emergency);
+
+          return data;
         } else {
-          console.error(
-            "Failed to submit the form:",
-            response.status,
-            response.statusText
-          );
           const errorData = await response.json();
-          console.error("Error Details:", errorData);
-  
-          // Show error toast with message from the API or generic message
-          toast.error("An error occurred while submitting the form.");
+          console.error("Failed to fetch dashboard data:", errorData);
+
+          // Handle errors with a message from the API
+          throw new Error(
+            errorData.message || "Failed to fetch dashboard data."
+          );
         }
       } catch (error) {
-        console.error("An error occurred while submitting the form:", error);
-  
-        // Show error toast for unexpected errors
-        toast.error("An unexpected error occurred. Please try again later.");
-      } finally {
-        setLoadingCard("Generate ID Card");
+        console.error("An unexpected error occurred:", error);
+
+        // Handle unexpected errors
+        throw error;
       }
     };
 
+    // Example Usage
+    fetchPatientDashboard(1, 10);
+  }, []);
 
-    useEffect(() => {
-      const fetchPatientDashboard = async (page = 1, size = 10) => {
-        // Retrieve the JWT token from localStorage
-        const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
-        const role = "patient"; // Replace with the required role
-  
-        try {
-          // Construct the URL with query parameters
-          const url = `https://docuhealth-backend-h03u.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
-  
-          // Make the GET request
-          const response = await fetch(url, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
-              Role: role, // Add role to the headers
-            },
-          });
-  
-          // Handle the response
-          if (response.ok) {
-            const data = await response.json();
-            // console.log("Patient Dashboard Data:", data);
-            // setHin(data.HIN);
-            // setName(data.fullname);
-            // setDob(data.DOB);
-            localStorage.setItem("toggleState", data.emergency);
-            setEmergencyModeEnabled(data.emergency);
-            // Display a success message or process the data as needed
-            return data;
-          } else {
-            const errorData = await response.json();
-            console.error("Failed to fetch dashboard data:", errorData);
-  
-            // Handle errors with a message from the API
-            throw new Error(
-              errorData.message || "Failed to fetch dashboard data."
-            );
-          }
-        } catch (error) {
-          console.error("An unexpected error occurred:", error);
-  
-          // Handle unexpected errors
-          throw error;
+  const [emergencyNotice, setEmergencyNotice] = useState(false);
+
+  const handleToggleEmergencyMode = async () => {
+    const newState = !isEmergencyModeEnabled;
+    setEmergencyModeEnabled(newState);
+    setEmergencyNotice(false);
+
+    localStorage.setItem("toggleState", newState.toString()); // Update local storage
+
+    const jwtToken = localStorage.getItem("jwtToken");
+
+    try {
+      const response = await fetch(
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/toggle_emergency_mode",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
         }
-      };
-  
-      // Example Usage
-      fetchPatientDashboard(1, 10);
-    }, []);
-  
-    const [emergencyNotice, setEmergencyNotice] = useState(false);
-  
-    const handleToggleEmergencyMode = async () => {
-      const newState = !isEmergencyModeEnabled;
-      setEmergencyModeEnabled(newState);
-      setEmergencyNotice(false);
-  
-      localStorage.setItem("toggleState", newState.toString()); // Update local storage
-  
-      const jwtToken = localStorage.getItem("jwtToken");
-  
-      try {
-        const response = await fetch(
-          "https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/toggle_emergency_mode",
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwtToken}`,
-            },
-          }
-        );
-  
-        if (!response.ok) {
-          throw new Error("Failed to update emergency mode");
-        }
-  
-        const responseData = await response.json();
-        toast.success(responseData.message);
-        // console.log(responseData);
-      } catch (error) {
-        console.error("Error:", error.message);
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update emergency mode");
       }
-    };
-  
+
+      const responseData = await response.json();
+      toast.success(responseData.message);
+      // console.log(responseData);
+    } catch (error) {
+      console.error("Error:", error.message);
+    }
+  };
+
   return (
     <div>
       <div className="min-h-screen bg-gray-100 flex">
@@ -583,15 +583,14 @@ const UserSubAcctDashboard = () => {
             onClick={closeSidebar}
           ></div>
         )}
-           <UserSideBar
-      
-      isSidebarOpen={isSidebarOpen}
-      toggleSidebar={toggleSidebar}
-      closeSidebar={closeSidebar}
-      isEmergencyModeEnabled={isEmergencyModeEnabled}
-      setEmergencyNotice={setEmergencyNotice}
-      isActive={isActive}
-      />
+        <UserSideBar
+          isSidebarOpen={isSidebarOpen}
+          toggleSidebar={toggleSidebar}
+          closeSidebar={closeSidebar}
+          isEmergencyModeEnabled={isEmergencyModeEnabled}
+          setEmergencyNotice={setEmergencyNotice}
+          isActive={isActive}
+        />
 
         {/* Main Content */}
         <main className="flex-1">
@@ -603,9 +602,9 @@ const UserSubAcctDashboard = () => {
           />
 
           <EmergencyNotice
-               emergencyNotice={emergencyNotice}
-               setEmergencyNotice={setEmergencyNotice}
-               handleToggleEmergencyMode={handleToggleEmergencyMode}
+            emergencyNotice={emergencyNotice}
+            setEmergencyNotice={setEmergencyNotice}
+            handleToggleEmergencyMode={handleToggleEmergencyMode}
           />
 
           {/* Content */}
@@ -616,7 +615,16 @@ const UserSubAcctDashboard = () => {
               </div>
               <div className="w-full sm:w-auto ">
                 <button
-                  onClick={toggleOverlay}
+                  onClick={() => {
+                    if (paymentStatus) {
+                      toggleOverlay;
+                      return;
+                    } else {
+                      toast.success(
+                        "Kindly subscribe to a plan to access this feature"
+                      );
+                    }
+                  }}
                   className="bg-[#0000FF] text-white py-2 px-4 rounded-full w-full sm:w-auto"
                 >
                   Create A Sub Account
@@ -763,7 +771,16 @@ const UserSubAcctDashboard = () => {
                       <div className="text-sm flex justify-start items-center gap-4">
                         <button
                           className="bg-[#0000FF] text-white py-2 px-3 rounded-full"
-                          onClick={closeNoticeMessageToCreateAcct}
+                          onClick={() => {
+                            if (paymentStatus) {
+                              closeNoticeMessageToCreateAcct;
+                              return;
+                            } else {
+                              toast.success(
+                                "Kindly subscribe to a plan to access this feature"
+                              );
+                            }
+                          }}
                         >
                           Create a sub account
                         </button>
@@ -802,7 +819,8 @@ const UserSubAcctDashboard = () => {
                             {subaccount.firstname + " " + subaccount.lastname}
                           </td>
                           <td className="border-b border-gray-300 px-4 pb-3 pt-3">
-                            {subaccount.HIN.slice(0, 4) + '*'.repeat(subaccount.HIN.length - 5)}
+                            {subaccount.HIN.slice(0, 4) +
+                              "*".repeat(subaccount.HIN.length - 5)}
                           </td>
                           <td className="border-b border-gray-300 px-4 pb-3 pt-3">
                             {subaccount.DOB}
@@ -841,8 +859,25 @@ const UserSubAcctDashboard = () => {
                                   </p>
                                 </Link>
 
-                                <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
-                                onClick={() => handleOpenForm(subaccount.firstname + " " + subaccount.lastname, subaccount.HIN, subaccount.DOB)}>
+                                <p
+                                  className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                                  onClick={() => {
+                                    if (paymentStatus) {
+                                      handleOpenForm(
+                                        subaccount.firstname +
+                                          " " +
+                                          subaccount.lastname,
+                                        subaccount.HIN,
+                                        subaccount.DOB
+                                      );
+                                      return;
+                                    } else {
+                                      toast.success(
+                                        "Kindly subscribe to a plan to access this feature"
+                                      );
+                                    }
+                                  }}
+                                >
                                   Generate ID Card
                                 </p>
                               </div>
@@ -889,7 +924,13 @@ const UserSubAcctDashboard = () => {
                           Full Name:{" "}
                           {record.patient_info?.fullname || "No Name Available"}
                         </p>
-                        <p>(# {record.patient_HIN || "No HIN Available"} )</p>
+                        <p>
+                          (#{" "}
+                          {record.patient_HIN.slice(0, 4) +
+                            "*".repeat(record.patient_HIN.length - 5) ||
+                            "No HIN Available"}{" "}
+                          )
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -1030,7 +1071,16 @@ const UserSubAcctDashboard = () => {
                               <div className="flex items-center gap-1">
                                 <button
                                   className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer"
-                                  onClick={exportToPDF}
+                                  onClick={() => {
+                                    if (paymentStatus) {
+                                      exportToPDF;
+                                      return;
+                                    } else {
+                                      toast.success(
+                                        "Kindly subscribe to a plan to access this feature"
+                                      );
+                                    }
+                                  }}
                                 >
                                   Export as pdf
                                 </button>
@@ -1279,7 +1329,11 @@ const UserSubAcctDashboard = () => {
                 {subaccounts.map((subaccount, index) => (
                   <div key={index} className="bg-white shadow px-4 py-2 my-3">
                     <div className=" flex justify-between items-center py-3 relative ">
-                      <p>HIN : {subaccount.HIN.slice(0, 4) + '*'.repeat(subaccount.HIN.length - 5)}</p>
+                      <p>
+                        HIN :{" "}
+                        {subaccount.HIN.slice(0, 4) +
+                          "*".repeat(subaccount.HIN.length - 5)}
+                      </p>
                       <p>
                         <i
                           className={`bx bx-dots-vertical-rounded ml-3  p-2 ${
@@ -1308,10 +1362,27 @@ const UserSubAcctDashboard = () => {
                             </p>
                           </Link>
 
-                          <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
-                                onClick={() => handleOpenForm(subaccount.firstname + " " + subaccount.lastname, subaccount.HIN, subaccount.DOB)}>
-                                  Generate ID Card
-                                </p>
+                          <p
+                            className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                            onClick={() => {
+                              if (paymentStatus) {
+                                handleOpenForm(
+                                  subaccount.firstname +
+                                    " " +
+                                    subaccount.lastname,
+                                  subaccount.HIN,
+                                  subaccount.DOB
+                                );
+                                return;
+                              } else {
+                                toast.success(
+                                  "Kindly subscribe to a plan to access this feature"
+                                );
+                              }
+                            }}
+                          >
+                            Generate ID Card
+                          </p>
                         </div>
                       )}
                     </div>
@@ -1373,7 +1444,13 @@ const UserSubAcctDashboard = () => {
                         <p>
                           {record.patient_info?.fullname || "No Name Available"}
                         </p>
-                        <p>(# {record.patient_HIN || "No HIN Available"} )</p>
+                        <p>
+                          (#{" "}
+                          {record.patient_HIN.slice(0, 4) +
+                            "*".repeat(record.patient_HIN.length - 5) ||
+                            "No HIN Available"}{" "}
+                          )
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -1515,7 +1592,16 @@ const UserSubAcctDashboard = () => {
                             <div className="flex items-center gap-1">
                               <button
                                 className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer"
-                                onClick={exportToPDF}
+                                onClick={() => {
+                                  if (paymentStatus) {
+                                    exportToPDF;
+                                    return;
+                                  } else {
+                                    toast.success(
+                                      "Kindly subscribe to a plan to access this feature"
+                                    );
+                                  }
+                                }}
                               >
                                 Export as pdf
                               </button>
@@ -1868,7 +1954,7 @@ const UserSubAcctDashboard = () => {
                         </h2>
                         <p className="text-gray-600">{selectedUser}</p>
                         <p className="text-gray-500 text-sm">
-                        { selectedUserDOB.split("-").reverse().join("-") }
+                          {selectedUserDOB.split("-").reverse().join("-")}
                         </p>
 
                         <div className="flex justify-between text-left text-[13px] mt-4 w-full ">

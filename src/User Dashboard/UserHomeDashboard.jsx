@@ -496,6 +496,7 @@ const UserHomeDashboard = () => {
 
             <EmergencyNotice
               emergencyNotice={emergencyNotice}
+              paymentStatus={paymentStatus}
               setEmergencyNotice={setEmergencyNotice}
               handleToggleEmergencyMode={handleToggleEmergencyMode}
             />
