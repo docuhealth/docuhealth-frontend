@@ -1541,7 +1541,7 @@ const UserSubAcctDashboard = () => {
                     {popoverVisible === record._id && (
                       <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm z-50">
                         <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto w-[90%] sm:w-[60%]">
-                          <div className="flex justify-between items-center">
+                          <div className="flex flex-col gap-3 items-start">
                             <div className="">
                               <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center p-1">
                                 {record.patient_info.fullname
