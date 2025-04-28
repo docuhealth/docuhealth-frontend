@@ -174,6 +174,16 @@ const UserSubscriptionsDashboard = () => {
     
         const data = response.data;
         console.log("Fetched:", data);
+
+        const paymentLink = data.authorization_url;
+
+        if (paymentLink) {
+          window.open(paymentLink, '_blank'); 
+          // open the payment link in a new side tab
+        } else {
+          console.log("Payment link not found.");
+        }
+
         // maybe show success toast here if you want
       } catch (error) {
         toast.error(
@@ -305,7 +315,7 @@ const UserSubscriptionsDashboard = () => {
 
                         {/* Button Section */}
                         <div
-                         onClick={ () => handlePayment(plan._id)}
+                         onClick={ () => handlePayment(plan.plan_id)}
                           className={`rounded-full my-4 ${
                             index === 0
                               ? "font-semibold"
