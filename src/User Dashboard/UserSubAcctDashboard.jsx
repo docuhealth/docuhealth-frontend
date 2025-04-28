@@ -1279,7 +1279,7 @@ const UserSubAcctDashboard = () => {
                 {subaccounts.map((subaccount, index) => (
                   <div key={index} className="bg-white shadow px-4 py-2 my-3">
                     <div className=" flex justify-between items-center py-3 relative ">
-                      <p>HIN : {subaccount.HIN}</p>
+                      <p>HIN : {subaccount.HIN.slice(0, 4) + '*'.repeat(subaccount.HIN.length - 5)}</p>
                       <p>
                         <i
                           className={`bx bx-dots-vertical-rounded ml-3  p-2 ${

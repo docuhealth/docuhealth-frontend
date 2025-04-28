@@ -149,6 +149,41 @@ const UserSubscriptionsDashboard = () => {
       }
     };
 
+    const handlePayment = async (planId) => {
+      console.log("Plan ID:", planId); // Log the planId to see if it's being passed correctly
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) {
+          toast.error("Token not found. Please log in again.");
+          return; // don't continue if no token
+        }
+    
+        const response = await axios.post(
+          "https://docuhealth-backend-h03u.onrender.com/api/patient/subscriptions/initialize_payment_to_plan",
+          {
+            role: "patient",
+            plan_id: planId, // also send the planId if needed
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+    
+        const data = response.data;
+        console.log("Fetched:", data);
+        // maybe show success toast here if you want
+      } catch (error) {
+        toast.error(
+          error.response?.data?.message || "An error occurred while processing payment."
+        );
+        console.error("Error initializing payment:", error.response.data.message);
+      }
+    };
+    
+
   return (
     <div>
       <div className="min-h-screen bg-gray-100 flex">
@@ -270,6 +305,7 @@ const UserSubscriptionsDashboard = () => {
 
                         {/* Button Section */}
                         <div
+                         onClick={ () => handlePayment(plan._id)}
                           className={`rounded-full my-4 ${
                             index === 0
                               ? "font-semibold"
@@ -279,7 +315,7 @@ const UserSubscriptionsDashboard = () => {
                           }`}
                         >
                           <div className="py-3">
-                            <p className="text-sm text-center">
+                            <p className="text-sm text-center cursor-pointer">
                               Choose {plan.title}
                             </p>
                           </div>
