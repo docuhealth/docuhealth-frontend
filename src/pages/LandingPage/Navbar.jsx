@@ -10,6 +10,8 @@ import PharmacyModal from "../../Components/Pharmacy Mode/PharmacyModal";
 import PharmacyModeGenerate from "../../Components/Pharmacy Mode/PharmacyModeGenerate";
 import PharmacyModeUpload from "../../Components/Pharmacy Mode/PharmacyModeUpload";
 import PharmacyModeReset from "../../Components/Pharmacy Mode/PharmacyModeReset";
+import PharmacyGenerateMessage from "../../Components/Pharmacy Mode/PharmacyGenerateMessage";
+import PharmacyResetMessage from "../../Components/Pharmacy Mode/PharmacyResetMessage";
 
 const Navbar = ({showPharmacyMode}) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,6 +27,9 @@ const Navbar = ({showPharmacyMode}) => {
   const [name, setName] = useState("...");
   const [pharmacyMode, setPharmacyMode] = useState(showPharmacyMode)
   const [pharmacyModeProceed, setPharmacyModeProceed] = useState()
+  const[isPharmacyCreated, setIsPharmacyCreated] = useState(false)
+  const[isPharmacyReset, setIsPharmacyReset] = useState(false)
+  const [isPharmacyUpload, setIsPharmacyUpload] = useState(false)
 
 
   useEffect(() => {
@@ -155,14 +160,23 @@ const Navbar = ({showPharmacyMode}) => {
        )}
 
        {pharmacyModeProceed === 'generate' && (
-        <PharmacyModeGenerate setPharmacyModeProceed ={setPharmacyModeProceed} />
+        <PharmacyModeGenerate setPharmacyModeProceed ={setPharmacyModeProceed} setIsPharmacyCreated = {setIsPharmacyCreated} />
        )}
+
+       {isPharmacyCreated && (
+        <PharmacyGenerateMessage setIsPharmacyCreated = {setIsPharmacyCreated} />
+       )}
+  
+
        {pharmacyModeProceed === 'upload' && (
         <PharmacyModeUpload setPharmacyModeProceed ={setPharmacyModeProceed} />
        )}
+
        {pharmacyModeProceed === 'reset' && (
-        <PharmacyModeReset setPharmacyModeProceed ={setPharmacyModeProceed} />
+        <PharmacyModeReset setPharmacyModeProceed ={setPharmacyModeProceed} setIsPharmacyReset = {setIsPharmacyReset} />
        )}
+
+       {isPharmacyReset && (<PharmacyResetMessage setIsPharmacyReset = {setIsPharmacyReset} />)}
 
       <div className="fixed w-full z-50">
         {/* Top Navigation Bar */}

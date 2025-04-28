@@ -1,16 +1,59 @@
 import React, {useState} from 'react'
 import { X } from "lucide-react";
+import { toast } from 'react-toastify';
 
-const PharmacyModeReset = ({setPharmacyModeProceed}) => {
+const PharmacyModeReset = ({setPharmacyModeProceed, setIsPharmacyReset}) => {
 
     const [formData, setFormData] = useState({
           emailAddress: ""
         });
+        const[loading, setLoading] = useState(false)
     
         const handleChange = (e) => {
           const { name, value } = e.target;
           setFormData({ ...formData, [name]: value });
         };
+
+          const payload ={
+            email : formData.emailAddress
+          }
+        const handleSubmit = async (e) => {
+          setLoading(true)
+          e.preventDefault(); 
+          
+      
+          try {
+            const response = await fetch("https://docuhealth-backend-h03u.onrender.com/api/pharmarcy/reset_code", {
+              method: "PATCH", 
+              headers: {
+                "Content-Type": "application/json", // Indicate the payload format
+              },
+              body: JSON.stringify(payload), 
+            });
+      
+            if (response.ok) {
+              setLoading(false)
+              setIsPharmacyReset(true)
+              setPharmacyModeProceed("")
+              // toast.success("Email sent successfully!");
+              // setLoading('Send Otp')
+              // setTimeout(() => {
+              //   navigate("/hospital-verify-otp",  { state: { email } });
+              // }, 1000);
+            } else {
+              console.log()
+              const errorData = await response.json();
+              console.error("Failed to create pharmacy", errorData);
+            }
+          } catch (error) {
+           console.error(`Error: ${error.message}`);
+           toast.error(error.response.message)
+          //  setLoading('Send Otp')
+          }finally{
+            setLoading(false)
+          }
+        };
+  
 
   return (
      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 ">
@@ -32,7 +75,7 @@ const PharmacyModeReset = ({setPharmacyModeProceed}) => {
                 <div className="bg-white ">
                   <div className="mb-2">
                     <label className="block text-gray-700 text-sm font-medium mb-1">
-                     Input your email address
+                     Input your registered email address
                     </label>
                     <input
                       type="eamil"
@@ -50,10 +93,10 @@ const PharmacyModeReset = ({setPharmacyModeProceed}) => {
               </div>
       
               <button
-                // onClick={handleProceed}
+                onClick={handleSubmit}
                 className="mt-4 w-full bg-[#0000FF] text-white py-2 rounded-full transition text-sm"
               >
-                Request a new pharmacy code
+                {loading ? 'Requesting a new phramacy code' : 'Request a new pharmacy code'}
               </button>
             </div>
           </div>
