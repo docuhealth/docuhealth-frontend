@@ -1,7 +1,9 @@
 import React from "react";
+import { toast } from "react-toastify";
 
 const NoticeDisplay = ({
   noticeDisplay,
+  paymentStatus,
   closeNoticeMessage,
   setGenerateIDCardForm,
 }) => {
@@ -45,8 +47,14 @@ const NoticeDisplay = ({
                 <div
                   className=" bg-[#0000FF]  text-center text-white rounded-full py-2 cursor-pointer"
                   onClick={() => {
-                    closeNoticeMessage(); // Call the function properly
-                    setGenerateIDCardForm(true);
+                    if (paymentStatus) {
+                      closeNoticeMessage(); // Call the function properly
+                      setGenerateIDCardForm(true);
+                      return;
+                    }else{
+                      toast.success('Kindly subscribe to a plan to access this feature')
+                    }
+                
                   }}
                 >
                   <p className="text-sm">Get Identity Card</p>

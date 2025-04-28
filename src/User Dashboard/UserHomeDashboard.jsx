@@ -26,6 +26,7 @@ const UserHomeDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hin, setHin] = useState("Loading..");
   const [loading, setLoading] = useState(true);
+  const [paymentStatus, setPaymentStatus] = useState(false);
   const [name, setName] = useState("fetching...");
   const [dob, setDob] = useState("fetching...");
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -33,7 +34,6 @@ const UserHomeDashboard = () => {
   const [datainfo, setDataInfo] = useState("");
   const [generateIDCard, setGenerateIDCard] = useState(false);
   const [generateIDCardForm, setGenerateIDCardForm] = useState(false);
-
 
   const location = useLocation();
 
@@ -203,7 +203,10 @@ const UserHomeDashboard = () => {
         // Handle the response
         if (response.ok) {
           const data = await response.json();
-          // console.log("Patient Dashboard Data:", data);
+          console.log("Patient Dashboard Data:", data);
+          if (data.is_subscribed) {
+            setPaymentStatus(true);
+          }
           setHin(data.HIN);
           setName(data.fullname);
           setDob(data.DOB);
@@ -486,6 +489,7 @@ const UserHomeDashboard = () => {
           <section className="py-8 px-4">
             <NoticeDisplay
               noticeDisplay={noticeDisplay}
+              paymentStatus={paymentStatus}
               closeNoticeMessage={closeNoticeMessage}
               setGenerateIDCardForm={setGenerateIDCardForm}
             />
@@ -514,12 +518,20 @@ const UserHomeDashboard = () => {
               </div>
               <div className="flex justify-center flex-col sm:flex-row gap-3 sm:gap-5 items-start sm:items-center">
                 <div className="w-full sm:w-auto text-sm">
-                <p>HIN : {hin.slice(0, 4) + '*'.repeat(hin.length - 5)}</p>
-
+                  <p>HIN : {hin.slice(0, 4) + "*".repeat(hin.length - 5)}</p>
                 </div>
                 <div
                   className="border border-[#0000FF] py-2 px-6 rounded-full text-[#0000FF] cursor-pointer text-sm"
-                  onClick={() => setGenerateIDCardForm(true)}
+                  onClick={() => {
+                    if (paymentStatus) {
+                      setGenerateIDCardForm(true);
+                      return;
+                    } else {
+                      toast.success(
+                        "Kindly subscribe to a plan to access this feature"
+                      );
+                    }
+                  }}
                 >
                   <p>Get Identity Card</p>
                 </div>
@@ -536,6 +548,7 @@ const UserHomeDashboard = () => {
               popoverVisible={popoverVisible}
               datainfo={datainfo}
               selectedRecord={selectedRecord}
+              paymentStatus={paymentStatus}
               exportToPDF={exportToPDF}
               setPopoverVisible={setPopoverVisible}
             />
