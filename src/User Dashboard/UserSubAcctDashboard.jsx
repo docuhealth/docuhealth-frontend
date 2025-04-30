@@ -510,9 +510,20 @@ const UserSubAcctDashboard = () => {
         if (response.ok) {
           const data = await response.json();
 
-          if (data.is_subscribed) {
-            setPaymentStatus(true);
+          if(data.is_subscribed){
+            sessionStorage.setItem("is_subscribed", true);
+
           }
+
+
+          if (sessionStorage.getItem("is_subscribed") === "true") {
+            setPaymentStatus(true);
+            sessionStorage.setItem("is_subscribed", true);
+         
+          }else{
+            setPaymentStatus(false);
+          }
+
           localStorage.setItem("toggleState", data.emergency);
           setEmergencyModeEnabled(data.emergency);
 
@@ -617,7 +628,7 @@ const UserSubAcctDashboard = () => {
                 <button
                   onClick={() => {
                     if (paymentStatus) {
-                      toggleOverlay;
+                      toggleOverlay();
                       return;
                     } else {
                       toast.success(
@@ -773,7 +784,7 @@ const UserSubAcctDashboard = () => {
                           className="bg-[#0000FF] text-white py-2 px-3 rounded-full"
                           onClick={() => {
                             if (paymentStatus) {
-                              closeNoticeMessageToCreateAcct;
+                              closeNoticeMessageToCreateAcct();
                               return;
                             } else {
                               toast.success(
@@ -1073,7 +1084,7 @@ const UserSubAcctDashboard = () => {
                                   className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer"
                                   onClick={() => {
                                     if (paymentStatus) {
-                                      exportToPDF;
+                                      exportToPDF();
                                       return;
                                     } else {
                                       toast.success(
@@ -1594,7 +1605,7 @@ const UserSubAcctDashboard = () => {
                                 className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer"
                                 onClick={() => {
                                   if (paymentStatus) {
-                                    exportToPDF;
+                                    exportToPDF();
                                     return;
                                   } else {
                                     toast.success(

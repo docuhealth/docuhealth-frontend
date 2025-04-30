@@ -203,10 +203,22 @@ const UserHomeDashboard = () => {
         // Handle the response
         if (response.ok) {
           const data = await response.json();
-          console.log("Patient Dashboard Data:", data);
-          if (data.is_subscribed) {
-            setPaymentStatus(true);
+          // console.log("Patient Dashboard Data:", data);
+
+          if(data.is_subscribed){
+            sessionStorage.setItem("is_subscribed", true);
+
           }
+
+
+          if (sessionStorage.getItem("is_subscribed") === "true") {
+            setPaymentStatus(true);
+            sessionStorage.setItem("is_subscribed", true);
+         
+          }else{
+            setPaymentStatus(false);
+          }
+
           setHin(data.HIN);
           setName(data.fullname);
           setDob(data.DOB);

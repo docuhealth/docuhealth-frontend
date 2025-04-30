@@ -48,9 +48,10 @@ const EmergencyNotice = ({
                 <div
                   className=" bg-[#0000FF]  text-center text-white rounded-full py-2 cursor-pointer"
                   onClick={() => {
-                    if (paymentStatus) {
-                      handleToggleEmergencyMode
-                      return;
+                    if (paymentStatus === true) {
+                      console.log(paymentStatus)
+                      handleToggleEmergencyMode()
+                  
                     } else {
                       toast.success(
                         "Kindly subscribe to a plan to access this feature"

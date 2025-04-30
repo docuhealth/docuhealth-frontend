@@ -75,6 +75,7 @@ const UserLogoutDasboard = () => {
         // Perform logout logic
         localStorage.removeItem("jwtToken"); // Remove token if applicable
         localStorage.removeItem("userlogin"); // Remove login data
+        sessionStorage.removeItem("is_subscribed"); // Remove subscription data
         navigate("/user-login"); // Redirect to the login page
       }
     } catch (error) {
