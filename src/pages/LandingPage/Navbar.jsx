@@ -12,6 +12,7 @@ import PharmacyModeUpload from "../../Components/Pharmacy Mode/PharmacyModeUploa
 import PharmacyModeReset from "../../Components/Pharmacy Mode/PharmacyModeReset";
 import PharmacyGenerateMessage from "../../Components/Pharmacy Mode/PharmacyGenerateMessage";
 import PharmacyResetMessage from "../../Components/Pharmacy Mode/PharmacyResetMessage";
+import PharmacyModeUploadNext from "../../Components/Pharmacy Mode/PharmacyModeUploadNext";
 
 const Navbar = ({showPharmacyMode}) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +30,7 @@ const Navbar = ({showPharmacyMode}) => {
   const [pharmacyModeProceed, setPharmacyModeProceed] = useState()
   const[isPharmacyCreated, setIsPharmacyCreated] = useState(false)
   const[isPharmacyReset, setIsPharmacyReset] = useState(false)
-  const [isPharmacyUpload, setIsPharmacyUpload] = useState(false)
+  const [isPharmacyUploadCode, setIsPharmacyUploadCode] = useState(false)
 
 
   useEffect(() => {
@@ -169,7 +170,11 @@ const Navbar = ({showPharmacyMode}) => {
   
 
        {pharmacyModeProceed === 'upload' && (
-        <PharmacyModeUpload setPharmacyModeProceed ={setPharmacyModeProceed} />
+        <PharmacyModeUpload setPharmacyModeProceed ={setPharmacyModeProceed} setIsPharmacyUploadCode={setIsPharmacyUploadCode}/>
+       )}
+
+       {isPharmacyUploadCode && (
+        <PharmacyModeUploadNext setIsPharmacyUploadCode ={setIsPharmacyUploadCode}/>
        )}
 
        {pharmacyModeProceed === 'reset' && (

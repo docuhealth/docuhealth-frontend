@@ -44,6 +44,7 @@ const PharmacyModeReset = ({setPharmacyModeProceed, setIsPharmacyReset}) => {
               console.log()
               const errorData = await response.json();
               console.error("Failed to create pharmacy", errorData);
+              toast.error(errorData.message)
             }
           } catch (error) {
            console.error(`Error: ${error.message}`);
