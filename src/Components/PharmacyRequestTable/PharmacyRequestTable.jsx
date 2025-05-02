@@ -343,7 +343,7 @@ const PharmacyRequestTable = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {!pharmacyData || pharmacyData.length === 0 ? (
                 <p>No pharmacy data available.</p>
-              ) : pharmacyData.filter((pharmacy) => pharmacy.statuss === 'approved')
+              ) : pharmacyData.filter((pharmacy) => pharmacy.status === 'approved')
                   .length === 0 ? (
                 <p>No approved pharmacies found.</p>
               ) :
