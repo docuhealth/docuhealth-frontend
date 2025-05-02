@@ -162,7 +162,7 @@ const PharmacyModeUpload = ({
             <div className="bg-white ">
               <div className="mb-2">
                 <label className="block text-gray-700 text-sm font-medium mb-1">
-                  Input Pharmacy Code
+                  Input Patient's HIN
                 </label>
                 <input
                   type="text"
