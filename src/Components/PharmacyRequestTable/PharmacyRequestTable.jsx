@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Eye } from "lucide-react";
+import { toast } from "react-toastify";
 import { pharmacyRequests } from "./PharmacyData/PharmacyRequests";
 import PharmacyTablePagination from "./PharmacyTablePagination/PharmacyTablePagination";
 
@@ -11,24 +12,29 @@ const PharmacyRequestTable = () => {
   const [displayData, setDisplayData] = useState([]);
   const [openPopover, setOpenPopover] = useState(null);
   const [activePharmacy, setActivePharmacy] = useState(false);
+  const [pharmacyData, setPharmacyData] = useState([]);
+  const [isPharmacyList, setIsPharmacyList] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const totalPages = Math.ceil(pharmacyRequests.length / ITEMS_PER_PAGE);
-
-  useEffect(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    setDisplayData(pharmacyRequests.slice(startIndex, endIndex));
-  }, [currentPage]);
+  const totalPages = Math.ceil(pharmacyRequests.length / ITEMS_PER_PAGE)
+  // useEffect(() => {
+  //   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  //   const endIndex = startIndex + ITEMS_PER_PAGE;
+  //   setDisplayData(pharmacyRequests.slice(startIndex, endIndex));
+  // }, [currentPage]);
 
   const handleRowSelection = (id) => {
-    const newSelection = new Set(selectedRows);
-    if (newSelection.has(id)) {
-      newSelection.delete(id);
-    } else {
-      newSelection.add(id);
-    }
-    setSelectedRows(newSelection);
+    setSelectedRows((prevSelected) => {
+      const newSelection = new Set(prevSelected);
+      if (newSelection.has(id)) {
+        newSelection.delete(id);
+      } else {
+        newSelection.add(id);
+      }
+      return newSelection;
+    });
   };
+  
 
   const togglePopover = (index) => {
     setOpenPopover(openPopover === index ? null : index);
@@ -41,10 +47,10 @@ const PharmacyRequestTable = () => {
   };
 
   useEffect(() => {
-    const fetchPatientDashboard = async () => {
+    const fetchAllPharmacies = async () => {
+      setLoading(true);
       // Retrieve the JWT token from localStorage
       const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
-    
 
       try {
         // Construct the URL with query parameters
@@ -56,13 +62,20 @@ const PharmacyRequestTable = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
-            
           },
         });
 
         // Handle the response
         if (response.ok) {
-          console.log(response.data);
+          setLoading(false);
+          const data = await response.json(); // Wait for the JSON to be parsed
+          console.log(data); // Now this will log the actual JSON object
+          if (data.data.length > 0) {
+            setPharmacyData(data.data);
+            setIsPharmacyList(true);
+          } else {
+            setIsPharmacyList(false);
+          }
         } else {
           const errorData = await response.json();
           console.error("Failed to fetch dashboard data:", errorData);
@@ -74,11 +87,196 @@ const PharmacyRequestTable = () => {
         throw error;
       } finally {
         // console.log(datainfo);
+        setLoading(false);
       }
     };
 
-    fetchPatientDashboard()
+    fetchAllPharmacies();
   }, []);
+
+  const handleRequestApprove = async (pharma_code) => {
+    toast.success("Pharmacy request is being approved")
+    console.log(pharma_code)
+
+    const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+
+    const payload = {
+      pharma_codes: [pharma_code]  // If there's more than one pharma code, add them here
+    };
+
+    try {
+      // Construct the URL with query parameters
+      const url = `https://docuhealth-backend-h03u.onrender.com/api/admin/pharmarcy/approve_registration`;
+
+      // Make the GET request
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+        },
+        body: JSON.stringify(payload), // Convert the payload to a JSON string
+      });
+
+      // Handle the response
+      if (response.ok) {
+        setLoading(false);
+        const data = await response.json(); // Wait for the JSON to be parsed
+        console.log(data); // Now this will log the actual JSON object
+        toast.success(data.message); // Assuming the API returns a pharmacy_name field
+        toast.success("Kindly refresh to see changes")
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to fetch dashboard data:", errorData);
+      }
+    } catch (error) {
+      console.error("An unexpected error occurred:", error);
+
+      // Handle unexpected errors
+      throw error;
+    } finally {
+
+    }
+  }
+  const handleRequestDecline = async (pharma_code) => {
+    toast.success("Pharmacy request is being blocked")
+    console.log(pharma_code)
+
+    const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+
+    const payload = {
+      pharma_codes: [pharma_code]  // If there's more than one pharma code, add them here
+    };
+
+    try {
+      // Construct the URL with query parameters
+      const url = `https://docuhealth-backend-h03u.onrender.com/api/admin/pharmarcy/block`;
+
+      // Make the GET request
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+        },
+        body: JSON.stringify(payload), // Convert the payload to a JSON string
+      });
+
+      // Handle the response
+      if (response.ok) {
+        setLoading(false);
+        const data = await response.json(); // Wait for the JSON to be parsed
+        console.log(data); // Now this will log the actual JSON object
+        toast.success('Pharmacy request blocked successfully'); 
+        toast.success("Kindly refresh to see changes")
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to fetch dashboard data:", errorData);
+      }
+    } catch (error) {
+      console.error("An unexpected error occurred:", error);
+
+      // Handle unexpected errors
+      throw error;
+    } finally {
+
+    }
+  }
+  const handleDeclineAll = async () => {
+    const selectedIds = Array.from(selectedRows);
+    console.log("Declining requests for IDs:", selectedIds);
+
+    toast.success("Pharmacy requests are being blocked")
+
+
+    const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+
+    const payload = {
+      pharma_codes: selectedIds
+    };
+
+    
+    try {
+      // Construct the URL with query parameters
+      const url = `https://docuhealth-backend-h03u.onrender.com/api/admin/pharmarcy/block`;
+
+      // Make the GET request
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+        },
+        body: JSON.stringify(payload), // Convert the payload to a JSON string
+      });
+
+      // Handle the response
+      if (response.ok) {
+        setLoading(false);
+        const data = await response.json(); // Wait for the JSON to be parsed
+        console.log(data); // Now this will log the actual JSON object
+        toast.success('Pharmacy requests blocked successfully'); 
+        toast.success("Kindly refresh to see changes")
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to fetch dashboard data:", errorData);
+      }
+    } catch (error) {
+      console.error("An unexpected error occurred:", error);
+
+      // Handle unexpected errors
+      throw error;
+    } finally {
+    }
+    setSelectedRows(new Set());
+  }
+  const handleApproveAll = async () => {
+    const selectedIds = Array.from(selectedRows);
+    console.log("Approving requests for IDs:", selectedIds);
+
+    toast.success("Pharmacy requests are being approved")
+
+    const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+
+    const payload = {
+      pharma_codes: selectedIds  // If there's more than one pharma code, add them here
+    };
+
+    try {
+      // Construct the URL with query parameters
+      const url = `https://docuhealth-backend-h03u.onrender.com/api/admin/pharmarcy/approve_registration`;
+
+      // Make the GET request
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+        },
+        body: JSON.stringify(payload), // Convert the payload to a JSON string
+      });
+
+      // Handle the response
+      if (response.ok) {
+        setLoading(false);
+        const data = await response.json(); // Wait for the JSON to be parsed
+        console.log(data); // Now this will log the actual JSON object
+        toast.success(data.message); // Assuming the API returns a pharmacy_name field
+        toast.success("Kindly refresh to see changes")
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to fetch dashboard data:", errorData);
+      }
+    } catch (error) {
+      console.error("An unexpected error occurred:", error);
+
+      // Handle unexpected errors
+      throw error;
+    } finally {
+
+    }
+    setSelectedRows(new Set());
+  }
 
   return (
     <div className="relative">
@@ -92,7 +290,7 @@ const PharmacyRequestTable = () => {
               <div className=" flex justify-end gap-3">
                 <button
                   className="px-4 py-1.5 border border-red-400  text-red-400 rounded-full text-sm font-medium  transition-colors"
-                  // onClick={handleDeclineAll}
+                  onClick={handleDeclineAll}
                 >
                   {activePharmacy
                     ? "Block selected pharmacies"
@@ -102,7 +300,7 @@ const PharmacyRequestTable = () => {
                   className={` ${
                     activePharmacy ? "hidden" : ""
                   } px-4 py-1.5 border border-[#0000FF]  text-[#0000FF]   rounded-full text-sm font-medium  transition-colors`}
-                  // onClick={handleDeclineAll}
+                  onClick={handleApproveAll}
                 >
                   Approve all selected
                 </button>
@@ -265,13 +463,13 @@ const PharmacyRequestTable = () => {
                 <th className="px-3 py-4 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
                   Pharmacy address
                 </th>
-                <th className="px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                  <span className="sr-only">Actions</span>
+                <th className="px-3 py-4 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+                  Status
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {displayData.map((request, index) => (
+              {/* {displayData.map((request, index) => (
                 <tr key={request.id} className="hover:bg-gray-50">
                   <td className="px-3 py-3.5 whitespace-nowrap">
                     <div className="flex items-center">
@@ -347,13 +545,119 @@ const PharmacyRequestTable = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))} */}
+
+              {isPharmacyList &&
+                pharmacyData.length > 0 &&
+                pharmacyData.map((request, index) => (
+                  <tr key={request.id} className="hover:bg-gray-50">
+                    <td className="px-3 py-3.5 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 text-blue-600 border-gray-30 rounded"
+                          checked={selectedRows.has(request.pharma_code)}
+                          onChange={() => handleRowSelection(request.pharma_code)}
+                        />
+                      </div>
+                    </td>
+                    <td className="px-3 py-3.5 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {request.name}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3.5 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">
+                        {request.email}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3.5 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">
+                        {request.phone_num}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3.5">
+                      <div className="text-sm text-gray-500 max-w-xs">
+                        {request.address}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3.5">
+                      <div
+                        className={`text-sm font-medium max-w-xs ${
+                          request.status === "approved"
+                            ? "text-green-600"
+                            : request.status === "blocked"
+                            ? "text-red-600"
+                            : "text-yellow-500" // for 'pending' or anything else
+                        }`}
+                      >
+                        {request.status}
+                      </div>
+                    </td>
+
+                    <td className="px-3 py-3.5 whitespace-nowrap  text-sm font-medium">
+                      <div className="flex space-x-2 justify-end">
+                        <svg
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          onClick={() => togglePopover(index)}
+                          // className={` ${
+                          //           openPopover === index
+                          //             ? "bg-gray-100 p-2 rounded-full"
+                          //             : ""
+                          //         }`}
+                        >
+                          <path
+                            d="M12 6C11.45 6 11 6.45 11 7C11 7.55 11.45 8 12 8C12.55 8 13 7.55 13 7C13 6.45 12.55 6 12 6ZM12 16C11.45 16 11 16.45 11 17C11 17.55 11.45 18 12 18C12.55 18 13 17.55 13 17C13 16.45 12.55 16 12 16ZM12 11C11.45 11 11 11.45 11 12C11 12.55 11.45 13 12 13C12.55 13 13 12.55 13 12C13 11.45 12.55 11 12 11Z"
+                            fill="#717473"
+                          />
+                        </svg>
+
+                        {openPopover === index && (
+                          <div className="absolute right-0 mt-8 bg-white border shadow-md rounded-lg p-2 w-52  z-30">
+                            <p
+                              className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                              onClick={() => handleRequestApprove(request.pharma_code)}
+                            >
+                              Approve Request
+                            </p>{" "}
+                            <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                            onClick={() => handleRequestDecline(request.pharma_code)}
+                            >
+                              Decline Request
+                            </p>
+                            <p
+                              className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                              onClick={() => handleCopy(request.phone_num)}
+                            >
+                              Copy Phone Number
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
+          {loading ? (
+            <p className="text-center bg-white py-5 text-sm">
+              Pharmacy requests loading
+            </p>
+          ) : isPharmacyList ? (
+            <p className="text-center bg-white py-5 hidden"></p>
+          ) : (
+            <p className="text-center bg-white py-5 text-sm">
+              No pharmacy requests are available
+            </p>
+          )}
         </div>
       )}
 
-      <div className="px-4 py-3 flex items-center justify-between  sm:px-6 ">
+      {/* <div className="px-4 py-3 flex items-center justify-between  sm:px-6 ">
         <div className="text-sm text-gray-500">
           Showing page {currentPage} of {totalPages} entries
         </div>
@@ -362,7 +666,7 @@ const PharmacyRequestTable = () => {
           totalPages={totalPages}
           onPageChange={setCurrentPage}
         />
-      </div>
+      </div> */}
     </div>
   );
 };
