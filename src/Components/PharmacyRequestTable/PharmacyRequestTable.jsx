@@ -1,29 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { Eye } from "lucide-react";
 import { toast } from "react-toastify";
-import { pharmacyRequests } from "./PharmacyData/PharmacyRequests";
-import PharmacyTablePagination from "./PharmacyTablePagination/PharmacyTablePagination";
+
 
 const ITEMS_PER_PAGE = 7;
 
 const PharmacyRequestTable = () => {
   const [selectedRows, setSelectedRows] = useState(new Set());
   const [currentPage, setCurrentPage] = useState(1);
-  const [displayData, setDisplayData] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
   const [openPopover, setOpenPopover] = useState(null);
   const [activePharmacy, setActivePharmacy] = useState(false);
   const [pharmacyData, setPharmacyData] = useState([]);
   const [isPharmacyList, setIsPharmacyList] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isActivePharmacyList, setIsActivePharmacyList] = useState(false);
 
-  const totalPages = Math.ceil(pharmacyRequests.length / ITEMS_PER_PAGE);
-  // useEffect(() => {
-  //   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  //   const endIndex = startIndex + ITEMS_PER_PAGE;
-  //   setDisplayData(pharmacyRequests.slice(startIndex, endIndex));
-  // }, [currentPage]);
 
+  
   const handleRowSelection = (id) => {
     setSelectedRows((prevSelected) => {
       const newSelection = new Set(prevSelected);
@@ -46,6 +39,8 @@ const PharmacyRequestTable = () => {
     alert("Phone number copied to clipboard!");
   };
 
+  const itemsPerPage = 10;
+
   useEffect(() => {
     const fetchAllPharmacies = async () => {
       setLoading(true);
@@ -53,25 +48,27 @@ const PharmacyRequestTable = () => {
       const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
 
       try {
-        // Construct the URL with query parameters
-        const url = `https://docuhealth-backend-h03u.onrender.com/api/admin/pharmarcy/get_all`;
-
-        // Make the GET request
-        const response = await fetch(url, {
+        const url = new URL("https://docuhealth-backend-h03u.onrender.com/api/admin/pharmarcy/get_all");
+        url.searchParams.append("page", currentPage);
+        url.searchParams.append("size", itemsPerPage);
+        
+        const response = await fetch(url.toString(), {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+            Authorization: `Bearer ${jwtToken}`,
           },
         });
+        
 
         // Handle the response
         if (response.ok) {
           setLoading(false);
           const data = await response.json(); // Wait for the JSON to be parsed
           console.log(data); // Now this will log the actual JSON object
-          if (data.data.length > 0) {
-            setPharmacyData(data.data);
+          setTotalPages(data.total_pages)
+          if (data.pharmacies.length > 0) {
+            setPharmacyData(data.pharmacies);
             setIsPharmacyList(true);
           } else {
             setIsPharmacyList(false);
@@ -92,7 +89,7 @@ const PharmacyRequestTable = () => {
     };
 
     fetchAllPharmacies();
-  }, []);
+  }, [currentPage]);
 
   const handleRequestApprove = async (pharma_code) => {
     toast.success("Pharmacy request is being approved");
@@ -687,16 +684,62 @@ const PharmacyRequestTable = () => {
         </div>
       )}
 
-      {/* <div className="px-4 py-3 flex items-center justify-between  sm:px-6 ">
-        <div className="text-sm text-gray-500">
-          Showing page {currentPage} of {totalPages} entries
-        </div>
-        <PharmacyTablePagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
-      </div> */}
+
+{totalPages > 1 && (
+          <div className="flex flex-col md:flex-row gap-3 justify-between items-center my-4">
+            {/* Pagination Info */}
+            <span className="text-gray-500 text-sm">
+              Showing page {currentPage} of {totalPages} entries
+            </span>
+
+            {/* Pagination Buttons */}
+            <div className="flex items-center">
+              {/* Previous Button */}
+              <button
+                className={`px-3 py-1 mx-1 rounded-full ${
+                  currentPage === 1
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-300 hover:bg-gray-400"
+                }`}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                &lt;
+              </button>
+
+              {/* Page Numbers */}
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i + 1}
+                  className={`px-3 py-1 mx-1 rounded-full ${
+                    currentPage === i + 1
+                      ? "bg-[#0000FF] text-white"
+                      : "bg-gray-300 hover:bg-gray-400"
+                  }`}
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              {/* Next Button */}
+              <button
+                className={`px-3 py-1 mx-1 rounded-full ${
+                  currentPage === totalPages
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-300 hover:bg-gray-400"
+                }`}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+              >
+                &gt;
+              </button>
+            </div>
+          </div>
+        )}
+      
     </div>
   );
 };
