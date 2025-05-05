@@ -285,7 +285,7 @@ const UserHomeDashboard = () => {
 
       // console.log(response.json);
       console.log(response.data.records);
-      // setRecords(response.data.records);
+      setRecords(response.data.records);
       setTotalPages(response.data.total_pages);
 
       // console.log(response.data.records);

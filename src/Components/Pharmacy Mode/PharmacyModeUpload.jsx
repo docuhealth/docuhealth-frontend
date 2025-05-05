@@ -21,9 +21,10 @@ const PharmacyModeUpload = ({
 
   const payload = {
     pharma_code: formData.pharmacyCode,
+    patient_HIN : formData.patient_HIN
   };
 
-  const handleFectchPharmacyName = async (e) => {
+  const handleFetchPharmacyName = async (e) => {
     e.preventDefault();
     setLoading(true);
 
@@ -71,15 +72,55 @@ const PharmacyModeUpload = ({
   };
 
   const handleSubmit = async (e) => {
-    sessionStorage.setItem("pharmacyCode", formData.pharmacyCode);
-    sessionStorage.setItem("patient_HIN", formData.patient_HIN);
-    sessionStorage.setItem('pharmacyName', pharmacyName)
-    setIsPharmacyUploadCode(true);
-    setPharmacyModeProceed(false);
-    setFormData({
-      pharmacyCode: "",
-      patient_HIN : ""
-    })
+    setLoading(true)
+    if(formData.patient_HIN === ''){
+      toast.error('Please enter patient hin')
+    }
+    try {
+   
+
+      const response = await fetch(
+        `https://docuhealth-backend-h03u.onrender.com/api/pharmarcy/get_patient_name`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json(); // Wait for the JSON to be parsed
+        console.log(data); // Now this will log the actual JSON object
+        setLoading(false)
+        
+        sessionStorage.setItem("pharmacyCode", formData.pharmacyCode);
+        sessionStorage.setItem("patient_HIN", formData.patient_HIN);
+        sessionStorage.setItem('pharmacyName', pharmacyName)
+        sessionStorage.setItem('patient_name', data.name)
+        setIsPharmacyUploadCode(true);
+        setPharmacyModeProceed(false);
+        setFormData({
+          pharmacyCode: "",
+          patient_HIN : ""
+        })
+      } else {
+        console.log();
+        const errorData = await response.json();
+        console.error("Failed to fetch hin", errorData);
+        toast.error(errorData.message);
+      }
+    } catch (error) {
+      console.error(`Error: ${error.message}`);
+      toast.error(error.response.message);
+      //  setLoading('Send Otp')
+    } finally {
+      setLoading(false);
+
+    }
+
+  
   };
 
   return (
@@ -122,7 +163,7 @@ const PharmacyModeUpload = ({
           </div>
 
           <button
-            onClick={handleFectchPharmacyName}
+            onClick={handleFetchPharmacyName}
             className="mt-4 w-full bg-[#0000FF] text-white py-2 rounded-full transition text-sm"
           >
             {loading ? "Proceeding" : "Proceed"}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -10,6 +10,15 @@ const PharmacyModeUploadNext = ({ setIsPharmacyUploadCode , setIsPharmacyUploadS
     dosage: "",
     summary: "",
   });
+  const [patientName, setPatientName] = useState('');
+
+  useEffect(() => {
+    const name = sessionStorage.getItem('patient_name');
+    if (name) {
+      setPatientName(name);
+    }
+  }, []);
+  
 
   const [loading, setLoading] = useState(false);
 
@@ -180,7 +189,7 @@ const PharmacyModeUploadNext = ({ setIsPharmacyUploadCode , setIsPharmacyUploadS
           onClick={handleSubmit}
           className="mt-4 w-full bg-[#0000FF] text-white py-2 rounded-full transition text-sm"
         >
-          {loading ? "Uploading" : "Upload "}
+          {loading ? "Uploading for " : "Upload for "} {patientName}
         </button>
       </div>
     </div>
