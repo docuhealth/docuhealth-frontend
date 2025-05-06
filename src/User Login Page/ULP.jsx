@@ -662,6 +662,19 @@ const ULP = () => {
                 </div>
 
                 <div className="relative">
+                <p className="font-semibold pb-1">Referred By:</p>
+                <div className="relative">
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                    value={referred_by}
+                    onChange={(e) => setReferred_by(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+                <div className="relative">
                   <p className="font-semibold pb-1">Date Of Birth:</p>
                   <div className="relative">
                     <input
