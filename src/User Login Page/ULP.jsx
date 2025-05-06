@@ -283,6 +283,7 @@ const ULP = () => {
                   <input
                     type="text"
                     className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                    placeholder="Referral email"
                     value={referred_by}
                     onChange={(e) => setReferred_by(e.target.value)}
                     required
@@ -666,6 +667,7 @@ const ULP = () => {
                 <div className="relative">
                   <input
                     type="text"
+                    placeholder="Referral email"
                     className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
                     value={referred_by}
                     onChange={(e) => setReferred_by(e.target.value)}

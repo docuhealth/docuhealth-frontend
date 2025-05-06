@@ -152,7 +152,7 @@ const PharmacyModeGenerate = ({setPharmacyModeProceed, setIsPharmacyCreated}) =>
                 name="referred_by"
                 value={formData.referred_by}
                 onChange={handleChange}
-                placeholder="Referral"
+                placeholder="Referral email"
                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0000FF]  text-sm"
               />
             
