@@ -179,7 +179,7 @@ const ULP = () => {
 
               {/* Password Input */}
               <div className="relative">
-                <p className="font-semibold pb-1">Password:</p>
+                <p className="font-semibold pb-1">Password :</p>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -206,7 +206,7 @@ const ULP = () => {
 
               {/* Confirm Password Input */}
               <div className="relative">
-                <p className="font-semibold pb-1">Confirm Password:</p>
+                <p className="font-semibold pb-1">Confirm Password :</p>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -265,7 +265,7 @@ const ULP = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="relative">
-                <p className="font-semibold pb-1">Full Name:</p>
+                <p className="font-semibold pb-1">Full Name :</p>
                 <div className="relative">
                   <input
                     type="text"
@@ -278,7 +278,7 @@ const ULP = () => {
               </div>
 
               <div className="relative">
-                <p className="font-semibold pb-1">Referred By:</p>
+                <p className="font-semibold pb-1">Referred By :</p>
                 <div className="relative">
                   <input
                     type="text"
@@ -291,7 +291,7 @@ const ULP = () => {
               </div>
 
               <div className="relative">
-                <p className="font-semibold pb-1">Date Of Birth:</p>
+                <p className="font-semibold pb-1">Date Of Birth :</p>
                 <div className="relative">
                   <input
                     type="date"
@@ -389,7 +389,7 @@ const ULP = () => {
               </div>
 
               <div className="relative">
-                <p className="font-semibold pb-1">Sex:</p>
+                <p className="font-semibold pb-1">Sex :</p>
                 <div className="relative">
                   <select
                     className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
@@ -564,7 +564,7 @@ const ULP = () => {
 
                 {/* Password Input */}
                 <div className="relative">
-                  <p className="font-semibold">Password:</p>
+                  <p className="font-semibold">Password :</p>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
@@ -591,7 +591,7 @@ const ULP = () => {
 
                 {/* Confirm Password Input */}
                 <div className="relative">
-                  <p className="font-semibold">Confirm Password:</p>
+                  <p className="font-semibold">Confirm Password :</p>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
@@ -662,7 +662,7 @@ const ULP = () => {
                 </div>
 
                 <div className="relative">
-                <p className="font-semibold pb-1">Referred By:</p>
+                <p className="font-semibold pb-1">Referred By :</p>
                 <div className="relative">
                   <input
                     type="text"
@@ -675,7 +675,7 @@ const ULP = () => {
               </div>
 
                 <div className="relative">
-                  <p className="font-semibold pb-1">Date Of Birth:</p>
+                  <p className="font-semibold pb-1">Date Of Birth :</p>
                   <div className="relative">
                     <input
                       type="date"
@@ -773,7 +773,7 @@ const ULP = () => {
                 </div>
 
                 <div className="relative">
-                  <p className="font-semibold pb-1">Sex:</p>
+                  <p className="font-semibold pb-1">Sex :</p>
                   <div className="relative">
                     <select
                       className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
