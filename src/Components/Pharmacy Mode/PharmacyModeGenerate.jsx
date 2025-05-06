@@ -10,6 +10,7 @@ const PharmacyModeGenerate = ({setPharmacyModeProceed, setIsPharmacyCreated}) =>
       phoneNumber: "",
       emailAddress: "",
       pharmacyAddress: "",  
+      referred_by: ""
     });
     const[loading, setLoading] = useState(false)
 
@@ -22,7 +23,8 @@ const PharmacyModeGenerate = ({setPharmacyModeProceed, setIsPharmacyCreated}) =>
       name: formData.pharmacyName,
       email:  formData.emailAddress,
       phone_num: formData.phoneNumber,
-      address: formData.emailAddress
+      address: formData.emailAddress,
+      referred_by: formData.referred_by
     }
 
     const handleSubmit = async (e) => {
@@ -30,7 +32,7 @@ const PharmacyModeGenerate = ({setPharmacyModeProceed, setIsPharmacyCreated}) =>
       setLoading(true)
 
       // Validate form data here if needed
-      if (!formData.pharmacyName || !formData.phoneNumber || !formData.emailAddress || !formData.pharmacyAddress) {
+      if (!formData.pharmacyName || !formData.phoneNumber || !formData.emailAddress || !formData.pharmacyAddress || !formData.referred_by) {
         toast.error("Please fill in all fields.");
         setLoading(false)
         return;
@@ -143,6 +145,21 @@ const PharmacyModeGenerate = ({setPharmacyModeProceed, setIsPharmacyCreated}) =>
 
             <div className="mb-2">
               <label className="block text-gray-700 text-sm font-medium mb-1">
+               Referred By
+              </label>
+              <input
+                type="text"
+                name="referred_by"
+                value={formData.referred_by}
+                onChange={handleChange}
+                placeholder="Referral"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0000FF]  text-sm"
+              />
+            
+            </div>
+
+            <div className="mb-2">
+              <label className="block text-gray-700 text-sm font-medium mb-1">
                Pharmacy address
               </label>
               <textarea
@@ -153,6 +170,8 @@ const PharmacyModeGenerate = ({setPharmacyModeProceed, setIsPharmacyCreated}) =>
                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0000FF]  h-24 resize-none text-sm"
               ></textarea>
             </div>
+
+        
           </div>
         </div>
 

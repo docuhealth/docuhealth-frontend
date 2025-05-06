@@ -17,6 +17,7 @@ const ULP = () => {
 
   const [fullname, setFullName] = useState("");
   const [sex, setSex] = useState("");
+  const[referred_by, setReferred_by] = useState('')
   const [DOB, setDOB] = useState("");
   const [state, setState] = useState("");
   const [signUp, setSignUp] = useState("");
@@ -64,6 +65,7 @@ const ULP = () => {
       state,
       sex,
       DOB,
+      referred_by
     };
     try {
       const response = await axios.post(
@@ -97,7 +99,8 @@ const ULP = () => {
       confirmPassword,
       fullname,
       state,
-      DOB
+      DOB,
+      referred_by
     );
 
     setEmail("");
@@ -108,6 +111,7 @@ const ULP = () => {
     setFullName("");
     setSex("");
     setState("");
+    setReferred_by("")
   };
 
   const handleNextStep = () => {
@@ -268,6 +272,19 @@ const ULP = () => {
                     className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
                     value={fullname}
                     onChange={(e) => setFullName(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="relative">
+                <p className="font-semibold pb-1">Referred By:</p>
+                <div className="relative">
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                    value={referred_by}
+                    onChange={(e) => setReferred_by(e.target.value)}
                     required
                   />
                 </div>
