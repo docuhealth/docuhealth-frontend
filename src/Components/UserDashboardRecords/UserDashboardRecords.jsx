@@ -73,7 +73,7 @@ const UserDashboardRecords = ({
                     <div className="text-gray-700 truncate text-sm">
                       <span className="font-medium">Name of Hospital:</span>
                       <p>
-                        {record?.hospital_info?.name + " Hospital" || "N/A"}
+                        {record?.hospital_info?.name + " Hospital" || 'N/A'}
                       </p>
                     </div>
 
@@ -82,10 +82,11 @@ const UserDashboardRecords = ({
 
                     {/* Medical Personnel */}
                     <div className="text-gray-700 truncate text-sm">
-                      <span className="font-medium">Medical Personnel:</span>
+                      <span className="font-medium">
+                        { record?.pharmacy_info?.pharmacist ? 'Pharmacy Attendant': 'Medical Personnel:'}</span>
                       <p>
                         {record?.hospital_info?.medical_personnel ||
-                          record?.pharmacist}
+                          record?.pharmacy_info?.pharmacist}
                       </p>
                     </div>
 
@@ -325,27 +326,27 @@ const UserDashboardRecords = ({
                             {/* Name of Medical Personnel */}
                             <div className="col-span-2 text-sm">
                               <label className="block text-gray-600 text-sm font-medium">
-                                Name of Medical Personnel
+                              { record?.pharmacy_info?.pharmacist ? 'Pharmacy Attendant': 'Medical Personnel:'}
                               </label>
                               <input
                                 type="text"
                                 value={
                                   selectedRecord?.hospital_info
                                     ?.medical_personnel ||
-                                  selectedRecord?.pharmacist
+                                  selectedRecord?.pharmacy_info.pharmacist
                                 }
                                 readOnly
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
                               />
                             </div>
-                            {selectedRecord?.pharmacy_address ? (
+                            {selectedRecord?.pharmacy_info?.pharmacy_address ? (
                               <div className="col-span-2 text-sm">
                                 <label className="block text-gray-600 text-sm font-medium">
                                   Pharmacy address
                                 </label>
                                 <input
                                   type="text"
-                                  value={selectedRecord?.pharmacy_address}
+                                  value={selectedRecord?.pharmacy_info?.pharmacy_address}
                                   readOnly
                                   className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
                                 />
@@ -362,8 +363,24 @@ const UserDashboardRecords = ({
                                 <input
                                   type="text"
                                   value={selectedRecord?.drugs.map(
-                                    (drug, index) => drug
+                                    (drug, index) => " " +drug + " "
                                   )}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+                            ) : (
+                              <div className="hidden"> </div>
+                            )}
+
+                            {selectedRecord?.dosage ? (
+                              <div className="col-span-2 text-sm">
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Drug Usage Respectively
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord?.dosage}
                                   readOnly
                                   className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
                                 />
