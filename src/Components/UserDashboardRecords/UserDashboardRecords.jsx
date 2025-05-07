@@ -339,6 +339,7 @@ const UserDashboardRecords = ({
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
                               />
                             </div>
+
                             {selectedRecord?.pharmacy_info?.pharmacy_address ? (
                               <div className="col-span-2 text-sm">
                                 <label className="block text-gray-600 text-sm font-medium">
@@ -363,7 +364,7 @@ const UserDashboardRecords = ({
                                 <input
                                   type="text"
                                   value={selectedRecord?.drugs.map(
-                                    (drug, index) => " " +drug + " "
+                                    (drug, index) => " " + drug + " "
                                   )}
                                   readOnly
                                   className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
@@ -559,7 +560,7 @@ const UserDashboardRecords = ({
                           </div>
                         </div>
                         {/* Responsive Grid Layout */}
-                        <div className="grid grid-cols-1 gap-4 p-4">
+                        <div className="flex flex-col gap-3 py-3">
                           {/* Pulse Rate */}
                           <div>
                             <label className="block text-gray-600 text-sm font-medium">
@@ -696,28 +697,28 @@ const UserDashboardRecords = ({
                           {/* Name of Medical Personnel */}
                           <div className="col-span-1 sm:col-span-2">
                             <label className="block text-gray-600 text-sm font-medium">
-                              Name of Medical Personnel
+                                 { record?.pharmacy_info?.pharmacist ? 'Pharmacy Attendant': 'Medical Personnel:'}
                             </label>
                             <input
                               type="text"
                               value={
                                 selectedRecord?.hospital_info
                                   ?.medical_personnel ||
-                                selectedRecord?.pharmacist
+                                selectedRecord?.pharmacy_info?.pharmacist
                               }
                               readOnly
                               className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
                             />
                           </div>
 
-                          {selectedRecord?.pharmacy_address ? (
+                          {selectedRecord?.pharmacy_info?.pharmacy_address ?  (
                             <div className="col-span-2 text-sm">
                               <label className="block text-gray-600 text-sm font-medium">
                                 Pharmacy address
                               </label>
                               <input
                                 type="text"
-                                value={selectedRecord?.pharmacy_address}
+                                value={selectedRecord?.pharmacy_info?.pharmacy_address}
                                 readOnly
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
                               />
@@ -734,7 +735,7 @@ const UserDashboardRecords = ({
                               <input
                                 type="text"
                                 value={selectedRecord?.drugs.map(
-                                  (drug, index) => drug
+                                  (drug, index) => " " + drug + " "
                                 )}
                                 readOnly
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
@@ -743,6 +744,22 @@ const UserDashboardRecords = ({
                           ) : (
                             <div className="hidden"> </div>
                           )}
+
+{selectedRecord?.dosage ? (
+                              <div className="col-span-2 text-sm">
+                                <label className="block text-gray-600 text-sm font-medium">
+                                  Drug Usage Respectively
+                                </label>
+                                <input
+                                  type="text"
+                                  value={selectedRecord?.dosage}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                />
+                              </div>
+                            ) : (
+                              <div className="hidden"> </div>
+                            )}
 
                           {/* Attachment */}
                           <div className="">
@@ -802,11 +819,11 @@ const UserDashboardRecords = ({
                     {/* Medical Personnel */}
                     <div>
                       <span className="text-gray-500 block text-sm">
-                        Medical Personnel
+                      { record?.pharmacy_info?.pharmacist ? 'Pharmacy Attendant': 'Medical Personnel:'}
                       </span>
                       <p className="text-gray-700 font-medium">
                         {record?.hospital_info?.medical_personnel ||
-                          record?.pharmacist}
+                          record?.pharmacy_info?.pharmacist}
                       </p>
                     </div>
 
