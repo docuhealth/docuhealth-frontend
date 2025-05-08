@@ -71,9 +71,16 @@ const UserDashboardRecords = ({
 
                     {/* Hospital Name */}
                     <div className="text-gray-700 truncate text-sm">
-                      <span className="font-medium">Name of Hospital:</span>
+                      <span className="font-medium">
+                        {" "}
+                        {record?.pharmacy_info?.pharmacy_name
+                          ? "Name of Pharmacy :"
+                          : "Name of Hospital :"}
+                      </span>
                       <p>
-                        {record?.hospital_info?.name + " Hospital" || 'N/A'}
+                        {record?.hospital_info?.name
+                          ? record.hospital_info.name + " Hospital"
+                          : record?.pharmacy_info?.pharmacy_name + " Pharmacy"}
                       </p>
                     </div>
 
@@ -83,7 +90,10 @@ const UserDashboardRecords = ({
                     {/* Medical Personnel */}
                     <div className="text-gray-700 truncate text-sm">
                       <span className="font-medium">
-                        { record?.pharmacy_info?.pharmacist ? 'Pharmacy Attendant': 'Medical Personnel:'}</span>
+                        {record?.pharmacy_info?.pharmacist
+                          ? "Pharmacy Attendant"
+                          : "Medical Personnel:"}
+                      </span>
                       <p>
                         {record?.hospital_info?.medical_personnel ||
                           record?.pharmacy_info?.pharmacist}
@@ -128,10 +138,13 @@ const UserDashboardRecords = ({
                               </div>
 
                               <div>
-                                <p className="font-semibold text-sm">
-                                  {selectedRecord?.hospital_info?.name || "N/A"}{" "}
-                                  Hospital
+                                <p>
+                                  {record?.hospital_info?.name
+                                    ? record.hospital_info.name + " Hospital"
+                                    : record?.pharmacy_info?.pharmacy_name +
+                                      " Pharmacy"}
                                 </p>
+
                                 <div className="text-[12px] flex items-center gap-1 text-gray-400 text-sm">
                                   <p>
                                     <span className="">
@@ -257,8 +270,10 @@ const UserDashboardRecords = ({
                               <input
                                 type="text"
                                 value={
-                                  selectedRecord?.basic_info?.blood_pressure +
-                                    " MM HG" || "N/A"
+                                  selectedRecord?.basic_info?.blood_pressure
+                                    ? selectedRecord.basic_info.blood_pressure +
+                                        " MM HG" || "N/A"
+                                    : "N/A"
                                 }
                                 readOnly
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
@@ -283,7 +298,7 @@ const UserDashboardRecords = ({
                             {/* Summary/Treatment Plan */}
                             <div className="col-span-2 text-sm">
                               <label className="block text-gray-600 text-sm font-medium">
-                                Summary/Treatment Plan
+                                Summary / Treatment Plan
                               </label>
                               <textarea
                                 value={selectedRecord?.summary || "N/A"}
@@ -326,7 +341,9 @@ const UserDashboardRecords = ({
                             {/* Name of Medical Personnel */}
                             <div className="col-span-2 text-sm">
                               <label className="block text-gray-600 text-sm font-medium">
-                              { record?.pharmacy_info?.pharmacist ? 'Pharmacy Attendant': 'Medical Personnel:'}
+                                {record?.pharmacy_info?.pharmacist
+                                  ? "Pharmacy Attendant"
+                                  : "Medical Personnel:"}
                               </label>
                               <input
                                 type="text"
@@ -347,7 +364,10 @@ const UserDashboardRecords = ({
                                 </label>
                                 <input
                                   type="text"
-                                  value={selectedRecord?.pharmacy_info?.pharmacy_address}
+                                  value={
+                                    selectedRecord?.pharmacy_info
+                                      ?.pharmacy_address
+                                  }
                                   readOnly
                                   className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
                                 />
@@ -359,7 +379,7 @@ const UserDashboardRecords = ({
                             {selectedRecord?.drugs ? (
                               <div className="col-span-2 text-sm">
                                 <label className="block text-gray-600 text-sm font-medium">
-                                  Drugs Prescribed
+                                  Drugs Bought
                                 </label>
                                 <input
                                   type="text"
@@ -502,9 +522,11 @@ const UserDashboardRecords = ({
                                 : ""}
                             </div>
                             <div>
-                              <p className="font-semibold text-md">
-                                {selectedRecord?.hospital_info?.name || "N/A"}{" "}
-                                Hospital
+                              <p>
+                                {record?.hospital_info?.name
+                                  ? record.hospital_info.name + " Hospital"
+                                  : record?.pharmacy_info?.pharmacy_name +
+                                    " Pharmacy"}
                               </p>
                               <div className="text-[12px] flex items-center gap-1 text-gray-400">
                                 <p>
@@ -630,8 +652,10 @@ const UserDashboardRecords = ({
                             <input
                               type="text"
                               value={
-                                selectedRecord?.basic_info?.blood_pressure +
-                                  " MM HG" || "N/A"
+                                selectedRecord?.basic_info?.blood_pressure
+                                  ? selectedRecord.basic_info.blood_pressure +
+                                      " MM HG" || "N/A"
+                                  : "N/A"
                               }
                               readOnly
                               className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
@@ -697,7 +721,9 @@ const UserDashboardRecords = ({
                           {/* Name of Medical Personnel */}
                           <div className="col-span-1 sm:col-span-2">
                             <label className="block text-gray-600 text-sm font-medium">
-                                 { record?.pharmacy_info?.pharmacist ? 'Pharmacy Attendant': 'Medical Personnel:'}
+                              {record?.pharmacy_info?.pharmacist
+                                ? "Pharmacy Attendant"
+                                : "Medical Personnel:"}
                             </label>
                             <input
                               type="text"
@@ -711,14 +737,17 @@ const UserDashboardRecords = ({
                             />
                           </div>
 
-                          {selectedRecord?.pharmacy_info?.pharmacy_address ?  (
+                          {selectedRecord?.pharmacy_info?.pharmacy_address ? (
                             <div className="col-span-2 text-sm">
                               <label className="block text-gray-600 text-sm font-medium">
                                 Pharmacy address
                               </label>
                               <input
                                 type="text"
-                                value={selectedRecord?.pharmacy_info?.pharmacy_address}
+                                value={
+                                  selectedRecord?.pharmacy_info
+                                    ?.pharmacy_address
+                                }
                                 readOnly
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
                               />
@@ -730,7 +759,7 @@ const UserDashboardRecords = ({
                           {selectedRecord?.drugs ? (
                             <div className="col-span-2 text-sm">
                               <label className="block text-gray-600 text-sm font-medium">
-                                Drugs Prescribed
+                                Drugs Bought
                               </label>
                               <input
                                 type="text"
@@ -745,21 +774,21 @@ const UserDashboardRecords = ({
                             <div className="hidden"> </div>
                           )}
 
-{selectedRecord?.dosage ? (
-                              <div className="col-span-2 text-sm">
-                                <label className="block text-gray-600 text-sm font-medium">
-                                  Drug Usage Respectively
-                                </label>
-                                <input
-                                  type="text"
-                                  value={selectedRecord?.dosage}
-                                  readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
-                                />
-                              </div>
-                            ) : (
-                              <div className="hidden"> </div>
-                            )}
+                          {selectedRecord?.dosage ? (
+                            <div className="col-span-2 text-sm">
+                              <label className="block text-gray-600 text-sm font-medium">
+                                Drug Usage Respectively
+                              </label>
+                              <input
+                                type="text"
+                                value={selectedRecord?.dosage}
+                                readOnly
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              />
+                            </div>
+                          ) : (
+                            <div className="hidden"> </div>
+                          )}
 
                           {/* Attachment */}
                           <div className="">
@@ -798,11 +827,16 @@ const UserDashboardRecords = ({
                   <div className="grid grid-cols-1 gap-y-2 sm:flex sm:space-x-4 sm:items-center ">
                     {/* Name of Hospital */}
                     <div>
-                      <span className="text-gray-500 block text-sm">
-                        Name of Hospital
+                      <span className="font-medium">
+                        {" "}
+                        {record?.pharmacy_info?.pharmacy_name
+                          ? "Name of Pharmacy :"
+                          : "Name of Hospital :"}
                       </span>
-                      <p className="text-gray-700 font-medium">
-                        {record?.hospital_info?.name + " Hospital" || "N/A"}
+                      <p>
+                        {record?.hospital_info?.name
+                          ? record.hospital_info.name + " Hospital"
+                          : record?.pharmacy_info?.pharmacy_name}
                       </p>
                     </div>
 
@@ -812,14 +846,16 @@ const UserDashboardRecords = ({
                         Diagnosis
                       </span>
                       <p className="text-gray-700 font-medium">
-                        <p>{record?.basic_info?.diagnosis || "N/A"}</p>
+                        <p>{record?.basic_info?.diagnosis || "Nil"}</p>
                       </p>
                     </div>
 
                     {/* Medical Personnel */}
                     <div>
                       <span className="text-gray-500 block text-sm">
-                      { record?.pharmacy_info?.pharmacist ? 'Pharmacy Attendant': 'Medical Personnel:'}
+                        {record?.pharmacy_info?.pharmacist
+                          ? "Pharmacy Attendant"
+                          : "Medical Personnel:"}
                       </span>
                       <p className="text-gray-700 font-medium">
                         {record?.hospital_info?.medical_personnel ||
@@ -904,3 +940,5 @@ const UserDashboardRecords = ({
 };
 
 export default UserDashboardRecords;
+
+
