@@ -23,7 +23,7 @@ const PharmacyModeGenerate = ({setPharmacyModeProceed, setIsPharmacyCreated}) =>
       name: formData.pharmacyName,
       email:  formData.emailAddress,
       phone_num: formData.phoneNumber,
-      address: formData.emailAddress,
+      address: formData.pharmacyAddress,
       referred_by: formData.referred_by
     }
 
