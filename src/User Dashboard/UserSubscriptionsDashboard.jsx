@@ -44,7 +44,7 @@ const UserSubscriptionsDashboard = () => {
           },
         }
       );
-      console.log(response.data)
+      console.log(response.data);
 
       setPlans(response.data.subscriptionPlans || []); // Assuming response.data.plans contains the plans
       // console.log(response.data.subscriptionPlans);
@@ -61,139 +61,138 @@ const UserSubscriptionsDashboard = () => {
     fetchPatientPlans();
   }, []);
 
+  useEffect(() => {
+    const fetchPatientDashboard = async (page = 1, size = 10) => {
+      // Retrieve the JWT token from localStorage
+      const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
+      const role = "patient"; // Replace with the required role
 
-    useEffect(() => {
-      const fetchPatientDashboard = async (page = 1, size = 10) => {
-        // Retrieve the JWT token from localStorage
-        const jwtToken = localStorage.getItem("jwtToken"); // Replace "jwtToken" with your token key
-        const role = "patient"; // Replace with the required role
-  
-        try {
-          // Construct the URL with query parameters
-          const url = `https://docuhealth-backend-h03u.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
-  
-          // Make the GET request
-          const response = await fetch(url, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
-              Role: role, // Add role to the headers
-            },
-          });
-  
-          // Handle the response
-          if (response.ok) {
-            const data = await response.json();
-            // console.log("Patient Dashboard Data:", data);
-            // setHin(data.HIN);
-            // setName(data.fullname);
-            // setDob(data.DOB);
-            localStorage.setItem("toggleState", data.emergency);
-            setEmergencyModeEnabled(data.emergency);
-            // Display a success message or process the data as needed
-            return data;
-          } else {
-            const errorData = await response.json();
-            console.error("Failed to fetch dashboard data:", errorData);
-  
-            // Handle errors with a message from the API
-            throw new Error(
-              errorData.message || "Failed to fetch dashboard data."
-            );
-          }
-        } catch (error) {
-          console.error("An unexpected error occurred:", error);
-  
-          // Handle unexpected errors
-          throw error;
-        }
-      };
-  
-      // Example Usage
-      fetchPatientDashboard(1, 10);
-    }, []);
-  
-    const [emergencyNotice, setEmergencyNotice] = useState(false);
-  
-    const handleToggleEmergencyMode = async () => {
-      const newState = !isEmergencyModeEnabled;
-      setEmergencyModeEnabled(newState);
-      setEmergencyNotice(false);
-  
-      localStorage.setItem("toggleState", newState.toString()); // Update local storage
-  
-      const jwtToken = localStorage.getItem("jwtToken");
-  
       try {
-        const response = await fetch(
-          "https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/toggle_emergency_mode",
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwtToken}`,
-            },
-          }
-        );
-  
-        if (!response.ok) {
-          throw new Error("Failed to update emergency mode");
-        }
-  
-        const responseData = await response.json();
-        toast.success(responseData.message);
-        // console.log(responseData);
-      } catch (error) {
-        console.error("Error:", error.message);
-      }
-    };
+        // Construct the URL with query parameters
+        const url = `https://docuhealth-backend-h03u.onrender.com/api/patient/dashboard?page=${page}&size=${size}`;
 
-    const handlePayment = async (planId) => {
-      toast.success("Redirecting to payment page...");
-      console.log("Plan ID:", planId); // Log the planId to see if it's being passed correctly
-      try {
-        const token = localStorage.getItem("jwtToken");
-        if (!token) {
-          toast.error("Token not found. Please log in again.");
-          return; // don't continue if no token
-        }
-    
-        const response = await axios.post(
-          "https://docuhealth-backend-h03u.onrender.com/api/patient/subscriptions/initialize_payment_to_plan",
-          {
-            role: "patient",
-            plan_id: planId, // also send the planId if needed
+        // Make the GET request
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`, // Add JWT token to the Authorization header
+            Role: role, // Add role to the headers
           },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-    
-        const data = response.data;
-        console.log("Fetched:", data);
+        });
 
-        const paymentLink = data.authorization_url;
-
-        if (paymentLink) {
-          window.open(paymentLink, '_blank'); 
-          // open the payment link in a new side tab
+        // Handle the response
+        if (response.ok) {
+          const data = await response.json();
+          // console.log("Patient Dashboard Data:", data);
+          // setHin(data.HIN);
+          // setName(data.fullname);
+          // setDob(data.DOB);
+          localStorage.setItem("toggleState", data.emergency);
+          setEmergencyModeEnabled(data.emergency);
+          // Display a success message or process the data as needed
+          return data;
         } else {
-          console.log("Payment link not found.");
-        }
+          const errorData = await response.json();
+          console.error("Failed to fetch dashboard data:", errorData);
 
-        // maybe show success toast here if you want
+          // Handle errors with a message from the API
+          throw new Error(
+            errorData.message || "Failed to fetch dashboard data."
+          );
+        }
       } catch (error) {
-        toast.error(
-          error.response?.data?.message || "An error occurred while processing payment."
-        );
-        console.error("Error initializing payment:", error.response.data.message);
+        console.error("An unexpected error occurred:", error);
+
+        // Handle unexpected errors
+        throw error;
       }
     };
-    
+
+    // Example Usage
+    fetchPatientDashboard(1, 10);
+  }, []);
+
+  const [emergencyNotice, setEmergencyNotice] = useState(false);
+
+  const handleToggleEmergencyMode = async () => {
+    const newState = !isEmergencyModeEnabled;
+    setEmergencyModeEnabled(newState);
+    setEmergencyNotice(false);
+
+    localStorage.setItem("toggleState", newState.toString()); // Update local storage
+
+    const jwtToken = localStorage.getItem("jwtToken");
+
+    try {
+      const response = await fetch(
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/emergency/toggle_emergency_mode",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update emergency mode");
+      }
+
+      const responseData = await response.json();
+      toast.success(responseData.message);
+      // console.log(responseData);
+    } catch (error) {
+      console.error("Error:", error.message);
+    }
+  };
+
+  const handlePayment = async (planId) => {
+    toast.success("Redirecting to payment page...");
+    console.log("Plan ID:", planId); // Log the planId to see if it's being passed correctly
+    try {
+      const token = localStorage.getItem("jwtToken");
+      if (!token) {
+        toast.error("Token not found. Please log in again.");
+        return; // don't continue if no token
+      }
+
+      const response = await axios.post(
+        "https://docuhealth-backend-h03u.onrender.com/api/patient/subscriptions/initialize_payment_to_plan",
+        {
+          role: "patient",
+          plan_id: planId, // also send the planId if needed
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = response.data;
+      console.log("Fetched:", data);
+
+      const paymentLink = data.authorization_url;
+
+      if (paymentLink) {
+        window.open(paymentLink, "_blank");
+        // open the payment link in a new side tab
+      } else {
+        console.log("Payment link not found.");
+      }
+
+      // maybe show success toast here if you want
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred while processing payment."
+      );
+      console.error("Error initializing payment:", error.response.data.message);
+    }
+  };
 
   return (
     <div>
@@ -223,10 +222,10 @@ const UserSubscriptionsDashboard = () => {
             closeSidebar={closeSidebar}
           />
 
-          <EmergencyNotice 
-             emergencyNotice={emergencyNotice}
-             setEmergencyNotice={setEmergencyNotice}
-             handleToggleEmergencyMode={handleToggleEmergencyMode}
+          <EmergencyNotice
+            emergencyNotice={emergencyNotice}
+            setEmergencyNotice={setEmergencyNotice}
+            handleToggleEmergencyMode={handleToggleEmergencyMode}
           />
 
           {/* Content */}
@@ -244,6 +243,65 @@ const UserSubscriptionsDashboard = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="p-4 rounded-xl bg-[#F5F8F8]">
+                    <div className="flex justify-between items-center">
+                      <p className="text-sm text-gray-600 pb-2">Basic Plan</p>
+                    </div>
+
+                    {/* Price Section */}
+                    <div className="pb-4">
+                      <p className="text-2xl font-semibold pb-1">
+                        ₦0<span className="text-sm font-normal">/forever</span>
+                      </p>
+                      <p className="text-sm text-gray-600 leading-6">
+                        The basic plan is a free, interesting and complete plan.
+                        It has all the necessary features to get you started
+                      </p>
+                    </div>
+
+                    <hr />
+
+                    {/* Features Section */}
+                    <div className="py-5">
+                      {[
+                        "Access to dashboard",
+                        "Unlimited account information update",
+                        "Access to all medical history",
+                      ].map((feature, i) => (
+                        <p key={i} className="flex items-center text-[12px]">
+                          <i className="bx bx-check text-[#0000FF] text-2xl mr-1"></i>{" "}
+                          {feature}
+                        </p>
+                      ))}
+                      {[
+                        "Emergency mode access",
+                       
+                        "Exporting files as PDF",
+                        "Creation of sub-account",
+                         "Creation of Identity card",
+                      ].map((feature, i) => (
+                        <p key={i} className="flex items-center text-[12px]">
+                          <i className="bx bx-x text-2xl text-red-600 mr-1"></i>{" "}
+                          {feature}
+                        </p>
+                      ))}
+                    </div>
+
+                    {/* Button Section */}
+                    <div className="rounded-full my-4 font-semibold">
+                      <div className="py-3">
+                        <p
+                          className="text-sm text-center cursor-pointer"
+                          onClick={() =>
+                            toast.success("You are already on the free plan!")
+                          }
+                        >
+                          Choose Free Plan
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   {plans
                     .slice() // Create a copy of the array to avoid mutating the original
                     .sort((a, b) => {
@@ -284,8 +342,7 @@ const UserSubscriptionsDashboard = () => {
                         {/* Price Section */}
                         <div className="pb-4">
                           <p className="text-2xl font-semibold pb-1">
-                            ₦
-                            {plan.price}
+                            ₦{plan.price}
                             <span className="text-sm font-normal">
                               /{plan.duration}
                             </span>
@@ -316,7 +373,7 @@ const UserSubscriptionsDashboard = () => {
 
                         {/* Button Section */}
                         <div
-                         onClick={ () => handlePayment(plan.plan_id)}
+                          onClick={() => handlePayment(plan.plan_id)}
                           className={`rounded-full my-4 ${
                             index === 0
                               ? "font-semibold"
