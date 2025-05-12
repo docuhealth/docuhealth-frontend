@@ -245,7 +245,7 @@ const UserSubscriptionsDashboard = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="p-4 rounded-xl bg-[#F5F8F8]">
                     <div className="flex justify-between items-center">
-                      <p className="text-sm text-gray-600 pb-2">Basic Plan</p>
+                      <p className="text-sm text-gray-900 pb-2">Basic Plan</p>
                     </div>
 
                     {/* Price Section */}
@@ -332,7 +332,7 @@ const UserSubscriptionsDashboard = () => {
                                   ? "#FE9000 "
                                   : "inherit",
                               paddingBottom:
-                                index === 1 || index === 2 ? "10px" : "inherit",
+                                index === 0 || index === 1 ? "10px" : "inherit",
                             }}
                           >
                             {plan.title}
@@ -375,11 +375,8 @@ const UserSubscriptionsDashboard = () => {
                         <div
                           onClick={() => handlePayment(plan.plan_id)}
                           className={`rounded-full my-4 ${
-                            index === 0
-                              ? "font-semibold"
-                              : index === 1
-                              ? "border border-[#0000FF] text-[#0000FF] font-semibold"
-                              : "bg-[#0000FF] text-white font-semibold"
+                          "border border-[#0000FF] text-[#0000FF] font-semibold"
+                             
                           }`}
                         >
                           <div className="py-3">
