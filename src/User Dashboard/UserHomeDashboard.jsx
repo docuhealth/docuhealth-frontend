@@ -532,7 +532,7 @@ const UserHomeDashboard = () => {
               </div>
               <div className="flex justify-center flex-col sm:flex-row gap-3 sm:gap-5 items-start sm:items-center">
                 <div className="w-full sm:w-auto text-sm">
-                  <p>HIN : {hin.slice(0, 4) + "*".repeat(hin.length - 5)}</p>
+                  <p>HIN : {hin}</p>
                 </div>
                 <div
                   className="border border-[#0000FF] py-2 px-6 rounded-full text-[#0000FF] cursor-pointer text-sm"
