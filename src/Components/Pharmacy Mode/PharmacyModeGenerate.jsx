@@ -24,7 +24,7 @@ const PharmacyModeGenerate = ({setPharmacyModeProceed, setIsPharmacyCreated}) =>
       email:  formData.emailAddress,
       phone_num: formData.phoneNumber,
       address: formData.pharmacyAddress,
-      referred_by: formData.referred_by
+      ...(formData.referred_by && { referred_by: formData.referred_by }) // only include if referred_by is not empty
     }
 
     const handleSubmit = async (e) => {
@@ -32,7 +32,7 @@ const PharmacyModeGenerate = ({setPharmacyModeProceed, setIsPharmacyCreated}) =>
       setLoading(true)
 
       // Validate form data here if needed
-      if (!formData.pharmacyName || !formData.phoneNumber || !formData.emailAddress || !formData.pharmacyAddress || !formData.referred_by) {
+      if (!formData.pharmacyName || !formData.phoneNumber || !formData.emailAddress || !formData.pharmacyAddress) {
         toast.error("Please fill in all fields.");
         setLoading(false)
         return;
@@ -51,7 +51,7 @@ const PharmacyModeGenerate = ({setPharmacyModeProceed, setIsPharmacyCreated}) =>
     
         if (response.status === 200) {
           setLoading(false)
-          console.log(response.data);
+          // console.log(response.data);
           setPharmacyModeProceed("")
           setIsPharmacyCreated(true)
           
@@ -152,7 +152,7 @@ const PharmacyModeGenerate = ({setPharmacyModeProceed, setIsPharmacyCreated}) =>
                 name="referred_by"
                 value={formData.referred_by}
                 onChange={handleChange}
-                placeholder="Referral email"
+                placeholder="Referral email (optional)"
                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0000FF]  text-sm"
               />
             

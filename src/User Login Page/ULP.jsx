@@ -17,7 +17,7 @@ const ULP = () => {
 
   const [fullname, setFullName] = useState("");
   const [sex, setSex] = useState("");
-  const[referred_by, setReferred_by] = useState('')
+  const [referred_by, setReferred_by] = useState("");
   const [DOB, setDOB] = useState("");
   const [state, setState] = useState("");
   const [signUp, setSignUp] = useState("");
@@ -57,6 +57,16 @@ const ULP = () => {
     setShowToast(true);
     e.preventDefault();
 
+    if (!fullname || !DOB || !state || !sex) {
+      toast.error(
+        "Please fill in all required fields: Full Name, DOB, State, and Sex."
+      );
+      
+      setSignUp("Sign Up Now");
+      setShowToast(false);
+      return;
+    }
+
     const userData = {
       fullname,
       password,
@@ -65,7 +75,7 @@ const ULP = () => {
       state,
       sex,
       DOB,
-      referred_by
+      ...(referred_by && { referred_by }), // Include referred_by only if it's not empty
     };
     try {
       const response = await axios.post(
@@ -79,7 +89,7 @@ const ULP = () => {
       );
 
       toast.success(response.data.message || "Registration successful!");
-      console.log(response.data.message);
+      // console.log(response.data.message);
       setnotification(true);
       setNotificationVisible(false);
     } catch (error) {
@@ -111,7 +121,7 @@ const ULP = () => {
     setFullName("");
     setSex("");
     setState("");
-    setReferred_by("")
+    setReferred_by("");
   };
 
   const handleNextStep = () => {
@@ -283,7 +293,7 @@ const ULP = () => {
                   <input
                     type="text"
                     className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                    placeholder="Referral email"
+                    placeholder="Referral email (optional)"
                     value={referred_by}
                     onChange={(e) => setReferred_by(e.target.value)}
                     required
@@ -425,7 +435,6 @@ const ULP = () => {
                 </div>
               </div>
 
-           
               <button
                 type="button"
                 onClick={handleSubmit}
@@ -663,18 +672,18 @@ const ULP = () => {
                 </div>
 
                 <div className="relative">
-                <p className="font-semibold pb-1">Referred By :</p>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Referral email"
-                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
-                    value={referred_by}
-                    onChange={(e) => setReferred_by(e.target.value)}
-                    required
-                  />
+                  <p className="font-semibold pb-1">Referred By :</p>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Referral email (optional)"
+                      className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                      value={referred_by}
+                      onChange={(e) => setReferred_by(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
                 <div className="relative">
                   <p className="font-semibold pb-1">Date Of Birth :</p>
