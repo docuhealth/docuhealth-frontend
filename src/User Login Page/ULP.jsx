@@ -61,7 +61,7 @@ const ULP = () => {
       toast.error(
         "Please fill in all required fields: Full Name, DOB, State, and Sex."
       );
-      
+
       setSignUp("Sign Up Now");
       setShowToast(false);
       return;
@@ -434,7 +434,16 @@ const ULP = () => {
                   </div>
                 </div>
               </div>
-
+          <p className="text-sm text-gray-600">
+              By Signing up, you agree to our{" "}
+              <Link
+                to="/privacy-policy"
+                className="text-[#0000FF] hover:underline"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </p>
               <button
                 type="button"
                 onClick={handleSubmit}
@@ -451,6 +460,7 @@ const ULP = () => {
                 Sign in
               </Link>
             </p>
+  
           </div>
         </div>
 
@@ -818,6 +828,17 @@ const ULP = () => {
                     </div>
                   </div>
                 </div>
+
+                        <p className="text-sm text-gray-600">
+              By Signing up, you agree to our{" "}
+              <Link
+                to="/privacy-policy"
+                className="text-[#0000FF] hover:underline"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </p>
 
                 {/* Move to next step button */}
                 <button

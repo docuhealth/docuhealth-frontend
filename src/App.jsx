@@ -41,6 +41,7 @@ import AdminLogoutDashboard from "./Admin Dashboard/AdminLogOutDashboard";
 import ProtectedRouteHospital from "./Components/Hospital Protected Route/ProtectedRouteHospital";
 import UserProtectedRoute from "./Components/User Protected Route/UserProtectedRoute";
 import AdminProtectedRoute from './Components/Admin Protected Route/AdminProtectedRoute'
+import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy";
 
 function App() {
   return (
@@ -64,6 +65,9 @@ function App() {
         <Route path="/hospital-forgot-password" element={<FP />} />
         <Route path="/hospital-verify-otp" element={<VerifyOTP />} />
         <Route path="/hospital-set-new-password" element={<NP />} />
+
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
         <Route
           path="/hospital-home-dashboard"
           element={

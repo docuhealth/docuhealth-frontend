@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import axios from 'axios'
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const PharmacyModeGenerate = ({setPharmacyModeProceed, setIsPharmacyCreated}) => {
 
@@ -174,6 +175,16 @@ const PharmacyModeGenerate = ({setPharmacyModeProceed, setIsPharmacyCreated}) =>
         
           </div>
         </div>
+                <p className="text-sm text-gray-600">
+              By Signing up, you agree to our{" "}
+              <Link
+                to="/privacy-policy"
+                className="text-[#0000FF] hover:underline"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </p>
 
         <button
           onClick={handleSubmit}

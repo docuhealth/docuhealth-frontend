@@ -401,6 +401,16 @@ const HLP = () => {
                   </div>
                 </form>
               </div>
+                      <p className="text-sm text-gray-600">
+                            By Signing up, you agree to our{" "}
+                            <Link
+                              to="/privacy-policy"
+                              className="text-[#0000FF] hover:underline"
+                            >
+                              Privacy Policy
+                            </Link>
+                            .
+                          </p>
 
               <button
                 type="button"
@@ -735,6 +745,17 @@ const HLP = () => {
                   </form>
                 </div>
 
+        <p className="text-sm text-gray-600">
+              By Signing up, you agree to our{" "}
+              <Link
+                to="/privacy-policy"
+                className="text-[#0000FF] hover:underline"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </p>
+            
                 <button
                   type="button"
                   onClick={handleSubmit}
