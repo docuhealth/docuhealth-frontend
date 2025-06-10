@@ -38,8 +38,7 @@ const OurServices = () => {
             <h3 className="font-semibold">Centralized Medical Records</h3>
             <p className="text-[#8E8EA9] py-2 text-sm">
               Store and organize all your health documents, including
-              prescriptions, lab results, X-rays, and doctor’s notes, in one
-              secure place.
+              prescriptions, lab results, X-rays, and doctor’s notes, in a place.
             </p>
           </div>
 

@@ -4,7 +4,8 @@ import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import dashb from "../../assets/img/dashb.png";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 
 const USI = () => {
   const [email, setEmail] = useState("");
@@ -99,7 +100,7 @@ const USI = () => {
         localStorage.setItem("userlogin", detailLogin);
 
         toast.success("Login successful");
-        console.log(response.data);
+        // console.log(response.data);
         setLogin("Next");
         setEmail("");
         setPhone_Num("");

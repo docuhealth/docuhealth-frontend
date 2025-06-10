@@ -5,7 +5,7 @@ import logo from "../assets/img/logo.png";
 import TabComponents from "../Hospital Dashboard/Tabs/TabComponent";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import axios from "axios";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import DynamicDate from "../Components/Dynamic Date/DynamicDate";
 import { useNavigate } from "react-router-dom";
 import UserSideBar from "../Components/UserSideBar/UserSideBar";
@@ -56,7 +56,7 @@ const UserSettingsDashboard = () => {
         // Handle the response
         if (response.ok) {
           const data = await response.json();
-          console.log("Patient Dashboard Data:", data);
+          // console.log("Patient Dashboard Data:", data);
           setDataInfo(data);
 
           // Display a success message or process the data as needed
@@ -76,7 +76,7 @@ const UserSettingsDashboard = () => {
         // Handle unexpected errors
         throw error;
       } finally {
-        console.log(datainfo);
+        // console.log(datainfo);
       }
     };
 
@@ -84,7 +84,7 @@ const UserSettingsDashboard = () => {
     fetchPatientDashboard(1, 10)
       .then((data) => {
         // Process the dashboard data
-        console.log("Dashboard Data:", data);
+        // console.log("Dashboard Data:", data);
       })
       .catch((error) => {
         // Handle errors
@@ -117,7 +117,7 @@ const UserSettingsDashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoadingInfo("Saving Changes");
-    console.log("Form submitted:", formData);
+    // console.log("Form submitted:", formData);
 
     try {
       // Retrieve token from local storage

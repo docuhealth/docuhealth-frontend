@@ -1,5 +1,5 @@
 import React from "react";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 
 const UserSubAcctNoticeDisplay = ({noticeDisplay, noticeMessage, paymentStatus, closeNoticeMessage, closeNoticeMessageToCreateAcct}) => {
     return (

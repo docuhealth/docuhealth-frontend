@@ -3,7 +3,8 @@ import logo from "../assets/img/logo.png";
 import dashb from "../assets/img/dashb.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
+
 const AVO = () => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [notificationVisible, setNotificationVisible] = useState(false);

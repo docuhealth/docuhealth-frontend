@@ -47,7 +47,7 @@ const UserLogoutDasboard = () => {
     setLoading("Logging Out");
 
     const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
-    console.log("Token:", token);
+    // console.log("Token:", token);
 
     if (!token) {
       console.log("Token not found. Please log in again.");
@@ -69,7 +69,7 @@ const UserLogoutDasboard = () => {
 
       // Check if the response is successful
       if (response.status === 200) {
-        console.log("Logout successful:", response.data.message);
+        // console.log("Logout successful:", response.data.message);
 
         setLoading("Yes I am sure, Log Out");
         // Perform logout logic

@@ -5,7 +5,7 @@ import AdminHead from "./Admin Part/AdminHead";
 import DynamicDate from "../Components/Dynamic Date/DynamicDate";
 import { ChevronDown } from "lucide-react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import AdminSideBar from "../Components/AdminSideBar/AdminSideBar";
 
 const AdminUsersDashbaord = () => {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import UserDashHead from "./Dashboard Part/UserDashHead";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/img/logo.png";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import axios from "axios";
 import DynamicDate from "../Components/Dynamic Date/DynamicDate";
 import { jsPDF } from "jspdf";

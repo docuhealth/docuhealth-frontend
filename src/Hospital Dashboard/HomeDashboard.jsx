@@ -5,7 +5,7 @@ import DashHead from "./Dashboard Part/DashHead";
 import axios from "axios";
 import ReactApexChart from "react-apexcharts";
 import DynamicDate from "../Components/Dynamic Date/DynamicDate";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 

@@ -4,7 +4,7 @@ import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React Icons
 import dashb from "../../assets/img/dashb.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 
 const NP = () => {
   const [password, setPassword] = useState("");

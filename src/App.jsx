@@ -42,6 +42,7 @@ import ProtectedRouteHospital from "./Components/Hospital Protected Route/Protec
 import UserProtectedRoute from "./Components/User Protected Route/UserProtectedRoute";
 import AdminProtectedRoute from './Components/Admin Protected Route/AdminProtectedRoute'
 import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy";
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
         pauseOnHover
         draggable
       />
+       <Toaster position="top-right" reverseOrder={false} />
 
       <Routes>
         <Route path="/" element={<Home />} />

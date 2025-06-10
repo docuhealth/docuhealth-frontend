@@ -4,7 +4,7 @@ import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import dashb from "../../assets/img/dashb.png";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 
 
 const FP = () => {

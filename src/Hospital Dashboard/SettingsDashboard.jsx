@@ -5,7 +5,7 @@ import TabComponents from "./Tabs/TabComponent";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React Icons
 import DashHead from "./Dashboard Part/DashHead";
 import axios from "axios";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import DynamicDate from "../Components/Dynamic Date/DynamicDate";
 import { useNavigate } from "react-router-dom";
 

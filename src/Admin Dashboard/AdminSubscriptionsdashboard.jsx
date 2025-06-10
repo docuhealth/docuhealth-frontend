@@ -3,7 +3,7 @@ import logo from "../assets/img/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import AdminHead from "./Admin Part/AdminHead";
 import axios from "axios";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import DynamicDate from "../Components/Dynamic Date/DynamicDate";
 import { ChevronDown } from "lucide-react";
 import AdminSideBar from "../Components/AdminSideBar/AdminSideBar";

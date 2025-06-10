@@ -5,7 +5,7 @@ import logo from "../assets/img/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import DynamicDate from "../Components/Dynamic Date/DynamicDate";
 import axios from "axios";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import UserSideBar from "../Components/UserSideBar/UserSideBar";
 import EmergencyNotice from "../Components/EmergencyNotice/EmergencyNotice";
 
@@ -44,7 +44,7 @@ const UserSubscriptionsDashboard = () => {
           },
         }
       );
-      console.log(response.data);
+      // console.log(response.data);
 
       setPlans(response.data.subscriptionPlans || []); // Assuming response.data.plans contains the plans
       // console.log(response.data.subscriptionPlans);
@@ -150,7 +150,7 @@ const UserSubscriptionsDashboard = () => {
 
   const handlePayment = async (planId) => {
     toast.success("Redirecting to payment page...");
-    console.log("Plan ID:", planId); // Log the planId to see if it's being passed correctly
+    // console.log("Plan ID:", planId); // Log the planId to see if it's being passed correctly
     try {
       const token = localStorage.getItem("jwtToken");
       if (!token) {
@@ -173,7 +173,7 @@ const UserSubscriptionsDashboard = () => {
       );
 
       const data = response.data;
-      console.log("Fetched:", data);
+      // console.log("Fetched:", data);
 
       const paymentLink = data.authorization_url;
 

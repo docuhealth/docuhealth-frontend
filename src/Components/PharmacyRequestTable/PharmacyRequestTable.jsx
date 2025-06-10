@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Eye } from "lucide-react";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 
 
 const ITEMS_PER_PAGE = 7;

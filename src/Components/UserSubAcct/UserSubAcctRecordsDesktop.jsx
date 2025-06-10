@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 
 const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, fetchMedicalHistory, handleOpenForm, paymentStatus, isMedicalRecords, setIsMedicalRecords, setDefaultRecords, records, popoverVisible, exportToPDF, setPopoverVisible, selectedRecord, totalPages, currentPage, setCurrentPage, openPopover, togglePopoverr }) => {
   return (

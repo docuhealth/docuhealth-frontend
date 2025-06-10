@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import TabComponents from "./TabComponent";
 import profilepic from "../../assets/img/profile.png";
 import axios from "axios";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 

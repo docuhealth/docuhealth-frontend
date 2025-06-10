@@ -3,7 +3,7 @@ import logo from "../../assets/img/logo.png";
 import dashb from "../../assets/img/dashb.png";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import axios from "axios";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
-import { toast } from "react-toastify";
+
 
 const PharmacyGenerateMessage = ({setIsPharmacyCreated}) => {
     return (

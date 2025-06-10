@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import logo from "../assets/img/logo.png";
 import dashb from "../assets/img/dashb.png";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 
 const AFP = () => {
   const [email, setEmail] = useState("");

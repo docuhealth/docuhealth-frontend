@@ -50,7 +50,7 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
         // Handle unexpected errors
         throw error;
       } finally {
-        console.log(datainfo);
+        // console.log(datainfo);
       }
     };
 

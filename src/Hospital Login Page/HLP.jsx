@@ -4,7 +4,7 @@ import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React
 import dashb from "../assets/img/dashb.png";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 
 const HLP = () => {
   const [email, setEmail] = useState("");

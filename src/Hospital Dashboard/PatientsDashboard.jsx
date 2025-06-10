@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import DashHead from "./Dashboard Part/DashHead";
 import DynamicDate from "../Components/Dynamic Date/DynamicDate";
 import axios from "axios";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import PatientHospitalInfo from "./Tabs/PatientHospitalInfo";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";

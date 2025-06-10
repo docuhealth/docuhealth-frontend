@@ -5,7 +5,7 @@ import Data from "./Subscription Data/Data.json";
 import DashHead from "./Dashboard Part/DashHead";
 import DynamicDate from "../Components/Dynamic Date/DynamicDate";
 import axios from "axios";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 
 const SubscriptionsDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

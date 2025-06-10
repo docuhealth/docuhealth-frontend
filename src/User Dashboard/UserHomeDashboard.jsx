@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import DynamicDate from "../Components/Dynamic Date/DynamicDate";
 import logo from "../assets/img/logo.png";
 import NL from "../assets/img/NL.png";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import axios from "axios";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -284,7 +284,7 @@ const UserHomeDashboard = () => {
       );
 
       // console.log(response.json);
-      console.log(response.data.records);
+      // console.log(response.data.records);
       setRecords(response.data.records);
       setTotalPages(response.data.total_pages);
 
