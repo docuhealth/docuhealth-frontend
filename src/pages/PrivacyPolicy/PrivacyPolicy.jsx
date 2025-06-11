@@ -104,10 +104,6 @@ const PrivacyPolicy = () => (
           <li>Digital integrations that enhance patient experience</li>
         </ul>
         <p>
-          We will only share your information with your explicit consent, which
-          will be obtained through clear opt-in forms or agreements.
-        </p>
-        <p>
           DocuHealth does not sell your personal information under any
           circumstances.
         </p>
