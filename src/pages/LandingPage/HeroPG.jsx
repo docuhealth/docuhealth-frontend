@@ -84,10 +84,12 @@ const HeroPG = () => {
               />
             </svg>
           </div>
+          
           <div className="text-[#8E8EA9] text-sm md:text-md" >
             Keep track of every health information
           </div>
         </div>
+        
         <div >
           <div className=" text-2xl md:text-5xl text-center font-bold text-[#8E8EA9]"  data-aos="zoom-in-up" >
             <h1 className="hidden lg:block">
