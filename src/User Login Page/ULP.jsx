@@ -153,12 +153,12 @@ const ULP = () => {
             <div className="pb-10">
               <img src={logo} alt="Logo" className="" />
             </div>
-            <h2 className="text-2xl font-bold mb-2 ">Create Your Account</h2>
-            <p className="text-gray-600  mb-6">
+            <h2 className="text-xl font-bold mb-2 ">Create Your Account</h2>
+            <p className="text-gray-600  mb-6 text-sm">
               Create your account with your correct credentials to get started
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 text-sm">
               {/* Email Input */}
               <div className="relative">
                 <p className="font-semibold pb-1">Email :</p>
@@ -245,7 +245,7 @@ const ULP = () => {
               <button
                 type="button"
                 onClick={handleNextStep}
-                className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700"
+                className="w-full bg-[#0000FF] text-white py-3 rounded-full hover:bg-blue-700 "
               >
                 Move to Step 2 / 3
               </button>
@@ -268,12 +268,12 @@ const ULP = () => {
             <div className="pb-10">
               <img src={logo} alt="Logo" className="" />
             </div>
-            <h2 className="text-2xl font-bold mb-2 ">Create Your Account</h2>
-            <p className="text-gray-600  mb-6">
+            <h2 className="text-xl font-bold mb-2 ">Create Your Account</h2>
+            <p className="text-gray-600  mb-6 text-sm">
               Create your account with your correct credentials to get started
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 text-sm">
               <div className="relative">
                 <p className="font-semibold pb-1">Full Name :</p>
                 <div className="relative">
@@ -490,7 +490,7 @@ const ULP = () => {
         </div>
       </div>
       {notification && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 text-sm">
           <div className="bg-white py-6 px-14 rounded-lg shadow-lg flex flex-col justify-center items-center">
             <div className="pb-2">
               <svg
@@ -507,7 +507,7 @@ const ULP = () => {
                 />
               </svg>
             </div>
-            <p className="text-[#15C621] mb-4 text-sm sm:text-base">
+            <p className="text-[#15C621] mb-4 text-[12px] sm:text-sm ">
               You have successfully signed up
             </p>
             <div className="flex justify-center w-full">
@@ -530,21 +530,21 @@ const ULP = () => {
               <div>
                 <img src={logo} alt="DocuHealth Logo" />
               </div>
-              <h1 className="text-[#0000FF] text-3xl font-bold">DocuHealth</h1>
+              <h1 className="text-[#0000FF] text-2xl font-bold">DocuHealth</h1>
             </div>
             <div
               className="px-5"
               id="temp"
               style={{ display: step === 1 ? "block" : "none" }}
             >
-              <h2 className="text-xl sm:text-2xl  mb-1 ">
+              <h2 className="text-sm sm:text-2xl  mb-1 ">
                 Create Your Account
               </h2>
-              <p className="text-gray-600  mb-6">
+              <p className="text-gray-600  mb-6 text-[12px]">
                 Create your account with your correct credentials to get started
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 text-[12px]">
                 {/* Email Input */}
                 <div className="relative">
                   <p className="font-semibold">Email :</p>
@@ -647,7 +647,7 @@ const ULP = () => {
               </form>
 
               {/* Sign-In Prompt */}
-              <p className="text-center text-sm text-gray-600 mt-4">
+              <p className="text-center text-[12px] text-gray-600 mt-4">
                 Already have an account?{" "}
                 <Link
                   to="/user-login"
@@ -662,12 +662,12 @@ const ULP = () => {
               id="temp"
               style={{ display: step === 2 ? "block" : "none" }}
             >
-              <h2 className="text-xl sm:text-2xl mb-2 ">Create Your Account</h2>
-              <p className="text-gray-600  mb-6">
+              <h2 className="text-sm sm:text-2xl mb-2 ">Create Your Account</h2>
+              <p className="text-gray-600  mb-6 text-[12px]">
                 Create your account with your correct credentials to get started
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 text-[12px]">
                 <div className="relative">
                   <p className="font-semibold">Full Name :</p>
                   <div className="relative">
@@ -829,7 +829,7 @@ const ULP = () => {
                   </div>
                 </div>
 
-                        <p className="text-sm text-gray-600">
+                        <p className="text-[12px] text-gray-600">
               By Signing up, you agree to our{" "}
               <Link
                 to="/privacy-policy"
@@ -851,7 +851,7 @@ const ULP = () => {
               </form>
 
               {/* Sign-In Prompt */}
-              <p className="text-center text-sm text-gray-600 mt-4">
+              <p className="text-center text-[12px] text-gray-600 mt-4">
                 Already have an account?{" "}
                 <Link
                   to="/user-login"
