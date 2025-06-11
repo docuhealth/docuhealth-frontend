@@ -94,13 +94,13 @@ const FP = () => {
               <div className="pb-10">
                 <img src={logo} alt="Logo" className="" />
               </div>
-              <h2 className="text-2xl font-bold mb-2">Forgot Password</h2>
-              <p className="text-gray-600 mb-6">
+              <h2 className="text-xl font-bold mb-2">Forgot Password</h2>
+              <p className="text-gray-600 mb-6 text-sm">
                 Input your registered email below to receieve an OTP to help you
                 reset your password.
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 text-sm">
                 {/* Email Input */}
                 <div className="relative">
                   <p className="font-semibold pb-1">Enter Email :</p>
@@ -161,16 +161,16 @@ const FP = () => {
               <div>
                 <img src={logo} alt="DocuHealth Logo" />
               </div>
-              <h1 className="text-[#0000FF] text-3xl font-bold">DocuHealth</h1>
+              <h1 className="text-[#0000FF] text-2xl font-bold">DocuHealth</h1>
             </div>
             <div className="px-5" id="temp">
-              <h2 className=" text-xl sm:text-2xl  mb-2">Forgot Password ?</h2>
-              <p className="text-gray-600 mb-6">
+              <h2 className=" text-base sm:text-2xl  mb-2">Forgot Password ?</h2>
+              <p className="text-gray-600 mb-6 text-sm">
                 Input your registered email below to receieve an OTP to help you
                 reset your password.
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 text-sm">
                 {/* Email Input */}
                 <div className="relative">
                   <p className="pb-1">Enter Email :</p>

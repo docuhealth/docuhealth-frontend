@@ -147,13 +147,13 @@ const VerifyOTP = () => {
               <div className="pb-10">
                 <img src={logo} alt="Logo" className="" />
               </div>
-              <h2 className="text-2xl font-bold mb-2">Verify OTP</h2>
-              <p className="text-gray-600 mb-6">
+              <h2 className="text-xl font-bold mb-2">Verify OTP</h2>
+              <p className="text-gray-600 mb-6 text-sm">
                 Please enter the 6 digit Pin we sent to your email address to
                 proceed!
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 text-sm">
                 {/* OTP Input Boxes */}
                 <div id="otp" className="flex justify-center space-x-3 mb-4">
                   {otp.map((digit, index) => (
@@ -233,16 +233,16 @@ const VerifyOTP = () => {
               <div>
                 <img src={logo} alt="DocuHealth Logo" />
               </div>
-              <h1 className="text-[#0000FF] text-3xl font-bold">DocuHealth</h1>
+              <h1 className="text-[#0000FF] text-2xl font-bold">DocuHealth</h1>
             </div>
             <div className="px-5" id="temp">
-              <h2 className=" text-xl sm:text-2xl  mb-2">Verify OTP</h2>
-              <p className="text-gray-600 mb-6">
+              <h2 className=" text-base sm:text-2xl  mb-2">Verify OTP</h2>
+              <p className="text-gray-600 mb-6 text-sm">
                 Please enter the 6 digit Pin we sent to your email address to
                 proceed!
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 text-sm">
                 {/* OTP Input Boxes */}
                 <div id="otp" className="flex justify-center space-x-3 mb-4">
                   {otp.map((digit, index) => (

@@ -106,15 +106,15 @@ const NPU = () => {
               <div className="pb-10">
                 <img src={logo} alt="Logo" className="" />
               </div>
-              <h2 className="text-2xl font-bold mb-2 ">
+              <h2 className="text-xl font-bold mb-2 ">
                 Set Up A New Password
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-6 text-sm">
                 Try to set up a password you won’t forget for easy access to
                 your dashboard.
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 text-sm">
                 {/* Password Input */}
                 <div className="relative">
                   <p className="font-semibold pb-1">Password:</p>
@@ -209,7 +209,7 @@ const NPU = () => {
 
         {/* Notification Modal */}
         {notification && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 text-sm">
             <div className="bg-white py-6 px-14 rounded-lg shadow-lg flex flex-col justify-center items-center">
               <div className="pb-2">
                 <svg
@@ -226,7 +226,7 @@ const NPU = () => {
                   />
                 </svg>
               </div>
-              <p className=" text-[#15C621] mb-4 text-sm sm:text-base">
+              <p className=" text-[#15C621] mb-4 text-sm ">
                 You have successfully reset your password!
               </p>
               <div className="flex justify-center w-full">
@@ -248,20 +248,20 @@ const NPU = () => {
                 <div>
                   <img src={logo} alt="DocuHealth Logo" />
                 </div>
-                <h1 className="text-[#0000FF] text-3xl font-bold">
+                <h1 className="text-[#0000FF] text-2xl font-bold">
                   DocuHealth
                 </h1>
               </div>
               <div className="px-5" id="temp">
-                <h2 className="text-xl sm:text-2xl  mb-2 ">
+                <h2 className="text-base sm:text-2xl  mb-2 ">
                   Set Up A New Password
                 </h2>
-                <p className="text-gray-600 mb-6">
+                <p className="text-gray-600 mb-6 text-sm">
                   Try to set up a password you won’t forget for easy access to
                   your dashboard.
                 </p>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4 text-sm">
                   {/* Password Input */}
                   <div className="relative">
                     <p className="pb-1">Password:</p>

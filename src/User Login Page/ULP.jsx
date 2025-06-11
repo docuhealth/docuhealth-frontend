@@ -507,7 +507,7 @@ const ULP = () => {
                 />
               </svg>
             </div>
-            <p className="text-[#15C621] mb-4 text-[12px] sm:text-sm ">
+            <p className="text-[#15C621] mb-4 text-sm sm:text-sm ">
               You have successfully signed up
             </p>
             <div className="flex justify-center w-full">

@@ -157,12 +157,12 @@ const HLP = () => {
             <div className="pb-10">
               <img src={logo} alt="Logo" className="" />
             </div>
-            <h2 className="text-2xl font-bold mb-2 ">Create Your Account</h2>
-            <p className="text-gray-600  mb-6">
+            <h2 className="text-xl font-bold mb-2 ">Create Your Account</h2>
+            <p className="text-gray-600  mb-6 text-sm">
               Create your account with your correct credentials to get started
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 text-sm">
               {/* Email Input */}
               <div className="relative">
                 <p className="font-semibold pb-1">Email :</p>
@@ -262,12 +262,12 @@ const HLP = () => {
             <div className="pb-10">
               <img src={logo} alt="Logo" className="" />
             </div>
-            <h2 className="text-2xl font-bold mb-2 ">Create Your Account</h2>
-            <p className="text-gray-600  mb-6">
+            <h2 className="text-xl font-bold mb-2 ">Create Your Account</h2>
+            <p className="text-gray-600  mb-6 text-sm">
               Create your account with your correct credentials to get started
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 text-sm">
               {/* Email Input */}
               <div className="relative">
                 <p className="font-semibold pb-1">Name Of Hospital :</p>
@@ -350,11 +350,11 @@ const HLP = () => {
             <div className="pb-10">
               <img src={logo} alt="Logo" className="" />
             </div>
-            <h2 className="text-2xl font-bold mb-2 ">
+            <h2 className="text-xl font-bold mb-2 ">
               Upload Hospital Logo/Picture
             </h2>
-            <div className="flex flex-col justify-center items-center">
-              <p className="text-gray-600  mb-6">
+            <div className="flex flex-col justify-center items-center text-sm">
+              <p className="text-gray-600  mb-6 text-sm">
                 Add up a picture or logo of your hospital to complete your sign
                 up process
               </p>
@@ -476,7 +476,7 @@ const HLP = () => {
                 />
               </svg>
             </div>
-            <p className="text-[#15C621] mb-4 text-sm sm:text-base">
+            <p className="text-[#15C621] mb-4 text-sm ">
               You have successfully signed up
             </p>
             <div className="flex justify-center w-full">
@@ -500,21 +500,21 @@ const HLP = () => {
               <div>
                 <img src={logo} alt="DocuHealth Logo" />
               </div>
-              <h1 className="text-[#0000FF] text-3xl font-bold">DocuHealth</h1>
+              <h1 className="text-[#0000FF] text-2xl font-bold">DocuHealth</h1>
             </div>
             <div
               className="px-5"
               id="temp"
               style={{ display: step === 1 ? "block" : "none" }}
             >
-              <h2 className="text-xl sm:text-2xl  mb-1 ">
+              <h2 className="text-base sm:text-2xl  mb-1 ">
                 Create Your Account
               </h2>
-              <p className="text-gray-600  mb-6">
+              <p className="text-gray-600  mb-6 text-sm">
                 Create your account with your correct credentials to get started
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 text-sm">
                 {/* Email Input */}
                 <div className="relative">
                   <p className="pb-1">Email :</p>
@@ -610,8 +610,8 @@ const HLP = () => {
               id="temp"
               style={{ display: step === 2 ? "block" : "none" }}
             >
-              <h2 className="text-xl sm:text-2xl mb-2 ">Create Your Account</h2>
-              <p className="text-gray-600  mb-6">
+              <h2 className="text-base sm:text-2xl mb-2 ">Create Your Account</h2>
+              <p className="text-gray-600  mb-6 text-sm">
                 Create your account with your correct credentials to get started
               </p>
 
@@ -693,10 +693,10 @@ const HLP = () => {
               id="temp"
               style={{ display: step === 3 ? "block" : "none" }}
             >
-              <h2 className="text-xl sm:text-2xl font-bold mb-2 ">
+              <h2 className="text-base sm:text-2xl font-bold mb-2 ">
                 Upload Hospital Logo/Picture
               </h2>
-              <div className="flex flex-col justify-center items-center">
+              <div className="flex flex-col justify-center items-center text-sm">
                 <p className="text-gray-600  mb-6">
                   Add up a picture or logo of your hospital to complete your
                   sign up process

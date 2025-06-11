@@ -104,15 +104,15 @@ const HSI = () => {
       <div className="min-h-screen">
         <div className="flex">
           {/* Left Side */}
-          <div className=" hidden sm:flex flex-1 h-screen items-center justify-center">
+          <div className=" hidden sm:flex flex-1 h-screen items-center justify-center text-sm">
             <div className="w-3/4" id="temp">
               <div className="pb-10">
                 <img src={logo} alt="Logo" className="" />
               </div>
-              <h2 className="text-2xl font-bold mb-2">
+              <h2 className="text-xl font-bold mb-2">
                 Sign Into Your Account
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-6 text-sm">
                 Input your correct log-in credentials to get access into your
                 dashboard
               </p>
@@ -240,24 +240,24 @@ const HSI = () => {
         </div>
       </div>
       {notificationVisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 text-sm">
           <div className="fixed bottom-0 left-0 right-0 bg-white text-black  py-4 rounded-t-3xl shadow-md animate-slide-up ">
             <div className="flex justify-center items-center gap-1 pb-4">
               <div>
                 <img src={logo} alt="DocuHealth Logo" />
               </div>
-              <h1 className="text-[#0000FF] text-3xl font-bold">DocuHealth</h1>
+              <h1 className="text-[#0000FF] text-2xl font-bold">DocuHealth</h1>
             </div>
             <div className="px-5" id="temp">
-              <h2 className=" text-xl sm:text-2xl  mb-2">
+              <h2 className=" text-base sm:text-2xl  mb-2">
                 Sign Into Your Account
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-6 text-sm">
                 Input your correct log-in credentials to get access into your
                 dashboard
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 text-sm">
                 {/* Email Input */}
                 <div className="relative">
                   <p className="pb-1">Hospital Email Address :</p>
@@ -322,8 +322,7 @@ const HSI = () => {
                   </div>
                 </div>
 
-                {/* Error Message */}
-                {error && <p className="text-red-500 text-sm">{error}</p>}
+              
 
                 {/* Submit Button */}
                 <button
