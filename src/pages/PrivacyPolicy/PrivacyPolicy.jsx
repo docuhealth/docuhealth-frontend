@@ -89,6 +89,36 @@ const PrivacyPolicy = () => (
         </p>
 
         <h2 class="text-base font-semibold text-gray-900">
+          7. Data Sharing With Partners
+        </h2>
+        <p>
+          DocuHealth may share your medical summary data with authorized
+          healthcare partners, digital health platforms, or service providers
+          strictly for health-related purposes, such as:
+        </p>
+        <ul class="list-disc pl-6 space-y-1">
+          <li>Care coordination</li>
+          <li>Preventive health services</li>
+          <li>Health-related research or analytics</li>
+          <li>Health benefit programs</li>
+          <li>Digital integrations that enhance patient experience</li>
+        </ul>
+        <p>
+          We will only share your information with your explicit consent, which
+          will be obtained through clear opt-in forms or agreements.
+        </p>
+        <p>
+          DocuHealth does not sell your personal information under any
+          circumstances.
+        </p>
+        <p>
+          All partners must sign a Data Sharing Agreement and comply with all
+          relevant data protection laws, including the Nigeria Data Protection
+          Regulation (NDPR), to ensure your data is handled securely and
+          responsibly.
+        </p>
+
+        <h2 class="text-base font-semibold text-gray-900">
           8. Legal Compliance
         </h2>
         <p>
