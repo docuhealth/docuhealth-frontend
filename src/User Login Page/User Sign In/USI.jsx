@@ -269,15 +269,15 @@ const USI = () => {
                 </h1>
               </div>
               <div className="px-5" id="temp">
-                <h2 className=" text-sm sm:text-2xl  mb-2">
+                <h2 className=" text-base sm:text-2xl  mb-2">
                   Sign Into Your Account
                 </h2>
-                <p className="text-gray-600 mb-6 text-[12px]">
+                <p className="text-gray-600 mb-6 text-sm">
                   Input your correct log-in credentials to get access into your
                   dashboard
                 </p>
 
-                <form onSubmit={handleSubmit} className="space-y-4 text-[12px]">
+                <form onSubmit={handleSubmit} className="space-y-4 text-sm">
                   {/* Email Input */}
                   <div className="relative">
                     <p className="pb-1">Email :</p>
@@ -357,7 +357,7 @@ const USI = () => {
                 </form>
 
                 {/* Sign-Up Prompt */}
-                <p className="text-center text-[12px] text-gray-600 mt-4">
+                <p className="text-center text-sm text-gray-600 mt-4">
                   Haven't Registered Yet?{" "}
                   <Link
                     to="/user-create-account"

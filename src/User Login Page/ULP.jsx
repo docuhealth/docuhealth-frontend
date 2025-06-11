@@ -537,14 +537,14 @@ const ULP = () => {
               id="temp"
               style={{ display: step === 1 ? "block" : "none" }}
             >
-              <h2 className="text-sm sm:text-2xl  mb-1 ">
+              <h2 className="text-base sm:text-2xl  mb-1 ">
                 Create Your Account
               </h2>
-              <p className="text-gray-600  mb-6 text-[12px]">
+              <p className="text-gray-600  mb-6 text-sm">
                 Create your account with your correct credentials to get started
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4 text-[12px]">
+              <form onSubmit={handleSubmit} className="space-y-4 text-sm">
                 {/* Email Input */}
                 <div className="relative">
                   <p className="font-semibold">Email :</p>
@@ -647,7 +647,7 @@ const ULP = () => {
               </form>
 
               {/* Sign-In Prompt */}
-              <p className="text-center text-[12px] text-gray-600 mt-4">
+              <p className="text-center text-sm text-gray-600 mt-4">
                 Already have an account?{" "}
                 <Link
                   to="/user-login"
@@ -662,12 +662,12 @@ const ULP = () => {
               id="temp"
               style={{ display: step === 2 ? "block" : "none" }}
             >
-              <h2 className="text-sm sm:text-2xl mb-2 ">Create Your Account</h2>
-              <p className="text-gray-600  mb-6 text-[12px]">
+              <h2 className="text-md sm:text-2xl mb-2 ">Create Your Account</h2>
+              <p className="text-gray-600  mb-6 text-sm">
                 Create your account with your correct credentials to get started
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4 text-[12px]">
+              <form onSubmit={handleSubmit} className="space-y-4 text-sm">
                 <div className="relative">
                   <p className="font-semibold">Full Name :</p>
                   <div className="relative">
@@ -829,7 +829,7 @@ const ULP = () => {
                   </div>
                 </div>
 
-                        <p className="text-[12px] text-gray-600">
+                        <p className="text-sm text-gray-600">
               By Signing up, you agree to our{" "}
               <Link
                 to="/privacy-policy"
@@ -851,7 +851,7 @@ const ULP = () => {
               </form>
 
               {/* Sign-In Prompt */}
-              <p className="text-center text-[12px] text-gray-600 mt-4">
+              <p className="text-center text-sm text-gray-600 mt-4">
                 Already have an account?{" "}
                 <Link
                   to="/user-login"
