@@ -84,7 +84,7 @@ const Navbar = ({showPharmacyMode}) => {
         </div>
         <div className="flex justify-center items-center gap-5 text-sm">
           <a href="#" className="font-semibold">
-            Home
+            ome
           </a>
           <a
             href="#OurServices"
