@@ -3,6 +3,7 @@ import logo from "../../../assets/img/logo.png";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Logo } from "../../../Pages_/Components/ui/Logo";
 import EmergencyModeForm from "../../../Emergency Mode Feature/EmergencyModeForm";
 import EmergencyModeRecords from "../../../Emergency Mode Feature/EmergencyModeRecords";
 import EmergencyModeRecordsMobile from "../../../Emergency Mode Feature/EmergencyModeRecordsMobile";
@@ -66,7 +67,7 @@ const Navbar = ({ showPharmacyMode }) => {
       <div
         className={`${
           isScrolled
-            ? "fixed w-full z-50 bg-white shadow transition-transform"
+            ? "fixed w-full z-50 bg-white shadow-md transition-transform"
             : "absolute w-full"
         } ${
           isVisible ? "translate-y-0" : "-translate-y-full"
@@ -74,10 +75,10 @@ const Navbar = ({ showPharmacyMode }) => {
         style={{ transition: "transform 0.3s ease-in-out" }}
       >
         <Link to="/">
-          <div className="   flex gap-1 items-center font-semibold">
+          {/* <div className="   flex gap-1 items-center font-semibold">
             <img src={logo} alt="Logo" className="h-6" />
             <h1 className="text-xl">DOCUHEALTH</h1>
-          </div>
+          </div> */}
         </Link>
         <div className="flex justify-center items-center gap-5 text-sm">
           <a href="#" className="font-semibold">

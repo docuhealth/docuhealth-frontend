@@ -2,26 +2,31 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import Home from "././pages/LandingPage/LandingPageSections/Home";
-import ConfirmAcct from "./pages/LandingPage/WelcomePageSection/ConfirmAcct";
-import Hospital_Create_Account from "./pages/Auth/Hospital/Hospital_Create_Account";
-import Hospital_Sign_In from "./pages/Auth/Hospital/Hospital_Sign_In";
-import User_Create_Account from "./pages/Auth/User/User_Create_Account";
-import User_Create_Account_Verify_OTP from "./pages/Auth/User/User_Create_Account_Verify_OTP";
-import Hospital_Forget_Password from "./pages/Auth/Hospital/Hospital_Forget_Password";
-import NotFound from "./Not Found/NotFound";
-import Hospital_Verify_OTP from "./pages/Auth/Hospital/Hospital_Verify_OTP";
-import Hospital_Create_New_Password from "./pages/Auth/Hospital/Hospital_Create_New_Password";
+// import Home from "././pages/LandingPage/LandingPageSections/Home";
 
-import User_Sign_In from "./pages/Auth/User/User_Sign_In";
-import User_Forget_Password from "./pages/Auth/User/User_Forget_Password";
-import User_Verify_OTP from "./pages/Auth/User/User_Verify_OTP";
-import User_Create_New_Password from "./pages/Auth/User/User_Create_New_Password";
-import Admin_Sign_In from "./pages/Auth/Admin/Admin_Sign_In";
-import Admin_Create_Account from "./pages/Auth/Admin/Admin_Create_Account";
-import Admin_Forget_Password from "./pages/Auth/Admin/Admin_Forget_Password";
-import Admin_Verify_OTP from "./pages/Auth/Admin/Admin_Verify_OTP";
-import Admin_Create_New_Password from "./pages/Auth/Admin/Admin_Create_New_Password";
+import Landing_Page_Layout from "./Layouts/Landing_Page_Layout/Landing_Page_Layout";
+import Home_Page from "./Pages_/Home Page/Home_Page";
+
+
+import ConfirmAcct from "./pages/LandingPage/WelcomePageSection/ConfirmAcct";
+import Hospital_Create_Account from "./Auth/Hospital/Hospital_Create_Account";
+import Hospital_Sign_In from "./Auth/Hospital/Hospital_Sign_In";
+import User_Create_Account from "./Auth/User/User_Create_Account";
+import User_Create_Account_Verify_OTP from "./Auth/User/User_Create_Account_Verify_OTP";
+import Hospital_Forget_Password from "./Auth/Hospital/Hospital_Forget_Password";
+import NotFound from "./Not Found/NotFound";
+import Hospital_Verify_OTP from "./Auth/Hospital/Hospital_Verify_OTP";
+import Hospital_Create_New_Password from "./Auth/Hospital/Hospital_Create_New_Password";
+
+import User_Sign_In from "./Auth/User/User_Sign_In";
+import User_Forget_Password from "./Auth/User/User_Forget_Password";
+import User_Verify_OTP from "./Auth/User/User_Verify_OTP";
+import User_Create_New_Password from "./Auth/User/User_Create_New_Password";
+import Admin_Sign_In from "./Auth/Admin/Admin_Sign_In";
+import Admin_Create_Account from "./Auth/Admin/Admin_Create_Account";
+import Admin_Forget_Password from "./Auth/Admin/Admin_Forget_Password";
+import Admin_Verify_OTP from "./Auth/Admin/Admin_Verify_OTP";
+import Admin_Create_New_Password from "./Auth/Admin/Admin_Create_New_Password";
 import AdminHomeDashboard from "./Admin Dashboard/AdminHomeDashboard";
 import AdminUsersDashboard from "./Admin Dashboard/AdminUsersDashboard";
 import AdminSettingsDashboard from "./Admin Dashboard/AdminSettingsDashboard";
@@ -32,8 +37,8 @@ import AdminProtectedRoute from "./Components/Admin Protected Route/AdminProtect
 import PrivacyPolicy from "./pages/LandingPage/PrivacyPolicy/PrivacyPolicy";
 import { Toaster } from "react-hot-toast";
 
-import ProtectedRoute from "./pages/Auth/ProtectedRoute/ProtectedRoute";
-import HospitalProtectedRoute from "./pages/Auth/ProtectedRoute/HospitalProtectedRoute";
+import ProtectedRoute from "./Auth/ProtectedRoute/ProtectedRoute";
+import HospitalProtectedRoute from "./Auth/ProtectedRoute/HospitalProtectedRoute";
 
 import Patient_Dashboard_Layout from "./Layouts/Patient_Dashboard_Layout/Patient_Dashboard_Layout";
 import Patient_Home_Dashboard from "./Dashboard/Patient_Dashboard/Patient_Home_Dashboard";
@@ -91,7 +96,17 @@ function App() {
 
 
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Landing_Page_Layout />} >
+               <Route
+            index
+            element={
+              <Home_Page />
+
+            }
+          />
+        </Route>
+
+
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/confirm-account" element={<ConfirmAcct />} />
         <Route

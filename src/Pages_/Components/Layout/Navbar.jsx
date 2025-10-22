@@ -1,0 +1,427 @@
+import React, { useState, useEffect } from "react";
+import logo from "../../../assets/img/logo.png";
+import { Link } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
+import axios from "axios";
+import { toast } from "react-toastify";
+
+import { Logo } from "../ui/Logo";
+import EmergencyModeForm from "../../../Emergency Mode Feature/EmergencyModeForm";
+import EmergencyModeRecords from "../../../Emergency Mode Feature/EmergencyModeRecords";
+import EmergencyModeRecordsMobile from "../../../Emergency Mode Feature/EmergencyModeRecordsMobile";
+import PharmacyModal from "../../../Components/Pharmacy Mode/PharmacyModal";
+import PharmacyModeGenerate from "../../../Components/Pharmacy Mode/PharmacyModeGenerate";
+import PharmacyModeUpload from "../../../Components/Pharmacy Mode/PharmacyModeUpload";
+import PharmacyModeReset from "../../../Components/Pharmacy Mode/PharmacyModeReset";
+import PharmacyGenerateMessage from "../../../Components/Pharmacy Mode/PharmacyGenerateMessage";
+import PharmacyResetMessage from "../../../Components/Pharmacy Mode/PharmacyResetMessage";
+import PharmacyModeUploadNext from "../../../Components/Pharmacy Mode/PharmacyModeUploadNext";
+import PharmacyUploadSuccessfulMessage from "../../../Components/Pharmacy Mode/PharmacyUploadSucessfulMessage";
+
+const Navbar = ({ showPharmacyMode }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollTop, setLastScrollTop] = useState(0);
+  const [guestModeForm, setGuestModeForm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [records, setRecords] = useState([]);
+  const [isMedicalRecord, setisMedicalRecord] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [popoverVisible, setPopoverVisible] = useState(null);
+  const [name, setName] = useState("...");
+  const [pharmacyMode, setPharmacyMode] = useState(showPharmacyMode);
+  const [pharmacyModeProceed, setPharmacyModeProceed] = useState();
+  const [isPharmacyCreated, setIsPharmacyCreated] = useState(false);
+  const [isPharmacyReset, setIsPharmacyReset] = useState(false);
+  const [isPharmacyUploadCode, setIsPharmacyUploadCode] = useState(false);
+  const [isPharmacyUploadSuccessful, setIsPharmacyUploadSuccessful] =
+    useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+
+      if (currentScroll > lastScrollTop) {
+        // User is scrolling down → hide navbar after a short delay
+        setIsVisible(false);
+      } else {
+        // User is scrolling up → show navbar
+        setIsVisible(true);
+      }
+
+      // If user scrolls past a certain threshold, make navbar fixed
+      setIsScrolled(currentScroll > 50);
+      setLastScrollTop(currentScroll);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScrollTop]);
+
+  const [openDropdown, setOpenDropdown] = useState(null); // for toggling dropdowns
+
+  const toggleDropdown = (menu) => {
+    setOpenDropdown(openDropdown === menu ? null : menu);
+  };
+
+  // console.log("pharmacyMode", pharmacyMode)
+
+  return (
+    <div className="text-[#0E0E31] relative z-50">
+      <div
+      className={` ${
+        isScrolled
+          ? "fixed w-full  bg-white shadow transition-transform"
+          : "w-full "
+      } ${isVisible ? "translate-y-0" : "-translate-y-full"}
+      hidden sm:flex justify-between px-16 items-center py-4 `}
+      style={{ transition: "transform 0.3s ease-in-out" }}
+    >
+      <Link to="/">
+        <Logo />
+      </Link>
+
+      {/* Middle Links */}
+      <div className="flex justify-center items-center gap-5 text-sm relative">
+        <Link to="/" className="font-semibold text-[#3E4095]">
+          Home
+        </Link>
+
+        {/* Our Company Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => toggleDropdown("company")}
+            className="flex items-center gap-1 text-[#797979] transition-all hover:text-[#3E4095] hover:scale-105"
+          >
+            Our Company
+            <ChevronDown
+              className={`w-4 h-4 transition-transform duration-300 ${
+                openDropdown === "company" ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          {/* Dropdown Menu */}
+          {openDropdown === "company" && (
+            <div className="absolute left-0 mt-8 w-48 bg-white border shadow-lg rounded-lg  " >
+              <Link
+                to="/about-us"
+                className="block px-4 py-2.5 text-sm text-[#797979] hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-t-lg"
+              >
+                About Us
+              </Link>
+              <Link
+                to="/mission"
+                className="block px-4 py-2.5 text-sm text-[#797979] hover:bg-gray-100 hover:text-[#3E4095]"
+              >
+                Our Mission
+              </Link>
+              <Link
+                to="/vision"
+                className="block px-4 py-2.5 text-sm text-[#797979] hover:bg-gray-100 hover:text-[#3E4095]"
+              >
+                Our Vision
+              </Link>
+              <Link
+                to="/vision"
+                className="block px-4 py-2.5 text-sm text-[#797979] hover:bg-gray-100 hover:text-[#3E4095]"
+              >
+                Docu Health API
+              </Link>
+              <Link
+                to="/vision"
+                className="block px-4 py-2.5 text-sm text-[#797979] hover:bg-gray-100 hover:text-[#3E4095]"
+              >
+                Legal Notice
+              </Link>
+              <Link
+                to="/vision"
+                className="block px-4 py-2.5 text-sm text-[#797979] hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-b-lg"
+              >
+                Our Privacy Policy 
+              </Link>
+            </div>
+          )}
+        </div>
+
+        <Link
+          to="#OurServices"
+          className="text-[#797979] transition-all hover:text-[#3E4095] hover:scale-105"
+        >
+          Our Products
+        </Link>
+
+        <Link
+          to="#OurBenefits"
+          className="text-[#797979] transition-all hover:text-[#3E4095] hover:scale-105"
+        >
+          FAQ
+        </Link>
+
+        <Link
+          to="#OurFeatures"
+          className="text-[#797979] transition-all hover:text-[#3E4095] hover:scale-105"
+        >
+          Contact Us
+        </Link>
+
+        <Link
+          to="#OurFeatures"
+          className="text-[#797979] transition-all hover:text-[#3E4095] hover:scale-105"
+        >
+          DocuHealth News
+        </Link>
+
+        {/* Others Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => toggleDropdown("others")}
+            className="flex items-center gap-1 text-[#797979] transition-all hover:text-[#3E4095] hover:scale-105"
+          >
+            Others
+            <ChevronDown
+              className={`w-4 h-4 transition-transform duration-300 ${
+                openDropdown === "others" ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          {/* Dropdown Menu */}
+          {openDropdown === "others" && (
+            <div className="absolute left-0 mt-8 w-48 bg-white border shadow-lg rounded-lg  z-50">
+              <Link
+                to="/privacy-policy"
+                className="block px-4 py-2.5 text-sm text-[#797979] hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-t-lg"
+              >
+                Pharmacy Mode
+              </Link>
+              <Link
+                to="/terms"
+                className="block px-4 py-2.5 text-sm text-[#797979]  hover:bg-gray-100 hover:text-[#3E4095]"
+              >
+                Guest Mode
+              </Link>
+              <Link
+                to="/support"
+                className="block px-4 py-2.5 text-sm text-[#797979] hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-b-lg"
+              >
+                Support
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Right side buttons */}
+      <div className="flex justify-center items-center gap-2 text-sm">
+        <Link to="/user-create-account">
+          <button className="border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095]">
+            Sign Up
+          </button>
+        </Link>
+        <Link to="/user-login">
+          <button className="border rounded-full py-2 px-8  transition-all hover:bg-[#34345F] bg-[#3E4095] text-white">
+            Sign In
+          </button>
+        </Link>
+      </div>
+    </div>
+
+      {guestModeForm && (
+        <EmergencyModeForm
+          emergencyFormToggle={setGuestModeForm}
+          name={setName}
+          medicalRecordToggle={setisMedicalRecord}
+          records={setRecords}
+        />
+      )}
+      {isMedicalRecord && (
+        <div className="hidden overflow-x-auto  fixed inset-0 bg-black bg-opacity-60 lg:flex items-start justify-center z-50">
+          {loading ? (
+            <p className="text-center py-4">Loading...</p>
+          ) : records === "No medical records" ? (
+            <p className="text-center py-4">No medical records found.</p>
+          ) : (
+            <div>
+              <EmergencyModeRecords
+                records={records}
+                medicalRecordToggle={setisMedicalRecord}
+                name={name}
+              />
+            </div>
+          )}
+        </div>
+      )}
+      {isMedicalRecord && (
+        <div className=" lg:hidden space-y-4 overflow-x-auto  fixed inset-0 bg-black bg-opacity-60 z-50 py-20">
+          {loading ? (
+            <p className="text-gray-500 text-center">
+              Loading medical records...
+            </p>
+          ) : records === "No medical records" ? (
+            <p className="text-center py-4">No medical records found.</p>
+          ) : (
+            <div>
+              <EmergencyModeRecordsMobile
+                records={records}
+                medicalRecordToggle={setisMedicalRecord}
+                name={name}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {pharmacyMode && (
+        <PharmacyModal
+          setPharmacyMode={setPharmacyMode}
+          setPharmacyModeProceed={setPharmacyModeProceed}
+        />
+      )}
+
+      {pharmacyModeProceed === "generate" && (
+        <PharmacyModeGenerate
+          setPharmacyModeProceed={setPharmacyModeProceed}
+          setIsPharmacyCreated={setIsPharmacyCreated}
+        />
+      )}
+
+      {isPharmacyCreated && (
+        <PharmacyGenerateMessage setIsPharmacyCreated={setIsPharmacyCreated} />
+      )}
+
+      {pharmacyModeProceed === "upload" && (
+        <PharmacyModeUpload
+          setPharmacyModeProceed={setPharmacyModeProceed}
+          setIsPharmacyUploadCode={setIsPharmacyUploadCode}
+        />
+      )}
+
+      {isPharmacyUploadCode && (
+        <PharmacyModeUploadNext
+          setIsPharmacyUploadCode={setIsPharmacyUploadCode}
+          setIsPharmacyUploadSuccessful={setIsPharmacyUploadSuccessful}
+        />
+      )}
+
+      {isPharmacyUploadSuccessful && (
+        <PharmacyUploadSuccessfulMessage
+          setIsPharmacyUploadSuccessful={setIsPharmacyUploadSuccessful}
+        />
+      )}
+
+      {pharmacyModeProceed === "reset" && (
+        <PharmacyModeReset
+          setPharmacyModeProceed={setPharmacyModeProceed}
+          setIsPharmacyReset={setIsPharmacyReset}
+        />
+      )}
+
+      {isPharmacyReset && (
+        <PharmacyResetMessage setIsPharmacyReset={setIsPharmacyReset} />
+      )}
+
+      <div className="fixed w-full z-50">
+        {/* Top Navigation Bar */}
+        <div className="sm:hidden flex justify-between items-center px-3 py-4 bg-white shadow">
+          <button onClick={() => setIsOpen(true)}>
+            <i className="bx bx-menu-alt-left text-3xl"></i>
+          </button>
+          <img src={logo} alt="DocuHealth Logo" />
+        </div>
+
+        {/* Sidebar Menu */}
+        <div
+          className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg transform z-50 sm:hidden ${
+            isOpen
+              ? "translate-x-0 z-50 sm:hidden"
+              : "-translate-x-full z-50 sm:hidden"
+          } transition-transform duration-300 ease-in-out text-[#0E0E31]`}
+        >
+          {/* Close Button */}
+          <div className="flex justify-between items-center px-4 py-4">
+            <Link to="/">
+              <div className="   flex gap-1 items-center font-semibold">
+                <img src={logo} alt="Logo" className="h-6" />
+                <h1 className="text-xl">DOCUHEALTH</h1>
+              </div>
+            </Link>
+
+            <button onClick={() => setIsOpen(false)}>
+              <i className="bx bx-x text-3xl"></i>
+            </button>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="flex flex-col px-6 mt-4 space-y-4 text-gray-700">
+            <a
+              href="#"
+              className="text-lg font-medium"
+              onClick={() => setIsOpen(false)}
+            >
+              Home
+            </a>
+            <a
+              href="#OurServices"
+              className="text-lg text-gray-400"
+              onClick={() => setIsOpen(false)}
+            >
+              Our services
+            </a>
+            <a
+              href="#OurBenefits"
+              className="text-lg text-gray-400"
+              onClick={() => setIsOpen(false)}
+            >
+              Benefits
+            </a>
+            <a
+              href="#OurFeatures"
+              className="text-lg text-gray-400"
+              onClick={() => setIsOpen(false)}
+            >
+              Features
+            </a>
+            <p
+              href=""
+              className="text-lg text-gray-400"
+              onClick={() => {
+                setIsOpen(false);
+                setGuestModeForm(true);
+              }}
+            >
+              Guest Mode
+            </p>
+          </nav>
+
+          {/* Sign In / Sign Up Buttons */}
+          <div className="absolute bottom-8 left-0 w-full px-6">
+            <Link to="/user-login">
+              <button
+                className="w-full bg-[#0E0E31] text-white py-2 rounded-full"
+                onClick={() => setIsOpen(false)}
+              >
+                Sign in
+              </button>
+            </Link>
+            <Link to="/user-create-account">
+              <button
+                className="w-full mt-2 border border-[#0E0E31] text-[#0E0E31] py-2 rounded-full"
+                onClick={() => setIsOpen(false)}
+              >
+                {" "}
+                Sign up
+              </button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Navbar;

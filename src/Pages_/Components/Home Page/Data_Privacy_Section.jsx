@@ -1,0 +1,74 @@
+import React from "react";
+import BackgroundTemplate from "../ui/BackgroundTemplate";
+import data_privacy_img from "../../../assets/img/data_privacy_img.png";
+import { Check } from "lucide-react";
+
+const Data_Privacy_Section = () => {
+
+    const securityData = [
+  {
+    text: "End-to-end encryption",
+    color: "bg-[#E7E4FD]",
+  },
+  {
+    text: "Role-based data access",
+    color: "bg-[#FDF4E4]",
+  },
+  {
+    text: "Secure authentication",
+    color: "bg-[#FDE4E4]",
+  },
+  {
+    text: "Patient-permission-based access",
+    color: "bg-[#E4ECFD]",
+  },
+  {
+    text: "NDPR compliant under the National Data Protection Commission (NDPC)",
+    color: "bg-[#ECE4FD]",
+  },
+];
+
+  return (
+    <>
+      <BackgroundTemplate>
+        <section className="py-24 px-16 text-sm text-[#464646] bg-[#F6FCFE] ">
+          <div className="w-full flex flex-col md:flex-row items-start justify-between gap-10 ">
+            <div className="hidden md:flex w-full md:w-1/2 items-center justify-center">
+              <img
+                src={data_privacy_img}
+                alt="Data Privacy Illustration"
+                className="object-contain"
+              />
+            </div>
+            <div className="w-full md:w-1/2">
+          <h2 className="text-2xl md:text-3xl font-semibold text-[#3E4095] mb-4">
+          Data Privacy & Security
+        </h2>
+          <p className="mb-6">
+          At DocuHealth we follow global healthcare security standards:
+        </p>
+        <div className="space-y-4">
+          {securityData.map((item, index) => (
+            <div
+              key={index}
+               className={`flex items-center justify-between rounded-full ${item.color} py-3 px-5 shadow-sm transition-all duration-300
+                ${index % 2 === 0 ? "mr-10" : "ml-10"}
+              `}
+            >
+              <span className="text-[#1f1f75] text-sm  font-medium">
+                {item.text}
+              </span>
+              <div className="bg-[#1f1f75] p-1 rounded">
+                <Check className="text-white w-3 h-3" />
+              </div>
+            </div>
+          ))}
+        </div>
+            </div>
+          </div>
+        </section>
+      </BackgroundTemplate>
+    </>
+  );
+};
+export default Data_Privacy_Section;
