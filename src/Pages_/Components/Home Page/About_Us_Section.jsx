@@ -4,13 +4,13 @@ import about_img from "../../../assets/img/about_img.png";
 const About_Us_Section = () => {
   return (
     <>
-      <div className="relative py-20 px-16 bg-[#F6FCFE]">
-        <div className="flex items-start gap-7 ">
+      <div className="relative py-20 px-5 lg:px-16 bg-[#F6FCFE]" id="about-us">
+        <div className="flex flex-col-reverse lg:flex-row items-start gap-7 ">
           <div className="flex-1 z-10">
             <img src={about_img} alt="about us image" className="object-contain" />
           </div>
           <div className="flex-1">
-            <h2 className="font-semibold pb-4 text-3xl text-[#3E4095]">
+            <h2 className="font-semibold pb-4 text-2xl lg:text-3xl text-[#3E4095]">
               About DocuHealth
             </h2>
             <div className="text-sm space-y-4 text-[#464646] leading-6">

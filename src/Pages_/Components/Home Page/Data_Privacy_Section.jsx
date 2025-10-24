@@ -31,17 +31,17 @@ const Data_Privacy_Section = () => {
   return (
     <>
       <BackgroundTemplate>
-        <section className="py-24 px-16 text-sm text-[#464646] bg-[#F6FCFE] ">
-          <div className="w-full flex flex-col md:flex-row items-start justify-between gap-10 ">
-            <div className="hidden md:flex w-full md:w-1/2 items-center justify-center">
+        <section className="py-24 px-5 lg:px-16 text-sm text-[#464646] bg-white lg:bg-[#F6FCFE] ">
+          <div className="w-full flex flex-col-reverse lg:flex-row items-start justify-between gap-10 ">
+            <div className="hidden md:flex w-full lg:w-1/2 items-center justify-center">
               <img
                 src={data_privacy_img}
                 alt="Data Privacy Illustration"
                 className="object-contain"
               />
             </div>
-            <div className="w-full md:w-1/2">
-          <h2 className="text-2xl md:text-3xl font-semibold text-[#3E4095] mb-4">
+            <div className="w-full lg:w-1/2">
+          <h2 className="text-2xl lg:text-3xl font-semibold text-[#3E4095] mb-4">
           Data Privacy & Security
         </h2>
           <p className="mb-6">
@@ -51,8 +51,8 @@ const Data_Privacy_Section = () => {
           {securityData.map((item, index) => (
             <div
               key={index}
-               className={`flex items-center justify-between rounded-full ${item.color} py-3 px-5 shadow-sm transition-all duration-300
-                ${index % 2 === 0 ? "mr-10" : "ml-10"}
+               className={`flex items-center justify-between rounded-md lg:rounded-full ${item.color} py-3 px-5 shadow-sm transition-all duration-300
+                ${index % 2 === 0 ? "lg:mr-10" : "lg:ml-10"}
               `}
             >
               <span className="text-[#1f1f75] text-sm  font-medium">

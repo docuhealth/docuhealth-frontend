@@ -69,6 +69,16 @@
   background: #555; /* Slightly lighter on hover */
 }
 
+@media (max-width: 1024px) {
+  .underline-double {
+     color: #B9BBFF;
+  }
+  .underline-double::before,
+.underline-double::after {
+   background-color: #B9BBFF;
+}
+
+}
 
 
 @media (max-width: 600px) {
@@ -95,6 +105,12 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;     /* Firefox */
 }
+
+.swiper-pagination-bullet-active {
+  background-color: #3E4095 !important; /* DocuHealth purple */
+}
+
+
 
 
 

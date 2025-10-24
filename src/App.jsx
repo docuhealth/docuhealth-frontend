@@ -1,14 +1,20 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Toaster } from "react-hot-toast";
 
-// import Home from "././pages/LandingPage/LandingPageSections/Home";
 
 import Landing_Page_Layout from "./Layouts/Landing_Page_Layout/Landing_Page_Layout";
 import Home_Page from "./Pages_/Home Page/Home_Page";
+import Our_Vision_Page from "./Pages_/Our Vision/Our_Vision_Page";
+import Our_Mission_Page from "./Pages_/Our Mission/Our_Mission_Page";
+import DocuHealth_News_Page from "./Pages_/DocuHealth News Page/DocuHealth_News_Page";
+import DocuHealth_API_Page from "./Pages_/DocuHealth API Page/DocuHealth_API_Page";
+import Legal_Notice_Page from "./Pages_/Legal Notice/Legal_Notice_Page";
+import Privacy_Policy_Page from "./Pages_/Our Privacy Policy/Privacy_Policy_Page";
 
 
-import ConfirmAcct from "./pages/LandingPage/WelcomePageSection/ConfirmAcct";
+
 import Hospital_Create_Account from "./Auth/Hospital/Hospital_Create_Account";
 import Hospital_Sign_In from "./Auth/Hospital/Hospital_Sign_In";
 import User_Create_Account from "./Auth/User/User_Create_Account";
@@ -34,8 +40,7 @@ import AdminSubscriptionDashboard from "./Admin Dashboard/AdminSubscriptionsdash
 import AdminLogoutDashboard from "./Admin Dashboard/AdminLogOutDashboard";
 
 import AdminProtectedRoute from "./Components/Admin Protected Route/AdminProtectedRoute";
-import PrivacyPolicy from "./pages/LandingPage/PrivacyPolicy/PrivacyPolicy";
-import { Toaster } from "react-hot-toast";
+
 
 import ProtectedRoute from "./Auth/ProtectedRoute/ProtectedRoute";
 import HospitalProtectedRoute from "./Auth/ProtectedRoute/HospitalProtectedRoute";
@@ -105,10 +110,63 @@ function App() {
             }
           />
         </Route>
+        <Route path="/our-vision" element={<Landing_Page_Layout />} >
+               <Route
+            index
+            element={
+              <Our_Vision_Page />
+
+            }
+          />
+        </Route>
+        <Route path="/our-mission" element={<Landing_Page_Layout />} >
+               <Route
+            index
+            element={
+              <Our_Mission_Page />
+
+            }
+          />
+        </Route>
+        <Route path="/docuhealth-news" element={<Landing_Page_Layout />} >
+               <Route
+            index
+            element={
+              <DocuHealth_News_Page />
+
+            }
+          />
+        </Route>
+        <Route path="/docuhealth-api" element={<Landing_Page_Layout />} >
+               <Route
+            index
+            element={
+              <DocuHealth_API_Page />
+
+            }
+          />
+        </Route>
+        <Route path="/our-legal-notice" element={<Landing_Page_Layout />} >
+               <Route
+            index
+            element={
+              <Legal_Notice_Page/>
+
+            }
+          />
+        </Route>
+        <Route path="/our-privacy-policy" element={<Landing_Page_Layout />} >
+               <Route
+            index
+            element={
+              <Privacy_Policy_Page/>
+
+            }
+          />
+        </Route>
 
 
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/confirm-account" element={<ConfirmAcct />} />
+
         <Route
           path="/hospital-create-account"
           element={<Hospital_Create_Account />}
