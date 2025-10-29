@@ -122,7 +122,7 @@ const Privacy_Policy_Page = () => {
           security and legal purposes.
         </p>
 
-        <h2 class="text-base font-semibold text-[#464646]">5. Data Deletion</h2>
+        <h2 class="text-base font-semibold text-[#464646]">4. Data Deletion</h2>
         <p>
           You have the right to request the deletion of your DocuHealth account.
           However, please note that once a medical summary is uploaded by a
@@ -132,7 +132,7 @@ const Privacy_Policy_Page = () => {
           compliance with legal and regulatory obligations.
         </p>
 
-        <h2 class="text-base font-semibold text-[#464646]">6. Data Security</h2>
+        <h2 class="text-base font-semibold text-[#464646]">5. Data Security</h2>
         <p>
           We are committed to safeguarding your personal and health information.
           DocuHealth employs industry-standard security measures, including
@@ -141,7 +141,7 @@ const Privacy_Policy_Page = () => {
         </p>
 
         <h2 class="text-base font-semibold text-[#464646]">
-          7. Data Sharing With Partners
+          6. Data Sharing With Partners
         </h2>
         <p>
           DocuHealth may share your medical summary data with authorized
@@ -167,7 +167,7 @@ const Privacy_Policy_Page = () => {
         </p>
 
         <h2 class="text-base font-semibold text-[#464646]">
-          8. Legal Compliance
+          7. Legal Compliance
         </h2>
         <p>
           DocuHealth complies with all relevant data protection laws, including
@@ -177,7 +177,7 @@ const Privacy_Policy_Page = () => {
         </p>
 
         <h2 class="text-base font-semibold text-[#464646]">
-          9. Termination and Withdrawal
+          8. Termination and Withdrawal
         </h2>
         <p>
           You can choose to deactivate or delete your account at any time by
@@ -188,7 +188,7 @@ const Privacy_Policy_Page = () => {
         </p>
 
         <h2 class="text-base font-semibold text-[#464646]">
-          10. Agreement to Terms
+          9. Agreement to Terms
         </h2>
         <p>
           By clicking “Registering On Our Platform”, you acknowledge that you

@@ -16,7 +16,7 @@ const TabComponent = ({ tabs }) => {
             className={`text-sm px-2 sm:px-4  py-2 sm:text-sm font-medium transition-colors duration-200
               ${
                 activeTab === index
-                  ? "text-[#0000FF]  border-b-2 border-[#0000FF] font-semibold"
+                  ? "text-[#3E4095]  border-b-2 border-[#3E4095] font-semibold"
                   : "text-gray-600 hover:text-gray-800"
               }`}
           >

@@ -14,6 +14,7 @@ import Legal_Notice_Page from "./Pages_/Legal Notice/Legal_Notice_Page";
 import Privacy_Policy_Page from "./Pages_/Our Privacy Policy/Privacy_Policy_Page";
 
 
+import Hospital_Verification_Request from "./Auth/Hospital/Hospital_Verification_Request";
 
 import Hospital_Create_Account from "./Auth/Hospital/Hospital_Create_Account";
 import Hospital_Sign_In from "./Auth/Hospital/Hospital_Sign_In";
@@ -28,6 +29,8 @@ import User_Sign_In from "./Auth/User/User_Sign_In";
 import User_Forget_Password from "./Auth/User/User_Forget_Password";
 import User_Verify_OTP from "./Auth/User/User_Verify_OTP";
 import User_Create_New_Password from "./Auth/User/User_Create_New_Password";
+
+
 import Admin_Sign_In from "./Auth/Admin/Admin_Sign_In";
 import Admin_Create_Account from "./Auth/Admin/Admin_Create_Account";
 import Admin_Forget_Password from "./Auth/Admin/Admin_Forget_Password";
@@ -166,8 +169,11 @@ function App() {
         </Route>
 
 
-
-        <Route
+ <Route
+          path="/hospital-verification-request"
+          element={<Hospital_Verification_Request />}
+        />
+        {/* <Route
           path="/hospital-create-account"
           element={<Hospital_Create_Account />}
         />
@@ -180,7 +186,7 @@ function App() {
         <Route
           path="/hospital-set-new-password"
           element={<Hospital_Create_New_Password />}
-        />
+        /> */}
 
         {/* Hospital Admin Routes */}
         <Route

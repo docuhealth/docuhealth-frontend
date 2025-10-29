@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import logo from "../../assets/img/logo.png";
+import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 import dashb from "../../assets/img/dashb.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { authAPI } from "../../utils/authAPI";
@@ -67,10 +67,10 @@ const User_Create_Account_Verify_OTP = () => {
         <div className="w-full flex-1">
           <div className=" hidden sm:flex justify-center items-center py-10 h-screen ">
             <Link to="/">
-              <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold">
-                <img src={logo} alt="Logo" className="h-6" />
-                <h1 className="text-xl">DOCUHEALTH</h1>
-              </div>
+               <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
+                         <img src={docuhealth_logo} alt="Logo" className="w-6" />
+                         <h1 className="text-xl">DocuHealth</h1>
+                       </div>
             </Link>
             <div className="w-full">
               <div className="px-10 w-full">
@@ -87,7 +87,7 @@ const User_Create_Account_Verify_OTP = () => {
                     <div className="relative">
                       <input
                         type="email"
-                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -101,7 +101,7 @@ const User_Create_Account_Verify_OTP = () => {
                     <div className="relative">
                       <input
                         type="number"
-                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value)}
                         required
@@ -117,7 +117,7 @@ const User_Create_Account_Verify_OTP = () => {
                     className={`w-full py-3 rounded-full ${
                       isLoading
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-[#0000FF] text-white hover:bg-blue-700"
+                        : "bg-[#3E4095] text-white"
                     }`}
                   >
                     {isLoading ? "Verifying OTP" : "Proceed"}
@@ -132,7 +132,7 @@ const User_Create_Account_Verify_OTP = () => {
         <div
           className="flex-1 h-screen flex flex-col justify-center items-center p-4"
           style={{
-            background: "linear-gradient(to bottom, #0000FF, #718FCC)",
+            background: "linear-gradient(to bottom, #3E4095, #718FCC)",
           }}
         >
           <div className="">
@@ -154,10 +154,10 @@ const User_Create_Account_Verify_OTP = () => {
         </div>
       </div>
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
-        <div className=" absolute top-10 left-5  flex gap-2 items-center font-semibold">
-          <img src={logo} alt="Logo" className="h-6" />
-          <h1 className="text-xl">DOCUHEALTH</h1>
-        </div>
+      <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+               <img src={docuhealth_logo} alt="Logo" className="w-6" />
+               <h1 className="text-xl">DocuHealth</h1>
+             </div>
         <div className="w-full">
           <div className="px-5 w-full">
             <h2 className="text-xl font-semibold pb-1">Verify OTP</h2>
@@ -173,7 +173,7 @@ const User_Create_Account_Verify_OTP = () => {
                 <div className="relative">
                   <input
                     type="email"
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -187,7 +187,7 @@ const User_Create_Account_Verify_OTP = () => {
                 <div className="relative">
                   <input
                     type="number"
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     required
@@ -203,7 +203,7 @@ const User_Create_Account_Verify_OTP = () => {
                 className={`w-full py-3 rounded-full ${
                   isLoading
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#0000FF] text-white hover:bg-blue-700"
+                    : "bg-[#3E4095] text-white "
                 }`}
               >
                 {isLoading ? "Verifying OTP" : "Proceed"}

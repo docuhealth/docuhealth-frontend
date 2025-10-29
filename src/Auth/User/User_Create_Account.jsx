@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import logo from "../../assets/img/logo.png";
+import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React Icons
 import dashb from "../../assets/img/dashb.png";
 import { Link } from "react-router-dom";
@@ -138,7 +138,7 @@ const ULP = () => {
     if (score <= 3)
       return { strength: score, label: "Fair", color: "bg-yellow-500" };
     if (score <= 4)
-      return { strength: score, label: "Good", color: "bg-blue-500" };
+      return { strength: score, label: "Good", color: "bg-[#3E4095]" };
     return { strength: score, label: "Strong", color: "bg-green-500" };
   };
 
@@ -244,10 +244,10 @@ const ULP = () => {
         <div className="  w-1/2 h-full overflow-y-scroll hide-scrollbar flex-1 ">
           <div className="hidden sm:flex flex-col  items-start justify-center  py-10 ">
             <Link to="/">
-              <div className="pl-10 pb-10 flex gap-1 items-center font-semibold">
-                <img src={logo} alt="Logo" className="h-6" />
-                <h1 className="text-xl">DOCUHEALTH</h1>
-              </div>
+                  <div className="pl-10 pb-10 flex gap-1 items-center font-semibold text-[#3E4095]">
+                             <img src={docuhealth_logo} alt="Logo" className="w-6" />
+                             <h1 className="text-xl">DocuHealth</h1>
+                           </div>
             </Link>
 
             {step === 1 ? (
@@ -268,7 +268,7 @@ const ULP = () => {
                       <div className="relative">
                         <input
                           type="email"
-                          className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                          className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           required
@@ -284,7 +284,7 @@ const ULP = () => {
                       <div className="relative">
                         <input
                           type="number"
-                          className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                          className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                           value={phone_num}
                           onChange={(e) => setPhone_Num(e.target.value)}
                           required
@@ -299,7 +299,7 @@ const ULP = () => {
                         <input
                           type={showPassword ? "text" : "password"}
                           placeholder=""
-                          className={`w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500 ${
+                          className={`w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095] ${
                             password && !isPasswordValid
                               ? "focus:border-red-500"
                               : ""
@@ -461,7 +461,7 @@ const ULP = () => {
                         <input
                           type={showPassword ? "text" : "password"}
                           placeholder=""
-                          className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                          className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           required
@@ -490,7 +490,7 @@ const ULP = () => {
                         email &&
                         confirmPassword &&
                         password === confirmPassword
-                          ? "bg-[#0000FF] text-white hover:bg-blue-700"
+                          ? "bg-[#3E4095] text-white"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                       disabled={
@@ -514,7 +514,7 @@ const ULP = () => {
                     Already have an account?{" "}
                     <Link
                       to="/user-login"
-                      className="text-[#0000FF] hover:underline"
+                      className="text-[#3E4095] hover:underline"
                     >
                       Sign in
                     </Link>
@@ -538,7 +538,7 @@ const ULP = () => {
                       <div className="relative">
                         <input
                           type="text"
-                          className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                          className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                           value={firstName}
                           onChange={(e) => setFirstName(e.target.value)}
                           required
@@ -550,7 +550,7 @@ const ULP = () => {
                       <div className="relative">
                         <input
                           type="text"
-                          className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                          className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                           value={lastName}
                           onChange={(e) => setLastName(e.target.value)}
                           required
@@ -562,7 +562,7 @@ const ULP = () => {
                       <div className="relative">
                         <input
                           type="text"
-                          className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                          className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                           value={middleName}
                           onChange={(e) => setMiddleName(e.target.value)}
                           required
@@ -574,7 +574,7 @@ const ULP = () => {
                       <div className="relative">
                         <input
                           type="date"
-                          className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+                          className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#3E4095] appearance-none pr-10"
                           value={DOB}
                           onChange={(e) => setDOB(e.target.value)}
                           required
@@ -603,7 +603,7 @@ const ULP = () => {
                       <p className="font-semibold pb-1">Gender :</p>
                       <div className="relative">
                         <select
-                          className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+                          className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#3E4095] appearance-none pr-10"
                           value={gender}
                           onChange={(e) => setGender(e.target.value)}
                           required
@@ -640,7 +640,7 @@ const ULP = () => {
                       onClick={handleFinalStep}
                       className={`w-full transition-colors py-3 rounded-full  ${
                         firstName && lastName && middleName && DOB && gender
-                          ? "bg-[#0000FF] text-white hover:bg-blue-700"
+                          ? "bg-[#3E4095] text-white"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                       disabled={
@@ -660,7 +660,7 @@ const ULP = () => {
                     Already have an account?{" "}
                     <Link
                       to="/user-login"
-                      className="text-[#0000FF] hover:underline"
+                      className="text-[#3E4095] hover:underline"
                     >
                       Sign in
                     </Link>
@@ -687,7 +687,7 @@ const ULP = () => {
                       <p className="font-semibold pb-1">Country :</p>
                       <div className="relative w-full">
                         <select
-                          className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                          className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-[#3E4095] outline-none appearance-none pr-10"
                           value={country}
                           onChange={(e) => setCountry(e.target.value)}
                           required
@@ -723,7 +723,7 @@ const ULP = () => {
                       <p className="font-semibold pb-1">State Of Residence :</p>
                       <div className="relative w-full">
                         <select
-                          className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                          className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border- outline-none appearance-none pr-10"
                           value={state}
                           onChange={(e) => setState(e.target.value)}
                           disabled={!states.length}
@@ -760,7 +760,7 @@ const ULP = () => {
                       <p className="font-semibold pb-1">City :</p>
                       <div className="relative w-full">
                         <select
-                          className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                          className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border- outline-none appearance-none pr-10"
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
                           required
@@ -797,7 +797,7 @@ const ULP = () => {
                       <div className="relative">
                         <input
                           type="text"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-none focus:border-blue-500"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                           placeholder="e.g olorunda street"
                           value={street}
                           onChange={(e) => setStreet(e.target.value)}
@@ -812,7 +812,7 @@ const ULP = () => {
                       <div className="relative">
                         <input
                           type="text"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-none focus:border-blue-500"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                           placeholder="e.g No. 1234"
                           value={houseNO}
                           onChange={(e) => setHouseNO(e.target.value)}
@@ -827,7 +827,7 @@ const ULP = () => {
                       <div className="relative">
                         <input
                           type="text"
-                          className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                          className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                           value={referred_by}
                           onChange={(e) => setReferred_by(e.target.value)}
                           required
@@ -839,7 +839,7 @@ const ULP = () => {
                       By Signing up, you agree to our{" "}
                       <Link
                         to="/privacy-policy"
-                        className="text-[#0000FF] hover:underline"
+                        className="text-[#3E4095] hover:underline"
                       >
                         Privacy Policy
                       </Link>
@@ -855,7 +855,7 @@ const ULP = () => {
                         street &&
                         houseNO &&
                         !isSubmitting
-                          ? "bg-[#0000FF] text-white hover:bg-blue-700"
+                          ? "bg-[#3E4095] text-white "
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       } `}
                       disabled={
@@ -875,7 +875,7 @@ const ULP = () => {
                     Already have an account?{" "}
                     <Link
                       to="/user-login"
-                      className="text-[#0000FF] hover:underline"
+                      className="text-[#3E4095] hover:underline"
                     >
                       Sign in
                     </Link>
@@ -889,7 +889,7 @@ const ULP = () => {
         <div
           className="w-1/2 h-screen flex flex-col justify-center items-center p-4 flex-1"
           style={{
-            background: "linear-gradient(to bottom, #0000FF, #718FCC)",
+            background: "linear-gradient(to bottom, #3E4095, #718FCC)",
           }}
         >
           <div className="">
@@ -913,9 +913,9 @@ const ULP = () => {
 
       <div className="h-screen sm:hidden">
         <div className="h-full overflow-y-scroll hide-scrollbar py-10">
-          <div className="pl-5 flex gap-2 items-center font-semibold">
-            <img src={logo} alt="Logo" className="h-6" />
-            <h1 className="text-xl">DOCUHEALTH</h1>
+          <div className="pl-5 flex gap-1 items-center font-semibold text-[#3E4095]">
+                <img src={docuhealth_logo} alt="Logo" className="w-6" />
+                             <h1 className="text-xl">DocuHealth</h1>
           </div>
           {step === 1 ? (
             <>
@@ -935,7 +935,7 @@ const ULP = () => {
                     <div className="relative">
                       <input
                         type="email"
-                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -951,7 +951,7 @@ const ULP = () => {
                     <div className="relative">
                       <input
                         type="number"
-                        className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                        className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                         value={phone_num}
                         onChange={(e) => setPhone_Num(e.target.value)}
                         required
@@ -966,7 +966,7 @@ const ULP = () => {
                       <input
                         type={showPassword ? "text" : "password"}
                         placeholder=""
-                        className={`w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500 ${
+                        className={`w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095] ${
                           password && !isPasswordValid
                             ? "focus:border-red-500"
                             : ""
@@ -1127,7 +1127,7 @@ const ULP = () => {
                       <input
                         type={showPassword ? "text" : "password"}
                         placeholder=""
-                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
@@ -1156,7 +1156,7 @@ const ULP = () => {
                       email &&
                       confirmPassword &&
                       password === confirmPassword
-                        ? "bg-[#0000FF] text-white hover:bg-blue-700"
+                        ? "bg-[#3E4095] text-white "
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     }`}
                     disabled={
@@ -1180,7 +1180,7 @@ const ULP = () => {
                   Already have an account?{" "}
                   <Link
                     to="/user-login"
-                    className="text-[#0000FF] hover:underline"
+                    className="text-[#3E4095] hover:underline"
                   >
                     Sign in
                   </Link>
@@ -1204,7 +1204,7 @@ const ULP = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                        className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         required
@@ -1216,7 +1216,7 @@ const ULP = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                        className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         required
@@ -1228,7 +1228,7 @@ const ULP = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                        className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                         value={middleName}
                         onChange={(e) => setMiddleName(e.target.value)}
                         required
@@ -1240,7 +1240,7 @@ const ULP = () => {
                     <div className="relative">
                       <input
                         type="date"
-                        className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+                        className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#3E4095] appearance-none pr-10"
                         value={DOB}
                         onChange={(e) => setDOB(e.target.value)}
                         required
@@ -1269,7 +1269,7 @@ const ULP = () => {
                     <p className="font-semibold pb-1">Gender :</p>
                     <div className="relative">
                       <select
-                        className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+                        className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#3E4095] appearance-none pr-10"
                         value={gender}
                         onChange={(e) => setGender(e.target.value)}
                         required
@@ -1306,7 +1306,7 @@ const ULP = () => {
                     onClick={handleFinalStep}
                     className={`w-full transition-colors py-3 rounded-full  ${
                       firstName && lastName && middleName && DOB && gender
-                        ? "bg-[#0000FF] text-white hover:bg-blue-700"
+                        ? "bg-[#3E4095] text-white "
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     }`}
                     disabled={
@@ -1322,7 +1322,7 @@ const ULP = () => {
                   Already have an account?{" "}
                   <Link
                     to="/user-login"
-                    className="text-[#0000FF] hover:underline"
+                    className="text-[#3E4095] hover:underline"
                   >
                     Sign in
                   </Link>
@@ -1349,7 +1349,7 @@ const ULP = () => {
                     <p className="font-semibold pb-1">Country :</p>
                     <div className="relative w-full">
                       <select
-                        className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                        className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-[#3E4095] outline-none appearance-none pr-10"
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
                         required
@@ -1385,7 +1385,7 @@ const ULP = () => {
                     <p className="font-semibold pb-1">State Of Residence :</p>
                     <div className="relative w-full">
                       <select
-                        className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                        className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-[#3E4095] outline-none appearance-none pr-10"
                         value={state}
                         onChange={(e) => setState(e.target.value)}
                         disabled={!states.length}
@@ -1422,7 +1422,7 @@ const ULP = () => {
                     <p className="font-semibold pb-1">City :</p>
                     <div className="relative w-full">
                       <select
-                        className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                        className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-[#3E4095] outline-none appearance-none pr-10"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
                         required
@@ -1459,7 +1459,7 @@ const ULP = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-none focus:border-blue-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                         placeholder="e.g olorunda street"
                         value={street}
                         onChange={(e) => setStreet(e.target.value)}
@@ -1474,7 +1474,7 @@ const ULP = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-none focus:border-blue-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                         placeholder="e.g No. 1234"
                         value={houseNO}
                         onChange={(e) => setHouseNO(e.target.value)}
@@ -1489,7 +1489,7 @@ const ULP = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                        className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-[#3E4095]"
                         value={referred_by}
                         onChange={(e) => setReferred_by(e.target.value)}
                         required
@@ -1501,7 +1501,7 @@ const ULP = () => {
                     By Signing up, you agree to our{" "}
                     <Link
                       to="/privacy-policy"
-                      className="text-[#0000FF] hover:underline"
+                      className="text-[#3E4095] hover:underline"
                     >
                       Privacy Policy
                     </Link>
@@ -1517,7 +1517,7 @@ const ULP = () => {
                       street &&
                       houseNO &&
                       !isSubmitting
-                        ? "bg-[#0000FF] text-white hover:bg-blue-700"
+                        ? "bg-[#3E4095] text-white "
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     } `}
                     disabled={
@@ -1537,7 +1537,7 @@ const ULP = () => {
                   Already have an account?{" "}
                   <Link
                     to="/user-login"
-                    className="text-[#0000FF] hover:underline"
+                    className="text-[#3E4095] hover:underline"
                   >
                     Sign in
                   </Link>

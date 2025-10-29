@@ -23,7 +23,7 @@ const UserSubAcctOverlay = ({
               </div>
               <button
                 onClick={toggleAcctCreationOverlay}
-                className="text-gray-500 hover:text-black"
+                className="text-gray-500 "
               >
                 <i className="bx bx-x text-2xl"></i>
               </button>
@@ -43,7 +43,7 @@ const UserSubAcctOverlay = ({
                   name="firstname"
                   value={formData.firstname}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-none focus:border-[#0000FF] h-10"
+                  className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-none focus:border-[#3E4095] h-10"
                   required
                 />
               </div>
@@ -56,7 +56,7 @@ const UserSubAcctOverlay = ({
                   name="lastname"
                   value={formData.lastname}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-none focus:border-[#0000FF] h-10"
+                  className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-none focus:border-[#3E4095] h-10"
                   required
                 />
               </div>
@@ -69,7 +69,7 @@ const UserSubAcctOverlay = ({
                   name="middlename"
                   value={formData.middlename}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-none focus:border-[#0000FF] h-10"
+                  className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-none focus:border-[#3E4095] h-10"
                 />
               </div>
               <div className="mb-4">
@@ -81,7 +81,7 @@ const UserSubAcctOverlay = ({
                   name="dob"
                   value={formData.dob}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-none focus:border-[#0000FF] h-10"
+                  className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-none focus:border-[#3E4095] h-10"
                   required
                 />
               </div>
@@ -99,7 +99,7 @@ const UserSubAcctOverlay = ({
                   }}
                   onFocus={() => setIsOpen(true)} // when clicked/focused
                   onBlur={() => setIsOpen(false)} // when closed
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-none focus:border-[#0000FF] appearance-none cursor-pointer h-10"
+                  className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-none focus:border-[#3E4095] appearance-none cursor-pointer h-10"
                   required
                 >
                   <option value="">Select</option>
@@ -151,7 +151,7 @@ const UserSubAcctOverlay = ({
                 <button
                   className={` text-center py-3 px-4 rounded-full w-full ${
                     isFormValid && !loading
-                      ? "bg-[#0000FF] text-white hover:bg-blue-700 cursor-pointer"
+                      ? "bg-[#3E4095] text-white  cursor-pointer"
                       : "cursor-not-allowed bg-gray-300 text-gray-500"
                   }  `}
                   disabled={!isFormValid || loading}

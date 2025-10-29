@@ -393,11 +393,14 @@ const Navbar = ({ showPharmacyMode }) => {
         <PharmacyResetMessage setIsPharmacyReset={setIsPharmacyReset} />
       )}
 
-      <div className="absolute top-0 w-full z-50">
+      <div className={` w-full z-50  ${isScrolled
+          ? "fixed w-full  bg-white shadow transition-transform"
+          : "absolute top-0 w-full shadow"
+          }`}>
         {/* Top Navigation Bar */}
-        <div className={`lg:hidden flex justify-between items-center px-3 py-4 ${currentPath === '/' ? 'bg-none' : 'bg-white'} `}>
+        <div className={`lg:hidden flex justify-between items-center px-3 py-4 ${currentPath === '/' ? 'bg-none' : 'bg-white'}  `}>
           <button onClick={() => setIsOpen(true)}>
-            <i className={`bx bx-menu-alt-left text-3xl ${currentPath === '/' ? 'text-white' : 'text-[#3E4095]'} `}></i>
+            <i className={`bx bx-menu-alt-left text-3xl ${currentPath === '/' && !isScrolled ? 'text-white' : 'text-[#3E4095]'} `}></i>
           </button>
           <div className="bg-white p-2 rounded-full">
             <img src={docuhealth_logo} alt="DocuHealth Logo" className="w-6" />
@@ -432,9 +435,9 @@ const Navbar = ({ showPharmacyMode }) => {
             {/* Home */}
             <Link
               to="/"
-              className={`relative font-semibold transition-all hover:text-[#3E4095] ${currentPath === "/"
-                ? "text-[#3E4095] after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-[#3E4095] after:rounded-full"
-                : "text-[#797979] after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-[#3E4095] after:rounded-full after:transition-all after:duration-300 hover:after:w-full"
+              className={`relative transition-all hover:text-[#3E4095] ${currentPath === "/"
+                ? "text-[#3E4095] font-medium"
+                : "text-[#797979]"
               }`}
               onClick={() => {
                 setIsOpen(false);
@@ -457,8 +460,8 @@ const Navbar = ({ showPharmacyMode }) => {
                                 "/our-legal-notice",
                                 "/our-privacy-policy",
                               ].includes(currentPath)
-                                ? "text-[#3E4095] font-medium after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-full after:h-[3px] after:bg-[#3E4095] after:rounded-full after:transition-all after:duration-300"
-                                : "text-[#797979] after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-0 after:h-[3px] after:bg-[#3E4095] after:rounded-full after:transition-all after:duration-300 hover:after:w-full"
+                                ? "text-[#3E4095] font-medium "
+                                : "text-[#797979] "
                               }`}
               >
                 Our Company
@@ -469,7 +472,7 @@ const Navbar = ({ showPharmacyMode }) => {
               </button>
 
               {openDropdown === "company" && (
-                <div className="flex flex-col mt-2 ml-3 space-y-2 text-xs">
+                <div className="flex flex-col mt-3 ml-3 space-y-3 text-sm">
                   <a
                     href="/#about-us"
                   className="block  text-[#797979] hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-t-lg"
@@ -597,8 +600,8 @@ const Navbar = ({ showPharmacyMode }) => {
               to="/docuhealth-news"
               className={`relative transition-all hover:text-[#3E4095] hover:scale-105
                 ${currentPath === "/docuhealth-news"
-                            ? "text-[#3E4095] font-medium after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-full after:h-[3px] after:bg-[#3E4095] after:rounded-full after:transition-all after:duration-300"
-                            : "text-[#797979] after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-0 after:h-[3px] after:bg-[#3E4095] after:rounded-full after:transition-all after:duration-300 hover:after:w-full"
+                            ? "text-[#3E4095] font-medium "
+                            : "text-[#797979] "
                           }`}
               onClick={() => {
                 setIsOpen(false);
@@ -623,7 +626,7 @@ const Navbar = ({ showPharmacyMode }) => {
               </button>
 
               {openDropdown === "others" && (
-                <div className="flex flex-col mt-2 ml-3 space-y-2 text-xs">
+                <div className="flex flex-col mt-3 ml-3 space-y-3 text-sm">
                   <Link
                     to=""
                     onClick={() => {

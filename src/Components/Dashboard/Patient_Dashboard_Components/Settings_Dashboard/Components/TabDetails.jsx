@@ -60,7 +60,7 @@ const AccountSettingsTab = () => {
     if (score <= 3)
       return { strength: score, label: "Fair", color: "bg-yellow-500" };
     if (score <= 4)
-      return { strength: score, label: "Good", color: "bg-blue-500" };
+      return { strength: score, label: "Good", color: "bg-[#3E4095]" };
     return { strength: score, label: "Strong", color: "bg-green-500" };
   };
 
@@ -215,7 +215,7 @@ const AccountSettingsTab = () => {
                   type="text"
                   value={formData.firstname}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-blue-500 text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
                 />
               </div>
               <div className="">
@@ -231,7 +231,7 @@ const AccountSettingsTab = () => {
                   type="text"
                   value={formData.lastname}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-blue-500 text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
                 />
               </div>
               <div className="">
@@ -247,7 +247,7 @@ const AccountSettingsTab = () => {
                   type="text"
                   value={formData.middlename}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-blue-500 text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
                 />
               </div>
 
@@ -265,7 +265,7 @@ const AccountSettingsTab = () => {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-blue-500 text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
                 />
               </div>
 
@@ -283,7 +283,7 @@ const AccountSettingsTab = () => {
                   type="number"
                   value={formData.phone_num}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-blue-500 text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
                 />
               </div>
 
@@ -292,7 +292,7 @@ const AccountSettingsTab = () => {
                 <div className="relative">
                   <select
                     name="gender"
-                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-blue-500 text-sm appearance-none "
+                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
                     value={formData.gender}
                     onChange={handleChange}
                   >
@@ -330,7 +330,7 @@ const AccountSettingsTab = () => {
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder=""
-                    className={`w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-blue-500 text-sm appearance-none pl-8 ${
+                    className={`w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none pl-8 ${
                       formData.password && !isPasswordValid
                         ? "focus:border-red-500"
                         : ""
@@ -491,7 +491,7 @@ const AccountSettingsTab = () => {
                   <input
                     name="DOB"
                     type="date"
-                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-blue-500 text-sm appearance-none "
+                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
                     value={formData.DOB}
                     onChange={handleChange}
                   />

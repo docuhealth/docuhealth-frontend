@@ -157,7 +157,7 @@ const handlePayment = async (planId) => {
                   "Access to all medical history",
                 ].map((feature, i) => (
                   <p key={i} className="flex items-center text-[12px]">
-                    <i className="bx bx-check text-[#0000FF] text-xl mr-1"></i>
+                    <i className="bx bx-check text-[#3E4095] text-xl mr-1"></i>
                     {feature}
                   </p>
                 ))}
@@ -224,7 +224,7 @@ const handlePayment = async (planId) => {
                 <div className="py-5">
                   {plan.features.map((feature, i) => (
                     <p key={i} className="flex items-center text-[12px]">
-                      <i className="bx bx-check text-[#0000FF] text-xl mr-1"></i>
+                      <i className="bx bx-check text-[#3E4095] text-xl mr-1"></i>
                       {feature}
                     </p>
                   ))}
@@ -233,7 +233,7 @@ const handlePayment = async (planId) => {
                 {/* Button */}
                 <div
                   onClick={() => handlePayment(plan.paystack_plan_code)}
-                  className="rounded-full my-4 border border-[#0000FF] text-[#0000FF] font-semibold"
+                  className="rounded-full my-4 border border-[#3E4095] text-[#3E4095] font-semibold"
                 >
                   <div className="py-3">
                     <p className="text-sm text-center cursor-pointer">

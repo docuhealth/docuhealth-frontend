@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import logo from "../../assets/img/logo.png";
+import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 import dashb from "../../assets/img/dashb.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { authAPI } from "../../utils/authAPI";
@@ -125,10 +125,10 @@ const VerifyOTP = () => {
         <div className="w-full flex-1">
           <div className="hidden sm:flex justify-center items-center py-10 h-screen">
             <Link to="/">
-              <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold">
-                <img src={logo} alt="Logo" className="h-6" />
-                <h1 className="text-xl">DOCUHEALTH</h1>
-              </div>
+                <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
+                                    <img src={docuhealth_logo} alt="Logo" className="w-6" />
+                                    <h1 className="text-xl">DocuHealth</h1>
+                                  </div>
             </Link>
             <div className="px-10 w-full">
               <h2 className="text-xl font-semibold pb-1">Verify OTP</h2>
@@ -149,7 +149,7 @@ const VerifyOTP = () => {
                       value={digit}
                       onChange={(e) => handleChange(e.target.value, index)}
                       onKeyDown={(e) => handleKeyDown(e, index)}
-                      className="w-12 h-12 text-center border-b-2  outline-none focus:border-[#0000FF] border-gray-400"
+                      className="w-12 h-12 text-center border-b-2  outline-none focus:border-[#3E4095] border-gray-400"
                       onBlur={(e) => {
                         if (e.target.value) {
                           e.target.classList.remove("border-blue-500");
@@ -166,7 +166,7 @@ const VerifyOTP = () => {
                     You did not receive the OTP?{" "}
                     <span
                       onClick={handleResend}
-                      className="text-[#0000FF] hover:underline cursor-pointer"
+                      className="text-[#3E4095] hover:underline cursor-pointer"
                     >
                       Click to resend
                     </span>
@@ -180,7 +180,7 @@ const VerifyOTP = () => {
                   className={`w-full py-3 rounded-full ${
                     isLoading
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-[#0000FF] text-white hover:bg-blue-700"
+                      : "bg-[#3E4095] text-white "
                   }`}
                 >
                   {isLoading ? "Verifying OTP..." : "Proceed"}
@@ -194,7 +194,7 @@ const VerifyOTP = () => {
         <div
           className="flex-1 h-screen flex flex-col justify-center items-center p-4"
           style={{
-            background: "linear-gradient(to bottom, #0000FF, #718FCC)",
+            background: "linear-gradient(to bottom, #3E4095, #718FCC)",
           }}
         >
           <div className="">
@@ -217,9 +217,9 @@ const VerifyOTP = () => {
       </div>
 
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
-        <div className=" fixed top-10 left-5  flex gap-2 items-center font-semibold">
-          <img src={logo} alt="Logo" className="h-6" />
-          <h1 className="text-xl">DOCUHEALTH</h1>
+    <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+          <img src={docuhealth_logo} alt="Logo" className="w-6" />
+          <h1 className="text-xl">DocuHealth</h1>
         </div>
         <div>
           <div className="px-5 w-full">
@@ -235,7 +235,7 @@ const VerifyOTP = () => {
                 <div className="relative">
                   <input
                     type="number"
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
                     value={mobileOTP}
                     onChange={(e) => setMobileOTP(e.target.value)}
                     required
@@ -250,7 +250,7 @@ const VerifyOTP = () => {
                   You did not receive the OTP?{" "}
                   <span
                     onClick={handleResend}
-                    className="text-[#0000FF] hover:underline cursor-pointer"
+                    className="text-[#3E4095] hover:underline cursor-pointer"
                   >
                     Click to resend
                   </span>
@@ -264,7 +264,7 @@ const VerifyOTP = () => {
                 className={`w-full py-3 rounded-full ${
                   isLoading
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#0000FF] text-white hover:bg-blue-700"
+                    : "bg-[#3E4095] text-white "
                 }`}
               >
                 {isLoading ? "Verifying OTP..." : "Proceed"}

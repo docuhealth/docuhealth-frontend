@@ -61,7 +61,7 @@ const UserSubAcctRecords = ({ subAccounts, loading, setDisplaySubAcctModal, setV
             {/* Left Section */}
             <div className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
               <div className="font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-3 ">
-                <div className="w-9 h-9 rounded-full bg-[#0000FF]/10  overflow-hidden flex justify-center items-center text-sm font-semibold text-[#0000FF] ">
+                <div className="w-9 h-9 rounded-full bg-[#3E4095]/10  overflow-hidden flex justify-center items-center text-sm font-semibold text-[#3E4095] ">
                   {subaccount
                     ? `${subaccount.firstname?.[0] || ""}${
                          subaccount.lastname?.[0] || ""

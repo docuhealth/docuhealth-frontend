@@ -67,7 +67,7 @@ const Patient_Home_Dashboard = () => {
           <div className="relative">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="flex items-center gap-2 px-6 py-2 border border-[#0000FF] text-[#0000FF] font-medium rounded-full hover:bg-blue-50 transition"
+              className="flex items-center gap-2 px-6 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full hover:bg-blue-50 transition"
             >
               Sort by: {selected}
               <ChevronDown
@@ -92,7 +92,7 @@ const Patient_Home_Dashboard = () => {
           </div>
           <div>
             <button
-              className="flex items-center gap-2 px-6 py-2 bg-[#0000FF] text-white font-medium rounded-full transition"
+              className="flex items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition"
               onClick={() => handleSelection(profile)}
             >
               Get Identity Card
@@ -115,7 +115,7 @@ const Patient_Home_Dashboard = () => {
           <div className="relative">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="flex justify-center items-center gap-2 px-6 py-2 border border-[#0000FF] text-[#0000FF] font-medium rounded-full hover:bg-blue-50 transition w-full"
+              className="flex justify-center items-center gap-2 px-6 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full hover:bg-blue-50 transition w-full"
             >
               Sort by: {selected}
               <ChevronDown
@@ -140,7 +140,7 @@ const Patient_Home_Dashboard = () => {
           </div>
           <div>
             <button
-              className="flex justify-center items-center gap-2 px-6 py-2 bg-[#0000FF] text-white font-medium rounded-full transition w-full "
+              className="flex justify-center items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition w-full "
               onClick={() => setOnboardIDCard(true)}
             >
               Get Identity Card

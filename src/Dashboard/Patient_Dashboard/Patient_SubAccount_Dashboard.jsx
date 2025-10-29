@@ -295,7 +295,7 @@ const Patient_SubAccount_Dashboard = () => {
 
         <div>
           <button
-            className="flex justify-center items-center gap-2 px-6 py-2 bg-[#0000FF] text-white font-medium rounded-full transition w-full "
+            className="flex justify-center items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition w-full "
             onClick={toggleAcctCreationOverlay}
             disabled={loading}
           >

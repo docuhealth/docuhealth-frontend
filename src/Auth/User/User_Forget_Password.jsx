@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import logo from "../../assets/img/logo.png";
+import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import dashb from "../../assets/img/dashb.png";
 import axios from "axios";
@@ -72,9 +72,9 @@ const FP = () => {
         <div className="w-full flex-1">
           <div className=" hidden sm:flex justify-center items-center py-10 h-screen ">
             <Link to="/">
-              <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold">
-                <img src={logo} alt="Logo" className="h-6" />
-                <h1 className="text-xl">DOCUHEALTH</h1>
+              <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
+                <img src={docuhealth_logo} alt="Logo" className="w-6" />
+                <h1 className="text-xl">DocuHealth</h1>
               </div>
             </Link>
             <div className="px-10 w-full">
@@ -91,7 +91,7 @@ const FP = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -102,7 +102,7 @@ const FP = () => {
 
                   <button
                     type="submit"
-                    className={`w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
+                    className={`w-full py-3 rounded-full bg-[#3E4095] text-white hover:bg-blue-700"
             ${isLoading ? "cursor-not-allowed bg-gray-300 text-gray-500 " : ""}
           `}
                     disabled={isLoading}
@@ -119,7 +119,7 @@ const FP = () => {
         <div
           className="flex-1 h-screen flex flex-col justify-center items-center p-4"
           style={{
-            background: "linear-gradient(to bottom, #0000FF, #718FCC)",
+            background: "linear-gradient(to bottom, #3E4095, #718FCC)",
           }}
         >
           <div className="">
@@ -142,9 +142,9 @@ const FP = () => {
       </div>
 
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
-        <div className=" fixed top-10 left-5  flex gap-2 items-center font-semibold">
-          <img src={logo} alt="Logo" className="h-6" />
-          <h1 className="text-xl">DOCUHEALTH</h1>
+        <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+          <img src={docuhealth_logo} alt="Logo" className="w-6" />
+          <h1 className="text-xl">DocuHealth</h1>
         </div>
         <div className="">
           <div className="px-5 w-full">
@@ -161,7 +161,7 @@ const FP = () => {
                   <div className="relative">
                     <input
                       type="text"
-                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -172,7 +172,7 @@ const FP = () => {
 
                 <button
                   type="submit"
-                  className={`w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
+                  className={`w-full py-3 rounded-full bg-[#3E4095]  text-white hover:bg-blue-700"
             ${isLoading ? "cursor-not-allowed bg-gray-300 text-gray-500 " : ""}
           `}
                   disabled={isLoading}
@@ -189,41 +189,3 @@ const FP = () => {
 };
 
 export default FP;
-
-{
-  /* <div className="w-3/4" id="temp">
-
-<h2 className="text-xl font-bold mb-2">Forgot Password</h2>
-<p className="text-gray-600 mb-6 text-sm">
-  Input your registered email below to receieve an OTP to help you
-  reset your password.
-</p>
-
-<form onSubmit={handleSubmit} className="space-y-4 text-sm">
-
-  <div className="relative">
-    <p className="font-semibold pb-1">Enter Email :</p>
-    <div className="relative">
-      <input
-        type="text"
-        className="w-full px-4 py-3 border rounded-lg pl-5 outline-none focus:border-blue-500"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-    </div>
-  </div>
-
-
-  <button
-    type="submit"
-    className={`w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
-            ${isLoading ? 'cursor-not-allowed bg-gray-300 text-gray-500 ' : ''}
-          `}
-    disabled={isLoading}
-  >
-    {isLoading ? 'Sending Otp' : "Send Otp"}
-  </button>
-</form>
-</div> */
-}

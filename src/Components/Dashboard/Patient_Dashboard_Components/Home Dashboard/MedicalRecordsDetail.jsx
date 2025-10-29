@@ -36,7 +36,7 @@ const MedicalRecordsDetail = ({
             <h2 className=" text-sm">After Visit Summary Overview</h2>
           </div>
           <div className=" flex flex-col sm:flex-row justify-end items-center gap-3 w-full sm:w-auto">
-            <div className="flex justify-center items-center gap-1 border border-[#0000FF] py-1.5 px-4 rounded-full w-full sm:w-auto text-[#0000FF]">
+            <div className="flex justify-center items-center gap-1 border border-[#3E4095] py-1.5 px-4 rounded-full w-full sm:w-auto text-[#3E4095]">
               <svg
                 width="14"
                 height="14"
@@ -52,7 +52,7 @@ const MedicalRecordsDetail = ({
 
               <p>Print summary</p>
             </div>
-            <div className="flex justify-center items-center gap-1 border border-[#0000FF] py-1.5 px-4 rounded-full text-white bg-[#0000FF] w-full sm:w-auto">
+            <div className="flex justify-center items-center gap-1 border border-[#3E4095] py-1.5 px-4 rounded-full text-white bg-[#3E4095] w-full sm:w-auto">
               <svg
                 width="14"
                 height="14"
@@ -385,8 +385,8 @@ const MedicalRecordsDetail = ({
                   className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 sm:items-center bg-white border rounded-lg px-4 py-3 mb-3 shadow-sm"
                 >
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-[12px]">
-                    <div className="p-2 bg-[#0000FF]/10 rounded-md">
-                      <Icon className="text-[#0000FF]" size={20} />
+                    <div className="p-2 bg-[#3E4095]/10 rounded-md">
+                      <Icon className="text-[#3E4095]" size={20} />
                     </div>
                     <div>
                       <p className="font-medium text-gray-800">{fileName}</p>
@@ -397,7 +397,7 @@ const MedicalRecordsDetail = ({
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 text-[12px] w-full sm:w-auto">
-                    <div className="flex items-center justify-center gap-1 border border-blue-600 text-[#0000FF]  rounded-full  font-medium hover:bg-blue-50 transition  text-center py-1 px-3 w-full sm:w-28">
+                    <div className="flex items-center justify-center gap-1 border border-blue-600 text-[#3E4095]  rounded-full  font-medium hover:bg-blue-50 transition  text-center py-1 px-3 w-full sm:w-28">
                       <Eye className="w-3 h-3" />
                       <a
                         href={fileUrl}
@@ -408,7 +408,7 @@ const MedicalRecordsDetail = ({
                         View
                       </a>
                     </div>
-                    <div className=" flex items-center justify-center gap-1 border border-blue-600 bg-[#0000FF] text-white  rounded-full font-medium hover:bg-blue-700 transition  text-center py-1 px-3 w-full sm:w-28">
+                    <div className=" flex items-center justify-center gap-1 border border-blue-600 bg-[#3E4095] text-white  rounded-full font-medium hover:bg-blue-700 transition  text-center py-1 px-3 w-full sm:w-28">
                       <ArrowDownToLine className="w-3 h-3" />
                       <a href={fileUrl} target="_blank" download className="">
                         Download

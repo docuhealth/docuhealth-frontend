@@ -35,7 +35,7 @@ const Pagination = ({
                   key={i + 1}
                   className={`h-8 w-8 mx-1 rounded-full ${
                     currentPage === i + 1
-                      ? "bg-[#0000FF] text-white"
+                      ? "bg-[#3E4095] text-white"
                       : "bg-gray-300 hover:bg-gray-400"
                   }`}
                   onClick={() => fetchData(i + 1)}

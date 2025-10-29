@@ -52,7 +52,7 @@ const Id_Card = ({
                       selectedProfile?.lastname
                     }
                     readOnly
-                    className="w-full px-3 py-2 border rounded-md  text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-md  text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#3E4095]"
                   />
                 </div>
 
@@ -66,7 +66,7 @@ const Id_Card = ({
                     value={idCardData.firstEmergency}
                     onChange={handleChange}
                     placeholder="Enter first emergency number"
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3E4095]"
                   />
                 </div>
 
@@ -80,7 +80,7 @@ const Id_Card = ({
                     value={idCardData.secondEmergency}
                     onChange={handleChange}
                     placeholder="Enter second emergency number"
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3E4095]"
                   />
                 </div>
 
@@ -93,12 +93,12 @@ const Id_Card = ({
                     value={idCardData.emergencyAddress}
                     onChange={handleChange}
                     placeholder="Enter emergency address"
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-24 resize-none"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3E4095] h-24 resize-none"
                   ></textarea>
                 </div>
 
                 <div
-                  className=" bg-[#0000FF]  text-center text-white rounded-full py-2 cursor-pointer"
+                  className=" bg-[#3E4095]  text-center text-white rounded-full py-2 cursor-pointer"
                   onClick={() => handleIDCardCreation(selectedProfile)}
                 >
                   <p>Generate ID Card</p>
@@ -181,7 +181,7 @@ const Id_Card = ({
                   </div>
                 </div>
                 <div className=" text-center">
-                  <div className="w-14 h-14 mx-auto mb-2 border-2 border-[#1C1CFE] rounded-full flex items-center justify-center text-[#1C1CFE] text-lg font-bold">
+                  <div className="w-14 h-14 mx-auto mb-2 border-2 border-[#3E4095] rounded-full flex items-center justify-center text-[#3E4095] text-lg font-bold">
                     {(selectedProfile?.firstname?.[0] || "").toUpperCase()}
                     {(selectedProfile?.lastname?.[0] || "").toUpperCase()}
                   </div>

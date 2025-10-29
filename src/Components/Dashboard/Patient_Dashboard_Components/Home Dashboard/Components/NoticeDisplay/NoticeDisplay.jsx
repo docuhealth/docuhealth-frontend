@@ -54,7 +54,7 @@ const NoticeDisplay = ({
                   </p>
                 </div>
                 <div
-                  className=" bg-[#0000FF]  text-center text-white rounded-full py-2 cursor-pointer"
+                  className=" bg-[#3E4095]  text-center text-white rounded-full py-2 cursor-pointer"
                   onClick={() => {
                     // if (paymentStatus) {
                     //   closeNoticeMessage(); // Call the function properly
