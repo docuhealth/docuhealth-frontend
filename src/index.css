@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap')
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap")
 layer(base);
 
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
   --animate-slide-up: slideUp 0.5s ease-out;
@@ -34,16 +34,12 @@ layer(base);
   }
 }
 
-/* *{
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    font-family: "Montserrat", serif;
-    scroll-behavior: smooth;
-} */
+* {
+  font-family: "Montserrat", serif;
+  scroll-behavior: smooth;
+}
 
-
-  /* Custom Scrollbar */
+/* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px; /* Thin scrollbar */
 }
@@ -62,12 +58,9 @@ layer(base);
   background: #555; /* Slightly lighter on hover */
 }
 
-
-
 @media (max-width: 600px) {
   .apexcharts-legend {
-    display:none
- 
+    display: none;
   }
   .apexcharts-legend-series {
     display: none;
@@ -76,5 +69,3 @@ layer(base);
     display: none;
   }
 }
-
-
