@@ -139,7 +139,7 @@ const USI = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                         value={inputValue}
                         onChange={handleInputChange}
                         required
@@ -154,7 +154,7 @@ const USI = () => {
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
-                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -270,7 +270,7 @@ const USI = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                     value={inputValue}
                     onChange={handleInputChange}
                     required
@@ -285,7 +285,7 @@ const USI = () => {
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required

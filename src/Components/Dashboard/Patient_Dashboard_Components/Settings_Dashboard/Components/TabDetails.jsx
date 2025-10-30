@@ -215,7 +215,7 @@ const AccountSettingsTab = () => {
                   type="text"
                   value={formData.firstname}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
                 />
               </div>
               <div className="">
@@ -231,7 +231,7 @@ const AccountSettingsTab = () => {
                   type="text"
                   value={formData.lastname}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
                 />
               </div>
               <div className="">
@@ -247,7 +247,7 @@ const AccountSettingsTab = () => {
                   type="text"
                   value={formData.middlename}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
                 />
               </div>
 
@@ -265,7 +265,7 @@ const AccountSettingsTab = () => {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
                 />
               </div>
 
@@ -283,7 +283,7 @@ const AccountSettingsTab = () => {
                   type="number"
                   value={formData.phone_num}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
                 />
               </div>
 
@@ -292,7 +292,7 @@ const AccountSettingsTab = () => {
                 <div className="relative">
                   <select
                     name="gender"
-                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
+                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
                     value={formData.gender}
                     onChange={handleChange}
                   >
@@ -330,7 +330,7 @@ const AccountSettingsTab = () => {
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder=""
-                    className={`w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none pl-8 ${
+                    className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none pl-8 ${
                       formData.password && !isPasswordValid
                         ? "focus:border-red-500"
                         : ""
@@ -473,7 +473,7 @@ const AccountSettingsTab = () => {
                       </div>
                     </div>
                     {isPasswordValid && (
-                      <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded">
+                      <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded-sm">
                         <p className="text-sm text-green-700 font-medium">
                           ✓ Password meets all requirements!
                         </p>
@@ -491,7 +491,7 @@ const AccountSettingsTab = () => {
                   <input
                     name="DOB"
                     type="date"
-                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
+                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
                     value={formData.DOB}
                     onChange={handleChange}
                   />
@@ -502,7 +502,7 @@ const AccountSettingsTab = () => {
                 <button
                   onClick={handleSubmit}
                   disabled={loading}
-                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium text-white rounded-full shadow-sm focus:outline-none transition-all ${
+                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium text-white rounded-full shadow-xs focus:outline-hidden transition-all ${
                     !loading
                       ? "bg-[#0000FF] hover:bg-blue-700"
                       : "bg-gray-300 cursor-not-allowed"
@@ -536,7 +536,7 @@ const AccountSettingsTab = () => {
                   type="button"
                     disabled={loading}
                   onClick={handleCancel}
-                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-sm  ${!loading ? 'text-[#0000FF] bg-white border border-[#0000FF] hover:bg-gray-50': 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-none`}
+                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-xs  ${!loading ? 'text-[#0000FF] bg-white border border-[#0000FF] hover:bg-gray-50': 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-hidden`}
                 >
                   Cancel Changes
                 </button>
@@ -553,7 +553,7 @@ const AccountSettingsTab = () => {
               type="checkbox"
               checked={isAcctDeleteConfirmed}
               onChange={(e) => setIsAcctDeleteConfirmed(e.target.checked)}
-              className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+              className="rounded-sm border-gray-300 text-red-600 focus:ring-red-500"
             />
             <span className="text-sm text-gray-700">
               I confirm account deactivation

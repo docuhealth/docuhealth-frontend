@@ -55,7 +55,7 @@ const FAQ_Section = () => {
                 {faqData.map((item, index) => (
                   <div
                     key={index}
-                    className={`bg-white lg:bg-[#f5f9ff] ${openIndex === index ? 'rounded-sm' : 'rounded-full'} overflow-hidden shadow-sm transition-all duration-100`}
+                    className={`bg-white lg:bg-[#f5f9ff] ${openIndex === index ? 'rounded-xs' : 'rounded-full'} overflow-hidden shadow-xs transition-all duration-100`}
                   >
                     <button
                       onClick={() => toggleAccordion(index)}
@@ -65,7 +65,7 @@ const FAQ_Section = () => {
                         {item.question}
                       </span>
                       <Plus
-                        className={`w-5 h-5 text-[#3E4095] transform transition-transform duration-500 ${openIndex === index ? "rotate-[360deg]" : "rotate-0"
+                        className={`w-5 h-5 text-[#3E4095] transform transition-transform duration-500 ${openIndex === index ? "rotate-360" : "rotate-0"
                           }`}
                       />
                     </button>

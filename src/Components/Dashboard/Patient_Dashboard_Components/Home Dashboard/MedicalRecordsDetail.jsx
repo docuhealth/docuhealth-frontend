@@ -382,7 +382,7 @@ const MedicalRecordsDetail = ({
               return (
                 <div
                   key={index}
-                  className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 sm:items-center bg-white border rounded-lg px-4 py-3 mb-3 shadow-sm"
+                  className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 sm:items-center bg-white border rounded-lg px-4 py-3 mb-3 shadow-xs"
                 >
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-[12px]">
                     <div className="p-2 bg-[#3E4095]/10 rounded-md">

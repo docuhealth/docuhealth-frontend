@@ -193,7 +193,7 @@ const handlePayment = async (planId) => {
             {subscriptionPlans.map((plan) => (
               <div
                 key={plan.id}
-                className="p-4 rounded-xl bg-gradient-to-b from-[#ECFAFF] to-[#EEEEFD]"
+                className="p-4 rounded-xl bg-linear-to-b from-[#ECFAFF] to-[#EEEEFD]"
               >
                 {/* Header */}
                 <div className="flex justify-between items-center">

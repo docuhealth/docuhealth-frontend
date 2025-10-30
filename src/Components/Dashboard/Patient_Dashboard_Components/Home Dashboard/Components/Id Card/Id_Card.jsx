@@ -22,7 +22,7 @@ const Id_Card = ({
     <>
       {onboardIDCard && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  ">
-          <div className="bg-white rounded-sm shadow-lg p-6 max-w-md w-full relative max-h-[80vh] overflow-y-auto mx-5">
+          <div className="bg-white rounded-xs shadow-lg p-6 max-w-md w-full relative max-h-[80vh] overflow-y-auto mx-5">
             <div className="flex justify-between items-center gap-2 pb-2">
               <div className="flex justify-start items-center gap-2 ">
                 <p>
@@ -52,7 +52,7 @@ const Id_Card = ({
                       selectedProfile?.lastname
                     }
                     readOnly
-                    className="w-full px-3 py-2 border rounded-md  text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#3E4095]"
+                    className="w-full px-3 py-2 border rounded-md  text-gray-700 focus:outline-hidden focus:ring-2 focus:ring-[#3E4095]"
                   />
                 </div>
 
@@ -66,7 +66,7 @@ const Id_Card = ({
                     value={idCardData.firstEmergency}
                     onChange={handleChange}
                     placeholder="Enter first emergency number"
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3E4095]"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#3E4095]"
                   />
                 </div>
 
@@ -80,7 +80,7 @@ const Id_Card = ({
                     value={idCardData.secondEmergency}
                     onChange={handleChange}
                     placeholder="Enter second emergency number"
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3E4095]"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#3E4095]"
                   />
                 </div>
 
@@ -93,7 +93,7 @@ const Id_Card = ({
                     value={idCardData.emergencyAddress}
                     onChange={handleChange}
                     placeholder="Enter emergency address"
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3E4095] h-24 resize-none"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#3E4095] h-24 resize-none"
                   ></textarea>
                 </div>
 
@@ -216,7 +216,7 @@ const Id_Card = ({
                       <h3 className="font-semibold text-[#313131]">
                         Emergency Address
                       </h3>
-                      <p className="text-[#313131] max-w-28 break-words text-[10px]">
+                      <p className="text-[#313131] max-w-28 wrap-break-word text-[10px]">
                         {idCardData.emergencyAddress || ""}
                       </p>
                     </div>

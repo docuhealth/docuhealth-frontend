@@ -95,8 +95,8 @@ const Navbar = ({ showPharmacyMode }) => {
     <div className="text-[#0E0E31] relative z-50">
       <div
         className={` ${isScrolled
-          ? "fixed w-full  bg-white shadow transition-transform"
-          : "w-full shadow"
+          ? "fixed w-full  bg-white shadow-sm transition-transform"
+          : "w-full shadow-sm"
           } ${isVisible ? "translate-y-0" : "-translate-y-full"}
       hidden lg:flex justify-between px-16 items-center py-4 `}
         style={{ transition: "transform 0.3s ease-in-out" }}
@@ -394,8 +394,8 @@ const Navbar = ({ showPharmacyMode }) => {
       )}
 
       <div className={` w-full z-50  ${isScrolled
-          ? "fixed w-full  bg-white shadow transition-transform"
-          : "absolute top-0 w-full shadow"
+          ? "fixed w-full  bg-white shadow-sm transition-transform"
+          : "absolute top-0 w-full shadow-sm"
           }`}>
         {/* Top Navigation Bar */}
         <div className={`lg:hidden flex justify-between items-center px-3 py-4 ${currentPath === '/' ? 'bg-none' : 'bg-white'}  `}>

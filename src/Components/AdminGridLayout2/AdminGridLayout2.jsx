@@ -4,7 +4,7 @@ import ReactApexChart from "react-apexcharts";
 const AdminGridLayout2 = ({loading, hasData, subscribedChartOptions, subscribedChartData, pieChartOptions, pieChartData}) => {
   return (
     <div className="py-3 grid grid-cols-1 lg:grid-cols-2 gap-4">
-    <div className="bg-white p-4 rounded-2xl shadow grid grid-cols-1 ">
+    <div className="bg-white p-4 rounded-2xl shadow-sm grid grid-cols-1 ">
       <h3 className="font-semibold mb-4">Total Subscribed Users</h3>
       {loading ? (
         <p>Loading chart data...</p>
@@ -20,7 +20,7 @@ const AdminGridLayout2 = ({loading, hasData, subscribedChartOptions, subscribedC
       )}
     </div>
 
-    <div className="bg-white p-4 rounded-2xl shadow grid grid-cols-1 place-items-center">
+    <div className="bg-white p-4 rounded-2xl shadow-sm grid grid-cols-1 place-items-center">
       <h3 className="font-semibold mb-4 text-left w-full">
         Users with sub account
       </h3>

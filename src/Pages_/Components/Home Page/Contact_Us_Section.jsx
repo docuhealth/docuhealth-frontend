@@ -178,7 +178,7 @@ const Contact_Us_Section = () => {
                     onChange={handleChange}
                     required
                     placeholder="Full name"
-                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-none"
+                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-hidden"
                   />
                 </div>
 
@@ -191,7 +191,7 @@ const Contact_Us_Section = () => {
                     onChange={handleChange}
                     required
                     placeholder="Email address"
-                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-none"
+                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-hidden"
                   />
                 </div>
 
@@ -203,7 +203,7 @@ const Contact_Us_Section = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="Phone number"
-                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-none"
+                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-hidden"
                   />
                 </div>
 
@@ -216,7 +216,7 @@ const Contact_Us_Section = () => {
                     required
                     placeholder="Type your message"
                     rows="4"
-                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-none"
+                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-hidden"
                   />
                 </div>
 
@@ -245,7 +245,7 @@ const Contact_Us_Section = () => {
                     onChange={handleChange}
                     required
                     placeholder="Your organization name"
-                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-none"
+                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-hidden"
                   />
                 </div>
 
@@ -258,7 +258,7 @@ const Contact_Us_Section = () => {
                     onChange={handleChange}
                     required
                     placeholder="example@gmail.com"
-                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-none"
+                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-hidden"
                   />
                 </div>
 
@@ -270,7 +270,7 @@ const Contact_Us_Section = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="Contact number"
-                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-none"
+                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-hidden"
                   />
                 </div>
 
@@ -283,7 +283,7 @@ const Contact_Us_Section = () => {
                     required
                     placeholder="Tell us how we can collaborate"
                     rows="4"
-                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-none"
+                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-hidden"
                   />
                 </div>
 
