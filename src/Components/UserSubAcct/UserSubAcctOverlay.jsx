@@ -33,7 +33,7 @@ const UserSubAcctOverlay = ({showOverlay, handleSubmit, toggleOverlay, handleCha
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2 h-12 focus:outline-none focus:border-[#0000FF]"
+                  className="w-full border border-gray-300 rounded-lg px-2 py-2 h-12 focus:outline-hidden focus:border-[#0000FF]"
                   required
                 />
               </div>
@@ -46,7 +46,7 @@ const UserSubAcctOverlay = ({showOverlay, handleSubmit, toggleOverlay, handleCha
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2 h-12 focus:outline-none focus:border-[#0000FF]"
+                  className="w-full border border-gray-300 rounded-lg px-2 py-2 h-12 focus:outline-hidden focus:border-[#0000FF]"
                   required
                 />
               </div>
@@ -59,7 +59,7 @@ const UserSubAcctOverlay = ({showOverlay, handleSubmit, toggleOverlay, handleCha
                   name="dateOfBirth"
                   value={formData.dateOfBirth}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2 h-12 focus:outline-none focus:border-[#0000FF]"
+                  className="w-full border border-gray-300 rounded-lg px-2 py-2 h-12 focus:outline-hidden focus:border-[#0000FF]"
                   required
                 />
               </div>
@@ -71,7 +71,7 @@ const UserSubAcctOverlay = ({showOverlay, handleSubmit, toggleOverlay, handleCha
                   name="sex"
                   value={formData.sex}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2 h-12 focus:outline-none focus:border-[#0000FF] "
+                  className="w-full border border-gray-300 rounded-lg px-2 py-2 h-12 focus:outline-hidden focus:border-[#0000FF] "
                   required
                 >
                   <option value="">Select</option>

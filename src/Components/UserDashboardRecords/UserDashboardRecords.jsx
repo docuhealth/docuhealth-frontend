@@ -29,7 +29,7 @@ const UserDashboardRecords = ({
                 records.map((record) => (
                   <div
                     key={record._id}
-                    className="bg-white shadow-sm rounded-lg p-4 flex items-center justify-between "
+                    className="bg-white shadow-xs rounded-lg p-4 flex items-center justify-between "
                   >
                     {/* Date and Time */}
                     <div className="text-gray-700 text-sm">
@@ -122,7 +122,7 @@ const UserDashboardRecords = ({
                       </p>
                     </div>
                     {popoverVisible === record._id && (
-                      <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm z-50">
+                      <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-xs z-50">
                         <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto  ">
                           <div className="flex justify-between items-center">
                             <div className="flex justify-start items-center gap-2">
@@ -211,7 +211,7 @@ const UserDashboardRecords = ({
                                   "N/A"
                                 }
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none text-sm"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden text-sm"
                               />
                             </div>
 
@@ -227,7 +227,7 @@ const UserDashboardRecords = ({
                                   "N/A"
                                 }
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none text-sm"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden text-sm"
                               />
                             </div>
 
@@ -243,7 +243,7 @@ const UserDashboardRecords = ({
                                     ?.respiratory_rate || "N/A"
                                 }
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -258,7 +258,7 @@ const UserDashboardRecords = ({
                                   selectedRecord?.basic_info?.weight || "N/A"
                                 }
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -276,7 +276,7 @@ const UserDashboardRecords = ({
                                     : "N/A"
                                 }
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -291,7 +291,7 @@ const UserDashboardRecords = ({
                                   selectedRecord?.basic_info?.diagnosis || "N/A"
                                 }
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -303,7 +303,7 @@ const UserDashboardRecords = ({
                               <textarea
                                 value={selectedRecord?.summary || "N/A"}
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-hidden"
                               ></textarea>
                             </div>
 
@@ -319,7 +319,7 @@ const UserDashboardRecords = ({
                                   datainfo?.fullname
                                 }
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -334,7 +334,7 @@ const UserDashboardRecords = ({
                                   selectedRecord?.patient_info?.sex || "N/A"
                                 }
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -353,7 +353,7 @@ const UserDashboardRecords = ({
                                   selectedRecord?.pharmacy_info.pharmacist
                                 }
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -369,7 +369,7 @@ const UserDashboardRecords = ({
                                       ?.pharmacy_address
                                   }
                                   readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                 />
                               </div>
                             ) : (
@@ -387,7 +387,7 @@ const UserDashboardRecords = ({
                                     (drug, index) => " " + drug + " "
                                   )}
                                   readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                 />
                               </div>
                             ) : (
@@ -403,7 +403,7 @@ const UserDashboardRecords = ({
                                   type="text"
                                   value={selectedRecord?.dosage}
                                   readOnly
-                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                 />
                               </div>
                             ) : (
@@ -415,7 +415,7 @@ const UserDashboardRecords = ({
                               <label className="block text-gray-600 text-sm font-medium">
                                 Attachment
                               </label>
-                              <div className="w-full  px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none">
+                              <div className="w-full  px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden">
                                 {selectedRecord?.attachments &&
                                 selectedRecord.attachments.length > 0 ? (
                                   <ul className="list-style-none pl-0 flex gap-2">
@@ -507,7 +507,7 @@ const UserDashboardRecords = ({
                     </div>
                   </div>
                   {popoverVisible === record._id && (
-                    <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm z-50">
+                    <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-xs z-50">
                       <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto w-[90%] sm:w-[60%]">
                         <div className="flex flex-col gap-3 items-start">
                           <div className="">
@@ -594,7 +594,7 @@ const UserDashboardRecords = ({
                                 selectedRecord?.basic_info?.pulse_rate || "N/A"
                               }
                               readOnly
-                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                             />
                           </div>
 
@@ -609,7 +609,7 @@ const UserDashboardRecords = ({
                                 selectedRecord?.basic_info?.temperature || "N/A"
                               }
                               readOnly
-                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                             />
                           </div>
 
@@ -625,7 +625,7 @@ const UserDashboardRecords = ({
                                 "N/A"
                               }
                               readOnly
-                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                             />
                           </div>
 
@@ -640,7 +640,7 @@ const UserDashboardRecords = ({
                                 selectedRecord?.basic_info?.weight || "N/A"
                               }
                               readOnly
-                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                             />
                           </div>
 
@@ -658,7 +658,7 @@ const UserDashboardRecords = ({
                                   : "N/A"
                               }
                               readOnly
-                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                             />
                           </div>
 
@@ -673,7 +673,7 @@ const UserDashboardRecords = ({
                                 selectedRecord?.basic_info?.diagnosis || "N/A"
                               }
                               readOnly
-                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                             />
                           </div>
 
@@ -685,7 +685,7 @@ const UserDashboardRecords = ({
                             <textarea
                               value={selectedRecord?.summary || "N/A"}
                               readOnly
-                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-none"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-hidden"
                             ></textarea>
                           </div>
 
@@ -701,7 +701,7 @@ const UserDashboardRecords = ({
                                 datainfo?.fullname
                               }
                               readOnly
-                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                             />
                           </div>
 
@@ -714,7 +714,7 @@ const UserDashboardRecords = ({
                               type="text"
                               value={selectedRecord?.patient_info?.sex || "N/A"}
                               readOnly
-                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                             />
                           </div>
 
@@ -733,7 +733,7 @@ const UserDashboardRecords = ({
                                 selectedRecord?.pharmacy_info?.pharmacist
                               }
                               readOnly
-                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                             />
                           </div>
 
@@ -749,7 +749,7 @@ const UserDashboardRecords = ({
                                     ?.pharmacy_address
                                 }
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
                           ) : (
@@ -767,7 +767,7 @@ const UserDashboardRecords = ({
                                   (drug, index) => " " + drug + " "
                                 )}
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
                           ) : (
@@ -783,7 +783,7 @@ const UserDashboardRecords = ({
                                 type="text"
                                 value={selectedRecord?.dosage}
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
                           ) : (
@@ -795,7 +795,7 @@ const UserDashboardRecords = ({
                             <label className="block text-gray-600 text-sm font-medium">
                               Attachment
                             </label>
-                            <div className="w-full  px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none">
+                            <div className="w-full  px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden">
                               {selectedRecord.attachments &&
                               selectedRecord.attachments.length > 0 ? (
                                 <ul className="list-style-none pl-0 flex gap-2">

@@ -46,7 +46,7 @@ const ConfirmAcct = () => {
               {/* Dropdown */}
               <div className="relative w-full">
                 <select
-                  className="border border-gray-300 px-4 py-2 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10 text-sm"
+                  className="border border-gray-300 px-4 py-2 rounded-sm w-full focus:border-blue-600 outline-hidden appearance-none pr-10 text-sm"
                   value={accountType}
                   onChange={(e) => setAccountType(e.target.value)}
                 >

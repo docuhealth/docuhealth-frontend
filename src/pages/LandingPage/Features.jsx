@@ -18,7 +18,7 @@ const Features = () => {
         </div>
         <div>
           <div className="hidden  sm:grid grid-cols-2 lg:grid-cols-4 grid-rows-3 mx-5 lg:mx-28 gap-5">
-            <div className="shadow rounded-md p-4 col-span-2" data-aos="fade-down">
+            <div className="shadow-sm rounded-md p-4 col-span-2" data-aos="fade-down">
               <div className="py-2">
                 <svg
                   width="20"
@@ -49,7 +49,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
+            <div className="shadow-sm rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
               <div className="py-2">
                 <svg
                   width="20"
@@ -79,7 +79,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
+            <div className="shadow-sm rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
               <div className="py-2">
                 <svg
                   width="20"
@@ -108,7 +108,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-down">
+            <div className="shadow-sm rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-down">
               <div className="py-2">
                 <svg
                   width="20"
@@ -140,7 +140,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-down">
+            <div className="shadow-sm rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-down">
               <div className="py-2">
                 <svg
                   width="20"
@@ -171,7 +171,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow rounded-md p-4 col-span-2 row-span-2 relative" data-aos="fade-up">
+            <div className="shadow-sm rounded-md p-4 col-span-2 row-span-2 relative" data-aos="fade-up">
               <div className="py-2">
                 <svg
                   width="20"
@@ -204,15 +204,15 @@ const Features = () => {
               </div>
 
               <div class="hidden lg:flex gap-10 items-center my-20 justify-center text-[#8E8EA9]">
-                <div class="bg-white text-gray-600 px-5 py-3 rounded text-center text-sm shadow w-56 transform rotate-45 ">
+                <div class="bg-white text-gray-600 px-5 py-3 rounded-sm text-center text-sm shadow-sm w-56 transform rotate-45 ">
                   Track procedures easily
                 </div>
-                <div class="bg-white text-gray-600 px-5 py-3 rounded text-sm w-56 text-center shadow transform rotate-45">
+                <div class="bg-white text-gray-600 px-5 py-3 rounded-sm text-sm w-56 text-center shadow-sm transform rotate-45">
                   Access detailed
                 </div>
               </div>
             </div>
-            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-down">
+            <div className="shadow-sm rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-down">
               <div className="py-2">
                 <svg
                   width="20"
@@ -241,7 +241,7 @@ const Features = () => {
                 </p>
               </div>
             </div>{" "}
-            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-down">
+            <div className="shadow-sm rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-down">
               <div className="py-2">
                 <svg
                   width="20"
@@ -272,7 +272,7 @@ const Features = () => {
             </div>
           </div>
           <div className="sm:hidden grid grid-cols-2 lg:grid-cols-4 grid-rows-3 mx-5 lg:mx-28 gap-5">
-            <div className="shadow rounded-md p-4 col-span-2" data-aos="fade-down">
+            <div className="shadow-sm rounded-md p-4 col-span-2" data-aos="fade-down">
               <div className="py-2">
                 <svg
                   width="20"
@@ -303,7 +303,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
+            <div className="shadow-sm rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
               <div className="py-2">
                 <svg
                   width="20"
@@ -333,7 +333,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
+            <div className="shadow-sm rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
               <div className="py-2">
                 <svg
                   width="20"
@@ -362,7 +362,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
+            <div className="shadow-sm rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
               <div className="py-2">
                 <svg
                   width="20"
@@ -394,7 +394,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
+            <div className="shadow-sm rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
               <div className="py-2">
                 <svg
                   width="20"
@@ -425,7 +425,7 @@ const Features = () => {
                 </p>
               </div>
             </div>
-            <div className="shadow rounded-md p-4 col-span-2 row-span-2 relative" data-aos="fade-up">
+            <div className="shadow-sm rounded-md p-4 col-span-2 row-span-2 relative" data-aos="fade-up">
               <div className="py-2">
                 <svg
                   width="20"
@@ -458,15 +458,15 @@ const Features = () => {
               </div>
 
               <div class="hidden lg:flex gap-10 items-center my-20 justify-center text-[#8E8EA9]">
-                <div class="bg-white text-gray-600 px-5 py-3 rounded text-center text-sm shadow w-56 transform rotate-45 ">
+                <div class="bg-white text-gray-600 px-5 py-3 rounded-sm text-center text-sm shadow-sm w-56 transform rotate-45 ">
                   Track procedures easily
                 </div>
-                <div class="bg-white text-gray-600 px-5 py-3 rounded text-sm w-56 text-center shadow transform rotate-45">
+                <div class="bg-white text-gray-600 px-5 py-3 rounded-sm text-sm w-56 text-center shadow-sm transform rotate-45">
                   Access detailed
                 </div>
               </div>
             </div>
-            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
+            <div className="shadow-sm rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
               <div className="py-2">
                 <svg
                   width="20"
@@ -495,7 +495,7 @@ const Features = () => {
                 </p>
               </div>
             </div>{" "}
-            <div className="shadow rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
+            <div className="shadow-sm rounded-md p-4 col-span-2 sm:col-span-1" data-aos="fade-up">
               <div className="py-2">
                 <svg
                   width="20"

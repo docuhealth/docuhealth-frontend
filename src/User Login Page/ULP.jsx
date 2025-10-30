@@ -165,7 +165,7 @@ const ULP = () => {
                 <div className="relative">
                   <input
                     type="email"
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -179,7 +179,7 @@ const ULP = () => {
                 <div className="relative">
                   <input
                     type="number"
-                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-blue-500"
                     value={phone_num}
                     onChange={(e) => setPhone_Num(e.target.value)}
                     required
@@ -194,7 +194,7 @@ const ULP = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder=""
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -221,7 +221,7 @@ const ULP = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder=""
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
@@ -279,7 +279,7 @@ const ULP = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-blue-500"
                     value={fullname}
                     onChange={(e) => setFullName(e.target.value)}
                     required
@@ -292,7 +292,7 @@ const ULP = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-blue-500"
                     placeholder="Referral email (optional)"
                     value={referred_by}
                     onChange={(e) => setReferred_by(e.target.value)}
@@ -306,7 +306,7 @@ const ULP = () => {
                 <div className="relative">
                   <input
                     type="date"
-                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+                    className="w-full px-4 py-3 border rounded-lg outline-hidden focus:border-blue-500 appearance-none pr-10"
                     value={DOB}
                     onChange={(e) => setDOB(e.target.value)}
                     required
@@ -336,7 +336,7 @@ const ULP = () => {
                 <p className="font-semibold pb-1">State Of Residence :</p>
                 <div className="relative w-full">
                   <select
-                    className="border border-gray-300 px-4 py-3 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                    className="border border-gray-300 px-4 py-3 rounded-sm w-full focus:border-blue-600 outline-hidden appearance-none pr-10"
                     value={state}
                     onChange={(e) => setState(e.target.value)}
                     required
@@ -403,7 +403,7 @@ const ULP = () => {
                 <p className="font-semibold pb-1">Sex :</p>
                 <div className="relative">
                   <select
-                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+                    className="w-full px-4 py-3 border rounded-lg outline-hidden focus:border-blue-500 appearance-none pr-10"
                     value={sex}
                     onChange={(e) => setSex(e.target.value)}
                     required
@@ -524,7 +524,7 @@ const ULP = () => {
         </div>
       )}
       {notificationVisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-xs flex items-center justify-center z-50">
           <div className="fixed bottom-0 left-0 right-0 bg-white text-black  py-4 rounded-t-3xl shadow-md animate-slide-up ">
             <div className="flex justify-center items-center gap-1 pb-4">
               <div>
@@ -551,7 +551,7 @@ const ULP = () => {
                   <div className="relative">
                     <input
                       type="email"
-                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -565,7 +565,7 @@ const ULP = () => {
                   <div className="relative">
                     <input
                       type="number"
-                      className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                      className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-blue-500"
                       value={phone_num}
                       onChange={(e) => {
                         const value = e.target.value;
@@ -589,7 +589,7 @@ const ULP = () => {
                     <input
                       type={showPassword ? "text" : "password"}
                       placeholder=""
-                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -616,7 +616,7 @@ const ULP = () => {
                     <input
                       type={showPassword ? "text" : "password"}
                       placeholder=""
-                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
@@ -673,7 +673,7 @@ const ULP = () => {
                   <div className="relative">
                     <input
                       type="text"
-                      className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                      className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-blue-500"
                       value={fullname}
                       onChange={(e) => setFullName(e.target.value)}
                       required
@@ -687,7 +687,7 @@ const ULP = () => {
                     <input
                       type="text"
                       placeholder="Referral email (optional)"
-                      className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                      className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-blue-500"
                       value={referred_by}
                       onChange={(e) => setReferred_by(e.target.value)}
                       required
@@ -700,7 +700,7 @@ const ULP = () => {
                   <div className="relative">
                     <input
                       type="date"
-                      className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+                      className="w-full px-4 py-3 border rounded-lg outline-hidden focus:border-blue-500 appearance-none pr-10"
                       value={DOB}
                       onChange={(e) => setDOB(e.target.value)}
                       required
@@ -730,7 +730,7 @@ const ULP = () => {
                   <p className="font-semibold">State Of Residence :</p>
                   <div className="relative w-full">
                     <select
-                      className="border border-gray-300 px-4 py-3 rounded w-full focus:border-blue-600 outline-none appearance-none pr-10"
+                      className="border border-gray-300 px-4 py-3 rounded-sm w-full focus:border-blue-600 outline-hidden appearance-none pr-10"
                       value={state}
                       onChange={(e) => setState(e.target.value)}
                       required
@@ -797,7 +797,7 @@ const ULP = () => {
                   <p className="font-semibold pb-1">Sex :</p>
                   <div className="relative">
                     <select
-                      className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 appearance-none pr-10"
+                      className="w-full px-4 py-3 border rounded-lg outline-hidden focus:border-blue-500 appearance-none pr-10"
                       value={sex}
                       onChange={(e) => setSex(e.target.value)}
                       required

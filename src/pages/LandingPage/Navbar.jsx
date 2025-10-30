@@ -67,7 +67,7 @@ const Navbar = ({showPharmacyMode}) => {
       <div
         className={`${
           isScrolled
-            ? "fixed w-full z-50 bg-white shadow transition-transform"
+            ? "fixed w-full z-50 bg-white shadow-sm transition-transform"
             : "absolute w-full"
         } ${
           isVisible ? "translate-y-0" : "-translate-y-full"
@@ -191,7 +191,7 @@ const Navbar = ({showPharmacyMode}) => {
 
       <div className="fixed w-full z-50">
         {/* Top Navigation Bar */}
-        <div className="sm:hidden flex justify-between items-center px-3 py-4 bg-white shadow">
+        <div className="sm:hidden flex justify-between items-center px-3 py-4 bg-white shadow-sm">
           <button onClick={() => setIsOpen(true)}>
             <i className="bx bx-menu-alt-left text-3xl"></i>
           </button>

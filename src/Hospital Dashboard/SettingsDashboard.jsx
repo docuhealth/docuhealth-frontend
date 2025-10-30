@@ -554,7 +554,7 @@ const SettingsDashboard = () => {
                     type="text"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none "
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500 outline-hidden "
                   />
                 </div>
 
@@ -572,7 +572,7 @@ const SettingsDashboard = () => {
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500 outline-hidden"
                   />
                 </div>
 
@@ -590,7 +590,7 @@ const SettingsDashboard = () => {
                     type="number"
                     value={formData.doctors}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500 outline-hidden"
                   />
                 </div>
 
@@ -608,7 +608,7 @@ const SettingsDashboard = () => {
                     type="number"
                     value={formData.others}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500 outline-hidden"
                   />
                 </div>
 
@@ -627,7 +627,7 @@ const SettingsDashboard = () => {
                     type="text"
                     value={formData.address}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500 outline-hidden"
                   />
                 </div>
               </div>
@@ -637,14 +637,14 @@ const SettingsDashboard = () => {
   <button
     type="submit"
     onClick={handleSubmit}
-    className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none"
+    className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-xs hover:bg-blue-700 focus:outline-hidden"
   >
     {loadingInfo ? loadingInfo : "Save Changes"}
   </button>
   <button
     type="button"
     onClick={handleCancel}
-    className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none"
+    className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-xs hover:bg-gray-50 focus:outline-hidden"
   >
     Cancel Changes
   </button>
@@ -661,7 +661,7 @@ const SettingsDashboard = () => {
                   type="checkbox"
                   checked={isConfirmed}
                   onChange={(e) => setIsConfirmed(e.target.checked)}
-                  className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                  className="rounded-sm border-gray-300 text-red-600 focus:ring-red-500"
                 />
                 <span className="text-sm text-gray-700">
                   I confirm account deactivation
@@ -700,7 +700,7 @@ const SettingsDashboard = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder=""
-                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -725,7 +725,7 @@ const SettingsDashboard = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder=""
-                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                   value={newpassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
@@ -752,7 +752,7 @@ const SettingsDashboard = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder=""
-                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -778,7 +778,7 @@ const SettingsDashboard = () => {
           <div className="flex flex-row justify-around sm:justify-start  space-x-4">
             <button
               type="submit"
-              className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
+              className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-xs hover:bg-blue-700 focus:outline-hidden "
               onClick={handlePasswordUpdate}
             >
               {loading ? loading : "Save Changes"}
@@ -786,7 +786,7 @@ const SettingsDashboard = () => {
             <button
               type="button"
               onClick={handleSecurityCancel}
-              className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
+              className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-xs hover:bg-gray-50 focus:outline-hidden  "
             >
               Cancel Changes
             </button>
@@ -960,7 +960,7 @@ const SettingsDashboard = () => {
           <div className="flex flex-row justify-around sm:justify-start  space-x-4">
             <button
               type="submit"
-              className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none "
+              className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0000FF] border border-transparent rounded-full shadow-xs hover:bg-blue-700 focus:outline-hidden "
               onClick={handleNotificationUpdate}
             >
               {loading ? loading : "Save Changes"}
@@ -968,7 +968,7 @@ const SettingsDashboard = () => {
             <button
               type="button"
               onClick={handleNotificationCancel}
-              className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-sm hover:bg-gray-50 focus:outline-none  "
+              className="sm:w-auto flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm font-medium text-[#0000FF] bg-white border border-[#0000FF] rounded-full shadow-xs hover:bg-gray-50 focus:outline-hidden  "
             >
               Cancel Changes
             </button>
@@ -1268,7 +1268,7 @@ const SettingsDashboard = () => {
                   {/* Upload Button */}
                   <button
                     onClick={uploadImage}
-                    className=" bg-[#0000FF]  text-white px-4 py-2 rounded"
+                    className=" bg-[#0000FF]  text-white px-4 py-2 rounded-sm"
                     disabled={loading}
                   >
                     {loadingImg ? "Uploading..." : "Upload"}

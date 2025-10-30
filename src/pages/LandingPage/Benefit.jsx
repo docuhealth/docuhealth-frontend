@@ -18,7 +18,7 @@ const Benefit = () => {
               Exciting Benefits Of <br /> DocuHealth ?
             </h2>
           <div className=" sm:hidden grid grid-cols-2 place-items-center gap-2 my-2 p-2 ">
-            <div className="bg-white shadow  rounded-md h-32 p-2 " data-aos="zoom-in-up">
+            <div className="bg-white shadow-sm  rounded-md h-32 p-2 " data-aos="zoom-in-up">
               <div className="py-1">
                 <svg
                   width="20"
@@ -40,7 +40,7 @@ const Benefit = () => {
                 </p>
               </div>
             </div>
-            <div className="bg-white shadow p-2 rounded-md  h-32 " data-aos="zoom-in-up">
+            <div className="bg-white shadow-sm p-2 rounded-md  h-32 " data-aos="zoom-in-up">
               <div className="py-1">
                 <svg
                   width="20"
@@ -63,7 +63,7 @@ const Benefit = () => {
                 </p>
               </div>
             </div>
-            <div className="bg-white shadow p-2 rounded-md  h-32 " data-aos="zoom-in-up">
+            <div className="bg-white shadow-sm p-2 rounded-md  h-32 " data-aos="zoom-in-up">
               <div className="py-1">
                 <svg
                   width="20"
@@ -85,7 +85,7 @@ const Benefit = () => {
                 </p>
               </div>
             </div>
-            <div className="bg-white shadow  rounded-md  h-32 p-2" data-aos="zoom-in-up">
+            <div className="bg-white shadow-sm  rounded-md  h-32 p-2" data-aos="zoom-in-up">
               <div className="py-1">
                 <svg
                   width="20"
@@ -122,7 +122,7 @@ const Benefit = () => {
           </div>
         
           <div className="hidden sm:grid grid-cols-2 place-items-center gap-4 my-2 p-2 ">
-            <div className="bg-white shadow p-3 sm:p-4 rounded-md sm:w-[230px] transition-transform duration-300 hover:-rotate-6">
+            <div className="bg-white shadow-sm p-3 sm:p-4 rounded-md sm:w-[230px] transition-transform duration-300 hover:-rotate-6">
               <div className="py-1">
                 <svg
                   width="20"
@@ -144,7 +144,7 @@ const Benefit = () => {
                 </p>
               </div>
             </div>
-            <div className="bg-white shadow p-3 sm:p-4 rounded-md sm:w-[230px] transition-transform duration-300 hover:rotate-6">
+            <div className="bg-white shadow-sm p-3 sm:p-4 rounded-md sm:w-[230px] transition-transform duration-300 hover:rotate-6">
               <div className="py-1">
                 <svg
                   width="20"
@@ -167,7 +167,7 @@ const Benefit = () => {
                 </p>
               </div>
             </div>
-            <div className="bg-white shadow p-3 sm:p-4 rounded-md sm:w-[230px] transition-transform duration-300 hover:-rotate-6">
+            <div className="bg-white shadow-sm p-3 sm:p-4 rounded-md sm:w-[230px] transition-transform duration-300 hover:-rotate-6">
               <div className="py-1">
                 <svg
                   width="20"
@@ -189,7 +189,7 @@ const Benefit = () => {
                 </p>
               </div>
             </div>
-            <div className="bg-white shadow p-3  sm:p-4 rounded-md sm:w-[230px] transition-transform duration-300 hover:rotate-6">
+            <div className="bg-white shadow-sm p-3  sm:p-4 rounded-md sm:w-[230px] transition-transform duration-300 hover:rotate-6">
               <div className="py-1">
                 <svg
                   width="20"

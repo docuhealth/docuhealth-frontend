@@ -10,7 +10,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
               <div className=" py-5 border-t-2 sm:hidden">
                 <p className="font-semibold">Sub accounts</p>
                 {subaccounts.map((subaccount, index) => (
-                  <div key={index} className="bg-white shadow px-4 py-2 my-3">
+                  <div key={index} className="bg-white shadow-sm px-4 py-2 my-3">
                     <div className=" flex justify-between items-center py-3 relative ">
                       <p>
                         HIN :{" "}
@@ -33,20 +33,20 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                             to=""
                             onClick={() => fetchMedicalHistory(subaccount.HIN)}
                           >
-                            <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer">
+                            <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
                               Check Medical History
                             </p>
                           </Link>
 
                           <Link to="/user-sub-account-upgrade">
                             {" "}
-                            <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer">
+                            <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
                               Upgrade Sub Account
                             </p>
                           </Link>
 
                           <p
-                            className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                            className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                             onClick={() => {
                               if (paymentStatus) {
                                 handleOpenForm(
@@ -222,7 +222,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                       </div>
                     </div>
                     {popoverVisible === record._id && (
-                      <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm z-50">
+                      <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-xs z-50">
                         <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto w-[90%] sm:w-[60%]">
                           <div className="flex flex-col gap-3 items-start">
                             <div className="">
@@ -304,7 +304,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                                 type="text"
                                 value={selectedRecord.basic_info.pulse_rate}
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -317,7 +317,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                                 type="text"
                                 value={selectedRecord.basic_info.temperature}
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -332,7 +332,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                                   selectedRecord.basic_info.respiratory_rate
                                 }
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -345,7 +345,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                                 type="text"
                                 value={selectedRecord.basic_info.weight}
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -361,7 +361,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                                   "MM HG"
                                 }
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -374,7 +374,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                                 type="text"
                                 value={selectedRecord.basic_info.diagnosis}
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -386,7 +386,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                               <textarea
                                 value={selectedRecord.summary}
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-hidden"
                               ></textarea>
                             </div>
 
@@ -399,7 +399,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                                 type="text"
                                 value={selectedRecord.patient_info.fullname}
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -412,7 +412,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                                 type="text"
                                 value={selectedRecord.patient_info.sex}
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
 
@@ -427,7 +427,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                                   selectedRecord.hospital_info.medical_personnel
                                 }
                                 readOnly
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                               />
                             </div>
                             {/* Attachment */}

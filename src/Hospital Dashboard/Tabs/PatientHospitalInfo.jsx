@@ -451,7 +451,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                   <label className="block text-sm font-medium text-gray-700">
                     Full Name
                   </label>
-                  <p className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100">
+                  <p className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs bg-gray-100">
                     {patientData.info.fullname || "NIL"}
                   </p>
                 </div>
@@ -460,7 +460,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                   <label className="block text-sm font-medium text-gray-700">
                     Sex
                   </label>
-                  <p className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100">
+                  <p className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs bg-gray-100">
                     {patientData.info.sex || "NIL"}
                   </p>
                 </div>
@@ -469,7 +469,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                   <label className="block text-sm font-medium text-gray-700">
                     Date Of Birth
                   </label>
-                  <p className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100">
+                  <p className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs bg-gray-100">
                     {patientData.info.DOB || "NIL"}
                   </p>
                 </div>
@@ -478,7 +478,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                   <label className="block text-sm font-medium text-gray-700">
                     Phone Number
                   </label>
-                  <p className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100">
+                  <p className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs bg-gray-100">
                     {patientData.info.phone_num || "NIL"}
                   </p>
                 </div>
@@ -488,7 +488,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                   <label className="block text-sm font-medium text-gray-700">
                     State
                   </label>
-                  <p className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100">
+                  <p className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs bg-gray-100">
                     {patientData.info.state || "NIL"}
                   </p>
                 </div>
@@ -498,7 +498,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                   <label className="block text-sm font-medium text-gray-700">
                     Email
                   </label>
-                  <p className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100">
+                  <p className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs bg-gray-100">
                     {patientData.info.email || "NIL"}
                   </p>
                 </div>
@@ -524,7 +524,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                     records.map((record) => (
                       <div
                         key={record._id}
-                        className="bg-white shadow-sm rounded-lg p-4 flex items-center justify-between "
+                        className="bg-white shadow-xs rounded-lg p-4 flex items-center justify-between "
                       >
                         {/* Date and Time */}
                         <div className="text-gray-700 text-sm">
@@ -620,7 +620,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                           </p>
                         </div>
                         {popoverVisible === record._id && (
-                          <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm z-50">
+                          <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-xs z-50">
                             <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto  ">
                               <div className="flex justify-between items-center">
                                 <div className="flex justify-start items-center gap-2">
@@ -712,7 +712,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                       "N/A"
                                     }
                                     readOnly
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none text-sm"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden text-sm"
                                   />
                                 </div>
 
@@ -728,7 +728,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                       "N/A"
                                     }
                                     readOnly
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none text-sm"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden text-sm"
                                   />
                                 </div>
 
@@ -744,7 +744,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                         ?.respiratory_rate || "N/A"
                                     }
                                     readOnly
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                   />
                                 </div>
 
@@ -760,7 +760,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                       "N/A"
                                     }
                                     readOnly
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                   />
                                 </div>
 
@@ -778,7 +778,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                         : "N/A"
                                     }
                                     readOnly
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                   />
                                 </div>
 
@@ -794,7 +794,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                       "N/A"
                                     }
                                     readOnly
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                   />
                                 </div>
 
@@ -806,7 +806,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                   <textarea
                                     value={selectedRecord?.summary || "N/A"}
                                     readOnly
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-none"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-hidden"
                                   ></textarea>
                                 </div>
 
@@ -822,7 +822,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                       datainfo?.fullname
                                     }
                                     readOnly
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                   />
                                 </div>
 
@@ -837,7 +837,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                       selectedRecord?.patient_info?.sex || "N/A"
                                     }
                                     readOnly
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                   />
                                 </div>
 
@@ -856,7 +856,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                       selectedRecord?.pharmacy_info.pharmacist
                                     }
                                     readOnly
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                   />
                                 </div>
 
@@ -873,7 +873,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                           ?.pharmacy_address
                                       }
                                       readOnly
-                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                     />
                                   </div>
                                 ) : (
@@ -891,7 +891,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                         (drug, index) => " " + drug + " "
                                       )}
                                       readOnly
-                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                     />
                                   </div>
                                 ) : (
@@ -907,7 +907,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                       type="text"
                                       value={selectedRecord?.dosage}
                                       readOnly
-                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                     />
                                   </div>
                                 ) : (
@@ -919,7 +919,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                   <label className="block text-gray-600 text-sm font-medium">
                                     Attachment
                                   </label>
-                                  <div className="w-full  px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none">
+                                  <div className="w-full  px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden">
                                     {selectedRecord?.attachments &&
                                     selectedRecord.attachments.length > 0 ? (
                                       <ul className="list-style-none pl-0 flex gap-2">
@@ -1011,7 +1011,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                </div>
                              </div>
                              {popoverVisible === record._id && (
-                               <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm z-50">
+                               <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-xs z-50">
                                  <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto w-[90%] sm:w-[60%]">
                                    <div className="flex flex-col gap-3 items-start">
                                      <div className="">
@@ -1098,7 +1098,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                            selectedRecord?.basic_info?.pulse_rate || "N/A"
                                          }
                                          readOnly
-                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                        />
                                      </div>
            
@@ -1113,7 +1113,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                            selectedRecord?.basic_info?.temperature || "N/A"
                                          }
                                          readOnly
-                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                        />
                                      </div>
            
@@ -1129,7 +1129,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                            "N/A"
                                          }
                                          readOnly
-                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                        />
                                      </div>
            
@@ -1144,7 +1144,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                            selectedRecord?.basic_info?.weight || "N/A"
                                          }
                                          readOnly
-                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                        />
                                      </div>
            
@@ -1162,7 +1162,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                              : "N/A"
                                          }
                                          readOnly
-                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                        />
                                      </div>
            
@@ -1177,7 +1177,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                            selectedRecord?.basic_info?.diagnosis || "N/A"
                                          }
                                          readOnly
-                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                        />
                                      </div>
            
@@ -1189,7 +1189,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                        <textarea
                                          value={selectedRecord?.summary || "N/A"}
                                          readOnly
-                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-none"
+                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-hidden"
                                        ></textarea>
                                      </div>
            
@@ -1205,7 +1205,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                            datainfo?.fullname
                                          }
                                          readOnly
-                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                        />
                                      </div>
            
@@ -1218,7 +1218,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                          type="text"
                                          value={selectedRecord?.patient_info?.sex || "N/A"}
                                          readOnly
-                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                        />
                                      </div>
            
@@ -1237,7 +1237,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                            selectedRecord?.pharmacy_info?.pharmacist
                                          }
                                          readOnly
-                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                         className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                        />
                                      </div>
            
@@ -1253,7 +1253,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                                ?.pharmacy_address
                                            }
                                            readOnly
-                                           className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                           className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                          />
                                        </div>
                                      ) : (
@@ -1271,7 +1271,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                              (drug, index) => " " + drug + " "
                                            )}
                                            readOnly
-                                           className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                           className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                          />
                                        </div>
                                      ) : (
@@ -1287,7 +1287,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                            type="text"
                                            value={selectedRecord?.dosage}
                                            readOnly
-                                           className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                                           className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                                          />
                                        </div>
                                      ) : (
@@ -1299,7 +1299,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                                        <label className="block text-gray-600 text-sm font-medium">
                                          Attachment
                                        </label>
-                                       <div className="w-full  px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none">
+                                       <div className="w-full  px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden">
                                          {selectedRecord.attachments &&
                                          selectedRecord.attachments.length > 0 ? (
                                            <ul className="list-style-none pl-0 flex gap-2">
@@ -1459,7 +1459,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                     name="pulse_rate"
                     value={formData.pulse_rate}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0000FF]"
                   />
                 </div>
 
@@ -1473,7 +1473,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                     name="temperature"
                     value={formData.temperature}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0000FF]"
                   />
                 </div>
 
@@ -1487,7 +1487,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                     name="respiratory_rate"
                     value={formData.respiratory_rate}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0000FF]"
                   />
                 </div>
 
@@ -1501,7 +1501,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                     name="blood_pressure"
                     value={formData.blood_pressure}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0000FF]"
                   />
                 </div>
 
@@ -1513,7 +1513,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                     name="weight"
                     value={formData.weight}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0000FF]"
                   />
                 </div>
 
@@ -1525,7 +1525,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                     name="diagnosis"
                     value={formData.diagnosis}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0000FF]"
                   />
                 </div>
 
@@ -1552,7 +1552,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                     name="summary"
                     value={formData.summary}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-5 h-[200px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                    className="w-full px-4 py-5 h-[200px] border rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0000FF]"
                   ></textarea>
                 </div>
                 {/* <div>
@@ -1561,7 +1561,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                   </label>
                   <input
                     type="file"
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                   />
                 </div> */}
 
@@ -1592,13 +1592,13 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                           <img
                             src={preview}
                             alt={`file-preview-${index}`}
-                            className="w-full h-full object-cover rounded"
+                            className="w-full h-full object-cover rounded-sm"
                           />
                         </div>
                       ) : (
                         <div
                           key={index}
-                          className="w-20 h-20 flex justify-center items-center bg-gray-200 rounded"
+                          className="w-20 h-20 flex justify-center items-center bg-gray-200 rounded-sm"
                         >
                           PDF
                         </div>
@@ -1616,7 +1616,7 @@ const PatientHospitalInfo = ({ patientData, hin }) => {
                     name="medical_personnel"
                     value={formData.medical_personnel}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0000FF]"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0000FF]"
                   />
                   <p className="text-sm text-gray-500 py-2">
                     Info: We prioritize the privacy and security of patient's

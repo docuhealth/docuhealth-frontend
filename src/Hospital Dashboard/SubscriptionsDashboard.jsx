@@ -327,7 +327,7 @@ const SubscriptionsDashboard = () => {
                       className={`p-4 rounded-xl ${
                         index === 0
                           ? "bg-[#F5F8F8]"
-                          : "bg-gradient-to-b from-[#ECFAFF] to-[#EEEEFD]"
+                          : "bg-linear-to-b from-[#ECFAFF] to-[#EEEEFD]"
                       }`}
                     >
                       {/* Plan Title and Price */}
