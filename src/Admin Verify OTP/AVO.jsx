@@ -165,7 +165,7 @@ const AVO = () => {
                       value={digit}
                       onChange={(e) => handleChange(e.target.value, index)}
                       onKeyDown={(e) => handleKeyDown(e, index)}
-                      className="w-12 h-12 text-center border-b-2  outline-none focus:border-[#0000FF] border-gray-400"
+                      className="w-12 h-12 text-center border-b-2  outline-hidden focus:border-[#0000FF] border-gray-400"
                       onBlur={(e) => {
                         if (e.target.value) {
                           e.target.classList.remove("border-blue-500");
@@ -227,7 +227,7 @@ const AVO = () => {
         </div>
       </div>
       {notificationVisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-xs flex items-center justify-center z-50">
           <div className="fixed bottom-0 left-0 right-0 bg-white text-black  py-4 rounded-t-3xl shadow-md animate-slide-up ">
             <div className="flex justify-center items-center gap-1 pb-4">
               <div>
@@ -254,7 +254,7 @@ const AVO = () => {
                       value={digit}
                       onChange={(e) => handleChange(e.target.value, index)}
                       onKeyDown={(e) => handleKeyDown(e, index)}
-                      className="w-8 h-12 text-center border-b-2  outline-none focus:border-[#0000FF] border-gray-400"
+                      className="w-8 h-12 text-center border-b-2  outline-hidden focus:border-[#0000FF] border-gray-400"
                       onBlur={(e) => {
                         if (e.target.value) {
                           e.target.classList.remove("border-blue-500");

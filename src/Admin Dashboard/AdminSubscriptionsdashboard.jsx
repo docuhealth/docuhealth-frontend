@@ -263,7 +263,7 @@ const AdminSubscriptionsdashboard = () => {
                       className={`p-4 rounded-xl relative ${
                         index === 0
                           ? "bg-[#F5F8F8]"
-                          : "bg-gradient-to-b from-[#ECFAFF] to-[#EEEEFD]"
+                          : "bg-linear-to-b from-[#ECFAFF] to-[#EEEEFD]"
                       }`}
                     >
                       {/* Plan Title and Price */}
@@ -292,7 +292,7 @@ const AdminSubscriptionsdashboard = () => {
                       </div>
 
                       {popoverOpen[plan._id] && (
-                        <div className="absolute top-14 right-0 bg-white shadow p-2 rounded">
+                        <div className="absolute top-14 right-0 bg-white shadow-sm p-2 rounded-sm">
                           <p className="text-sm text-gray-700 cursor-pointer" onClick={() => {deleteSubscriptionPlan(plan.plan_id)
                             togglePopover(plan._id) }
                           }>Remove Plan</p>

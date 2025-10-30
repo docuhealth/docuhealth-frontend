@@ -230,7 +230,7 @@ const HeroPG = () => {
 
         </div>
       </div>
-      <div className="bg-gradient-to-b from-[#CAD1FF] to-[#869799] p-2 sm:p-5 rounded-lg lg:rounded-3xl my-3" data-aos="zoom-in">
+      <div className="bg-linear-to-b from-[#CAD1FF] to-[#869799] p-2 sm:p-5 rounded-lg lg:rounded-3xl my-3" data-aos="zoom-in">
         <img src={overviewPG} alt="overview_Img" className="w-[1080px]" />
       </div>
     </div>

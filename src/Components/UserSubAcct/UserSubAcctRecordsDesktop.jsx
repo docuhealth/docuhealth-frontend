@@ -51,7 +51,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                         <div className="absolute right-0 mt-2 bg-white border shadow-md rounded-lg p-2 w-52  z-30">
                           <Link to="">
                             <p
-                              className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                              className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() =>
                                 fetchMedicalHistory(subaccount.HIN)
                               }
@@ -62,13 +62,13 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
 
                           <Link to="/user-sub-account-upgrade">
                             {" "}
-                            <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer">
+                            <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
                               Upgrade Sub Account
                             </p>
                           </Link>
 
                           <p
-                            className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                            className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                             onClick={() => {
                               if (paymentStatus) {
                                 handleOpenForm(
@@ -147,7 +147,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
             {records.map((record) => (
               <div
                 key={record._id}
-                className="bg-white shadow-sm rounded-lg p-4 flex items-center justify-between space-x-2"
+                className="bg-white shadow-xs rounded-lg p-4 flex items-center justify-between space-x-2"
               >
                 {/* Date and Time */}
                 <div className="text-gray-700">
@@ -224,7 +224,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                 </div>
 
                 {popoverVisible === record._id && (
-                  <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm z-50">
+                  <div className="fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-xs z-50">
                     <div className="bg-white shadow-lg rounded-lg p-5 relative max-h-[80vh] overflow-y-auto  ">
                       <div className="flex justify-between items-center">
                         <div className="flex justify-start items-center gap-2">
@@ -304,7 +304,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                             type="text"
                             value={selectedRecord.basic_info.pulse_rate}
                             readOnly
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                           />
                         </div>
 
@@ -317,7 +317,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                             type="text"
                             value={selectedRecord.basic_info.temperature}
                             readOnly
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                           />
                         </div>
 
@@ -330,7 +330,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                             type="text"
                             value={selectedRecord.basic_info.respiratory_rate}
                             readOnly
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                           />
                         </div>
 
@@ -343,7 +343,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                             type="text"
                             value={selectedRecord.basic_info.weight}
                             readOnly
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                           />
                         </div>
 
@@ -358,7 +358,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                               selectedRecord.basic_info.blood_pressure + "MM HG"
                             }
                             readOnly
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                           />
                         </div>
 
@@ -371,7 +371,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                             type="text"
                             value={selectedRecord.basic_info.diagnosis}
                             readOnly
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                           />
                         </div>
 
@@ -383,7 +383,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                           <textarea
                             value={selectedRecord.summary}
                             readOnly
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 h-24 focus:outline-hidden"
                           ></textarea>
                         </div>
 
@@ -396,7 +396,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                             type="text"
                             value={selectedRecord.patient_info.fullname}
                             readOnly
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                           />
                         </div>
 
@@ -409,7 +409,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                             type="text"
                             value={selectedRecord.patient_info.sex}
                             readOnly
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                           />
                         </div>
 
@@ -424,7 +424,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                               selectedRecord.hospital_info.medical_personnel
                             }
                             readOnly
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-hidden"
                           />
                         </div>
 

@@ -1,19 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap")
+layer(base);
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-*{
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    font-family: "Montserrat", serif;
-    scroll-behavior: smooth;
+@theme {
+  --animate-slide-up: slideUp 0.5s ease-out;
+
+  @keyframes slideUp {
+    0% {
+      transform: translateY(100%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
 }
 
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
 
-  /* Custom Scrollbar */
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+* {
+  font-family: "Montserrat", serif;
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px; /* Thin scrollbar */
 }
@@ -32,12 +58,9 @@
   background: #555; /* Slightly lighter on hover */
 }
 
-
-
 @media (max-width: 600px) {
   .apexcharts-legend {
-    display:none
- 
+    display: none;
   }
   .apexcharts-legend-series {
     display: none;
@@ -46,5 +69,3 @@
     display: none;
   }
 }
-
-

@@ -661,7 +661,7 @@ const HomeDashboard = () => {
               <div className="col-span-2 sm:col-auto">
                 <div className="bg-white py-4 px-2 border rounded-md">
                   <div className="flex justify-start gap-3 items-center ">
-                    <div className="bg-[#3380FF] bg-opacity-10 p-2 rounded-sm">
+                    <div className="bg-[#3380FF] bg-opacity-10 p-2 rounded-xs">
                       <svg
                         width="24"
                         height="24"
@@ -709,7 +709,7 @@ const HomeDashboard = () => {
               <div className="col-span-2 sm:col-auto">
                 <div className="bg-white py-4 px-2 border rounded-md">
                   <div className="flex justify-start gap-3 items-center ">
-                    <div className="bg-[#9181DB] bg-opacity-10 p-2 rounded-sm">
+                    <div className="bg-[#9181DB] bg-opacity-10 p-2 rounded-xs">
                       <svg
                         width="24"
                         height="24"
@@ -757,7 +757,7 @@ const HomeDashboard = () => {
               <div className="col-span-2 sm:col-auto">
                 <div className="bg-white py-4 px-2 border rounded-md">
                   <div className="flex justify-start gap-3 items-center ">
-                    <div className="bg-[#FFB849] bg-opacity-10 p-2 rounded-sm">
+                    <div className="bg-[#FFB849] bg-opacity-10 p-2 rounded-xs">
                       <svg
                         width="24"
                         height="24"
@@ -809,7 +809,7 @@ const HomeDashboard = () => {
               <div className="col-span-2 sm:col-auto">
                 <div className="bg-white py-4 px-2 border rounded-md">
                   <div className="flex justify-start gap-3 items-center ">
-                    <div className="bg-[#F0A0A0] bg-opacity-10 p-2 rounded-sm">
+                    <div className="bg-[#F0A0A0] bg-opacity-10 p-2 rounded-xs">
                       <svg
                         width="24"
                         height="24"
@@ -858,7 +858,7 @@ const HomeDashboard = () => {
 
             <div className="py-3 grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* First Chart */}
-              <div className="bg-white p-4 rounded-2xl shadow">
+              <div className="bg-white p-4 rounded-2xl shadow-sm">
                 <h3 className=" font-semibold mb-4">
                   Summary of Diagnosis / Treatment
                 </h3>
@@ -878,7 +878,7 @@ const HomeDashboard = () => {
                 )}
               </div>
               
-              <div className="bg-white p-4 rounded-2xl shadow">
+              <div className="bg-white p-4 rounded-2xl shadow-sm">
                 <h3 className=" font-semibold mb-4">Patients HIN Checked</h3>
                 {loading ? (
                   <p>Loading data...</p>

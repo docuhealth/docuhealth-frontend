@@ -91,7 +91,7 @@ const UserDashHead = ({ isSidebarOpen, toggleSidebar, closeSidebar }) => {
         </div>
       </header>
 
-      <header className=" sm:hidden bg-white shadow py-4 flex justify-between items-center px-4 ">
+      <header className=" sm:hidden bg-white shadow-sm py-4 flex justify-between items-center px-4 ">
         <div className="text-sm font-semibold flex items-center gap-2">
           <p onClick={toggleSidebar}>
             <i class="bx bx-menu text-2xl"></i>

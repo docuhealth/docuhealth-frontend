@@ -353,7 +353,7 @@ const PharmacyRequestTable = () => {
                         <div className="flex items-center">
                           <input
                             type="checkbox"
-                            className="h-4 w-4 text-blue-600 border-gray-30 rounded"
+                            className="h-4 w-4 text-blue-600 border-gray-30 rounded-sm"
                             checked={selectedRows.has(request.pharma_code)}
                             onChange={() =>
                               handleRowSelection(request.pharma_code)
@@ -432,7 +432,7 @@ const PharmacyRequestTable = () => {
                                 {activePharmacy ? "" : "Approve Request"}
                               </p>{" "}
                               <p
-                                className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                                className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                                 onClick={() => handleRequestDecline(request.pharma_code)}
                               
                               >
@@ -495,7 +495,7 @@ const PharmacyRequestTable = () => {
                     <div className="flex items-center">
                       <input
                         type="checkbox"
-                        className="h-4 w-4 text-blue-600 border-gray-30 rounded"
+                        className="h-4 w-4 text-blue-600 border-gray-30 rounded-sm"
                         checked={selectedRows.has(request.id)}
                         onChange={() => handleRowSelection(request.id)}
                       />
@@ -541,7 +541,7 @@ const PharmacyRequestTable = () => {
                       {openPopover === index && (
                         <div className="absolute right-0 mt-8 bg-white border shadow-md rounded-lg p-2 w-52  z-30">
                           <p
-                            className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                            className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                             onClick={() => {
                               console.log(
                                 "Approve request clicked",
@@ -551,11 +551,11 @@ const PharmacyRequestTable = () => {
                           >
                             Approve Request
                           </p>{" "}
-                          <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer">
+                          <p className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
                             Decline Request
                           </p>
                           <p
-                            className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                            className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                             onClick={() => handleCopy(request.phone)}
                           >
                             Copy Phone Number
@@ -575,7 +575,7 @@ const PharmacyRequestTable = () => {
                       <div className="flex items-center">
                         <input
                           type="checkbox"
-                          className="h-4 w-4 text-blue-600 border-gray-30 rounded"
+                          className="h-4 w-4 text-blue-600 border-gray-30 rounded-sm"
                           checked={selectedRows.has(request.pharma_code)}
                           onChange={() =>
                             handleRowSelection(request.pharma_code)
@@ -641,7 +641,7 @@ const PharmacyRequestTable = () => {
                         {openPopover === index && (
                           <div className="absolute right-0 mt-8 bg-white border shadow-md rounded-lg p-2 w-52  z-30">
                             <p
-                              className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                              className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() =>
                                 handleRequestApprove(request.pharma_code)
                               }
@@ -649,7 +649,7 @@ const PharmacyRequestTable = () => {
                               Approve Request
                             </p>{" "}
                             <p
-                              className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                              className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() =>
                                 handleRequestDecline(request.pharma_code)
                               }
@@ -657,7 +657,7 @@ const PharmacyRequestTable = () => {
                               Decline Request
                             </p>
                             <p
-                              className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                              className="text-sm text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => handleCopy(request.phone_num)}
                             >
                               Copy Phone Number

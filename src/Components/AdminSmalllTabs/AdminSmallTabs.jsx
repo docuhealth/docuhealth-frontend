@@ -6,7 +6,7 @@ const AdminSmallTabs = ({totalUsers, totalUsersPercent, regHosp, regHospPercent,
       <div className="col-span-2 sm:col-auto">
         <div className="bg-white py-4 px-2 border rounded-md">
           <div className="flex justify-start gap-3 items-center ">
-            <div className="bg-[#3380FF] bg-opacity-10 p-2 rounded-sm">
+            <div className="bg-[#3380FF] bg-opacity-10 p-2 rounded-xs">
               <svg
                 width="24"
                 height="24"
@@ -52,7 +52,7 @@ const AdminSmallTabs = ({totalUsers, totalUsersPercent, regHosp, regHospPercent,
       <div className="col-span-2 sm:col-auto">
         <div className="bg-white py-4 px-2 border rounded-md">
           <div className="flex justify-start gap-3 items-center ">
-            <div className="bg-[#9181DB] bg-opacity-10 p-2 rounded-sm">
+            <div className="bg-[#9181DB] bg-opacity-10 p-2 rounded-xs">
               <svg
                 width="24"
                 height="24"
@@ -96,7 +96,7 @@ const AdminSmallTabs = ({totalUsers, totalUsersPercent, regHosp, regHospPercent,
       <div className="col-span-2 sm:col-auto">
         <div className="bg-white py-4 px-2 border rounded-md">
           <div className="flex justify-start gap-3 items-center ">
-            <div className="bg-[#FFB849] bg-opacity-10 p-2 rounded-sm">
+            <div className="bg-[#FFB849] bg-opacity-10 p-2 rounded-xs">
               <svg
                 width="24"
                 height="24"
@@ -143,7 +143,7 @@ const AdminSmallTabs = ({totalUsers, totalUsersPercent, regHosp, regHospPercent,
       <div className="col-span-2 sm:col-auto">
         <div className="bg-white py-4 px-2 border rounded-md">
           <div className="flex justify-start gap-3 items-center ">
-            <div className="bg-[#F0A0A0] bg-opacity-10 p-2 rounded-sm">
+            <div className="bg-[#F0A0A0] bg-opacity-10 p-2 rounded-xs">
               <svg
                 width="24"
                 height="24"

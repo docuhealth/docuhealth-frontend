@@ -46,7 +46,7 @@ const UserSubAcctIDCard = ({generateIDCard, setGenerateIDCard, selectedUser, for
                           value={formData.firstEmergency}
                           onChange={handleChange}
                           placeholder="Enter first emergency number"
-                          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
 
@@ -60,7 +60,7 @@ const UserSubAcctIDCard = ({generateIDCard, setGenerateIDCard, selectedUser, for
                           value={formData.secondEmergency}
                           onChange={handleChange}
                           placeholder="Enter second emergency number"
-                          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
 
@@ -73,7 +73,7 @@ const UserSubAcctIDCard = ({generateIDCard, setGenerateIDCard, selectedUser, for
                           value={formData.emergencyAddress}
                           onChange={handleChange}
                           placeholder="Enter emergency address"
-                          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-24 resize-none"
+                          className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500 h-24 resize-none"
                         ></textarea>
                       </div>
                     </div>
@@ -194,7 +194,7 @@ const UserSubAcctIDCard = ({generateIDCard, setGenerateIDCard, selectedUser, for
                             <h3 className="font-semibold text-[#313131]">
                               Emergency Address
                             </h3>
-                            <p className="text-[#313131] max-w-28 break-words text-[10px]">
+                            <p className="text-[#313131] max-w-28 wrap-break-word text-[10px]">
                               {formData.emergencyAddress || ""}
                             </p>
                           </div>

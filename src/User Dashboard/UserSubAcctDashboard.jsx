@@ -626,7 +626,7 @@ const UserSubAcctDashboard = () => {
           />
 
           {/* Content */}
-          <section className="pt-6 px-8 w-full relative bg-gray-100 shadow min-h-screen">
+          <section className="pt-6 px-8 w-full relative bg-gray-100 shadow-sm min-h-screen">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-10">
               <div className="pb-3 sm:p-0 w-full sm:w-auto">
                 <DynamicDate />
