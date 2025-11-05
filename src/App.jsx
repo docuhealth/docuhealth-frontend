@@ -15,6 +15,7 @@ import Privacy_Policy_Page from "./Pages_/Our Privacy Policy/Privacy_Policy_Page
 
 
 import Hospital_Verification_Request from "./Auth/Hospital/Hospital_Verification_Request";
+import Hospital_Onboarding from "./Auth/Hospital/Hospital_Onboarding";
 
 import Hospital_Create_Account from "./Auth/Hospital/Hospital_Create_Account";
 import Hospital_Sign_In from "./Auth/Hospital/Hospital_Sign_In";
@@ -88,6 +89,8 @@ import Hospital_Receptionist_Settings_Dashboard from "./Dashboard/Hospital_Dashb
 import Hospital_Receptionist_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Receptionist/Hospital_Receptionist_HealthPersonnel_Dashboard";
 import Hospital_Receptionist_Admission_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Receptionist/Hospital_Receptionist_Admission_Dashboard";
 
+import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
+
 function App() {
   return (
     <Router>
@@ -101,6 +104,7 @@ function App() {
         draggable
       />
       <Toaster position="top-right" reverseOrder={false} />
+      <ScrollToTop />
 
 
       <Routes>
@@ -172,6 +176,10 @@ function App() {
  <Route
           path="/hospital-verification-request"
           element={<Hospital_Verification_Request />}
+        />
+ <Route
+          path="/hospital-onboarding"
+          element={<Hospital_Onboarding />}
         />
         {/* <Route
           path="/hospital-create-account"

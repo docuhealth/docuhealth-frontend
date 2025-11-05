@@ -195,15 +195,17 @@ const USI = () => {
                   {/* Submit Button */}
                   <button
                     type="submit"
-                    className={`w-full py-3 rounded-full ${
-                      isFormValid && !isSubmitting
+                    className={`w-full py-3 rounded-full ${isFormValid && !isSubmitting
                         ? "bg-[#3E4095] text-white"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
+                      }`}
                     onClick={handleSubmit}
                     disabled={!isFormValid || isSubmitting}
                   >
-                    {isSubmitting ? "Logging In..." : "Next"}
+                    {isSubmitting ? (     <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Logging In...
+                    </div> ): ("Next")}
                   </button>
                 </form>
 
@@ -250,10 +252,10 @@ const USI = () => {
 
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
         <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
-                <img src={docuhealth_logo} alt="Logo" className="w-6" />
-                <h1 className="text-xl">DocuHealth</h1>
-              </div>
-        <div className="">
+          <img src={docuhealth_logo} alt="Logo" className="w-6" />
+          <h1 className="text-xl">DocuHealth</h1>
+        </div>
+   
           <div className="px-5 w-full">
             <h2 className="text-xl font-semibold pb-1">
               Sign Into Your Account
@@ -326,15 +328,17 @@ const USI = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className={`w-full py-3 rounded-full ${
-                  isFormValid && !isSubmitting
+                className={`w-full py-3 rounded-full ${isFormValid && !isSubmitting
                     ? "bg-[#3E4095] text-white "
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
+                  }`}
                 onClick={handleSubmit}
                 disabled={!isFormValid || isSubmitting}
               >
-                {isSubmitting ? "Logging In..." : "Next"}
+               {isSubmitting ? (     <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Logging In...
+                    </div> ): ("Next")}
               </button>
             </form>
 
@@ -349,7 +353,6 @@ const USI = () => {
               </Link>
             </p>
           </div>
-        </div>
       </div>
     </>
   );

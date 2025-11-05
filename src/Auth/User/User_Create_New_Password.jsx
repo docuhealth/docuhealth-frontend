@@ -363,7 +363,11 @@ const NPU = () => {
                       : "bg-[#3E4095] text-white "
                   }`}
                 >
-                  {isLoading ? "Resetting Password" : "Reset Password"}
+             
+                  {isLoading ? (     <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Resetting Password
+                    </div> ): ("Reset Password")}
                 </button>
               </form>
             </div>
@@ -639,7 +643,10 @@ const NPU = () => {
                     : "bg-[#3E4095] text-white "
                 }`}
               >
-                {isLoading ? "Resetting Password" : "Reset Password"}
+                 {isLoading ? (     <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Resetting Password
+                    </div> ): ("Reset Password")}
               </button>
             </form>
           </div>

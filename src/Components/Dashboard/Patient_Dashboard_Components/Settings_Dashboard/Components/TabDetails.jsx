@@ -504,7 +504,7 @@ const AccountSettingsTab = () => {
                   disabled={loading}
                   className={`w-full px-3 sm:px-4 py-2 text-sm font-medium text-white rounded-full shadow-sm focus:outline-none transition-all ${
                     !loading
-                      ? "bg-[#0000FF] hover:bg-blue-700"
+                      ? "bg-[#3E4095] "
                       : "bg-gray-300 cursor-not-allowed"
                   }`}
                 >
@@ -536,7 +536,7 @@ const AccountSettingsTab = () => {
                   type="button"
                     disabled={loading}
                   onClick={handleCancel}
-                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-sm  ${!loading ? 'text-[#0000FF] bg-white border border-[#0000FF] hover:bg-gray-50': 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-none`}
+                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-sm  ${!loading ? 'text-[#3E4095] bg-white border border-[#3E4095] hover:bg-gray-50': 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-none`}
                 >
                   Cancel Changes
                 </button>

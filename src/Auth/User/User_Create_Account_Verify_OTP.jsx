@@ -120,7 +120,10 @@ const User_Create_Account_Verify_OTP = () => {
                         : "bg-[#3E4095] text-white"
                     }`}
                   >
-                    {isLoading ? "Verifying OTP" : "Proceed"}
+                      {isLoading ? (     <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Verifying Otp
+                    </div> ): ("Proceed")}
                   </button>
                 </form>
               </div>
@@ -206,7 +209,11 @@ const User_Create_Account_Verify_OTP = () => {
                     : "bg-[#3E4095] text-white "
                 }`}
               >
-                {isLoading ? "Verifying OTP" : "Proceed"}
+             
+                {isLoading ? (     <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Verifying Otp
+                    </div> ): ("Proceed")}
               </button>
             </form>
           </div>

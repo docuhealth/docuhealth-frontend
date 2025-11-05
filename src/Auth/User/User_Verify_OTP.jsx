@@ -183,7 +183,11 @@ const VerifyOTP = () => {
                       : "bg-[#3E4095] text-white "
                   }`}
                 >
-                  {isLoading ? "Verifying OTP..." : "Proceed"}
+           
+                  {isLoading ? (     <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Verifying OTP...
+                    </div> ): ("Proceed")}
                 </button>
               </form>
             </div>
@@ -267,7 +271,10 @@ const VerifyOTP = () => {
                     : "bg-[#3E4095] text-white "
                 }`}
               >
-                {isLoading ? "Verifying OTP..." : "Proceed"}
+             {isLoading ? (     <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Verifying OTP...
+                    </div> ): ("Proceed")}
               </button>
             </form>
           </div>

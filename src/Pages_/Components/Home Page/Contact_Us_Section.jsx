@@ -25,7 +25,7 @@ const Contact_Us_Section = () => {
     if (activeTab === "provider") {
       // Format for provider
       payload = {
-        redirect_url: "http://localhost:5174/hospital-verification-request", // or dynamically set this if needed
+        redirect_url: "http://localhost:5173/hospital-verification-request", // or dynamically set this if needed
         name: formData.name,
         contact_email: formData.email,
         phone: formData.phone,

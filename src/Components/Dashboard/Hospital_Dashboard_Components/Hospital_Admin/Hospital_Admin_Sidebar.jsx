@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
-import logo from "../../../../assets/img/logo.png";
+import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast'
 
 const Hospital_Admin_Sidebar = () => {
   const navigate = useNavigate();
@@ -9,10 +10,10 @@ const Hospital_Admin_Sidebar = () => {
 
   return (
     <>
-      <div className="p-4 flex justify-between items-center  ">
-        <div className="flex justify-start items-center gap-1">
-          <img src={logo} alt="docuhealth logo" className="w-6" />
-          <h1 className="text-xl font-semibold text-[#0000FF]">DocuHealth</h1>
+        <div className="pt-5 pl-5 pb-3 flex justify-between items-center  ">
+        <div className="flex justify-start items-center gap-1 font-semibold text-[#3E4095]">
+           <img src={docuhealth_logo} alt="Logo" className="w-6" />
+                     <h1 className="text-xl">DocuHealth</h1>
         </div>
       </div>
       <nav className="mt-4 text-sm">
@@ -22,9 +23,9 @@ const Hospital_Admin_Sidebar = () => {
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-admin-home-dashboard"
-                    ? "bg-[#0000FF] text-white"
+                    ? "bg-[#3E4095] text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -58,9 +59,9 @@ const Hospital_Admin_Sidebar = () => {
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-admin-staff-dashboard"
-                    ? "bg-[#0000FF] text-white"
+                    ? "bg-[#3E4095] text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -94,9 +95,9 @@ const Hospital_Admin_Sidebar = () => {
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-admin-patients-dashboard"
-                    ? "bg-[#0000FF] text-white"
+                    ? "bg-[#3E4095] text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -130,9 +131,9 @@ const Hospital_Admin_Sidebar = () => {
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-admin-messages-dashboard"
-                    ? "bg-[#0000FF] text-white"
+                    ? "bg-[#3E4095] text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -166,9 +167,9 @@ const Hospital_Admin_Sidebar = () => {
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-admin-appointments-dashboard"
-                    ? "bg-[#0000FF] text-white"
+                    ? "bg-[#3E4095] text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -197,14 +198,16 @@ const Hospital_Admin_Sidebar = () => {
               </li>
             </div>
           </Link>
-          <Link to="/hospital-admin-wallet-dashboard">
+          <Link to="" onClick={()=>{
+            toast.success('Feature is coming soon')
+          }}>
             <div className="px-4 my-4">
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-admin-wallet-dashboard"
-                    ? "bg-[#0000FF] text-white"
+                    ? "bg-[#3E4095] text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -238,9 +241,9 @@ const Hospital_Admin_Sidebar = () => {
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-admin-settings-dashboard"
-                    ? "bg-[#0000FF] text-white"
+                    ? "bg-[#3E4095] text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -269,14 +272,16 @@ const Hospital_Admin_Sidebar = () => {
               </li>
             </div>
           </Link>
-          <Link to="/hospital-admin-subscriptions-dashboard">
+          <Link to="" onClick={()=>{
+            toast.success('Feature is coming soon')
+          }}>
             <div className="px-4 my-4">
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-admin-subscriptions-dashboard"
-                    ? "bg-[#0000FF] text-white"
+                    ? "bg-[#3E4095] text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -311,7 +316,7 @@ const Hospital_Admin_Sidebar = () => {
         //    onClick={handleLogout}
            >
             <li
-              className={`group px-4 py-2  text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+              className={`group px-4 py-2  text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
             >
               <svg
                 width="20"
