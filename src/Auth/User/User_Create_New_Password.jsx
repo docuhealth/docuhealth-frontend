@@ -4,8 +4,8 @@ import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React Icons
 import dashb from "../../assets/img/dashb.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import { authAPI } from "../../utils/authAPI";
-import axios from "axios";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 const NPU = () => {
   const [password, setPassword] = useState("");
@@ -14,7 +14,7 @@ const NPU = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState(false);
 
-  const [role, setRole] = useState("patient");
+
 
   // Password validation states
   const [passwordRequirements, setPasswordRequirements] = useState({
@@ -65,16 +65,7 @@ const NPU = () => {
     return { strength: score, label: "Strong", color: "bg-green-500" };
   };
 
-  useEffect(() => {
-    const isMobile = window.innerWidth <= 768; // Adjust breakpoint as needed
-    if (isMobile) {
-      const timer = setTimeout(() => {
-        setNotificationVisible(true);
-      }, 2000); // 2 seconds delay
 
-      return () => clearTimeout(timer); // Cleanup on component unmount
-    }
-  }, []);
 
   const navigate = useNavigate();
   const location = useLocation();

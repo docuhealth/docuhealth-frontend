@@ -9,27 +9,14 @@ import toast from "react-hot-toast";
 const USI = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("patient");
   const [showPassword, setShowPassword] = useState(false);
   const [phone_num, setPhone_Num] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [notificationVisible, setNotificationVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const isMobile = window.innerWidth <= 768; // Adjust breakpoint as needed
-    if (isMobile) {
-      const timer = setTimeout(() => {
-        setNotificationVisible(true);
-      }, 2000); // 2 seconds delay
-
-      return () => clearTimeout(timer); // Cleanup on component unmount
-    }
-  }, []);
 
   const handleInputChange = (e) => {
     const value = e.target.value.trim();
@@ -83,6 +70,7 @@ const USI = () => {
         const data = await login(userData);
 
         setToken(data.data.access_token, data.data.role);
+        // Send token to sessionStorage
         // console.log(data)
         // console.log(data.access_token)
 

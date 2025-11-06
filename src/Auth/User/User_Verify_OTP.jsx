@@ -79,7 +79,7 @@ const VerifyOTP = () => {
         access_token: response.data.access_token,
       };
       setTimeout(() => {
-        navigate("/user-set-new-password", { state: navigateData });
+        navigate("/user-create-new-password", { state: navigateData });
       }, 1000);
     } catch (error) {
       console.error("Error during OTP verification:", error);

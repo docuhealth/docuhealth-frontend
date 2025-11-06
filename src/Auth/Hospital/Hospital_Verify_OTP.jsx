@@ -1,46 +1,38 @@
 import React, { useState, useEffect } from "react";
-import logo from "../../assets/img/logo.png";
+import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 import dashb from "../../assets/img/dashb.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { authAPI } from "../../utils/authAPI";
+import { FaKey } from "react-icons/fa";
 import axios from "axios";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
-const VerifyOTP = () => {
+const Hospital_Verify_OTP = () => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [notificationVisible, setNotificationVisible] = useState(false);
-  const [role, setRole] = useState("hospital");
-  const [loading, setLoading] = useState("");
+  const [mobileOTP, setMobileOTP] = useState("");
+  const [role, setRole] = useState("patient");
+  const [isLoading, setIsLoading] = useState(false);
 
   const location = useLocation();
-    const navigate = useNavigate();
-  const { email } = location.state || {}; // Retrieve email from state
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const isMobile = window.innerWidth <= 768; // Adjust breakpoint as needed
-    if (isMobile) {
-      const timer = setTimeout(() => {
-        setNotificationVisible(true);
-      }, 2000); // 2 seconds delay
-
-      return () => clearTimeout(timer); // Cleanup on component unmount
-    }
-  }, []);
+  const { email } = location.state || {};
 
   const handleChange = (value, index) => {
     // Allow only numeric values
     if (!/^\d?$/.test(value)) return;
-  
+
     const updatedOtp = [...otp];
     updatedOtp[index] = value;
     setOtp(updatedOtp);
-  
+
     // Move focus to the next input if a digit is entered
     if (value && index < otp.length - 1) {
       const nextInput = document.getElementById(`otp-${index + 1}`);
       if (nextInput) nextInput.focus();
     }
   };
-  
+
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace") {
       if (!otp[index] && index > 0) {
@@ -57,42 +49,45 @@ const VerifyOTP = () => {
   };
 
   const handleSubmit = async (e) => {
-    setLoading("Verifying Otp");
+    setIsLoading(true);
     e.preventDefault();
+    const enteredOtp = otp.join("");
 
     try {
-      // Combine the OTP array into a single string
-      const enteredOtp = otp.join("");
-      console.log("Entered OTP:", enteredOtp, email);
+      // Dynamically determine which field to send (email or phone_num)
+      const payload = {
+        otp: enteredOtp ? enteredOtp : mobileOTP,
+        email, // Send either email or phone_num
+        // role: role, // Include the role in the request
+      };
 
-      // Send the OTP and email to the API
-      const response = await axios.post(
-        "https://docuhealth-backend-h03u.onrender.com/api/auth/verify_otp",
-        {
-          otp: enteredOtp,
-          email: email,
-          role: role
-        }
+      // Send the request to the API
+      const response = await authAPI(
+        "POST",
+        "api/auth/forgot-password/verify-otp",
+        payload
       );
 
-      // Check if the request was successful
-      if (response.status === 200) {
-        console.log("OTP verified successfully:", response.data);
-        setLoading("Proceed");
-        // Perform further actions based on response
-        toast.success(response.data.message || "OTP Verified!");
-        setTimeout(() => {
-          navigate("/hospital-set-new-password",  { state: { email } });
-        }, 1000);
-      } else {
-        console.error("OTP verification failed:", response.data);
-        setLoading("Proceed");
-        toast.error("OTP Verification Failed.");
-      }
+      // Handle the response
+      setIsLoading(false);
+
+      // Display success message
+      toast.success(response.message || "OTP Verified!");
+      // console.log(response)
+      // Navigate and pass the appropriate data
+      const navigateData = {
+        email,
+        access_token: response.data.access_token,
+      };
+      setTimeout(() => {
+        navigate("/set-new-password", { state: navigateData });
+      }, 1000);
     } catch (error) {
-      console.error("Error during OTP verification:", error.message);
-      setLoading("Proceed");
+      console.error("Error during OTP verification:", error);
+      setIsLoading(false);
       toast.error("OTP Verification Failed, Try Again");
+    }finally{
+      setIsLoading(false);
     }
   };
 
@@ -100,46 +95,54 @@ const VerifyOTP = () => {
     console.log("Resend OTP");
 
     try {
-      const response = await fetch(
-        "https://docuhealth-backend-h03u.onrender.com/api/auth/forgot_password",
-        {
-          method: "POST", // Use POST method for sending data
-          headers: {
-            "Content-Type": "application/json", // Indicate the payload format
-          },
-          body: JSON.stringify({ email, role }), // Send the email as JSON
-        }
+      // Prepare the payload dynamically
+      const payload = {
+        role, // Include the role
+        email, // Dynamically add email or phone_num
+      };
+
+      // Make the POST request
+      const response = await authAPI(
+        "POST",
+        "api/auth/forgot-password",
+        payload
       );
 
       if (response.ok) {
-        toast.success("Email sent successfully!");
+        toast.success("OTP sent successfully!");
       } else {
-        toast.error(`Failed to send email, try again`);
+        const errorData = await response.json();
+        toast.error(errorData.message || "Failed to resend OTP, try again.");
       }
     } catch (error) {
       console.error(`Error: ${error.message}`);
+      toast.error("An error occurred. Please try again later.");
     }
   };
 
   return (
-    <div>
-      <div className="min-h-screen">
-        <div className="flex">
-          {/* Left Side */}
-          <div className="hidden sm:flex flex-1 h-screen  items-center justify-center text-sm">
-            <div className="w-3/4" id="temp">
-              <div className="pb-10">
-                <img src={logo} alt="Logo" className="" />
-              </div>
-              <h2 className="text-xl font-bold mb-2">Verify OTP</h2>
-              <p className="text-gray-600 mb-6">
+   <>
+    <div className="hidden h-screen sm:flex">
+        {/* Left Side */}
+
+        <div className="w-full flex-1">
+          <div className="hidden sm:flex justify-center items-center py-10 h-screen">
+
+                <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
+                                    <img src={docuhealth_logo} alt="Logo" className="w-6" />
+                                    <h1 className="text-xl">DocuHealth</h1>
+                                  </div>
+
+            <div className="px-10 w-full">
+              <h2 className="text-xl font-semibold pb-1">Verify OTP</h2>
+              <p className="text-gray-600 mb-6 text-sm">
                 Please enter the 6 digit Pin we sent to your email address to
                 proceed!
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="text-sm">
                 {/* OTP Input Boxes */}
-                <div id="otp" className="flex justify-center space-x-3 mb-4">
+                <div id="otp" className="flex justify-center space-x-3 pb-8">
                   {otp.map((digit, index) => (
                     <input
                       key={index}
@@ -149,7 +152,7 @@ const VerifyOTP = () => {
                       value={digit}
                       onChange={(e) => handleChange(e.target.value, index)}
                       onKeyDown={(e) => handleKeyDown(e, index)}
-                      className="w-12 h-12 text-center border-b-2  outline-none focus:border-[#0000FF] border-gray-400"
+                      className="w-12 h-12 text-center border-b-2  outline-none focus:border-[#3E4095] border-gray-400"
                       onBlur={(e) => {
                         if (e.target.value) {
                           e.target.classList.remove("border-blue-500");
@@ -162,11 +165,11 @@ const VerifyOTP = () => {
 
                 {/* Resend OTP Link */}
                 <div>
-                  <p className="text-center text-sm text-gray-600 mt-4">
+                  <p className="text-center text-sm text-gray-600 pb-5">
                     You did not receive the OTP?{" "}
                     <span
                       onClick={handleResend}
-                      className="text-[#0000FF] hover:underline cursor-pointer"
+                      className="text-[#3E4095] hover:underline cursor-pointer"
                     >
                       Click to resend
                     </span>
@@ -176,106 +179,112 @@ const VerifyOTP = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
+                  disabled={isLoading}
+                  className={`w-full py-3 rounded-full ${
+                    isLoading
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-[#3E4095] text-white "
+                  }`}
                 >
-                  {loading ? loading : "Proceed"}
+           
+                  {isLoading ? (     <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Verifying OTP...
+                    </div> ): ("Proceed")}
                 </button>
               </form>
             </div>
           </div>
+        </div>
 
-          {/* Right Side */}
-          <div
-            className="flex-1 h-screen flex flex-col justify-center items-center p-4"
-            style={{
-              background: "linear-gradient(to bottom, #0000FF, #718FCC)",
-            }}
-          >
-            <div className="">
-              <p className="text-white font-semibold text-2xl pb-1">
-                The simplest way to manage <br /> medical records
-              </p>
-              <p className="text-white font-light">
-                No better way to attend to, and keep records of medical records
-              </p>
-            </div>
+        {/* Right Side */}
+        <div
+          className="flex-1 h-screen flex flex-col justify-center items-center p-4"
+          style={{
+            background: "linear-gradient(to bottom, #3E4095, #718FCC)",
+          }}
+        >
+          <div className="">
+            <p className="text-white font-semibold text-2xl pb-1">
+              The simplest way to manage <br /> medical records
+            </p>
+            <p className="text-white font-light text-sm">
+              No better way to attend to, and keep records of medical records
+            </p>
+          </div>
 
-            <div className="max-h-[470px] flex justify-center items-center pt-2">
-              <img
-                src={dashb}
-                alt="Dashboard"
-                className="object-contain w-full h-full"
-              />
-            </div>
+          <div className="max-h-[420px] flex justify-center items-center pt-2">
+            <img
+              src={dashb}
+              alt="Dashboard"
+              className="object-contain w-full h-full"
+            />
           </div>
         </div>
       </div>
-      {notificationVisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 text-sm">
-          <div className="fixed bottom-0 left-0 right-0 bg-white text-black  py-4 rounded-t-3xl shadow-md animate-slide-up ">
-            <div className="flex justify-center items-center gap-1 pb-4">
-              <div>
-                <img src={logo} alt="DocuHealth Logo" />
+
+      <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
+    <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+          <img src={docuhealth_logo} alt="Logo" className="w-6" />
+          <h1 className="text-xl">DocuHealth</h1>
+        </div>
+        <div>
+          <div className="px-5 w-full">
+            <h2 className="text-xl font-semibold pb-1">Verify OTP</h2>
+            <p className="text-gray-600 mb-6 text-sm">
+              Please enter the 6 digit Pin we sent to your email address to
+              proceed!
+            </p>
+
+            <form onSubmit={handleSubmit} className="text-sm">
+              <div className="relative pb-5">
+                <p className="font-semibold pb-1">Enter OTP :</p>
+                <div className="relative">
+                  <input
+                    type="number"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
+                    value={mobileOTP}
+                    onChange={(e) => setMobileOTP(e.target.value)}
+                    required
+                  />
+                  <FaKey className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                </div>
               </div>
-              <h1 className="text-[#0000FF] text-2xl font-bold">DocuHealth</h1>
-            </div>
-            <div className="px-5" id="temp">
-              <h2 className=" text-base sm:text-2xl  mb-2">Verify OTP</h2>
-              <p className="text-gray-600 mb-6">
-                Please enter the 6 digit Pin we sent to your email address to
-                proceed!
-              </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4 text-sm">
-                {/* OTP Input Boxes */}
-                <div id="otp" className="flex justify-center space-x-3 mb-4">
-                  {otp.map((digit, index) => (
-                    <input
-                      key={index}
-                      id={`otp-${index}`}
-                      type="text"
-                      maxLength="1"
-                      value={digit}
-                      onChange={(e) => handleChange(e.target.value, index)}
-                      onKeyDown={(e) => handleKeyDown(e, index)}
-                      className="w-8 h-12 text-center border-b-2  outline-none focus:border-[#0000FF] border-gray-400"
-                      onBlur={(e) => {
-                        if (e.target.value) {
-                          e.target.classList.remove("border-blue-500");
-                          e.target.classList.add("border-black");
-                        }
-                      }}
-                    />
-                  ))}
-                </div>
+              {/* Resend OTP Link */}
+              <div>
+                <p className="text-center text-sm text-gray-600 pb-5">
+                  You did not receive the OTP?{" "}
+                  <span
+                    onClick={handleResend}
+                    className="text-[#3E4095] hover:underline cursor-pointer"
+                  >
+                    Click to resend
+                  </span>
+                </p>
+              </div>
 
-                {/* Resend OTP Link */}
-                <div>
-                  <p className="text-center text-sm text-gray-600 mt-4">
-                    You did not receive the OTP?{" "}
-                    <span
-                      onClick={handleResend}
-                      className="text-[#0000FF] hover:underline cursor-pointer"
-                    >
-                      Click to resend
-                    </span>
-                  </p>
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  className="w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
-                >
-                  {loading ? loading : "Proceed"}
-                </button>
-              </form>
-            </div>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full py-3 rounded-full ${
+                  isLoading
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#3E4095] text-white "
+                }`}
+              >
+             {isLoading ? (     <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Verifying OTP...
+                    </div> ): ("Proceed")}
+              </button>
+            </form>
           </div>
         </div>
-      )}
-    </div>
-  );
-};
+      </div>
+   </>
+  )
+}
 
-export default VerifyOTP;
+export default Hospital_Verify_OTP

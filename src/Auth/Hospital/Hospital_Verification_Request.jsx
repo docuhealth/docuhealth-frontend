@@ -20,7 +20,11 @@ const Hospital_Verification_Request = () => {
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
         const inquiryId = queryParams.get("inquiry_id");
-        if (inquiryId) setInquiry(inquiryId);
+        if (inquiryId){setInquiry(inquiryId)
+        }else{
+            toast.error("Invalid or missing verification parameters.");
+            setTimeout(() => navigate("/"), 1500);
+    };
     }, [location.search]);
 
     const handleFileChange = (e) => {
@@ -86,7 +90,9 @@ const Hospital_Verification_Request = () => {
                 navigate('/')
             },2000)
         } catch (error) {
-            toast.error("Something went wrong. Please try again.");
+            // toast.error("Something went wrong. Please try again.");
+            // console.log
+            toast.error(error.response.data.detail)
         } finally {
             setLoading(false);
             setEmail("");
