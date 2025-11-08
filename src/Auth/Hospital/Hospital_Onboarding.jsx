@@ -200,10 +200,10 @@ const Hospital_Onboarding = () => {
 
           console.log(response);
           toast.success("Registration successful!");
-        //   toast.success("Kindly check your email for OTP verification!");
-        //   setTimeout(() => {
-        //     navigate("/user-create-account-verify-otp");
-        //   }, 1000);
+          toast.success("Kindly check your email for your login link !");
+          setTimeout(() => {
+            navigate("/");
+          }, 1000);
         } catch (error) {
           console.error("Error:", error);
           toast.error(
@@ -213,23 +213,23 @@ const Hospital_Onboarding = () => {
           setIsSubmitting(false);
 
           // reset step
-        //   setStep(1);
+          setStep(1);
 
           // Step 1 fields
-        //   setEmail("");
-        //   setName("");
-        //   setPhone_Num("");
-        //   setPassword("");
-        //   setConfirmPassword("");
+          setEmail("");
+          setName("");
+          setPhone_Num("");
+          setPassword("");
+          setConfirmPassword("");
 
 
         //   // Step 2 fields
 
-        //   setCountry("");
-        //   setState("");
-        //   setCity("");
-        //   setStreet("");
-        //   setHouseNO("");
+          setCountry("");
+          setState("");
+          setCity("");
+          setStreet("");
+          setHouseNO("");
         }
     };
 

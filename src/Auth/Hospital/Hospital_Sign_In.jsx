@@ -50,7 +50,7 @@ const Hospital_Sign_In = () => {
         const data = await login(userData);
 
         setToken(data.data.access_token, data.data.role);
-        // console.log(data)
+        console.log(data)
         // console.log(data.access_token)
 
         toast.success("Login successful");

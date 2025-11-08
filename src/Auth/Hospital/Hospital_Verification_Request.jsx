@@ -84,6 +84,7 @@ const Hospital_Verification_Request = () => {
 
             console.log("✅ Server Response:", res);
             toast.success("Verification request sent successfully!");
+            toast.success("Kindly check your email periodically to check if receive verification !");
             setEmail("");
             setDocuments([]);
             setTimeout(()=> {
