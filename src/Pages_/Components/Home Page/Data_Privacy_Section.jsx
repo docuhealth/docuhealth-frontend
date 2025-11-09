@@ -51,11 +51,11 @@ const Data_Privacy_Section = () => {
           {securityData.map((item, index) => (
             <div
               key={index}
-               className={`flex  items-center gap-2 justify-start rounded-md lg:rounded-full ${item.color} py-3 px-5 shadow-sm transition-all duration-300
+               className={`flex  items-center gap-2 justify-start rounded-md lg:rounded-full ${item.color} py-3 px-5 shadow-xs transition-all duration-300
                 ${index % 2 === 0 ? "lg:mr-10" : "lg:ml-10"}
               `}
             >
-                 <div className="bg-[#1f1f75] p-0.5 rounded">
+                 <div className="bg-[#1f1f75] p-0.5 rounded-sm">
                 <Check className="text-white w-3 h-3" />
               </div>
               <span className="text-[#1f1f75] text-sm  font-medium">

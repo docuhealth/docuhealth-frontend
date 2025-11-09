@@ -177,7 +177,7 @@ const AccountSettingsTab = () => {
                                     type="text"
                                     value={formData.name}
                                     onChange={handleChange}
-                                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
+                                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
                                 />
                             </div>
                             {/* Email Input */}
@@ -194,7 +194,7 @@ const AccountSettingsTab = () => {
                                     type="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
+                                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
                                 />
                             </div>
                             <div className="relative text-sm hidden sm:block">
@@ -204,7 +204,7 @@ const AccountSettingsTab = () => {
                                         type={showPassword ? "text" : "password"}
                                         name="password"
                                         placeholder=""
-                                        className={`w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none pl-8 ${formData.password && !isPasswordValid
+                                        className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none pl-8 ${formData.password && !isPasswordValid
                                             ? "focus:border-red-500"
                                             : ""
                                             }`}
@@ -334,7 +334,7 @@ const AccountSettingsTab = () => {
                                             </div>
                                         </div>
                                         {isPasswordValid && (
-                                            <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded">
+                                            <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded-sm">
                                                 <p className="text-sm text-green-700 font-medium">
                                                     ✓ Password meets all requirements!
                                                 </p>
@@ -357,7 +357,7 @@ const AccountSettingsTab = () => {
                                     type="number"
                                     value={formData.phone_num}
                                     onChange={handleChange}
-                                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none "
+                                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
                                 />
                             </div>
 
@@ -368,7 +368,7 @@ const AccountSettingsTab = () => {
                                         type={showPassword ? "text" : "password"}
                                         name="password"
                                         placeholder=""
-                                        className={`w-full h-[38px] px-3 py-2 border rounded-md outline-none focus:border-[#3E4095] text-sm appearance-none pl-8 ${formData.password && !isPasswordValid
+                                        className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none pl-8 ${formData.password && !isPasswordValid
                                                 ? "focus:border-red-500"
                                                 : ""
                                             }`}
@@ -498,7 +498,7 @@ const AccountSettingsTab = () => {
                                             </div>
                                         </div>
                                         {isPasswordValid && (
-                                            <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded">
+                                            <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded-sm">
                                                 <p className="text-sm text-green-700 font-medium">
                                                     ✓ Password meets all requirements!
                                                 </p>
@@ -513,7 +513,7 @@ const AccountSettingsTab = () => {
                                 <button
                                     onClick={handleSubmit}
                                     disabled={loading}
-                                    className={`w-full px-3 sm:px-4 py-2 text-sm font-medium text-white rounded-full shadow-sm focus:outline-none transition-all ${!loading
+                                    className={`w-full px-3 sm:px-4 py-2 text-sm font-medium text-white rounded-full shadow-xs focus:outline-hidden transition-all ${!loading
                                         ? "bg-[#3E4095] "
                                         : "bg-gray-300 cursor-not-allowed"
                                         }`}
@@ -546,7 +546,7 @@ const AccountSettingsTab = () => {
                                     type="button"
                                     disabled={loading}
                                     onClick={handleCancel}
-                                    className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-sm  ${!loading ? 'text-[#3E4095] bg-white border border-[#3E4095] hover:bg-gray-50' : 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-none`}
+                                    className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-xs  ${!loading ? 'text-[#3E4095] bg-white border border-[#3E4095] hover:bg-gray-50' : 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-hidden`}
                                 >
                                     Cancel Changes
                                 </button>

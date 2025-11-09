@@ -14,7 +14,7 @@ const Newsletter = () => {
   };
 
   return (
-    <div className=" py-14 rounded-sm">
+    <div className=" py-14 rounded-xs">
       <div className="flex flex-col justify-center items-center text-center px-4">
         {/* Icon */}
         <div className="mb-2">
@@ -59,7 +59,7 @@ const Newsletter = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter an email address"
-              className="w-full outline-none focus:outline-none pl-5 
+              className="w-full outline-hidden focus:outline-hidden pl-5 
                         rounded-l-full rounded-r-full sm:rounded-r-none
                          py-3 border border-gray-300 sm:col-span-3"
               required

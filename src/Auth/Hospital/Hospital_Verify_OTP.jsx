@@ -152,7 +152,7 @@ const Hospital_Verify_OTP = () => {
                       value={digit}
                       onChange={(e) => handleChange(e.target.value, index)}
                       onKeyDown={(e) => handleKeyDown(e, index)}
-                      className="w-12 h-12 text-center border-b-2  outline-none focus:border-[#3E4095] border-gray-400"
+                      className="w-12 h-12 text-center border-b-2  outline-hidden focus:border-[#3E4095] border-gray-400"
                       onBlur={(e) => {
                         if (e.target.value) {
                           e.target.classList.remove("border-blue-500");
@@ -242,7 +242,7 @@ const Hospital_Verify_OTP = () => {
                 <div className="relative">
                   <input
                     type="number"
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                     value={mobileOTP}
                     onChange={(e) => setMobileOTP(e.target.value)}
                     required

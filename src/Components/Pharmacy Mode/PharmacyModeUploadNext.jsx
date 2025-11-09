@@ -138,7 +138,7 @@ const PharmacyModeUploadNext = ({ setIsPharmacyUploadCode , setIsPharmacyUploadS
                 value={formData.pharmacistName}
                 onChange={handleChange}
                 placeholder="Enter name of pharmacist on duty"
-                className="w-full px-3 py-2 border rounded-md text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0000FF]  text-sm"
+                className="w-full px-3 py-2 border rounded-md text-gray-500 focus:outline-hidden focus:ring-2 focus:ring-[#0000FF]  text-sm"
               />
             </div>
 
@@ -152,7 +152,7 @@ const PharmacyModeUploadNext = ({ setIsPharmacyUploadCode , setIsPharmacyUploadS
                 value={formData.drugName}
                 onChange={handleChange}
                 placeholder="Enter drugs e.g Paracetamol, Ibuprofen"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0000FF]  text-sm"
+                className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#0000FF]  text-sm"
               />
             </div>
 
@@ -166,7 +166,7 @@ const PharmacyModeUploadNext = ({ setIsPharmacyUploadCode , setIsPharmacyUploadS
                 value={formData.dosage}
                 onChange={handleChange}
                 placeholder="Enter the dosage e.g 500mg , 1g respectively"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0000FF]  text-sm"
+                className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#0000FF]  text-sm"
               />
             </div>
 
@@ -179,7 +179,7 @@ const PharmacyModeUploadNext = ({ setIsPharmacyUploadCode , setIsPharmacyUploadS
                 value={formData.summary}
                 onChange={handleChange}
                 placeholder="Enter a summary of diagnosis"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0000FF]  h-24 resize-none text-sm"
+                className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#0000FF]  h-24 resize-none text-sm"
               ></textarea>
             </div>
           </div>

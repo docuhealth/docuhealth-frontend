@@ -6,7 +6,7 @@ const UserSubAcctNoticeDisplay = ({ noticeDisplay, noticeMessage, paymentStatus,
     <div className="">
       {noticeDisplay && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 text-sm">
-          <div className="bg-white rounded-sm shadow-lg p-6 max-w-lg w-full relative max-h-[80vh] overflow-y-auto mx-5 hide-scrollbar">
+          <div className="bg-white rounded-xs shadow-lg p-6 max-w-lg w-full relative max-h-[80vh] overflow-y-auto mx-5 hide-scrollbar">
             {noticeMessage.map((message, index) => (
               <div key={index} className="">
                 <div className="flex justify-start items-center gap-2 pb-1">

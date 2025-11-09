@@ -505,7 +505,7 @@ const PatientsDashboard = () => {
                       placeholder="HIN Number"
                       value={hin}
                       onChange={(e) => setHin(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg py-2 px-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#0000FF] focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-lg py-2 px-3 mb-4 focus:outline-hidden focus:ring-2 focus:ring-[#0000FF] focus:border-transparent"
                     />
                     <button
                       type="submit"

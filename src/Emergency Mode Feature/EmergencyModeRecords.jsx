@@ -14,7 +14,7 @@ const EmergencyModeRecords = ({ records, medicalRecordToggle, name }) => {
                   records.map((record) => (
                     <div
                       key={record._id}
-                      className="bg-white shadow-sm rounded-lg p-4 flex items-center justify-between gap-5"
+                      className="bg-white shadow-xs rounded-lg p-4 flex items-center justify-between gap-5"
                     >
                       {/* Date and Time */}
                       <div className="text-gray-700 text-sm">

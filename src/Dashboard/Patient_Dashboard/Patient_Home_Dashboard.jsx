@@ -77,7 +77,7 @@ const Patient_Home_Dashboard = () => {
               />
             </button>
             {isOpen && (
-              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-sm shadow-lg z-10">
+              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-xs shadow-lg z-10">
                 {options.map((option) => (
                   <button
                     key={option}
@@ -125,7 +125,7 @@ const Patient_Home_Dashboard = () => {
               />
             </button>
             {isOpen && (
-              <div className="absolute right-0 mt-2 w-full bg-white border border-gray-200 rounded-sm shadow-lg z-10">
+              <div className="absolute right-0 mt-2 w-full bg-white border border-gray-200 rounded-xs shadow-lg z-10">
                 {options.map((option) => (
                   <button
                     key={option}

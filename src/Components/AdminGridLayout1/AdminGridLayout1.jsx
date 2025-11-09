@@ -4,7 +4,7 @@ import ReactApexChart from "react-apexcharts";
 const AdminGridLayout1 = ({loading, hasData, chart1Options, chartData}) => {
   return (
     <div className="py-3 grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div className="bg-white p-4 rounded-2xl shadow">
+      <div className="bg-white p-4 rounded-2xl shadow-sm">
         <h3 className=" font-semibold mb-4">
           Revenue Generated Overview (demo-- no revenue yet)
         </h3>
@@ -21,7 +21,7 @@ const AdminGridLayout1 = ({loading, hasData, chart1Options, chartData}) => {
           <p>No revenue data available.</p>
         )}
       </div>
-      <div className="bg-white p-4 rounded-2xl shadow">
+      <div className="bg-white p-4 rounded-2xl shadow-sm">
         <h3 className=" font-semibold mb-4">Total Registered Users</h3>
         {loading ? (
           <p>Loading chart data...</p>

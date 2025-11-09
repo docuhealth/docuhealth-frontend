@@ -129,7 +129,7 @@ const Hospital_Verification_Request = () => {
                                     <div className="relative">
                                         <input
                                             type="email"
-                                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
+                                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             required
@@ -262,7 +262,7 @@ const Hospital_Verification_Request = () => {
                             <div className="relative">
                                 <input
                                     type="email"
-                                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
+                                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required

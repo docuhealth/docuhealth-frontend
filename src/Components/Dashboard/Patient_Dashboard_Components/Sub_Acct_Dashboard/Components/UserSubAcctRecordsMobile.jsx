@@ -70,10 +70,10 @@ const UserSubAcctRecordsMobile = ({
                 ></i>
 
                 {openPopover === index && (
-                  <div className="absolute  right-4 mt-2 bg-white border shadow rounded-sm p-2 w-52 z-30">
+                  <div className="absolute  right-4 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
                     <Link to="">
                       <p
-                        className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                        className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                         onClick={(index) => {
                           togglePopover(index);
                           setViewDetailMedicalRecord(true)
@@ -92,13 +92,13 @@ const UserSubAcctRecordsMobile = ({
                         setDisplaySubAcctModal(true);
                       }}
                     >
-                      <p className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer">
+                      <p className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
                         Upgrade Sub Account
                       </p>
                     </Link>
 
                     <p
-                      className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded cursor-pointer"
+                      className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                        onClick={() => {
                         // if (paymentStatus) {
                         //   handleOpenForm(

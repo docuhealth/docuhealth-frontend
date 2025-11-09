@@ -118,7 +118,7 @@ const ACA = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-blue-500"
                     value={fullname}
                     onChange={(e) => setFullName(e.target.value)}
                     required
@@ -132,7 +132,7 @@ const ACA = () => {
                 <div className="relative">
                   <input
                     type="email"
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -146,7 +146,7 @@ const ACA = () => {
                 <div className="relative">
                   <input
                     type="number"
-                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-blue-500"
                     value={phone_num}
                     onChange={(e) => setPhone_Num(e.target.value)}
                     required
@@ -161,7 +161,7 @@ const ACA = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder=""
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -188,7 +188,7 @@ const ACA = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder=""
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
@@ -279,7 +279,7 @@ const ACA = () => {
       )}
 
        {notificationVisible && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-xs flex items-center justify-center z-50">
                 <div className="fixed bottom-0 left-0 right-0 bg-white text-black  py-4 rounded-t-3xl shadow-md animate-slide-up ">
                   <div className="flex justify-center items-center gap-1 pb-4">
                     <div>
@@ -306,7 +306,7 @@ const ACA = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-blue-500"
                     value={fullname}
                     onChange={(e) => setFullName(e.target.value)}
                     required
@@ -320,7 +320,7 @@ const ACA = () => {
                         <div className="relative">
                           <input
                             type="email"
-                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -334,7 +334,7 @@ const ACA = () => {
                         <div className="relative">
                           <input
                             type="number"
-                            className="w-full px-4 py-3 border rounded-lg pl-3 outline-none focus:border-blue-500"
+                            className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-blue-500"
                             value={phone_num}
                             onChange={(e) => {
                               const value = e.target.value;
@@ -358,7 +358,7 @@ const ACA = () => {
                           <input
                             type={showPassword ? "text" : "password"}
                             placeholder=""
-                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -385,7 +385,7 @@ const ACA = () => {
                           <input
                             type={showPassword ? "text" : "password"}
                             placeholder=""
-                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-blue-500"
+                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-blue-500"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required

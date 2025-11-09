@@ -57,7 +57,7 @@ const hospitalProfile = profile || defaultProfile;
           </div>
         </header>
 
-        <header className=" sm:hidden bg-white shadow py-4 flex justify-between items-center px-4 ">
+        <header className=" sm:hidden bg-white shadow-sm py-4 flex justify-between items-center px-4 ">
           <div className="text-sm font-semibold flex items-center gap-2">
             <p>
               <i
@@ -99,7 +99,7 @@ const hospitalProfile = profile || defaultProfile;
               </p>
             </div>
             {isPopoverOpen && (
-              <div className="absolute top-20 right-4 bg-white shadow rounded-md  p-2 z-50">
+              <div className="absolute top-20 right-4 bg-white shadow-sm rounded-md  p-2 z-50">
                 <ul className="text-sm text-gray-700">
                   <li className="py-1 px-3 hover:bg-gray-100 cursor-pointer font-semibold">
                     {hospitalProfile

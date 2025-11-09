@@ -7,7 +7,7 @@ const Hospital_Admin_Layout = () => {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <aside className=" w-64 shadow border z-20 min-h-screen hidden sm:block">
+      <aside className=" w-64 shadow-sm border z-20 min-h-screen hidden sm:block">
         <Hospital_Admin_Sidebar />
       </aside>
 

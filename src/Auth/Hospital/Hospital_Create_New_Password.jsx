@@ -160,7 +160,7 @@ const Hospital_Create_New_Password = () => {
                     <input
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
-                      className={`w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095] ${
+                      className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${
                         password && !isPasswordValid
                           ? "focus:border-red-500"
                           : ""
@@ -303,7 +303,7 @@ const Hospital_Create_New_Password = () => {
                         </div>
                       </div>
                       {isPasswordValid && (
-                        <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded">
+                        <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded-sm">
                           <p className="text-sm text-green-700 font-medium">
                             ✓ Password meets all requirements!
                           </p>
@@ -320,7 +320,7 @@ const Hospital_Create_New_Password = () => {
                     <input
                       type={showPassword ? "text" : "password"}
                       placeholder="Confirm your password"
-                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
+                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
@@ -443,7 +443,7 @@ const Hospital_Create_New_Password = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    className={`w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095] ${
+                    className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${
                       password && !isPasswordValid ? "focus:border-red-500" : ""
                     }`}
                     value={password}
@@ -583,7 +583,7 @@ const Hospital_Create_New_Password = () => {
                       </div>
                     </div>
                     {isPasswordValid && (
-                      <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded">
+                      <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded-sm">
                         <p className="text-sm text-green-700 font-medium">
                           ✓ Password meets all requirements!
                         </p>
@@ -600,7 +600,7 @@ const Hospital_Create_New_Password = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Confirm your password"
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-none focus:border-[#3E4095]"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
