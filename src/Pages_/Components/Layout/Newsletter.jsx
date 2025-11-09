@@ -61,12 +61,12 @@ const Newsletter = () => {
               placeholder="Enter an email address"
               className="w-full outline-hidden focus:outline-hidden pl-5 
                         rounded-l-full rounded-r-full sm:rounded-r-none
-                         py-3 border border-gray-300 sm:col-span-3"
+                         py-3 border border-gray-300 sm:col-span-3 bg-white"
               required
             />
             <button
               type="submit"
-              className="w-full  bg-[#212121] lg:bg-[#3E4095] py-3  
+              className="w-full  bg-[#212121]/60 lg:bg-[#3E4095] py-3  
                         
                  rounded-full sm:rounded-l-none       text-white sm:col-span-2 "
             >
