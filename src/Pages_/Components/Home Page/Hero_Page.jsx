@@ -30,7 +30,8 @@ const HeroPG = () => {
               Healthcare System.
             </p>
             <div className="text-sm flex flex-col lg:flex-row items-center gap-3">
-              <button className="hidden  group w-full lg:w-auto justify-center border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095] lg:flex items-center gap-1 2xl:text-xl">
+              <a href='#contact-us'>
+              <button className="hidden  group w-full lg:w-auto justify-center border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095] lg:flex items-center gap-1 2xl:text-xl cursor-pointer">
                 Partner with Us as A Healthcare Provider
                 <svg
                   width="16"
@@ -45,38 +46,11 @@ const HeroPG = () => {
                   />
                 </svg>
               </button>
-              <button className="group w-full lg:w-auto justify-center border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095] hidden sm:flex   lg:hidden items-center gap-1">
-                Partner with Us as A Healthcare Provider
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M10.6688 6.27614L4.93109 12.0139L3.98828 11.0711L9.72601 5.33333H4.66883V4H12.0021V11.3333H10.6688V6.27614Z"
-                    className="fill-[#3E4095] transition-all duration-300 group-hover:fill-white"
-                  />
-                </svg>
-              </button>
-              <button className="group w-full lg:w-auto justify-center border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095] flex sm:hidden items-center gap-1 ">
-                Partner with Us
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M10.6688 6.27614L4.93109 12.0139L3.98828 11.0711L9.72601 5.33333H4.66883V4H12.0021V11.3333H10.6688V6.27614Z"
-                    className="fill-[#3E4095] transition-all duration-300 group-hover:fill-white"
-                  />
-                </svg>
-              </button>
-              <button className="border w-full lg:w-auto  rounded-full py-2 px-8  transition-all hover:bg-[#34345F] bg-[#3E4095] text-white flex items-center gap-1 justify-center 2xl:text-xl">
+              </a>
+              <button className="border w-full lg:w-auto  rounded-full py-2 px-8  transition-all hover:bg-[#34345F] bg-[#3E4095] text-white flex items-center gap-1 justify-center 2xl:text-xl cursor-pointer">
+              <Link to='/user-login'>
                 Get your HIN
+                </Link>
                 <svg
                   width="16"
                   height="16"
@@ -151,8 +125,11 @@ const HeroPG = () => {
             </div>
          
             <div className="text-sm flex flex-col lg:flex-row items-center gap-3">
-              <button className="w-full lg:w-auto justify-center   transition-all bg-white rounded-full py-2 px-8 text-[#3E4095] flex sm:hidden items-center gap-1">
+       
+              <button className="w-full lg:w-auto justify-center   transition-all bg-white rounded-full py-2 px-8 text-[#3E4095] flex sm:hidden items-center gap-1 cursor-pointer">
+              <a href='#contact-us'>
                 Partner with Us
+                </a>
                 <svg
                   width="16"
                   height="16"
@@ -165,12 +142,20 @@ const HeroPG = () => {
                     className="fill-[#3E4095] transition-all duration-300"
                   />
                 </svg>
+               
               </button>
-                   <button className="w-full lg:w-auto justify-center   transition-all bg-white rounded-full py-2 px-8 text-[#3E4095] hidden sm:flex lg:hidden items-center gap-1">
+            
+             
+                   <button className="w-full lg:w-auto justify-center cursor-pointer  transition-all bg-white rounded-full py-2 px-8 text-[#3E4095] hidden sm:flex lg:hidden items-center gap-1">
+                   <a href='#contact-us'>
                 Partner with Us as A Healthcare Provider
+                </a>
                 </button>
-              <button className="border border-white w-full lg:w-auto  rounded-full py-2 px-8  transition-all  text-white flex items-center gap-1 justify-center ">
+          
+              <button className="border border-white w-full lg:w-auto  rounded-full py-2 px-8  transition-all  text-white flex items-center gap-1 justify-center cursor-pointer">
+               <Link to='/user-login'>
                 Get your HIN
+                </Link>
                 <svg
                   width="16"
                   height="16"
@@ -183,6 +168,7 @@ const HeroPG = () => {
                     className="fill-white transition-all duration-300 "
                   />
                 </svg>
+           
               </button>
             </div>
           </div>
