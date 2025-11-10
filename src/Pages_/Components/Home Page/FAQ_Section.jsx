@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import BackgroundTemplate from "../ui/BackgroundTemplate";
 import { Plus } from "lucide-react";
-import faq_img from '../../../assets/img/faq_img.png'
+
 const FAQ_Section = () => {
 
   const faqData = [
@@ -86,7 +86,7 @@ const FAQ_Section = () => {
             {/* Right side: illustration (optional placeholder) */}
             <div className="hidden md:flex w-full lg:w-1/2 items-center justify-center">
               <img
-                src={faq_img}
+                src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777829/faq_img_btvz2n.png'
                 alt="FAQ Illustration"
                 className="object-contain"
               />

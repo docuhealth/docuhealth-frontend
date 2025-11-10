@@ -1,6 +1,5 @@
 import React from "react";
 import BackgroundTemplate from "../ui/BackgroundTemplate";
-import data_privacy_img from "../../../assets/img/data_privacy_img.png";
 import { Check } from "lucide-react";
 
 const Data_Privacy_Section = () => {
@@ -35,7 +34,7 @@ const Data_Privacy_Section = () => {
           <div className="w-full flex flex-col-reverse lg:flex-row items-start justify-between gap-10 ">
             <div className="hidden md:flex w-full lg:w-1/2 items-center justify-center">
               <img
-                src={data_privacy_img}
+                src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777827/data_privacy_img_bg5a9y.png'
                 alt="Data Privacy Illustration"
                 className="object-contain"
               />

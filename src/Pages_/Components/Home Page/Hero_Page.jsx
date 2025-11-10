@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import hero_img from "../../../assets/img/hero_img.png";
 import footerImgMobile from "../../../assets/img/footerImgMobile.png";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -95,7 +94,7 @@ const HeroPG = () => {
           </div>
           <div className="flex-1 z-10 ">
             <img
-              src={hero_img}
+              src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777871/hero_img_rfihkx.png'
               alt="hero image"
               className="rounded-lg w-full object-contain"
             />
@@ -189,7 +188,7 @@ const HeroPG = () => {
           </div>
           <div className="flex-1 z-10 ">
             <img
-              src={hero_img}
+              src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777871/hero_img_rfihkx.png'
               alt="hero image"
               className="rounded-lg w-full object-contain"
             />

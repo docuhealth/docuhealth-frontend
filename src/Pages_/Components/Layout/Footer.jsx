@@ -50,8 +50,8 @@ const Footer = () => {
             </a>
           </div>
           <div className='flex gap-10'>
- <img src={docuhealth_ndpr_audit} alt="docuhealth ndpr audit image" className='w-40 rounded-lg' />
-          <img src={docuhealth_fhir} alt="docuhealth fhir image" className=' w-60 rounded-lg' />
+ <img src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777839/docuhealth_ndpr_audit_lwqlq8.jpg' alt="docuhealth ndpr audit image" className='w-40 rounded-lg' />
+          <img src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777826/docuhealth_fhir_zdtw2p.jpg' alt="docuhealth fhir image" className=' w-60 rounded-lg' />
           </div>
          
         </div>
@@ -156,12 +156,12 @@ const Footer = () => {
           </div>
         <div className="flex flex-col  gap-4">
   <img
-    src={docuhealth_ndpr_audit}
+    src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777839/docuhealth_ndpr_audit_lwqlq8.jpg'
     alt="docuhealth ndpr audit image"
     className="w-full sm:w-1/2 object-cover rounded-3xl"
   />
   <img
-    src={docuhealth_fhir}
+    src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777826/docuhealth_fhir_zdtw2p.jpg'
     alt="docuhealth fhir image"
     className="w-full sm:w-1/2 object-cover rounded-3xl"
   />
