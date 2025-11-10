@@ -60,10 +60,10 @@ const Contact_Us_Section = () => {
         <div className="w-full  flex flex-col lg:flex-row 6 text-sm gap-10 lg:gap-0">
           {/* Left Section */}
           <div className="lg:w-1/2">
-            <h2 className="text-2xl lg:text-3xl font-semibold text-[#3E4095] mb-4">
+            <h2 className="text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-[#3E4095] mb-4">
               Contact us
             </h2>
-            <p className=" mb-8">In case you want to quickly make enquiries:</p>
+            <p className=" mb-8 2xl:text-xl">In case you want to quickly make enquiries:</p>
 
             <div className="space-y-6">
               {/* Phone */}
@@ -83,8 +83,8 @@ const Contact_Us_Section = () => {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-semibold ">Call us:</p>
-                  <p className="">+234 808 198 8860</p>
+                  <p className="font-semibold 2xl:text-lg ">Call us:</p>
+                  <p className="2xl:text-lg">+234 808 198 8860</p>
                 </div>
               </div>
 
@@ -105,8 +105,8 @@ const Contact_Us_Section = () => {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-semibold ">Email us:</p>
-                  <p className="">support@docuhealthservices.com</p>
+                  <p className="font-semibold 2xl:text-lg">Email us:</p>
+                  <p className="2xl:text-lg">support@docuhealthservices.com</p>
                 </div>
               </div>
 
@@ -127,10 +127,10 @@ const Contact_Us_Section = () => {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-semibold ">
+                  <p className="font-semibold 2xl:text-lg">
                     For Partnerships and Collaborations
                   </p>
-                  <p className="">info@docuhealth.online</p>
+                  <p className="2xl:text-lg">info@docuhealth.online</p>
                 </div>
               </div>
             </div>
@@ -142,7 +142,7 @@ const Contact_Us_Section = () => {
             <div className="flex mb-6 bg-[#F6FCFE] rounded-full p-1">
               <button
                 onClick={() => setActiveTab("individual")}
-                className={`flex-1 py-2 rounded-full font-medium transition-all ${
+                className={`flex-1 py-2 rounded-full font-medium transition-all 2xl:text-lg ${
                   activeTab === "individual"
                     ? "bg-[#3E4095] text-white"
                     : "text-[#3E4095]"
@@ -152,7 +152,7 @@ const Contact_Us_Section = () => {
               </button>
               <button
                 onClick={() => setActiveTab("provider")}
-                className={`flex-1 py-2 rounded-full font-medium transition-all ${
+                className={`flex-1 py-2 rounded-full font-medium transition-all 2xl:text-lg ${
                   activeTab === "provider"
                     ? "bg-[#3E4095] text-white"
                     : "text-[#3E4095]"
@@ -164,8 +164,8 @@ const Contact_Us_Section = () => {
 
             {/* Individual Form */}
             {activeTab === "individual" && (
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <h3 className="text-[#3E4095] font-semibold">
+              <form onSubmit={handleSubmit} className="space-y-5 2xl:text-lg">
+                <h3 className="text-[#3E4095] font-semibold 2xl:text-lg">
                   Send us a message as an Individual
                 </h3>
 
@@ -178,7 +178,7 @@ const Contact_Us_Section = () => {
                     onChange={handleChange}
                     required
                     placeholder="Full name"
-                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-hidden"
+                    className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E4095] outline-hidden "
                   />
                 </div>
 

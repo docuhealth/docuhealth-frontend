@@ -12,15 +12,15 @@ const Footer = () => {
     <div className='bg-cover bg-center bg-no-repeat '
       style={{
         backgroundImage: `url(${window.innerWidth < 768 ? footerImgMobile : footerImg})`,
-         }}>
+      }}>
 
       <Newsletter />
       <hr className='text-[#BDB5B5]' />
       <div className="hidden lg:flex flex-col lg:flex-row flex-wrap justify-between px-5 sm:px-16 py-14 text-white gap-10 lg:gap-0">
         {/* Left Section */}
         <div>
-          <h1 className="text-3xl font-bold mb-2">DOCUHEALTH</h1>
-          <p className="text-sm mb-4 text-[#EFEFEF]">
+          <h1 className="text-3xl 2xl:text-4xl font-bold mb-2">DOCUHEALTH</h1>
+          <p className="text-sm 2xl:text-lg mb-4 text-[#EFEFEF]">
             Nigeria’s First Centralized Healthcare Platform
           </p>
           <div className="flex space-x-4 pb-5">
@@ -50,13 +50,47 @@ const Footer = () => {
             </a>
           </div>
           <div className='flex gap-10'>
- <img src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777839/docuhealth_ndpr_audit_lwqlq8.jpg' alt="docuhealth ndpr audit image" className='w-40 rounded-lg' />
-          <img src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777826/docuhealth_fhir_zdtw2p.jpg' alt="docuhealth fhir image" className=' w-60 rounded-lg' />
+            <img src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777839/docuhealth_ndpr_audit_lwqlq8.jpg' alt="docuhealth ndpr audit image" className='w-40 rounded-lg' />
+            <img src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777826/docuhealth_fhir_zdtw2p.jpg' alt="docuhealth fhir image" className=' w-60 rounded-lg' />
           </div>
-         
+
         </div>
 
         {/* Middle Section */}
+        <div>
+          <h2 className="text-xl 2xl:text-2xl font-semibold mb-3">Our Company</h2>
+          <ul className="space-y-2 2xl:text-lg text-sm text-[#EFEFEF]">
+            <li><a href="/#about-us">About us</a></li>
+            <li><Link to="/our-mission">Mission</Link></li>
+            <li><Link to="/our-vision">Vision</Link></li>
+            <li><Link to="/docuhealth-api">DocuHealth API</Link></li>
+            <li><Link to="/our-legal-notice">Legal Notice</Link></li>
+            <li><Link to="/our-privacy-policy">Our privacy policy</Link></li>
+          </ul>
+        </div>
+
+        {/* Right Section */}
+        <div>
+          <h2 className="text-xl 2xl:text-2xl font-semibold mb-3">Contact us</h2>
+          <ul className="space-y-2 2xl:text-lg text-sm text-[#EFEFEF] ">
+            <li>+2348081988860</li>
+            <li>
+              <a href="mailto:Support@docuhealthservices.com">
+                Support@docuhealthservices.com
+              </a>
+            </li>
+            <li>
+              <a href="mailto:Info@docuhealth.online">
+                Info@docuhealth.online
+              </a>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+
+      <div className="lg:hidden flex flex-row flex-wrap justify-between px-5 sm:px-16 py-14 text-white gap-10 lg:gap-0">
+        {/* Left Section */}
         <div>
           <h2 className="text-xl font-semibold mb-3">Our Company</h2>
           <ul className="space-y-2 text-sm text-[#EFEFEF]">
@@ -69,39 +103,6 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Right Section */}
-        <div>
-          <h2 className="text-xl font-semibold mb-3">Contact us</h2>
-          <ul className="space-y-2 text-sm text-[#EFEFEF] ">
-            <li>+2348081988860</li>
-            <li>
-              <a href="mailto:Support@docuhealthservices.com">
-                Support@docuhealthservices.com
-              </a>
-            </li>
-            <li>
-              <a href="mailto:Info@docuhealth.online">
-                Info@docuhealth.online
-              </a>
-            </li>
-          </ul>
-          
-        </div>
-      </div>
-      <div className="lg:hidden flex flex-row flex-wrap justify-between px-5 sm:px-16 py-14 text-white gap-10 lg:gap-0">
-        {/* Left Section */}
-        <div>
-          <h2 className="text-xl font-semibold mb-3">Our Company</h2>
-          <ul className="space-y-2 text-sm text-[#EFEFEF]">
-             <li><a href="/#about-us">About us</a></li>
-            <li><Link to="/our-mission">Mission</Link></li>
-            <li><Link to="/our-vision">Vision</Link></li>
-            <li><Link to="/docuhealth-api">DocuHealth API</Link></li>
-            <li><Link to="/our-legal-notice">Legal Notice</Link></li>
-            <li><Link to="/our-privacy-policy">Our privacy policy</Link></li>
-          </ul>
-        </div>
-      
 
         {/* Middle Section */}
         <div>
@@ -120,7 +121,7 @@ const Footer = () => {
             </li>
           </ul>
         </div>
-      
+
 
         {/* Right Section */}
         <div>
@@ -154,27 +155,27 @@ const Footer = () => {
 
             </a>
           </div>
-        <div className="flex flex-col  gap-4">
-  <img
-    src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777839/docuhealth_ndpr_audit_lwqlq8.jpg'
-    alt="docuhealth ndpr audit image"
-    className="w-full sm:w-1/2 object-cover rounded-3xl"
-  />
-  <img
-    src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777826/docuhealth_fhir_zdtw2p.jpg'
-    alt="docuhealth fhir image"
-    className="w-full sm:w-1/2 object-cover rounded-3xl"
-  />
-</div>
+          <div className="flex flex-col  gap-4">
+            <img
+              src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777839/docuhealth_ndpr_audit_lwqlq8.jpg'
+              alt="docuhealth ndpr audit image"
+              className="w-full sm:w-1/2 object-cover rounded-3xl"
+            />
+            <img
+              src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777826/docuhealth_fhir_zdtw2p.jpg'
+              alt="docuhealth fhir image"
+              className="w-full sm:w-1/2 object-cover rounded-3xl"
+            />
+          </div>
 
-        
+
         </div>
-       
+
       </div>
 
       <hr className='text-[#BDB5B5]' />
-      <div className=' text-center text-[#BDB5B5]  py-5'>
-        <p className='hidden sm:block text-sm text-[#EFEFEF] '>  &copy; {new Date().getFullYear()} Docuhealth Services Limited. All rights reserved.
+      <div className=' text-center text-[#BDB5B5]  py-5 '>
+        <p className='hidden sm:block text-sm text-[#EFEFEF] 2xl:text-lg'>  &copy; {new Date().getFullYear()} Docuhealth Services Limited. All rights reserved.
           Designed and  developed  by Docuhealth Tech Team.</p>
         <p className='block sm:hidden p-3 text-xs text-[#EFEFEF] pb-5'>  &copy; {new Date().getFullYear()} Docuhealth Services Limited. All rights reserved.
           Designed and  developed by Docuhealth Tech Team.</p>

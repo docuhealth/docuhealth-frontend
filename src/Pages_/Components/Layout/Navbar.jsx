@@ -106,7 +106,7 @@ const Navbar = ({ showPharmacyMode }) => {
         </Link>
 
         {/* Middle Links */}
-        <div className="flex justify-center items-center gap-5 text-sm relative">
+        <div className="flex justify-center items-center gap-5 text-sm 2xl:text-lg relative">
           <Link to="/"
             className={`relative font-semibold transition-all hover:text-[#3E4095] ${currentPath === "/"
                 ? "text-[#3E4095] after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-[#3E4095] after:rounded-full"
@@ -285,7 +285,7 @@ const Navbar = ({ showPharmacyMode }) => {
         </div>
 
         {/* Right side buttons */}
-        <div className="flex justify-center items-center gap-2 text-sm">
+        <div className="flex justify-center items-center gap-2 text-sm 2xl:text-lg">
           <Link to="/user-create-account">
             <button className="border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095]">
               Sign Up

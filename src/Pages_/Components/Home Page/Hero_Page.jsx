@@ -14,14 +14,14 @@ const HeroPG = () => {
       <div className=" hidden lg:block bg-cover bg-left relative px-5 lg:px-16 py-36 lg:py-20  ">
         <div className="flex flex-col lg:flex-row items-start sm:items-center lg:items-start gap-5 ">
           <div className="flex-1 w-full">
-            <h1 className="text-3xl lg:text-5xl font-bold leading-[50px] lg:leading-[60px] pb-5 text-[#212121] text-center lg:text-left">
+            <h1 className="text-3xl lg:text-5xl 2xl:text-6xl font-bold leading-[50px] lg:leading-[60px] pb-5 text-[#212121] text-center lg:text-left">
               Nigeria's First{" "}
               <span className="text-[#3E4095] block underline-double">
                 Centralized
               </span>{" "}
               <span className="block">Healthcare Platform</span>
             </h1>
-            <p className="font-normal pb-10 text-[#727272] text-sm hidden lg:block ">
+            <p className="font-normal pb-10 text-[#727272] text-sm  2xl:text-xl hidden lg:block ">
               Connecting Patients, Providers, and Payers through One <br />{" "}
               Secure Healthcare System.
             </p>
@@ -30,7 +30,7 @@ const HeroPG = () => {
               Healthcare System.
             </p>
             <div className="text-sm flex flex-col lg:flex-row items-center gap-3">
-              <button className="hidden  group w-full lg:w-auto justify-center border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095] lg:flex items-center gap-1">
+              <button className="hidden  group w-full lg:w-auto justify-center border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095] lg:flex items-center gap-1 2xl:text-xl">
                 Partner with Us as A Healthcare Provider
                 <svg
                   width="16"
@@ -60,7 +60,7 @@ const HeroPG = () => {
                   />
                 </svg>
               </button>
-              <button className="group w-full lg:w-auto justify-center border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095] flex sm:hidden items-center gap-1">
+              <button className="group w-full lg:w-auto justify-center border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095] flex sm:hidden items-center gap-1 ">
                 Partner with Us
                 <svg
                   width="16"
@@ -75,7 +75,7 @@ const HeroPG = () => {
                   />
                 </svg>
               </button>
-              <button className="border w-full lg:w-auto  rounded-full py-2 px-8  transition-all hover:bg-[#34345F] bg-[#3E4095] text-white flex items-center gap-1 justify-center ">
+              <button className="border w-full lg:w-auto  rounded-full py-2 px-8  transition-all hover:bg-[#34345F] bg-[#3E4095] text-white flex items-center gap-1 justify-center 2xl:text-xl">
                 Get your HIN
                 <svg
                   width="16"

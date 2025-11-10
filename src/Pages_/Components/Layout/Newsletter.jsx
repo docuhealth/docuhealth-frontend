@@ -41,8 +41,8 @@ const Newsletter = () => {
 
         {/* Text */}
         <div className="mb-5 text-white">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-1">Subscribe to our Newsletter</h2>
-          <p className="text-sm max-w-2xl">
+          <h2 className="text-xl sm:text-2xl 2xl:text-3xl font-semibold mb-1">Subscribe to our Newsletter</h2>
+          <p className="text-sm max-w-2xl 2xl:text-base">
             Subscribe to our Newsletter to always be the first to receive docuhealth
             important updates right in your email, we promise not to ever spam you
           </p>

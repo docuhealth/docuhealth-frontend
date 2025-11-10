@@ -10,10 +10,10 @@ const About_Us_Section = () => {
             <img src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777850/about_img_jc2jvs.png' alt="about us image" className="object-contain" />
           </div>
           <div className="flex-1">
-            <h2 className="font-semibold pb-4 text-2xl lg:text-3xl text-[#3E4095]">
+            <h2 className="font-semibold pb-4 text-2xl lg:text-3xl text-[#3E4095] 2xl:text-4xl">
               About DocuHealth
             </h2>
-            <div className="text-sm space-y-4 text-[#464646] leading-6">
+            <div className="text-sm 2xl:text-xl space-y-4 text-[#464646] leading-6">
               <p>
                 DocuHealth Services unifies Nigeria’s healthcare ecosystem
                 through a trusted, data-driven network that gives every patient

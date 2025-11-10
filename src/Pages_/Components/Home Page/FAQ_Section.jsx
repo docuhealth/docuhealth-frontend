@@ -44,10 +44,10 @@ const FAQ_Section = () => {
           <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-10 ">
             {/* Left side: FAQs */}
             <div className="w-full lg:w-1/2">
-              <h2 className="text-2xl lg:text-3xl font-semibold text-[#3E4095] mb-4">
+              <h2 className="text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-[#3E4095] mb-4">
                 Frequently asked questions (FAQ)
               </h2>
-              <p className="mb-6">
+              <p className="mb-6 2xl:text-xl">
                 See the answers to some of the frequent questions we’re being asked
               </p>
 
@@ -61,7 +61,7 @@ const FAQ_Section = () => {
                       onClick={() => toggleAccordion(index)}
                       className="w-full flex justify-between items-center px-5 py-3  text-left"
                     >
-                      <span className="text-[#3E4095] font-medium text-sm md:text-base">
+                      <span className="text-[#3E4095] font-medium text-sm md:text-base 2xl:text-lg">
                         {item.question}
                       </span>
                       <Plus
@@ -71,7 +71,7 @@ const FAQ_Section = () => {
                     </button>
 
                     <div
-                      className={`px-5 text-sm text-gray-600 transition-all duration-500 ease-in-out ${openIndex === index
+                      className={`px-5 text-sm text-gray-600 transition-all duration-500 ease-in-out 2xl:text-lg ${openIndex === index
                           ? "max-h-40 opacity-100 pb-2"
                           : "max-h-0 opacity-0 overflow-hidden"
                         }`}

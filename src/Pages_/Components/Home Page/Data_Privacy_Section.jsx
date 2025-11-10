@@ -40,10 +40,10 @@ const Data_Privacy_Section = () => {
               />
             </div>
             <div className="w-full lg:w-1/2">
-          <h2 className="text-2xl lg:text-3xl font-semibold text-[#3E4095] mb-4">
+          <h2 className="text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-[#3E4095] mb-4">
           Data Privacy & Security
         </h2>
-          <p className="mb-6">
+          <p className="mb-6 2xl:text-xl">
           At DocuHealth we follow global healthcare security standards:
         </p>
         <div className="space-y-4">
@@ -57,7 +57,7 @@ const Data_Privacy_Section = () => {
                  <div className="bg-[#1f1f75] p-0.5 rounded-sm">
                 <Check className="text-white w-3 h-3" />
               </div>
-              <span className="text-[#1f1f75] text-sm  font-medium">
+              <span className="text-[#1f1f75] text-sm  font-medium 2xl:text-lg">
                 {item.text}
               </span>
            

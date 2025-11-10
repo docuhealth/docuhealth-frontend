@@ -43,10 +43,10 @@ const Core_Product_Section = () => {
     <>
       <BackgroundTemplate>
         <div className="py-24 px-5 lg:px-16 text-sm text-[#464646]" id="our-services">
-          <h2 className="font-semibold pb-4 text-2xl lg:text-3xl text-[#3E4095] text-center">
+          <h2 className="font-semibold pb-4 text-2xl lg:text-3xl 2xl:text-4xl text-[#3E4095] text-center">
             DocuHealth Core Product
           </h2>
-          <p className="text-center pb-8">
+          <p className="text-center pb-8  2xl:text-xl">
             Find out everything you need to know about our core products
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
@@ -58,13 +58,13 @@ const Core_Product_Section = () => {
                   <div className="w-16 h-16 bg-[#3E4095] rounded-full flex items-center justify-center  mb-4">
                     <Icon className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-[#3E4095] font-semibold text-lg mb-2">
+                  <h3 className="text-[#3E4095] font-semibold text-lg mb-2  2xl:text-xl">
                     {core_product.title}
                   </h3>
-                  <p className="text-gray-600 mb-4 font-semibold">
+                  <p className="text-gray-600 mb-4 font-semibold  2xl:text-lg">
                     {core_product.description}
                   </p>
-                  <ul className="list-disc list-inside text-gray-700 space-y-1">
+                  <ul className="list-disc list-inside text-gray-700 space-y-1 2xl:text-lg">
                     {core_product.points.map((point, i) => (
                       <li key={i}>{point}</li>
                     ))}

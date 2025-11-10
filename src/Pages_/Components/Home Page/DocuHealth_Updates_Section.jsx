@@ -47,10 +47,10 @@ const DocuHealth_Updates_Section = () => {
         <BackgroundTemplate>
             <section className='py-16 px-12 text-sm text-[#464646] lg:bg-[#F6FCFE]'>
                 <div className="text-center">
-                    <h2 className="text-2xl lg:text-3xl font-semibold text-[#3E4095]">
+                    <h2 className="text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-[#3E4095]">
                         Latest DocuHealth News & Updates
                     </h2>
-                    <p className="text-sm mt-2">
+                    <p className="text-sm mt-2 2xl:text-xl">
                         Stay informed about DocuHealth platform updates and health information.
                     </p>
                     <button className="custom-prev absolute left-1 top-1/2 -translate-y-1/2 text-[#3E4095] cursor-pointer ">
@@ -121,20 +121,20 @@ const DocuHealth_Updates_Section = () => {
                                     </div>
 
                                     <div className="flex flex-col text-left p-5">
-                                        <h3 className="font-semibold  mb-2">{item.title}</h3>
-                                        <p className=" text-sm mb-4 line-clamp-3">{item.description}</p>
+                                        <h3 className="font-semibold  mb-2 2xl:text-lg">{item.title}</h3>
+                                        <p className=" text-sm mb-4 line-clamp-3 2xl:text-base">{item.description}</p>
 
                                         <div className="flex items-center text-sm gap-1 mb-3">
                                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M5.25033 0.583496V1.75016H8.75033V0.583496H9.91699V1.75016H12.2503C12.5725 1.75016 12.8337 2.01133 12.8337 2.3335V11.6668C12.8337 11.989 12.5725 12.2502 12.2503 12.2502H1.75033C1.42816 12.2502 1.16699 11.989 1.16699 11.6668V2.3335C1.16699 2.01133 1.42816 1.75016 1.75033 1.75016H4.08366V0.583496H5.25033ZM11.667 6.41683H2.33366V11.0835H11.667V6.41683ZM4.08366 2.91683H2.33366V5.25016H11.667V2.91683H9.91699V4.0835H8.75033V2.91683H5.25033V4.0835H4.08366V2.91683Z" fill="#3E4095" />
                                             </svg>
 
-                                            <span>Posted on {item.date}</span>
+                                            <span className='2xl:text-base'>Posted on {item.date}</span>
                                         </div>
 
                                         <a
                                             href="#"
-                                            className="flex items-center text-[#3E4095] font-medium text-sm hover:underline"
+                                            className="flex items-center text-[#3E4095] font-medium text-sm hover:underline 2xl:text-base"
                                         >
                                             Read more <ArrowRight size={14} className="ml-1" />
                                         </a>
