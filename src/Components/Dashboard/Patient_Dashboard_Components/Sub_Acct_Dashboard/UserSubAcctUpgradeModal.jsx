@@ -82,11 +82,11 @@ const UserSubAcctUpgradeModal = ({
     <>
       <div>
         {displaySubAcctModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-5">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-5">
             <div className="bg-white rounded-xs shadow-lg p-6 max-w-lg w-full relative">
               <div className="flex justify-between items-center pb-5">
                 <div className="flex-1 text-center">
-                  <h2 className="text-lg font-semibold">Sub Account Upgrade</h2>
+                  <h2 className="text-md font-semibold">Sub Account Upgrade</h2>
                 </div>
                 <button
                   onClick={() => {
@@ -194,7 +194,7 @@ const UserSubAcctUpgradeModal = ({
                     </div>
 
                     <div
-                      className="col-span-2 text-center bg-[#3E4095] text-white py-3 px-4 rounded-full cursor-pointer "
+                      className="col-span-2 text-sm text-center bg-[#3E4095] text-white py-3 px-4 rounded-full cursor-pointer "
                       onClick={handleNextStepSubAcctUpgrade}
                     >
                       <p> Move to step 2 / 3</p>
@@ -494,7 +494,7 @@ const UserSubAcctUpgradeModal = ({
                     </div>
 
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         House Number (optional)
                       </label>
                       <input
@@ -523,7 +523,7 @@ const UserSubAcctUpgradeModal = ({
                     </div>
                     <div
                       className={`col-span-2 text-center ${                    isValid && !subAcctUpgradeLoading
-                      ? "bg-[#3E4095] text-white hover:bg-blue-700 cursor-pointer"
+                      ? "bg-[#3E4095] text-white  cursor-pointer"
                       : "cursor-not-allowed bg-gray-300 text-gray-500"} py-3 px-4 rounded-full cursor-pointer`}
                       onClick={handleSubAcctUpgrade}
                       disabled={!isValid || subAcctUpgradeLoading}

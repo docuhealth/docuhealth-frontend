@@ -7,8 +7,15 @@ export function getToken() {
   return sessionStorage.getItem("token");
 }
 
+export function getHospitalToken() {
+  return sessionStorage.getItem("hospital_token");
+}
+
 export function getRole(){
   return sessionStorage.getItem("role");
+}
+export function getHospitalRole(){
+  return sessionStorage.getItem("hospital_role");
 }
 
 export function setToken(token,role) {
@@ -18,6 +25,16 @@ export function setToken(token,role) {
   }
   if(role){
     sessionStorage.setItem("role", role)
+  }
+}
+
+export function setHospitalToken(token,role) {
+  if (token) {
+    // console.log(role)
+    sessionStorage.setItem("hospital_token", token);
+  }
+  if(role){
+    sessionStorage.setItem("hospital_role", role)
   }
 }
 

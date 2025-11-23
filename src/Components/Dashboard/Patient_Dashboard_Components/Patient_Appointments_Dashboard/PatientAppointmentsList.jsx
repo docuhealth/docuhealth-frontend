@@ -6,14 +6,10 @@ import { formatFullDate, formatTime } from "./Components/Date_Time_Formatter";
 const PatientAppointmentsList = () => {
   const {
     appointments,
-    setAppointments,
     loading,
     count,
-    setCount,
     currentPage,
-    setCurrentPage,
     totalPages,
-    setTotalPages,
     fetchAppointments,
   } = useContext(AppointmentsContext);
 

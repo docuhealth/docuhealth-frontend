@@ -94,6 +94,9 @@ import Hospital_Receptionist_Settings_Dashboard from "./Dashboard/Hospital_Dashb
 import Hospital_Receptionist_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Receptionist/Hospital_Receptionist_HealthPersonnel_Dashboard";
 import Hospital_Receptionist_Admission_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Receptionist/Hospital_Receptionist_Admission_Dashboard";
 
+import HospitalAdminProviders from "./Providers/Hospital/HospitalAdminProviders";
+import HospitalReceptionistProviders from "./Providers/Hospital/HospitalReceptionistProviders";
+
 import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
 
 function App() {
@@ -135,104 +138,152 @@ function App() {
           {/* Hospital Admin Routes */}
           <Route
             path="/hospital-admin-home-dashboard"
-            element={<Hospital_Admin_Layout />}
+            element={
+              <HospitalAdminProviders>
+            <Hospital_Admin_Layout />
+            </HospitalAdminProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalAdminProviders>
                 <Hospital_Admin_Home_Dashboard />
+                </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-admin-staff-dashboard"
-            element={<Hospital_Admin_Layout />}
+            element={
+              <HospitalAdminProviders>
+            <Hospital_Admin_Layout />
+            </HospitalAdminProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalAdminProviders>
                 <Hospital_Admin_Staff_Dashboard />
+                </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-admin-patients-dashboard"
-            element={<Hospital_Admin_Layout />}
+            element={
+              <HospitalAdminProviders>
+            <Hospital_Admin_Layout />
+            </HospitalAdminProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalAdminProviders>
                 <Hospital_Admin_Patients_Dashboard />
+                </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-admin-messages-dashboard"
-            element={<Hospital_Admin_Layout />}
+            element={
+              <HospitalAdminProviders>
+            <Hospital_Admin_Layout />
+            </HospitalAdminProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalAdminProviders>
                 <Hospital_Admin_Messages_Dashboard />
+                </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-admin-appointments-dashboard"
-            element={<Hospital_Admin_Layout />}
+            element={
+              <HospitalAdminProviders>
+            <Hospital_Admin_Layout />
+            </HospitalAdminProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalAdminProviders>
                 <Hospital_Admin_Appointments_Dashboard />
+                </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-admin-wallet-dashboard"
-            element={<Hospital_Admin_Layout />}
+            element={
+              <HospitalAdminProviders>
+            <Hospital_Admin_Layout />
+            </HospitalAdminProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalAdminProviders>
                 <Hospital_Admin_Wallet_Dashboard />
+                </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-admin-settings-dashboard"
-            element={<Hospital_Admin_Layout />}
+            element={
+              <HospitalAdminProviders>
+            <Hospital_Admin_Layout />
+            </HospitalAdminProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalAdminProviders>
                 <Hospital_Admin_Settings_Dashboard />
+                </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-admin-subscriptions-dashboard"
-            element={<Hospital_Admin_Layout />}
+            element={
+              <HospitalAdminProviders>
+            <Hospital_Admin_Layout />
+            </HospitalAdminProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalAdminProviders>
                 <Hospital_Admin_Subscriptions_Dashboard />
+                </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
             />
@@ -334,65 +385,94 @@ function App() {
           {/* Hospital Receptionist Routes */}
           <Route
             path="/hospital-receptionist-home-dashboard"
-            element={<Hospital_Receptionist_Layout />}
+            element={
+              <HospitalReceptionistProviders>
+            <Hospital_Receptionist_Layout />
+            </HospitalReceptionistProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalReceptionistProviders>
                 <Hospital_Receptionist_Home_Dashboard />
+                </HospitalReceptionistProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-receptionist-appointments-dashboard"
-            element={<Hospital_Receptionist_Layout />}
+            element={
+              <HospitalReceptionistProviders>
+            <Hospital_Receptionist_Layout />
+            </HospitalReceptionistProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalReceptionistProviders>
                 <Hospital_Receptionist_Appointments_Dashboard />
+                </HospitalReceptionistProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-receptionist-patients-dashboard"
-            element={<Hospital_Receptionist_Layout />}
+            element={
+              <HospitalReceptionistProviders>
+            <Hospital_Receptionist_Layout />
+            </HospitalReceptionistProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalReceptionistProviders>
                 <Hospital_Receptionist_Patients_Dashboard />
+                </HospitalReceptionistProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-receptionist-messages-dashboard"
-            element={<Hospital_Receptionist_Layout />}
+            element={
+              <HospitalReceptionistProviders>
+            <Hospital_Receptionist_Layout />
+            </HospitalReceptionistProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalReceptionistProviders>
                 <Hospital_Receptionist_Messages_Dashboard />
+                </HospitalReceptionistProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-receptionist-settings-dashboard"
-            element={<Hospital_Receptionist_Layout />}
+            element={
+              <HospitalReceptionistProviders>
+            <Hospital_Receptionist_Layout />
+            </HospitalReceptionistProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalReceptionistProviders>
                 <Hospital_Receptionist_Settings_Dashboard />
+                </HospitalReceptionistProviders>
 
                 // </ProtectedRoute>
               }
@@ -400,13 +480,18 @@ function App() {
           </Route>
           <Route
             path="/hospital-receptionist-healthpersonnel-dashboard"
-            element={<Hospital_Receptionist_Layout />}
+            element={
+              <HospitalReceptionistProviders>
+            <Hospital_Receptionist_Layout />
+            </HospitalReceptionistProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalReceptionistProviders>
                 <Hospital_Receptionist_HealthPersonnel_Dashboard />
+                </HospitalReceptionistProviders>
 
                 // </ProtectedRoute>
               }
@@ -414,18 +499,27 @@ function App() {
           </Route>
           <Route
             path="/hospital-receptionist-admission-dashboard"
-            element={<Hospital_Receptionist_Layout />}
+            element={
+              <HospitalReceptionistProviders>
+            <Hospital_Receptionist_Layout />
+            </HospitalReceptionistProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalReceptionistProviders>
                 <Hospital_Receptionist_Admission_Dashboard />
+                </HospitalReceptionistProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
 
+          <Route path="*" element={<div className="flex justify-center items-center min-h-screen">
+            <p>Page Not Found</p>
+
+          </div>} />
 
         </Routes>
       ) : (

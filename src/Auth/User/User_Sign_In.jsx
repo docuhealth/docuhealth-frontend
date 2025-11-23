@@ -81,7 +81,7 @@ const USI = () => {
         setPassword("");
 
         setTimeout(() => {
-          navigate("/user-home-dashboard");
+          window.location.href = "/user-home-dashboard";
         }, 1000);
         // Handle success (e.g., save token, redirect user)
       } catch (error) {

@@ -15,7 +15,7 @@ const UserSubAcctOverlay = ({
   return (
     <div className="">
       {showCreateSubAcctOverlay && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-5 r">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-5 r">
           <div className="bg-white rounded-xs shadow-lg p-6 max-w-lg w-full relative max-h-[80vh] overflow-y-auto hide-scrollbar">
             <div className="flex justify-between items-center pb-8">
               <div className="flex-1 text-center">

@@ -281,10 +281,7 @@ const Patient_SubAccount_Dashboard = () => {
     }
   };
 
-  //   useEffect(() => {
-  //   console.log("Loading state:", loading);
-  // }, [loading]);
-  
+
 
   return (
     <>
@@ -355,12 +352,4 @@ const Patient_SubAccount_Dashboard = () => {
 
 export default Patient_SubAccount_Dashboard;
 
-{
-  /* <UserSubAcctNoticeDisplay
-noticeDisplay={noticeDisplay}
-noticeMessage={noticeMessage}
-paymentStatus={paymentStatus}
-closeNoticeMessage={closeNoticeMessage}
-closeNoticeMessageToCreateAcct={closeNoticeMessageToCreateAcct}
-/> */
-}
+

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { login, setToken } from "../../services/authService";
+import { login, setHospitalToken } from "../../services/authService";
 import toast from "react-hot-toast";
 import dashb from "../../assets/img/dashb.png";
 import docuhealth_logo from '../../assets/img/docuhealth_logo.png'
@@ -48,25 +48,41 @@ const Hospital_Sign_In = () => {
 
       try {
         const data = await login(userData);
-
-        setToken(data.data.access_token, data.data.role);
-        console.log(data)
-        // console.log(data.access_token)
+        setHospitalToken(data.data.access_token, data.data.role);
+        // console.log(data)
 
         toast.success("Login successful");
         setIsSubmitting(false);
         setEmail("");
         setPassword("");
 
-        // setTimeout(() => {
-        //   navigate("/user-home-dashboard");
-        // }, 1000);
-        // Handle success (e.g., save token, redirect user)
+        const role = data.data.role;
+        const staffRole = data.data.staff_role?.toLowerCase();
+    
+        // Redirect Logic
+        if (role === "hospital") {
+            window.location.href = "/hospital-admin-home-dashboard";
+        }
+    
+        if (role === "hospital_staff") {
+            if (staffRole === "receptionist") {
+                window.location.href = "/hospital-receptionist-home-dashboard";
+            } 
+            else if (staffRole === "doctor") {
+                window.location.href = "/hospital-doctors-home-dashboard";
+            } 
+            else {
+                // default for now
+                window.location.href = " ";
+            }
+        }
+
       } catch (error) {
         console.log(error);
         toast.error(error.message || "Login failed. Please try again.");
         setIsSubmitting(false);
       } finally {
+        setIsSubmitting(false);
         setEmail("");
         setPassword("");
       }

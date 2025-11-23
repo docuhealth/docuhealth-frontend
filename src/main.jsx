@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { getHospitalRole, getRole } from "./services/authService.js";
 import "./index.css";
 import App from "./App.jsx";
 import ProfileProvider from "./context/Patient Context/AppContext.jsx";
@@ -9,18 +10,39 @@ import AppointmentsProvider from "./context/Patient Context/AppointmentsContext.
 import IdCardProvider from "./context/Patient Context/IdCardContext.jsx";
 import SubscriptionPlansProvider from "./context/Patient Context/SubscriptionsContext.jsx";
 
-createRoot(document.getElementById("root")).render(
+
+const role = getRole(); 
+
+const PatientProviders = ({ children }) => (
   <ProfileProvider>
     <IdCardProvider>
       <MedicalRecordsProvider>
         <SubAccountProvider>
           <AppointmentsProvider>
-            <SubscriptionPlansProvider>
-              <App />
-            </SubscriptionPlansProvider>
+            <SubscriptionPlansProvider>{children}</SubscriptionPlansProvider>
           </AppointmentsProvider>
         </SubAccountProvider>
       </MedicalRecordsProvider>
     </IdCardProvider>
   </ProfileProvider>
+);
+
+
+const Root = () => {
+  if (role === "patient") {
+    return (
+      <PatientProviders>
+        <App />
+      </PatientProviders>
+    );
+    
+  } else {
+    return <App />; // Fallback for login page etc.
+  }
+};
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <Root />
+  </StrictMode>
 );

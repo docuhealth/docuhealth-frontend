@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Bell } from "lucide-react";
 import Hospital_Receptionist_Sidebar_Mobile from "./Hospital_Receptionist_Sidebar_Mobile";
+import { ReceptionistAppContext } from "../../../../context/Hospital Context/Receptionist/ReceptionistAppContext";
 
 const Hospital_Receptionist_Header = () => {
 
@@ -10,14 +11,9 @@ const Hospital_Receptionist_Header = () => {
       setIsPopoverOpen(!isPopoverOpen);
       };
   
-      const profile = null;
-      const defaultProfile = {
-      firstname: "Guest",
-      lastname: "Guest",
-    };
-  
-      const hospitalReceptionistProfile = profile || defaultProfile;
-  
+      const {profile} = useContext(ReceptionistAppContext);
+
+
 
       
   return (
@@ -26,9 +22,7 @@ const Hospital_Receptionist_Header = () => {
         <header className="hidden bg-white py-4 px-6 sm:flex justify-between items-center border ">
           <h2 className="text-md font-medium">
             Welcome back{" "}
-            {hospitalReceptionistProfile
-              ? `${hospitalReceptionistProfile.firstname} ${hospitalReceptionistProfile.lastname}`
-              : "Loading..."}{" "}
+            {profile ? `${profile.firstname} ${profile.lastname}` : "Loading..."}{" "}
             ! 👋
           </h2>
           <div className="flex items-center gap-4">
@@ -40,17 +34,16 @@ const Hospital_Receptionist_Header = () => {
             </div>
             <div className="flex items-center">
               <div className="w-9 h-9 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center text-sm font-semibold ">
-                  {hospitalReceptionistProfile
-                  ? `${hospitalReceptionistProfile.firstname?.[0] || ""}${
-                      hospitalReceptionistProfile.lastname?.[0] || ""
-                    }`.toUpperCase()
-                  : "NA"}
+              {profile
+                ? `${profile.firstname?.[0] || ""}${profile.lastname?.[0] || ""
+                  }`.toUpperCase()
+                : "NA"}
               </div>
               <div className="flex flex-col items-start">
                 <p className="ml-2 text-sm font-medium">
-                  {hospitalReceptionistProfile
-                    ? `${hospitalReceptionistProfile.firstname} ${hospitalReceptionistProfile.lastname}`
-                    : "Loading..."}
+                {profile
+                  ? `${profile.firstname} ${profile.lastname}`
+                  : "Loading..."}
                 </p>
                 <p className="ml-2 text-sm text-gray-500">Hospital</p>
               </div>
@@ -69,9 +62,9 @@ const Hospital_Receptionist_Header = () => {
             <p>
               {" "}
               <span className="font-light">Welcome back,</span> <br />
-              {hospitalReceptionistProfile
-                ? `${hospitalReceptionistProfile.firstname} ${hospitalReceptionistProfile.lastname}`
-                : "Loading..."}{" "}
+              {profile
+              ? `${profile.firstname} ${profile.lastname}`
+              : "Loading..."}{" "}
               !{" "}
             </p>
             <p className="text-md">👋</p>
@@ -85,11 +78,10 @@ const Hospital_Receptionist_Header = () => {
             </div>
             <div className="flex justify-center items-center">
               <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center">
-                {hospitalReceptionistProfile
-                  ? `${hospitalReceptionistProfile.firstname?.[0] || ""}${
-                      hospitalReceptionistProfile.lastname?.[0] || ""
-                    }`.toUpperCase()
-                  : "NA"}
+              {profile
+                ? `${profile.firstname?.[0] || ""}${profile.lastname?.[0] || ""
+                  }`.toUpperCase()
+                : "NA"}
               </div>
               <p onClick={togglePopover} className="cursor-pointer relative">
                 <i
@@ -103,9 +95,9 @@ const Hospital_Receptionist_Header = () => {
               <div className="absolute top-20 right-4 bg-white shadow-sm rounded-md  p-2 z-50">
                 <ul className="text-sm text-gray-700">
                   <li className="py-1 px-3 hover:bg-gray-100 cursor-pointer font-semibold">
-                    {hospitalReceptionistProfile
-                      ? `${hospitalReceptionistProfile.firstname} ${hospitalReceptionistProfile.lastname}`
-                      : "Loading..."}
+                  {profile
+                    ? `${profile.firstname} ${profile.lastname}`
+                    : "Loading..."}
                   </li>
                   <li className="pb-1 px-3 hover:bg-gray-100 cursor-pointer">
                     Hospital

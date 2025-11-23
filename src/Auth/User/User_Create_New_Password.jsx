@@ -392,7 +392,7 @@ const NPU = () => {
       </div>
       {/* Notification Modal */}
       {notification && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 text-sm px-5">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 text-sm px-5">
           <div className="bg-white py-6 px-8 rounded-lg shadow-lg flex flex-col justify-center items-center ">
             <div className="pb-2">
               <svg
@@ -414,7 +414,7 @@ const NPU = () => {
             </p>
             <div className="flex justify-center w-full">
               <button
-                className="bg-[#3E4095] w-full rounded-full text-white px-4 py-2"
+                className="bg-[#3E4095] w-full rounded-full text-white px-4 py-2 cursor-pointer"
                 onClick={handleNavigation}
               >
                 Go To SignIn

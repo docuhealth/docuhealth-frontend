@@ -10,7 +10,7 @@ const Patient_Dashboard_Header = () => {
     setIsPopoverOpen(!isPopoverOpen);
   };
 
-  const { profile }  = useContext(AppContext);
+  const { profile } = useContext(AppContext);
 
   return (
     <div className="relative">
@@ -31,8 +31,7 @@ const Patient_Dashboard_Header = () => {
           <div className="flex items-center">
             <div className="w-9 h-9 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center text-sm font-semibold ">
               {profile
-                ? `${profile.firstname?.[0] || ""}${
-                    profile.lastname?.[0] || ""
+                ? `${profile.firstname?.[0] || ""}${profile.lastname?.[0] || ""
                   }`.toUpperCase()
                 : "NA"}
             </div>
@@ -76,16 +75,14 @@ const Patient_Dashboard_Header = () => {
           <div className="flex justify-center items-center">
             <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center">
               {profile
-                ? `${profile.firstname?.[0] || ""}${
-                    profile.lastname?.[0] || ""
+                ? `${profile.firstname?.[0] || ""}${profile.lastname?.[0] || ""
                   }`.toUpperCase()
                 : "NA"}
             </div>
             <p onClick={togglePopover} className="cursor-pointer relative">
               <i
-                className={`bx bx-chevron-down text-2xl transform transition-transform duration-300 ${
-                  isPopoverOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`bx bx-chevron-down text-2xl transform transition-transform duration-300 ${isPopoverOpen ? "rotate-180" : "rotate-0"
+                  }`}
               />
             </p>
           </div>
@@ -106,7 +103,7 @@ const Patient_Dashboard_Header = () => {
         </div>
       </header>
       <div className="sm:hidden">
-           <Patient_Sidebar_Mobile openMobileSidebar={openMobileSidebar} setOpenMobileSidebar={setOpenMobileSidebar} />
+        <Patient_Sidebar_Mobile openMobileSidebar={openMobileSidebar} setOpenMobileSidebar={setOpenMobileSidebar} />
       </div>
     </div>
   );
