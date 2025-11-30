@@ -62,14 +62,14 @@ const formatFullDateTime = (dateString) => {
 export { formatFullDateTime };
 
 
-const truncateWords = (text, maxWords) => {
+const truncateWords = (text, maxChars) => {
   if (!text) return "";
-  const words = text.split(" ");
-  if (words.length <= maxWords) return text;
-  return words.slice(0, maxWords).join(" ") + "...";
+  if (text.length <= maxChars) return text;
+  return text.slice(0, maxChars) + "...";
 };
 
 export { truncateWords };
+
 
 const getAge = (dobString) => {
   if (!dobString) return "N/A";

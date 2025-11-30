@@ -365,8 +365,8 @@ const MedicalRecordsDetail = ({
           <p className="font-medium mb-4">Uploaded Documents / Images</p>
           <div>
 
-            {selectedMedicalRecord?.attachments?.length > 0 ? (
-            selectedMedicalRecord.attachments.map((attachment, index) => {
+            {selectedMedicalRecord?.attachments_info?.length > 0 ? (
+            selectedMedicalRecord.attachments_info.map((attachment, index) => {
               // Extract file details
               const fileName = attachment.filename || "Unnamed file";
               const fileUrl = attachment.url;

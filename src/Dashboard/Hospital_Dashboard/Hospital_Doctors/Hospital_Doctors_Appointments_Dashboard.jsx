@@ -59,7 +59,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
                             </div>
                         </div>
                         <div>
-                                <AfterVisitSummary  setAfterVisitSummary={setAfterVisitSummary}/>
+                        <AfterVisitSummary  setAfterVisitSummary={setAfterVisitSummary} selectedPatientDetails={selectedPatientDetails}/>
                         </div>
                     </>
                 ) :(

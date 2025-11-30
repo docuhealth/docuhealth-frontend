@@ -114,7 +114,7 @@ function App() {
   const hostname = window.location.hostname;
   // hostname.startsWith("hospital.")
   // true
-  const isHospital = hostname.startsWith("hospital.");
+  const isHospital = true;
 
   return (
     <Router>
