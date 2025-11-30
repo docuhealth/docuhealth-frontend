@@ -14,10 +14,10 @@ const DoctorProfileProvider = (props)=> {
         if (isUserLoggedIn) {
           const fetchProfile = async () => {
             try {
-              const res = await axiosInstance.get("api/receptionists/dashboard"); // Example endpoint
+              const res = await axiosInstance.get("api/doctor/dashboard"); 
               setProfile(res.data.receptionist);
             
-              // console.log(res.data);
+
             } catch (err) {
               console.error("Error fetching profile:", err);
             }
