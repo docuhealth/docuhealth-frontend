@@ -14,6 +14,7 @@ const Hospital_Forget_Password = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
+     e.preventDefault();
     setIsLoading(true);
 
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -28,6 +29,7 @@ const Hospital_Forget_Password = () => {
       const payload = {
         email
       }
+      console.log(payload)
 
       const response = await authAPI(
         "POST",
@@ -46,7 +48,8 @@ const Hospital_Forget_Password = () => {
       // Navigate with appropriate data
       const navigateData = email;
       setTimeout(() => {
-        navigate("/verify-otp", { state: navigateData });
+      navigate("/verify-otp", { state: { email } });
+
       }, 1000);
 
     } catch (error) {

@@ -16,7 +16,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
         role: "",
         personnel: "",
         specialization: "",
-        ward: "",
+        ward: "4",
         email: "",
         password: "",
     });

@@ -61,6 +61,8 @@ const Hospital_Verify_OTP = () => {
         // role: role, // Include the role in the request
       };
 
+      console.log(payload)
+
       // Send the request to the API
       const response = await authAPI(
         "POST",
@@ -80,7 +82,7 @@ const Hospital_Verify_OTP = () => {
         access_token: response.data.access_token,
       };
       setTimeout(() => {
-        navigate("/set-new-password", { state: navigateData });
+        navigate("/create-new-password", { state: navigateData });
       }, 1000);
     } catch (error) {
       console.error("Error during OTP verification:", error);

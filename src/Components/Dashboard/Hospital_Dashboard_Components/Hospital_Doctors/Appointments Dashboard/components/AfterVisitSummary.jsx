@@ -287,8 +287,8 @@ const AfterVisitSummary = ({
     console.log("Final payload:", payload);
 
     try {
-      const res = await axiosInstance.post('api/medical-records', payload);
-      console.log (res)
+      const res = await axiosInstance.post("api/medical-records", payload);
+      console.log(res);
       toast.success("After visit summary created successfully");
       setAfterVisitSummary(false);
     } catch (err) {
@@ -1046,7 +1046,11 @@ const AfterVisitSummary = ({
 
             <div className="flex items-center justify-end cursor-pointer gap-4">
               <button
-                className={`py-2 ${loading ? 'border border-gray-400 text-gray-400 cursor-not-allowed' : 'text-[#3E4095] border border-[#3E4095] '} rounded-full text-sm px-20 mt-5 `}
+                className={`py-2 ${
+                  loading
+                    ? "border border-gray-400 text-gray-400 cursor-not-allowed"
+                    : "text-[#3E4095] border border-[#3E4095] "
+                } rounded-full text-sm px-20 mt-5 `}
                 disabled={loading}
                 onClick={() => {
                   setStep(step - 1);
@@ -1055,20 +1059,24 @@ const AfterVisitSummary = ({
                 Previous
               </button>
               <button
-              disabled={loading}
-                className={`py-2.5  rounded-full text-sm px-20 mt-5 text-white  ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#3E4095] cursor-pointer'}`}
+                disabled={loading}
+                className={`py-2.5  rounded-full text-sm px-20 mt-5 text-white  ${
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-[#3E4095] cursor-pointer"
+                }`}
                 onClick={() => {
                   handleSubmit();
                 }}
               >
-                   {loading ? (
-                                <div className="flex items-center justify-center gap-2">
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                    Creating afer visit summary...
-                                </div>
-                            ) : (
-                                "Submit"
-                            )}
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Creating afer visit summary...
+                  </div>
+                ) : (
+                  "Submit"
+                )}
               </button>
             </div>
           </div>
