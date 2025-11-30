@@ -71,6 +71,9 @@ const Hospital_Sign_In = () => {
             else if (staffRole === "doctor") {
                 window.location.href = "/hospital-doctors-home-dashboard";
             } 
+            else if (staffRole === "nurse") {
+                window.location.href = "/hospital-nurses-home-dashboard";
+            } 
             else {
                 // default for now
                 window.location.href = " ";

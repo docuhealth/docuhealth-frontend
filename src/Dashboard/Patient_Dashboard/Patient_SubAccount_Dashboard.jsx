@@ -267,8 +267,10 @@ const Patient_SubAccount_Dashboard = () => {
       );
       console.log(res);
       setShowCreateSubAcctOverlay(false);
+      toast.success('Sub account created successfully')
     } catch (error) {
       console.error("Error creating sub account:", error);
+      toast.error('Sub account creation failed')
     } finally {
       setLoading(false);
       setFormData({

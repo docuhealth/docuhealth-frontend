@@ -259,7 +259,7 @@ const Hospital_Receptionist_Sidebar = () => {
              onClick={handleLogout}
           >
             <li
-              className={`group px-4 py-2  text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+              className={`group px-4 py-2 cursor-pointer text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
             >
               <svg
                 width="20"

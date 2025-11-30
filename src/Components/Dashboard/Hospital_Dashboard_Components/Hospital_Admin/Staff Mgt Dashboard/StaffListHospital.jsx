@@ -159,8 +159,8 @@ const toggleStaff = (id) => {
                 <p>
                   {staff.phone_no}
                 </p>
-                <p>
-
+                <p className='truncate max-w-[120px]'>
+                {staff.email}
                 </p>
                 <p>
                   {staff.gender}

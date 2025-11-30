@@ -153,8 +153,8 @@ const MedicalRecords = ({
                 </svg>
                 <p className="font-medium">
                   {" "}
-                  {record?.doctor
-                    ? `${record.doctor.firstname} ${record.doctor.lastname}`
+                  {record?.doctor_info
+                    ? `${record.doctor_info.firstname} ${record.doctor_info.lastname}`
                     : "NIL"}
                 </p>
               </div>
@@ -196,8 +196,8 @@ const MedicalRecords = ({
                   />
                 </svg>
               </div>
-              <p className=""> {record?.hospital
-                    ? `${record.hospital.name}`
+              <p className=""> {record?.hospital_info
+                    ? `${record.hospital_info.name}`
                     : "NIL"}</p>
             </div>
             <div className="flex items-center gap-1 pb-3 border-b ">

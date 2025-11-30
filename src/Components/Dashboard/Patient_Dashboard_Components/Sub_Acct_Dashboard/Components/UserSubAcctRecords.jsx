@@ -9,7 +9,7 @@ const UserSubAcctRecords = ({ subAccounts, loading, setDisplaySubAcctModal, setV
   const [openPopover, setOpenPopover] = useState(null);
   const paymentStatus = true; // example placeholder
 
-   const {
+  const {
     onboardIDCard,
     setOnboardIDCard,
     idCardData,
@@ -45,8 +45,8 @@ const UserSubAcctRecords = ({ subAccounts, loading, setDisplaySubAcctModal, setV
 
   return (
     <>
- 
-   
+
+
       <div className="flex flex-col ">
         <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
           <p className=" col-span-2 w-full pl-5 ">Name</p>
@@ -63,8 +63,7 @@ const UserSubAcctRecords = ({ subAccounts, loading, setDisplaySubAcctModal, setV
               <div className="font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-3 ">
                 <div className="w-9 h-9 rounded-full bg-[#3E4095]/10  overflow-hidden flex justify-center items-center text-sm font-semibold text-[#3E4095] ">
                   {subaccount
-                    ? `${subaccount.firstname?.[0] || ""}${
-                         subaccount.lastname?.[0] || ""
+                    ? `${subaccount.firstname?.[0] || ""}${subaccount.lastname?.[0] || ""
                       }`.toUpperCase()
                     : "NA"}
                 </div>
@@ -82,13 +81,17 @@ const UserSubAcctRecords = ({ subAccounts, loading, setDisplaySubAcctModal, setV
               <p className=" w-full py-6 ">Sex: {subaccount.gender}</p>
               {/* {subaccount.date_created.split("T")[0]} */}
               <p className="relative  w-full py-6 ">12/10/2025</p>
-              <div className="relative  w-full py-6 flex justify-end ">
-                <i
-                  className={`bx bx-dots-vertical-rounded cursor-pointer mr-5 ${
-                    openPopover === index ? "bg-slate-300 rounded-full h-8 w-8 flex justify-center items-center" : "h-8 w-8 flex justify-center items-center"
-                  }`}
+              <div className="relative w-full py-6 flex justify-center items-center ">
+                <div
                   onClick={() => togglePopover(index)}
-                ></i>
+                  className={`cursor-pointer mr-5 flex justify-center items-center
+      h-8 w-8 rounded-full 
+      ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
+    `}
+                >
+                  <i className="bx bx-dots-vertical-rounded text-sm"></i>
+                </div>
+
 
                 {openPopover === index && (
                   <div className="absolute top-14 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
@@ -96,9 +99,9 @@ const UserSubAcctRecords = ({ subAccounts, loading, setDisplaySubAcctModal, setV
                       <p
                         className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                         onClick={(index) => {
-                            togglePopover(index)
-                            setViewDetailMedicalRecord(true)
-                            setSelectedSubAcct(subaccount)
+                          togglePopover(index)
+                          setViewDetailMedicalRecord(true)
+                          setSelectedSubAcct(subaccount)
                         }}
                       >
                         Check Medical History
@@ -134,7 +137,7 @@ const UserSubAcctRecords = ({ subAccounts, loading, setDisplaySubAcctModal, setV
                         // }
                         togglePopover()
                         handleSelection(subaccount)
-                 
+
                       }}
                     >
                       Generate ID Card
@@ -149,13 +152,13 @@ const UserSubAcctRecords = ({ subAccounts, loading, setDisplaySubAcctModal, setV
         ))}
       </div>
 
-      <Id_Card onboardIDCard ={onboardIDCard} setOnboardIDCard ={setOnboardIDCard}
-      idCardData={idCardData} 
-      handleChange={handleChange} 
-      handleIDCardCreation ={handleIDCardCreation}
-      isIDCreatedSuccessfully = {isIDCreatedSuccessfully}
-      setIsIDCreatedSuccessfully ={setIsIDCreatedSuccessfully}
-      selectedProfile = {selectedProfile} />
+      <Id_Card onboardIDCard={onboardIDCard} setOnboardIDCard={setOnboardIDCard}
+        idCardData={idCardData}
+        handleChange={handleChange}
+        handleIDCardCreation={handleIDCardCreation}
+        isIDCreatedSuccessfully={isIDCreatedSuccessfully}
+        setIsIDCreatedSuccessfully={setIsIDCreatedSuccessfully}
+        selectedProfile={selectedProfile} />
 
     </>
   );

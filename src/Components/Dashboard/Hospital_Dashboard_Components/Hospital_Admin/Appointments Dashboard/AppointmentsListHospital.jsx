@@ -1,4 +1,4 @@
-import React, {useContext} from 'react'
+import React, { useContext } from 'react'
 import { HosAppointmentsContext } from '../../../../../context/Hospital Context/Admin/HosAppointmentsContext'
 import Pagination from '../../../Patient_Dashboard_Components/Pagination/Pagination'
 import { formatFullDate, formatTime } from '../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter'
@@ -81,7 +81,7 @@ const AppointmentsListHospital = () => {
         <div className="max-w-md text-center">
           <p className="text-[12px] text-gray-500">
             {" "}
-            You currently don’t have any upcoming appointment/follow-up meeting in this hospital. 
+            You currently don’t have any upcoming appointment/follow-up meeting in this hospital.
           </p>
         </div>
       </div>
@@ -92,78 +92,68 @@ const AppointmentsListHospital = () => {
     <>
       <div className="text-[12px] my-4">
         <div>
-          {appointments.map((appointment) => (
-            <div
-              key={appointment.id}
-              className="mb-4 p-4 border rounded-md grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 lg:gap-0 "
+        {appointments.map((appointment) => (
+        <div
+          key={appointment.id}
+          className="mb-4 p-4 border rounded-md grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-0 "
+        >
+          <div className="flex items-center gap-1">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              <div className="flex items-center gap-1">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"
-                    fill="#1B2B40"
-                  />
-                </svg>
-                <p>Date: {formatFullDate(appointment.scheduled_time)}</p>
-              </div>
-              <div className="flex items-center gap-1">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM13 12H17V14H11V7H13V12Z"
-                    fill="#1B2B40"
-                  />
-                </svg>
+              <path
+                d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"
+                fill="#1B2B40"
+              />
+            </svg>
+            <p>Date / Time: {formatFullDate(appointment.scheduled_time)} / {formatTime(appointment.scheduled_time)}</p>
+          </div>
+          <div className="flex items-center gap-1">
+          <svg width="20" height="20" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#1B2B40" />
+                  </svg>
 
-                <p>Time: {formatTime(appointment.scheduled_time)}</p>
-              </div>
-              <div className="flex items-center gap-1 lg:col-span-2">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8 20V14H16V20H19V4H5V20H8ZM10 20H14V16H10V20ZM21 20H23V22H1V20H3V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V20ZM11 8V6H13V8H15V10H13V12H11V10H9V8H11Z"
-                    fill="#1B2B40"
-                  />
-                </svg>
+            <p>Patient : {appointment.patient.firstname}{" "}
+            {appointment.patient.lastname}</p>
+          </div>
+          <div className="flex items-center gap-1">
+          <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"
+                fill="#1B2B40"
+              />
+            </svg>
 
-                <p>
-                  Hospital: {appointment.patient.firstname}{" "}
-                  {appointment.patient.lastname}
-                </p>
-              </div>
-              <div className="flex items-center gap-1">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z" fill="#1B2B40"/>
-</svg>
+            <p>Last Visit : {appointment.last_visited || 'NIL'}</p>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z" fill="#1B2B40" />
+            </svg>
 
 
-                <p>{appointment.staff.role.charAt(0).toUpperCase() + appointment.staff.role.slice(1)}
-                : {appointment.staff.firstname}{" "}
-                  {appointment.staff.lastname}</p>
-              </div>
-              <div className="border-l lg:flex lg:justify-center lg:items-center sm:col-span-2 lg:col-span-1 w-full my-4 lg:my-0">
-                <button className="border border-[#3E4095] rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300">
-                    <p className="text-[#3E4095]">Send a message</p>
-                </button>
-              </div>
-            </div>
-          ))}
+            <p>{'Appointed ' + appointment.staff.role.charAt(0).toUpperCase() + appointment.staff.role.slice(1)}
+              : {appointment.staff.firstname}{" "}
+              {appointment.staff.lastname}</p>
+          </div>
+          <div className="border-l lg:flex lg:justify-center lg:items-center sm:col-span-2 lg:col-span-1 w-full my-4 lg:my-0">
+            <button className="border border-[#3E4095] rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300">
+              <p className="text-[#3E4095]">Send a message</p>
+            </button>
+          </div>
+        </div>
+      ))}
         </div>
         <Pagination
           count={count}

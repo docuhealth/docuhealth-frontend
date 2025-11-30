@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { Country, State, City } from 'country-state-city';
 
 const UserSubAcctUpgradeModal = ({
   displaySubAcctModal,
@@ -27,57 +28,56 @@ const UserSubAcctUpgradeModal = ({
   const [cities, setCities] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Fetch all countries + states
+  
   useEffect(() => {
-    const fetchCountriesStates = async () => {
-      try {
-        const response = await axios.get(
-          "https://countriesnow.space/api/v0.1/countries/states"
-        );
-        setCountries(response.data.data);
-      } catch (error) {
-        console.error("Error fetching countries & states:", error);
-      }
-    };
-    fetchCountriesStates();
+   // Load all countries on mount
+     const allCountries = Country.getAllCountries();
+     setCountries(allCountries);
   }, []);
 
-  // Update states when country changes
-  useEffect(() => {
-    if (subAcctUpgradeData.child_country) {
-      const selected = countries.find(
-        (c) => c.name === subAcctUpgradeData.child_country
-      );
-      setStates(selected?.states || []);
-      setSubAcctUpgradeData((prevData) => ({
-        ...prevData,
-        child_state: "",
-      }));
 
-      setCities([]);
-    }
-  }, [subAcctUpgradeData.child_country, countries]);
+
+      // Update states when country changes
+      useEffect(() => {
+        if (subAcctUpgradeData.child_country) {
+          const selectedCountry = countries.find(c => c.name === subAcctUpgradeData.child_country);
+          if (selectedCountry) {
+            const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
+            setStates(countryStates);
+          } else {
+            setStates([]);
+          }
+          setSubAcctUpgradeData((prevData) => ({
+            ...prevData,
+            child_state: "",
+          }));
+          setCities([]); // reset cities
+          setSubAcctUpgradeData((prevData) => ({
+            ...prevData,
+            child_city: "",
+          }));
+        }
+      }, [subAcctUpgradeData.child_country, countries]);
 
   // Fetch cities when state changes
-  useEffect(() => {
-    if (subAcctUpgradeData.child_country && subAcctUpgradeData.child_state) {
-      const fetchCities = async () => {
-        try {
-          const response = await axios.post(
-            "https://countriesnow.space/api/v0.1/countries/state/cities",
-            {
-              country: subAcctUpgradeData.child_country,
-              state: subAcctUpgradeData.child_state,
-            }
-          );
-          setCities(response.data.data);
-        } catch (error) {
-          console.error("Error fetching cities:", error);
-        }
-      };
-      fetchCities();
-    }
-  }, [subAcctUpgradeData.child_state, subAcctUpgradeData.child_country]);
+
+
+    // Fetch cities when state changes
+    useEffect(() => {
+      if (subAcctUpgradeData.child_country && subAcctUpgradeData.child_state) {
+        const selectedCountry = countries.find(c => c.name === subAcctUpgradeData.child_country);
+        if (!selectedCountry) return;
+    
+        const stateCities = selectedCountry ? City.getCitiesOfState(selectedCountry.isoCode, subAcctUpgradeData.child_state) : [];
+        setCities(stateCities || []);
+        setSubAcctUpgradeData((prevData) => ({
+          ...prevData,
+          child_city: "",
+        }));
+      } else {
+        setCities([]);
+      }
+    }, [subAcctUpgradeData.child_state, subAcctUpgradeData.child_country, countries]);
   return (
     <>
       <div>
@@ -166,10 +166,10 @@ const UserSubAcctUpgradeModal = ({
                           -- Select a country --
                         </option>
                         {countries.map((c) => (
-                          <option key={c.iso2} value={c.name}>
-                            {c.name}
-                          </option>
-                        ))}
+                                                        <option key={c.isoCode} value={c.name}>
+                                                            {c.name}
+                                                        </option>
+                                                    ))}
                       </select>
                       <div
                         className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-9 right-2 ${
@@ -429,10 +429,10 @@ const UserSubAcctUpgradeModal = ({
                           -- Select your state --
                         </option>
                         {states.map((s) => (
-                          <option key={s.name} value={s.name}>
-                            {s.name}
-                          </option>
-                        ))}
+                                                        <option key={s.isoCode} value={s.isoCode}>
+                                                            {s.name}
+                                                        </option>
+                                                    ))}
                       </select>
                       <div
                         className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-9 right-2 `}
@@ -467,11 +467,11 @@ const UserSubAcctUpgradeModal = ({
                         <option value="" selected>
                           -- Select City --
                         </option>
-                        {cities.map((c, i) => (
-                          <option key={i} value={c}>
-                            {c}
-                          </option>
-                        ))}
+                        {cities.map((c) => (
+                                                        <option key={c.name} value={c.name}>
+                                                            {c.name}
+                                                        </option>
+                                                    ))}
                       </select>
                       <div
                         className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-9 right-2 `}

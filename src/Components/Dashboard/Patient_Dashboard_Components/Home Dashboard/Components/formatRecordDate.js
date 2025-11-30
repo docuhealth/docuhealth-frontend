@@ -70,3 +70,23 @@ const truncateWords = (text, maxWords) => {
 };
 
 export { truncateWords };
+
+const getAge = (dobString) => {
+  if (!dobString) return "N/A";
+
+  const dob = new Date(dobString);
+  const today = new Date();
+
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  const dayDiff = today.getDate() - dob.getDate();
+
+  // If birthday hasn't occurred yet this year, subtract 1
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+
+  return age + " years old";
+};
+
+export {getAge}

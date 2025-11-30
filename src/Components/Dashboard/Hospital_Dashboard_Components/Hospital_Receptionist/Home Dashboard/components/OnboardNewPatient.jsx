@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash, FaLock } from 'react-icons/fa'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import axiosInstance from '../../../../../../utils/axiosInstance'
+import { Country, State, City } from 'country-state-city';
 
 
 const OnboardNewPatient = ({ setNewPatient }) => {
@@ -90,55 +91,53 @@ const OnboardNewPatient = ({ setNewPatient }) => {
     };
 
     useEffect(() => {
-        const fetchCountriesStates = async () => {
-            try {
-                const response = await axios.get(
-                    "https://countriesnow.space/api/v0.1/countries/states"
-                );
-                setCountries(response.data.data);
-            } catch (error) {
-                console.error("Error fetching countries & states:", error);
-            }
-        };
-        fetchCountriesStates();
+        // Load all countries on mount
+        const allCountries = Country.getAllCountries();
+        setCountries(allCountries);
     }, []);
 
-    // Update states when country changes
+
     useEffect(() => {
         if (patientData.country) {
-            const selected = countries.find(
+            const selectedCountry = countries.find(
                 (c) => c.name === patientData.country
             );
-            setStates(selected?.states || []);
-            setPatientData((prevData) => ({
-                ...prevData,
+            if (selectedCountry) {
+                const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
+                setStates(countryStates);
+            } else {
+                setStates([]);
+            }
+
+            setPatientData((prev) => ({
+                ...prev,
                 state: "",
             }));
-
             setCities([]);
         }
     }, [patientData.country, countries]);
 
-    // Fetch cities when state changes
+
     useEffect(() => {
         if (patientData.country && patientData.state) {
-            const fetchCities = async () => {
-                try {
-                    const response = await axios.post(
-                        "https://countriesnow.space/api/v0.1/countries/state/cities",
-                        {
-                            country: patientData.country,
-                            state: patientData.state,
-                        }
-                    );
-                    setCities(response.data.data);
-                } catch (error) {
-                    console.error("Error fetching cities:", error);
-                }
-            };
-            fetchCities();
+          const selectedCountry = countries.find(
+            (c) => c.name === patientData.country
+          );
+          if (!selectedCountry) return;
+      
+          const stateCities = City.getCitiesOfState(
+            selectedCountry.isoCode, // country ISO
+            patientData.state // now correctly the state ISO
+          );
+          setCities(stateCities);
+        } else {
+          setCities([]);
         }
-    }, [patientData.state, patientData.country]);
+      }, [patientData.state, patientData.country, countries]);
+      
+
+    console.log(cities)
+
 
     const handleStepOne = () => {
         if (patientData.email && patientData.phone_num && patientData.password && patientData.confirm_password && patientData.password === patientData.confirm_password && isPasswordValid) {
@@ -186,7 +185,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
         }
 
         try {
-            const res = await axiosInstance.post('api/receptionists/register-patient', payload)
+            const res = await axiosInstance.post('api/receptionists/register/patient', payload)
             toast.success('Patient Registration Successful')
             console.log(res)
             setPatientHIN(res.data.profile.hin)
@@ -632,7 +631,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                                                     -- Select a country --
                                                 </option>
                                                 {countries.map((c) => (
-                                                    <option key={c.iso2} value={c.name}>
+                                                    <option key={c.isoCode} value={c.name}>
                                                         {c.name}
                                                     </option>
                                                 ))}
@@ -673,7 +672,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                                                     -- Select your state --
                                                 </option>
                                                 {states.map((s) => (
-                                                    <option key={s.name} value={s.name}>
+                                                    <option key={s.isoCode} value={s.isoCode}>
                                                         {s.name}
                                                     </option>
                                                 ))}
@@ -705,18 +704,17 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                                                 name="city"
                                                 value={patientData.city}
                                                 onChange={handlePatientDataChange}
-                                                className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-[#3E4095] appearance-none text-sm"
+                                                className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none text-sm"
                                                 required
                                             >
-                                                <option value="" selected>
-                                                    -- Select City --
-                                                </option>
-                                                {cities.map((c, i) => (
-                                                    <option key={i} value={c}>
-                                                        {c}
+                                                <option value="">-- Select City --</option>
+                                                {cities.map((c) => (
+                                                    <option key={c.name} value={c.name}>
+                                                        {c.name}
                                                     </option>
                                                 ))}
                                             </select>
+
                                             <div
                                                 className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-9 right-2 `}
                                             >

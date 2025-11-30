@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import logo from "../../../../assets/img/logo.png";
+import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Hospital_Doctors_Sidebar_Mobile = ({
@@ -10,21 +10,23 @@ const Hospital_Doctors_Sidebar_Mobile = ({
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const handleLogout = () => {
+  const handleLogout = (event) => {
+    event.preventDefault();
     setOpenMobileSidebar(false);
-    sessionStorage.removeItem("token");
-    navigate("/hospital-login"); // 👈 redirect
+    sessionStorage.clear();   // removes ALL session-based auth data
+    navigate("/login");       // redirect to login page
   };
+
   return (
     <>
       <div
         className={`w-64 min-h-screen absolute top-0 left-0 z-50 bg-white transform transition-transform duration-300 ease-in-out
               ${openMobileSidebar ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="p-4 flex justify-between items-center    ">
-          <div className="flex justify-start items-center gap-1">
-            <img src={logo} alt="" className="w-6" />
-            <h1 className="text-xl font-semibold text-[#0000FF]">DocuHealth</h1>
+       <div className="p-4 flex justify-between items-center    ">
+          <div className="flex justify-start items-center gap-1 font-semibold text-[#3E4095]">
+            <img src={docuhealth_logo} alt="Logo" className="w-6" />
+            <h1 className="text-xl">DocuHealth</h1>
           </div>
           <div
             className=" sm:hidden "
@@ -60,9 +62,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       <li
                         className={`group px-4 py-2   ${
                           currentPath === "/hospital-doctors-home-dashboard"
-                            ? "bg-[#0000FF] text-white"
+                            ? "bg-[#3E4095] text-white"
                             : "text-gray-700"
-                        } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                       >
                         <span>
                           <svg
@@ -97,9 +99,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       <li
                         className={`group px-4 py-2   ${
                           currentPath === "/hospital-doctors-appointments-dashboard"
-                            ? "bg-[#0000FF] text-white"
+                            ? "bg-[#3E4095] text-white"
                             : "text-gray-700"
-                        } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                       >
                         <span>
                           <svg
@@ -135,9 +137,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       <li
                         className={`group px-4 py-2   ${
                           currentPath === "/hospital-doctors-patients-dashboard"
-                            ? "bg-[#0000FF] text-white"
+                            ? "bg-[#3E4095] text-white"
                             : "text-gray-700"
-                        } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                       >
                         <span>
                           <svg
@@ -172,9 +174,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       <li
                         className={`group px-4 py-2   ${
                           currentPath === "/hospital-doctors-lab-dashboard"
-                            ? "bg-[#0000FF] text-white"
+                            ? "bg-[#3E4095] text-white"
                             : "text-gray-700"
-                        } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                       >
                         <span>
                           <svg
@@ -209,9 +211,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       <li
                         className={`group px-4 py-2   ${
                           currentPath === "/hospital-doctors-messages-dashboard"
-                            ? "bg-[#0000FF] text-white"
+                            ? "bg-[#3E4095] text-white"
                             : "text-gray-700"
-                        } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                       >
                         <span>
                           <svg
@@ -247,9 +249,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       <li
                         className={`group px-4 py-2   ${
                           currentPath === "/hospital-doctors-healthpersonnel-dashboard"
-                            ? "bg-[#0000FF] text-white"
+                            ? "bg-[#3E4095] text-white"
                             : "text-gray-700"
-                        } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                       >
                         <span>
                           <svg
@@ -283,9 +285,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       <li
                         className={`group px-4 py-2   ${
                           currentPath === "/hospital-doctors-settings-dashboard"
-                            ? "bg-[#0000FF] text-white"
+                            ? "bg-[#3E4095] text-white"
                             : "text-gray-700"
-                        } text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                       >
                         <span>
                           <svg
@@ -317,10 +319,10 @@ const Hospital_Doctors_Sidebar_Mobile = ({
         
                   <div
                     className="px-4 my-4"
-                    //    onClick={handleLogout}
+                       onClick={handleLogout}
                   >
                     <li
-                      className={`group px-4 py-2  text-gray-700 hover:bg-[#0000FF] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                      className={`group px-4 py-2  text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                     >
                       <svg
                         width="20"

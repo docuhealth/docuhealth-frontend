@@ -6,6 +6,8 @@ import OnboardNewPatient from '../../../Components/Dashboard/Hospital_Dashboard_
 import toast from 'react-hot-toast'
 import axiosInstance from '../../../utils/axiosInstance'
 import BookAppointment from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home Dashboard/components/BookAppointment'
+import AppointmentsList from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Appointments Dashboard/AppointmentsList'
+import RecentPatients from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home Dashboard/components/RecentPatients'
 
 const Hospital_Receptionist_Home_Dashboard = () => {
   const [newPatient, setNewPatient] = useState(false)
@@ -60,10 +62,13 @@ const Hospital_Receptionist_Home_Dashboard = () => {
               </div>
             </div>
             <div className='bg-white rounded-xl border mt-3 p-5 text-sm'>
-              <div className='flex items-center gap-1 cursor-pointer border-b pb-3' onClick={() => {
-                setCheckHIN(false)
-              }}>
-                <ArrowLeft className='w-4 h-4 text-gray-800' />
+              <div className='flex items-center gap-1 cursor-pointer border-b pb-3'>
+                <div
+                  onClick={() => {
+                    setCheckHIN(false)
+                  }}>
+                  <ArrowLeft className='w-4 h-4 text-gray-800' />
+                </div>
                 <p>Patient details</p>
               </div>
               <div className='py-5 border-b'>
@@ -270,11 +275,25 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                   </div>
                 </div>
               </div>
-              <div>
-
+              <div className="bg-white my-5 border rounded-2xl p-5">
+                <div className=" border rounded-lg p-5">
+                  <h2 className=" mb-4 pb-2 border-b font-medium">
+                    Recent Patient attended to
+                  </h2>
+                  <div>
+                    <RecentPatients />
+                  </div>
+                </div>
               </div>
-              <div>
-                
+              <div className="bg-white my-5 border rounded-2xl p-5">
+                <div className=" border rounded-lg p-5">
+                  <h2 className=" mb-4 pb-2 border-b font-medium">
+                    Upcoming Appointments List
+                  </h2>
+                  <div>
+                    <AppointmentsList />
+                  </div>
+                </div>
               </div>
             </div>
           </>

@@ -6,7 +6,7 @@ import Hospital_Receptionist_Sidebar from "../../../Components/Dashboard/Hospita
 const Hospital_Receptionist_Layout = () => {
   return (
     <div className="flex h-screen">
-      {/* Sidebar */}
+      {/* Sidebar */} 
       <aside className=" w-64 shadow-sm border z-20 min-h-screen hidden sm:block">
         <Hospital_Receptionist_Sidebar />
       </aside>

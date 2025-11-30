@@ -59,18 +59,16 @@ const UserSubAcctRecordsMobile = ({
                 {subaccount.hin.slice(0, 4) +
                   "*".repeat(subaccount.hin.length - 5)}
               </p>
-              <div className=" ">
-                <i
-                  className={`bx bx-dots-vertical-rounded cursor-pointer ${
-                    openPopover === index
-                      ? "bg-slate-300 rounded-full h-8 w-8 flex justify-center items-center"
-                      : "h-8 w-8 flex justify-center items-center"
-                  }`}
-                  onClick={() => togglePopover(index)}
-                ></i>
+              <div
+          onClick={() => togglePopover(index)}
+          className={`h-8 w-8 flex justify-center items-center rounded-full cursor-pointer
+            ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
+          `}
+        >
+          <i className="bx bx-dots-vertical-rounded text-sm"></i>
 
                 {openPopover === index && (
-                  <div className="absolute  right-4 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
+                  <div className="absolute  right-4 mt-40 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
                     <Link to="">
                       <p
                         className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"

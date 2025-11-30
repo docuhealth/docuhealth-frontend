@@ -96,6 +96,16 @@ import Hospital_Receptionist_Admission_Dashboard from "./Dashboard/Hospital_Dash
 
 import HospitalAdminProviders from "./Providers/Hospital/HospitalAdminProviders";
 import HospitalReceptionistProviders from "./Providers/Hospital/HospitalReceptionistProviders";
+import HospitalDoctorProviders from "./Providers/Hospital/HospitalDoctorProviders";
+import HospitalNursesProviders from "./Providers/Hospital/HospitalNursesProviders";
+
+import Hospital_Nurses_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_Nurses/Hospital_Nurses_Layout";
+import Hospital_Nurses_Home_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Home_Dashboard";
+import Hospital_Nurses_Appointments_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Appointments_Dashboard";
+import Hospital_Nurses_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_HealthPersonnel_Dashboard";
+import Hospital_Nurses_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Messages_Dashboard";
+import Hospital_Nurses_Patients_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Patients_Dashboard";
+import Hospital_Nurses_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Settings_Dashboard";
 
 import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
 
@@ -292,91 +302,132 @@ function App() {
           {/* Hospital Doctors Routes */}
           <Route
             path="/hospital-doctors-home-dashboard"
-            element={<Hospital_Doctors_Layout />}
+            element={
+              <HospitalDoctorProviders>
+            <Hospital_Doctors_Layout />
+            </HospitalDoctorProviders>
+          }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalDoctorProviders>
                 <Hospital_Doctors_Home_Dashboard />
+                </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-doctors-appointments-dashboard"
-            element={<Hospital_Doctors_Layout />}
+            element={
+              <HospitalDoctorProviders>
+            <Hospital_Doctors_Layout />
+            </HospitalDoctorProviders>
+          }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalDoctorProviders>
                 <Hospital_Doctors_Appointments_Dashboard />
+                </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-doctors-patients-dashboard"
-            element={<Hospital_Doctors_Layout />}
+            element={
+              <HospitalDoctorProviders>
+            <Hospital_Doctors_Layout />
+            </HospitalDoctorProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalDoctorProviders>
                 <Hospital_Doctors_Patients_Dashboard />
+                </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-doctors-messages-dashboard"
-            element={<Hospital_Doctors_Layout />}
+            element={
+              <HospitalDoctorProviders>
+            <Hospital_Doctors_Layout />
+            </HospitalDoctorProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalDoctorProviders>
                 <Hospital_Doctors_Messages_Dashboard />
+                </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-doctors-settings-dashboard"
-            element={<Hospital_Doctors_Layout />}
+            element={
+              <HospitalDoctorProviders>
+            <Hospital_Doctors_Layout />
+            </HospitalDoctorProviders>
+          }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalDoctorProviders>
                 <Hospital_Doctors_Settings_Dashboard />
+                </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-doctors-healthpersonnel-dashboard"
-            element={<Hospital_Doctors_Layout />}
+            element={
+              <HospitalDoctorProviders>
+            <Hospital_Doctors_Layout />
+            </HospitalDoctorProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalDoctorProviders>
                 <Hospital_Doctors_HealthPersonnel_Dashboard />
+                </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-doctors-lab-dashboard"
-            element={<Hospital_Doctors_Layout />}
+            element={
+              <HospitalDoctorProviders>
+            <Hospital_Doctors_Layout />
+            </HospitalDoctorProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
+                <HospitalDoctorProviders>
                 <Hospital_Doctors_Lab_Dashboard />
+                </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
             />
@@ -515,6 +566,123 @@ function App() {
               }
             />
           </Route>
+
+
+          <Route
+            path="/hospital-nurses-home-dashboard"
+            element={
+              <HospitalNursesProviders>
+            <Hospital_Nurses_Layout />
+            </HospitalNursesProviders>}
+          >
+            <Route
+              index
+              element={
+                // <ProtectedRoute>
+                <HospitalNursesProviders>
+                <Hospital_Nurses_Home_Dashboard />
+                </HospitalNursesProviders>
+                // </ProtectedRoute>
+              }
+            />
+          </Route>
+
+          <Route
+            path="/hospital-nurses-patients-dashboard"
+            element={
+              <HospitalNursesProviders>
+            <Hospital_Nurses_Layout />
+            </HospitalNursesProviders>}
+          >
+            <Route
+              index
+              element={
+                // <ProtectedRoute>
+                <HospitalNursesProviders>
+                <Hospital_Nurses_Patients_Dashboard />
+                </HospitalNursesProviders>
+                // </ProtectedRoute>
+              }
+            />
+          </Route>
+
+          <Route
+            path="/hospital-nurses-messages-dashboard"
+            element={
+              <HospitalNursesProviders>
+            <Hospital_Nurses_Layout />
+            </HospitalNursesProviders>}
+          >
+            <Route
+              index
+              element={
+                // <ProtectedRoute>
+                <HospitalNursesProviders>
+                <Hospital_Nurses_Messages_Dashboard />
+                </HospitalNursesProviders>
+                // </ProtectedRoute>
+              }
+            />
+          </Route>
+
+
+          <Route
+            path="/hospital-nurses-healthpersonnel-dashboard"
+            element={
+              <HospitalNursesProviders>
+            <Hospital_Nurses_Layout />
+            </HospitalNursesProviders>}
+          >
+            <Route
+              index
+              element={
+                // <ProtectedRoute>
+                <HospitalNursesProviders>
+                <Hospital_Nurses_HealthPersonnel_Dashboard />
+                </HospitalNursesProviders>
+                // </ProtectedRoute>
+              }
+            />
+          </Route>
+
+          <Route
+            path="/hospital-nurses-appointments-dashboard"
+            element={
+              <HospitalNursesProviders>
+            <Hospital_Nurses_Layout />
+            </HospitalNursesProviders>}
+          >
+            <Route
+              index
+              element={
+                // <ProtectedRoute>
+                <HospitalNursesProviders>
+                <Hospital_Nurses_Appointments_Dashboard />
+                </HospitalNursesProviders>
+                // </ProtectedRoute>
+              }
+            />
+          </Route>
+
+          <Route
+            path="/hospital-nurses-settings-dashboard"
+            element={
+              <HospitalNursesProviders>
+            <Hospital_Nurses_Layout />
+            </HospitalNursesProviders>}
+          >
+            <Route
+              index
+              element={
+                // <ProtectedRoute>
+                <HospitalNursesProviders>
+                <Hospital_Nurses_Settings_Dashboard />
+                </HospitalNursesProviders>
+                // </ProtectedRoute>
+              }
+            />
+          </Route>
+
 
           <Route path="*" element={<div className="flex justify-center items-center min-h-screen">
             <p>Page Not Found</p>

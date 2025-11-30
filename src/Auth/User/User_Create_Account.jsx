@@ -4,9 +4,10 @@ import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React
 import dashb from "../../assets/img/dashb.png";
 import { Link } from "react-router-dom";
 import { authAPI } from "../../utils/authAPI";
-import axios from "axios";
-import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { Country, State, City } from 'country-state-city';
+
 
 const ULP = () => {
   const [email, setEmail] = useState("");
@@ -62,46 +63,45 @@ const ULP = () => {
 
   // Fetch all countries + states
   useEffect(() => {
-    const fetchCountriesStates = async () => {
-      try {
-        const response = await axios.get(
-          "https://countriesnow.space/api/v0.1/countries/states"
-        );
-        setCountries(response.data.data);
-      } catch (error) {
-        console.error("Error fetching countries & states:", error);
-      }
-    };
-    fetchCountriesStates();
+    // Load all countries on mount
+    const allCountries = Country.getAllCountries();
+    setCountries(allCountries);
   }, []);
 
-  // Update states when country changes
-  useEffect(() => {
-    if (country) {
-      const selected = countries.find((c) => c.name === country);
-      setStates(selected?.states || []);
-      setState("");
-      setCities([]);
+ // Update states when country changes
+useEffect(() => {
+  if (country) {
+    const selectedCountry = countries.find(c => c.name === country);
+    if (selectedCountry) {
+      const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
+      setStates(countryStates);
+    } else {
+      setStates([]);
     }
-  }, [country, countries]);
+    setState("");  // reset state
+    setCities([]); // reset cities
+    setCity("");   // reset city
+  }
+}, [country, countries]);
 
-  // Fetch cities when state changes
-  useEffect(() => {
-    if (country && state) {
-      const fetchCities = async () => {
-        try {
-          const response = await axios.post(
-            "https://countriesnow.space/api/v0.1/countries/state/cities",
-            { country, state }
-          );
-          setCities(response.data.data);
-        } catch (error) {
-          console.error("Error fetching cities:", error);
-        }
-      };
-      fetchCities();
-    }
-  }, [state, country]);
+// Update cities when state changes
+useEffect(() => {
+  if (country && state) {
+    const selectedCountry = countries.find(c => c.name === country);
+    if (!selectedCountry) return;
+
+    const stateCities = selectedCountry ? City.getCitiesOfState(selectedCountry.isoCode, state) : [];
+    setCities(stateCities || []);
+    setCity(""); // reset city
+  } else {
+    setCities([]);
+  }
+}, [state, country, countries]);
+
+// console.log('states:', states);
+// console.log('cities:', cities);
+
+
 
   // Password validation function
   const validatePassword = (password) => {
@@ -301,8 +301,8 @@ const ULP = () => {
                           type={showPassword ? "text" : "password"}
                           placeholder=""
                           className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${password && !isPasswordValid
-                              ? "focus:border-red-500"
-                              : ""
+                            ? "focus:border-red-500"
+                            : ""
                             }`}
                           value={password}
                           onChange={(e) => {
@@ -348,7 +348,7 @@ const ULP = () => {
                                   }`}
                                 style={{
                                   width: `${(getPasswordStrength(password).strength /
-                                      5) *
+                                    5) *
                                     100
                                     }%`,
                                 }}
@@ -362,70 +362,70 @@ const ULP = () => {
                           <div className="space-y-1">
                             <div
                               className={`flex items-center text-sm ${passwordRequirements.hasLowercase
-                                  ? "text-green-600"
-                                  : "text-red-500"
+                                ? "text-green-600"
+                                : "text-red-500"
                                 }`}
                             >
                               <span
                                 className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasLowercase
-                                    ? "bg-green-500"
-                                    : "bg-red-500"
+                                  ? "bg-green-500"
+                                  : "bg-red-500"
                                   }`}
                               ></span>
                               Include lowercase letters (a-z)
                             </div>
                             <div
                               className={`flex items-center text-sm ${passwordRequirements.hasUppercase
-                                  ? "text-green-600"
-                                  : "text-red-500"
+                                ? "text-green-600"
+                                : "text-red-500"
                                 }`}
                             >
                               <span
                                 className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasUppercase
-                                    ? "bg-green-500"
-                                    : "bg-red-500"
+                                  ? "bg-green-500"
+                                  : "bg-red-500"
                                   }`}
                               ></span>
                               Include uppercase letters (A-Z)
                             </div>
                             <div
                               className={`flex items-center text-sm ${passwordRequirements.hasNumber
-                                  ? "text-green-600"
-                                  : "text-red-500"
+                                ? "text-green-600"
+                                : "text-red-500"
                                 }`}
                             >
                               <span
                                 className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasNumber
-                                    ? "bg-green-500"
-                                    : "bg-red-500"
+                                  ? "bg-green-500"
+                                  : "bg-red-500"
                                   }`}
                               ></span>
                               Include at least one number (0-9)
                             </div>
                             <div
                               className={`flex items-center text-sm ${passwordRequirements.hasSymbol
-                                  ? "text-green-600"
-                                  : "text-red-500"
+                                ? "text-green-600"
+                                : "text-red-500"
                                 }`}
                             >
                               <span
                                 className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasSymbol
-                                    ? "bg-green-500"
-                                    : "bg-red-500"
+                                  ? "bg-green-500"
+                                  : "bg-red-500"
                                   }`}
                               ></span>
                               Include at least one symbol (!@#$%^&*)
                             </div>
                             <div
                               className={`flex items-center text-sm ${passwordRequirements.hasMinLength
-                                  ? "text-green-600"
-                                  : "text-red-500"
+                                ? "text-green-600"
+                                : "text-red-500"
                                 }`}
                             >
                               <span
                                 className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasMinLength
-                                    ? "bg-green-500"
-                                    : "bg-red-500"
+                                  ? "bg-green-500"
+                                  : "bg-red-500"
                                   }`}
                               ></span>
                               Be at least 8 characters long
@@ -474,11 +474,11 @@ const ULP = () => {
                       type="button"
                       onClick={handleNextStep}
                       className={`w-full py-3  rounded-full transition-colors ${isPasswordValid &&
-                          email &&
-                          confirmPassword &&
-                          password === confirmPassword
-                          ? "bg-[#3E4095] text-white"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        email &&
+                        confirmPassword &&
+                        password === confirmPassword
+                        ? "bg-[#3E4095] text-white"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         }`}
                       disabled={
                         !isPasswordValid ||
@@ -626,8 +626,8 @@ const ULP = () => {
                       type="button"
                       onClick={handleFinalStep}
                       className={`w-full transition-colors py-3 rounded-full  ${firstName && lastName && middleName && DOB && gender
-                          ? "bg-[#3E4095] text-white"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        ? "bg-[#3E4095] text-white"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         }`}
                       disabled={
                         !firstName ||
@@ -682,7 +682,7 @@ const ULP = () => {
                             -- Select a country --
                           </option>
                           {countries.map((c) => (
-                            <option key={c.iso2} value={c.name}>
+                            <option key={c.isoCode} value={c.name}>
                               {c.name}
                             </option>
                           ))}
@@ -714,12 +714,13 @@ const ULP = () => {
                           onChange={(e) => setState(e.target.value)}
                           disabled={!states.length}
                           required
+                       
                         >
                           <option value="" seleceted>
                             -- Select your state --
                           </option>
                           {states.map((s) => (
-                            <option key={s.name} value={s.name}>
+                            <option key={s.isoCode} value={s.isoCode}>
                               {s.name}
                             </option>
                           ))}
@@ -754,12 +755,13 @@ const ULP = () => {
                           <option value="" selected>
                             -- Select City --
                           </option>
-                          {cities.map((c, i) => (
-                            <option key={i} value={c}>
-                              {c}
+                          {cities.map((c) => (
+                            <option key={c.name} value={c.name}>
+                              {c.name}
                             </option>
                           ))}
                         </select>
+
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                           <svg
                             className="w-4 h-4 text-gray-400"
@@ -835,13 +837,13 @@ const ULP = () => {
                       type="button"
                       onClick={handleSubmit}
                       className={`w-full transition-colors py-3 rounded-full ${country &&
-                          state &&
-                          city &&
-                          street &&
-                          houseNO &&
-                          !isSubmitting
-                          ? "bg-[#3E4095] text-white "
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        state &&
+                        city &&
+                        street &&
+                        houseNO &&
+                        !isSubmitting
+                        ? "bg-[#3E4095] text-white "
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         } `}
                       disabled={
                         !country ||
@@ -852,10 +854,10 @@ const ULP = () => {
                         isSubmitting
                       }
                     >
-                 {isSubmitting ? (     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Submitting...
-                    </div> ): ("Sign Up Now")}
+                      {isSubmitting ? (<div className="flex items-center justify-center gap-2">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Submitting...
+                      </div>) : ("Sign Up Now")}
                     </button>
                   </form>
 
@@ -955,8 +957,8 @@ const ULP = () => {
                         type={showPassword ? "text" : "password"}
                         placeholder=""
                         className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${password && !isPasswordValid
-                            ? "focus:border-red-500"
-                            : ""
+                          ? "focus:border-red-500"
+                          : ""
                           }`}
                         value={password}
                         onChange={(e) => {
@@ -1015,70 +1017,70 @@ const ULP = () => {
                         <div className="space-y-1">
                           <div
                             className={`flex items-center text-sm ${passwordRequirements.hasLowercase
-                                ? "text-green-600"
-                                : "text-red-500"
+                              ? "text-green-600"
+                              : "text-red-500"
                               }`}
                           >
                             <span
                               className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasLowercase
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
+                                ? "bg-green-500"
+                                : "bg-red-500"
                                 }`}
                             ></span>
                             Include lowercase letters (a-z)
                           </div>
                           <div
                             className={`flex items-center text-sm ${passwordRequirements.hasUppercase
-                                ? "text-green-600"
-                                : "text-red-500"
+                              ? "text-green-600"
+                              : "text-red-500"
                               }`}
                           >
                             <span
                               className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasUppercase
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
+                                ? "bg-green-500"
+                                : "bg-red-500"
                                 }`}
                             ></span>
                             Include uppercase letters (A-Z)
                           </div>
                           <div
                             className={`flex items-center text-sm ${passwordRequirements.hasNumber
-                                ? "text-green-600"
-                                : "text-red-500"
+                              ? "text-green-600"
+                              : "text-red-500"
                               }`}
                           >
                             <span
                               className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasNumber
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
+                                ? "bg-green-500"
+                                : "bg-red-500"
                                 }`}
                             ></span>
                             Include at least one number (0-9)
                           </div>
                           <div
                             className={`flex items-center text-sm ${passwordRequirements.hasSymbol
-                                ? "text-green-600"
-                                : "text-red-500"
+                              ? "text-green-600"
+                              : "text-red-500"
                               }`}
                           >
                             <span
                               className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasSymbol
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
+                                ? "bg-green-500"
+                                : "bg-red-500"
                                 }`}
                             ></span>
                             Include at least one symbol (!@#$%^&*)
                           </div>
                           <div
                             className={`flex items-center text-sm ${passwordRequirements.hasMinLength
-                                ? "text-green-600"
-                                : "text-red-500"
+                              ? "text-green-600"
+                              : "text-red-500"
                               }`}
                           >
                             <span
                               className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasMinLength
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
+                                ? "bg-green-500"
+                                : "bg-red-500"
                                 }`}
                             ></span>
                             Be at least 8 characters long
@@ -1127,11 +1129,11 @@ const ULP = () => {
                     type="button"
                     onClick={handleNextStep}
                     className={`w-full py-3  rounded-full transition-colors ${isPasswordValid &&
-                        email &&
-                        confirmPassword &&
-                        password === confirmPassword
-                        ? "bg-[#3E4095] text-white "
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      email &&
+                      confirmPassword &&
+                      password === confirmPassword
+                      ? "bg-[#3E4095] text-white "
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                     disabled={
                       !isPasswordValid ||
@@ -1279,8 +1281,8 @@ const ULP = () => {
                     type="button"
                     onClick={handleFinalStep}
                     className={`w-full transition-colors py-3 rounded-full  ${firstName && lastName && middleName && DOB && gender
-                        ? "bg-[#3E4095] text-white "
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      ? "bg-[#3E4095] text-white "
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                     disabled={
                       !firstName || !lastName || !middleName || !DOB || !gender
@@ -1331,10 +1333,10 @@ const ULP = () => {
                           -- Select a country --
                         </option>
                         {countries.map((c) => (
-                          <option key={c.iso2} value={c.name}>
-                            {c.name}
-                          </option>
-                        ))}
+                            <option key={c.isoCode} value={c.name}>
+                              {c.name}
+                            </option>
+                          ))}
                       </select>
                       <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <svg
@@ -1368,10 +1370,10 @@ const ULP = () => {
                           -- Select your state --
                         </option>
                         {states.map((s) => (
-                          <option key={s.name} value={s.name}>
-                            {s.name}
-                          </option>
-                        ))}
+                            <option key={s.isoCode} value={s.isoCode}>
+                              {s.name}
+                            </option>
+                          ))}
                       </select>
                       <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <svg
@@ -1403,11 +1405,11 @@ const ULP = () => {
                         <option value="" selected>
                           -- Select City --
                         </option>
-                        {cities.map((c, i) => (
-                          <option key={i} value={c}>
-                            {c}
-                          </option>
-                        ))}
+                        {cities.map((c) => (
+                            <option key={c.name} value={c.name}>
+                              {c.name}
+                            </option>
+                          ))}
                       </select>
                       <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <svg
@@ -1484,13 +1486,13 @@ const ULP = () => {
                     type="button"
                     onClick={handleSubmit}
                     className={`w-full transition-colors py-3 rounded-full ${country &&
-                        state &&
-                        city &&
-                        street &&
-                        houseNO &&
-                        !isSubmitting
-                        ? "bg-[#3E4095] text-white "
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      state &&
+                      city &&
+                      street &&
+                      houseNO &&
+                      !isSubmitting
+                      ? "bg-[#3E4095] text-white "
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       } `}
                     disabled={
                       !country ||
@@ -1501,10 +1503,10 @@ const ULP = () => {
                       isSubmitting
                     }
                   >
-                    {isSubmitting ? (     <div className="flex items-center justify-center gap-2">
+                    {isSubmitting ? (<div className="flex items-center justify-center gap-2">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       Submitting...
-                    </div> ): ("Sign Up Now")}
+                    </div>) : ("Sign Up Now")}
                   </button>
                 </form>
 

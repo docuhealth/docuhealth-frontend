@@ -37,6 +37,8 @@ const HosStaffsProvider = (props) => {
         }
       };
     
+     
+    
         useEffect(() => {
         if (isUserLoggedIn) {
             fetchStaffs(1); // Fetch on mount

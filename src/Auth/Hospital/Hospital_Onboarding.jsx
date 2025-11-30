@@ -8,6 +8,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { authAPI } from "../../utils/authAPI";
+import { Country, State, City } from 'country-state-city';
 
 const Hospital_Onboarding = () => {
     const navigate = useNavigate();
@@ -18,16 +19,16 @@ const Hospital_Onboarding = () => {
         const params = new URLSearchParams(window.location.search);
         const token = params.get("token");
         const requestId = params.get("request_id");
-    
+
         if (!token || !requestId) {
-          toast.error("Invalid or missing onboarding parameters.");
-          setTimeout(() => navigate("/"), 1500);
+            toast.error("Invalid or missing onboarding parameters.");
+            setTimeout(() => navigate("/"), 1500);
         } else {
-          // ✅ Update state
-          setVerificationToken(token);
-          setVerificationRequest(requestId);
-          console.log("✅ Token:", token);
-          console.log("✅ Request ID:", requestId);
+            // ✅ Update state
+            setVerificationToken(token);
+            setVerificationRequest(requestId);
+            console.log("✅ Token:", token);
+            console.log("✅ Request ID:", requestId);
         }
     }, [navigate]);
 
@@ -76,46 +77,40 @@ const Hospital_Onboarding = () => {
 
     // Fetch all countries + states
     useEffect(() => {
-        const fetchCountriesStates = async () => {
-            try {
-                const response = await axios.get(
-                    "https://countriesnow.space/api/v0.1/countries/states"
-                );
-                setCountries(response.data.data);
-            } catch (error) {
-                console.error("Error fetching countries & states:", error);
-            }
-        };
-        fetchCountriesStates();
+        // Load all countries on mount
+        const allCountries = Country.getAllCountries();
+        setCountries(allCountries);
     }, []);
 
     // Update states when country changes
     useEffect(() => {
         if (country) {
-            const selected = countries.find((c) => c.name === country);
-            setStates(selected?.states || []);
-            setState("");
-            setCities([]);
+            const selectedCountry = countries.find(c => c.name === country);
+            if (selectedCountry) {
+                const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
+                setStates(countryStates);
+            } else {
+                setStates([]);
+            }
+            setState("");  // reset state
+            setCities([]); // reset cities
+            setCity("");   // reset city
         }
     }, [country, countries]);
 
     // Fetch cities when state changes
     useEffect(() => {
         if (country && state) {
-            const fetchCities = async () => {
-                try {
-                    const response = await axios.post(
-                        "https://countriesnow.space/api/v0.1/countries/state/cities",
-                        { country, state }
-                    );
-                    setCities(response.data.data);
-                } catch (error) {
-                    console.error("Error fetching cities:", error);
-                }
-            };
-            fetchCities();
+            const selectedCountry = countries.find(c => c.name === country);
+            if (!selectedCountry) return;
+
+            const stateCities = selectedCountry ? City.getCitiesOfState(selectedCountry.isoCode, state) : [];
+            setCities(stateCities || []);
+            setCity(""); // reset city
+        } else {
+            setCities([]);
         }
-    }, [state, country]);
+    }, [state, country, countries]);
 
     // Password validation function
     const validatePassword = (password) => {
@@ -179,57 +174,57 @@ const Hospital_Onboarding = () => {
         setShowToast(true);
 
         const payload = {
-          email,
-          password,
-          profile: {
-            name,
-            country,
-            state,
-            city,
-            street,
-            house_no: houseNO,
-          },
-        verification_token,
-        verification_request 
+            email,
+            password,
+            profile: {
+                name,
+                country,
+                state,
+                city,
+                street,
+                house_no: houseNO,
+            },
+            verification_token,
+            verification_request
         };
         console.log(payload)
         try {
-          const response = await authAPI("POST", "api/hospitals", payload, {
-            headers: { "Content-Type": "application/json" },
-          });
+            const response = await authAPI("POST", "api/hospitals", payload, {
+                headers: { "Content-Type": "application/json" },
+            });
 
-          console.log(response);
-          toast.success("Registration successful!");
-          toast.success("Kindly check your email for your login link !");
-          setTimeout(() => {
-            navigate("/");
-          }, 1000);
+            console.log(response);
+            toast.success("Registration successful!");
+            toast.success("Kindly check your email for your login link !");
+            setTimeout(() => {
+                navigate("/");
+            }, 1000);
         } catch (error) {
-          console.error("Error:", error);
-          toast.error(
-            error.message || "Something went wrong. Please refresh and try again."
-          );
+            console.error("Error:", error);
+            toast.error(
+                error.message || "Something went wrong. Please refresh and try again."
+            );
         } finally {
-          setIsSubmitting(false);
+            setIsSubmitting(false);
 
-          // reset step
-          setStep(1);
+            // reset step
+            setStep(1);
 
-          // Step 1 fields
-          setEmail("");
-          setName("");
-          setPhone_Num("");
-          setPassword("");
-          setConfirmPassword("");
+            // Step 1 fields
+            setEmail("");
+            setName("");
+            setPhone_Num("");
+            setPassword("");
+            setConfirmPassword("");
 
 
-        //   // Step 2 fields
+            //   // Step 2 fields
 
-          setCountry("");
-          setState("");
-          setCity("");
-          setStreet("");
-          setHouseNO("");
+            setCountry("");
+            setState("");
+            setCity("");
+            setStreet("");
+            setHouseNO("");
         }
     };
 
@@ -525,7 +520,7 @@ const Hospital_Onboarding = () => {
                                                         -- Select a country --
                                                     </option>
                                                     {countries.map((c) => (
-                                                        <option key={c.iso2} value={c.name}>
+                                                        <option key={c.isoCode} value={c.name}>
                                                             {c.name}
                                                         </option>
                                                     ))}
@@ -562,7 +557,7 @@ const Hospital_Onboarding = () => {
                                                         -- Select your state --
                                                     </option>
                                                     {states.map((s) => (
-                                                        <option key={s.name} value={s.name}>
+                                                        <option key={s.isoCode} value={s.isoCode}>
                                                             {s.name}
                                                         </option>
                                                     ))}
@@ -597,9 +592,9 @@ const Hospital_Onboarding = () => {
                                                     <option value="" selected>
                                                         -- Select City --
                                                     </option>
-                                                    {cities.map((c, i) => (
-                                                        <option key={i} value={c}>
-                                                            {c}
+                                                    {cities.map((c) => (
+                                                        <option key={c.name} value={c.name}>
+                                                            {c.name}
                                                         </option>
                                                     ))}
                                                 </select>
@@ -670,10 +665,10 @@ const Hospital_Onboarding = () => {
                                                 isSubmitting
                                             }
                                         >
-                                            {isSubmitting ? (     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Submitting...
-                    </div> ): ("Sign Up Now")}
+                                            {isSubmitting ? (<div className="flex items-center justify-center gap-2">
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                Submitting...
+                                            </div>) : ("Sign Up Now")}
                                         </button>
 
                                     </form>
@@ -995,7 +990,7 @@ const Hospital_Onboarding = () => {
                                                     -- Select a country --
                                                 </option>
                                                 {countries.map((c) => (
-                                                    <option key={c.iso2} value={c.name}>
+                                                    <option key={c.isoCode} value={c.name}>
                                                         {c.name}
                                                     </option>
                                                 ))}
@@ -1032,7 +1027,7 @@ const Hospital_Onboarding = () => {
                                                     -- Select your state --
                                                 </option>
                                                 {states.map((s) => (
-                                                    <option key={s.name} value={s.name}>
+                                                    <option key={s.isoCode} value={s.isoCode}>
                                                         {s.name}
                                                     </option>
                                                 ))}
@@ -1067,9 +1062,9 @@ const Hospital_Onboarding = () => {
                                                 <option value="" selected>
                                                     -- Select City --
                                                 </option>
-                                                {cities.map((c, i) => (
-                                                    <option key={i} value={c}>
-                                                        {c}
+                                                {cities.map((c) => (
+                                                    <option key={c.name} value={c.name}>
+                                                        {c.name}
                                                     </option>
                                                 ))}
                                             </select>
@@ -1140,10 +1135,10 @@ const Hospital_Onboarding = () => {
                                             isSubmitting
                                         }
                                     >
-                                        {isSubmitting ? (     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Submitting...
-                    </div> ): ("Sign Up Now")}
+                                        {isSubmitting ? (<div className="flex items-center justify-center gap-2">
+                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                            Submitting...
+                                        </div>) : ("Sign Up Now")}
                                     </button>
 
                                 </form>

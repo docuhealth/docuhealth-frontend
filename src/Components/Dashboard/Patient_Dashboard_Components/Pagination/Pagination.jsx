@@ -5,6 +5,7 @@ const Pagination = ({
   currentPage,
   totalPages,
   fetchData,
+  tab
 }) => {
   return (
     <>
@@ -23,7 +24,7 @@ const Pagination = ({
                     ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                     : "bg-gray-300 hover:bg-gray-400"
                 }`}
-                onClick={() => fetchData(currentPage - 1)}
+                onClick={() => fetchData(currentPage - 1, tab)}
                 disabled={currentPage === 1}
               >
                 &lt;
@@ -38,7 +39,7 @@ const Pagination = ({
                       ? "bg-[#3E4095] text-white"
                       : "bg-gray-300 hover:bg-gray-400"
                   }`}
-                  onClick={() => fetchData(i + 1)}
+                  onClick={() => fetchData(i + 1, tab)}
                 >
                   {i + 1}
                 </button>
@@ -51,7 +52,7 @@ const Pagination = ({
                     ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                     : "bg-gray-300 hover:bg-gray-400"
                 }`}
-                onClick={() => fetchData(currentPage + 1)}
+                onClick={() => fetchData(currentPage + 1, tab)}
                 disabled={currentPage === totalPages}
               >
                 &gt;

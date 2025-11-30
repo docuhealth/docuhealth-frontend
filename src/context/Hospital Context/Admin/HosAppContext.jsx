@@ -8,6 +8,7 @@ export const HosAppContext = createContext();
 
 const HosProfileProvider = (props) => {
     const [profile, setProfile] = useState(null);
+    const [wards, setWards] = useState([])
     const isUserLoggedIn = !!getHospitalToken();
 
   
@@ -23,6 +24,19 @@ const HosProfileProvider = (props) => {
           }
         };
         fetchProfile();
+
+        const fetchWards = async(page = 1, pageSize = 10) => {
+          try{
+            const res = await axiosInstance.get(`api/hospitals/wards?page=${page}&size=${pageSize}`)
+            console.log( 'wards ' , res)
+            setWards(res.data.results)
+          }catch(err){
+            console.error("Error fetching wards:", err);
+            toast.error("Error fetching wards");
+          }
+        }
+
+        fetchWards(1)
       } else {
         return;
       }
@@ -30,7 +44,7 @@ const HosProfileProvider = (props) => {
 
 
     return (
-        <HosAppContext.Provider value={{ profile }}>{props.children}</HosAppContext.Provider>
+        <HosAppContext.Provider value={{ profile, wards }}>{props.children}</HosAppContext.Provider>
     );
 };
 

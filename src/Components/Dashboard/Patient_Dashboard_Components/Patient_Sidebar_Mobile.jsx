@@ -2,6 +2,7 @@ import React, {useContext, useState, useEffect} from "react";
 import { AppContext } from "../../../context/Patient Context/AppContext";
 import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Patient_Sidebar_Mobile = ({
   openMobileSidebar,
@@ -177,8 +178,12 @@ const Patient_Sidebar_Mobile = ({
               </div>
             </Link>
             <Link
-              to="/user-messages-dashboard"
-              onClick={() => setOpenMobileSidebar(false)}
+              to=""
+              onClick={() => 
+              {
+                setOpenMobileSidebar(false)
+                toast.success('feature coming soon !')
+              }}
             >
               <div className="px-4 my-4">
                 <li

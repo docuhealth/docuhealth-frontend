@@ -13,7 +13,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
         lastname: "",
         phone: "",
         gender: "",
-        role : "",
+        role: "",
         personnel: "",
         specialization: "",
         ward: "",
@@ -21,16 +21,25 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
         password: "",
     });
 
-    const profile = useContext(HosAppContext);
+    const { profile, wards } = useContext(HosAppContext);
 
     const [passwordRequirements, setPasswordRequirements] = useState({});
     const [isPasswordValid, setIsPasswordValid] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState({ strength: 0 });
 
+
     const personnelOptions = ["doctor", "nurse", "receptionist"];
     const specializationOptions = ["surgeon", "pediatrician", "cardiologist"];
-    const wardOptions = ["emergency ward", "recovery ward"];
-    const gender = ["male", "female" ];
+    const gender = ["male", "female"];
+
+
+    const [wardOptions, setWardOptions] = useState([]);
+
+    useEffect(() => {
+        if (Array.isArray(wards)) {
+            setWardOptions(wards);
+        }
+    }, [wards]);
 
     // Auto-generate password on step 2
     useEffect(() => {
@@ -111,52 +120,60 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
             toast.error("Please fill in all required fields.");
             return;
         }
-    
+
         const isReceptionist = form.personnel.toLowerCase() === "receptionist";
-    
+
         // Specialization & ward required ONLY if not receptionist
         if (!isReceptionist) {
             if (!form.specialization.trim()) {
                 toast.error("Please select an area of specialization.");
                 return;
             }
-    
+
             if (!form.ward.trim()) {
                 toast.error("Please assign a ward.");
                 return;
             }
         }
-    
+
         setStep(2);
     };
-    
-    
 
-    const handleSubmit = async(e) => {
+
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if(!form.email){
+        if (!form.email) {
             toast.error("Enter an email address")
         }
 
         setLoading(true)
 
         const payload = {
-            email : form.email,
-            password : form.password,
-            profile : {
-                firstname : form.firstname,
-                lastname : form.lastname,
-                phone_no : form.phone,
-                role : form.personnel,
-                specialization : form.specialization,
-                gender : form.gender            
+            email: form.email,
+            password: form.password,
+            profile: {
+              firstname: form.firstname,
+              lastname: form.lastname,
+              phone_no: form.phone,
+              role: form.personnel,
+              gender: form.gender,
+              staff_id: "NIG_101",
+              email: form.email,
+          
+              ...(form.specialization && { specialization: form.specialization }),
+              
+              // Add ward ONLY if available
+              ...(form.ward && { ward: form.ward })
             },
-            invitation_message : invitationHTML
-        }
+          
+            invitation_message: invitationHTML
+          };
+          
 
         console.log(payload)
-        try{
+        try {
             const res = await axiosInstance.post("api/hospitals/team-member", payload)
 
             console.log(res)
@@ -167,7 +184,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                 lastname: "",
                 phone: "",
                 gender: "",
-                role : "",
+                role: "",
                 personnel: "",
                 specialization: "",
                 ward: "",
@@ -178,11 +195,11 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
             setStep(1)
             setCreateNewStaff(false)
             setLoading(false)
-        } catch (error){
+        } catch (error) {
             toast.error(" Something went wrong. Please try again. ")
             setCreateNewStaff(false)
             setLoading(false)
-        }finally{
+        } finally {
             setLoading(false)
             setStep(1)
             setForm({
@@ -190,7 +207,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                 lastname: "",
                 phone: "",
                 gender: "",
-                role : "",
+                role: "",
                 personnel: "",
                 specialization: "",
                 ward: "",
@@ -200,7 +217,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
         }
     }
-    
+
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-5">
@@ -247,7 +264,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                                 className="border p-2 rounded-lg outline-none text-sm focus:border-[#3E4095]"
                             />
 
-<select
+                            <select
                                 value={form.gender}
                                 onChange={(e) => handleChange("gender", e.target.value)}
                                 className="border p-2 rounded-lg outline-none text-sm  focus:border-[#3E4095]"
@@ -292,7 +309,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
                             {/* Ward dropdown */}
                             <select
-                              disabled={form.personnel === "receptionist"}
+                                disabled={form.personnel === "receptionist"}
                                 value={form.ward}
                                 onChange={(e) => handleChange("ward", e.target.value)}
                                 className={`border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-[#3E4095] ${form.personnel === "receptionist" ? "bg-gray-100" : ""
@@ -300,8 +317,8 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                             >
                                 <option value="">Assign to ward</option>
                                 {wardOptions.map((w) => (
-                                    <option key={w} value={w}>
-                                        {w}
+                                    <option key={w.id} value={w.id}>
+                                        {w.name + ' ward'}
                                     </option>
                                 ))}
                             </select>
@@ -364,16 +381,16 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                             />
                         </div>
 
-                        <button className={`mt-5 ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#3E4095] cursor-pointer'}  text-white px-4 py-2 rounded-full w-full text-sm `}    disabled={loading} onClick={handleSubmit}>
+                        <button className={`mt-5 ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#3E4095] cursor-pointer'}  text-white px-4 py-2 rounded-full w-full text-sm `} disabled={loading} onClick={handleSubmit}>
 
                             {loading ? (
-                                        <div className="flex items-center justify-center gap-2">
-                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                            Adding to team...
-                                        </div>
-                                    ) : (
-                                        "Add to team"
-                                    )}
+                                <div className="flex items-center justify-center gap-2">
+                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    Adding to team...
+                                </div>
+                            ) : (
+                                "Add to team"
+                            )}
                         </button>
                     </div>
                 )}

@@ -10,7 +10,7 @@ const ReceptionistAdmissionRequestProvider = (props) => {
     const [count, setCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const pageSize = 7; // Example page size
+    const pageSize = 6; // Example page size
 
     const isUserLoggedIn = !!getHospitalToken();
 
@@ -23,6 +23,7 @@ const ReceptionistAdmissionRequestProvider = (props) => {
             );
 
             setAdmissionRequests(res.data.results || [])
+            console.log(res.data.results)
             setCount(res.data.count || 0);
             setCurrentPage(page);
             setTotalPages(Math.ceil(res.data.count / pageSize));

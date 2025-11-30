@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { AppContext } from "../../../context/Patient Context/AppContext";
 import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Patient_Dashboard_Sidebar = () => {
   const { profile, toggleEmergencyStatus, newEmergencyStatus } =
@@ -131,8 +132,12 @@ const Patient_Dashboard_Sidebar = () => {
               </li>
             </div>
           </Link>
-          <Link to="/user-messages-dashboard">
-            <div className="px-4 my-4">
+          <Link to="" >
+            <div className="px-4 my-4" onClick={
+              () => {
+                toast.success('feature coming soon !')
+              }
+            }>
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/user-messages-dashboard"
