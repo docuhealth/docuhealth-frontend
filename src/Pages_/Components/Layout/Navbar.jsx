@@ -258,6 +258,7 @@ const Navbar = ({ showPharmacyMode }) => {
             {/* Dropdown Menu */}
             {openDropdown === "others" && (
               <div className="absolute left-0 mt-8 w-48 bg-white border shadow-lg rounded-lg  z-50">
+                {/* 
                 <Link
                   to="/privacy-policy"
                   className="block px-4 py-2.5 text-sm text-[#797979] hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-t-lg"
@@ -272,10 +273,16 @@ const Navbar = ({ showPharmacyMode }) => {
                 >
                   Guest Mode
                 </Link>
+                */}
                 <Link
-                  to="/support"
+                  to=""
                   className="block px-4 py-2.5 text-sm text-[#797979] hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-b-lg"
-                  onClick={() => toggleDropdown("")}
+                  onClick={() => {
+                    toggleDropdown("")
+                    toast.success('Coming Soon !')
+                  }
+
+                  }
                 >
                   Support
                 </Link>
@@ -627,6 +634,7 @@ const Navbar = ({ showPharmacyMode }) => {
 
               {openDropdown === "others" && (
                 <div className="flex flex-col mt-3 ml-3 space-y-3 text-sm">
+                  {/* 
                   <Link
                     to=""
                     onClick={() => {
@@ -649,12 +657,14 @@ const Navbar = ({ showPharmacyMode }) => {
                   >
                     Guest Mode
                   </p>
+                  */}
                   <Link
-                    to="/support"
+                    to=""
                     onClick={() => {
                       setIsOpen(false);
                       setOpenDropdown("")
                       toggleDropdown("")
+                      toast.success('Coming Soon !')
                     }}
                     className=""
                   >
