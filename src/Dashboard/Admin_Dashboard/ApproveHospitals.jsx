@@ -53,7 +53,7 @@ const ApproveHospitals = () => {
 
     const handleLogout = () => {
         sessionStorage.clear();   // removes ALL session-based auth data
-        navigate("/login");       // redirect to login page
+        navigate("/");       // redirect to login page
     };
 
     useEffect(() => {
@@ -109,7 +109,7 @@ const ApproveHospitals = () => {
                 <div className="grid grid-cols-6 text-left text-sm bg-gray-100 py-5 rounded-md">
                     <p className="pl-5">Hospital ID</p>
                     <p>Email</p>
-                    <p>Phone</p>
+                    <p>Doc</p>
                     <p>Requested At</p>
                     <p>Status</p>
                     <p>Options</p>
