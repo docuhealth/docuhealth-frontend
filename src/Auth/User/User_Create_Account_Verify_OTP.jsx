@@ -57,7 +57,7 @@ const User_Create_Account_Verify_OTP = () => {
     } catch (error) {
       console.error("Error during OTP verification:", error.message);
       setIsLoading(false);
-      toast.error(error.message || "OTP Verification Failed, Try Again");
+      toast.error(error.response.data.detail || "OTP Verification Failed, Try Again");
     }
   };
   return (
@@ -67,10 +67,10 @@ const User_Create_Account_Verify_OTP = () => {
         <div className="w-full flex-1">
           <div className=" hidden sm:flex justify-center items-center py-10 h-screen ">
             <Link to="/">
-               <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
-                         <img src={docuhealth_logo} alt="Logo" className="w-6" />
-                         <h1 className="text-xl">DocuHealth</h1>
-                       </div>
+              <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
+                <img src={docuhealth_logo} alt="Logo" className="w-6" />
+                <h1 className="text-xl">DocuHealth</h1>
+              </div>
             </Link>
             <div className="w-full">
               <div className="px-10 w-full">
@@ -114,16 +114,15 @@ const User_Create_Account_Verify_OTP = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className={`w-full py-3 rounded-full ${
-                      isLoading
+                    className={`w-full py-3 rounded-full ${isLoading
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                         : "bg-[#3E4095] text-white"
-                    }`}
+                      }`}
                   >
-                      {isLoading ? (     <div className="flex items-center justify-center gap-2">
+                    {isLoading ? (<div className="flex items-center justify-center gap-2">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       Verifying Otp
-                    </div> ): ("Proceed")}
+                    </div>) : ("Proceed")}
                   </button>
                 </form>
               </div>
@@ -157,10 +156,12 @@ const User_Create_Account_Verify_OTP = () => {
         </div>
       </div>
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
-      <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
-               <img src={docuhealth_logo} alt="Logo" className="w-6" />
-               <h1 className="text-xl">DocuHealth</h1>
-             </div>
+      <Link to="/">
+        <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+          <img src={docuhealth_logo} alt="Logo" className="w-6" />
+          <h1 className="text-xl">DocuHealth</h1>
+        </div>
+      </Link>
         <div className="w-full">
           <div className="px-5 w-full">
             <h2 className="text-xl font-semibold pb-1">Verify OTP</h2>
@@ -203,17 +204,16 @@ const User_Create_Account_Verify_OTP = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3 rounded-full ${
-                  isLoading
+                className={`w-full py-3 rounded-full ${isLoading
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#3E4095] text-white "
-                }`}
+                  }`}
               >
-             
-                {isLoading ? (     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Verifying Otp
-                    </div> ): ("Proceed")}
+
+                {isLoading ? (<div className="flex items-center justify-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Verifying Otp
+                </div>) : ("Proceed")}
               </button>
             </form>
           </div>

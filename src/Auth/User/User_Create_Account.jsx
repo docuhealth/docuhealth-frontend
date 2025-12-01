@@ -207,7 +207,7 @@ useEffect(() => {
     } catch (error) {
       console.error("Error:", error);
       toast.error(
-        error.message || "Something went wrong. Please refresh and try again."
+        error.response.data.detail || "Something went wrong. Please refresh and try again."
       );
     } finally {
       setIsSubmitting(false);
@@ -903,10 +903,13 @@ useEffect(() => {
 
       <div className="h-screen sm:hidden">
         <div className="h-full overflow-y-scroll hide-scrollbar py-10">
+        <Link to="/">
           <div className="pl-5 flex gap-1 items-center font-semibold text-[#3E4095]">
             <img src={docuhealth_logo} alt="Logo" className="w-6" />
             <h1 className="text-xl">DocuHealth</h1>
           </div>
+          </Link>
+          
           {step === 1 ? (
             <>
               <div className="w-full px-5 flex  flex-col justify-center h-screen " id="temp">

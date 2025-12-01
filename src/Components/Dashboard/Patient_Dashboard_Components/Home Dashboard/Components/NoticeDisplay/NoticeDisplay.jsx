@@ -10,7 +10,7 @@ const NoticeDisplay = ({
   handleSelection
 }) => {
 
-    const profile = useContext(AppContext);
+    const {profile} = useContext(AppContext);
   
 
 
@@ -63,8 +63,18 @@ const NoticeDisplay = ({
                     // }else{
                     //   toast.success('Kindly subscribe to a plan to access this feature')
                     // }
-                    handleSelection(profile)
-                    closeNoticeMessage()
+
+                    if(profile){
+                      closeNoticeMessage()
+                      handleSelection(profile)
+                    }else{
+                      console.log(
+                        'no profile'
+                      )
+                      toast.error("We couldn't find a profile. Try again")
+                    }
+                    // 
+                    // 
                 
                   }}
                 >

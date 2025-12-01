@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import TIDF from "../../../../../../assets/img/templateIDCardFront.png";
 import TIDB from "../../../../../../assets/img/templateIDCardBack.png";
 import NL from "../../../../../../assets/img/NL.png";
@@ -14,9 +14,15 @@ const Id_Card = ({
   setIsIDCreatedSuccessfully,
   selectedProfile,
 }) => {
-  // console.log(selectedProfile);
 
-  // console.log(profile)
+  const fullName = useMemo(() => {
+    if (!selectedProfile) return "";
+
+    const p = selectedProfile.profile || selectedProfile; // normalize
+    return [p.firstname, p.middlename, p.lastname]
+      .filter(Boolean)
+      .join(" ");
+  }, [selectedProfile]);
 
   return (
     <>
@@ -44,13 +50,14 @@ const Id_Card = ({
                   <input
                     type="text"
                     name="fullName"
-                    value={
-                      selectedProfile?.firstname +
-                      " " +
-                      selectedProfile?.middlename +
-                      " " +
-                      selectedProfile?.lastname
-                    }
+                    value={[
+                      selectedProfile?.firstname || selectedProfile?.profile?.firstname,
+                      selectedProfile?.middlename || selectedProfile?.profile?.middlename,
+                      selectedProfile?.lastname || selectedProfile?.profile?.lastname
+                    ]
+                      .filter(Boolean) // removes undefined / empty values
+                      .join(" ")}
+
                     readOnly
                     className="w-full px-3 py-2 border rounded-md  text-gray-700 focus:outline-hidden focus:ring-2 focus:ring-[#3E4095]"
                   />

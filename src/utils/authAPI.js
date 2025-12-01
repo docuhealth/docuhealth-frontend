@@ -1,5 +1,6 @@
 // utils/authAPI.js
 import axiosInstance from "./axiosInstance";
+import toast from "react-hot-toast";
 
 export async function authAPI(method, endpoint, payload = {}, config = {}) {
   try {
@@ -13,6 +14,7 @@ export async function authAPI(method, endpoint, payload = {}, config = {}) {
 
     return response.data;
   } catch (error) {
+    console.log("Auth API Error:", error);
     throw error.response?.data || error.message;
   }
 }

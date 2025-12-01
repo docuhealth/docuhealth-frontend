@@ -50,6 +50,7 @@ const VerifyOTP = () => {
   const handleSubmit = async (e) => {
     setIsLoading(true);
     e.preventDefault();
+    console.log('hi')
     const enteredOtp = otp.join("");
 
     try {
@@ -84,7 +85,13 @@ const VerifyOTP = () => {
     } catch (error) {
       console.error("Error during OTP verification:", error);
       setIsLoading(false);
-      toast.error("OTP Verification Failed, Try Again");
+      toast.error(
+        error?.detail ||
+        error?.message ||
+        error ||
+        "An error occurred. Please try again."
+      );
+      
     }
   };
 
@@ -104,16 +111,12 @@ const VerifyOTP = () => {
         "api/auth/forgot-password",
         payload
       );
-
-      if (response.ok) {
-        toast.success("OTP sent successfully!");
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Failed to resend OTP, try again.");
-      }
-    } catch (error) {
-      console.error(`Error: ${error.message}`);
-      toast.error("An error occurred. Please try again later.");
+      toast.success("OTP sent successfully!");
+  
+    }
+    catch (error) {
+      console.log(error);
+      toast.error(error?.detail || error?.message || "An error occurred. Please try again.");
     }
   };
 
@@ -125,10 +128,10 @@ const VerifyOTP = () => {
         <div className="w-full flex-1">
           <div className="hidden sm:flex justify-center items-center py-10 h-screen">
             <Link to="/">
-                <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
-                                    <img src={docuhealth_logo} alt="Logo" className="w-6" />
-                                    <h1 className="text-xl">DocuHealth</h1>
-                                  </div>
+              <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
+                <img src={docuhealth_logo} alt="Logo" className="w-6" />
+                <h1 className="text-xl">DocuHealth</h1>
+              </div>
             </Link>
             <div className="px-10 w-full">
               <h2 className="text-xl font-semibold pb-1">Verify OTP</h2>
@@ -177,17 +180,16 @@ const VerifyOTP = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`w-full py-3 rounded-full ${
-                    isLoading
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-[#3E4095] text-white "
-                  }`}
+                  className={`w-full py-3 rounded-full ${isLoading
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#3E4095] text-white "
+                    }`}
                 >
-           
-                  {isLoading ? (     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Verifying OTP...
-                    </div> ): ("Proceed")}
+
+                  {isLoading ? (<div className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Verifying OTP...
+                  </div>) : ("Proceed")}
                 </button>
               </form>
             </div>
@@ -221,10 +223,12 @@ const VerifyOTP = () => {
       </div>
 
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
-    <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
-          <img src={docuhealth_logo} alt="Logo" className="w-6" />
-          <h1 className="text-xl">DocuHealth</h1>
-        </div>
+        <Link to="/">
+          <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+            <img src={docuhealth_logo} alt="Logo" className="w-6" />
+            <h1 className="text-xl">DocuHealth</h1>
+          </div>
+        </Link>
         <div>
           <div className="px-5 w-full">
             <h2 className="text-xl font-semibold pb-1">Verify OTP</h2>
@@ -265,16 +269,15 @@ const VerifyOTP = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3 rounded-full ${
-                  isLoading
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#3E4095] text-white "
-                }`}
+                className={`w-full py-3 rounded-full ${isLoading
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#3E4095] text-white "
+                  }`}
               >
-             {isLoading ? (     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Verifying OTP...
-                    </div> ): ("Proceed")}
+                {isLoading ? (<div className="flex items-center justify-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Verifying OTP...
+                </div>) : ("Proceed")}
               </button>
             </form>
           </div>

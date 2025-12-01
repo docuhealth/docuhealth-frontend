@@ -18,7 +18,7 @@ const Patient_Home_Dashboard = () => {
 
   const [noticeDisplay, setNoticeDisplay] = useState(false);
 
-  const {profile} = useContext(AppContext);
+  const { profile } = useContext(AppContext);
 
   const {
     onboardIDCard,
@@ -71,9 +71,8 @@ const Patient_Home_Dashboard = () => {
             >
               Sort by: {selected}
               <ChevronDown
-                className={`w-4 h-4 transition-transform ${
-                  isOpen ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
             {isOpen && (
@@ -93,7 +92,17 @@ const Patient_Home_Dashboard = () => {
           <div>
             <button
               className="flex items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition"
-              onClick={() => handleSelection(profile)}
+              onClick={() => {
+                if (profile) {
+                  handleSelection(profile)
+                } else {
+                  console.log(
+                    'no profile'
+                  )
+                  toast.error("We couldn't find a profile. Try again")
+                }
+              }}
+
             >
               Get Identity Card
             </button>
@@ -119,9 +128,8 @@ const Patient_Home_Dashboard = () => {
             >
               Sort by: {selected}
               <ChevronDown
-                className={`w-4 h-4 transition-transform ${
-                  isOpen ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
             {isOpen && (
@@ -141,7 +149,16 @@ const Patient_Home_Dashboard = () => {
           <div>
             <button
               className="flex justify-center items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition w-full "
-              onClick={() => setOnboardIDCard(true)}
+              onClick={() => {
+                if (profile) {
+                  handleSelection(profile)
+                } else {
+                  console.log(
+                    'no profile'
+                  )
+                  toast.error("We couldn't find a profile. Try again")
+                }
+              }}
             >
               Get Identity Card
             </button>
@@ -171,13 +188,13 @@ const Patient_Home_Dashboard = () => {
         handleIDCardCreation={handleIDCardCreation}
         isIDCreatedSuccessfully={isIDCreatedSuccessfully}
         setIsIDCreatedSuccessfully={setIsIDCreatedSuccessfully}
-        selectedProfile = {selectedProfile}
+        selectedProfile={selectedProfile}
       />
 
       <NoticeDisplay
         noticeDisplay={noticeDisplay}
         closeNoticeMessage={closeNoticeMessage}
-        handleSelection ={handleSelection}
+        handleSelection={handleSelection}
       />
     </>
   );

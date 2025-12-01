@@ -25,6 +25,7 @@ const IdCardProvider = (props) => {
   };
 
   const handleSelection = (selected) => {
+    // console.log(selected)
     setOnboardIDCard(true);
     setSelectedProfile(selected);
   };

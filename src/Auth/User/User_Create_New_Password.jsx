@@ -121,13 +121,24 @@ const NPU = () => {
       setIsLoading(false);
       setNotification(true); // Trigger any other notification logic
     } catch (error) {
-      toast.error("An error occurred. Please try again later."); // Network or unexpected error toast
       console.error("Error resetting password:", error);
+
+      const errorMessage =
+        error?.response?.data?.detail || // backend error
+        error?.detail ||                 // custom thrown error
+        error?.message ||                // JS error
+        error ||                         // string error
+        "An error occurred. Please try again later.";
+
+      toast.error(errorMessage);
       setIsLoading(false);
-    } finally {
-      setPassword("");
-      setConfirmPassword("");
+    }finally{
+      setPassword('')
+      setConfirmPassword('')
+      setIsPasswordValid('')
+      setPasswordRequirements('')
     }
+
   };
 
   const handleNavigation = () => {
@@ -139,13 +150,13 @@ const NPU = () => {
     <div>
       <div className="hidden h-screen sm:flex">
         {/* Left Side */}
-        <div className=" w-full flex-1">
-          <div className="hidden sm:flex justify-center items-center py-10 h-screen 4">
+        <div className=" w-1/2 h-full overflow-y-scroll hide-scrollbar flex-1">
+          <div className="hidden sm:flex flex-col  items-start justify-center py-10 ">
             <Link to="/">
-                 <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
-                                     <img src={docuhealth_logo} alt="Logo" className="w-6" />
-                                     <h1 className="text-xl">DocuHealth</h1>
-                                   </div>
+            <div className="pl-10 pb-10 flex gap-1 items-center font-semibold text-[#3E4095]">
+                <img src={docuhealth_logo} alt="Logo" className="w-6" />
+                <h1 className="text-xl">DocuHealth</h1>
+              </div>
             </Link>
             <div className="px-10 w-full">
               <h2 className="text-xl font-semibold pb-1 ">
@@ -164,11 +175,10 @@ const NPU = () => {
                     <input
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
-                      className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${
-                        password && !isPasswordValid
-                          ? "focus:border-red-500"
-                          : ""
-                      }`}
+                      className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${password && !isPasswordValid
+                        ? "focus:border-red-500"
+                        : ""
+                        }`}
                       value={password}
                       onChange={(e) => {
                         setPassword(e.target.value);
@@ -208,14 +218,12 @@ const NPU = () => {
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
-                            className={`h-2 rounded-full transition-all duration-300 ${
-                              getPasswordStrength(password).color
-                            }`}
+                            className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrength(password).color
+                              }`}
                             style={{
-                              width: `${
-                                (getPasswordStrength(password).strength / 5) *
+                              width: `${(getPasswordStrength(password).strength / 5) *
                                 100
-                              }%`,
+                                }%`,
                             }}
                           ></div>
                         </div>
@@ -226,82 +234,72 @@ const NPU = () => {
                       </p>
                       <div className="space-y-1">
                         <div
-                          className={`flex items-center text-sm ${
-                            passwordRequirements.hasLowercase
-                              ? "text-green-600"
-                              : "text-red-500"
-                          }`}
+                          className={`flex items-center text-sm ${passwordRequirements.hasLowercase
+                            ? "text-green-600"
+                            : "text-red-500"
+                            }`}
                         >
                           <span
-                            className={`w-2 h-2 rounded-full mr-2 ${
-                              passwordRequirements.hasLowercase
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                            }`}
+                            className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasLowercase
+                              ? "bg-green-500"
+                              : "bg-red-500"
+                              }`}
                           ></span>
                           Include lowercase letters (a-z)
                         </div>
                         <div
-                          className={`flex items-center text-sm ${
-                            passwordRequirements.hasUppercase
-                              ? "text-green-600"
-                              : "text-red-500"
-                          }`}
+                          className={`flex items-center text-sm ${passwordRequirements.hasUppercase
+                            ? "text-green-600"
+                            : "text-red-500"
+                            }`}
                         >
                           <span
-                            className={`w-2 h-2 rounded-full mr-2 ${
-                              passwordRequirements.hasUppercase
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                            }`}
+                            className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasUppercase
+                              ? "bg-green-500"
+                              : "bg-red-500"
+                              }`}
                           ></span>
                           Include uppercase letters (A-Z)
                         </div>
                         <div
-                          className={`flex items-center text-sm ${
-                            passwordRequirements.hasNumber
-                              ? "text-green-600"
-                              : "text-red-500"
-                          }`}
+                          className={`flex items-center text-sm ${passwordRequirements.hasNumber
+                            ? "text-green-600"
+                            : "text-red-500"
+                            }`}
                         >
                           <span
-                            className={`w-2 h-2 rounded-full mr-2 ${
-                              passwordRequirements.hasNumber
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                            }`}
+                            className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasNumber
+                              ? "bg-green-500"
+                              : "bg-red-500"
+                              }`}
                           ></span>
                           Include at least one number (0-9)
                         </div>
                         <div
-                          className={`flex items-center text-sm ${
-                            passwordRequirements.hasSymbol
-                              ? "text-green-600"
-                              : "text-red-500"
-                          }`}
+                          className={`flex items-center text-sm ${passwordRequirements.hasSymbol
+                            ? "text-green-600"
+                            : "text-red-500"
+                            }`}
                         >
                           <span
-                            className={`w-2 h-2 rounded-full mr-2 ${
-                              passwordRequirements.hasSymbol
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                            }`}
+                            className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasSymbol
+                              ? "bg-green-500"
+                              : "bg-red-500"
+                              }`}
                           ></span>
                           Include at least one symbol (!@#$%^&*)
                         </div>
                         <div
-                          className={`flex items-center text-sm ${
-                            passwordRequirements.hasMinLength
-                              ? "text-green-600"
-                              : "text-red-500"
-                          }`}
+                          className={`flex items-center text-sm ${passwordRequirements.hasMinLength
+                            ? "text-green-600"
+                            : "text-red-500"
+                            }`}
                         >
                           <span
-                            className={`w-2 h-2 rounded-full mr-2 ${
-                              passwordRequirements.hasMinLength
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                            }`}
+                            className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasMinLength
+                              ? "bg-green-500"
+                              : "bg-red-500"
+                              }`}
                           ></span>
                           Be at least 8 characters long
                         </div>
@@ -348,17 +346,16 @@ const NPU = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`w-full py-3 rounded-full ${
-                    isLoading
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-[#3E4095] text-white "
-                  }`}
+                  className={`w-full py-3 rounded-full ${isLoading
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#3E4095] text-white "
+                    }`}
                 >
-             
-                  {isLoading ? (     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Resetting Password
-                    </div> ): ("Reset Password")}
+
+                  {isLoading ? (<div className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Resetting Password
+                  </div>) : ("Reset Password")}
                 </button>
               </form>
             </div>
@@ -425,10 +422,12 @@ const NPU = () => {
       )}
 
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
-           <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
-                            <img src={docuhealth_logo} alt="Logo" className="w-6" />
-                            <h1 className="text-xl">DocuHealth</h1>
-                          </div>
+        <Link to="/">
+          <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+            <img src={docuhealth_logo} alt="Logo" className="w-6" />
+            <h1 className="text-xl">DocuHealth</h1>
+          </div>
+        </Link>
         <div>
           <div className="px-5 w-full">
             <h2 className="text-xl font-semibold pb-1 ">
@@ -447,9 +446,8 @@ const NPU = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${
-                      password && !isPasswordValid ? "focus:border-red-500" : ""
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${password && !isPasswordValid ? "focus:border-red-500" : ""
+                      }`}
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
@@ -489,13 +487,11 @@ const NPU = () => {
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            getPasswordStrength(password).color
-                          }`}
+                          className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrength(password).color
+                            }`}
                           style={{
-                            width: `${
-                              (getPasswordStrength(password).strength / 5) * 100
-                            }%`,
+                            width: `${(getPasswordStrength(password).strength / 5) * 100
+                              }%`,
                           }}
                         ></div>
                       </div>
@@ -506,82 +502,72 @@ const NPU = () => {
                     </p>
                     <div className="space-y-1">
                       <div
-                        className={`flex items-center text-sm ${
-                          passwordRequirements.hasLowercase
-                            ? "text-green-600"
-                            : "text-red-500"
-                        }`}
+                        className={`flex items-center text-sm ${passwordRequirements.hasLowercase
+                          ? "text-green-600"
+                          : "text-red-500"
+                          }`}
                       >
                         <span
-                          className={`w-2 h-2 rounded-full mr-2 ${
-                            passwordRequirements.hasLowercase
-                              ? "bg-green-500"
-                              : "bg-red-500"
-                          }`}
+                          className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasLowercase
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                            }`}
                         ></span>
                         Include lowercase letters (a-z)
                       </div>
                       <div
-                        className={`flex items-center text-sm ${
-                          passwordRequirements.hasUppercase
-                            ? "text-green-600"
-                            : "text-red-500"
-                        }`}
+                        className={`flex items-center text-sm ${passwordRequirements.hasUppercase
+                          ? "text-green-600"
+                          : "text-red-500"
+                          }`}
                       >
                         <span
-                          className={`w-2 h-2 rounded-full mr-2 ${
-                            passwordRequirements.hasUppercase
-                              ? "bg-green-500"
-                              : "bg-red-500"
-                          }`}
+                          className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasUppercase
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                            }`}
                         ></span>
                         Include uppercase letters (A-Z)
                       </div>
                       <div
-                        className={`flex items-center text-sm ${
-                          passwordRequirements.hasNumber
-                            ? "text-green-600"
-                            : "text-red-500"
-                        }`}
+                        className={`flex items-center text-sm ${passwordRequirements.hasNumber
+                          ? "text-green-600"
+                          : "text-red-500"
+                          }`}
                       >
                         <span
-                          className={`w-2 h-2 rounded-full mr-2 ${
-                            passwordRequirements.hasNumber
-                              ? "bg-green-500"
-                              : "bg-red-500"
-                          }`}
+                          className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasNumber
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                            }`}
                         ></span>
                         Include at least one number (0-9)
                       </div>
                       <div
-                        className={`flex items-center text-sm ${
-                          passwordRequirements.hasSymbol
-                            ? "text-green-600"
-                            : "text-red-500"
-                        }`}
+                        className={`flex items-center text-sm ${passwordRequirements.hasSymbol
+                          ? "text-green-600"
+                          : "text-red-500"
+                          }`}
                       >
                         <span
-                          className={`w-2 h-2 rounded-full mr-2 ${
-                            passwordRequirements.hasSymbol
-                              ? "bg-green-500"
-                              : "bg-red-500"
-                          }`}
+                          className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasSymbol
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                            }`}
                         ></span>
                         Include at least one symbol (!@#$%^&*)
                       </div>
                       <div
-                        className={`flex items-center text-sm ${
-                          passwordRequirements.hasMinLength
-                            ? "text-green-600"
-                            : "text-red-500"
-                        }`}
+                        className={`flex items-center text-sm ${passwordRequirements.hasMinLength
+                          ? "text-green-600"
+                          : "text-red-500"
+                          }`}
                       >
                         <span
-                          className={`w-2 h-2 rounded-full mr-2 ${
-                            passwordRequirements.hasMinLength
-                              ? "bg-green-500"
-                              : "bg-red-500"
-                          }`}
+                          className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasMinLength
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                            }`}
                         ></span>
                         Be at least 8 characters long
                       </div>
@@ -628,16 +614,15 @@ const NPU = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3 rounded-full ${
-                  isLoading
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#3E4095] text-white "
-                }`}
+                className={`w-full py-3 rounded-full ${isLoading
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#3E4095] text-white "
+                  }`}
               >
-                 {isLoading ? (     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Resetting Password
-                    </div> ): ("Reset Password")}
+                {isLoading ? (<div className="flex items-center justify-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Resetting Password
+                </div>) : ("Reset Password")}
               </button>
             </form>
           </div>

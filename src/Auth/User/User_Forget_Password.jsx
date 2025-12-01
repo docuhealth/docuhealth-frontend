@@ -59,7 +59,7 @@ const FP = () => {
       // Handle unexpected errors
       console.error("An error occurred:", error);
       toast.error(
-        error.message || "An error occurred. Please try again later."
+        error.response.data.detail || "An error occurred. Please try again later."
       );
       setIsLoading(false);
     }
@@ -107,11 +107,11 @@ const FP = () => {
           `}
                     disabled={isLoading}
                   >
-                  
-                    {isLoading ? (     <div className="flex items-center justify-center gap-2">
+
+                    {isLoading ? (<div className="flex items-center justify-center gap-2">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       Sending Otp
-                    </div> ): ("Send Otp")}
+                    </div>) : ("Send Otp")}
                   </button>
                 </form>
               </div>
@@ -146,10 +146,12 @@ const FP = () => {
       </div>
 
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
-        <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
-          <img src={docuhealth_logo} alt="Logo" className="w-6" />
-          <h1 className="text-xl">DocuHealth</h1>
-        </div>
+        <Link to="/">
+          <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+            <img src={docuhealth_logo} alt="Logo" className="w-6" />
+            <h1 className="text-xl">DocuHealth</h1>
+          </div>
+        </Link>
         <div className="">
           <div className="px-5 w-full">
             <div>
@@ -181,10 +183,10 @@ const FP = () => {
           `}
                   disabled={isLoading}
                 >
-                    {isLoading ? (     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Sending Otp
-                    </div> ): ("Send Otp")}
+                  {isLoading ? (<div className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Sending Otp
+                  </div>) : ("Send Otp")}
                 </button>
               </form>
             </div>

@@ -70,9 +70,6 @@ const USI = () => {
         const data = await login(userData);
 
         setToken(data.data.access_token, data.data.role);
-        // Send token to sessionStorage
-        // console.log(data)
-        // console.log(data.access_token)
 
         toast.success("Login successful");
         setIsSubmitting(false);
@@ -86,7 +83,7 @@ const USI = () => {
         // Handle success (e.g., save token, redirect user)
       } catch (error) {
         console.log(error);
-        toast.error(error.message || "Login failed. Please try again.");
+        toast.error(error.response.data.detail || "Login failed. Please try again.");
         setIsSubmitting(false);
       } finally {
         setEmail("");
@@ -239,10 +236,12 @@ const USI = () => {
       </div>
 
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
+         <Link to="/">
         <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
           <img src={docuhealth_logo} alt="Logo" className="w-6" />
           <h1 className="text-xl">DocuHealth</h1>
         </div>
+      </Link>
    
           <div className="px-5 w-full">
             <h2 className="text-xl font-semibold pb-1">

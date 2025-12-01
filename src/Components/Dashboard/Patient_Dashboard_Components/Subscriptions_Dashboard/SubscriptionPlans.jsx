@@ -115,7 +115,7 @@ const handlePayment = async (planId) => {
               </defs>
             </svg>
 
-            <h2 className="font-medium pb-1">No upcoming appointment!</h2>
+            <h2 className="font-medium pb-1">No subscription plans!</h2>
             <div className="max-w-md text-center">
               <p className="text-[12px] text-gray-500">
                 {" "}
