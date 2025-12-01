@@ -87,7 +87,12 @@ const Hospital_Verify_OTP = () => {
     } catch (error) {
       console.error("Error during OTP verification:", error);
       setIsLoading(false);
-      toast.error("OTP Verification Failed, Try Again");
+      toast.error(
+        error?.detail ||
+        error?.message ||
+        error ||
+        "An error occurred. Please try again."
+      );
     }finally{
       setIsLoading(false);
     }
@@ -109,16 +114,10 @@ const Hospital_Verify_OTP = () => {
         "api/auth/forgot-password",
         payload
       );
-
-      if (response.ok) {
-        toast.success("OTP sent successfully!");
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Failed to resend OTP, try again.");
-      }
-    } catch (error) {
-      console.error(`Error: ${error.message}`);
-      toast.error("An error occurred. Please try again later.");
+      toast.success("OTP sent successfully!");
+    }   catch (error) {
+      console.log(error);
+      toast.error(error?.detail || error?.message || "An error occurred. Please try again.");
     }
   };
 

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,  } from "react";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
 import toast from "react-hot-toast";
 import Pagination from "../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination";
@@ -12,6 +13,8 @@ const ApproveHospitals = () => {
     const [openOptions, setOpenOptions] = useState(null);
     const [approving, setApproving] = useState(null);
     const pageSize = 6; // Example page size
+
+    const navigate = useNavigate()
 
     const fetchRequests = async (page = 1) => {
         setLoading(true);

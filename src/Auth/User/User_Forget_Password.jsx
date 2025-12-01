@@ -62,6 +62,8 @@ const FP = () => {
         error.response.data.detail || "An error occurred. Please try again later."
       );
       setIsLoading(false);
+    }finally{
+      setIsLoading(false)
     }
   };
 

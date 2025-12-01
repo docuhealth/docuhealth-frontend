@@ -116,13 +116,23 @@ const Hospital_Create_New_Password = () => {
         setIsLoading(false);
         setNotification(true); // Trigger any other notification logic
       } catch (error) {
-        toast.error("An error occurred. Please try again later."); // Network or unexpected error toast
         console.error("Error resetting password:", error);
+
+        const errorMessage =
+          error?.response?.data?.detail || // backend error
+          error?.detail ||                 // custom thrown error
+          error?.message ||                // JS error
+          error ||                         // string error
+          "An error occurred. Please try again later.";
+  
+        toast.error(errorMessage);
         setIsLoading(false);
       } finally {
         setIsLoading(false)
-        setPassword("");
-        setConfirmPassword("");
+        setPassword('')
+        setConfirmPassword('')
+        setIsPasswordValid('')
+        setPasswordRequirements('')
       }
     };
 

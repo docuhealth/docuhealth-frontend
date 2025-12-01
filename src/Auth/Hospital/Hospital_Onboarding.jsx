@@ -200,12 +200,12 @@ const Hospital_Onboarding = () => {
             setTimeout(() => {
                 navigate("/");
             }, 1000);
-        } catch (error) {
+        }  catch (error) {
             console.error("Error:", error);
             toast.error(
-                error.message || "Something went wrong. Please refresh and try again."
+              error.response.data.detail || "Something went wrong. Please refresh and try again."
             );
-        } finally {
+          }  finally {
             setIsSubmitting(false);
 
             // reset step

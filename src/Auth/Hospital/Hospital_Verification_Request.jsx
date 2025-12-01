@@ -93,7 +93,7 @@ const Hospital_Verification_Request = () => {
         } catch (error) {
             // toast.error("Something went wrong. Please try again.");
             // console.log
-            toast.error(error.response.data.detail)
+            toast.error(error.response.data.detail || "Hospital Verification Request failed. Please try again.")
         } finally {
             setLoading(false);
             setEmail("");

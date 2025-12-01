@@ -55,7 +55,7 @@ const Hospital_Forget_Password = () => {
     } catch (error) {
       console.error("An error occurred:", error);
       toast.error(
-        error.message || "An error occurred. Please try again later."
+        error.response.data.detail || "An error occurred. Please try again later."
       );
 
 

@@ -82,12 +82,13 @@ const Hospital_Sign_In = () => {
 
       } catch (error) {
         console.log(error);
-        toast.error(error.message || "Login failed. Please try again.");
+        toast.error(error.response.data.detail || "Login failed. Please try again.");
         setIsSubmitting(false);
       } finally {
         setIsSubmitting(false);
         setEmail("");
         setPassword("");
+        setShowToast(false)
       }
     } else {
       toast.error("Please ensure all fields are correct.");
