@@ -185,7 +185,8 @@ const Hospital_Onboarding = () => {
                 house_no: houseNO,
             },
             verification_token,
-            verification_request
+            verification_request,
+            redirect_url: "https://hospital.docuhealthservices.net/login",
         };
         console.log(payload)
         try {

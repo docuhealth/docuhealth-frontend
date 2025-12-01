@@ -90,6 +90,7 @@ const USI = () => {
         setPhone_Num("");
         setInputValue("");
         setPassword("");
+        setShowToast(false)
       }
     } else {
       toast.error("Please ensure all fields are correct.");

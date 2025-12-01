@@ -109,6 +109,8 @@ import Hospital_Nurses_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/H
 
 import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
 
+import ApproveHospitals from "./Dashboard/Admin_Dashboard/ApproveHospitals";
+
 function App() {
 
   const hostname = window.location.hostname;
@@ -856,6 +858,10 @@ function App() {
             />
           </Route>
 
+          <Route
+            path="/admin"
+            element={<ApproveHospitals />}
+          />
           <Route
             path="/admin-create-account"
             element={<Admin_Create_Account />}
