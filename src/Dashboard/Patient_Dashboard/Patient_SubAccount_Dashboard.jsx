@@ -31,10 +31,12 @@ const Patient_SubAccount_Dashboard = () => {
     child_password: "",
     confirm_password: "",
     child_state: "",
+    child_stateCode: "",
     child_city: "",
     child_street: "",
     child_house_number: "",
     child_country: "",
+    child_countryCode: "",
   });
   const [subAcctUpgradeStep, setSubAcctUpgradeStep] = useState(1);
   const [subAcctUpgradeLoading, setSubAcctUpgradeLoading] = useState(false);

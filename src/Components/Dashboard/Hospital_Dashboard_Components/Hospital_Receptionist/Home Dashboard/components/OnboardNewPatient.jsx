@@ -29,7 +29,9 @@ const OnboardNewPatient = ({ setNewPatient }) => {
         street: "",
         city: "",
         state: "",
+        stateCode: "",
         country: "",
+        countryCode: "",
         house_no: ""
     })
     const [patientHIN, setPatientHIN] = useState('')
@@ -119,22 +121,18 @@ const OnboardNewPatient = ({ setNewPatient }) => {
 
 
     useEffect(() => {
-        if (patientData.country && patientData.state) {
-          const selectedCountry = countries.find(
-            (c) => c.name === patientData.country
-          );
-          if (!selectedCountry) return;
-      
-          const stateCities = City.getCitiesOfState(
-            selectedCountry.isoCode, // country ISO
-            patientData.state // now correctly the state ISO
-          );
-          setCities(stateCities);
-        } else {
-          setCities([]);
-        }
-      }, [patientData.state, patientData.country, countries]);
-      
+        if (patientData.countryCode && patientData.stateCode) {
+            const citiesOfState = City.getCitiesOfState(
+              patientData.countryCode,
+              patientData.stateCode
+            );
+        
+            setCities(citiesOfState);
+          } else {
+            setCities([]);
+          }
+    }, [patientData.countryCode, patientData.stateCode, countries]);
+
 
     console.log(cities)
 
@@ -171,7 +169,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                 lastname: patientData.lastname,
                 middlename: patientData.middlename,
                 street: patientData.street,
-                city: patientData.street,
+                city: patientData.city,
                 state: patientData.state,
                 country: patientData.country,
                 house_no: patientData.house_no
@@ -185,7 +183,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
         }
 
         try {
-            const res = await axiosInstance.post('api/receptionists/register/patient', payload)
+            const res = await axiosInstance.post('api/receptionists/patient/register', payload)
             toast.success('Patient Registration Successful')
             console.log(res)
             setPatientHIN(res.data.profile.hin)
@@ -194,6 +192,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
 
         } catch (err) {
             console.error("Error registering account:", err);
+            console.log(err)
             toast.error(err.response?.data?.message || "Patient Registration failed.");
             setStep(1)
             setNewPatient(false)
@@ -619,7 +618,18 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                                                 name="country"
                                                 value={patientData.country}
                                                 onChange={(e) => {
-                                                    handlePatientDataChange(e);
+                                                    const selected = countries.find(
+                                                        (c) => c.name === e.target.value
+                                                    );
+
+                                                    setPatientData((prev) => ({
+                                                        ...prev,
+                                                        country: selected.name,      // save name for payload
+                                                        countryCode: selected.isoCode, // save isoCode for fetching
+                                                        state: "",
+                                                        stateCode: "",
+                                                        city: ""
+                                                    }));
                                                     setIsOpen(false);
                                                 }}
                                                 onFocus={() => setIsOpen(true)} // when clicked/focused
@@ -663,7 +673,16 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                                             <select
                                                 value={patientData.state}
                                                 name="state"
-                                                onChange={handlePatientDataChange}
+                                                onChange={(e) => {
+                                                    const selected = states.find((s) => s.name === e.target.value);
+                                                
+                                                    setPatientData((prev) => ({
+                                                      ...prev,
+                                                      state: selected.name,
+                                                      stateCode: selected.isoCode,  // needed for city fetching
+                                                      city: ""
+                                                    }));
+                                                  }}
                                                 className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-[#3E4095] appearance-none text-sm"
                                                 required
                                                 disabled={!states.length}
@@ -672,7 +691,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                                                     -- Select your state --
                                                 </option>
                                                 {states.map((s) => (
-                                                    <option key={s.isoCode} value={s.isoCode}>
+                                                    <option key={s.isoCode} value={s.name}>
                                                         {s.name}
                                                     </option>
                                                 ))}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import DynamicDate from '../../../Components/Dynamic Date/DynamicDate'
 import template from '../../../assets/img/template.png'
@@ -8,6 +8,7 @@ import axiosInstance from '../../../utils/axiosInstance'
 import BookAppointment from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home Dashboard/components/BookAppointment'
 import AppointmentsList from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Appointments Dashboard/AppointmentsList'
 import RecentPatients from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home Dashboard/components/RecentPatients'
+import { ReceptionistAppContext } from '../../../context/Hospital Context/Receptionist/ReceptionistAppContext'
 
 const Hospital_Receptionist_Home_Dashboard = () => {
   const [newPatient, setNewPatient] = useState(false)
@@ -18,6 +19,14 @@ const Hospital_Receptionist_Home_Dashboard = () => {
   // const [patientEmail, setPatientEmail] = useState('')
   const [bookAppointment, setBookAppointment] = useState(false)
 
+  const { wards } = useContext(ReceptionistAppContext)
+
+  const totalBeds = wards?.reduce((sum, w) => sum + w.total_beds, 0) || 0;
+  const availableBeds = wards?.reduce((sum, w) => sum + w.available_beds, 0) || 0;
+  const occupiedBeds = totalBeds - availableBeds;
+
+  const totalWards = wards?.length || 0;
+  const occupiedWards = wards?.filter(w => w.available_beds < w.total_beds).length || 0;
 
   const handleHINCheck = async () => {
     setLoading(true)
@@ -148,7 +157,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                       type="text"
                       readOnly
                       className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                      value={patientDetails.street + patientDetails.city + patientDetails.state + patientDetails.country || 'NIL'}
+                      value={patientDetails.street + ', ' + patientDetails.city + ', ' + patientDetails.state + ', ' + patientDetails.country || 'NIL'}
                     />
                   </div>
 
@@ -247,6 +256,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                   </div>
                 </div>
               </div>
+
               <div className='bg-white rounded-xl border mt-5 p-5 text-sm text-gray-700'>
                 <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                   <div className=' flex items-center gap-2 bg-blue-50 p-3 rounded-md'>
@@ -258,7 +268,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                     </div>
                     <div>
                       <p className='text-xs'>Bed occupied / Available</p>
-                      <p className='text-[#3E4095] font-semibold text-lg'>50 / 57 Beds</p>
+                      <p className='text-[#3E4095] font-semibold text-lg'>  {occupiedBeds} / {totalBeds} Beds</p>
                     </div>
                   </div>
                   <div className=' flex items-center gap-2 bg-purple-100 p-3 rounded-md'>
@@ -270,11 +280,12 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                     </div>
                     <div>
                       <p className='text-xs'>Wards occupied / Available</p>
-                      <p className='text-[#9000FF] font-semibold text-lg'>50 / 57 Wards</p>
+                      <p className='text-[#9000FF] font-semibold text-lg'> {occupiedWards} / {totalWards} Wards</p>
                     </div>
                   </div>
                 </div>
               </div>
+
               <div className="bg-white my-5 border rounded-2xl p-5">
                 <div className=" border rounded-lg p-5">
                   <h2 className=" mb-4 pb-2 border-b font-medium">

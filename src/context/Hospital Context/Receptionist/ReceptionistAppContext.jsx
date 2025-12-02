@@ -7,6 +7,7 @@ export const ReceptionistAppContext = createContext();
 
 const ReceptionistProfileProvider = (props) => {
     const [profile, setProfile] = useState(null);
+    const [wards, setWards] = useState([]);
     const isUserLoggedIn = !!getHospitalToken();
 
     // console.log(isUserLoggedIn)
@@ -24,6 +25,21 @@ const ReceptionistProfileProvider = (props) => {
             }
           };
           fetchProfile();
+
+          const fetchWards = async (page = 1, pageSize = 10) => {
+            try {
+              const res = await axiosInstance.get(
+                `api/hospitals/wards?page=${page}&size=${pageSize}`
+              );
+              console.log("wards ", res);
+              setWards(res.data.results);
+            } catch (err) {
+              console.error("Error fetching wards:", err);
+              toast.error("Error fetching wards");
+            }
+          };
+    
+          fetchWards(1);
         } else {
           return;
         }
@@ -32,7 +48,7 @@ const ReceptionistProfileProvider = (props) => {
       // console.log(profile)
 
       return(
-        <ReceptionistAppContext.Provider value={{ profile }}>{props.children}</ReceptionistAppContext.Provider>
+        <ReceptionistAppContext.Provider value={{ profile, wards }}>{props.children}</ReceptionistAppContext.Provider>
       )
 }
 

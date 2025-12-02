@@ -58,6 +58,9 @@ const Hospital_Onboarding = () => {
     const [states, setStates] = useState([]);
     const [cities, setCities] = useState([]);
 
+    const [countryCode, setCountryCode] = useState('')
+    const [stateCode, setStateCode] = useState('')
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showToast, setShowToast] = useState(false);
 
@@ -101,16 +104,29 @@ const Hospital_Onboarding = () => {
     // Fetch cities when state changes
     useEffect(() => {
         if (country && state) {
-            const selectedCountry = countries.find(c => c.name === country);
-            if (!selectedCountry) return;
-
-            const stateCities = selectedCountry ? City.getCitiesOfState(selectedCountry.isoCode, state) : [];
-            setCities(stateCities || []);
-            setCity(""); // reset city
-        } else {
+          const selectedCountry = countries.find(c => c.name === country);
+          if (!selectedCountry) return;
+      
+          // Find the state object using its NAME
+          const selectedState = states.find(s => s.name === state);
+      
+          if (!selectedState) {
             setCities([]);
+            return;
+          }
+      
+          // Use ISO codes for city lookup
+          const stateCities = City.getCitiesOfState(
+            selectedCountry.isoCode,
+            selectedState.isoCode // <= this is the correct fix
+          );
+      
+          setCities(stateCities || []);
+          setCity("");
+        } else {
+          setCities([]);
         }
-    }, [state, country, countries]);
+      }, [state, country, countries, states]);
 
     // Password validation function
     const validatePassword = (password) => {
@@ -514,7 +530,11 @@ const Hospital_Onboarding = () => {
                                                 <select
                                                     className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-[#3E4095] outline-hidden appearance-none pr-10"
                                                     value={country}
-                                                    onChange={(e) => setCountry(e.target.value)}
+                                                    onChange={(e) => 
+                                                    {
+                                                        setCountry(e.target.options[e.target.selectedIndex].text);
+                                                    }
+                                                    }
                                                     required
                                                 >
                                                     <option value="" selected>
@@ -550,7 +570,7 @@ const Hospital_Onboarding = () => {
                                                 <select
                                                     className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border- outline-hidden appearance-none pr-10"
                                                     value={state}
-                                                    onChange={(e) => setState(e.target.value)}
+                                                    onChange={(e) => setState(e.target.options[e.target.selectedIndex].text)}
                                                     disabled={!states.length}
                                                     required
                                                 >
@@ -558,7 +578,7 @@ const Hospital_Onboarding = () => {
                                                         -- Select your state --
                                                     </option>
                                                     {states.map((s) => (
-                                                        <option key={s.isoCode} value={s.isoCode}>
+                                                        <option key={s.isoCode} value={s.name}>
                                                             {s.name}
                                                         </option>
                                                     ))}
@@ -984,7 +1004,7 @@ const Hospital_Onboarding = () => {
                                             <select
                                                 className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-[#3E4095] outline-hidden appearance-none pr-10"
                                                 value={country}
-                                                onChange={(e) => setCountry(e.target.value)}
+                                                onChange={(e) => setCountry(e.target.options[e.target.selectedIndex].text)}
                                                 required
                                             >
                                                 <option value="" selected>
@@ -1020,7 +1040,7 @@ const Hospital_Onboarding = () => {
                                             <select
                                                 className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border- outline-hidden appearance-none pr-10"
                                                 value={state}
-                                                onChange={(e) => setState(e.target.value)}
+                                                onChange={(e) => setState(e.target.options[e.target.selectedIndex].text)}
                                                 disabled={!states.length}
                                                 required
                                             >
@@ -1028,7 +1048,7 @@ const Hospital_Onboarding = () => {
                                                     -- Select your state --
                                                 </option>
                                                 {states.map((s) => (
-                                                    <option key={s.isoCode} value={s.isoCode}>
+                                                    <option key={s.isoCode} value={s.name}>
                                                         {s.name}
                                                     </option>
                                                 ))}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
 import { HosAppContext } from "../../../../../../context/Hospital Context/Admin/HosAppContext";
+import { HosStaffsContext } from "../../../../../../context/Hospital Context/Admin/HosStaffsContext";
 import axiosInstance from "../../../../../../utils/axiosInstance";
 import toast from "react-hot-toast";
 
@@ -16,12 +17,13 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
         role: "",
         personnel: "",
         specialization: "",
-        ward: "4",
+        ward: "",
         email: "",
         password: "",
     });
 
     const { profile, wards } = useContext(HosAppContext);
+    const {fetchStaffs} = useContext(HosStaffsContext)
 
     const [passwordRequirements, setPasswordRequirements] = useState({});
     const [isPasswordValid, setIsPasswordValid] = useState(false);
@@ -195,6 +197,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
             setStep(1)
             setCreateNewStaff(false)
             setLoading(false)
+            fetchStaffs()
         } catch (error) {
             toast.error(" Something went wrong. Please try again. ")
             setCreateNewStaff(false)

@@ -71,7 +71,7 @@ const PatientInfo = ({ patientFullInfo }) => {
                             type="text"
                             readOnly
                             className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                            value={patientFullInfo?.patient_info?.street + patientFullInfo?.patient_info?.city + patientFullInfo?.patient_info?.state + patientFullInfo?.patient_info?.country || 'NIL'}
+                            value={patientFullInfo?.patient_info?.street + ', ' +  patientFullInfo?.patient_info?.city + ', ' +  patientFullInfo?.patient_info?.state + ', ' +  patientFullInfo?.patient_info?.country || 'NIL'}
                         />
                     </div>
 
@@ -117,7 +117,7 @@ const PatientInfo = ({ patientFullInfo }) => {
                             Blood Pressure
                         </p>
                         <p className="font-medium">
-                            {patientFullInfo?.latest_vitals?.blood_pressure}
+                            {patientFullInfo?.latest_vitals?.blood_pressure} mmHG
                         </p>
                     </div>
                     <div className=" bg-white border rounded-md p-3">

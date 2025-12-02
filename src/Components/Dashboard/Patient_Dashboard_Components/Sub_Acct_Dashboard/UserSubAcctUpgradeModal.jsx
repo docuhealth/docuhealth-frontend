@@ -28,56 +28,53 @@ const UserSubAcctUpgradeModal = ({
   const [cities, setCities] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  
+
   useEffect(() => {
-   // Load all countries on mount
-     const allCountries = Country.getAllCountries();
-     setCountries(allCountries);
+    // Load all countries on mount
+    const allCountries = Country.getAllCountries();
+    setCountries(allCountries);
   }, []);
 
 
 
-      // Update states when country changes
-      useEffect(() => {
-        if (subAcctUpgradeData.child_country) {
-          const selectedCountry = countries.find(c => c.name === subAcctUpgradeData.child_country);
-          if (selectedCountry) {
-            const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
-            setStates(countryStates);
-          } else {
-            setStates([]);
-          }
-          setSubAcctUpgradeData((prevData) => ({
-            ...prevData,
-            child_state: "",
-          }));
-          setCities([]); // reset cities
-          setSubAcctUpgradeData((prevData) => ({
-            ...prevData,
-            child_city: "",
-          }));
-        }
-      }, [subAcctUpgradeData.child_country, countries]);
+  // Update states when country changes
+  useEffect(() => {
+    if (subAcctUpgradeData.child_country) {
+      const selectedCountry = countries.find(c => c.name === subAcctUpgradeData.child_country);
+      if (selectedCountry) {
+        const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
+        setStates(countryStates);
+      } else {
+        setStates([]);
+      }
+      setSubAcctUpgradeData((prevData) => ({
+        ...prevData,
+        child_state: "",
+      }));
+      setCities([]); // reset cities
+      setSubAcctUpgradeData((prevData) => ({
+        ...prevData,
+        child_city: "",
+      }));
+    }
+  }, [subAcctUpgradeData.child_country, countries]);
 
   // Fetch cities when state changes
 
 
-    // Fetch cities when state changes
-    useEffect(() => {
-      if (subAcctUpgradeData.child_country && subAcctUpgradeData.child_state) {
-        const selectedCountry = countries.find(c => c.name === subAcctUpgradeData.child_country);
-        if (!selectedCountry) return;
-    
-        const stateCities = selectedCountry ? City.getCitiesOfState(selectedCountry.isoCode, subAcctUpgradeData.child_state) : [];
-        setCities(stateCities || []);
-        setSubAcctUpgradeData((prevData) => ({
-          ...prevData,
-          child_city: "",
-        }));
-      } else {
-        setCities([]);
-      }
-    }, [subAcctUpgradeData.child_state, subAcctUpgradeData.child_country, countries]);
+  // Fetch cities when state changes
+  useEffect(() => {
+    if (subAcctUpgradeData.child_countryCode && subAcctUpgradeData.child_stateCode) {
+      const citiesOfState = City.getCitiesOfState(
+        subAcctUpgradeData.child_countryCode,
+        subAcctUpgradeData.child_stateCode
+      );
+
+      setCities(citiesOfState);
+    } else {
+      setCities([]);
+    }
+  }, [subAcctUpgradeData.child_stateCode, subAcctUpgradeData.child_countryCode, countries]);
   return (
     <>
       <div>
@@ -154,7 +151,18 @@ const UserSubAcctUpgradeModal = ({
                         name="child_country"
                         value={subAcctUpgradeData.child_country}
                         onChange={(e) => {
-                          handleSubAcctUpgradeDataChange(e);
+                          const selected = countries.find(
+                            (c) => c.name === e.target.value
+                          );
+
+                          setSubAcctUpgradeData((prev) => ({
+                            ...prev,
+                            child_country: selected.name,      // save name for payload
+                            child_countryCode: selected.isoCode, // save isoCode for fetching
+                            child_state: "",
+                            child_stateCode: "",
+                            child_city: ""
+                          }));
                           setIsOpen(false);
                         }}
                         onFocus={() => setIsOpen(true)} // when clicked/focused
@@ -166,15 +174,14 @@ const UserSubAcctUpgradeModal = ({
                           -- Select a country --
                         </option>
                         {countries.map((c) => (
-                                                        <option key={c.isoCode} value={c.name}>
-                                                            {c.name}
-                                                        </option>
-                                                    ))}
+                          <option key={c.isoCode} value={c.name}>
+                            {c.name}
+                          </option>
+                        ))}
                       </select>
                       <div
-                        className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-9 right-2 ${
-                          isOpen ? "rotate-180" : "rotate-0"
-                        }`}
+                        className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-9 right-2 ${isOpen ? "rotate-180" : "rotate-0"
+                          }`}
                       >
                         <svg
                           className="w-4 h-4 text-gray-400"
@@ -217,12 +224,11 @@ const UserSubAcctUpgradeModal = ({
                             handleSubAcctUpgradeDataChange(e);
                             validatePassword(e.target.value);
                           }}
-                          className={`w-full px-4 py-2 border rounded-lg pl-8 outline-hidden focus:border-[#3E4095] ${
-                            subAcctUpgradeData.child_password &&
-                            !isPasswordValid
+                          className={`w-full px-4 py-2 border rounded-lg pl-8 outline-hidden focus:border-[#3E4095] ${subAcctUpgradeData.child_password &&
+                              !isPasswordValid
                               ? "focus:border-red-500"
                               : ""
-                          }`}
+                            }`}
                           required
                         />
                         <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
@@ -290,19 +296,17 @@ const UserSubAcctUpgradeModal = ({
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
-                              className={`h-2 rounded-full transition-all duration-300 ${
-                                getPasswordStrength(
-                                  subAcctUpgradeData.child_password
-                                ).color
-                              }`}
+                              className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrength(
+                                subAcctUpgradeData.child_password
+                              ).color
+                                }`}
                               style={{
-                                width: `${
-                                  (getPasswordStrength(
-                                    subAcctUpgradeData.child_password
-                                  ).strength /
+                                width: `${(getPasswordStrength(
+                                  subAcctUpgradeData.child_password
+                                ).strength /
                                     5) *
                                   100
-                                }%`,
+                                  }%`,
                               }}
                             ></div>
                           </div>
@@ -313,82 +317,72 @@ const UserSubAcctUpgradeModal = ({
                         </p>
                         <div className="space-y-1">
                           <div
-                            className={`flex items-center text-sm ${
-                              passwordRequirements.hasLowercase
+                            className={`flex items-center text-sm ${passwordRequirements.hasLowercase
                                 ? "text-green-600"
                                 : "text-red-500"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`w-2 h-2 rounded-full mr-2 ${
-                                passwordRequirements.hasLowercase
+                              className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasLowercase
                                   ? "bg-green-500"
                                   : "bg-red-500"
-                              }`}
+                                }`}
                             ></span>
                             Include lowercase letters (a-z)
                           </div>
                           <div
-                            className={`flex items-center text-sm ${
-                              passwordRequirements.hasUppercase
+                            className={`flex items-center text-sm ${passwordRequirements.hasUppercase
                                 ? "text-green-600"
                                 : "text-red-500"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`w-2 h-2 rounded-full mr-2 ${
-                                passwordRequirements.hasUppercase
+                              className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasUppercase
                                   ? "bg-green-500"
                                   : "bg-red-500"
-                              }`}
+                                }`}
                             ></span>
                             Include uppercase letters (A-Z)
                           </div>
                           <div
-                            className={`flex items-center text-sm ${
-                              passwordRequirements.hasNumber
+                            className={`flex items-center text-sm ${passwordRequirements.hasNumber
                                 ? "text-green-600"
                                 : "text-red-500"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`w-2 h-2 rounded-full mr-2 ${
-                                passwordRequirements.hasNumber
+                              className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasNumber
                                   ? "bg-green-500"
                                   : "bg-red-500"
-                              }`}
+                                }`}
                             ></span>
                             Include at least one number (0-9)
                           </div>
                           <div
-                            className={`flex items-center text-sm ${
-                              passwordRequirements.hasSymbol
+                            className={`flex items-center text-sm ${passwordRequirements.hasSymbol
                                 ? "text-green-600"
                                 : "text-red-500"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`w-2 h-2 rounded-full mr-2 ${
-                                passwordRequirements.hasSymbol
+                              className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasSymbol
                                   ? "bg-green-500"
                                   : "bg-red-500"
-                              }`}
+                                }`}
                             ></span>
                             Include at least one symbol (!@#$%^&*)
                           </div>
                           <div
-                            className={`flex items-center text-sm ${
-                              passwordRequirements.hasMinLength
+                            className={`flex items-center text-sm ${passwordRequirements.hasMinLength
                                 ? "text-green-600"
                                 : "text-red-500"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`w-2 h-2 rounded-full mr-2 ${
-                                passwordRequirements.hasMinLength
+                              className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasMinLength
                                   ? "bg-green-500"
                                   : "bg-red-500"
-                              }`}
+                                }`}
                             ></span>
                             Be at least 8 characters long
                           </div>
@@ -420,7 +414,19 @@ const UserSubAcctUpgradeModal = ({
                       <select
                         value={subAcctUpgradeData.child_state}
                         name="child_state"
-                        onChange={handleSubAcctUpgradeDataChange}
+                        onChange={(e) => {
+                          const selected = states.find((s) => s.name === e.target.value);
+                      
+                          setSubAcctUpgradeData((prev) => ({
+                            ...prev,
+                            child_state: selected.name,
+                            child_stateCode: selected.isoCode,  // needed for city fetching
+                            child_city: ""
+                          }));
+                        }
+                         
+                          
+                        }
                         className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-[#3E4095] appearance-none"
                         required
                         disabled={!states.length}
@@ -429,10 +435,10 @@ const UserSubAcctUpgradeModal = ({
                           -- Select your state --
                         </option>
                         {states.map((s) => (
-                                                        <option key={s.isoCode} value={s.isoCode}>
-                                                            {s.name}
-                                                        </option>
-                                                    ))}
+                          <option key={s.isoCode} value={s.name}>
+                            {s.name}
+                          </option>
+                        ))}
                       </select>
                       <div
                         className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-9 right-2 `}
@@ -468,10 +474,10 @@ const UserSubAcctUpgradeModal = ({
                           -- Select City --
                         </option>
                         {cities.map((c) => (
-                                                        <option key={c.name} value={c.name}>
-                                                            {c.name}
-                                                        </option>
-                                                    ))}
+                          <option key={c.name} value={c.name}>
+                            {c.name}
+                          </option>
+                        ))}
                       </select>
                       <div
                         className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-9 right-2 `}
@@ -522,9 +528,9 @@ const UserSubAcctUpgradeModal = ({
                       />
                     </div>
                     <div
-                      className={`col-span-2 text-center ${                    isValid && !subAcctUpgradeLoading
-                      ? "bg-[#3E4095] text-white  cursor-pointer"
-                      : "cursor-not-allowed bg-gray-300 text-gray-500"} py-3 px-4 rounded-full cursor-pointer`}
+                      className={`col-span-2 text-center ${isValid && !subAcctUpgradeLoading
+                        ? "bg-[#3E4095] text-white  cursor-pointer"
+                        : "cursor-not-allowed bg-gray-300 text-gray-500"} py-3 px-4 rounded-full cursor-pointer`}
                       onClick={handleSubAcctUpgrade}
                       disabled={!isValid || subAcctUpgradeLoading}
                     >
