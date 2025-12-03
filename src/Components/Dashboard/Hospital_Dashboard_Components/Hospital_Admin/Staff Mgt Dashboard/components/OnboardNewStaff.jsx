@@ -169,7 +169,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
               // Add ward ONLY if available
               ...(form.ward && { ward: form.ward })
             },
-          
+            login_url : "https://hospital.docuhealthservices.net/login",
             invitation_message: invitationHTML
           };
           

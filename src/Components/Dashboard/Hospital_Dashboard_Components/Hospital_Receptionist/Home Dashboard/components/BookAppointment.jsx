@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import axiosInstance from "../../../../../../utils/axiosInstance";
 
@@ -43,7 +43,16 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
     const [requestLoading, setRequestLoading] = useState(false)
     const [staffList, setStaffList] = useState([]);
     const [isStaffSelected, setIsStaffSelected] = useState(false)
+    const [isStaffSelectedRole, setIsStaffSelectedRole] = useState(false)
     const [isOpen, setIsOpen] = useState(false);
+
+    const today = new Date();
+
+    const [selectedDay, setSelectedDay] = useState(String(today.getDate()));
+    const [selectedMonth, setSelectedMonth] = useState("January");
+    const [selectedYear, setSelectedYear] = useState(String(today.getFullYear()));
+    const [selectedTime, setSelectedTime] = useState("08:00");
+
     const [formData, setFormData] = useState({
         staff_id: "",
         patient_hin: "",
@@ -51,6 +60,8 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
         note: "",
         scheduled_time: ""
     });
+
+
 
 
     const personnelTypes = [
@@ -111,6 +122,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
 
             // Store the data
             setStaffList(data);
+            setIsStaffSelectedRole(selected.toLowerCase());
             toast.success(`${selected} fetched successfully.`);
         } catch (err) {
             console.error("Error fetching medical personnel:", err);
@@ -122,42 +134,50 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
     const handleAssign = (staffId) => {
         setIsStaffSelected(true); // show next card
 
-        console.log('hi')
-        // Prefill form data
         setFormData(prev => ({
             ...prev,
             staff_id: staffId,
         }));
     };
 
-    const handleRequest = async() => {
+    const handleRequest = async () => {
+
+        const selectedDate = new Date(
+            `${selectedMonth} ${selectedDay}, ${selectedYear} ${selectedTime}`
+       );
 
         setRequestLoading(true)
         const updatedFormData = {
             ...formData,
             patient_hin: patientDetails.hin,
-            scheduled_time: new Date().toISOString(),
-          };
-        
-          console.log("REQUEST PAYLOAD:", updatedFormData);
+            scheduled_time: selectedDate.toISOString()
+        };
+
+        console.log("REQUEST PAYLOAD:", updatedFormData);
 
 
-        try{
-            const res = await axiosInstance.post('api/receptionists/appointments',updatedFormData)
+        try {
+            const res = await axiosInstance.post('api/receptionists/appointments', updatedFormData)
             console.log(res)
             toast.success('You have successfully booked a consultation for a patient')
             setBookAppointment(false)
             setRequestLoading(false)
-        }catch(err){
+        } catch (err) {
             console.error("Error booking consultation:", err);
             toast.error(err.response?.data?.message || "Appointment Request failed.");
             setBookAppointment(false)
             setRequestLoading(false)
-        } finally{
+        } finally {
             setBookAppointment(false)
             setRequestLoading(false)
         }
     }
+
+    // useEffect(() => {
+    //     if(isStaffSelected){
+    //         console.log(isStaffSelectedRole)
+    //     }
+    // }, [isStaffSelected, isStaffSelectedRole])
 
 
 
@@ -181,10 +201,10 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                                 <p className="text-center text-gray-500 mb-4 text-sm">
                                     What’s the reason for the request?
                                 </p>
-                                <div className="mb-2">
+                                <div className="mb-2 text-[12px]">
                                     <p className="mb-1 text-gray-700 font-medium">Add note (optional) :</p>
                                     <textarea
-                                        className="border rounded-lg w-full  h-[100px] p-4 text-sm outline-none focus:border-[#3E4095]"
+                                        className="border rounded-lg w-full  h-[100px] p-3 text-[12px] outline-none focus:border-[#3E4095]"
                                         value={formData.note}
                                         onChange={(e) =>
                                             setFormData({ ...formData, note: e.target.value })
@@ -194,7 +214,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                                 </div>
 
                                 <div className="mb-2 relative ">
-                                    <p className="block text-sm font-medium text-gray-700 mb-1">
+                                    <p className="block text-[12px] font-medium text-gray-700 mb-1">
                                         Type :
                                     </p>
                                     <select
@@ -206,24 +226,33 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                                         }}
                                         onFocus={() => setIsOpen(true)} // when clicked/focused
                                         onBlur={() => setIsOpen(false)} // when closed
-                                        className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-sm"
+                                        className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-[12px]"
                                         required
                                     >
-                                        <option value="">Select</option>
-                                        <option value="male">Consultation</option>
+                                        <option value="" selected>Select</option>
+                                        {/* If role is doctor: show only Consultation */}
+                                        {isStaffSelectedRole === "doctor" && (
+                                            <option value="consultation">Consultation</option>
+                                        )}
+
+                                        {/* If role is nurse: show only Vital checkup */}
+                                        {isStaffSelectedRole === "nurse" && (
+                                            <option value="vital">Vital checkup / other nursing services</option>
+                                        )}
+                                        {/* <option value="male">Consultation</option>
                                         <option value="female">Vital checkup/other nursing services</option>
                                         <option value="other">Imaging services</option>
                                         <option value="unknown">Lab test</option>
-                                        <option value="unknown">Drug purchase/refill</option>
+                                        <option value="unknown">Drug purchase/refill</option> */}
                                     </select>
 
                                     {/* Custom dropdown arrow */}
                                     <div
-                                        className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-9 right-2 ${isOpen ? "rotate-180" : "rotate-0"
+                                        className={`w-3 h-3 text-gray-400 transform transition-transform duration-200 absolute inset-y-8 right-2 ${isOpen ? "rotate-180" : "rotate-0"
                                             }`}
                                     >
                                         <svg
-                                            className="w-4 h-4 text-gray-400"
+                                            className="w-3 h-3 text-gray-400"
                                             xmlns="http://www.w3.org/2000/svg"
                                             fill="none"
                                             viewBox="0 0 24 24"
@@ -238,41 +267,177 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                                         </svg>
                                     </div>
                                 </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[12px]">
+                                    <div className="relative">
+                                        <label className="block  pb-1">Day</label>
+                                        <select
+                                            value={selectedDay}
+                                            onChange={(e) => setSelectedDay(e.target.value)}
+                                            className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-[12px] "
+                                        >
+                                            {[...Array(31)].map((_, i) => (
+                                                <option key={i} value={i + 1}>{i + 1}</option>
+                                            ))}
+                                        </select>
+                                        <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
+                                            <svg
+                                                className="w-3 h-3 text-gray-400"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M19 9l-7 7-7-7"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div className="relative">
+                                        <label className="block  pb-1">Month</label>
+                                        <select
+                                            value={selectedMonth}
+                                            onChange={(e) => setSelectedMonth(e.target.value)}
+                                            className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-[12px] "
+                                        >
+                                            <option value="January" selected>
+                                                January
+                                            </option>
+                                            <option value="February">February</option>
+                                            <option value="March">March</option>
+                                            <option value="April">April</option>
+                                            <option value="May">May</option>
+                                            <option value="June">June</option>
+                                            <option value="July">July</option>
+                                            <option value="August">August</option>
+                                            <option value="September">September</option>
+                                            <option value="October">October</option>
+                                            <option value="November">November</option>
+                                            <option value="December">December</option>
+                                        </select>
+                                        <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
+                                            <svg
+                                                className="w-3 h-3 text-gray-400"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M19 9l-7 7-7-7"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div className="relative">
+                                        <label className="block text-[12px] pb-1">Year</label>
+                                        <select
+                                            value={selectedYear}
+                                            onChange={(e) => setSelectedYear(e.target.value)}
+                                            className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-[12px] "
+                                        >
+                                            <option value="2025" selected>
+                                                2025
+                                            </option>
+                                            <option value="2026">2026</option>
+                                        </select>
+                                        <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
+                                            <svg
+                                                className="w-3 h-3 text-gray-400"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M19 9l-7 7-7-7"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div className="relative">
+                                        <label className="block text-[12px] pb-1">Select time</label>
+                                        <select
+                                            value={selectedTime}
+                                            onChange={(e) => setSelectedTime(e.target.value)}
+                                            className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-[12px] "
+                                        >
+                                            <option value="08:00" selected>
+                                                08:00 AM
+                                            </option>
+                                            <option value="09:00">09:00 AM</option>
+                                            <option value="10:00">10:00 AM</option>
+                                            <option value="11:00">11:00 AM</option>
+                                            <option value="12:00">12:00 PM</option>
+                                            <option value="13:00">01:00 PM</option>
+                                            <option value="14:00">02:00 PM</option>
+                                            <option value="15:00">03:00 PM</option>
+                                            <option value="16:00">04:00 PM</option>
+                                            <option value="17:00">05:00 PM</option>
+                                        </select>
+                                        <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
+                                            <svg
+                                                className="w-3 h-3 text-gray-400"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M19 9l-7 7-7-7"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
 
                                 <button
-                            disabled={!formData.note || !formData.type || requestLoading}
-                            className={`mt-6 w-full cursor-pointer bg-[#3E4095] text-white py-2 rounded-full disabled:bg-[#3E4095]/60 ${requestLoading ? 'bg-[#3E4095]/60 cursor-not-allowed' : ''}} text-sm `}
-                            onClick={handleRequest}
-                        >
-                            {requestLoading ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <svg
-                                        className="animate-spin h-4 w-4 text-white"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <circle
-                                            className="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            strokeWidth="4"
-                                        ></circle>
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                        ></path>
-                                    </svg>
-                                    Processing Request
-                                </span>
-                            ) : (
-                                "Proceed"
-                            )}{" "}
+                                    disabled={ !formData.type || requestLoading || !selectedDay || !selectedMonth || !selectedTime || !selectedYear}
+                                    className={`mt-6 w-full cursor-pointer bg-[#3E4095] text-white py-2 rounded-full disabled:bg-[#3E4095]/60 ${requestLoading ? 'bg-[#3E4095]/60 cursor-not-allowed' : ''}} text-sm `}
+                                    onClick={handleRequest}
+                                >
+                                    {requestLoading ? (
+                                        <span className="flex items-center justify-center gap-2">
+                                            <svg
+                                                className="animate-spin h-4 w-4 text-white"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <circle
+                                                    className="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    strokeWidth="4"
+                                                ></circle>
+                                                <path
+                                                    className="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                                ></path>
+                                            </svg>
+                                            Processing Request
+                                        </span>
+                                    ) : (
+                                        "Proceed"
+                                    )}{" "}
 
-                        </button>
+                                </button>
 
 
                             </div>

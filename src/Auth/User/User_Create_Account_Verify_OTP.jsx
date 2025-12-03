@@ -13,19 +13,9 @@ const User_Create_Account_Verify_OTP = () => {
   const [role, setRole] = useState("patient");
   const [isLoading, setIsLoading] = useState(false);
 
-  const location = useLocation();
+
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const isMobile = window.innerWidth <= 768; // Adjust breakpoint as needed
-    if (isMobile) {
-      const timer = setTimeout(() => {
-        setNotificationVisible(true);
-      }, 2000); // 2 seconds delay
-
-      return () => clearTimeout(timer); // Cleanup on component unmount
-    }
-  }, []);
 
   const handleSubmit = async (e) => {
     setIsLoading(true);
@@ -49,15 +39,20 @@ const User_Create_Account_Verify_OTP = () => {
       setIsLoading(false);
 
       // Display success message
-      toast.success(response.message || "OTP Verified!");
-      // console.log(response)
-      setTimeout(() => {
-        navigate("/user-login");
-      }, 1000);
+      toast.success(response.message || "OTP Verified Successfully!");
+      console.log(response)
+      
+      const patientHin = response.hin;
+      navigate("/verify-nin", { state: { patient_hin: patientHin } });
     } catch (error) {
-      console.error("Error during OTP verification:", error.message);
+      console.error("Error during OTP verification:", error);
+      toast.error(error.detail || "OTP Verification Failed, Try Again");
+     
+    }finally{
       setIsLoading(false);
-      toast.error(error.response.data.detail || "OTP Verification Failed, Try Again");
+      
+      setEmail('')
+      setOtp('')
     }
   };
   return (

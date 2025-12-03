@@ -59,7 +59,7 @@ const FP = () => {
       // Handle unexpected errors
       console.error("An error occurred:", error);
       toast.error(
-        error.response.data.detail || "An error occurred. Please try again later."
+        error.detail || "An error occurred. Please try again later."
       );
       setIsLoading(false);
     }finally{

@@ -202,7 +202,7 @@ const Hospital_Onboarding = () => {
             },
             verification_token,
             verification_request,
-            redirect_url: "https://hospital.docuhealthservices.net/login",
+            login_url: "https://hospital.docuhealthservices.net/login",
         };
         console.log(payload)
         try {

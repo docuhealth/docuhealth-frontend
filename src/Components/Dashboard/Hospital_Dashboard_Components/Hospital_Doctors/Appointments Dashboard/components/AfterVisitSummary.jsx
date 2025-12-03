@@ -160,9 +160,11 @@ const AfterVisitSummary = ({
     referred_hosp: "string",
     patient: selectedPatientDetails.patient.hin || "",
   });
-  const [selectedDay, setSelectedDay] = useState("Monday");
+  const today = new Date();
+
+  const [selectedDay, setSelectedDay] = useState(String(today.getDate()));
   const [selectedMonth, setSelectedMonth] = useState("January");
-  const [selectedYear, setSelectedYear] = useState("2025");
+  const [selectedYear, setSelectedYear] = useState(String(today.getFullYear()));
   const [selectedTime, setSelectedTime] = useState("08:00");
 
   const [otherHospitalInput, setOtherHospitalInput] = useState("");
@@ -854,15 +856,9 @@ const AfterVisitSummary = ({
                     onChange={(e) => setSelectedDay(e.target.value)}
                     className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-6"
                   >
-                    <option value="Monday" selected>
-                      Monday
-                    </option>
-                    <option value="Tuesday">Tuesday</option>
-                    <option value="Wednesday">Wednesday</option>
-                    <option value="Thursday">Thursday</option>
-                    <option value="Friday">Friday</option>
-                    <option value="Saturday">Saturday</option>
-                    <option value="Sunday">Sunday</option>
+                    {[...Array(31)].map((_, i) => (
+                      <option key={i} value={i + 1}>{i + 1}</option>
+                    ))}
                   </select>
                   <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
                     <svg
@@ -1046,11 +1042,10 @@ const AfterVisitSummary = ({
 
             <div className="flex items-center justify-end cursor-pointer gap-4">
               <button
-                className={`py-2 ${
-                  loading
+                className={`py-2 ${loading
                     ? "border border-gray-400 text-gray-400 cursor-not-allowed"
                     : "text-[#3E4095] border border-[#3E4095] "
-                } rounded-full text-sm px-20 mt-5 `}
+                  } rounded-full text-sm px-20 mt-5 `}
                 disabled={loading}
                 onClick={() => {
                   setStep(step - 1);
@@ -1060,11 +1055,10 @@ const AfterVisitSummary = ({
               </button>
               <button
                 disabled={loading}
-                className={`py-2.5  rounded-full text-sm px-20 mt-5 text-white  ${
-                  loading
+                className={`py-2.5  rounded-full text-sm px-20 mt-5 text-white  ${loading
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-[#3E4095] cursor-pointer"
-                }`}
+                  }`}
                 onClick={() => {
                   handleSubmit();
                 }}

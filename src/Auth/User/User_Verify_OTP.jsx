@@ -87,8 +87,6 @@ const VerifyOTP = () => {
       setIsLoading(false);
       toast.error(
         error?.detail ||
-        error?.message ||
-        error ||
         "An error occurred. Please try again."
       );
       

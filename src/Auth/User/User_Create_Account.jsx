@@ -224,7 +224,7 @@ useEffect(() => {
     } catch (error) {
       console.error("Error:", error);
       toast.error(
-        error.response.data.detail || "Something went wrong. Please refresh and try again."
+        error.detail || "Something went wrong. Please refresh and try again."
       );
     } finally {
       setIsSubmitting(false);

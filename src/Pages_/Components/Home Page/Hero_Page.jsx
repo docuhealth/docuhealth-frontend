@@ -30,8 +30,7 @@ const HeroPG = () => {
               Healthcare System.
             </p>
             <div className="text-sm flex flex-col lg:flex-row items-center gap-3">
-              <a href='#contact-us'>
-              <button className="hidden  group w-full lg:w-auto justify-center border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095] lg:flex items-center gap-1 2xl:text-xl cursor-pointer">
+              <a href='#contact-us' className="hidden  group w-full lg:w-auto justify-center border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095] lg:flex items-center gap-1 2xl:text-xl cursor-pointer">
                 Partner with Us as A Healthcare Provider
                 <svg
                   width="16"
@@ -45,12 +44,12 @@ const HeroPG = () => {
                     className="fill-[#3E4095] transition-all duration-300 group-hover:fill-white"
                   />
                 </svg>
-              </button>
               </a>
-              <button className="border w-full lg:w-auto  rounded-full py-2 px-8  transition-all hover:bg-[#34345F] bg-[#3E4095] text-white flex items-center gap-1 justify-center 2xl:text-xl cursor-pointer">
-              <Link to='/user-login'>
-                Get your HIN
-                </Link>
+
+              <Link to='/user-login' className="border w-full lg:w-auto  rounded-full py-2 px-8  transition-all hover:bg-[#34345F] bg-[#3E4095] text-white flex items-center gap-1 justify-center 2xl:text-xl cursor-pointer">
+                
+                  Get your HIN
+                
                 <svg
                   width="16"
                   height="16"
@@ -63,13 +62,13 @@ const HeroPG = () => {
                     className="fill-white transition-all duration-300 "
                   />
                 </svg>
-              </button>
+              </Link>
             </div>
           </div>
           <div className="flex-1 z-10 ">
             <img
               src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777871/hero_img_rfihkx.png'
-              alt="hero image"
+              alt="Health platform hero illustration"
               className="rounded-lg w-full object-contain"
             />
           </div>
@@ -104,6 +103,8 @@ const HeroPG = () => {
           />
         </svg>
       </div>
+
+
       <div
         className="lg:hidden bg-cover bg-center bg-no-repeat relative px-5 lg:px-16 py-36 lg:py-20  "
         style={{
@@ -118,18 +119,18 @@ const HeroPG = () => {
               <span className="block">Healthcare Platform</span>
             </h1>
             <div className="sm:max-w-sm mx-auto ">
-   <p className="font-normal pb-5 text-[#DDDDDD] text-sm text-center lg:hidden ">
-              Connecting Patients, Providers, and Payers through One Secure
-              Healthcare System.
-            </p>
+              <p className="font-normal pb-5 text-[#DDDDDD] text-sm text-center lg:hidden ">
+                Connecting Patients, Providers, and Payers through One Secure
+                Healthcare System.
+              </p>
             </div>
-         
+
             <div className="text-sm flex flex-col lg:flex-row items-center gap-3">
-       
-              <button className="w-full lg:w-auto justify-center   transition-all bg-white rounded-full py-2 px-8 text-[#3E4095] flex sm:hidden items-center gap-1 cursor-pointer">
-              <a href='#contact-us'>
-                Partner with Us
-                </a>
+
+              <a href='#contact-us' className="w-full lg:w-auto justify-center   transition-all bg-white rounded-full py-2 px-8 text-[#3E4095] flex sm:hidden items-center gap-1 cursor-pointer">
+            
+                  Partner with Us
+               
                 <svg
                   width="16"
                   height="16"
@@ -142,20 +143,20 @@ const HeroPG = () => {
                     className="fill-[#3E4095] transition-all duration-300"
                   />
                 </svg>
-               
-              </button>
+
+              </a>
+
+
+              <a href='#contact-us' className="w-full lg:w-auto justify-center cursor-pointer  transition-all bg-white rounded-full py-2 px-8 text-[#3E4095] hidden sm:flex lg:hidden items-center gap-1">
             
+                  Partner with Us as A Healthcare Provider
+            
+              </a>
+
+              <Link to='/user-login' className="border border-white w-full lg:w-auto  rounded-full py-2 px-8  transition-all  text-white flex items-center gap-1 justify-center cursor-pointer">
              
-                   <button className="w-full lg:w-auto justify-center cursor-pointer  transition-all bg-white rounded-full py-2 px-8 text-[#3E4095] hidden sm:flex lg:hidden items-center gap-1">
-                   <a href='#contact-us'>
-                Partner with Us as A Healthcare Provider
-                </a>
-                </button>
-          
-              <button className="border border-white w-full lg:w-auto  rounded-full py-2 px-8  transition-all  text-white flex items-center gap-1 justify-center cursor-pointer">
-               <Link to='/user-login'>
-                Get your HIN
-                </Link>
+                  Get your HIN
+              
                 <svg
                   width="16"
                   height="16"
@@ -168,14 +169,14 @@ const HeroPG = () => {
                     className="fill-white transition-all duration-300 "
                   />
                 </svg>
-           
-              </button>
+
+              </Link>
             </div>
           </div>
           <div className="flex-1 z-10 ">
             <img
               src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777871/hero_img_rfihkx.png'
-              alt="hero image"
+              alt="Health platform hero illustration"
               className="rounded-lg w-full object-contain"
             />
           </div>
@@ -212,57 +213,57 @@ const HeroPG = () => {
 
 
 
-        <svg width="353" height="314" viewBox="0 0 353 314" fill="none" xmlns="http://www.w3.org/2000/svg"    className="absolute   top-[14%] sm:top-[8%]  left-1/2 -translate-x-1/2 lg:hidden">
-<path d="M180.271 53.7018C242.936 53.7018 293.677 99.982 293.677 157.001C293.676 214.019 242.935 260.299 180.271 260.299C117.606 260.298 66.8645 214.019 66.8643 157.001C66.8643 99.9821 117.606 53.702 180.271 53.7018Z" stroke="#B5B5B5" stroke-opacity="0.15" stroke-width="0.729452"/>
-<path d="M180.271 41.6566C250.181 41.6566 306.796 93.328 306.796 156.998C306.796 220.669 250.181 272.34 180.271 272.34C110.36 272.34 53.7451 220.669 53.7451 156.998C53.7453 93.3281 110.36 41.6567 180.271 41.6566Z" stroke="#B5B5B5" stroke-opacity="0.15" stroke-width="0.729452"/>
-<path d="M180.27 29.3987C257.663 29.3988 320.343 86.5589 320.344 156.999C320.344 227.44 257.663 284.6 180.27 284.6C102.876 284.6 40.1943 227.44 40.1943 156.999C40.1946 86.5588 102.876 29.3987 180.27 29.3987Z" stroke="#B5B5B5" stroke-opacity="0.15" stroke-width="0.729452"/>
-<path d="M180.269 16.0649C265.739 16.0649 334.968 79.1955 334.968 157C334.968 234.805 265.739 297.935 180.269 297.935C94.7982 297.935 25.5695 234.805 25.5693 157C25.5693 79.1956 94.7981 16.0651 180.269 16.0649Z" stroke="#B5B5B5" stroke-opacity="0.15" stroke-width="0.729452"/>
-<path d="M180.27 0.364258C275.243 0.364258 352.175 70.5239 352.175 157C352.175 243.476 275.243 313.636 180.27 313.636C85.2965 313.636 8.36426 243.476 8.36426 157C8.36426 70.524 85.2965 0.364423 180.27 0.364258Z" stroke="#B5B5B5" stroke-opacity="0.15" stroke-width="0.729452"/>
-<circle cx="287.174" cy="140.941" r="0.775362" fill="white"/>
-<circle cx="227.472" cy="111.477" r="0.775362" fill="white"/>
-<circle cx="329.819" cy="182.811" r="0.775362" fill="white"/>
-<circle cx="260.811" cy="163.427" r="0.775362" fill="white"/>
-<circle cx="324.392" cy="235.536" r="0.775362" fill="white"/>
-<circle cx="271.666" cy="207.623" r="0.775362" fill="white"/>
-<circle cx="342.225" cy="126.21" r="0.775362" fill="white"/>
-<circle cx="231.348" cy="125.434" r="0.775362" fill="white"/>
-<circle cx="171.645" cy="95.9699" r="0.775362" fill="white"/>
-<circle cx="273.993" cy="167.303" r="0.775362" fill="white"/>
-<circle cx="204.985" cy="147.919" r="0.775362" fill="white"/>
-<circle cx="268.565" cy="220.028" r="0.775362" fill="white"/>
-<circle cx="215.841" cy="192.115" r="0.775362" fill="white"/>
-<circle cx="286.398" cy="110.702" r="0.775362" fill="white"/>
-<circle cx="262.362" cy="92.8686" r="0.775362" fill="white"/>
-<circle cx="202.659" cy="63.4053" r="0.775362" fill="white" fill-opacity="0.5"/>
-<circle cx="305.008" cy="134.738" r="0.775362" fill="white"/>
-<circle cx="236" cy="115.354" r="0.775362" fill="white"/>
-<circle cx="299.579" cy="187.463" r="0.775362" fill="white"/>
-<circle cx="246.855" cy="159.55" r="0.775362" fill="white"/>
-<circle cx="317.413" cy="78.137" r="0.775362" fill="white"/>
-<circle cx="89.457" cy="81.2383" r="0.775362" fill="white" fill-opacity="0.5"/>
-<circle cx="29.7539" cy="51.7749" r="0.775362" fill="white" fill-opacity="0.5"/>
-<circle cx="132.102" cy="123.108" r="0.775362" fill="white"/>
-<circle cx="63.0947" cy="103.724" r="0.775362" fill="white"/>
-<circle cx="126.674" cy="175.833" r="0.775362" fill="white"/>
-<circle cx="73.9492" cy="147.919" r="0.775362" fill="white"/>
-<circle cx="144.508" cy="66.5066" r="0.775362" fill="white" fill-opacity="0.5"/>
-<circle cx="82.4785" cy="200.644" r="0.775362" fill="white"/>
-<circle cx="22.7754" cy="171.18" r="0.775362" fill="white"/>
-<circle cx="125.123" cy="242.514" r="0.775362" fill="white"/>
-<circle cx="56.1152" cy="223.13" r="0.775362" fill="white"/>
-<circle cx="119.695" cy="295.238" r="0.775362" fill="white"/>
-<circle cx="66.9716" cy="267.326" r="0.775362" fill="white"/>
-<circle cx="137.529" cy="185.912" r="0.775362" fill="white"/>
-<circle cx="171.645" cy="189.789" r="0.775362" fill="white"/>
-<circle cx="111.941" cy="160.325" r="0.775362" fill="white"/>
-<circle cx="214.29" cy="231.659" r="0.775362" fill="white"/>
-<circle cx="145.283" cy="212.275" r="0.775362" fill="white"/>
-<circle cx="208.862" cy="284.383" r="0.775362" fill="white"/>
-<circle cx="156.138" cy="256.47" r="0.775362" fill="white"/>
-<circle cx="226.695" cy="175.057" r="0.775362" fill="white"/>
-<path d="M340 29C340.09 32.2755 342.724 34.9096 346 35C342.724 35.0904 340.09 37.7245 340 41C339.91 37.7245 337.276 35.0904 334 35C337.276 34.9096 339.91 32.2755 340 29Z" fill="white"/>
-<path d="M6 192C6.09044 195.276 8.72449 197.91 12 198C8.72449 198.09 6.09044 200.724 6 204C5.90956 200.724 3.27551 198.09 0 198C3.27551 197.91 5.90956 195.276 6 192Z" fill="white"/>
-</svg>
+        <svg width="353" height="314" viewBox="0 0 353 314" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute   top-[14%] sm:top-[8%]  left-1/2 -translate-x-1/2 lg:hidden">
+          <path d="M180.271 53.7018C242.936 53.7018 293.677 99.982 293.677 157.001C293.676 214.019 242.935 260.299 180.271 260.299C117.606 260.298 66.8645 214.019 66.8643 157.001C66.8643 99.9821 117.606 53.702 180.271 53.7018Z" stroke="#B5B5B5" stroke-opacity="0.15" stroke-width="0.729452" />
+          <path d="M180.271 41.6566C250.181 41.6566 306.796 93.328 306.796 156.998C306.796 220.669 250.181 272.34 180.271 272.34C110.36 272.34 53.7451 220.669 53.7451 156.998C53.7453 93.3281 110.36 41.6567 180.271 41.6566Z" stroke="#B5B5B5" stroke-opacity="0.15" stroke-width="0.729452" />
+          <path d="M180.27 29.3987C257.663 29.3988 320.343 86.5589 320.344 156.999C320.344 227.44 257.663 284.6 180.27 284.6C102.876 284.6 40.1943 227.44 40.1943 156.999C40.1946 86.5588 102.876 29.3987 180.27 29.3987Z" stroke="#B5B5B5" stroke-opacity="0.15" stroke-width="0.729452" />
+          <path d="M180.269 16.0649C265.739 16.0649 334.968 79.1955 334.968 157C334.968 234.805 265.739 297.935 180.269 297.935C94.7982 297.935 25.5695 234.805 25.5693 157C25.5693 79.1956 94.7981 16.0651 180.269 16.0649Z" stroke="#B5B5B5" stroke-opacity="0.15" stroke-width="0.729452" />
+          <path d="M180.27 0.364258C275.243 0.364258 352.175 70.5239 352.175 157C352.175 243.476 275.243 313.636 180.27 313.636C85.2965 313.636 8.36426 243.476 8.36426 157C8.36426 70.524 85.2965 0.364423 180.27 0.364258Z" stroke="#B5B5B5" stroke-opacity="0.15" stroke-width="0.729452" />
+          <circle cx="287.174" cy="140.941" r="0.775362" fill="white" />
+          <circle cx="227.472" cy="111.477" r="0.775362" fill="white" />
+          <circle cx="329.819" cy="182.811" r="0.775362" fill="white" />
+          <circle cx="260.811" cy="163.427" r="0.775362" fill="white" />
+          <circle cx="324.392" cy="235.536" r="0.775362" fill="white" />
+          <circle cx="271.666" cy="207.623" r="0.775362" fill="white" />
+          <circle cx="342.225" cy="126.21" r="0.775362" fill="white" />
+          <circle cx="231.348" cy="125.434" r="0.775362" fill="white" />
+          <circle cx="171.645" cy="95.9699" r="0.775362" fill="white" />
+          <circle cx="273.993" cy="167.303" r="0.775362" fill="white" />
+          <circle cx="204.985" cy="147.919" r="0.775362" fill="white" />
+          <circle cx="268.565" cy="220.028" r="0.775362" fill="white" />
+          <circle cx="215.841" cy="192.115" r="0.775362" fill="white" />
+          <circle cx="286.398" cy="110.702" r="0.775362" fill="white" />
+          <circle cx="262.362" cy="92.8686" r="0.775362" fill="white" />
+          <circle cx="202.659" cy="63.4053" r="0.775362" fill="white" fill-opacity="0.5" />
+          <circle cx="305.008" cy="134.738" r="0.775362" fill="white" />
+          <circle cx="236" cy="115.354" r="0.775362" fill="white" />
+          <circle cx="299.579" cy="187.463" r="0.775362" fill="white" />
+          <circle cx="246.855" cy="159.55" r="0.775362" fill="white" />
+          <circle cx="317.413" cy="78.137" r="0.775362" fill="white" />
+          <circle cx="89.457" cy="81.2383" r="0.775362" fill="white" fill-opacity="0.5" />
+          <circle cx="29.7539" cy="51.7749" r="0.775362" fill="white" fill-opacity="0.5" />
+          <circle cx="132.102" cy="123.108" r="0.775362" fill="white" />
+          <circle cx="63.0947" cy="103.724" r="0.775362" fill="white" />
+          <circle cx="126.674" cy="175.833" r="0.775362" fill="white" />
+          <circle cx="73.9492" cy="147.919" r="0.775362" fill="white" />
+          <circle cx="144.508" cy="66.5066" r="0.775362" fill="white" fill-opacity="0.5" />
+          <circle cx="82.4785" cy="200.644" r="0.775362" fill="white" />
+          <circle cx="22.7754" cy="171.18" r="0.775362" fill="white" />
+          <circle cx="125.123" cy="242.514" r="0.775362" fill="white" />
+          <circle cx="56.1152" cy="223.13" r="0.775362" fill="white" />
+          <circle cx="119.695" cy="295.238" r="0.775362" fill="white" />
+          <circle cx="66.9716" cy="267.326" r="0.775362" fill="white" />
+          <circle cx="137.529" cy="185.912" r="0.775362" fill="white" />
+          <circle cx="171.645" cy="189.789" r="0.775362" fill="white" />
+          <circle cx="111.941" cy="160.325" r="0.775362" fill="white" />
+          <circle cx="214.29" cy="231.659" r="0.775362" fill="white" />
+          <circle cx="145.283" cy="212.275" r="0.775362" fill="white" />
+          <circle cx="208.862" cy="284.383" r="0.775362" fill="white" />
+          <circle cx="156.138" cy="256.47" r="0.775362" fill="white" />
+          <circle cx="226.695" cy="175.057" r="0.775362" fill="white" />
+          <path d="M340 29C340.09 32.2755 342.724 34.9096 346 35C342.724 35.0904 340.09 37.7245 340 41C339.91 37.7245 337.276 35.0904 334 35C337.276 34.9096 339.91 32.2755 340 29Z" fill="white" />
+          <path d="M6 192C6.09044 195.276 8.72449 197.91 12 198C8.72449 198.09 6.09044 200.724 6 204C5.90956 200.724 3.27551 198.09 0 198C3.27551 197.91 5.90956 195.276 6 192Z" fill="white" />
+        </svg>
 
       </div>
     </>

@@ -119,10 +119,7 @@ const Hospital_Create_New_Password = () => {
         console.error("Error resetting password:", error);
 
         const errorMessage =
-          error?.response?.data?.detail || // backend error
-          error?.detail ||                 // custom thrown error
-          error?.message ||                // JS error
-          error ||                         // string error
+          error?.detail ||  
           "An error occurred. Please try again later.";
   
         toast.error(errorMessage);

@@ -27,7 +27,7 @@ import Hospital_Create_New_Password from "./Auth/Hospital/Hospital_Create_New_Pa
 
 import NotFound from "./Not Found/NotFound";
 
-
+import Verify_NIN from "./Auth/VerifyNIN/Verify_NIN";
 
 import User_Create_Account from "./Auth/User/User_Create_Account";
 import User_Create_Account_Verify_OTP from "./Auth/User/User_Create_Account_Verify_OTP";
@@ -758,6 +758,8 @@ function App() {
             />
           </Route>
 
+
+          <Route path="/verify-nin" element={<Verify_NIN />} />
 
           <Route path="/user-create-account" element={<User_Create_Account />} />
           <Route

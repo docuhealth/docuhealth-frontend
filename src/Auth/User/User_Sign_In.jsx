@@ -84,7 +84,17 @@ const USI = () => {
       } catch (error) {
         console.log(error);
         toast.error(error.response.data.detail || "Login failed. Please try again.");
+
         setIsSubmitting(false);
+
+        // Check if HIN exists in the response
+        const patientHin = error.response?.data?.hin;
+        if (patientHin) {
+          setTimeout(() => {
+            // Navigate to NIN verification page and pass the HIN
+            navigate("/verify-nin", { state: { patient_hin: patientHin } });
+          }, 1000);
+        }
       } finally {
         setEmail("");
         setPhone_Num("");
@@ -128,6 +138,8 @@ const USI = () => {
                         className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                         value={inputValue}
                         onChange={handleInputChange}
+                        onInput={handleInputChange}
+                        autoComplete="email" 
                         required
                       />
                       <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -143,6 +155,8 @@ const USI = () => {
                         className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        onInput={(e) => setPassword(e.target.value)}
+                        autoComplete="current-password"
                         required
                       />
                       <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -182,16 +196,16 @@ const USI = () => {
                   <button
                     type="submit"
                     className={`w-full py-3 rounded-full ${isFormValid && !isSubmitting
-                        ? "bg-[#3E4095] text-white"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      ? "bg-[#3E4095] text-white"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                     onClick={handleSubmit}
                     disabled={!isFormValid || isSubmitting}
                   >
-                    {isSubmitting ? (     <div className="flex items-center justify-center gap-2">
+                    {isSubmitting ? (<div className="flex items-center justify-center gap-2">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       Logging In...
-                    </div> ): ("Next")}
+                    </div>) : ("Next")}
                   </button>
                 </form>
 
@@ -237,110 +251,110 @@ const USI = () => {
       </div>
 
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
-         <Link to="/">
-        <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
-          <img src={docuhealth_logo} alt="Logo" className="w-6" />
-          <h1 className="text-xl">DocuHealth</h1>
-        </div>
-      </Link>
-   
-          <div className="px-5 w-full">
-            <h2 className="text-xl font-semibold pb-1">
-              Sign Into Your Account
-            </h2>
-            <p className="text-gray-600 mb-6 text-sm">
-              Input your correct log-in credentials to get access into your
-              dashboard
-            </p>
-
-            <form onSubmit={handleSubmit} className="text-sm">
-              {/* Email Input */}
-              <div className="relative pb-3">
-                <p className="font-semibold pb-1">Email :</p>
-                <div className="relative">
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    required
-                  />
-                  <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                </div>
-              </div>
-
-              {/* Password Input */}
-              <div className="relative pb-5">
-                <p className="font-semibold pb-1">Password:</p>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute top-1/2 right-3 transform -translate-y-1/2"
-                  >
-                    {showPassword ? (
-                      <FaEyeSlash className="h-4 w-4 text-gray-400" />
-                    ) : (
-                      <FaEye className="h-4 w-4 text-gray-400" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Remember Me Checkbox */}
-              <div className="flex justify-between items-center pb-5">
-                <div id="checkbox">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Remember me
-                  </label>
-                </div>
-                <div>
-                  <Link
-                    to="/user-forgot-password"
-                    className="underline text-[#3E4095]"
-                  >
-                    Forgot Password
-                  </Link>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className={`w-full py-3 rounded-full ${isFormValid && !isSubmitting
-                    ? "bg-[#3E4095] text-white "
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
-                onClick={handleSubmit}
-                disabled={!isFormValid || isSubmitting}
-              >
-               {isSubmitting ? (     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Logging In...
-                    </div> ): ("Next")}
-              </button>
-            </form>
-
-            {/* Sign-Up Prompt */}
-            <p className="text-center text-sm text-gray-600 mt-4">
-              Haven't Registered Yet?{" "}
-              <Link
-                to="/user-create-account"
-                className="text-[#3E4095] hover:underline"
-              >
-                Sign Up
-              </Link>
-            </p>
+        <Link to="/">
+          <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+            <img src={docuhealth_logo} alt="Logo" className="w-6" />
+            <h1 className="text-xl">DocuHealth</h1>
           </div>
+        </Link>
+
+        <div className="px-5 w-full">
+          <h2 className="text-xl font-semibold pb-1">
+            Sign Into Your Account
+          </h2>
+          <p className="text-gray-600 mb-6 text-sm">
+            Input your correct log-in credentials to get access into your
+            dashboard
+          </p>
+
+          <form onSubmit={handleSubmit} className="text-sm">
+            {/* Email Input */}
+            <div className="relative pb-3">
+              <p className="font-semibold pb-1">Email :</p>
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  required
+                />
+                <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              </div>
+            </div>
+
+            {/* Password Input */}
+            <div className="relative pb-5">
+              <p className="font-semibold pb-1">Password:</p>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                >
+                  {showPassword ? (
+                    <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <FaEye className="h-4 w-4 text-gray-400" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Remember Me Checkbox */}
+            <div className="flex justify-between items-center pb-5">
+              <div id="checkbox">
+                <label className="flex items-center">
+                  <input type="checkbox" className="mr-2" />
+                  Remember me
+                </label>
+              </div>
+              <div>
+                <Link
+                  to="/user-forgot-password"
+                  className="underline text-[#3E4095]"
+                >
+                  Forgot Password
+                </Link>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className={`w-full py-3 rounded-full ${isFormValid && !isSubmitting
+                ? "bg-[#3E4095] text-white "
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+              onClick={handleSubmit}
+              disabled={!isFormValid || isSubmitting}
+            >
+              {isSubmitting ? (<div className="flex items-center justify-center gap-2">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Logging In...
+              </div>) : ("Next")}
+            </button>
+          </form>
+
+          {/* Sign-Up Prompt */}
+          <p className="text-center text-sm text-gray-600 mt-4">
+            Haven't Registered Yet?{" "}
+            <Link
+              to="/user-create-account"
+              className="text-[#3E4095] hover:underline"
+            >
+              Sign Up
+            </Link>
+          </p>
+        </div>
       </div>
     </>
   );
