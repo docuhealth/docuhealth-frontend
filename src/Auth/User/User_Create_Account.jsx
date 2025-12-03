@@ -1335,7 +1335,7 @@ useEffect(() => {
               <div
                 className="w-full px-5 flex  flex-col justify-center h-screen"
                 id="temp"
-                style={{ display: step === 3 ? "block" : "none" }}
+
               >
                 <h2 className="text-xl font-semibold pb-1 ">
                   Create Your Account
