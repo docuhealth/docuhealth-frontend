@@ -140,6 +140,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
                                 </div>
                             </div>
                         </div>
+                        
                         <div className="p-5 my-5 bg-[#FAFAFA] border rounded-xl">
                             <p className="text-[12px] mb-4">
                                 {" "}

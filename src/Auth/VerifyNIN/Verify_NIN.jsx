@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { authAPI } from "../../utils/authAPI";
 import { FaKey } from "react-icons/fa";
 import toast from "react-hot-toast";
+import { setToken } from "../../services/authService";
 
 const Verify_NIN = () => {
 
@@ -38,8 +39,10 @@ const Verify_NIN = () => {
             console.log(payload)
             const response = await authAPI("POST", "api/auth/nin", payload);
 
+            setToken(response.data.access_token, response.data.role);
+
             toast.success(response.message || "NIN Verified Successfully!");
-            setTimeout(() => navigate("/user-login"), 1000);
+            setTimeout(() => navigate("/user-home-dashboard"), 1000);
         } catch (error) {
             console.error("Error during NIN verification:", error.message);
             toast.error(

@@ -4,11 +4,14 @@ import AppointmentsList from "../../../Components/Dashboard/Hospital_Dashboard_C
 import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments Dashboard/components/PatientInfo";
 import AfterVisitSummary from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments Dashboard/components/AfterVisitSummary";
 import RequestAdmission from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments Dashboard/components/RequestAdmission";
+import OtherMedicalServices from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments Dashboard/components/OtherMedicalServices";
 
 const Hospital_Doctors_Appointments_Dashboard = () => {
   const [seePatientDetails, setSeePatientDetails] = useState(false);
   const [afterVisitSummary, setAfterVisitSummary] = useState(false);
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
+
+  const [otherMedicalServices, setOtherMedicalServices] = useState(false);
 
   const [requestAdmission, setRequestAdmission] = useState(false);
 
@@ -19,8 +22,11 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
           <div className="py-2 text-sm flex justify-between items-center">
             <DynamicDate />
             <div className="flex items-center gap-3">
-              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer ">
+              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer "  onClick={()=> {
+                  setOtherMedicalServices(true)
+                }}>
                 Other medical services
+               
               </button>
               <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer"
               onClick={()=> {
@@ -48,6 +54,13 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
             />
           </div>
           {
+            otherMedicalServices && (
+              <OtherMedicalServices setOtherMedicalServices={setOtherMedicalServices} 
+              selectedPatientDetails={selectedPatientDetails}
+              />
+            )
+          }
+          {
             requestAdmission && (
                 <RequestAdmission  setRequestAdmission ={setRequestAdmission} selectedPatientDetails={selectedPatientDetails}/>
             )
@@ -57,13 +70,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
         <>
           <div className="py-2 text-sm flex justify-between items-center">
             <DynamicDate />
-            <div className="flex items-center gap-3">
-              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer ">
-                Other medical services
-              </button>
-              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer">
-                Request for admission
-              </button>
+            <div className="">
               <button
                 className="py-2.5 px-10 rounded-full bg-[#3E4095] text-white cursor-pointer"
                 onClick={() => {
