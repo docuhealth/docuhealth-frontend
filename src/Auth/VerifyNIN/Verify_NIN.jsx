@@ -36,14 +36,18 @@ const Verify_NIN = () => {
 
         try {
             const payload = { patient: patient_hin, nin: user_nin };
-            console.log(payload)
+            // console.log(payload)
             const response = await authAPI("POST", "api/auth/nin", payload);
+            // console.log(response)
 
             setToken(response.data.access_token, response.data.role);
 
             toast.success(response.message || "NIN Verified Successfully!");
-            setTimeout(() => navigate("/user-home-dashboard"), 1000);
+            setTimeout(() => {
+                window.location.href = "/user-home-dashboard";
+              }, 1000);
         } catch (error) {
+            // console.log(error)
             console.error("Error during NIN verification:", error.message);
             toast.error(
                 error.detail || "NIN Verification Failed, Try Again"
