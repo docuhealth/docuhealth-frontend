@@ -114,12 +114,12 @@ import ApproveHospitals from "./Dashboard/Admin_Dashboard/ApproveHospitals";
 function App() {
 
   const hostname = window.location.hostname;
-  
+
   const isHospital = hostname.startsWith("hospital.");
 
   return (
     <Router>
-      {/* Toast Notification Container */}
+      
       <ToastContainer
         position="top-right"
         autoClose={3000}
