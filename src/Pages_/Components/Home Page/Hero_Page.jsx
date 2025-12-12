@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import footerImgMobile from "../../../assets/img/footerImgMobilee.webP";
+import footerImgMobile from "../../../assets/img/footerImgMobilee.webp";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
