@@ -406,7 +406,7 @@ const Navbar = ({ showPharmacyMode }) => {
           }`}>
         {/* Top Navigation Bar */}
         <div className={`lg:hidden flex justify-between items-center px-3 py-4 ${currentPath === '/' ? 'bg-none' : 'bg-white'}  `}>
-          <button onClick={() => setIsOpen(true)}>
+          <button onClick={() => setIsOpen(true)} aria-label="menu nav">
             <i className={`bx bx-menu-alt-left text-3xl ${currentPath === '/' && !isScrolled ? 'text-white' : 'text-[#3E4095]'} `}></i>
           </button>
           <div className="bg-white p-2 rounded-full">

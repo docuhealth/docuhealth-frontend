@@ -53,11 +53,11 @@ const DocuHealth_Updates_Section = () => {
                     <p className="text-sm mt-2 2xl:text-xl">
                         Stay informed about DocuHealth platform updates and health information.
                     </p>
-                    <button className="custom-prev absolute left-1 top-1/2 -translate-y-1/2 text-[#3E4095] cursor-pointer ">
+                    <button className="custom-prev absolute left-1 top-1/2 -translate-y-1/2 text-[#3E4095] cursor-pointer " aria-label="Previous slide">
                         <ChevronLeft size={40} />
                     </button>
 
-                    <button className="custom-next absolute right-1 top-1/2 -translate-y-1/2 text-[#3E4095] cursor-pointer">
+                    <button className="custom-next absolute right-1 top-1/2 -translate-y-1/2 text-[#3E4095] cursor-pointer" aria-label="Next slide">
                         <ChevronRight size={40} />
                     </button>
 
