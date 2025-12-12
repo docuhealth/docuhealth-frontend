@@ -7,7 +7,14 @@ const About_Us_Section = () => {
       <div className="relative py-20 px-5 lg:px-16 bg-[#F6FCFE]" id="about-us">
         <div className="flex flex-col-reverse lg:flex-row items-start gap-7 ">
           <div className="flex-1 z-10">
-            <img src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777850/about_img_jc2jvs.png' alt="about us image" className="object-contain" />
+          <img
+  src="https://res.cloudinary.com/drhfrgahv/image/upload/f_auto,q_auto,w_811/v1762777850/about_img_jc2jvs.png"
+  alt="about us image"
+  width="811"
+  height="321"
+  className="object-contain w-full h-auto"
+/>
+
           </div>
           <div className="flex-1">
             <h2 className="font-semibold pb-4 text-2xl lg:text-3xl text-[#3E4095] 2xl:text-4xl">

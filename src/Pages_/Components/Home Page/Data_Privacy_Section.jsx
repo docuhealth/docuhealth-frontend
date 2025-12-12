@@ -33,11 +33,14 @@ const Data_Privacy_Section = () => {
         <section className="py-24 px-5 lg:px-16 text-sm text-[#464646] bg-white lg:bg-[#F6FCFE] ">
           <div className="w-full flex flex-col-reverse lg:flex-row items-start justify-between gap-10 ">
             <div className="hidden md:flex w-full lg:w-1/2 items-center justify-center">
-              <img
-                src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777827/data_privacy_img_bg5a9y.png'
-                alt="Data Privacy Illustration"
-                className="object-contain"
-              />
+            <img
+  src="https://res.cloudinary.com/drhfrgahv/image/upload/f_auto,q_auto,w_600/v1762777827/data_privacy_img_bg5a9y.png"
+  alt="Data Privacy Illustration"
+  width="600"
+  height="400"
+  className="object-contain w-full h-auto"
+/>
+
             </div>
             <div className="w-full lg:w-1/2">
           <h2 className="text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-[#3E4095] mb-4">

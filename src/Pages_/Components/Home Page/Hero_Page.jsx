@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import footerImgMobile from "../../../assets/img/footerImgMobile.png";
+import footerImgMobile from "../../../assets/img/footerImgMobilee.webP";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -66,11 +66,14 @@ const HeroPG = () => {
             </div>
           </div>
           <div className="flex-1 z-10 ">
-            <img
-              src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777871/hero_img_rfihkx.png'
-              alt="Health platform hero illustration"
-              className="rounded-lg w-full object-contain"
-            />
+          <img
+  src="https://res.cloudinary.com/drhfrgahv/image/upload/f_auto,q_auto,w_800/v1762777871/hero_img_rfihkx.png"
+  alt="Health platform hero illustration"
+  width="811"
+  height="532"
+  className="rounded-lg w-full h-auto object-contain"
+/>
+
           </div>
         </div>
         <svg
@@ -174,11 +177,14 @@ const HeroPG = () => {
             </div>
           </div>
           <div className="flex-1 z-10 ">
-            <img
-              src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777871/hero_img_rfihkx.png'
-              alt="Health platform hero illustration"
-              className="rounded-lg w-full object-contain"
-            />
+          <img
+  src="https://res.cloudinary.com/drhfrgahv/image/upload/f_auto,q_auto,w_800/v1762777871/hero_img_rfihkx.png"
+  alt="Health platform hero illustration"
+  width="811"
+  height="532"
+  className="rounded-lg w-full h-auto object-contain"
+/>
+
           </div>
         </div>
         <svg

@@ -85,11 +85,14 @@ const FAQ_Section = () => {
 
             {/* Right side: illustration (optional placeholder) */}
             <div className="hidden md:flex w-full lg:w-1/2 items-center justify-center">
-              <img
-                src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777829/faq_img_btvz2n.png'
-                alt="FAQ Illustration"
-                className="object-contain"
-              />
+            <img
+  src="https://res.cloudinary.com/drhfrgahv/image/upload/f_auto,q_auto,w_600/v1762777829/faq_img_btvz2n.png"
+  alt="FAQ Illustration"
+  width="600"
+  height="400"
+  className="object-contain w-full h-auto"
+/>
+
             </div>
           </div>
         </section>
