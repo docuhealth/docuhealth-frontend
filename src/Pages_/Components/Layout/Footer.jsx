@@ -49,10 +49,23 @@ const Footer = () => {
 
             </a>
           </div>
-          <div className='flex gap-10'>
-            <img src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777839/docuhealth_ndpr_audit_lwqlq8.jpg' alt="docuhealth ndpr audit image" className='w-40 rounded-lg' />
-            <img src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777826/docuhealth_fhir_zdtw2p.jpg' alt="docuhealth fhir image" className=' w-60 rounded-lg' />
-          </div>
+          <div className="flex gap-10">
+  <img
+    src="https://res.cloudinary.com/drhfrgahv/image/upload/v1762777839/docuhealth_ndpr_audit_lwqlq8.jpg"
+    alt="DocuHealth NDPR Audit"
+    width={160}   // approximate pixel width for w-40 (10rem)
+    height={120}  // maintain aspect ratio
+    className="w-40 rounded-lg"
+  />
+  <img
+    src="https://res.cloudinary.com/drhfrgahv/image/upload/v1762777826/docuhealth_fhir_zdtw2p.jpg"
+    alt="DocuHealth FHIR"
+    width={240}   // approximate pixel width for w-60 (15rem)
+    height={180}  // maintain aspect ratio
+    className="w-60 rounded-lg"
+  />
+</div>
+
 
         </div>
 

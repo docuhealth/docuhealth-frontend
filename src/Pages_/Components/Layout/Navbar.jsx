@@ -425,12 +425,19 @@ const Navbar = ({ showPharmacyMode }) => {
         >
           {/* Close Button */}
           <div className="flex justify-between items-center px-4 py-4">
-            <Link to="/">
-              <div className="   flex gap-1 items-center font-bold">
-                <img src={docuhealth_logo} alt="Logo" className="w-6" />
-                <h1 className="text-xl text-[#3E4095]">DocuHealth</h1>
-              </div>
-            </Link>
+          <Link to="/">
+  <div className="flex gap-1 items-center font-bold">
+    <img
+      src={docuhealth_logo}
+      alt="Logo"
+      width={24}       // corresponds to Tailwind w-6 (6 * 4px)
+      height={24}      // maintain aspect ratio
+      className="w-6 h-6"
+    />
+    <h1 className="text-xl text-[#3E4095]">DocuHealth</h1>
+  </div>
+</Link>
+
 
             <button onClick={() => setIsOpen(false)}>
               <i className="bx bx-x text-3xl"></i>
