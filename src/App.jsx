@@ -114,8 +114,7 @@ import ApproveHospitals from "./Dashboard/Admin_Dashboard/ApproveHospitals";
 function App() {
 
   const hostname = window.location.hostname;
-  // hostname.startsWith("hospital.")
-  // true
+  
   const isHospital = hostname.startsWith("hospital.");
 
   return (
