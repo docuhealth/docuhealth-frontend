@@ -173,11 +173,6 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
         }
     }
 
-    // useEffect(() => {
-    //     if(isStaffSelected){
-    //         console.log(isStaffSelectedRole)
-    //     }
-    // }, [isStaffSelected, isStaffSelectedRole])
 
 
 
@@ -202,7 +197,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                                     What’s the reason for the request?
                                 </p>
                                 <div className="mb-2 text-[12px]">
-                                    <p className="mb-1 text-gray-700 font-medium">Add note (optional) :</p>
+                                    <p className="mb-1 text-gray-700 font-medium">Add note :</p>
                                     <textarea
                                         className="border rounded-lg w-full  h-[100px] p-3 text-[12px] outline-none focus:border-[#3E4095]"
                                         value={formData.note}

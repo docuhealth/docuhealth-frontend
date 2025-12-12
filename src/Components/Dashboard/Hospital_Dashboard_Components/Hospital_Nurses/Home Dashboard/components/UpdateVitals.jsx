@@ -50,6 +50,12 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
             toast.error(err.response?.data?.message || "Failed to update vitals.");
         } finally {
             setLoading(false);
+            setBloodPressure('')
+            setHeartRate('')
+            setHeight('')
+            setRespRate('')
+            setTemperature('')
+            setWeight('')
         }
 
 
