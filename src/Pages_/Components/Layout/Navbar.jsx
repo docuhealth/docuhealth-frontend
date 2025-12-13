@@ -126,8 +126,8 @@ const Navbar = ({ showPharmacyMode }) => {
                   "/our-mission",
                   "/our-vision",
                   "/docuhealth-api",
-                  "/our-legal-notice",
-                  "/our-privacy-policy",
+                  "/legal-notice",
+                  "/privacy-policy",
                 ].includes(currentPath)
                   ? "text-[#3E4095] font-medium after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-full after:h-[3px] after:bg-[#3E4095] after:rounded-full after:transition-all after:duration-300"
                   : "text-[#797979] after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-0 after:h-[3px] after:bg-[#3E4095] after:rounded-full after:transition-all after:duration-300 hover:after:w-full"
@@ -182,7 +182,7 @@ const Navbar = ({ showPharmacyMode }) => {
                   Docu Health API
                 </Link>
                 <Link
-                  to="/our-legal-notice"
+                  to="/legal-notice"
                   className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-[#3E4095] ${currentPath === "/our-legal-notice"
                       ? "text-[#3E4095] font-medium"
                       : "text-[#797979]"
@@ -192,14 +192,14 @@ const Navbar = ({ showPharmacyMode }) => {
                   Legal Notice
                 </Link>
                 <Link
-                  to="/our-privacy-policy"
+                  to="/privacy-policy"
                   className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-b-lg ${currentPath === "/our-privacy-policy"
                       ? "text-[#3E4095] font-medium"
                       : "text-[#797979]"
                     }`}
                   onClick={() => toggleDropdown("")}
                 >
-                  Our Privacy Policy
+                  Privacy Policy
                 </Link>
               </div>
             )}
@@ -471,8 +471,8 @@ const Navbar = ({ showPharmacyMode }) => {
                                 "/our-mission",
                                 "/our-vision",
                                 "/docuhealth-api",
-                                "/our-legal-notice",
-                                "/our-privacy-policy",
+                                "/legal-notice",
+                                "/privacy-policy",
                               ].includes(currentPath)
                                 ? "text-[#3E4095] font-medium "
                                 : "text-[#797979] "
@@ -542,7 +542,7 @@ const Navbar = ({ showPharmacyMode }) => {
                     Docu Health API
                   </Link>
                   <Link
-                    to="/our-legal-notice"
+                    to="/legal-notice"
                     onClick={() => {
                       setIsOpen(false);
                       toggleDropdown("");
@@ -556,7 +556,7 @@ const Navbar = ({ showPharmacyMode }) => {
                     Legal Notice
                   </Link>
                   <Link
-                    to="/our-privacy-policy"
+                    to="/privacy-policy"
                     onClick={() => {
                       setIsOpen(false);
                       toggleDropdown("");
@@ -567,7 +567,7 @@ const Navbar = ({ showPharmacyMode }) => {
                       : "text-[#797979]"
                     }`}
                   >
-                    Our Privacy Policy
+                    Privacy Policy
                   </Link>
                 </div>
               )}

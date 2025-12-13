@@ -738,7 +738,7 @@ function App() {
               }
             />
           </Route>
-          <Route path="/our-legal-notice" element={<Landing_Page_Layout />} >
+          <Route path="/legal-notice" element={<Landing_Page_Layout />} >
             <Route
               index
               element={
@@ -747,7 +747,7 @@ function App() {
               }
             />
           </Route>
-          <Route path="/our-privacy-policy" element={<Landing_Page_Layout />} >
+          <Route path="/privacy-policy" element={<Landing_Page_Layout />} >
             <Route
               index
               element={

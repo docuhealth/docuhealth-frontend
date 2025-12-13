@@ -77,8 +77,8 @@ const Footer = () => {
             <li><Link to="/our-mission">Mission</Link></li>
             <li><Link to="/our-vision">Vision</Link></li>
             <li><Link to="/docuhealth-api">DocuHealth API</Link></li>
-            <li><Link to="/our-legal-notice">Legal Notice</Link></li>
-            <li><Link to="/our-privacy-policy">Our privacy policy</Link></li>
+            <li><Link to="/legal-notice">Legal Notice</Link></li>
+            <li><Link to="/privacy-policy">Privacy policy</Link></li>
           </ul>
         </div>
 
@@ -111,8 +111,8 @@ const Footer = () => {
             <li><Link to="/our-mission">Mission</Link></li>
             <li><Link to="/our-vision">Vision</Link></li>
             <li><Link to="/docuhealth-api">DocuHealth API</Link></li>
-            <li><Link to="/our-legal-notice">Legal Notice</Link></li>
-            <li><Link to="/our-privacy-policy">Our privacy policy</Link></li>
+            <li><Link to="/legal-notice">Legal Notice</Link></li>
+            <li><Link to="/privacy-policy">Privacy policy</Link></li>
           </ul>
         </div>
 
