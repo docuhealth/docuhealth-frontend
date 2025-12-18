@@ -13,14 +13,14 @@ const ProfileProvider = (props) => {
 
 
 
-  console.log(isUserLoggedIn);
+  // console.log(isUserLoggedIn);
   useEffect(() => {
     if (isUserLoggedIn) {
       const fetchProfile = async () => {
         try {
           const res = await axiosInstance.get("api/patients/dashboard"); // Example endpoint
           setProfile(res.data.patient_info);
-          console.log(res.data);
+          // console.log(res.data);
         } catch (err) {
           console.error("Error fetching profile:", err);
         }

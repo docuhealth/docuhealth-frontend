@@ -139,6 +139,48 @@ const Patient_Sidebar_Mobile = ({
               </div>
             </Link>
             <Link
+              to=""
+              onClick={() => {
+                setOpenMobileSidebar(false)
+                toast.success('feature coming soon !')
+
+              }}
+            >
+              <div className="px-4 my-4">
+                <li
+                  className={`group px-4 py-2   ${
+                    currentPath === "/user-drugs-dashboard"
+                      ? "bg-[#3E4095] text-white"
+                      : "text-gray-700"
+                  } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                >
+                  <span>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={`group-hover:fill-white ${
+                        currentPath === "/user-drugs-dashboard"
+                          ? "fill-white"
+                          : ""
+                      }`}
+                    >
+         <path d="M16.4828 3.51818C18.4354 5.4708 18.4354 8.63665 16.4828 10.5892L10.5902 16.4818C8.63757 18.4344 5.47177 18.4344 3.51915 16.4818C1.56653 14.5291 1.56653 11.3634 3.51915 9.41073L9.41173 3.51818C11.3643 1.56555 14.5301 1.56555 16.4828 3.51818ZM11.7693 12.9456L7.05527 8.23163L4.69767 10.5892C3.39592 11.891 3.39592 14.0016 4.69767 15.3033C5.99941 16.6051 8.10996 16.6051 9.41173 15.3033L11.7693 12.9456ZM15.3042 4.69669C14.0025 3.39494 11.892 3.39494 10.5902 4.69669L8.23378 7.05312L12.9478 11.7671L15.3042 9.41073C16.606 8.10899 16.606 5.99844 15.3042 4.69669Z"
+                        className={`group-hover:fill-white ${
+                          currentPath === "/user-drugs-dashboard"
+                            ? "fill-white"
+                            : "fill-[#647284]"
+                        }`}
+                      />
+                    </svg>
+                  </span>
+                  My Drugs Record
+                </li>
+              </div>
+            </Link>
+            <Link
               to="/user-appointments-dashboard"
               onClick={() => setOpenMobileSidebar(false)}
             >

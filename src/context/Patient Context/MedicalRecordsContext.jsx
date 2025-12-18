@@ -22,7 +22,7 @@ const MedicalRecordsProvider = (props) => {
       const res = await axiosInstance.get(
         `api/patients/dashboard?page=${page}&size=${pageSize}`
       );
-      console.log(res.data);
+      // console.log(res.data);
 
       setMedicalRecords(res.data.results || []);
       setCount(res.data.count || 0);

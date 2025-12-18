@@ -19,7 +19,7 @@ const SubscriptionPlansProvider = (props) => {
         try{
             const res = await axiosInstance.get('api/subscriptions/plans')
             setSubscriptionPlans(res.data)
-            console.log(res.data)
+            // console.log(res.data)
         }catch(err){
                 console.log(err)
                 toast.error("Error fetching subscriptions plans");

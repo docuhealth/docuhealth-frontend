@@ -60,7 +60,7 @@ const USI = () => {
     setShowToast(true);
     e.preventDefault();
     if (isFormValid) {
-      console.log("Form Submitted");
+      // console.log("Form Submitted");
       const userData = {
         ...(email ? { email } : { phone_num }),
         password,

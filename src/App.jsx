@@ -113,13 +113,18 @@ import ApproveHospitals from "./Dashboard/Admin_Dashboard/ApproveHospitals";
 
 function App() {
 
+  // 🔐 Disable console.log in production
+  if (process.env.NODE_ENV === "production") {
+    console.log = () => { };
+  }
+
   const hostname = window.location.hostname;
 
   const isHospital = hostname.startsWith("hospital.");
 
   return (
     <Router>
-      
+
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -145,14 +150,14 @@ function App() {
             element={<Hospital_Create_New_Password />}
           />
 
-          
+
           {/* Hospital Admin Routes */}
           <Route
             path="/hospital-admin-home-dashboard"
             element={
               <HospitalAdminProviders>
-            <Hospital_Admin_Layout />
-            </HospitalAdminProviders>
+                <Hospital_Admin_Layout />
+              </HospitalAdminProviders>
             }
           >
             <Route
@@ -160,7 +165,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalAdminProviders>
-                <Hospital_Admin_Home_Dashboard />
+                  <Hospital_Admin_Home_Dashboard />
                 </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
@@ -170,8 +175,8 @@ function App() {
             path="/hospital-admin-staff-dashboard"
             element={
               <HospitalAdminProviders>
-            <Hospital_Admin_Layout />
-            </HospitalAdminProviders>
+                <Hospital_Admin_Layout />
+              </HospitalAdminProviders>
             }
           >
             <Route
@@ -179,7 +184,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalAdminProviders>
-                <Hospital_Admin_Staff_Dashboard />
+                  <Hospital_Admin_Staff_Dashboard />
                 </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
@@ -189,8 +194,8 @@ function App() {
             path="/hospital-admin-patients-dashboard"
             element={
               <HospitalAdminProviders>
-            <Hospital_Admin_Layout />
-            </HospitalAdminProviders>
+                <Hospital_Admin_Layout />
+              </HospitalAdminProviders>
             }
           >
             <Route
@@ -198,7 +203,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalAdminProviders>
-                <Hospital_Admin_Patients_Dashboard />
+                  <Hospital_Admin_Patients_Dashboard />
                 </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
@@ -208,8 +213,8 @@ function App() {
             path="/hospital-admin-messages-dashboard"
             element={
               <HospitalAdminProviders>
-            <Hospital_Admin_Layout />
-            </HospitalAdminProviders>
+                <Hospital_Admin_Layout />
+              </HospitalAdminProviders>
             }
           >
             <Route
@@ -217,7 +222,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalAdminProviders>
-                <Hospital_Admin_Messages_Dashboard />
+                  <Hospital_Admin_Messages_Dashboard />
                 </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
@@ -227,8 +232,8 @@ function App() {
             path="/hospital-admin-appointments-dashboard"
             element={
               <HospitalAdminProviders>
-            <Hospital_Admin_Layout />
-            </HospitalAdminProviders>
+                <Hospital_Admin_Layout />
+              </HospitalAdminProviders>
             }
           >
             <Route
@@ -236,7 +241,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalAdminProviders>
-                <Hospital_Admin_Appointments_Dashboard />
+                  <Hospital_Admin_Appointments_Dashboard />
                 </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
@@ -246,8 +251,8 @@ function App() {
             path="/hospital-admin-wallet-dashboard"
             element={
               <HospitalAdminProviders>
-            <Hospital_Admin_Layout />
-            </HospitalAdminProviders>
+                <Hospital_Admin_Layout />
+              </HospitalAdminProviders>
             }
           >
             <Route
@@ -255,7 +260,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalAdminProviders>
-                <Hospital_Admin_Wallet_Dashboard />
+                  <Hospital_Admin_Wallet_Dashboard />
                 </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
@@ -265,8 +270,8 @@ function App() {
             path="/hospital-admin-settings-dashboard"
             element={
               <HospitalAdminProviders>
-            <Hospital_Admin_Layout />
-            </HospitalAdminProviders>
+                <Hospital_Admin_Layout />
+              </HospitalAdminProviders>
             }
           >
             <Route
@@ -274,7 +279,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalAdminProviders>
-                <Hospital_Admin_Settings_Dashboard />
+                  <Hospital_Admin_Settings_Dashboard />
                 </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
@@ -284,8 +289,8 @@ function App() {
             path="/hospital-admin-subscriptions-dashboard"
             element={
               <HospitalAdminProviders>
-            <Hospital_Admin_Layout />
-            </HospitalAdminProviders>
+                <Hospital_Admin_Layout />
+              </HospitalAdminProviders>
             }
           >
             <Route
@@ -293,7 +298,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalAdminProviders>
-                <Hospital_Admin_Subscriptions_Dashboard />
+                  <Hospital_Admin_Subscriptions_Dashboard />
                 </HospitalAdminProviders>
                 // </ProtectedRoute>
               }
@@ -305,16 +310,16 @@ function App() {
             path="/hospital-doctors-home-dashboard"
             element={
               <HospitalDoctorProviders>
-            <Hospital_Doctors_Layout />
-            </HospitalDoctorProviders>
-          }
+                <Hospital_Doctors_Layout />
+              </HospitalDoctorProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
                 <HospitalDoctorProviders>
-                <Hospital_Doctors_Home_Dashboard />
+                  <Hospital_Doctors_Home_Dashboard />
                 </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
@@ -324,16 +329,16 @@ function App() {
             path="/hospital-doctors-appointments-dashboard"
             element={
               <HospitalDoctorProviders>
-            <Hospital_Doctors_Layout />
-            </HospitalDoctorProviders>
-          }
+                <Hospital_Doctors_Layout />
+              </HospitalDoctorProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
                 <HospitalDoctorProviders>
-                <Hospital_Doctors_Appointments_Dashboard />
+                  <Hospital_Doctors_Appointments_Dashboard />
                 </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
@@ -343,8 +348,8 @@ function App() {
             path="/hospital-doctors-patients-dashboard"
             element={
               <HospitalDoctorProviders>
-            <Hospital_Doctors_Layout />
-            </HospitalDoctorProviders>
+                <Hospital_Doctors_Layout />
+              </HospitalDoctorProviders>
             }
           >
             <Route
@@ -352,7 +357,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalDoctorProviders>
-                <Hospital_Doctors_Patients_Dashboard />
+                  <Hospital_Doctors_Patients_Dashboard />
                 </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
@@ -362,15 +367,15 @@ function App() {
             path="/hospital-doctors-messages-dashboard"
             element={
               <HospitalDoctorProviders>
-            <Hospital_Doctors_Layout />
-            </HospitalDoctorProviders>}
+                <Hospital_Doctors_Layout />
+              </HospitalDoctorProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
                 <HospitalDoctorProviders>
-                <Hospital_Doctors_Messages_Dashboard />
+                  <Hospital_Doctors_Messages_Dashboard />
                 </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
@@ -380,16 +385,16 @@ function App() {
             path="/hospital-doctors-settings-dashboard"
             element={
               <HospitalDoctorProviders>
-            <Hospital_Doctors_Layout />
-            </HospitalDoctorProviders>
-          }
+                <Hospital_Doctors_Layout />
+              </HospitalDoctorProviders>
+            }
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
                 <HospitalDoctorProviders>
-                <Hospital_Doctors_Settings_Dashboard />
+                  <Hospital_Doctors_Settings_Dashboard />
                 </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
@@ -399,8 +404,8 @@ function App() {
             path="/hospital-doctors-healthpersonnel-dashboard"
             element={
               <HospitalDoctorProviders>
-            <Hospital_Doctors_Layout />
-            </HospitalDoctorProviders>
+                <Hospital_Doctors_Layout />
+              </HospitalDoctorProviders>
             }
           >
             <Route
@@ -408,7 +413,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalDoctorProviders>
-                <Hospital_Doctors_HealthPersonnel_Dashboard />
+                  <Hospital_Doctors_HealthPersonnel_Dashboard />
                 </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
@@ -418,8 +423,8 @@ function App() {
             path="/hospital-doctors-lab-dashboard"
             element={
               <HospitalDoctorProviders>
-            <Hospital_Doctors_Layout />
-            </HospitalDoctorProviders>
+                <Hospital_Doctors_Layout />
+              </HospitalDoctorProviders>
             }
           >
             <Route
@@ -427,7 +432,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalDoctorProviders>
-                <Hospital_Doctors_Lab_Dashboard />
+                  <Hospital_Doctors_Lab_Dashboard />
                 </HospitalDoctorProviders>
                 // </ProtectedRoute>
               }
@@ -439,8 +444,8 @@ function App() {
             path="/hospital-receptionist-home-dashboard"
             element={
               <HospitalReceptionistProviders>
-            <Hospital_Receptionist_Layout />
-            </HospitalReceptionistProviders>
+                <Hospital_Receptionist_Layout />
+              </HospitalReceptionistProviders>
             }
           >
             <Route
@@ -448,7 +453,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalReceptionistProviders>
-                <Hospital_Receptionist_Home_Dashboard />
+                  <Hospital_Receptionist_Home_Dashboard />
                 </HospitalReceptionistProviders>
                 // </ProtectedRoute>
               }
@@ -458,8 +463,8 @@ function App() {
             path="/hospital-receptionist-appointments-dashboard"
             element={
               <HospitalReceptionistProviders>
-            <Hospital_Receptionist_Layout />
-            </HospitalReceptionistProviders>
+                <Hospital_Receptionist_Layout />
+              </HospitalReceptionistProviders>
             }
           >
             <Route
@@ -467,7 +472,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalReceptionistProviders>
-                <Hospital_Receptionist_Appointments_Dashboard />
+                  <Hospital_Receptionist_Appointments_Dashboard />
                 </HospitalReceptionistProviders>
                 // </ProtectedRoute>
               }
@@ -477,8 +482,8 @@ function App() {
             path="/hospital-receptionist-patients-dashboard"
             element={
               <HospitalReceptionistProviders>
-            <Hospital_Receptionist_Layout />
-            </HospitalReceptionistProviders>
+                <Hospital_Receptionist_Layout />
+              </HospitalReceptionistProviders>
             }
           >
             <Route
@@ -486,7 +491,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalReceptionistProviders>
-                <Hospital_Receptionist_Patients_Dashboard />
+                  <Hospital_Receptionist_Patients_Dashboard />
                 </HospitalReceptionistProviders>
                 // </ProtectedRoute>
               }
@@ -496,8 +501,8 @@ function App() {
             path="/hospital-receptionist-messages-dashboard"
             element={
               <HospitalReceptionistProviders>
-            <Hospital_Receptionist_Layout />
-            </HospitalReceptionistProviders>
+                <Hospital_Receptionist_Layout />
+              </HospitalReceptionistProviders>
             }
           >
             <Route
@@ -505,7 +510,7 @@ function App() {
               element={
                 // <ProtectedRoute>
                 <HospitalReceptionistProviders>
-                <Hospital_Receptionist_Messages_Dashboard />
+                  <Hospital_Receptionist_Messages_Dashboard />
                 </HospitalReceptionistProviders>
                 // </ProtectedRoute>
               }
@@ -515,15 +520,15 @@ function App() {
             path="/hospital-receptionist-settings-dashboard"
             element={
               <HospitalReceptionistProviders>
-            <Hospital_Receptionist_Layout />
-            </HospitalReceptionistProviders>}
+                <Hospital_Receptionist_Layout />
+              </HospitalReceptionistProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
                 <HospitalReceptionistProviders>
-                <Hospital_Receptionist_Settings_Dashboard />
+                  <Hospital_Receptionist_Settings_Dashboard />
                 </HospitalReceptionistProviders>
 
                 // </ProtectedRoute>
@@ -534,15 +539,15 @@ function App() {
             path="/hospital-receptionist-healthpersonnel-dashboard"
             element={
               <HospitalReceptionistProviders>
-            <Hospital_Receptionist_Layout />
-            </HospitalReceptionistProviders>}
+                <Hospital_Receptionist_Layout />
+              </HospitalReceptionistProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
                 <HospitalReceptionistProviders>
-                <Hospital_Receptionist_HealthPersonnel_Dashboard />
+                  <Hospital_Receptionist_HealthPersonnel_Dashboard />
                 </HospitalReceptionistProviders>
 
                 // </ProtectedRoute>
@@ -553,15 +558,15 @@ function App() {
             path="/hospital-receptionist-admission-dashboard"
             element={
               <HospitalReceptionistProviders>
-            <Hospital_Receptionist_Layout />
-            </HospitalReceptionistProviders>}
+                <Hospital_Receptionist_Layout />
+              </HospitalReceptionistProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
                 <HospitalReceptionistProviders>
-                <Hospital_Receptionist_Admission_Dashboard />
+                  <Hospital_Receptionist_Admission_Dashboard />
                 </HospitalReceptionistProviders>
                 // </ProtectedRoute>
               }
@@ -573,15 +578,15 @@ function App() {
             path="/hospital-nurses-home-dashboard"
             element={
               <HospitalNursesProviders>
-            <Hospital_Nurses_Layout />
-            </HospitalNursesProviders>}
+                <Hospital_Nurses_Layout />
+              </HospitalNursesProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
                 <HospitalNursesProviders>
-                <Hospital_Nurses_Home_Dashboard />
+                  <Hospital_Nurses_Home_Dashboard />
                 </HospitalNursesProviders>
                 // </ProtectedRoute>
               }
@@ -592,15 +597,15 @@ function App() {
             path="/hospital-nurses-patients-dashboard"
             element={
               <HospitalNursesProviders>
-            <Hospital_Nurses_Layout />
-            </HospitalNursesProviders>}
+                <Hospital_Nurses_Layout />
+              </HospitalNursesProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
                 <HospitalNursesProviders>
-                <Hospital_Nurses_Patients_Dashboard />
+                  <Hospital_Nurses_Patients_Dashboard />
                 </HospitalNursesProviders>
                 // </ProtectedRoute>
               }
@@ -611,15 +616,15 @@ function App() {
             path="/hospital-nurses-messages-dashboard"
             element={
               <HospitalNursesProviders>
-            <Hospital_Nurses_Layout />
-            </HospitalNursesProviders>}
+                <Hospital_Nurses_Layout />
+              </HospitalNursesProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
                 <HospitalNursesProviders>
-                <Hospital_Nurses_Messages_Dashboard />
+                  <Hospital_Nurses_Messages_Dashboard />
                 </HospitalNursesProviders>
                 // </ProtectedRoute>
               }
@@ -631,15 +636,15 @@ function App() {
             path="/hospital-nurses-healthpersonnel-dashboard"
             element={
               <HospitalNursesProviders>
-            <Hospital_Nurses_Layout />
-            </HospitalNursesProviders>}
+                <Hospital_Nurses_Layout />
+              </HospitalNursesProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
                 <HospitalNursesProviders>
-                <Hospital_Nurses_HealthPersonnel_Dashboard />
+                  <Hospital_Nurses_HealthPersonnel_Dashboard />
                 </HospitalNursesProviders>
                 // </ProtectedRoute>
               }
@@ -650,15 +655,15 @@ function App() {
             path="/hospital-nurses-appointments-dashboard"
             element={
               <HospitalNursesProviders>
-            <Hospital_Nurses_Layout />
-            </HospitalNursesProviders>}
+                <Hospital_Nurses_Layout />
+              </HospitalNursesProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
                 <HospitalNursesProviders>
-                <Hospital_Nurses_Appointments_Dashboard />
+                  <Hospital_Nurses_Appointments_Dashboard />
                 </HospitalNursesProviders>
                 // </ProtectedRoute>
               }
@@ -669,15 +674,15 @@ function App() {
             path="/hospital-nurses-settings-dashboard"
             element={
               <HospitalNursesProviders>
-            <Hospital_Nurses_Layout />
-            </HospitalNursesProviders>}
+                <Hospital_Nurses_Layout />
+              </HospitalNursesProviders>}
           >
             <Route
               index
               element={
                 // <ProtectedRoute>
                 <HospitalNursesProviders>
-                <Hospital_Nurses_Settings_Dashboard />
+                  <Hospital_Nurses_Settings_Dashboard />
                 </HospitalNursesProviders>
                 // </ProtectedRoute>
               }

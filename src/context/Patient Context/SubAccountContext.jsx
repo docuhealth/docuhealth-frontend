@@ -23,7 +23,7 @@ const SubAccountProvider = (props) => {
       const res = await axiosInstance.get(
         `api/patients/subaccounts?page=${page}&size=${pageSize}`
       );
-      console.log(res.data);
+      // console.log(res.data);
 
       setSubAccounts(res.data.results || []);
       setCount(res.data.count || 0);

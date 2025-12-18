@@ -21,7 +21,7 @@ const AppointmentsProvider = (props) => {
       const res = await axiosInstance.get(
         `api/patients/appointments?page=${page}&size=${pageSize}`
       );
-      console.log(res.data);
+      // console.log(res.data);
 
       setAppointments(res.data.results || []);
       setCount(res.data.count || 0);

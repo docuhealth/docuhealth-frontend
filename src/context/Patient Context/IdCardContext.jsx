@@ -31,7 +31,7 @@ const IdCardProvider = (props) => {
   };
 
   const handleIDCardCreation = async (selectedPatient) => {
-    console.log(selectedPatient);
+    // console.log(selectedPatient);
     const phoneRegex = /^\d{11,}$/; // only digits, minimum 11 digits
 
     if (
@@ -58,7 +58,7 @@ const IdCardProvider = (props) => {
     }
 
     try {
-      console.log(selectedPatient);
+      // console.log(selectedPatient);
       let res;
 
       if ("emergency" in (selectedPatient || {})) {
@@ -72,7 +72,7 @@ const IdCardProvider = (props) => {
       }
 
       // Log or handle API response
-      console.log("ID Card API Response:", res.data);
+      // console.log("ID Card API Response:", res.data);
 
       toast.success("ID Card Created Successfully");
       setOnboardIDCard(false);
