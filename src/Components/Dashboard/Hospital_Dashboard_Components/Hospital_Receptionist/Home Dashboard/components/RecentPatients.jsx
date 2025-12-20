@@ -160,7 +160,7 @@ const RecentPatients = () => {
         </div>
 
         {/* Date & Time */}
-        <p className="text-gray-500 text-xs mb-1">
+        <p className="text-gray-500  mb-1">
           {formatFullDate(patient.created_at)} •{" "}
           {formatTime(patient.created_at)}
         </p>
@@ -169,7 +169,7 @@ const RecentPatients = () => {
      
 
         {/* Details */}
-        <div className="mt-3 space-y-1 text-xs">
+        <div className="mt-3 space-y-1 ">
           <p>
             <span className="font-medium">HIN:</span>{" "}
             {patient.patient.hin
