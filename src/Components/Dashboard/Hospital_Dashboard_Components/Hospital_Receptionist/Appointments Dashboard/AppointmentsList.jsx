@@ -148,7 +148,7 @@ const AppointmentsList = () => {
                 : {appointment.staff.firstname}{" "}
                 {appointment.staff.lastname}</p>
             </div>
-            <div className="border-l lg:flex lg:justify-center lg:items-center sm:col-span-2 lg:col-span-1 w-full my-4 lg:my-0" >
+            <div className="lg:border-l lg:flex lg:justify-center lg:items-center sm:col-span-2 lg:col-span-1 w-full my-4 lg:my-0" >
               <button className="border border-[#3E4095] rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300 cursor-pointer" onClick={()=> {
                 toast.success('Coming Soon !')
               }}>
