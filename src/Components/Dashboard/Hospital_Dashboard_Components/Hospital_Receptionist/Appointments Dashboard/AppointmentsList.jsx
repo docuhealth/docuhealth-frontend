@@ -12,7 +12,7 @@ const AppointmentsList = () => {
     count,
     currentPage,
     totalPages,
-    fetchAppointments,
+    fetchAppointmentsList,
   } = useContext(ReceptionistAppointmentsListContext);
 
   if (loading) {
@@ -162,7 +162,7 @@ const AppointmentsList = () => {
         count={count}
         currentPage={currentPage}
         totalPages={totalPages}
-        fetchData={fetchAppointments}
+        fetchData={fetchAppointmentsList}
       />
     </div>
   )
