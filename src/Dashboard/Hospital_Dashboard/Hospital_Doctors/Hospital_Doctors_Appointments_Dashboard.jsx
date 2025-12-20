@@ -43,7 +43,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
                   setSeePatientDetails(false);
                 }}
               >
-                + Add after-visit summary
+                + Add new SOAP note
               </button>
             </div>
           </div>

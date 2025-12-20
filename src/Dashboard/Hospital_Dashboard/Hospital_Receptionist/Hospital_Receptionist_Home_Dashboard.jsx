@@ -193,7 +193,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
               <div className='pt-4'>
                 <img src={template} alt='img' />
               </div>
-              <div className='text-sm flex justify-end items-center gap-5 mt-5'>
+              <div className='text-sm grid grid-cols-1 lg:flex lg:justify-end lg:items-center gap-2 lg:gap-5 mt-5'>
                 <button className=' border border-[#3E4095] rounded-full py-2.5 px-8 text-[#3E4095] cursor-pointer' onClick={() => {
                   setNewPatient(!newPatient)
                 }}>
@@ -211,16 +211,16 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                       placeholder=" Enter patient's HIN "
                       value={patientHIN}
                       onChange={(e) => setPatientHIN(e.target.value)}
-                      className='outline-none bg-white pl-10 pr-5 rounded-l-full border py-3'
+                      className='outline-none bg-white pl-10 pr-5 rounded-l-full border py-3 flex-1'
                       required
                     />
 
                     <button
                       onClick={handleHINCheck}
                       disabled={loading}
-                      className={`w-full   py-3  ${loading ? 'cursor-not-allowed bg-gray-300 text-gray-500' : 'bg-[#3E4095] cursor-pointer'}
+                      className={`w-full flex-1  py-3  ${loading ? 'cursor-not-allowed bg-gray-300 text-gray-500' : 'bg-[#3E4095] cursor-pointer'}
                         
-                 rounded-full sm:rounded-l-none   px-8    text-white sm:col-span-2 `}
+                 rounded-full rounded-l-none   lg:px-8    text-white sm:col-span-2 `}
                     >
                       {
                         loading ? (
@@ -258,7 +258,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
               </div>
 
               <div className='bg-white rounded-xl border mt-5 p-5 text-sm text-gray-700'>
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
                   <div className=' flex items-center gap-2 bg-blue-50 p-3 rounded-md'>
                     <div className='bg-[#3E4095] p-2 rounded-full'>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

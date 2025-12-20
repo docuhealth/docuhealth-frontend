@@ -157,38 +157,38 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
   const [requestLoading, setRequestLoading] = useState(false)
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
- const handleRequest = async () => {
+  const handleRequest = async () => {
 
-        const selectedDate = new Date(
-            `${selectedMonth} ${selectedDay}, ${selectedYear} ${selectedTime}`
-       );
+    const selectedDate = new Date(
+      `${selectedMonth} ${selectedDay}, ${selectedYear} ${selectedTime}`
+    );
 
-        setRequestLoading(true)
-        const updatedFormData = {
-            ...formData,
-            patient_hin: selectedPatientDetails?.patient?.hin,
-            scheduled_time: selectedDate.toISOString()
-        };
+    setRequestLoading(true)
+    const updatedFormData = {
+      ...formData,
+      patient_hin: selectedPatientDetails?.patient?.hin,
+      scheduled_time: selectedDate.toISOString()
+    };
 
-        console.log("REQUEST PAYLOAD:", updatedFormData);
+    console.log("REQUEST PAYLOAD:", updatedFormData);
 
 
-        try {
-            const res = await axiosInstance.post('api/receptionists/appointments', updatedFormData)
-            console.log(res)
-            toast.success('You have successfully booked a consultation for a patient')
-            setIsStaffSelected(false)
-            setRequestLoading(false)
-        } catch (err) {
-            console.error("Error booking consultation:", err);
-            toast.error(err.response?.data?.message || "Appointment Request failed.");
-            setIsStaffSelected(false)
-            setRequestLoading(false)
-        } finally {
-          setIsStaffSelected(false)
-            setRequestLoading(false)
-        }
+    try {
+      const res = await axiosInstance.post('api/receptionists/appointments', updatedFormData)
+      console.log(res)
+      toast.success('You have successfully booked a consultation for a patient')
+      setIsStaffSelected(false)
+      setRequestLoading(false)
+    } catch (err) {
+      console.error("Error booking consultation:", err);
+      toast.error(err.response?.data?.message || "Appointment Request failed.");
+      setIsStaffSelected(false)
+      setRequestLoading(false)
+    } finally {
+      setIsStaffSelected(false)
+      setRequestLoading(false)
     }
+  }
 
   return (
     <>
@@ -199,20 +199,85 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
               key={appointment.id}
               className="mb-4 p-4 border rounded-md grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-0 "
             >
-              <div className="flex items-center gap-1">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+
+              <div className="flex items-center justify-between gap-1 relative">
+                <div className="flex items-center gap-1">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"
+                      fill="#1B2B40"
+                    />
+                  </svg>
+                  <p>Date / Time: {formatFullDate(appointment.scheduled_time)} / {formatTime(appointment.scheduled_time)}</p>
+                </div>
+                <div
+                  onClick={() => {
+                    togglePopover(index)
+
+                  }}
+                  className={`flex h-8 w-9 lg:hidden justify-center items-center rounded-full cursor-pointer
+        ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
+    `}
                 >
-                  <path
-                    d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"
-                    fill="#1B2B40"
-                  />
-                </svg>
-                <p>Date / Time: {formatFullDate(appointment.scheduled_time)} / {formatTime(appointment.scheduled_time)}</p>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M14 8C14 7.45 13.55 7 13 7C12.45 7 12 7.45 12 8C12 8.55 12.45 9 13 9C13.55 9 14 8.55 14 8ZM4 8C4 7.45 3.55 7 3 7C2.45 7 2 7.45 2 8C2 8.55 2.45 9 3 9C3.55 9 4 8.55 4 8ZM9 8C9 7.45 8.55 7 8 7C7.45 7 7 7.45 7 8C7 8.55 7.45 9 8 9C8.55 9 9 8.55 9 8Z"
+                      fill="#1A263E"
+                    />
+                  </svg>
+                </div>
+                {
+                  openPopover === index && (
+                    <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
+
+                      <p
+                        className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                        onClick={() => {
+                          setSelectedPatient(appointment)
+                          setOpenPopover(null)
+                        }}
+                      >
+                        See patient's details
+                      </p>
+
+
+                      <p
+                        className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                        onClick={() => {
+                          setUpdateVitals(true)
+                          setSelectedPatientForVitals(appointment)
+                          setOpenPopover(null)
+                        }}
+                      >
+                        Update vitals
+                      </p>
+
+                      <p
+                        className={`text-[12px] text-gray-700 p-2 rounded-sm cursor-pointer
+    hover:bg-gray-200 
+    ${fetchingPersonnel ? "pointer-events-none opacity-50" : ""}
+  `}
+                        onClick={() => {
+                          if (!fetchingPersonnel) {
+                            fetchHealthPersonnel();
+                            setSelectedPatientDetails(appointment)
+                          }
+                        }}
+                      >
+                        {fetchingPersonnel ? "Fetching Doctor…" : "Assign to a Doctor"}
+                      </p>
+
+
+                    </div>
+                  )
+                }
+
               </div>
               <div className="flex items-center gap-1">
                 <svg width="20" height="20" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -254,7 +319,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                     togglePopover(index)
 
                   }}
-                  className={`h-8 w-9 flex justify-center items-center rounded-full cursor-pointer
+                  className={` hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer
         ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
     `}
                 >
@@ -269,7 +334,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
 
                 {
                   openPopover === index && (
-                    <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
+                    <div className="hidden lg:absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
 
                       <p
                         className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
@@ -331,7 +396,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
         selectedPatient && (
           <>
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 text-sm">
-              <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
+              <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm mx-3">
                 <div className='text-sm'>
                   <div className='flex justify-end'>
                     <button

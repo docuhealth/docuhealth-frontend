@@ -83,7 +83,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
             </div>
             <div className="border rounded-md p-5 my-5">
                 <p className="font-medium">Vital signs</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 my-5 gap-5">
+                <div className="grid grid-cols-1  lg:grid-cols-3 my-5 gap-5">
                     <div className="relative">
                         <p className="pb-1">Blood pressure</p>
                         <div className="relative">

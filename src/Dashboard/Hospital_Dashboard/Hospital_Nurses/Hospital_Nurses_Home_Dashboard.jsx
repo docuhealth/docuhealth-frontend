@@ -39,7 +39,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
         ) : vitals ? (
           <>
             <div
-              className={`py-2 text-sm ${selectedPatient ? "flex justify-between items-center" : ""
+              className={`py-2 text-sm ${selectedPatient ? "flex flex-col lg:flex-row justify-between items-start lg:items-center gap-2" : ""
                 }`}
             >
               {/* LEFT SIDE: DATE */}
@@ -47,16 +47,16 @@ const Hospital_Nurses_Home_Dashboard = () => {
 
               {/* RIGHT SIDE: ONLY SHOW WHEN A PATIENT IS SELECTED */}
               {selectedPatient && (
-                <div className="flex items-center gap-3">
+                <div className="grid grid-cols-1 w-full lg:w-auto lg:flex lg:items-center gap-3">
                   <button
-                    className="py-2 px-10 w-60 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer"
+                    className="py-2 px-10 lg:w-60 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer"
                     onClick={() => setCheckAdditionalNote(true)}
                   >
                     Check additional note
                   </button>
 
                   <button
-                    className="py-2.5 px-10 w-60 rounded-full bg-[#3E4095] text-white cursor-pointer"
+                    className="py-2.5 px-10 lg:w-60 rounded-full bg-[#3E4095] text-white cursor-pointer"
                     onClick={() => {
                       setVitals(false)
                       setUpdateVitals(true)
@@ -78,7 +78,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
                   {checkAdditionalNote && (
                     <>
                       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 text-sm">
-                        <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
+                        <div className="bg-white rounded-lg shadow-lg p-4 max-w-md w-full relative text-sm mx-3">
                           <div className='border rounded-md p-4 text-sm'>
                             <div className='flex justify-end'>
                               <button
@@ -134,7 +134,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
               <div className='pt-4'>
                 <img src={template} alt='img' />
               </div>
-              <div className='text-sm flex justify-end items-center gap-5 mt-5'>
+              <div className='text-sm grid grid-cols-1 lg:flex lg:justify-end lg:items-center gap-2 lg:gap-5 mt-5'>
                 <button className='border border-[#3E4095] rounded-full py-2 px-12 text-[#3E4095] cursor-pointer'
                   onClick={() => {
                     setAdmissionRequest(true)
@@ -149,7 +149,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
                 </button>
               </div>
               <div className='bg-white rounded-xl border mt-5 p-5 text-sm text-gray-700'>
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
                   <div className=' flex items-center gap-2 bg-blue-50 p-3 rounded-md'>
                     <div className='bg-[#3E4095] p-2 rounded-full'>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { ReceptionistAppointmentsListContext } from '../../../../../context/Hospital Context/Receptionist/ReceptionistAppointmentsListContext'
 import Pagination from '../../../Patient_Dashboard_Components/Pagination/Pagination'
 import { formatFullDate, formatTime } from '../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter'
+import toast from 'react-hot-toast'
 
 const AppointmentsList = () => {
 
@@ -147,8 +148,10 @@ const AppointmentsList = () => {
                 : {appointment.staff.firstname}{" "}
                 {appointment.staff.lastname}</p>
             </div>
-            <div className="border-l lg:flex lg:justify-center lg:items-center sm:col-span-2 lg:col-span-1 w-full my-4 lg:my-0">
-              <button className="border border-[#3E4095] rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300">
+            <div className="border-l lg:flex lg:justify-center lg:items-center sm:col-span-2 lg:col-span-1 w-full my-4 lg:my-0" >
+              <button className="border border-[#3E4095] rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300 cursor-pointer" onClick={()=> {
+                toast.success('Coming Soon !')
+              }}>
                 <p className="text-[#3E4095]">Send a message</p>
               </button>
             </div>
