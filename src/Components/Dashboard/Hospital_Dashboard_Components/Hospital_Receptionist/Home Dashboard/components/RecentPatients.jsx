@@ -146,7 +146,7 @@ const RecentPatients = () => {
     {recentPatients.map((patient, index) => (
       <div
         key={index}
-        className="bg-white border border-gray-200 rounded-lg p-4 text-sm text-gray-700"
+        className="bg-white border border-gray-200 rounded-lg p-4 text-[12px] text-gray-700"
       >
         <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center'>
                {/* Patient name */}
