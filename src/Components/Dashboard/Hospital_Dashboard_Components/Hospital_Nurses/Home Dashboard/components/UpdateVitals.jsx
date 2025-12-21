@@ -28,7 +28,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
         setLoading(true)
 
         const payload = {
-            request: selectedPatient.id,
+            request: selectedPatient.patient.hin,
             staff : staffID,
             blood_pressure: bloodPressure,
             temp: temperature,
