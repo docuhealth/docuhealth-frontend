@@ -91,7 +91,7 @@ const Hospital_Nurses_Sidebar = () => {
               </li>
             </div>
           </Link>
-          <Link to="/hospital-nurses-messages-dashboard">
+          {/* <Link to="/hospital-nurses-messages-dashboard">
             <div className="px-4 my-4">
               <li
                 className={`group px-4 py-2   ${currentPath === "/hospital-nurses-messages-dashboard"
@@ -123,7 +123,7 @@ const Hospital_Nurses_Sidebar = () => {
                 Messages
               </li>
             </div>
-          </Link>
+          </Link> */}
           <Link to="/hospital-nurses-healthpersonnel-dashboard">
             <div className="px-4 my-4">
               <li

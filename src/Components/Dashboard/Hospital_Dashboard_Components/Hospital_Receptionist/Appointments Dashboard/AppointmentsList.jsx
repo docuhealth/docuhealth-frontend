@@ -26,8 +26,8 @@ const AppointmentsList = () => {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
-          width="200"
-          height="200"
+          width="180"
+          height="180"
           viewBox="0 0 366 366"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

@@ -1,14 +1,13 @@
 import React, { useState, useContext } from 'react'
-import { ArrowLeft } from 'lucide-react'
+import {Link} from 'react-router-dom'
 import DynamicDate from '../../../Components/Dynamic Date/DynamicDate'
 import template from '../../../assets/img/template.png'
-import toast from 'react-hot-toast'
-import axiosInstance from '../../../utils/axiosInstance'
 import { NursesAppContext } from '../../../context/Hospital Context/Nurses/NursesAppContext'
 import AdmissionRequests from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/AdmissionRequests'
 import Vitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/Vitals'
 import PatientVitalsDetails from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/PatientVitalsDetails'
 import UpdateVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/UpdateVitals'
+import PatientsAssignedToMyWard from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/PatientsAssignedToMyWard'
 
 const Hospital_Nurses_Home_Dashboard = () => {
 
@@ -181,6 +180,23 @@ const Hospital_Nurses_Home_Dashboard = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+              <div className="bg-white my-5 border rounded-2xl p-5">
+                <div className=" border rounded-lg p-5 ">
+                  <div className='flex justify-between items-center border-b pb-2 mb-4'>
+                  <h2 className="font-medium">
+                    Patients in my ward
+                  </h2>
+                  <Link to ='/hospital-nurses-patients-dashboard'>
+                  <p className='text-sm underline text-[#3E4095]'>view all </p>
+                  
+                  </Link>
+                  </div>
+                  <div className=''>
+                  <PatientsAssignedToMyWard />
+                </div>
+                </div>
+                
               </div>
             </div>
           </>

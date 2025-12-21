@@ -27,8 +27,8 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
-          width="200"
-          height="200"
+          width="180"
+          height="180"
           viewBox="0 0 366 366"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -197,14 +197,14 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
           {appointments.map((appointment, index) => (
             <div
               key={appointment.id}
-              className="mb-4 p-4 border rounded-md grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-0 "
+              className="mb-4 p-4 border rounded-md grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-2 "
             >
 
-              <div className="flex items-center justify-between gap-1 relative">
+              <div className="flex items-center justify-between gap-1 relative sm:col-span-2 lg:col-span-1">
                 <div className="flex items-center gap-1">
                   <svg
-                    width="20"
-                    height="20"
+                    width="14"
+                    height="14"
                     viewBox="0 0 24 24"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -234,7 +234,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                 </div>
                 {
                   openPopover === index && (
-                    <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
+                    <div className="absolute lg:hidden top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
 
                       <p
                         className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
@@ -279,8 +279,8 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                 }
 
               </div>
-              <div className="flex items-center gap-1">
-                <svg width="20" height="20" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <div className="flex items-center gap-1 sm:col-span-2 lg:col-span-1">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#1B2B40" />
                 </svg>
 
@@ -291,7 +291,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
 
               <div className="flex items-center gap-1">
 
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M10.0008 12.4993C13.4005 12.4993 16.2058 15.0441 16.6159 18.3327H3.38574C3.79581 15.0441 6.60114 12.4993 10.0008 12.4993ZM8.48991 14.3989C7.29522 14.7777 6.28897 15.5938 5.66867 16.666H10.0008L8.48991 14.3989ZM11.5121 14.3991L10.0008 16.666H14.333C13.7127 15.5939 12.7067 14.7778 11.5121 14.3991ZM15.0008 1.66602V6.66602C15.0008 9.42743 12.7622 11.666 10.0008 11.666C7.23941 11.666 5.00083 9.42743 5.00083 6.66602V1.66602H15.0008ZM6.6675 6.66602C6.6675 8.50693 8.15988 9.99935 10.0008 9.99935C11.8418 9.99935 13.3342 8.50693 13.3342 6.66602H6.6675ZM13.3342 3.33268H6.6675L6.66741 4.99935H13.3341L13.3342 3.33268Z" fill="#1B2B40" />
                 </svg>
 
@@ -304,7 +304,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
               <div className='flex items-center justify-between relative'>
                 <div className="flex items-center gap-1 w-full">
 
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V4H5V20H19ZM7 6H11V10H7V6ZM7 12H17V14H7V12ZM7 16H17V18H7V16ZM13 7H17V9H13V7Z" fill="#1B2B40" />
                   </svg>
 
@@ -334,7 +334,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
 
                 {
                   openPopover === index && (
-                    <div className="hidden lg:absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
+                    <div className="hidden lg:block lg:absolute top-0 lg:top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
 
                       <p
                         className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"

@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import axiosInstance from '../../../../../../utils/axiosInstance'
 import toast from 'react-hot-toast'
+import { NursesAppContext } from '../../../../../../context/Hospital Context/Nurses/NursesAppContext'
 
 const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
 
@@ -11,14 +12,24 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
     const [height, setHeight] = useState("");
     const [weight, setWeight] = useState("");
     const [heartRate, setHeartRate] = useState("");
+    const [staffID, setStaffID] = useState('')
 
+    const {profile} = useContext(NursesAppContext)
 
-    console.log(selectedPatient)
+    // console.log(profile)
+    useEffect(()=> {
+        if(profile){
+            setStaffID(profile.staff_id)
+        }
+    },[profile])
+
+    // console.log(selectedPatient)
     const handleSubmit = async () => {
         setLoading(true)
 
         const payload = {
             request: selectedPatient.id,
+            staff : staffID,
             blood_pressure: bloodPressure,
             temp: temperature,
             resp_rate: respRate,
@@ -37,7 +48,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
 
         try {
             const res = await axiosInstance.post(
-                "api/nurses/vital-signs/process",
+                "api/nurses/vital-signs/update",
                 payload
             );
 

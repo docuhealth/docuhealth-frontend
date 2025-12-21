@@ -152,21 +152,21 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                   </div>
 
                   <div>
-  <p className="text-sm font-medium text-gray-500 mb-1">
-    Home address
-  </p>
+                    <p className="text-sm font-medium text-gray-500 mb-1">
+                      Home address
+                    </p>
 
-  <textarea
-    readOnly
-    rows={3}
-    className="w-full text-gray-500 rounded-lg text-sm bg-white border px-3 py-2 resize-none"
-    value={
-      patientDetails?.street
-        ? `${patientDetails.street}, ${patientDetails.city}, ${patientDetails.state}, ${patientDetails.country}`
-        : "NIL"
-    }
-  />
-</div>
+                    <textarea
+                      readOnly
+                      rows={3}
+                      className="w-full text-gray-500 rounded-lg text-sm bg-white border px-3 py-2 resize-none"
+                      value={
+                        patientDetails?.street
+                          ? `${patientDetails.street}, ${patientDetails.city}, ${patientDetails.state}, ${patientDetails.country}`
+                          : "NIL"
+                      }
+                    />
+                  </div>
 
 
                   <div>

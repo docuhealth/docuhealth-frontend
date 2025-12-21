@@ -30,7 +30,7 @@ const Hospital_Nurses_Sidebar_Mobile = ({ openMobileSidebar,
             <h1 className="text-xl">DocuHealth</h1>
           </div>
           <div
-            className=" sm:hidden "
+            className=" lg:hidden "
             onClick={() => setOpenMobileSidebar(false)}
           >
             <svg
@@ -125,7 +125,7 @@ const Hospital_Nurses_Sidebar_Mobile = ({ openMobileSidebar,
                 </li>
               </div>
             </Link>
-            <Link to="/hospital-nurses-messages-dashboard"
+            {/* <Link to="/hospital-nurses-messages-dashboard"
               onClick={() => setOpenMobileSidebar(false)}>
               <div className="px-4 my-4">
                 <li
@@ -158,7 +158,7 @@ const Hospital_Nurses_Sidebar_Mobile = ({ openMobileSidebar,
                   Messages
                 </li>
               </div>
-            </Link>
+            </Link> */}
             <Link to="/hospital-nurses-healthpersonnel-dashboard"
               onClick={() => setOpenMobileSidebar(false)}>
               <div className="px-4 my-4">

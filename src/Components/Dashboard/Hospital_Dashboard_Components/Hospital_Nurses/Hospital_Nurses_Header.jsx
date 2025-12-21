@@ -14,7 +14,7 @@ const Hospital_Nurses_Header = () => {
   return (
     <>
         <div className="relative">
-        <header className="hidden bg-white py-4 px-6 sm:flex justify-between items-center border ">
+        <header className="hidden bg-white py-4 px-6 lg:flex justify-between items-center border ">
           <h2 className="text-md font-medium">
             Welcome back{" "}
             {profile ? `${profile.firstname} ${profile.lastname}` : "Loading..."}{" "}
@@ -46,7 +46,7 @@ const Hospital_Nurses_Header = () => {
           </div>
         </header>
 
-        <header className=" sm:hidden bg-white shadow-sm py-4 flex justify-between items-center px-4 ">
+        <header className=" lg:hidden bg-white shadow-sm py-4 flex justify-between items-center px-4 ">
           <div className="text-sm font-semibold flex items-center gap-2">
             <p>
               <i
@@ -102,7 +102,7 @@ const Hospital_Nurses_Header = () => {
             )}
           </div>
         </header>
-        <div className="sm:hidden">
+        <div className="lg:hidden">
           <Hospital_Nurses_Sidebar_Mobile
             openMobileSidebar={openMobileSidebar}
             setOpenMobileSidebar={setOpenMobileSidebar}

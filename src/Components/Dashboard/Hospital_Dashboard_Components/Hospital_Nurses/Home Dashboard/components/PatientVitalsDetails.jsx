@@ -95,15 +95,24 @@ const PatientVitalsDetails = ({ selectedPatient, setSelectedPatient }) => {
                         />
                     </div>
 
+                
+
                     <div>
-                        <p className="text-sm font-medium text-gray-500 mb-1 ">Home address</p>
-                        <input
-                            type="text"
-                            readOnly
-                            className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                            value={selectedPatient?.patient?.street + ', ' +  selectedPatient?.patient?.city + ', ' +  selectedPatient?.patient?.state + ', ' +  selectedPatient?.patient?.country || 'NIL'}
-                        />
-                    </div>
+                    <p className="text-sm font-medium text-gray-500 mb-1">
+                      Home address
+                    </p>
+
+                    <textarea
+                      readOnly
+                      rows={3}
+                      className="w-full text-gray-500 rounded-lg text-sm bg-white border px-3 py-2 resize-none"
+                      value={
+                        selectedPatient?.patient?.street
+                          ? `${selectedPatient.patient?.street}, ${selectedPatient.patient?.city}, ${selectedPatient.patient?.state}, ${selectedPatient.patient?.country}`
+                          : "NIL"
+                      }
+                    />
+                  </div>
 
                     <div className='lg:col-span-2'>
                         <p className="text-sm font-medium text-gray-500 mb-1  ">Assigned doctor</p>

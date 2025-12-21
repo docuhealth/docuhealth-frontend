@@ -141,51 +141,51 @@ const Health_Personnel_List = () => {
 
             </div>
             <div className="lg:hidden">
-  <div className="flex flex-col gap-4">
-    {healthPersonnelList.map((staff, index) => (
-      <div
-        key={index}
-        className="bg-white border border-gray-200 rounded-lg p-4 text-sm text-gray-700"
-      >
-        {/* Staff Name */}
-        <div className="flex items-center gap-2 font-semibold text-gray-900 mb-2">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" /> </svg>
-          <p>
-            {staff.firstname} {staff.lastname}
-          </p>
-        </div>
+                <div className="flex flex-col gap-4">
+                    {healthPersonnelList.map((staff, index) => (
+                        <div
+                            key={index}
+                            className="bg-white border border-gray-200 rounded-lg p-4 text-sm text-gray-700"
+                        >
+                            {/* Staff Name */}
+                            <div className="flex items-center gap-2 font-semibold text-gray-900 mb-2">
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" /> </svg>
+                                <p>
+                                    {staff.firstname} {staff.lastname}
+                                </p>
+                            </div>
 
-        {/* Staff details */}
-        <div className="space-y-1 grid grid-cols-1 sm:grid-cols-2 text-xs">
-          <p>
-            <span className="font-medium">Staff ID:</span>{" "}
-            {staff.staff_id || "—"}
-          </p>
+                            {/* Staff details */}
+                            <div className="space-y-1 grid grid-cols-1 sm:grid-cols-2 text-xs">
+                                <p>
+                                    <span className="font-medium">Staff ID:</span>{" "}
+                                    {staff.staff_id || "—"}
+                                </p>
 
-          <p>
-            <span className="font-medium">Role:</span>{" "}
-            {staff.role || "—"}
-          </p>
+                                <p>
+                                    <span className="font-medium">Role:</span>{" "}
+                                    {staff.role || "—"}
+                                </p>
 
-          <p>
-            <span className="font-medium">Phone:</span>{" "}
-            {staff.phone_no || "—"}
-          </p>
+                                <p>
+                                    <span className="font-medium">Phone:</span>{" "}
+                                    {staff.phone_no || "—"}
+                                </p>
 
-          <p className="truncate">
-            <span className="font-medium">Email:</span>{" "}
-            {staff.email || "—"}
-          </p>
+                                <p className="truncate">
+                                    <span className="font-medium">Email:</span>{" "}
+                                    {staff.email || "—"}
+                                </p>
 
-          <p>
-            <span className="font-medium">Sex:</span>{" "}
-            {staff.gender || "—"}
-          </p>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
+                                <p>
+                                    <span className="font-medium">Sex:</span>{" "}
+                                    {staff.gender || "—"}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
 
             <Pagination
                 count={count}
