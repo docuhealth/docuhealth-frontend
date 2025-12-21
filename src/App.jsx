@@ -111,6 +111,10 @@ import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
 
 import ApproveHospitals from "./Dashboard/Admin_Dashboard/ApproveHospitals";
 
+import Snowfall from 'react-snowfall'
+import Confetti from 'react-confetti'
+
+
 function App() {
 
   // 🔐 Disable console.log in production
@@ -125,6 +129,7 @@ function App() {
   return (
     <Router>
 
+
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -135,6 +140,8 @@ function App() {
       />
       <Toaster position="top-right" reverseOrder={false} />
       <ScrollToTop />
+
+
 
       {isHospital ? (
         <Routes>
@@ -697,237 +704,265 @@ function App() {
 
         </Routes>
       ) : (
-        <Routes>
-          <Route path="/" element={<Landing_Page_Layout />} >
-            <Route
-              index
-              element={
-                <Home_Page />
+        <>    <Snowfall
+          color="#cfe9ff"
+          snowflakeCount={120}
+          style={{
+            position: "fixed",
+            width: "100vw",
+            height: "100vh",
+            top: 0,
+            left: 0,
+            zIndex: 9999,
+            pointerEvents: "none",
+          }}
+        />
 
+          <Confetti
+
+            numberOfPieces={250}
+            recycle={false}
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              zIndex: 9999,
+              pointerEvents: "none",
+            }}
+          />
+          <Routes>
+            <Route path="/" element={<Landing_Page_Layout />} >
+              <Route
+                index
+                element={
+                  <Home_Page />
+
+                }
+              />
+            </Route>
+            <Route path="/our-vision" element={<Landing_Page_Layout />} >
+              <Route
+                index
+                element={
+                  <Our_Vision_Page />
+
+                }
+              />
+            </Route>
+            <Route path="/our-mission" element={<Landing_Page_Layout />} >
+              <Route
+                index
+                element={
+                  <Our_Mission_Page />
+
+                }
+              />
+            </Route>
+            <Route path="/docuhealth-news" element={<Landing_Page_Layout />} >
+              <Route
+                index
+                element={
+                  <DocuHealth_News_Page />
+
+                }
+              />
+            </Route>
+            <Route path="/docuhealth-api" element={<Landing_Page_Layout />} >
+              <Route
+                index
+                element={
+                  <DocuHealth_API_Page />
+
+                }
+              />
+            </Route>
+            <Route path="/legal-notice" element={<Landing_Page_Layout />} >
+              <Route
+                index
+                element={
+                  <Legal_Notice_Page />
+
+                }
+              />
+            </Route>
+            <Route path="/privacy-policy" element={<Landing_Page_Layout />} >
+              <Route
+                index
+                element={
+                  <Privacy_Policy_Page />
+
+                }
+              />
+            </Route>
+
+
+            <Route path="/verify-nin" element={<Verify_NIN />} />
+
+            <Route path="/user-create-account" element={<User_Create_Account />} />
+            <Route
+              path="/user-create-account-verify-otp"
+              element={<User_Create_Account_Verify_OTP />}
+            />
+            <Route path="/user-login" element={<User_Sign_In />} />
+            <Route
+              path="/user-forgot-password"
+              element={<User_Forget_Password />}
+            />
+            <Route path="/user-verify-otp" element={<User_Verify_OTP />} />
+
+            <Route
+
+              path="/user-create-new-password"
+              element={<User_Create_New_Password />}
+            />
+
+            <Route
+              path="/hospital-verification-request"
+              element={<Hospital_Verification_Request />}
+            />
+            <Route
+              path="/hospital-onboarding"
+              element={<Hospital_Onboarding />}
+            />
+
+
+            {/* Dashboard Routes */}
+            <Route
+              path="/user-home-dashboard"
+              element={<Patient_Dashboard_Layout />}
+            >
+              <Route
+                index
+                element={
+                  <ProtectedRoute>
+                    <Patient_Home_Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            <Route
+              path="/user-subaccount-dashboard"
+              element={<Patient_Dashboard_Layout />}
+            >
+              <Route
+                index
+                element={
+                  <ProtectedRoute>
+                    <Patient_SubAccount_Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            <Route
+              path="/user-appointments-dashboard"
+              element={<Patient_Dashboard_Layout />}
+            >
+              <Route
+                index
+                element={
+                  <ProtectedRoute>
+                    <Patient_Appointments_Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            <Route
+              path="/user-settings-dashboard"
+              element={<Patient_Dashboard_Layout />}
+            >
+              <Route
+                index
+                element={
+                  <ProtectedRoute>
+                    <Patient_Settings_Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            <Route
+              path="/user-subscriptions-dashboard"
+              element={<Patient_Dashboard_Layout />}
+            >
+              <Route
+                index
+                element={
+                  <ProtectedRoute>
+                    <Patient_Subscriptions_Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            <Route
+              path="/admin"
+              element={<ApproveHospitals />}
+            />
+            <Route
+              path="/admin-create-account"
+              element={<Admin_Create_Account />}
+            />
+            <Route path="/admin-login" element={<Admin_Sign_In />} />
+            <Route
+              path="/admin-forgot-password"
+              element={<Admin_Forget_Password />}
+            />
+            <Route path="/admin-verify-otp" element={<Admin_Verify_OTP />} />
+            <Route
+              path="/admin-set-new-password"
+              element={<Admin_Create_New_Password />}
+            />
+
+            <Route
+              path="/admin-home-dashboard"
+              element={
+                <AdminProtectedRoute>
+                  <AdminHomeDashboard />
+                </AdminProtectedRoute>
               }
             />
-          </Route>
-          <Route path="/our-vision" element={<Landing_Page_Layout />} >
-            <Route
-              index
-              element={
-                <Our_Vision_Page />
 
+            <Route
+              path="/admin-users-dashboard"
+              element={
+                <AdminProtectedRoute>
+                  <AdminUsersDashboard />
+                </AdminProtectedRoute>
               }
             />
-          </Route>
-          <Route path="/our-mission" element={<Landing_Page_Layout />} >
             <Route
-              index
+              path="/admin-settings-dashboard"
               element={
-                <Our_Mission_Page />
-
+                <AdminProtectedRoute>
+                  <AdminSettingsDashboard />
+                </AdminProtectedRoute>
               }
             />
-          </Route>
-          <Route path="/docuhealth-news" element={<Landing_Page_Layout />} >
-            <Route
-              index
-              element={
-                <DocuHealth_News_Page />
 
+            <Route
+              path="/admin-subscriptions-dashboard"
+              element={
+                <AdminProtectedRoute>
+                  <AdminSubscriptionDashboard />
+                </AdminProtectedRoute>
               }
             />
-          </Route>
-          <Route path="/docuhealth-api" element={<Landing_Page_Layout />} >
             <Route
-              index
+              path="/admin-logout-dashboard"
               element={
-                <DocuHealth_API_Page />
-
+                <AdminProtectedRoute>
+                  <AdminLogoutDashboard />
+                </AdminProtectedRoute>
               }
             />
-          </Route>
-          <Route path="/legal-notice" element={<Landing_Page_Layout />} >
-            <Route
-              index
-              element={
-                <Legal_Notice_Page />
+            <Route path="*" element={<NotFound />} />
 
-              }
-            />
-          </Route>
-          <Route path="/privacy-policy" element={<Landing_Page_Layout />} >
-            <Route
-              index
-              element={
-                <Privacy_Policy_Page />
+          </Routes>
+        </>
 
-              }
-            />
-          </Route>
-
-
-          <Route path="/verify-nin" element={<Verify_NIN />} />
-
-          <Route path="/user-create-account" element={<User_Create_Account />} />
-          <Route
-            path="/user-create-account-verify-otp"
-            element={<User_Create_Account_Verify_OTP />}
-          />
-          <Route path="/user-login" element={<User_Sign_In />} />
-          <Route
-            path="/user-forgot-password"
-            element={<User_Forget_Password />}
-          />
-          <Route path="/user-verify-otp" element={<User_Verify_OTP />} />
-
-          <Route
-
-            path="/user-create-new-password"
-            element={<User_Create_New_Password />}
-          />
-
-          <Route
-            path="/hospital-verification-request"
-            element={<Hospital_Verification_Request />}
-          />
-          <Route
-            path="/hospital-onboarding"
-            element={<Hospital_Onboarding />}
-          />
-
-
-          {/* Dashboard Routes */}
-          <Route
-            path="/user-home-dashboard"
-            element={<Patient_Dashboard_Layout />}
-          >
-            <Route
-              index
-              element={
-                <ProtectedRoute>
-                  <Patient_Home_Dashboard />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
-
-          <Route
-            path="/user-subaccount-dashboard"
-            element={<Patient_Dashboard_Layout />}
-          >
-            <Route
-              index
-              element={
-                <ProtectedRoute>
-                  <Patient_SubAccount_Dashboard />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
-
-          <Route
-            path="/user-appointments-dashboard"
-            element={<Patient_Dashboard_Layout />}
-          >
-            <Route
-              index
-              element={
-                <ProtectedRoute>
-                  <Patient_Appointments_Dashboard />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
-
-          <Route
-            path="/user-settings-dashboard"
-            element={<Patient_Dashboard_Layout />}
-          >
-            <Route
-              index
-              element={
-                <ProtectedRoute>
-                  <Patient_Settings_Dashboard />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
-
-          <Route
-            path="/user-subscriptions-dashboard"
-            element={<Patient_Dashboard_Layout />}
-          >
-            <Route
-              index
-              element={
-                <ProtectedRoute>
-                  <Patient_Subscriptions_Dashboard />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
-
-          <Route
-            path="/admin"
-            element={<ApproveHospitals />}
-          />
-          <Route
-            path="/admin-create-account"
-            element={<Admin_Create_Account />}
-          />
-          <Route path="/admin-login" element={<Admin_Sign_In />} />
-          <Route
-            path="/admin-forgot-password"
-            element={<Admin_Forget_Password />}
-          />
-          <Route path="/admin-verify-otp" element={<Admin_Verify_OTP />} />
-          <Route
-            path="/admin-set-new-password"
-            element={<Admin_Create_New_Password />}
-          />
-
-          <Route
-            path="/admin-home-dashboard"
-            element={
-              <AdminProtectedRoute>
-                <AdminHomeDashboard />
-              </AdminProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin-users-dashboard"
-            element={
-              <AdminProtectedRoute>
-                <AdminUsersDashboard />
-              </AdminProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin-settings-dashboard"
-            element={
-              <AdminProtectedRoute>
-                <AdminSettingsDashboard />
-              </AdminProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin-subscriptions-dashboard"
-            element={
-              <AdminProtectedRoute>
-                <AdminSubscriptionDashboard />
-              </AdminProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin-logout-dashboard"
-            element={
-              <AdminProtectedRoute>
-                <AdminLogoutDashboard />
-              </AdminProtectedRoute>
-            }
-          />
-          <Route path="*" element={<NotFound />} />
-
-        </Routes>
       )}
 
     </Router>

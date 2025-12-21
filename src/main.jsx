@@ -11,6 +11,7 @@ import IdCardProvider from "./context/Patient Context/IdCardContext.jsx";
 import SubscriptionPlansProvider from "./context/Patient Context/SubscriptionsContext.jsx";
 
 
+
 const role = getRole(); 
 
 const PatientProviders = ({ children }) => (

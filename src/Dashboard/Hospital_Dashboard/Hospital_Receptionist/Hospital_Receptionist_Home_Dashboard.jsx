@@ -60,10 +60,10 @@ const Hospital_Receptionist_Home_Dashboard = () => {
       {
         checkHIN ? (
           <>
-            <div className='py-2 text-sm flex justify-between items-center'>
+            <div className='py-2 text-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 w-full sm:w-auto'>
               <DynamicDate />
-              <div>
-                <button className='bg-[#3E4095] py-2.5 px-8 rounded-full text-white cursor-pointer' onClick={() => {
+              <div className='w-full sm:w-auto'>
+                <button className='bg-[#3E4095] py-2.5 px-8 w-full sm:w-auto rounded-full text-white cursor-pointer' onClick={() => {
                   setBookAppointment(!bookAppointment)
                 }}>
                   Book an appointment
@@ -152,14 +152,22 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium text-gray-500 mb-1 ">Home address</p>
-                    <input
-                      type="text"
-                      readOnly
-                      className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                      value={patientDetails.street + ', ' + patientDetails.city + ', ' + patientDetails.state + ', ' + patientDetails.country || 'NIL'}
-                    />
-                  </div>
+  <p className="text-sm font-medium text-gray-500 mb-1">
+    Home address
+  </p>
+
+  <textarea
+    readOnly
+    rows={3}
+    className="w-full text-gray-500 rounded-lg text-sm bg-white border px-3 py-2 resize-none"
+    value={
+      patientDetails?.street
+        ? `${patientDetails.street}, ${patientDetails.city}, ${patientDetails.state}, ${patientDetails.country}`
+        : "NIL"
+    }
+  />
+</div>
+
 
                   <div>
                     <p className="text-sm font-medium text-gray-500 mb-1 ">Assigned doctor</p>
