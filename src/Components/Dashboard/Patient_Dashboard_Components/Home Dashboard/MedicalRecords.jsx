@@ -58,7 +58,7 @@ const MedicalRecords = ({
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full text-sm">
+      <div className="flex flex-col justify-start lg:justify-center items-center text-center  h-auto lg:h-full mt-[15%] lg:mt-0 text-sm">
         Loading...
       </div>
     );

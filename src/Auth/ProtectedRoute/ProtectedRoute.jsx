@@ -4,7 +4,6 @@ import { getToken, getRole } from "../../services/authService";
 
 function ProtectedRoute({ children }) {
   const token = getToken();
-  const role = getRole();
 
   if (!token) {
     return <Navigate to="/user-login" replace />;
