@@ -428,7 +428,19 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                     </div>
                     <div className='mb-1 flex items-center gap-1'>
                       <p className='font-medium'>D.O.B:</p>
-                      <p className=' text-gray-600'>{selectedPatient?.patient?.gender ?? "NIL"}</p>
+                      <p className=' text-gray-600'>{selectedPatient?.patient?.dob ?? "NIL"}</p>
+                    </div>
+                    <div className='mb-1 flex items-center gap-1'>
+                      <p className='font-medium'>State of origin:</p>
+                      <p className=' text-gray-600'>{selectedPatient?.patient?.state ?? "NIL"}</p>
+                    </div>
+                    <div className='mb-1 flex items-center gap-1'>
+                      <p className='font-medium'>Contact Info:</p>
+                      <p className=' text-gray-600'>{selectedPatient?.patient?.phone_num ?? "NIL"}</p>
+                    </div>
+                    <div className='mb-1 flex items-center flex-wrap gap-1'>
+                      <p className='font-medium'>Contact Adress:</p>
+                      <p className=' text-gray-600'>{selectedPatient?.patient?.street + ', ' + selectedPatient?.patient?.city + ', ' + selectedPatient?.patient?.state + ', ' + selectedPatient?.patient?.country ?? "NIL"}</p>
                     </div>
 
 

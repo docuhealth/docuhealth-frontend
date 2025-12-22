@@ -176,7 +176,7 @@ const Patient_Sidebar_Mobile = ({
                       />
                     </svg>
                   </span>
-                  My Drugs Records
+                  My Drug Records
                 </li>
               </div>
             </Link>

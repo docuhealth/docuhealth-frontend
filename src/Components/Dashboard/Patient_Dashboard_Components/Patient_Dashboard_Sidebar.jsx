@@ -130,7 +130,7 @@ const Patient_Dashboard_Sidebar = () => {
      
 
                 </span>
-                My Drugs Records
+                My Drug Records
               </li>
             </div>
           </Link>

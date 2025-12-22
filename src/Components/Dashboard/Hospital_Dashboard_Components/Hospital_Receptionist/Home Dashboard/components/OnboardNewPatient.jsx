@@ -243,10 +243,10 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                                 </svg>
                                 <p className='pt-1 text-[#0B6011]'>Account Creation Successful</p>
 
-                                <div className='border p-3 rounded-lg my-3 text-sm text-gray-600'>
+                                <div className='border p-3 rounded-lg my-3 text-xs text-gray-600'>
                                     <p>You have successfully created an account for a new patient, they can proceed to log into their dashboard using the Email and Password you provided after verifying their email within 24 hrs</p>
                                 </div>
-                                <div className='border p-3 rounded-lg mb-5 text-sm text-gray-600 w-full'>
+                                <div className='border p-3 rounded-lg mb-5 text-xs text-gray-600 w-full'>
                                     <p className='pb-1'>Patient's HIN : {patientHIN || 'NIL'} <span></span></p>
                                     <p className='font-medium'> Note : <span className='font-normal'> Don’t share the HIN with any third party aside the patient or close family member if consented.</span></p>
                                 </div>
