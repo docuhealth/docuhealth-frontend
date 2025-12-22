@@ -72,7 +72,7 @@ const Patient_Sidebar_Mobile = ({
                             <h1 className="text-xl">DocuHealth</h1>
           </div>
           <div
-            className=" sm:hidden "
+            className=" lg:hidden "
             onClick={() => setOpenMobileSidebar(false)}
           >
             <svg

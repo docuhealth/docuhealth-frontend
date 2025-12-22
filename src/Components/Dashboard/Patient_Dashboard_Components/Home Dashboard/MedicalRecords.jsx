@@ -66,7 +66,7 @@ const MedicalRecords = ({
 
   if (medicalRecords.length === 0) {
     return (
-      <div className="flex flex-col justify-center items-center text-center  h-full">
+      <div className="flex flex-col justify-start lg:justify-center items-center text-center  h-auto lg:h-full mt-[15%] lg:mt-0">
         <svg
           width="200"
           height="200"
@@ -124,7 +124,7 @@ const MedicalRecords = ({
         <div className="max-w-md text-center">
           <p className="text-[12px] text-gray-500">
             {" "}
-            No records yet, no hospital has dropped an after-visit summary.
+            No records yet, no hospital has dropped an <br /> after-visit summary.
           </p>
         </div>
       </div>
