@@ -111,8 +111,8 @@ import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
 
 import ApproveHospitals from "./Dashboard/Admin_Dashboard/ApproveHospitals";
 
-import Snowfall from 'react-snowfall'
-import Confetti from 'react-confetti'
+// import Snowfall from 'react-snowfall'
+// import Confetti from 'react-confetti'
 
 
 function App() {
@@ -716,7 +716,8 @@ function App() {
 
         </Routes>
       ) : (
-        <>    <Snowfall
+        <>   
+         {/* <Snowfall
           color="#cfe9ff"
           snowflakeCount={120}
           style={{
@@ -731,7 +732,6 @@ function App() {
         />
 
           <Confetti
-
             numberOfPieces={250}
             recycle={false}
             style={{
@@ -741,7 +741,8 @@ function App() {
               zIndex: 9999,
               pointerEvents: "none",
             }}
-          />
+          /> */}
+
           <Routes>
             <Route path="/" element={<Landing_Page_Layout />} >
               <Route
