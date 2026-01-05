@@ -1,22 +1,15 @@
-import React, { useEffect, useState, createContext } from "react";
+import React, { useState, createContext, useEffect } from "react";
 import { getToken } from "../../services/authService";
-import axiosInstance from "../../utils/axiosInstance";
-import toast from "react-hot-toast";
-
 import { fetchPatientAppointments } from "../../queries/Patient/patientAppointments";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 export const AppointmentsContext = createContext();
 
-const AppointmentsProvider = (props) => {
-
+const AppointmentsProvider = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(1);
-
-  const pageSize = 7; // Example page size
-
+  const pageSize = 7;
   const isUserLoggedIn = !!getToken();
-
-  const queryClient = useQueryClient()
 
   const {
     data,
@@ -24,19 +17,20 @@ const AppointmentsProvider = (props) => {
     isPending,
     isError,
     error
+  } = useQuery({
+    queryKey: ["appointments", currentPage, pageSize],
+    queryFn: () => fetchPatientAppointments(currentPage, pageSize), // Ensure params are passed
+    enabled: isUserLoggedIn,
+    placeholderData: keepPreviousData, // v5 syntax for smooth pagination
+  });
 
-  } = useQuery(
-    {
-      queryKey : ["appointments", currentPage, pageSize],
-      queryFn : fetchPatientAppointments,
-      enabled : isUserLoggedIn,
-      keepPreviousData: true,
-      onError: () => {
-        toast.error("Error fetching appointments");
-      },
-
+  // Handle errors via useEffect since onError was removed from useQuery v5
+  useEffect(() => {
+    if (isError) {
+      toast.error("Error fetching appointments");
+      console.error(error);
     }
-  )
+  }, [isError, error]);
 
   const appointments = data?.results || [];
   const count = data?.count || 0;
@@ -49,14 +43,13 @@ const AppointmentsProvider = (props) => {
         isPending,
         isFetching,
         isError,
-        error,
         count,
         currentPage,
         totalPages,
         setCurrentPage,
        }}
     >
-      {props.children}
+      {children}
     </AppointmentsContext.Provider>
   );
 };

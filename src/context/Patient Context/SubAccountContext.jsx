@@ -5,7 +5,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import toast from "react-hot-toast";
 
 import { fetchSubaccounts } from "../../queries/Patient/patientSubAccount";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 
 
 export const SubAccountContext = createContext();
@@ -29,11 +29,16 @@ const SubAccountProvider = (props) => {
     queryKey : ["subAccounts", currentPage, pageSize],
     queryFn : fetchSubaccounts,
     enabled : isUserLoggedIn,
-    keepPreviousData : true,
-    onError: () => {
-      toast.error("Error fetching subaccounts");
-    }
+    placeholderData : keepPreviousData
   })
+
+   // Handle errors via useEffect since onError was removed from useQuery v5
+   useEffect(() => {
+    if (isError) {
+      toast.error("Error fetching subaccounts");
+      console.error(error);
+    }
+  }, [isError, error]);
 
   const subAccounts = data?.results || []
   const count = data?.count || 0;

@@ -652,7 +652,7 @@ const Hospital_Onboarding = () => {
                                         </div>
                                         <div className="relative pb-6">
                                             <p className="font-semibold pb-1">
-                                                Hospital House Number (optional):
+                                                Hospital House Number :
                                             </p>
                                             <div className="relative">
                                                 <input
@@ -1122,7 +1122,7 @@ const Hospital_Onboarding = () => {
                                     </div>
                                     <div className="relative pb-6">
                                         <p className="font-semibold pb-1">
-                                            Hospital House Number (optional):
+                                            Hospital House Number :
                                         </p>
                                         <div className="relative">
                                             <input

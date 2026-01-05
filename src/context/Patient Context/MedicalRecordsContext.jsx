@@ -4,7 +4,7 @@ import { getToken } from "../../services/authService";
 import axiosInstance from "../../utils/axiosInstance";
 import toast from "react-hot-toast";
 import { fetchPatientMedicalRecords } from "../../queries/Patient/patientMedicalRecords";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
 
 export const MedicalRecordsContext = createContext();
@@ -28,11 +28,16 @@ const MedicalRecordsProvider = (props) => {
     queryKey : ["medicalRecords", currentPage, pageSize],
     queryFn: fetchPatientMedicalRecords,
     enabled : isUserLoggedIn,
-    keepPreviousData : true,
-    onError: () => {
-      toast.error("Error fetching medical records");
-    },
+    placeholderData : keepPreviousData,
   })
+
+   // Handle errors via useEffect since onError was removed from useQuery v5
+  useEffect(() => {
+    if (isError) {
+      toast.error("Error fetching medical records");
+      console.error(error);
+    }
+  }, [isError, error]);
 
   const medicalRecords = data?.results || [];
   const count = data?.count || 0;
