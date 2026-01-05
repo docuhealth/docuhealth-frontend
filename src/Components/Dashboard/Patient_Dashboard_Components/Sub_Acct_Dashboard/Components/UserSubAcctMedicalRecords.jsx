@@ -2,21 +2,21 @@ import React from "react";
 import formatRecordDate from "../../Home Dashboard/Components/formatRecordDate";
 import { formatFullDateTime } from "../../Home Dashboard/Components/formatRecordDate";
 import { truncateWords } from "../../Home Dashboard/Components/formatRecordDate";
-import Pagination from "../../Pagination/Pagination";
+import Pagination2 from "../../Pagination/Pagination2";
 
 const UserSubAcctMedicalRecords = ({
   subAcctMedicalRecords,
   subAcctMedicalRecordsLoading,
   setViewDetailMedicalRecord,
 
-  fetchSubAcctMedicalRecords,
+  // Cleaned up props
   subAcctCount,
   subAcctCurrentPage,
   subAcctTotalPages,
+  setSubAcctCurrentPage, // Updated: use the setter instead of manual fetch
 
   setViewSubAcctDetailMedicalRecord,
   setSubAcctMedicalRecordsDetail
-
 
 
 }) => {
@@ -27,7 +27,7 @@ const UserSubAcctMedicalRecords = ({
       </div>
     );
   }
-  if (subAcctMedicalRecords.length === 0) {
+  if (!subAcctMedicalRecords || subAcctMedicalRecords.length === 0) {
     return (
       <>
         <div className="py-14">
@@ -224,8 +224,8 @@ const UserSubAcctMedicalRecords = ({
                   onClick={() => {
                     setViewSubAcctDetailMedicalRecord(true)
                     setSubAcctMedicalRecordsDetail(record)
-                    }
-                    
+                  }
+
                   }
                 >
                   <p>View details</p>
@@ -250,7 +250,12 @@ const UserSubAcctMedicalRecords = ({
             </div>
           ))}
         </div>
-        <Pagination count={subAcctCount} currentPage={subAcctCurrentPage} totalPages={subAcctTotalPages} fetchData={fetchSubAcctMedicalRecords} />
+        <Pagination2
+          count={subAcctCount}
+          currentPage={subAcctCurrentPage}
+          totalPages={subAcctTotalPages}
+          setCurrentPage={setSubAcctCurrentPage}
+        />
       </div>
     </>
   );

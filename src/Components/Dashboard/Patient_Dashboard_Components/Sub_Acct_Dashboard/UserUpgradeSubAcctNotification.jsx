@@ -12,7 +12,7 @@ const UserUpgradeSubAcctNotification = ({ subAcctUpgradeSuccessNot, setSubAcctUp
                                     <div className="flex justify-end py-3 px-4">
                                     <button
                                         onClick={() => { setSubAcctUpgradeSuccessNot(false) }}
-                                        className="text-gray-500 hover:text-black "
+                                        className="text-gray-500 hover:text-black cursor-pointer"
                                     >
                                         <i className="bx bx-x text-2xl"></i>
                                     </button>

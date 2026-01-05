@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import axiosInstance from "../../../../../utils/axiosInstance";
 import toast from "react-hot-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 const AccountSettingsTab = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +16,9 @@ const AccountSettingsTab = () => {
     gender: "",
     DOB: "",
   });
+
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [isAcctDeleteConfirmed, setIsAcctDeleteConfirmed] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -64,6 +69,63 @@ const AccountSettingsTab = () => {
     return { strength: score, label: "Strong", color: "bg-green-500" };
   };
 
+  const updateAccountMutation = useMutation(
+    {
+      mutationFn : async (payload) => {
+        const res = await axiosInstance.patch("api/patients/update", payload);
+        return res.data;
+      },
+      onSuccess : () => {
+        toast.success("Account updated successfully!");
+        queryClient.invalidateQueries(["profile"]); // ✅ re-run profile query
+        resetForm();
+      },
+      onError: (err) => {
+        console.error("Error updating account:", err);
+        toast.error("Error updating account.");
+      },
+    }
+  )
+
+  const deleteAccountMutation = useMutation({
+    mutationFn: async () => {
+      const res = await axiosInstance.delete("api/patients/delete");
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Account deactivated successfully");
+      sessionStorage.removeItem("token");
+      navigate("/user-login");
+    },
+    onError: (err) => {
+      console.error("Account deletion failed", err);
+      toast.error("Failed to deactivate account.");
+    },
+  });
+
+  const resetForm = () => {
+    setFormData({
+      firstname: "",
+      lastname: "",
+      middlename: "",
+      email: "",
+      password: "",
+      phone_num: "",
+      gender: "",
+      DOB: "",
+    });
+    setPasswordRequirements({
+      hasLowercase: false,
+      hasUppercase: false,
+      hasNumber: false,
+      hasSymbol: false,
+      hasMinLength: false,
+    });
+    setIsPasswordValid(false);
+    setShowPassword(false);
+  }
+
+
   // 🔹 Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -109,91 +171,37 @@ const AccountSettingsTab = () => {
       return;
     }
 
-    setLoading(true);
-
-    try {
-      const res = await axiosInstance.patch("api/patients/update", payload);
-      toast.success("Account details updated successfully!");
-    } catch (error) {
-      console.error("Error updating account:", error);
-      toast.error("An error occurred while saving changes.");
-    } finally {
-      setLoading(false);
-      setFormData({
-        firstname: "",
-        lastname: "",
-        password: "",
-        middlename: "",
-        email: "",
-        phone_num: "",
-        gender: "",
-        DOB: "",
-      });
-      setPasswordRequirements({
-        hasLowercase: false,
-        hasUppercase: false,
-        hasNumber: false,
-        hasSymbol: false,
-        hasMinLength: false,
-      });
-      setIsPasswordValid(false);
-      setShowPassword(false);
-    }
+    updateAccountMutation.mutate(payload);
   };
 
   // 🔹 Handle Cancel Changes (reset to empty or previous data)
   const handleCancel = () => {
-    const confirmReset = window.confirm(
-      "Are you sure you want to cancel and reset all changes?"
-    );
-    if (confirmReset) {
-      setFormData({
-        firstname: "",
-        lastname: "",
-        password: "",
-        middlename: "",
-        email: "",
-        phone_num: "",
-        gender: "",
-        DOB: "",
-      });
-      setPasswordRequirements({
-        hasLowercase: false,
-        hasUppercase: false,
-        hasNumber: false,
-        hasSymbol: false,
-        hasMinLength: false,
-      });
-      setIsPasswordValid(false);
-      setShowPassword(false);
-    }
+    if (window.confirm("Cancel all changes?")) resetForm();
   };
 
   // 🔹 Handle Account Deactivation
   const handleAcctDeactivate = async() => {
-    if (!isAcctDeleteConfirmed) return;
-    const confirmDeactivate = window.confirm(
-      "⚠️ Are you sure you want to deactivate your account? This action cannot be undone."
-    );
-    if (confirmDeactivate) {
-      setIsAcctDeleting(true)
-      try{
-        const res = await axiosInstance.delete('api/patients/delete')
-        toast.success('Account deactivation successful')
-      }catch(err){
-        console.log('account deletion', err)
-        sessionStorage.removeItem('token')
-        navigate("/user-login"); // 👈 redirect
-      }finally{
-        setIsAcctDeleting(false)
-      }
-  } else {
-    toast.error('Account deactivation cancelled')
-  }
 
-  // ✅ Reset checkbox state in both cases
-  setIsAcctDeleteConfirmed(false);
+    if (!isAcctDeleteConfirmed) return;
+
+    const confirmDeactivate = window.confirm(
+      "⚠️ Are you sure you want to deactivate your account? This cannot be undone."
+    );
+
+    if (!confirmDeactivate) {
+      toast.error("Account deactivation cancelled");
+      setIsAcctDeleteConfirmed(false);
+      return;
+    }
+
+    deleteAccountMutation.mutate();
+    setIsAcctDeleteConfirmed(false);
   };
+
+
+
+
+
 
   return (
     <>
@@ -501,14 +509,14 @@ const AccountSettingsTab = () => {
               <div className="flex flex-col sm:flex-row gap-2 relative pt-5">
                 <button
                   onClick={handleSubmit}
-                  disabled={loading}
-                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium text-white rounded-full shadow-xs focus:outline-hidden transition-all ${
-                    !loading
+                  disabled={updateAccountMutation.isPending}
+                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium text-white rounded-full shadow-xs focus:outline-hidden transition-all cursor-pointer ${
+                    !updateAccountMutation.isPending
                       ? "bg-[#3E4095] "
                       : "bg-gray-300 cursor-not-allowed"
                   }`}
                 >
-                  {loading ? (   <span className="flex items-center justify-center gap-2">
+                  {updateAccountMutation.isPending ? (   <span className="flex items-center justify-center gap-2">
                             <svg
                               className="animate-spin h-4 w-4 text-white"
                               xmlns="http://www.w3.org/2000/svg"
@@ -534,9 +542,9 @@ const AccountSettingsTab = () => {
                 </button>
                 <button
                   type="button"
-                    disabled={loading}
+                    disabled={updateAccountMutation.isPending}
                   onClick={handleCancel}
-                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-xs  ${!loading ? 'text-[#3E4095] bg-white border border-[#3E4095] hover:bg-gray-50': 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-hidden`}
+                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-xs cursor-pointer ${!updateAccountMutation.isPending ? 'text-[#3E4095] bg-white border border-[#3E4095] hover:bg-gray-50': 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-hidden`}
                 >
                   Cancel Changes
                 </button>
@@ -562,15 +570,15 @@ const AccountSettingsTab = () => {
 
           <button
             onClick={handleAcctDeactivate}
-            disabled={!isAcctDeleteConfirmed || isAcctDeleting}
-            className={`px-8 py-2 text-sm font-medium rounded-full transition-all duration-200 w-full sm:w-auto ${
-              isAcctDeleteConfirmed && !isAcctDeleting
+            disabled={!isAcctDeleteConfirmed || deleteAccountMutation.isPending}
+            className={`px-8 py-2 text-sm font-medium rounded-full transition-all duration-200 w-full sm:w-auto cursor-pointer ${
+              isAcctDeleteConfirmed && !deleteAccountMutation.isPending
                 ? "bg-red-600 hover:bg-red-700 text-white"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
             {
-              isAcctDeleting ? ( <span className="flex items-center justify-center gap-2">
+              deleteAccountMutation.isPending ? ( <span className="flex items-center justify-center gap-2">
                             <svg
                               className="animate-spin h-4 w-4 text-white"
                               xmlns="http://www.w3.org/2000/svg"

@@ -1,66 +1,58 @@
 import React, { useState, useEffect, useContext } from "react";
-import Pagination from "../Pagination/Pagination";
+import Pagination2 from "../Pagination/Pagination2";
 import toast from "react-hot-toast";
 import { SubAccountContext } from "../../../../context/Patient Context/SubAccountContext";
 import UserSubAcctRecords from "./Components/UserSubAcctRecords";
 import axiosInstance from "../../../../utils/axiosInstance";
 import UserSubAcctMedicalRecords from "./Components/UserSubAcctMedicalRecords";
 import MedicalRecordsDetail from "../Home Dashboard/MedicalRecordsDetail";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
 const UserSubAcctList = ({ setDisplaySubAcctModal }) => {
-  const { subAccounts } = useContext(SubAccountContext);
-  const { setSubAccounts } = useContext(SubAccountContext);
-  const { count } = useContext(SubAccountContext);
-  const { setCount } = useContext(SubAccountContext);
-  const { currentPage } = useContext(SubAccountContext);
-  const { setCurrentPage } = useContext(SubAccountContext);
-  const { totalPages } = useContext(SubAccountContext);
-  const { setTotalPages } = useContext(SubAccountContext);
-  const { fetchSubaccounts } = useContext(SubAccountContext);
-  const { loading } = useContext(SubAccountContext);
+  const {
+    subAccounts, isPending, count,
+    currentPage, setCurrentPage, totalPages
+  } = useContext(SubAccountContext);
+
+
+
   const [viewDetailMedicalRecord, setViewDetailMedicalRecord] = useState(false);
   const [selectedSubAcct, setSelectedSubAcct] = useState(null);
-  const [subAcctMedicalRecordsLoading, setSubAcctMedicalRecordsLoading] =
-    useState(false);
-  const [subAcctMedicalRecords, setSubAcctMedicalRecords] = useState([]);
+  const [viewSubAcctDetailMedicalRecord, setViewSubAcctDetailMedicalRecord] = useState(false);
+  const [subAcctMedicalRecordsDetail, setSubAcctMedicalRecordsDetail] = useState([]);
 
-  const [viewSubAcctDetailMedicalRecord, setViewSubAcctDetailMedicalRecord] =
-    useState(false);
-  const [subAcctMedicalRecordsDetail, setSubAcctMedicalRecordsDetail] =
-    useState([]);
-
-  const [subAcctCount, setSubAcctCount] = useState(0);
+  // Local state for sub-account pagination
   const [subAcctCurrentPage, setSubAcctCurrentPage] = useState(1);
-  const [subAcctTotalPages, setSubAcctTotalPages] = useState(1);
-
-  // ✅ don’t run on mount when it's null/undefined
-
   const pageSize = 6;
 
-  const fetchSubAcctMedicalRecords = async (page = 1) => {
-    setSubAcctMedicalRecordsLoading(true);
-    console.log(selectedSubAcct.hin)
-    try {
+  const {
+    data: medicalRecordsData,
+    isPending: subAcctMedicalRecordsLoading
+  } = useQuery({
+    queryKey: ["subAcctMedicalRecords", selectedSubAcct?.hin, subAcctCurrentPage],
+    queryFn: async () => {
       const res = await axiosInstance.get(
-        `api/patients/subaccounts/medical-records/${selectedSubAcct.hin}?page=${page}&size=${pageSize}`
+        `api/patients/subaccounts/medical-records/${selectedSubAcct.hin}?page=${subAcctCurrentPage}&size=${pageSize}`
       );
-      console.log(res.data);
-      setSubAcctMedicalRecords(res.data.results);
-      setSubAcctCount(res.data.count || 0);
-      setSubAcctCurrentPage(page);
-      setSubAcctTotalPages(Math.ceil(res.data.count / pageSize));
-    } catch (error) {
-      console.error("Error fetching medical records:", error);
-      toast.error("Error fetching medical records");
-    } finally {
-      setSubAcctMedicalRecordsLoading(false);
-    }
+      return res.data;
+    },
+    enabled: !!selectedSubAcct?.hin, // Only fetch if a sub-account is selected
+    placeholderData: keepPreviousData, // Prevents "flicker" when changing pages
+  });
+
+
+
+  const subAcctMedicalRecords = medicalRecordsData?.results || [];
+  const subAcctCount = medicalRecordsData?.count || 0;
+  const subAcctTotalPages = Math.ceil(subAcctCount / pageSize);
+
+  // Logic to handle going back to the list
+  const handleBackToList = () => {
+    setViewDetailMedicalRecord(false);
+    setSelectedSubAcct(null);
+    setSubAcctCurrentPage(1); // Reset page for next time
   };
 
-  useEffect(() => {
-    if (!selectedSubAcct) return;
-    fetchSubAcctMedicalRecords();
-  }, [selectedSubAcct]);
 
   return (
     <>
@@ -72,16 +64,15 @@ const UserSubAcctList = ({ setDisplaySubAcctModal }) => {
         ) : (
           <>
             <UserSubAcctMedicalRecords
-              subAcctMedicalRecords={subAcctMedicalRecords}
-              subAcctMedicalRecordsLoading={subAcctMedicalRecordsLoading}
-              setViewDetailMedicalRecord={setViewDetailMedicalRecord}
-              fetchSubAcctMedicalRecords={fetchSubAcctMedicalRecords}
-              subAcctCount={subAcctCount}
-              subAcctCurrentPage={subAcctCurrentPage}
-              subAcctTotalPages={subAcctTotalPages}
-
-              setViewSubAcctDetailMedicalRecord ={setViewSubAcctDetailMedicalRecord}
-              setSubAcctMedicalRecordsDetail = {setSubAcctMedicalRecordsDetail}
+            subAcctMedicalRecords={subAcctMedicalRecords}
+            subAcctMedicalRecordsLoading={subAcctMedicalRecordsLoading}
+            setViewDetailMedicalRecord={handleBackToList} // Passing back logic
+            subAcctCount={subAcctCount}
+            subAcctCurrentPage={subAcctCurrentPage}
+            setSubAcctCurrentPage={setSubAcctCurrentPage} // Pass the setter directly
+            subAcctTotalPages={subAcctTotalPages}
+            setViewSubAcctDetailMedicalRecord={setViewSubAcctDetailMedicalRecord}
+            setSubAcctMedicalRecordsDetail={setSubAcctMedicalRecordsDetail}
             />
           </>
         )
@@ -91,22 +82,18 @@ const UserSubAcctList = ({ setDisplaySubAcctModal }) => {
           <div>
             <UserSubAcctRecords
               subAccounts={subAccounts}
-              loading={loading}
+              isPending={isPending}
               setDisplaySubAcctModal={setDisplaySubAcctModal}
               setViewDetailMedicalRecord={setViewDetailMedicalRecord}
               setSelectedSubAcct={setSelectedSubAcct}
             />
           </div>
           <div className="">
-            <Pagination
+            <Pagination2
               count={count}
-              setCount={setCount}
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
               totalPages={totalPages}
-              setTotalPages={setTotalPages}
-              fetchData={fetchSubaccounts}
-              loading={loading}
             />
           </div>
         </div>

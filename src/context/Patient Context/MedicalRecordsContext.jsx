@@ -3,48 +3,54 @@ import { createContext } from "react";
 import { getToken } from "../../services/authService";
 import axiosInstance from "../../utils/axiosInstance";
 import toast from "react-hot-toast";
+import { fetchPatientMedicalRecords } from "../../queries/Patient/patientMedicalRecords";
+import { useQuery } from "@tanstack/react-query";
+
 
 export const MedicalRecordsContext = createContext();
 
 const MedicalRecordsProvider = (props) => {
-  const [medicalRecords, setMedicalRecords] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [count, setCount] = useState(0);
+
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const pageSize = 6; // ✅ 6 per page
 
   const isUserLoggedIn = !!getToken();
 
-  const fetchMedicalRecords = async (page = 1) => {
-    setLoading(true);
-    try {
-      const res = await axiosInstance.get(
-        `api/patients/dashboard?page=${page}&size=${pageSize}`
-      );
-      // console.log(res.data);
 
-      setMedicalRecords(res.data.results || []);
-      setCount(res.data.count || 0);
-      setCurrentPage(page);
-      setTotalPages(Math.ceil(res.data.count / pageSize));
-    } catch (err) {
-      console.error("Error fetching medical records:", err);
+  const {
+    data,
+    isPending,
+    isFetching,
+    isError,
+    error
+
+  } = useQuery({
+    queryKey : ["medicalRecords", currentPage, pageSize],
+    queryFn: fetchPatientMedicalRecords,
+    enabled : isUserLoggedIn,
+    keepPreviousData : true,
+    onError: () => {
       toast.error("Error fetching medical records");
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  })
 
-  useEffect(() => {
-    if (isUserLoggedIn) {
-      fetchMedicalRecords(1); // ✅ Fetch on mount
-    }
-  }, [isUserLoggedIn]);
+  const medicalRecords = data?.results || [];
+  const count = data?.count || 0;
+  const totalPages = Math.ceil(count / pageSize);
 
   return (
     <MedicalRecordsContext.Provider
-      value={{ medicalRecords, setMedicalRecords, loading, count, setCount, currentPage, setCurrentPage, totalPages, setTotalPages, fetchMedicalRecords }}
+      value={{
+        medicalRecords,
+        isPending,
+        isFetching,
+        error,
+        isError,
+        count,
+        totalPages,
+        currentPage,
+        setCurrentPage
+      }}
     >
       {props.children}
     </MedicalRecordsContext.Provider>

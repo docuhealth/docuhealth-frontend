@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import { getHospitalRole, getRole } from "./services/authService.js";
 import "./index.css";
 import App from "./App.jsx";
@@ -13,6 +14,8 @@ import SubscriptionPlansProvider from "./context/Patient Context/SubscriptionsCo
 
 
 const role = getRole(); 
+
+const queryClient = new QueryClient();
 
 const PatientProviders = ({ children }) => (
   <ProfileProvider>
@@ -44,6 +47,8 @@ const Root = () => {
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
+    <QueryClientProvider client={queryClient}>
     <Root />
+    </QueryClientProvider>
   </StrictMode>
 );

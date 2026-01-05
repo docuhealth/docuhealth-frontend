@@ -23,7 +23,7 @@ const UserSubAcctOverlay = ({
               </div>
               <button
                 onClick={toggleAcctCreationOverlay}
-                className="text-gray-500 "
+                className="text-gray-500 cursor-pointer"
               >
                 <i className="bx bx-x text-2xl"></i>
               </button>

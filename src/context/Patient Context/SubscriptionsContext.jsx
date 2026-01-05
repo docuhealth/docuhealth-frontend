@@ -4,38 +4,38 @@ import { getToken } from "../../services/authService";
 import axiosInstance from "../../utils/axiosInstance";
 import toast from "react-hot-toast";
 
+import { fetchSubscriptionPlans } from "../../queries/Patient/patientSubscriptionPlans";
+import { useQuery } from "@tanstack/react-query"; 
+
 
 export const SubscriptionsContext = createContext();
 
 const SubscriptionPlansProvider = (props) => {
 
-    const [loading, setLoading] = useState(false);
-    const [subscriptionPlans, setSubscriptionPlans] = useState([])
-
      const isUserLoggedIn = !!getToken();
 
-    const fetchSubscriptionPlans = async() => {
-        setLoading(true)
-        try{
-            const res = await axiosInstance.get('api/subscriptions/plans')
-            setSubscriptionPlans(res.data)
-            // console.log(res.data)
-        }catch(err){
-                console.log(err)
-                toast.error("Error fetching subscriptions plans");
-        }finally{
-            setLoading(false)
+     const {
+        data,
+        isPending,
+        isFetching,
+        isError,
+        error
+     } = useQuery(
+        {
+            queryKey: ['patient-subscription-plans'],
+            queryFn : fetchSubscriptionPlans,
+            enabled : isUserLoggedIn,
+            onError: () => {
+                toast.error("Error fetching subscription plans");
+              },
         }
-    }
+     )
 
-     useEffect(() => {
-        if (isUserLoggedIn) {
-          fetchSubscriptionPlans(); // ✅ Fetch on mount
-        }
-      }, [isUserLoggedIn]);
+
+     const subscriptionPlans = data
 
     return (
-        <SubscriptionsContext.Provider  value = {{ loading, subscriptionPlans }} >
+        <SubscriptionsContext.Provider  value = {{ isPending, isFetching, subscriptionPlans }} >
             {props.children}
         </SubscriptionsContext.Provider>
     )

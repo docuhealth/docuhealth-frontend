@@ -3,50 +3,55 @@ import { createContext } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { getToken } from "../../services/authService";
 import toast from "react-hot-toast";
+import { fetchPatientProfile } from "../../queries/Patient/patientProfile";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const AppContext = createContext();
 
 const ProfileProvider = (props) => {
-  const [profile, setProfile] = useState(null);
-  const [newEmergencyStatus, setNewEmergencyStatus] = useState(null)
   const isUserLoggedIn = !!getToken();
 
 
+  const queryClient = useQueryClient()
 
-  // console.log(isUserLoggedIn);
-  useEffect(() => {
-    if (isUserLoggedIn) {
-      const fetchProfile = async () => {
-        try {
-          const res = await axiosInstance.get("api/patients/dashboard"); // Example endpoint
-          setProfile(res.data.patient_info);
-          // console.log(res.data);
-        } catch (err) {
-          console.error("Error fetching profile:", err);
-        }
-      };
-      fetchProfile();
-    } else {
-      return;
-    }
-  }, [isUserLoggedIn]);
+  const {
+    data: profile,
+    isFetching,
+    isError,
+    error
 
-  const toggleEmergencyStatus = async () => {
-    try {
+  } = useQuery({
+    queryKey: ['patient-profile'],
+    queryFn: fetchPatientProfile,
+    enabled : isUserLoggedIn
+
+  })
+
+
+  const toggleEmergencyMutation = useMutation({
+    mutationFn: async () => {
       const res = await axiosInstance.patch("api/patients/emergency");
-      setNewEmergencyStatus(res.data?.emergency);
-      toast.success("Emergency status updated!");
       return res.data?.emergency;
-    } catch (err) {
+    },
+    onSuccess: () => {
+      toast.success("Emergency status updated!");
+      // 🔥 Refetch profile after update
+      queryClient.invalidateQueries(["patient-profile"]);
+    },
+    onError: () => {
       toast.error("Failed to update emergency status");
-      console.error(err);
-      throw err;
-    }
-  };
-
+    },
+  });
 
   return (
-    <AppContext.Provider value={{profile, newEmergencyStatus, toggleEmergencyStatus}}>{props.children}</AppContext.Provider>
+    <AppContext.Provider
+      value={{
+        profile,
+        isFetching,
+        isError,
+        toggleEmergencyStatus: toggleEmergencyMutation.mutate,
+      }}
+    >{props.children}</AppContext.Provider>
   );
 };
 

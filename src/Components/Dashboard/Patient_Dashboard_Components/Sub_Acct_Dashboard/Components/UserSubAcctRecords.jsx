@@ -5,12 +5,13 @@ import toast from "react-hot-toast";
 import Id_Card from "../../Home Dashboard/Components/Id Card/Id_Card";
 
 
-const UserSubAcctRecords = ({ subAccounts, loading, setDisplaySubAcctModal, setViewDetailMedicalRecord, setSelectedSubAcct }) => {
+const UserSubAcctRecords = ({ subAccounts, isPending, setDisplaySubAcctModal, setViewDetailMedicalRecord, setSelectedSubAcct }) => {
   const [openPopover, setOpenPopover] = useState(null);
   const paymentStatus = true; // example placeholder
 
   const {
     onboardIDCard,
+    isCreatingID,
     setOnboardIDCard,
     idCardData,
     handleChange,
@@ -31,7 +32,7 @@ const UserSubAcctRecords = ({ subAccounts, loading, setDisplaySubAcctModal, setV
     console.log("Generating ID Card for:", { name, hin, dob });
   };
 
-  if (loading) {
+  if (isPending) {
     return <p className="text-center pb-10 text-sm">Loading sub-accounts...</p>;
   }
 
@@ -122,25 +123,15 @@ const UserSubAcctRecords = ({ subAccounts, loading, setDisplaySubAcctModal, setV
                     </Link>
 
                     <p
-                      className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                      className={`text-[12px] p-2 rounded-sm cursor-pointer ${isCreatingID ? "text-gray-400" : "text-gray-700 hover:bg-gray-200"
+                        }`}
                       onClick={() => {
-                        // if (paymentStatus) {
-                        //   handleOpenForm(
-                        //     subaccount.firstname + " " + subaccount.lastname,
-                        //     subaccount.HIN,
-                        //     subaccount.DOB
-                        //   );
-                        // } else {
-                        //   toast.success(
-                        //     "Kindly subscribe to a plan to access this feature"
-                        //   );
-                        // }
-                        togglePopover()
-                        handleSelection(subaccount)
-
+                        if (isCreatingID) return; // Prevent double clicks
+                        togglePopover();
+                        handleSelection(subaccount);
                       }}
                     >
-                      Generate ID Card
+                      {isCreatingID ? "Processing..." : "Generate ID Card"}
                     </p>
                   </div>
                 )}

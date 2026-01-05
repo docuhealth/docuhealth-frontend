@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import Pagination from "../Pagination/Pagination";
+import Pagination2 from "../Pagination/Pagination2";
 import toast from "react-hot-toast";
 import { SubAccountContext } from "../../../../context/Patient Context/SubAccountContext";
 import UserSubAcctRecordsMobile from "./Components/UserSubAcctRecordsMobile";
@@ -9,15 +9,12 @@ import MedicalRecordsDetail from "../Home Dashboard/MedicalRecordsDetail";
 
 const UserSubAcctListMobile = ({ setDisplaySubAcctModal }) => {
   const { subAccounts } = useContext(SubAccountContext);
-  const { setSubAccounts } = useContext(SubAccountContext);
+  const { isPending } = useContext(SubAccountContext);
+  const { isFetching } = useContext(SubAccountContext);
   const { count } = useContext(SubAccountContext);
-  const { setCount } = useContext(SubAccountContext);
   const { currentPage } = useContext(SubAccountContext);
   const { setCurrentPage } = useContext(SubAccountContext);
   const { totalPages } = useContext(SubAccountContext);
-  const { setTotalPages } = useContext(SubAccountContext);
-  const { fetchSubaccounts } = useContext(SubAccountContext);
-  const { loading } = useContext(SubAccountContext);
 
   const [viewDetailMedicalRecord, setViewDetailMedicalRecord] = useState(false);
   const [selectedSubAcct, setSelectedSubAcct] = useState(null);
@@ -96,23 +93,19 @@ const UserSubAcctListMobile = ({ setDisplaySubAcctModal }) => {
             <div>
               <UserSubAcctRecordsMobile
                 subAccounts={subAccounts}
-                loading={loading}
+                isPending={isPending}
                 setDisplaySubAcctModal={setDisplaySubAcctModal}
                 setViewDetailMedicalRecord={setViewDetailMedicalRecord}
               setSelectedSubAcct={setSelectedSubAcct}
               />
             </div>
             <div className="">
-              <Pagination
-                count={count}
-                setCount={setCount}
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-                totalPages={totalPages}
-                setTotalPages={setTotalPages}
-                fetchSubaccounts={fetchSubaccounts}
-                loading={loading}
-              />
+            <Pagination2
+              count={count}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              totalPages={totalPages}
+            />
             </div>
           </div>
         </>

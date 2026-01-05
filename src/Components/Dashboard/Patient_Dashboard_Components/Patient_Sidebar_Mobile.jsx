@@ -3,6 +3,8 @@ import { AppContext } from "../../../context/Patient Context/AppContext";
 import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
+
 
 const Patient_Sidebar_Mobile = ({
   openMobileSidebar,
@@ -16,6 +18,8 @@ const Patient_Sidebar_Mobile = ({
   const location = useLocation();
   const currentPath = location.pathname;
   const navigate = useNavigate();
+
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     if (profile) {
@@ -48,6 +52,7 @@ const Patient_Sidebar_Mobile = ({
 
   const handleLogout = () => {
     setOpenMobileSidebar(false);
+    queryClient.clear();
     sessionStorage.removeItem("token");
     navigate("/user-login"); // 👈 redirect
   };

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { MedicalRecordsContext } from "../../../../context/Patient Context/MedicalRecordsContext";
-import Pagination from "../Pagination/Pagination";
+import Pagination2 from "../Pagination/Pagination2";
 import formatRecordDate from "./Components/formatRecordDate";
 import { formatFullDateTime } from "./Components/formatRecordDate";
 import { truncateWords } from "./Components/formatRecordDate";
@@ -10,56 +10,45 @@ const MedicalRecords = ({
   setViewDetailMedicalRecord,
   setSelectedMedicalRecord,
 }) => {
-  // console.log(selected)
-  const { loading } = useContext(MedicalRecordsContext);
+
+  const { isPending } = useContext(MedicalRecordsContext);
+  const { isFetching } = useContext(MedicalRecordsContext);
   const { medicalRecords } = useContext(MedicalRecordsContext);
-  const { setMedicalRecords } = useContext(MedicalRecordsContext);
   const { count } = useContext(MedicalRecordsContext);
-  const { setCount } = useContext(MedicalRecordsContext);
   const { currentPage } = useContext(MedicalRecordsContext);
   const { setCurrentPage } = useContext(MedicalRecordsContext);
   const { totalPages } = useContext(MedicalRecordsContext);
-  const { setTotalPages } = useContext(MedicalRecordsContext);
-  const { fetchMedicalRecords } = useContext(MedicalRecordsContext);
 
-  useEffect(() => {
-    if (!medicalRecords) return;
 
-    let sortedRecords = [...medicalRecords];
-
+  const sortedRecords = React.useMemo(() => {
+    if (!medicalRecords) return [];
+  
+    let sorted = [...medicalRecords];
+  
     switch (selected) {
       case "Latest":
-        sortedRecords.sort(
-          (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        );
+        sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         break;
       case "Oldest":
-        sortedRecords.sort(
-          (a, b) => new Date(a.created_at) - new Date(b.created_at)
-        );
+        sorted.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
         break;
       case "A-Z":
-        sortedRecords.sort((a, b) =>
-          a.chief_complaint.localeCompare(b.chief_complaint)
-        );
+        sorted.sort((a, b) => a.chief_complaint.localeCompare(b.chief_complaint));
         break;
       case "Z-A":
-        sortedRecords.sort((a, b) =>
-          b.chief_complaint.localeCompare(a.chief_complaint)
-        );
+        sorted.sort((a, b) => b.chief_complaint.localeCompare(a.chief_complaint));
         break;
       default:
         break;
     }
+  
+    return sorted;
+  }, [medicalRecords, selected]);
 
-    setMedicalRecords(sortedRecords);
-    // console.log("Sorted Records:", sortedRecords);
-  }, [selected]); // removed medicalRecords from deps
-
-  if (loading) {
+  if (isPending) {
     return (
       <div className="flex flex-col justify-start lg:justify-center items-center text-center  h-auto lg:h-full mt-[15%] lg:mt-0 text-sm">
-        Loading...
+        Loading medical records...
       </div>
     );
   }
@@ -133,9 +122,12 @@ const MedicalRecords = ({
 
   return (
     <div className="bg-white my-5 border rounded-2xl pt-8 px-6 ">
+      {isFetching && !isPending && (
+        <p className="text-gray-500 text-sm mb-2">Loading new page...</p>
+      )}
       <h1 className="mb-4 font-medium">Medical Records</h1>
       <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {medicalRecords.map((record) => (
+        {sortedRecords.map((record) => (
           <div key={record.id} className="bg-[#FAFEFF] border rounded-xl p-5">
             <div className="flex justify-between items-center ">
               <div className="flex items-center gap-1">
@@ -197,8 +189,8 @@ const MedicalRecords = ({
                 </svg>
               </div>
               <p className=""> {record?.hospital_info
-                    ? `${record.hospital_info.name}`
-                    : "NIL"}</p>
+                ? `${record.hospital_info.name}`
+                : "NIL"}</p>
             </div>
             <div className="flex items-center gap-1 pb-3 border-b ">
               <div>
@@ -252,11 +244,11 @@ const MedicalRecords = ({
       </div>
 
       <div>
-        <Pagination
+        <Pagination2
           count={count}
           currentPage={currentPage}
           totalPages={totalPages}
-          fetchData={fetchMedicalRecords}
+          setCurrentPage={setCurrentPage}
         />
       </div>
     </div>

@@ -8,13 +8,19 @@ import UserSubAcctList from "../../Components/Dashboard/Patient_Dashboard_Compon
 import UserSubAcctUpgradeModal from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserSubAcctUpgradeModal";
 import UserUpgradeSubAcctNotification from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserUpgradeSubAcctNotification";
 import UserSubAcctListMobile from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserSubAcctListMobile";
-import Id_Card from "../../Components/Dashboard/Patient_Dashboard_Components/Home Dashboard/Components/Id Card/Id_Card";
+
+
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Patient_SubAccount_Dashboard = () => {
+
+  const queryClient = useQueryClient();
+
   const [noticeDisplay, setNoticeDisplay] = useState(false);
   const [showCreateSubAcctOverlay, setShowCreateSubAcctOverlay] =
     useState(false);
-  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -69,7 +75,7 @@ const Patient_SubAccount_Dashboard = () => {
       subAcctUpgradeData.child_password &&
       subAcctUpgradeData.confirm_password &&
       subAcctUpgradeData.child_password ===
-        subAcctUpgradeData.confirm_password &&
+      subAcctUpgradeData.confirm_password &&
       isPasswordValid
     ) {
       setSubAcctUpgradeStep(3);
@@ -84,14 +90,46 @@ const Patient_SubAccount_Dashboard = () => {
     subAcctUpgradeData.child_state.trim() !== "" &&
     subAcctUpgradeData.child_house_number.trim() !== "" &&
     subAcctUpgradeData.child_street.trim() !== "" &&
-    subAcctUpgradeData.child_city.trim() !== "" 
+    subAcctUpgradeData.child_city.trim() !== ""
 
 
+  const upgradeSubAcctMutation = useMutation({
+    mutationFn: async (payload) => {
+      const res = await axiosInstance.post(`/api/patients/subaccounts/upgrade`, payload);
+      return res.data;
+    },
+    onSuccess: () => {
+
+      setDisplaySubAcctModal(false);
+      setSubAcctUpgradeSuccessNot(true);
+
+      queryClient.invalidateQueries({ queryKey: ["subAccounts"] });
+
+
+      setSubAcctUpgradeStep(1);
+      setSubAcctUpgradeData({
+        child_email: "",
+        child_hin: "",
+        child_phone_number: "",
+        child_password: "",
+        confirm_password: "",
+        child_state: "",
+        child_city: "",
+        child_street: "",
+        child_house_number: "",
+        child_country: "",
+      });
+    },
+    onError: (error) => {
+      console.error("Error upgrading sub account:", error);
+      toast.error(error.response?.data?.message || "Upgrade failed.");
+    },
+  });
 
   const handleSubAcctUpgrade = async () => {
     setSubAcctUpgradeLoading(true);
     // console.log(subAcctUpgradeData);
-    
+
 
     const payload = {
       email: subAcctUpgradeData.child_email,
@@ -105,40 +143,13 @@ const Patient_SubAccount_Dashboard = () => {
       country: subAcctUpgradeData.child_country,
     };
 
-    if(!isValid) {
+    if (!isValid) {
       setSubAcctUpgradeLoading(false);
       toast.error("Please fill all fields.");
       return;
     }
 
-    try {
-      const res = await axiosInstance.post(
-        `/api/patients/subaccounts/upgrade`,
-        payload
-      );
-      // console.log(res.data);
-      setDisplaySubAcctModal(false);
-      setSubAcctUpgradeSuccessNot(true);
-      setSubAcctUpgradeStep(1);
-    } catch (error) {
-      console.error("Error upgrading sub account:", error);
-      toast.error(error.response?.data?.message || "Upgrade failed.");
-    } finally {
-      setSubAcctUpgradeLoading(false);
-      setSubAcctUpgradeStep(1)
-      setSubAcctUpgradeData({
-        child_email: "",
-        child_hin: "",
-        child_phone_number: "",
-        child_password: "",
-        confirm_password: "",
-        child_state: "",
-        child_city: "",
-        child_street: "",
-        child_house_number: "",
-        child_country: "",
-      });
-    }
+    upgradeSubAcctMutation.mutate(payload);
   };
 
   const [showPassword, setShowPassword] = useState(false);
@@ -252,29 +263,22 @@ const Patient_SubAccount_Dashboard = () => {
     setShowCreateSubAcctOverlay(true);
   };
 
-  const handleSubAcctCreation = async (e) => {
-    e.preventDefault();
-    setLoading(true);
 
-    if (!isFormValid) {
-      setLoading(false);
-      toast.error("Please fill all required fields correctly.");
-      return;
-    }
 
-    try {
+  const subAcctCreationMutation = useMutation({
+    mutationFn: async (formData) => {
       const res = await axiosInstance.post(
         "/api/patients/subaccounts",
         formData
       );
-      console.log(res);
-      setShowCreateSubAcctOverlay(false);
+      return res.data
+    },
+    onSuccess: () => {
       toast.success('Sub account created successfully')
-    } catch (error) {
-      console.error("Error creating sub account:", error);
-      toast.error('Sub account creation failed')
-    } finally {
-      setLoading(false);
+      setShowCreateSubAcctOverlay(false);
+      queryClient.invalidateQueries({ queryKey: ["subAccounts"] });
+
+      // Reset form here
       setFormData({
         firstname: "",
         lastname: "",
@@ -282,7 +286,23 @@ const Patient_SubAccount_Dashboard = () => {
         dob: "",
         gender: "",
       });
+
+    },
+    onError: (err) => {
+      console.error("Error creating sub account:", err);
+      toast.error('Sub account creation failed')
     }
+  })
+
+  const handleSubAcctCreation = async (e) => {
+    e.preventDefault();
+
+    if (!isFormValid) {
+      toast.error("Please fill all required fields correctly.");
+      return;
+    }
+
+    subAcctCreationMutation.mutate(formData);
   };
 
 
@@ -296,9 +316,9 @@ const Patient_SubAccount_Dashboard = () => {
 
         <div>
           <button
-            className="flex justify-center items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition w-full "
+            className="flex justify-center items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition w-full cursor-pointer "
             onClick={toggleAcctCreationOverlay}
-            disabled={loading}
+            disabled={subAcctCreationMutation.isPending}
           >
             Create a sub account
           </button>
@@ -323,8 +343,9 @@ const Patient_SubAccount_Dashboard = () => {
         formData={formData}
         handleChange={handleChange}
         isFormValid={isFormValid}
-        loading={loading}
+        loading={subAcctCreationMutation.isPending}
       />
+
       <UserSubAcctUpgradeModal
         displaySubAcctModal={displaySubAcctModal}
         setDisplaySubAcctModal={setDisplaySubAcctModal}
@@ -334,7 +355,7 @@ const Patient_SubAccount_Dashboard = () => {
         handleNextStepSubAcctUpgrade={handleNextStepSubAcctUpgrade}
         subAcctUpgradeStep={subAcctUpgradeStep}
         handleSubAcctUpgrade={handleSubAcctUpgrade}
-        subAcctUpgradeLoading={subAcctUpgradeLoading}
+        subAcctUpgradeLoading={ upgradeSubAcctMutation.isPending }
         showPassword={showPassword}
         setShowPassword={setShowPassword}
         isPasswordValid={isPasswordValid}
@@ -346,6 +367,8 @@ const Patient_SubAccount_Dashboard = () => {
         setSubAcctUpgradeSuccessNot={setSubAcctUpgradeSuccessNot}
         isValid={isValid}
       />
+
+
       <UserUpgradeSubAcctNotification
         subAcctUpgradeSuccessNot={subAcctUpgradeSuccessNot}
         setSubAcctUpgradeSuccessNot={setSubAcctUpgradeSuccessNot}

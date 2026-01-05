@@ -3,6 +3,7 @@ import { AppContext } from "../../../context/Patient Context/AppContext";
 import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Patient_Dashboard_Sidebar = () => {
   const { profile, toggleEmergencyStatus, newEmergencyStatus } =
@@ -13,6 +14,8 @@ const Patient_Dashboard_Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
+
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     if (profile) {
@@ -45,6 +48,7 @@ const Patient_Dashboard_Sidebar = () => {
 
   const handleLogout = () => {
     sessionStorage.removeItem("token");
+    queryClient.clear();
     navigate("/user-login"); // 👈 redirect
   };
 

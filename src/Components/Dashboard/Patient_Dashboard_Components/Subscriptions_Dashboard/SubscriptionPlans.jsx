@@ -5,7 +5,7 @@ import DynamicDate from "../../../Dynamic Date/DynamicDate";
 import toast from "react-hot-toast";
 
 const SubscriptionPlans = () => {
-  const { subscriptionPlans, loading } = useContext(SubscriptionsContext);
+  const { subscriptionPlans, isPending } = useContext(SubscriptionsContext);
 
   // Payment handler (stub)
 const handlePayment = async (planId) => {
@@ -52,7 +52,7 @@ const handlePayment = async (planId) => {
     <>
       <div className="bg-white my-5 border rounded-2xl py-8 px-6">
         {/* ===== Loading State ===== */}
-        {loading ? (
+        {isPending ? (
           <div className="flex justify-center items-center ">
             <p className="text-gray-600 text-sm animate-pulse">
               Loading subscription plans...

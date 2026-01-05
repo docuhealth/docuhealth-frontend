@@ -1,22 +1,26 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AppointmentsContext } from "../../../../context/Patient Context/AppointmentsContext";
-import Pagination from "../Pagination/Pagination";
+// import Pagination from "../Pagination/Pagination";
+import Pagination2 from "../Pagination/Pagination2";
 import { formatFullDate, formatTime } from "./Components/Date_Time_Formatter";
 
 const PatientAppointmentsList = () => {
   const {
     appointments,
-    loading,
+    isPending,
+    isFetching,
+    isError,
+    error,
     count,
     currentPage,
     totalPages,
-    fetchAppointments,
+    setCurrentPage,
   } = useContext(AppointmentsContext);
 
-  if (loading) {
+  if (isPending) {
     return (
       <div className="flex justify-center items-center h-full text-sm">
-        Loading...
+        Loading appointments ...
       </div>
     );
   }
@@ -91,6 +95,9 @@ const PatientAppointmentsList = () => {
   return (
     <>
       <div className="text-[12px] my-4">
+        {isFetching && !isPending && (
+          <p className="text-gray-500 text-sm mb-2">Loading new page...</p>
+        )}
         <div>
           {appointments.map((appointment) => (
             <div
@@ -148,8 +155,8 @@ const PatientAppointmentsList = () => {
               </div>
               <div className="flex items-center gap-1">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z" fill="#1B2B40"/>
-</svg>
+                  <path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z" fill="#1B2B40" />
+                </svg>
 
 
                 <p>Doctor: {appointment?.staff?.firstname}{" "}
@@ -157,17 +164,17 @@ const PatientAppointmentsList = () => {
               </div>
               <div className="border-l lg:flex lg:justify-center lg:items-center sm:col-span-2 lg:col-span-1 w-full my-4 lg:my-0">
                 <button className="border border-[#3E4095] rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300">
-                    <p className="text-[#3E4095]">Send a message</p>
+                  <p className="text-[#3E4095]">Send a message</p>
                 </button>
               </div>
             </div>
           ))}
         </div>
-        <Pagination
+        <Pagination2
           count={count}
           currentPage={currentPage}
           totalPages={totalPages}
-          fetchData={fetchAppointments}
+          setCurrentPage={setCurrentPage}
         />
       </div>
     </>
