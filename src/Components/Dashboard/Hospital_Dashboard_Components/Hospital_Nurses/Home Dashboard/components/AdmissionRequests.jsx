@@ -205,7 +205,7 @@ const AdmissionRequests = ({ setAdmissionRequest }) => {
                                     </svg>
 
                                     <p className="">
-                                        admitted to : {" "}
+                                        admit to : {" "}
                                         {admissionRequest?.ward_info
                                             ? `${admissionRequest.ward_info.name} ward`
                                             : "NIL"}

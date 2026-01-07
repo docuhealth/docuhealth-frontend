@@ -102,6 +102,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
     note: "",
     scheduled_time: ""
   });
+  const [appointmentID, setAppointmentID] = useState('')
 
   const today = new Date();
 
@@ -165,16 +166,17 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
 
     setRequestLoading(true)
     const updatedFormData = {
-      ...formData,
-      patient_hin: selectedPatientDetails?.patient?.hin,
+      note : formData.note,
+      type : formData.type,
+      doctor_id : formData.staff_id,
       scheduled_time: selectedDate.toISOString()
     };
 
     console.log("REQUEST PAYLOAD:", updatedFormData);
 
-
+    // console.log(appointmentID)
     try {
-      const res = await axiosInstance.post('api/receptionists/appointments', updatedFormData)
+      const res = await axiosInstance.patch(`api/nurses/appointments/${appointmentID}/assign`, updatedFormData)
       console.log(res)
       toast.success('You have successfully booked a consultation for a patient')
       setIsStaffSelected(false)
@@ -267,6 +269,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                           if (!fetchingPersonnel) {
                             fetchHealthPersonnel();
                             setSelectedPatientDetails(appointment)
+                            setAppointmentID(appointment.id)
                           }
                         }}
                       >
@@ -440,7 +443,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                     </div>
                     <div className='mb-1 flex items-center flex-wrap gap-1'>
                       <p className='font-medium'>Contact Adress:</p>
-                      <p className=' text-gray-600'>{selectedPatient?.patient?.street + ', ' + selectedPatient?.patient?.city + ', ' + selectedPatient?.patient?.state + ', ' + selectedPatient?.patient?.country ?? "NIL"}</p>
+                      <p className=' text-gray-600'>{selectedPatient?.patient?.street + ', ' + selectedPatient?.patient?.city + ', ' + selectedPatient?.patient?.state + ', ' + selectedPatient?.patient?.country || "NIL"}</p>
                     </div>
 
 

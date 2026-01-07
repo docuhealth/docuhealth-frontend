@@ -43,7 +43,7 @@ const PatientVitalsDetails = ({ selectedPatient, setSelectedPatient }) => {
                 <div className="my-5 bg-[#FAFAFA] rounded-xl border p-4">
                 <h2 className="font-medium">General Information</h2>
 
-                <div className="grid grid-cols-1 gap-4 mt-4">
+                <div className="grid  gap-4 mt-4">
 
                     <div>
                         <p className="text-sm font-medium text-gray-500 mb-1 ">First Name</p>

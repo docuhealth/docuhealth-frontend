@@ -8,6 +8,7 @@ import Vitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/
 import PatientVitalsDetails from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/PatientVitalsDetails'
 import UpdateVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/UpdateVitals'
 import PatientsAssignedToMyWard from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/PatientsAssignedToMyWard'
+import ProcessVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/ProcessVitals'
 
 const Hospital_Nurses_Home_Dashboard = () => {
 
@@ -15,6 +16,8 @@ const Hospital_Nurses_Home_Dashboard = () => {
   const [admissionRequest, setAdmissionRequest] = useState(false)
   const [vitals, setVitals] = useState(false)
   const [updateVitals, setUpdateVitals] = useState(false)
+
+  const [processVitals, setProcessVitals] = useState(false)
 
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [checkAdditionalNote, setCheckAdditionalNote] = useState(false)
@@ -58,10 +61,10 @@ const Hospital_Nurses_Home_Dashboard = () => {
                     className="py-2.5 px-10 lg:w-60 rounded-full bg-[#3E4095] text-white cursor-pointer"
                     onClick={() => {
                       setVitals(false)
-                      setUpdateVitals(true)
+                      setProcessVitals(true)
                     }}
                   >
-                    Update Vitals
+                    Process Vitals
                   </button>
                 </div>
 
@@ -116,12 +119,12 @@ const Hospital_Nurses_Home_Dashboard = () => {
           </>
 
 
-        ) : updateVitals ? (
+        ) : processVitals ? (
           <>
              <div className='py-2 text-sm '>
               <DynamicDate />
               <div>
-                <UpdateVitals setUpdateVitals={setUpdateVitals} selectedPatient={selectedPatient}/>
+                <ProcessVitals selectedPatient={selectedPatient}  setProcessVitals={setProcessVitals}/>
               </div>
 
             </div>

@@ -219,7 +219,7 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
                                 <p>
                                     <strong>D.O.B:</strong>{" "}
                                     {selectedPatient?.patient?.dob
-                                        ? formatRecordDate(selectedPatient.patient.dob)
+                                        ? selectedPatient.patient.dob
                                         : "NIL"}
                                 </p>
 

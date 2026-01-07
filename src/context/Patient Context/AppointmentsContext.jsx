@@ -19,7 +19,7 @@ const AppointmentsProvider = ({ children }) => {
     error
   } = useQuery({
     queryKey: ["appointments", currentPage, pageSize],
-    queryFn: () => fetchPatientAppointments(currentPage, pageSize), // Ensure params are passed
+    queryFn: fetchPatientAppointments, // Ensure params are passed
     enabled: isUserLoggedIn,
     placeholderData: keepPreviousData, // v5 syntax for smooth pagination
   });
