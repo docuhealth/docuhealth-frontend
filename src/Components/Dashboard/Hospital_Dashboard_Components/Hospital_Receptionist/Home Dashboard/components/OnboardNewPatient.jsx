@@ -221,7 +221,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
 
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-5">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-2">
             {
                 onboardingSuccessful ? (
                     <>
@@ -264,7 +264,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                     </>
                 ) : (
                     <>
-                        <div className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full relative">
+                        <div className="bg-white rounded-lg shadow-lg px-4 py-6 max-w-lg w-full relative">
                             <div className="flex justify-between items-center pb-5">
                                 <div className="flex-1 text-center">
                                     <h2 className="text-md font-semibold">Register New Patient</h2>

@@ -50,7 +50,7 @@ const handlePayment = async (planId) => {
 
   return (
     <>
-      <div className="bg-white my-5 border rounded-2xl py-8 px-6">
+      <div className="bg-white my-5 border rounded-lg py-8 px-6">
         {/* ===== Loading State ===== */}
         {isPending ? (
           <div className="flex justify-center items-center ">

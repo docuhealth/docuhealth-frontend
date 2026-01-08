@@ -202,7 +202,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                 <img src={template} alt='img' />
               </div>
               <div className='text-sm grid grid-cols-1 lg:flex lg:justify-end lg:items-center gap-2 lg:gap-5 mt-5'>
-                <button className=' border border-[#3E4095] rounded-full py-2.5 px-8 text-[#3E4095] cursor-pointer' onClick={() => {
+                <button className=' border border-[#3E4095] rounded-full py-2.5 px-4 lg:px-8 text-[#3E4095] cursor-pointer' onClick={() => {
                   setNewPatient(!newPatient)
                 }}>
                   Register a new patient to DocuHealth
@@ -265,7 +265,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                 </div>
               </div>
 
-              <div className='bg-white rounded-xl border mt-5 p-5 text-sm text-gray-700'>
+              <div className='bg-white rounded-lg border mt-5 p-4 text-sm text-gray-700'>
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
                   <div className=' flex items-center gap-2 bg-blue-50 p-3 rounded-md'>
                     <div className='bg-[#3E4095] p-2 rounded-full'>
@@ -294,8 +294,8 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                 </div>
               </div>
 
-              <div className="bg-white my-5 border rounded-2xl p-5">
-                <div className=" border rounded-lg p-5">
+              <div className="bg-white rounded-lg my-5 ">
+                <div className=" border rounded-lg p-4 lg:p-6">
                   <h2 className=" mb-4 pb-2 border-b font-medium">
                     Recent Patients attended to
                   </h2>
@@ -304,8 +304,8 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="bg-white my-5 border rounded-2xl p-5">
-                <div className=" border rounded-lg p-5">
+              <div className="bg-white rounded-lg my-5 ">
+                <div className=" border rounded-lg p-4 lg:p-6">
                   <h2 className=" mb-4 pb-2 border-b font-medium">
                     Upcoming Appointments List
                   </h2>

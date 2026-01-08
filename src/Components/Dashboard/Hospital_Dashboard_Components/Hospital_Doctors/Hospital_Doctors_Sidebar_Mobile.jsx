@@ -168,7 +168,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       </li>
                     </div>
                   </Link>
-                  <Link to="/hospital-doctors-lab-dashboard"
+                  {/* <Link to="/hospital-doctors-lab-dashboard"
                         onClick={() => setOpenMobileSidebar(false)}>
                     <div className="px-4 my-4">
                       <li
@@ -241,7 +241,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                         Messages
                       </li>
                     </div>
-                  </Link>
+                  </Link> */}
         
                   <Link to="/hospital-doctors-healthpersonnel-dashboard"
                         onClick={() => setOpenMobileSidebar(false)}>

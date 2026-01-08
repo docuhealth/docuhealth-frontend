@@ -88,7 +88,7 @@ const UserSubAcctListMobile = ({ setDisplaySubAcctModal }) => {
         )
       ) : (
         <>
-          <div className=" sm:hidden pt-8 px-6 border rounded-2xl bg-white my-5 ">
+          <div className=" sm:hidden pt-8 px-6 border rounded-lg bg-white my-5 ">
             <h1 className=" mb-4">Sub-Accounts</h1>
             <div>
               <UserSubAcctRecordsMobile

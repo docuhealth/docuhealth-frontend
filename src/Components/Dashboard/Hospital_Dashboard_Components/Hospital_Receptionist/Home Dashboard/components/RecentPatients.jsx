@@ -141,57 +141,70 @@ const RecentPatients = () => {
                     ))
                 }
             </div>
-            <div className="lg:hidden">
-                <div className="flex flex-col gap-4">
-                    {recentPatients.map((patient, index) => (
-                        <div
-                            key={index}
-                            className="bg-white border border-gray-200 rounded-lg p-4 text-[12px] text-gray-700"
-                        >
-                            <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center'>
-                                {/* Patient name */}
-                                <div className="flex items-center gap-2 font-semibold text-gray-900 mb-2">
-                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" />
-                                    </svg>
-                                    <p>
+            <div className="lg:hidden flex flex-col gap-4">
+                {recentPatients.map((patient, index) => (
+                    <div
+                        key={index}
+                        className="bg-white border border-gray-200 rounded-md p-5  duration-200"
+                    >
+                        {/* Header: Avatar, Name and Gender Tag */}
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-full bg-blue-50 text-[#3E4095] flex items-center justify-center font-bold text-sm border border-blue-100 uppercase">
+                                    {patient.patient.firstname[0]}{patient.patient.lastname[0]}
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-gray-900 text-[14px] leading-tight">
                                         {patient.patient.firstname} {patient.patient.lastname}
+                                    </h3>
+                                    <p className="text-[11px] text-gray-500 font-medium">
+                                        {patient.patient.gender}
                                     </p>
                                 </div>
+                            </div>
+                            <span className="bg-gray-50 text-gray-600 text-[10px] px-2 py-1 rounded-md border border-gray-100 font-medium uppercase tracking-wider">
+                                {patient.patient.hin?.slice(-4) || "N/A"}
+                            </span>
+                        </div>
 
-                                {/* Date & Time */}
-                                <p className="text-gray-500  mb-1">
-                                    {formatFullDate(patient.created_at)} •{" "}
-                                    {formatTime(patient.created_at)}
+                        {/* Main Info Grid */}
+                        <div className="grid grid-cols-2 gap-y-4 pt-3 border-t border-gray-50">
+                            <div>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Registration Info</p>
+                                <div className="flex items-center gap-1.5 text-gray-700">
+                                    <i className='bx bx-calendar text-[#3E4095] text-[14px]'></i>
+                                    <p className="text-[11.5px] font-medium leading-none">
+                                        {formatFullDate(patient.created_at)}
+                                    </p>
+                                </div>
+                                <p className="text-[10px] text-gray-500 mt-1 pl-5">
+                                    at {formatTime(patient.created_at)}
                                 </p>
-
                             </div>
 
-
-                            {/* Details */}
-                            <div className="mt-3 space-y-1 ">
-                                <p>
-                                    <span className="font-medium">HIN:</span>{" "}
-                                    {patient.patient.hin
-                                        ? patient.patient.hin.slice(0, 4) +
-                                        "••••••" +
-                                        patient.patient.hin.slice(-2)
-                                        : "—"}
-                                </p>
-
-                                <p>
-                                    <span className="font-medium">Staff:</span>{" "}
-                                    {patient.staff.firstname} {patient.staff.lastname}
-                                </p>
-
-                                <p>
-                                    <span className="font-medium">Sex:</span>{" "}
-                                    {patient.patient.gender}
-                                </p>
+                            <div>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Assigned Staff</p>
+                                <div className="flex items-center gap-1.5 text-gray-700">
+                                    <i className='bx bx-shield-quarter text-[#3E4095] text-[14px]'></i>
+                                    <p className="text-[11.5px] font-medium leading-none">
+                                        {patient.staff.firstname} {patient.staff.lastname}
+                                    </p>
+                                </div>
+                                <p className="text-[10px] text-gray-500 mt-1 pl-5">Healthcare Provider</p>
                             </div>
                         </div>
-                    ))}
-                </div>
+
+                        {/* HIN Masked Section */}
+                        <div className="mt-4 bg-[#F8F9FF] rounded-lg p-2.5 flex justify-between items-center">
+                            <span className="text-[10px] font-semibold text-[#3E4095] uppercase">HIN Number</span>
+                            <span className="text-[12px] font-mono font-bold text-gray-600 tracking-widest">
+                                {patient.patient.hin
+                                    ? patient.patient.hin.slice(0, 4) + "••••" + patient.patient.hin.slice(-2)
+                                    : "—"}
+                            </span>
+                        </div>
+                    </div>
+                ))}
             </div>
 
 

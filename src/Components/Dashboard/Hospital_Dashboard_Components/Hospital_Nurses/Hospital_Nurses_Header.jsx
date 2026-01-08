@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import Hospital_Nurses_Sidebar_Mobile from './Hospital_Nurses_Sidebar_Mobile'
 import { NursesAppContext } from "../../../../context/Hospital Context/Nurses/NursesAppContext";
+
+import LogOutModal from "./LogOut/components/LogOutModal";
+import { fetchStaff } from "../../../../queries/Hospital/fetchStaff";
+
 
 const Hospital_Nurses_Header = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -11,6 +16,50 @@ const Hospital_Nurses_Header = () => {
     };
 
     const {profile} = useContext(NursesAppContext);
+
+
+    const navigate = useNavigate();
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selected, setSelected] = useState('nurse')
+    const [handoverData, setHandoverData] = useState(null);
+  
+    const [staffList, setStaffList] = useState(null);
+    const [isFetching, setIsFetching] = useState(false);
+
+
+    const handleLogoutLogic = async (handoverSelection) => {
+      // If user clicked "Just Logout" (handoverSelection is null)
+      if (!handoverSelection) {
+        sessionStorage.clear();
+        navigate("/login");
+        return;
+      }
+  
+      // If they clicked "Proceed to assign"
+      setHandoverData(handoverSelection);
+      setIsFetching(true);
+  
+      try {
+        console.log("Fetching staff manually...");
+        const data = await fetchStaff(selected);
+        setStaffList(data);
+        console.log("Staff list loaded:", data);
+      } catch (error) {
+        console.error("Error fetching staff:", error);
+        alert("Failed to load staff list. Please try again.");
+      } finally {
+        setIsFetching(false);
+      }
+    };
+  
+    const handleCloseModal = () => {
+      setIsModalOpen(false);
+      setStaffList(null); // Reset data so it starts from the checkbox view next time
+      setHandoverData(null);
+    };
+  
+
   return (
     <>
         <div className="relative">
@@ -106,6 +155,18 @@ const Hospital_Nurses_Header = () => {
           <Hospital_Nurses_Sidebar_Mobile
             openMobileSidebar={openMobileSidebar}
             setOpenMobileSidebar={setOpenMobileSidebar}
+            setIsModalOpen ={setIsModalOpen}
+          />
+        </div>
+        <div>
+          <LogOutModal 
+                isOpen={isModalOpen}
+                isFetching={isFetching}
+                onClose={handleCloseModal}
+                onLogout={handleLogoutLogic}
+                staffList={staffList}
+                selected ={selected}
+                setStaffList={setStaffList}
           />
         </div>
       </div>

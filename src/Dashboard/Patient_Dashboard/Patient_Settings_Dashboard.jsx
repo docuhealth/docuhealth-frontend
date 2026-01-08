@@ -11,7 +11,7 @@ const Patient_Settings_Dashboard = () => {
       <div className="py-2">
         <DynamicDate />
       </div>
-      <div className="block py-8 px-6 border rounded-2xl bg-white my-5 ">
+      <div className="block py-8 px-6 border rounded-lg bg-white my-5 ">
         <div>
           <div className="flex items-center">
             <div className="w-14 h-14 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center text-xl font-semibold ">

@@ -19,7 +19,7 @@ const Patient_Dashboard_Layout = () => {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-6 overflow-y-auto bg-[#F5F5F5]">
+        <main className="flex-1 p-4 lg:p-6 overflow-y-auto bg-[#F5F5F5]">
           <Outlet />
         </main>
       </div>

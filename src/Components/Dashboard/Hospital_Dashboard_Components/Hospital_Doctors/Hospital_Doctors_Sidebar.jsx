@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Hospital_Doctors_Sidebar = () => {
   const navigate = useNavigate();
@@ -131,8 +132,12 @@ const Hospital_Doctors_Sidebar = () => {
               </li>
             </div>
           </Link>
-          <Link to="/hospital-doctors-lab-dashboard">
-            <div className="px-4 my-4">
+          {/* <Link to="">
+            <div className="px-4 my-4"
+            onClick={()=> {
+              toast.success('feature coming soon !')
+            }}
+            >
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-doctors-lab-dashboard"
@@ -167,8 +172,12 @@ const Hospital_Doctors_Sidebar = () => {
               </li>
             </div>
           </Link>
-          <Link to="/hospital-doctors-messages-dashboard">
-            <div className="px-4 my-4">
+          <Link to="">
+            <div className="px-4 my-4"
+                onClick={()=> {
+                  toast.success('feature coming soon !')
+                }}
+            >
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-doctors-messages-dashboard"
@@ -202,7 +211,7 @@ const Hospital_Doctors_Sidebar = () => {
                 Messages
               </li>
             </div>
-          </Link>
+          </Link> */}
 
           <Link to="/hospital-doctors-healthpersonnel-dashboard">
             <div className="px-4 my-4">

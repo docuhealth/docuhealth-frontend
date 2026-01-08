@@ -137,13 +137,13 @@ const Hospital_Nurses_Home_Dashboard = () => {
                 <img src={template} alt='img' />
               </div>
               <div className='text-sm grid grid-cols-1 lg:flex lg:justify-end lg:items-center gap-2 lg:gap-5 mt-5'>
-                <button className='border border-[#3E4095] rounded-full py-2 px-12 text-[#3E4095] cursor-pointer'
+                {/* <button className='border border-[#3E4095] rounded-full py-2 px-12 text-[#3E4095] cursor-pointer'
                   onClick={() => {
                     setAdmissionRequest(true)
                   }}
                 >
                   Admission Request
-                </button>
+                </button> */}
                 <button className='bg-[#3E4095] text-white cursor-pointer py-2.5 px-12 rounded-full' onClick={() => {
                   setVitals(true)
                 }}>

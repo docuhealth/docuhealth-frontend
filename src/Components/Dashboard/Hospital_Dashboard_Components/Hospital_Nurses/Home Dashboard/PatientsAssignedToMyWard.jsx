@@ -142,6 +142,45 @@ const PatientsAssignedToMyWard = () => {
         ))
         }
       </div>
+      <div className="lg:hidden flex flex-col gap-4">
+        {assignedPatientsToWard.map((patient, index) => (
+          <div key={index} className="bg-white border border-gray-200 rounded-md p-4 ">
+            <div className="flex justify-between items-start border-b border-gray-50 pb-3 mb-3">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-50 text-[#3E4095] h-10 w-10 rounded-full flex items-center justify-center font-bold">
+                  {patient.patient.firstname[0]}{patient.patient.lastname[0]}
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-800 text-sm">{patient.patient.firstname} {patient.patient.lastname}</h3>
+                  <p className="text-[11px] text-gray-500 uppercase tracking-tight">{patient.patient.gender} patient</p>
+                </div>
+              </div>
+              <span className="text-[10px] bg-blue-50 text-[#3E4095] px-2 py-1 rounded-md font-medium">
+                Admitted
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-y-4">
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase">Admission Date</p>
+                <p className="text-[12px] font-medium text-gray-700">{formatFullDate(patient.admission_date)}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase">Admission Time</p>
+                <p className="text-[12px] font-medium text-gray-700">{formatTime(patient.admission_date)}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase">Assigned Doctor</p>
+                <p className="text-[12px] font-medium text-gray-700">Dr. {patient.staff.lastname}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase">Email/Info</p>
+                <p className="text-[12px] font-medium text-gray-700 truncate">{patient.email || "NIL"}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
       <Pagination
         count={count}
         currentPage={currentPage}

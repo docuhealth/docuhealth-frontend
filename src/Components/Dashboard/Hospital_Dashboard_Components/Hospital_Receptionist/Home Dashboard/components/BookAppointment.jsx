@@ -178,11 +178,11 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
 
     return (
         <>
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-5">
+            <div className="fixed inset-0 bg-black/50  backdrop-blur-sm flex items-center justify-center z-50 px-2">
                 {staffList.length > 0 ? (
                     isStaffSelected ? (
                         <>
-                            <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
+                            <div className="bg-white rounded-lg shadow-lg  py-6 max-w-md w-full relative text-sm">
                                 <div className="flex justify-end">
                                     <button
                                         onClick={() => setBookAppointment(false)}
@@ -439,7 +439,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                         </>
                     ) : (
                         <>
-                            <div className="bg-white rounded-lg shadow-lg p-6 max-w-5xl w-full relative text-sm">
+                            <div className="bg-white rounded-lg shadow-lg px-4 py-6 max-w-5xl w-full relative text-sm">
                                 <div className="flex justify-between items-center border-b pb-4">
                                     <h2 className="font-medium">Choose a preferred {selected}</h2>
                                     {/* Close Button */}

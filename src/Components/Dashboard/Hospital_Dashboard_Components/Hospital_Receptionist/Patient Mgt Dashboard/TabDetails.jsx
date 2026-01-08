@@ -23,7 +23,7 @@ const AdmittedPatientsTab = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-full text-sm">
+            <div className="flex justify-center items-center h-full text-sm my-5">
                 Loading...
             </div>
         );
@@ -101,7 +101,7 @@ const AdmittedPatientsTab = () => {
             <div className='my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
                 {
                     admittedPatients.map((admittedPatient, index) => (
-                        <div key={index} className="border p-3 rounded-xl">
+                        <div key={index} className="border p-4 rounded-lg">
                             <div className='flex justify-between items-center'>
                                 <p>{admittedPatient.patient.firstname} {admittedPatient.patient.lastname} </p>
                                 <div className="bg-[#D2F5DB] px-2 rounded-full">
@@ -293,7 +293,7 @@ const DischargedPatientsTab = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-full text-sm">
+            <div className="flex justify-center items-center h-full text-sm my-5">
                 Loading...
             </div>
         );
@@ -301,7 +301,7 @@ const DischargedPatientsTab = () => {
 
     if (admittedPatients.length === 0) {
         return (
-            <div className="flex flex-col justify-center items-center text-center  h-full">
+            <div className="flex flex-col justify-center items-center text-center my-3 h-full">
                 <svg
                     width="180"
                     height="180"
@@ -373,7 +373,7 @@ const DischargedPatientsTab = () => {
             <div className='my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
                 {
                     admittedPatients.map((admittedPatient, index) => (
-                        <div key={index} className="border p-3 rounded-xl">
+                        <div key={index} className="border p-4 rounded-lg">
                             <div className='flex justify-between items-center'>
                                 <p>{admittedPatient.patient.firstname} {admittedPatient.patient.lastname} </p>
                                 <div className="bg-[#D2F5DB] px-2 rounded-full">
