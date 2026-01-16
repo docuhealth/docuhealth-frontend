@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaEye, FaEyeSlash, FaSignOutAlt, FaSyncAlt, FaLock } from 'react-icons/fa';
 import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 import axiosInstance from '../../utils/axiosInstance';
+import { useQuery } from '@tanstack/react-query';
+import { getToken } from '../../services/authService';
 
 const Partner_Home_Dashboard = () => {
     const [showSecret, setShowSecret] = useState(false);
@@ -11,8 +13,27 @@ const Partner_Home_Dashboard = () => {
 
     const navigate = useNavigate()
 
+    const isPartnerLoggedIn = !!getToken();
+
     // Mock data - replace with actual state/props
     const clientID = "DEMO-DOCU-PART-9920";
+
+    const fetchPartnerProfile = async() => {
+        const res = await axiosInstance.get("api/partners/info"); 
+        return res
+        console.log(res)
+    }
+
+    const {
+        data,
+        isFetching,
+        isError,
+        error
+    } = useQuery({
+        queryKey : ['partner-profile'],
+        queryFn : fetchPartnerProfile,
+        enabled : isPartnerLoggedIn
+    })
 
 
     const handleRotateKeys = (e) => {

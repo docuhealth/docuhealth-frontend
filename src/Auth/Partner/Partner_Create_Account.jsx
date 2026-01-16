@@ -142,6 +142,7 @@ const Partner_Create_Account = () => {
             );
         } finally {
             setIsSubmitting(false);
+            setShowToast(false)
 
             setEmail('')
             setName('')
@@ -149,6 +150,8 @@ const Partner_Create_Account = () => {
             setPassword('')
             setConfirmPassword('')
             setAddress('')
+
+            setIsPasswordValid(false);
 
         }
 
