@@ -18,7 +18,10 @@ const Partner_Create_Account = () => {
     const [address, setAddress] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
-    const[step, setStep] = useState(1)
+    const [step, setStep] = useState(1)
+
+    const [registrationData, setRegistrationData] = useState(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
 
 
@@ -119,15 +122,19 @@ const Partner_Create_Account = () => {
         try {
             const response = await authAPI("POST", "api/partners/partner", payload, {
                 headers: { "Content-Type": "application/json" },
-              });
+            });
             // console.log(payload)
-    
-            console.log(response);
-            toast.success("Partner Registration successful!");
 
-            setTimeout(() => {
-                navigate("/partner-login");
-              }, 1000);
+            if (response.status === "success") {
+                // Store the credentials from image_14f50c.png
+                setRegistrationData({
+                    clientId: response.data.client_id,
+                    clientSecret: response.data.client_secret
+                });
+
+                toast.success("Partner Registration successful!");
+                setShowSuccessModal(true); // Open the modal instead of navigating
+            }
         } catch (error) {
             console.error("Error:", error);
             toast.error(
@@ -691,18 +698,17 @@ const Partner_Create_Account = () => {
                                     <button
                                         type="button"
                                         onClick={handleNextStep}
-                                        className={`w-full transition-colors py-3 rounded-full ${
-                                            email &&
+                                        className={`w-full transition-colors py-3 rounded-full ${email &&
                                             isPasswordValid &&
-                                            confirmPassword === password 
+                                            confirmPassword === password
                                             ? "bg-[#3E4095] text-white hover:bg-[#33357a]"
                                             : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                             }`}
 
-                                        disabled= {
+                                        disabled={
                                             !email ||
                                             !isPasswordValid ||
-                                            confirmPassword !== password 
+                                            confirmPassword !== password
                                         }
                                     >
                                         Next Step
@@ -712,110 +718,160 @@ const Partner_Create_Account = () => {
 
                             {step === 2 && (
                                 <>
-                                          < div className="relative pb-3">
-                                <p className="font-semibold pb-1">Full Name :</p>
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                            </div>
+                                    < div className="relative pb-3">
+                                        <p className="font-semibold pb-1">Full Name :</p>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
 
-                            <div className="relative pb-3">
-                                <p className="font-semibold pb-1">
-                                    Phone number :
-                                </p>
-                                <div className="relative">
-                                    <input
-                                        type="number"
-                                        className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
-                                        value={phone}
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-
-
-                            <div className="relative pb-3">
-                                <p className="font-semibold pb-1">Address :</p>
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
-                                        value={address}
-                                        onChange={(e) => setAddress(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                            </div>
+                                    <div className="relative pb-3">
+                                        <p className="font-semibold pb-1">
+                                            Phone number :
+                                        </p>
+                                        <div className="relative">
+                                            <input
+                                                type="number"
+                                                className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                value={phone}
+                                                onChange={(e) => setPhone(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
 
 
 
-                            <p className="text-sm text-gray-600 pb-6">
-                                By Signing up, you agree to our{" "}
-                                <Link
-                                    to="/privacy-policy"
-                                    className="text-[#3E4095] hover:underline"
-                                >
-                                    Privacy Policy
-                                </Link>
-                                .
-                            </p>
+                                    <div className="relative pb-3">
+                                        <p className="font-semibold pb-1">Address :</p>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                value={address}
+                                                onChange={(e) => setAddress(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
 
-                            <button
-                                type="button"
-                                onClick={handleSubmit}
-                                className={`w-full transition-colors py-3 rounded-full ${name &&
-                                    email &&
-                                    phone && address &&
-                                    isPasswordValid &&
-                                    confirmPassword === password &&
-                                    !isSubmitting
-                                    ? "bg-[#3E4095] text-white hover:bg-[#33357a]"
-                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    }`}
 
-                                disabled={
-                                    !name ||
-                                    !email ||
-                                    !phone ||
-                                    !address ||
-                                    !isPasswordValid ||
-                                    confirmPassword !== password ||
-                                    isSubmitting
-                                }
-                            >
-                                {isSubmitting ? (<div className="flex items-center justify-center gap-2">
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                    Submitting...
-                                </div>) : ("Sign Up Now")}
-                            </button>
+
+                                    <p className="text-sm text-gray-600 pb-6">
+                                        By Signing up, you agree to our{" "}
+                                        <Link
+                                            to="/privacy-policy"
+                                            className="text-[#3E4095] hover:underline"
+                                        >
+                                            Privacy Policy
+                                        </Link>
+                                        .
+                                    </p>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleSubmit}
+                                        className={`w-full transition-colors py-3 rounded-full ${name &&
+                                            email &&
+                                            phone && address &&
+                                            isPasswordValid &&
+                                            confirmPassword === password &&
+                                            !isSubmitting
+                                            ? "bg-[#3E4095] text-white hover:bg-[#33357a]"
+                                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                            }`}
+
+                                        disabled={
+                                            !name ||
+                                            !email ||
+                                            !phone ||
+                                            !address ||
+                                            !isPasswordValid ||
+                                            confirmPassword !== password ||
+                                            isSubmitting
+                                        }
+                                    >
+                                        {isSubmitting ? (<div className="flex items-center justify-center gap-2">
+                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                            Submitting...
+                                        </div>) : ("Sign Up Now")}
+                                    </button>
                                 </>
                             )}
 
-                  
+
 
                         </form>
 
                         <p className="text-center text-sm text-gray-600 mt-3">
-                  Already have an account?{" "}
-                  <Link
-                    to="/partner-login"
-                    className="text-[#3E4095] hover:underline"
-                  >
-                    Sign in
-                  </Link>
-                </p>
+                            Already have an account?{" "}
+                            <Link
+                                to="/partner-login"
+                                className="text-[#3E4095] hover:underline"
+                            >
+                                Sign in
+                            </Link>
+                        </p>
 
                     </div>
                 </div >
             </div >
+
+            {showSuccessModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+                    <div className="bg-white rounded-lg w-full max-w-lg p-8 shadow-2xl animate-in fade-in zoom-in duration-300">
+                        <div className="text-center mb-6">
+                            <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <FaLock className="text-2xl" />
+                            </div>
+                            <h3 className="text-2xl font-medium text-gray-800">Registration Complete!</h3>
+                            <p className="text-gray-500 text-xs mt-2">Please save your API credentials securely. You will not be able to see the secret key again.</p>
+                        </div>
+
+                        <div className="space-y-4">
+                            {/* Client ID Display */}
+                            <div>
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Client ID</label>
+                                <div className="flex items-center gap-2 mt-1 bg-gray-50 border rounded-sm p-3">
+                                    <code className="text-sm flex-1 break-all text-[#3E4095] font-mono">{registrationData?.clientId}</code>
+                                </div>
+                            </div>
+
+                            {/* Client Secret Display */}
+                            <div>
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Client Secret</label>
+                                <div className="mt-1 bg-gray-50 border border-amber-200 rounded-sm p-3">
+                                    <code className="text-sm block break-all text-gray-700 font-mono mb-2">
+                                        {registrationData?.clientSecret}
+                                    </code>
+                                    <button
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(registrationData?.clientSecret);
+                                            toast.success("Secret copied to clipboard!");
+                                        }}
+                                        className="w-full py-2 bg-amber-50 text-amber-700 rounded-lg text-xs font-bold hover:bg-amber-100 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                                    >
+                                        Copy Secret Key
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => navigate("/partner-login")}
+                            className="w-full mt-8 bg-[#3E4095] text-white py-2.5 rounded-full  transition-all text-sm cursor-pointer" 
+                        >
+                            I've saved my keys, Proceed to Login
+                        </button>
+                    </div>
+                </div>
+            )}
         </>
     )
 }

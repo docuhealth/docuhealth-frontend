@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaEye, FaEyeSlash, FaSignOutAlt, FaSyncAlt, FaLock } from 'react-icons/fa';
 import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
+import axiosInstance from '../../utils/axiosInstance';
 
 const Partner_Home_Dashboard = () => {
     const [showSecret, setShowSecret] = useState(false);
@@ -11,23 +12,29 @@ const Partner_Home_Dashboard = () => {
     const navigate = useNavigate()
 
     // Mock data - replace with actual state/props
-    const clientCode = "DEMO-DOCU-PART-9920";
-    const clientSecret = "demo_sk_live_51Npxxxxxxxxxxxxxxxx";
+    const clientID = "DEMO-DOCU-PART-9920";
 
 
     const handleRotateKeys = (e) => {
         e.preventDefault();
-        // Logic to verify password and rotate keys
-        console.log("Rotating keys with password:", password);
-        setIsModalOpen(false);
-        setPassword("");
+
+        try {
+
+        } catch (err) {
+
+        } finally {
+            setPassword("");
+            setIsModalOpen(false);
+        }
+        
+
     };
 
     const handleLogout = () => {
         // // Logic to clear session
         // console.log("Logging out...");
         sessionStorage.clear();   // removes ALL session-based auth data
-        navigate("/partner-login"); 
+        navigate("/partner-login");
     };
 
     return (
@@ -61,26 +68,7 @@ const Partner_Home_Dashboard = () => {
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Client Code</label>
                             <div className="flex items-center bg-gray-50 border rounded-lg px-4 py-2">
-                                <code className="flex-1 text-[#3E4095] font-mono font-medium">{clientCode}</code>
-                            </div>
-                        </div>
-
-                        {/* Client Secret */}
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">Client Secret Key</label>
-                            <div className="flex items-center bg-gray-50 border rounded-lg px-4 py-2 relative">
-                                <input
-                                    type={showSecret ? "text" : "password"}
-                                    readOnly
-                                    value={clientSecret}
-                                    className="bg-transparent flex-1 font-mono text-gray-600 outline-none"
-                                />
-                                <button
-                                    onClick={() => setShowSecret(!showSecret)}
-                                    className="text-gray-400 hover:text-[#3E4095] cursor-pointer"
-                                >
-                                    {showSecret ? <FaEyeSlash /> : <FaEye />}
-                                </button>
+                                <code className="flex-1 text-[#3E4095] font-mono font-medium">{clientID}</code>
                             </div>
                         </div>
 
