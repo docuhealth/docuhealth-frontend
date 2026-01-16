@@ -73,10 +73,10 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                 />
 
               ) : caseNoteHistory ? (
-                <CaseNote setCaseNoteHistory={setCaseNoteHistory} />
+                <CaseNote selected={selected} setCaseNoteHistory={setCaseNoteHistory} />
               ) : newCaseNote ? (
                 <>
-                <AddNewCaseNote setNewCaseNote={setNewCaseNote}/>
+                <AddNewCaseNote selected={selected} setNewCaseNote={setNewCaseNote}/>
                 </>
               ) :(
                 <div className="bg-white my-5 border rounded-2xl p-5 text-sm">

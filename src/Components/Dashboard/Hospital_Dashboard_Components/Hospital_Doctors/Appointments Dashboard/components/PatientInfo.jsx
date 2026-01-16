@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
-import axiosInstance from '../../../../../../utils/axiosInstance'
+import axiosInstanceHos from '../../../../../../utils/axiosInstanceHos'
 import toast from 'react-hot-toast'
 import TabComponent from './TabComponent'
 import getTabs from './TabDetails'
@@ -28,7 +28,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
     const fetchPatientInfo = async () => {
         try {
             setLoading(true)
-            const res = await axiosInstance.get(`api/doctors/patient/info/${selectedPatientDetails.patient.hin}`)
+            const res = await axiosInstanceHos.get(`api/doctors/patient/info/${selectedPatientDetails.patient.hin}`)
 
             console.log(res.data)
             setPatientFullInfo(res.data)
@@ -43,7 +43,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
     const fetchPatientMedRecords = async (page = 1) => {
         try {
             setMedLoading(true)
-            const res = await axiosInstance.get(`api/doctors/patient/records/${selectedPatientDetails.patient.hin}?page=${page}&size=${pageSize}`)
+            const res = await axiosInstanceHos.get(`api/doctors/patient/records/${selectedPatientDetails.patient.hin}?page=${page}&size=${pageSize}`)
 
             console.log(res.data)
             setPatientMedRecords(res.data.results || [])

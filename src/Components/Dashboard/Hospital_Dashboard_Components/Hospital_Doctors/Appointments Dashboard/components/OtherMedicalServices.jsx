@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import toast from 'react-hot-toast'
-import axiosInstance from '../../../../../../utils/axiosInstance'
+import axiosInstanceHos from '../../../../../../utils/axiosInstanceHos'
 
 
 const Pharmacist_Icon = () => (
@@ -96,7 +96,7 @@ const OtherMedicalServices = ({ setOtherMedicalServices, selectedPatientDetails 
         }
 
         try {
-            const res = await axiosInstance.get(
+            const res = await axiosInstanceHos.get(
                 `api/receptionists/staff/${selected.toLowerCase()}`
             );
 
@@ -127,7 +127,7 @@ const OtherMedicalServices = ({ setOtherMedicalServices, selectedPatientDetails 
         setRequestLoading(true)
 
         try {
-            const res = await axiosInstance.post('api/doctors/vital-signs/request', formData)
+            const res = await axiosInstanceHos.post('api/doctors/vital-signs/request', formData)
             console.log(res)
             toast.success('You have successfully assigned patient to a nurse for vitals checkup')
             setOtherMedicalServices(false)

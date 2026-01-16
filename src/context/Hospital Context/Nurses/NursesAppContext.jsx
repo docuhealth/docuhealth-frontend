@@ -1,5 +1,5 @@
 import React, { useEffect, useState, createContext } from "react";
-import axiosInstance from "../../../utils/axiosInstance";
+import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 import { getHospitalToken } from "../../../services/authService";
 
 
@@ -15,7 +15,7 @@ const NursesProfileProvider = (props) => {
         if (isUserLoggedIn) {
           const fetchProfile = async () => {
             try {
-              const res = await axiosInstance.get("api/nurses/dashboard"); // Example endpoint
+              const res = await axiosInstanceHos.get("api/nurses/dashboard"); // Example endpoint
               setProfile(res.data.nurse);
               setWardInfo(res.data.ward_info)
             

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
 import { HosAppContext } from "../../../../../../context/Hospital Context/Admin/HosAppContext";
 import { HosStaffsContext } from "../../../../../../context/Hospital Context/Admin/HosStaffsContext";
-import axiosInstance from "../../../../../../utils/axiosInstance";
+import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import toast from "react-hot-toast";
 
 const OnboardNewStaff = ({ setCreateNewStaff }) => {
@@ -176,7 +176,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
         console.log(payload)
         try {
-            const res = await axiosInstance.post("api/hospitals/team-member", payload)
+            const res = await axiosInstanceHos.post("api/hospitals/team-member", payload)
 
             console.log(res)
             toast.success(" Team member added successfully ")

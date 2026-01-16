@@ -4,7 +4,7 @@ import { X, UploadCloud, FileText } from "lucide-react";
 import { truncateWords } from "../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import toast from "react-hot-toast";
 import { DoctorAppContext } from "../../../../../../context/Hospital Context/Doctors/DoctorAppContext";
-import axiosInstance from "../../../../../../utils/axiosInstance";
+import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 
 const AfterVisitSummary = ({
   setAfterVisitSummary,
@@ -250,7 +250,7 @@ const AfterVisitSummary = ({
         formDataToUpload.append("files", fileObj.file);
       });
       try {
-        const response = await axiosInstance.post(
+        const response = await axiosInstanceHos.post(
           "api/medical-records/upload-attachments",
           formDataToUpload
         );
@@ -289,7 +289,7 @@ const AfterVisitSummary = ({
     console.log("Final payload:", payload);
 
     try {
-      const res = await axiosInstance.post("api/medical-records", payload);
+      const res = await axiosInstanceHos.post("api/medical-records", payload);
       console.log(res);
       toast.success("After visit summary created successfully");
       setAfterVisitSummary(false);

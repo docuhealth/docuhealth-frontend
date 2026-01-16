@@ -58,6 +58,26 @@ const Hospital_Nurses_Header = () => {
       setStaffList(null); // Reset data so it starts from the checkbox view next time
       setHandoverData(null);
     };
+
+    const handleFinalRequest = (staff_id) => {
+      console.log(handoverData)
+  
+      const {patientManagement: handover_appointments_state, myAppointments : handover_patients_state} = handoverData
+  
+      if(profile.staff_id === staff_id){
+        toast.error('You cannot assign to yourself !')
+        return
+      }
+  
+      const payload = {
+        to_nurse : staff_id,
+        handover_appointments : handover_appointments_state,
+        handover_patients : handover_patients_state
+      }
+  
+      console.log(payload)
+  
+    }
   
 
   return (
@@ -167,6 +187,7 @@ const Hospital_Nurses_Header = () => {
                 staffList={staffList}
                 selected ={selected}
                 setStaffList={setStaffList}
+                handleFinalRequest={handleFinalRequest}
           />
         </div>
       </div>

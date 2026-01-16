@@ -173,7 +173,8 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                 state: patientData.state,
                 country: patientData.country,
                 house_no: patientData.house_no
-            }
+            },
+            verify_url : 'https://docuhealthservices.net/user-create-account-verify-otp'
         }
 
         if (!isValid) {

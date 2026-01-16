@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import toast from "react-hot-toast";
-import axiosInstance from "../../../../../utils/axiosInstance";
+import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 import Pagination from "../../../Patient_Dashboard_Components/Pagination/Pagination";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";

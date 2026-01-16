@@ -13,6 +13,7 @@ const Id_Card = ({
   isIDCreatedSuccessfully,
   setIsIDCreatedSuccessfully,
   selectedProfile,
+  isCreatingID
 }) => {
 
   const fullName = useMemo(() => {
@@ -104,12 +105,28 @@ const Id_Card = ({
                   ></textarea>
                 </div>
 
-                <div
-                  className=" bg-[#3E4095]  text-center text-white rounded-full py-2 cursor-pointer"
-                  onClick={() => handleIDCardCreation(selectedProfile)}
-                >
-                  <p>Generate ID Card</p>
-                </div>
+                <button
+  disabled={isCreatingID}
+  className={`w-full mt-4 flex items-center justify-center gap-2 py-2 rounded-full  transition-all duration-300 shadow-md 
+    ${isCreatingID 
+      ? "bg-gray-400 cursor-not-allowed opacity-70" 
+      : "bg-[#3E4095] hover:bg-[#2e3075] hover:shadow-lg active:scale-[0.98] text-white cursor-pointer"
+    }`}
+  onClick={() => !isCreatingID && handleIDCardCreation(selectedProfile)}
+>
+  {isCreatingID ? (
+    <>
+      {/* Small Spinner */}
+      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <span>Processing...</span>
+    </>
+  ) : (
+    <span>Generate ID Card</span>
+  )}
+</button>
               </div>
             </div>
           </div>
@@ -231,7 +248,7 @@ const Id_Card = ({
                 </div>
                 <div>
                   <p className="text-[#313131] text-[11px] text-center pt-8">
-                    www.docuhealthservices.com
+                    www.docuhealthservices.net
                   </p>
                 </div>
               </div>
@@ -266,10 +283,10 @@ const Id_Card = ({
                   <p className="text-[#313131] text-[10px] font-medium">
                     This card belongs to the registered patient. If found,
                     please return it to the nearest hospital or contact
-                    support@docuhealthServices.com.
+                    support@docuhealthservices.com
                   </p>
                   <p className="text-[#313131] text-[11px] pb-2 pt-6">
-                    www.docuhealthservices.com
+                    www.docuhealthservices.net
                   </p>
                 </div>
               </div>

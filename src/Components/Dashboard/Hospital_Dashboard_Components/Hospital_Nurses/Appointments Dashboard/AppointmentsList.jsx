@@ -3,7 +3,7 @@ import Pagination from '../../../Patient_Dashboard_Components/Pagination/Paginat
 import { NursesAppointmentsListContext } from '../../../../../context/Hospital Context/Nurses/NursesAppointmentsListContext'
 import { formatFullDate, formatTime } from '../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter'
 import toast from 'react-hot-toast'
-import axiosInstance from '../../../../../utils/axiosInstance'
+import axiosInstanceHos from '../../../../../utils/axiosInstanceHos'
 
 const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
 
@@ -123,7 +123,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
   const fetchHealthPersonnel = async () => {
     setFetchingPersonnel(true)
     try {
-      const res = await axiosInstance.get(
+      const res = await axiosInstanceHos.get(
         `api/receptionists/staff/doctor`
       );
       const data = res.data;
@@ -176,7 +176,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
 
     // console.log(appointmentID)
     try {
-      const res = await axiosInstance.patch(`api/nurses/appointments/${appointmentID}/assign`, updatedFormData)
+      const res = await axiosInstanceHos.patch(`api/nurses/appointments/${appointmentID}/assign`, updatedFormData)
       console.log(res)
       toast.success('You have successfully booked a consultation for a patient')
       setIsStaffSelected(false)

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createContext } from "react";
-import axiosInstance from "../../../utils/axiosInstance";
+import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 import { getHospitalToken } from "../../../services/authService";
 
 export const ReceptionistAppContext = createContext();
@@ -16,7 +16,7 @@ const ReceptionistProfileProvider = (props) => {
         if (isUserLoggedIn) {
           const fetchProfile = async () => {
             try {
-              const res = await axiosInstance.get("api/receptionists/dashboard"); // Example endpoint
+              const res = await axiosInstanceHos.get("api/receptionists/dashboard"); // Example endpoint
               setProfile(res.data.receptionist);
             
               // console.log(res.data);
@@ -28,7 +28,7 @@ const ReceptionistProfileProvider = (props) => {
 
           const fetchWards = async (page = 1, pageSize = 10) => {
             try {
-              const res = await axiosInstance.get(
+              const res = await axiosInstanceHos.get(
                 `api/hospitals/wards?page=${page}&size=${pageSize}`
               );
               console.log("wards ", res);

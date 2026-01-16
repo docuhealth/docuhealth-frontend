@@ -141,6 +141,7 @@ const Patient_SubAccount_Dashboard = () => {
       street: subAcctUpgradeData.child_street,
       house_no: subAcctUpgradeData.child_house_number,
       country: subAcctUpgradeData.child_country,
+      verify_url : 'https://docuhealthservices.net/user-create-account-verify-otp'
     };
 
     if (!isValid) {

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import axiosInstanceHos from '../../../../../utils/axiosInstanceHos';
+import toast from 'react-hot-toast'; // or your preferred toast library
 
 const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInputs, handleAddListItem, handleRemoveItem, activeInput, setActiveInput }) => (
     <div className="border rounded-md p-4 mt-3 bg-gray-50/30">
@@ -16,7 +18,7 @@ const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInput
         {activeInput === field ? (
             <div className="flex gap-2">
                 <input
-                    autoFocus // Added autoFocus for better UX
+                    autoFocus
                     type="text"
                     value={inputs[field]}
                     onChange={(e) => setInputs({ ...inputs, [field]: e.target.value })}
@@ -38,9 +40,9 @@ const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInput
     </div>
 );
 
-
-const AddNewCaseNote = ({ setNewCaseNote }) => {
-    // 1. STATE MANAGEMENT
+// Added patientId prop so we know which patient to save the note for
+const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
+    const [loading, setLoading] = useState(false);
     const [caseNoteData, setCaseNoteData] = useState({
         observations: [],
         nursingCare: [],
@@ -49,7 +51,6 @@ const AddNewCaseNote = ({ setNewCaseNote }) => {
         followUp: []
     });
 
-    // Temporary states for the input fields
     const [inputs, setInputs] = useState({
         observations: "",
         nursingCare: "",
@@ -58,18 +59,14 @@ const AddNewCaseNote = ({ setNewCaseNote }) => {
         followUp: ""
     });
 
-    // Visibility states for inputs
     const [activeInput, setActiveInput] = useState(null);
 
-    // 2. HANDLERS
     const handleAddListItem = (field) => {
         if (!inputs[field].trim()) return;
-
         setCaseNoteData(prev => ({
             ...prev,
             [field]: [...prev[field], inputs[field]]
         }));
-
         setInputs(prev => ({ ...prev, [field]: "" }));
         setActiveInput(null);
     };
@@ -81,36 +78,54 @@ const AddNewCaseNote = ({ setNewCaseNote }) => {
         }));
     };
 
-    // 3. PAYLOAD GENERATION
-    const handleSubmit = () => {
-        const payload = {
-            patient_condition_observations: caseNoteData.observations,
-            nursing_care_given: caseNoteData.nursingCare,
-            patient_response_to_care: caseNoteData.patientResponse,
-            abnormalities_concerns: caseNoteData.concerns,
-            plan_follow_up_actions: caseNoteData.followUp,
-            created_at: new Date().toISOString(),
+    const handleSubmit = async () => {
+       
+        const fullPayload = {
+            patient: selected?.patient?.hin,
+            observation: caseNoteData.observations,
+            care: caseNoteData.nursingCare,
+            response: caseNoteData.patientResponse,
+            abnormalities: caseNoteData.concerns,
+            follow_up: caseNoteData.followUp
         };
 
-        console.log("Final Payload:", payload);
+        const filteredPayload = Object.fromEntries(
+            Object.entries(fullPayload).filter(([_, value]) => {
+                if (Array.isArray(value)) return value.length > 0; // Keep non-empty arrays
+                return value !== null && value !== undefined;    // Keep the patient ID
+            })
+        );
 
-        setCaseNoteData({
-            observations: [],
-            nursingCare: [],
-            patientResponse: [],
-            concerns: [],
-            followUp: []
-        })
-        setNewCaseNote(false)
-        // axiosInstance.post('/api/case-notes', payload)...
+        if (Object.keys(filteredPayload).length <= 1) {
+            toast.error("Please add at least one entry before uploading.");
+            return;
+        }
+    
+        // console.log("Sending filtered payload:", filteredPayload);
+
+        setLoading(true);
+        try {
+            console.log(payload)
+            // End-point from your image: /api/nurses/case-notes
+            await axiosInstanceHos.post('/api/nurses/case-notes', filteredPayload);
+            
+            toast.success("Case note uploaded successfully!");
+            
+            // 3. RESET & CLOSE
+            setCaseNoteData({
+                observations: [], nursingCare: [], patientResponse: [], concerns: [], followUp: []
+            });
+            setNewCaseNote(false);
+        } catch (error) {
+            console.error("Upload error:", error);
+            toast.error(error.response?.data?.message || "Failed to upload case note");
+        } finally {
+            setLoading(false);
+        }
     };
-
-
-
 
     return (
         <div className="bg-white my-5 border rounded-2xl pt-8 px-6 pb-8 text-sm ">
-            {/* Header */}
             <div className='flex items-center justify-between border-b pb-3'>
                 <div className='flex items-center gap-2 cursor-pointer' onClick={() => setNewCaseNote(false)}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4.56528 6.41685H11.6654V7.58352H4.56528L7.69426 10.7125L6.86932 11.5374L2.33203 7.00019L6.86932 2.46289L7.69426 3.28785L4.56528 6.41685Z" fill="#1B2B40" /></svg>
@@ -119,55 +134,24 @@ const AddNewCaseNote = ({ setNewCaseNote }) => {
             </div>
 
             <div className='my-5 space-y-4'>
-                <NoteSection title="1. Patient’s Condition & Observations" field="observations" placeholder="e.g. Patient is stable but reports mild headache" caseNoteData={caseNoteData}
-                    inputs={inputs}
-                    setInputs={setInputs}
-                    handleAddListItem={handleAddListItem}
-                    handleRemoveItem={handleRemoveItem}
-                    activeInput={activeInput}
-                    setActiveInput={setActiveInput} />
-                <NoteSection title="2. Nursing Care Given" field="nursingCare" placeholder="e.g. Administered prescribed painkillers" caseNoteData={caseNoteData}
-                    inputs={inputs}
-                    setInputs={setInputs}
-                    handleAddListItem={handleAddListItem}
-                    handleRemoveItem={handleRemoveItem}
-                    activeInput={activeInput}
-                    setActiveInput={setActiveInput} />
-                <NoteSection title="3. Patient’s Response to Care" field="patientResponse" placeholder="e.g. Pain level reduced from 7 to 3" caseNoteData={caseNoteData}
-                    inputs={inputs}
-                    setInputs={setInputs}
-                    handleAddListItem={handleAddListItem}
-                    handleRemoveItem={handleRemoveItem}
-                    activeInput={activeInput}
-                    setActiveInput={setActiveInput} />
-                <NoteSection title="4. Abnormalities / Concerns" field="concerns" placeholder="e.g. Slight swelling noted on left ankle" caseNoteData={caseNoteData}
-                    inputs={inputs}
-                    setInputs={setInputs}
-                    handleAddListItem={handleAddListItem}
-                    handleRemoveItem={handleRemoveItem}
-                    activeInput={activeInput}
-                    setActiveInput={setActiveInput} />
-                <NoteSection title="5. Plan / Follow-up Actions" field="followUp" placeholder="e.g. Monitor BP every 4 hours" caseNoteData={caseNoteData}
-                    inputs={inputs}
-                    setInputs={setInputs}
-                    handleAddListItem={handleAddListItem}
-                    handleRemoveItem={handleRemoveItem}
-                    activeInput={activeInput}
-                    setActiveInput={setActiveInput} />
-            </div>
-            <div className='flex justify-end'>
-            <button
-                onClick={handleSubmit}
-                className="w-full lg:w-auto bg-[#3E4095] text-white py-2.5 px-20 rounded-full  mt-5 text-sm "
-            >
-                Upload Case Note
-            </button>
+                <NoteSection title="1. Patient’s Condition & Observations" field="observations" placeholder="e.g. Patient is stable but reports mild headache" caseNoteData={caseNoteData} inputs={inputs} setInputs={setInputs} handleAddListItem={handleAddListItem} handleRemoveItem={handleRemoveItem} activeInput={activeInput} setActiveInput={setActiveInput} />
+                <NoteSection title="2. Nursing Care Given" field="nursingCare" placeholder="e.g. Administered prescribed painkillers" caseNoteData={caseNoteData} inputs={inputs} setInputs={setInputs} handleAddListItem={handleAddListItem} handleRemoveItem={handleRemoveItem} activeInput={activeInput} setActiveInput={setActiveInput} />
+                <NoteSection title="3. Patient’s Response to Care" field="patientResponse" placeholder="e.g. Pain level reduced from 7 to 3" caseNoteData={caseNoteData} inputs={inputs} setInputs={setInputs} handleAddListItem={handleAddListItem} handleRemoveItem={handleRemoveItem} activeInput={activeInput} setActiveInput={setActiveInput} />
+                <NoteSection title="4. Abnormalities / Concerns" field="concerns" placeholder="e.g. Slight swelling noted on left ankle" caseNoteData={caseNoteData} inputs={inputs} setInputs={setInputs} handleAddListItem={handleAddListItem} handleRemoveItem={handleRemoveItem} activeInput={activeInput} setActiveInput={setActiveInput} />
+                <NoteSection title="5. Plan / Follow-up Actions" field="followUp" placeholder="e.g. Monitor BP every 4 hours" caseNoteData={caseNoteData} inputs={inputs} setInputs={setInputs} handleAddListItem={handleAddListItem} handleRemoveItem={handleRemoveItem} activeInput={activeInput} setActiveInput={setActiveInput} />
             </div>
 
-           
+            <div className='flex justify-end'>
+                <button
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    className={`w-full lg:w-auto bg-[#3E4095] text-white py-2.5 px-20 rounded-full mt-5 text-sm cursor-pointer transition-opacity ${loading ? 'opacity-50' : 'opacity-100'}`}
+                >
+                    {loading ? "Uploading..." : "Upload Case Note"}
+                </button>
+            </div>
         </div>
     );
 }
 
 export default AddNewCaseNote;
-

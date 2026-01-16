@@ -1,5 +1,5 @@
 import React, { useEffect, useState, createContext } from "react";
-import axiosInstance from "../../../utils/axiosInstance";
+import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 import { getHospitalToken } from "../../../services/authService";
 
 
@@ -20,7 +20,7 @@ const DoctorsHealthPersonnelProvider = (props) => {
         setLoading(true)
 
         try {
-            const res = await axiosInstance.get(
+            const res = await axiosInstanceHos.get(
                 `api/hospitals/team-members?page=${page}&size=${pageSize}`
             );
 

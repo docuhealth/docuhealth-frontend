@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import logo from "../assets/img/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import AdminHead from "./Admin Part/AdminHead";
-import TabComponents from "../Hospital Dashboard/Tabs/TabComponent";
+// import TabComponents from "../Hospital Dashboard/Tabs/TabComponent";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import toast from 'react-hot-toast';
 import DynamicDate from "../Components/Dynamic Date/DynamicDate";

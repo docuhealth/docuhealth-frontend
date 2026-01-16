@@ -44,8 +44,7 @@ export async function login(userData) {
     withCredentials: true,
   });
   const data = response.data;
-  // console.log(data)
-  // console.log(data.data.role)
+
 
   return data;
 }
@@ -79,6 +78,38 @@ export async function refreshToken() {
     // rethrow so the caller can handle it
     throw error;
   }
+}
+
+export async function refreshHospitalToken() {
+  const savedToken = getHospitalToken();
+  
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}api/auth/refresh`,
+      null,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: savedToken ? `Bearer ${savedToken}` : undefined,
+        },
+      }
+    );
+    const data = response.data?.data;
+    if (data?.access_token) {
+      setHospitalToken(data.access_token, data.role);
+    }
+    return data;
+  } catch (error) {
+    console.error("Refresh token failed:", error.response?.data || error.message);
+
+    // optional: clear token if refresh fails
+    setHospitalToken(null);
+
+    // rethrow so the caller can handle it
+    throw error;
+  }
+
+
 }
 
 

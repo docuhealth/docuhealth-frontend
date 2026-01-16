@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import axiosInstance from '../../../../../../utils/axiosInstance'
+import axiosInstanceHos from '../../../../../../utils/axiosInstanceHos'
 import toast from 'react-hot-toast'
 import { NursesAppContext } from '../../../../../../context/Hospital Context/Nurses/NursesAppContext'
 
@@ -47,7 +47,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
 
 
         try {
-            const res = await axiosInstance.post(
+            const res = await axiosInstanceHos.post(
                 "api/nurses/vital-signs/update",
                 payload
             );

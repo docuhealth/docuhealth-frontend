@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DoctorAppContext } from "../../../../../../context/Hospital Context/Doctors/DoctorAppContext";
-import axiosInstance from "../../../../../../utils/axiosInstance";
+import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import { toast } from "react-hot-toast";
 
 const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
@@ -44,7 +44,7 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const res = await axiosInstance.post("api/doctors/admissions/request", form);
+      const res = await axiosInstanceHos.post("api/doctors/admissions/request", form);
 
       console.log(res)
       toast.success("Admission request successful");

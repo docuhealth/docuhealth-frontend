@@ -1,5 +1,5 @@
 import React, { useEffect, useState, createContext } from "react";
-import axiosInstance from "../../../utils/axiosInstance";
+import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 import { getHospitalToken } from "../../../services/authService";
 import toast from 'react-hot-toast'
 
@@ -22,7 +22,7 @@ const NursesAppointmentsListProvider = (props) => {
         setLoading(true)
 
         try {
-            const res = await axiosInstance.get(
+            const res = await axiosInstanceHos.get(
                 `api/nurses/appointments?page=${page}&size=${pageSize}`
             );
             console.log(res.data)

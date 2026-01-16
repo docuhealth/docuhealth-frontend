@@ -4,7 +4,7 @@ import formatRecordDate from '../../../../Patient_Dashboard_Components/Home Dash
 import { formatFullDateTime } from '../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate'
 import Pagination from '../../../../Patient_Dashboard_Components/Pagination/Pagination'
 import toast from 'react-hot-toast'
-import axiosInstance from '../../../../../../utils/axiosInstance'
+import axiosInstanceHos from '../../../../../../utils/axiosInstanceHos'
 
 const AdmissionRequests = ({ setAdmissionRequest }) => {
     const [admissionRequests, setAdmissionRequests] = useState([])
@@ -22,7 +22,7 @@ const AdmissionRequests = ({ setAdmissionRequest }) => {
         setLoading(true)
 
         try {
-            const res = await axiosInstance.get(
+            const res = await axiosInstanceHos.get(
                 `api/nurses/admissions/requests?page=${page}&size=${pageSize}`
             );
 
@@ -139,7 +139,7 @@ const AdmissionRequests = ({ setAdmissionRequest }) => {
         setLoadingAdmission(true)
 
         try {
-            const res = await axiosInstance.patch(
+            const res = await axiosInstanceHos.patch(
                 `api/hospitals/admissions/${admissionRequestID}/confirm`
             );
             toast.success('Patient admitted successfully');

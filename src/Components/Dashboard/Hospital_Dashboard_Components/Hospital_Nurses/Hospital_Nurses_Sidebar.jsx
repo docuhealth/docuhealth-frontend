@@ -3,6 +3,8 @@ import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import LogOutModal from "./LogOut/components/LogOutModal";
 import { fetchStaff } from "../../../../queries/Hospital/fetchStaff";
+import { NursesAppContext } from "../../../../context/Hospital Context/Nurses/NursesAppContext";
+import toast from 'react-hot-toast'
 
 
 const Hospital_Nurses_Sidebar = () => {
@@ -14,9 +16,14 @@ const Hospital_Nurses_Sidebar = () => {
   const [staffList, setStaffList] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
 
+  const [isFinalizing, setIsFinalizing] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
+
+  const {profile} = useContext(NursesAppContext);
+
 
 
 
@@ -50,6 +57,42 @@ const Hospital_Nurses_Sidebar = () => {
     setStaffList(null); // Reset data so it starts from the checkbox view next time
     setHandoverData(null);
   };
+
+  const handleFinalRequest = (staff_id) => {
+    console.log(handoverData)
+
+    const {patientManagement: handover_appointments_state, myAppointments : handover_patients_state} = handoverData
+
+    if(profile.staff_id === staff_id){
+      toast.error('You cannot assign to yourself !')
+      return
+    }
+
+    const payload = {
+      to_nurse : staff_id,
+      handover_appointments : handover_appointments_state,
+      handover_patients : handover_patients_state
+    }
+
+    setIsFinalizing(true);
+
+    try {
+      // Replace with your actual axios call
+      // await axiosInstanceHos.post('/api/nurses/handover', payload);
+      
+      toast.success('Handover successful. Logging out...');
+      
+      // Clear session and navigate
+      sessionStorage.clear();
+      navigate("/login");
+    } catch (error) {
+      console.error("Handover failed:", error);
+      toast.error(error.response?.data?.message || "Handover failed. Please try again.");
+    } finally {
+      setIsFinalizing(false);
+    }
+
+  }
 
 
 
@@ -289,12 +332,13 @@ const Hospital_Nurses_Sidebar = () => {
 
           <LogOutModal
            isOpen={isModalOpen}
-           isFetching={isFetching}
+           isFetching={isFetching || isFinalizing}
            onClose={handleCloseModal}
            onLogout={handleLogoutLogic}
            staffList={staffList}
            selected ={selected}
            setStaffList={setStaffList}
+           handleFinalRequest = {handleFinalRequest}
           />
         </ul>
       </nav>

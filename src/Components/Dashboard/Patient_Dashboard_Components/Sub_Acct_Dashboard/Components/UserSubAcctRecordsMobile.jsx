@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { IdCardContext } from "../../../../../context/Patient Context/IdCardContext";
-import toast from "react-hot-toast";
+import { MoreVertical, User, Calendar, History, TrendingUp, CreditCard } from "lucide-react";
 import Id_Card from "../../Home Dashboard/Components/Id Card/Id_Card";
 
 const UserSubAcctRecordsMobile = ({
@@ -12,7 +12,8 @@ const UserSubAcctRecordsMobile = ({
   setSelectedSubAcct
 }) => {
   const [openPopover, setOpenPopover] = useState(null);
-  const paymentStatus = true; // example placeholder
+
+  console.log(subAccounts)
 
   const {
     onboardIDCard,
@@ -31,114 +32,149 @@ const UserSubAcctRecordsMobile = ({
     setOpenPopover(openPopover === index ? null : index);
   };
 
-  const fetchMedicalHistory = (hin) => {
-    console.log("Fetching history for", hin);
-  };
-
-  const handleOpenForm = (name, hin, dob) => {
-    console.log("Generating ID Card for:", { name, hin, dob });
-  };
+  // console.log(subAccounts)
 
   if (isPending) {
-    return <p className="text-center pb-10 text-sm">Loading sub-accounts...</p>;
-  }
-  if (!subAccounts || subAccounts.length === 0) {
     return (
-      <p className="text-center py-6 text-gray-500 text-sm">
-        No Sub-Accounts found
-      </p>
+      <div className="flex justify-center py-10">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3E4095]"></div>
+      </div>
     );
   }
+
+  if (!subAccounts || subAccounts.length === 0) {
+    return (
+      <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+        <p className="text-gray-500 text-sm">No Sub-Accounts found</p>
+      </div>
+    );
+  }
+
+  
+
   return (
     <>
       <div className="space-y-4">
         {subAccounts.map((subaccount, index) => (
-          <div key={index} className=" relative border border-gray-300 p-5 rounded-md">
-            <div className="flex justify-between items-center py-2 border-b border-b-gray-200">
-              <p>
-                HIN:{" "}
-                {subaccount.hin.slice(0, 4) +
-                  "*".repeat(subaccount.hin.length - 5)}
-              </p>
-              <div
-                onClick={() => togglePopover(index)}
-                className={`h-8 w-8 flex justify-center items-center rounded-full cursor-pointer
-            ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
-          `}
-              >
-                <i className="bx bx-dots-vertical-rounded text-sm"></i>
+          <div key={index} className="bg-white border border-gray-200 rounded-lg  overflow-visible">
+            {/* Header: Name and Action */}
+            <div className="flex justify-between items-start p-4 pb-0">
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#3E4095] font-bold shadow-sm">
+                  {subaccount.firstname?.[0]}{subaccount.lastname?.[0]}
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-[15px]">
+                    {subaccount.firstname} {subaccount.lastname}
+                  </h3>
+                  <p className="text-[11px] font-mono text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded mt-1 inline-block">
+                    HIN: {subaccount.hin.slice(0, 4)}••••
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative">
+                <button
+                  onClick={() => togglePopover(index)}
+                  className={`p-2 rounded-full transition-colors ${
+                    openPopover === index ? "bg-gray-100 text-[#3E4095]" : "text-gray-400 hover:bg-gray-50"
+                  }`}
+                >
+                  <MoreVertical className="w-5 h-5" />
+                </button>
 
                 {openPopover === index && (
-                  <div className="absolute  right-4 mt-40 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
-                    <Link to="">
-                      <p
-                        className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
-                        onClick={(index) => {
-                          togglePopover(index);
-                          setViewDetailMedicalRecord(true)
-                          setSelectedSubAcct(subaccount)
+                  <>
+                    {/* Backdrop to close popover */}
+                    <div className="fixed inset-0 z-20" onClick={() => setOpenPopover(null)}></div>
+                    <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-lg p-1.5 w-56 z-30 animate-in fade-in zoom-in duration-150">
+                      <button
+                        className="w-full flex items-center gap-3 text-[12px] text-gray-700 hover:bg-indigo-50 hover:text-[#3E4095] p-2.5 rounded-lg transition-colors"
+                        onClick={() => {
+                          setOpenPopover(null);
+                          setViewDetailMedicalRecord(true);
+                          setSelectedSubAcct(subaccount);
                         }}
                       >
+                        {/* <History className="w-4 h-4" />  */}
                         Check Medical History
-                      </p>
-                    </Link>
+                      </button>
 
-                    <Link
-                      to=""
-                      onClick={() => {
-                        // example: show upgrade modal
-                        togglePopover();
-                        setDisplaySubAcctModal(true);
-                      }}
-                    >
-                      <p className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
-                        Upgrade Sub Account
-                      </p>
-                    </Link>
+                      <button
+                        className="w-full flex items-center gap-3 text-[12px] text-gray-700 hover:bg-indigo-50 hover:text-[#3E4095] p-2.5 rounded-lg transition-colors"
+                        onClick={() => {
+                          setOpenPopover(null);
+                          setDisplaySubAcctModal(true);
+                        }}
+                      >
+                        {/* <TrendingUp className="w-4 h-4" />  */}
+                        Upgrade Account
+                      </button>
 
-                    <p
-                      className={`text-[12px] p-2 rounded-sm cursor-pointer ${isCreatingID ? "text-gray-400" : "text-gray-700 hover:bg-gray-200"
+                      <button
+                        disabled={isCreatingID}
+                        className={`w-full flex items-center gap-3 text-[12px] p-2.5 rounded-lg transition-colors ${
+                          isCreatingID ? "text-gray-300" : "text-gray-700 hover:bg-indigo-50 hover:text-[#3E4095]"
                         }`}
-                      onClick={() => {
-                        if (isCreatingID) return; // Prevent double clicks
-                        togglePopover();
-                        handleSelection(subaccount);
-                      }}
-                    >
-                      {isCreatingID ? "Processing..." : "Generate ID Card"}
-                    </p>
-                  </div>
+                        onClick={() => {
+                          if (isCreatingID) return;
+                          setOpenPopover(null);
+                          handleSelection(subaccount);
+                        }}
+                      >
+                        {/* <CreditCard className="w-4 h-4" /> */}
+                        {isCreatingID ? "Processing..." : "Generate ID Card"}
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
-            <div className="grid grid-cols-2 py-4 gap-4">
-              <div className="flex flex-col gap-2">
-                <p className="text-gray-400 text-[13px]">Name</p>
-                <p> {subaccount.firstname} {subaccount.lastname}</p>
+
+            {/* Info Grid */}
+            <div className="p-4 pt-6 grid grid-cols-2 gap-y-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5 text-gray-400 text-[11px] font-bold uppercase tracking-wider">
+                  <Calendar className="w-3 h-3" /> Date of Birth
+                </div>
+                <p className="text-[13px] font-semibold text-gray-700">{subaccount.dob || "—"}</p>
               </div>
-              <div className="flex justify-center items-center flex-col gap-2 border-l border-l-gray-300 px-4">
-                <p className="text-gray-400 text-[13px]">Date of birth</p>
-                <p> {subaccount.dob}</p>
+
+              <div className="space-y-1 pl-4 border-l border-gray-100">
+                <div className="flex items-center gap-1.5 text-gray-400 text-[11px] font-bold uppercase tracking-wider">
+                  <User className="w-3 h-3" /> Sex
+                </div>
+                <p className="text-[13px] font-semibold text-gray-700 capitalize">{subaccount.gender || "—"}</p>
               </div>
-              <div className="flex flex-col gap-2">
-                <p className="text-gray-400 text-[13px]">Sex</p>
-                <p>{subaccount.gender}</p>
+
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5 text-gray-400 text-[11px] font-bold uppercase tracking-wider">
+                   Created
+                </div>
+                <p className="text-[13px] font-semibold text-gray-700">12 Oct, 2025</p>
               </div>
-              <div className="flex flex-col gap-2 border-l border-l-gray-300 justify-center items-center">
-                <p className="text-gray-400 text-[13px]">Date created</p>
-                <p>12/10/2025</p>
+
+              <div className="space-y-1 pl-4 border-l border-gray-100 flex flex-col justify-center">
+                <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-bold w-fit">
+                   Active
+                </span>
               </div>
             </div>
           </div>
-        ))}{" "}
+        ))}
       </div>
-      <Id_Card onboardIDCard={onboardIDCard} setOnboardIDCard={setOnboardIDCard}
+
+      <Id_Card 
+        onboardIDCard={onboardIDCard} 
+        setOnboardIDCard={setOnboardIDCard}
         idCardData={idCardData}
+        isCreatingID ={isCreatingID}
         handleChange={handleChange}
         handleIDCardCreation={handleIDCardCreation}
         isIDCreatedSuccessfully={isIDCreatedSuccessfully}
         setIsIDCreatedSuccessfully={setIsIDCreatedSuccessfully}
-        selectedProfile={selectedProfile} />
+        selectedProfile={selectedProfile} 
+      />
     </>
   );
 };

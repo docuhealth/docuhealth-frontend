@@ -4,7 +4,7 @@ import formatRecordDate from '../../../../Patient_Dashboard_Components/Home Dash
 import { formatFullDateTime } from '../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate'
 import Pagination from '../../../../Patient_Dashboard_Components/Pagination/Pagination'
 import toast from 'react-hot-toast'
-import axiosInstance from '../../../../../../utils/axiosInstance'
+import axiosInstanceHos from '../../../../../../utils/axiosInstanceHos'
 
 const Vitals = ({ setVitals, setSelectedPatient }) => {
 
@@ -22,7 +22,7 @@ const Vitals = ({ setVitals, setSelectedPatient }) => {
         setLoading(true)
 
         try {
-            const res = await axiosInstance.get(
+            const res = await axiosInstanceHos.get(
                 `api/nurses/vital-signs/requests?page=${page}&size=${pageSize}`
             );
 

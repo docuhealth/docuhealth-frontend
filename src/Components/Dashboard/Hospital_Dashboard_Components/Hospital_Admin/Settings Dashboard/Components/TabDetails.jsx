@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
-import axiosInstance from '../../../../../../utils/axiosInstance'
+import axiosInstanceHos from '../../../../../../utils/axiosInstanceHos'
 import toast from 'react-hot-toast'
 
 
@@ -110,7 +110,7 @@ const AccountSettingsTab = () => {
         // setLoading(true);
 
         // try {
-        //   const res = await axiosInstance.patch("api/patients/update", payload);
+        //   const res = await axiosInstanceHos.patch("api/patients/update", payload);
         //   toast.success("Account details updated successfully!");
         // } catch (error) {
         //   console.error("Error updating account:", error);

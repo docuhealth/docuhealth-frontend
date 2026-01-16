@@ -77,7 +77,7 @@ const UserSubAcctList = ({ setDisplaySubAcctModal }) => {
           </>
         )
       ) : (
-        <div className="hidden sm:block pt-8 px-6 border rounded-lg bg-white my-5 ">
+        <div className="hidden lg:block pt-8 px-6 border rounded-lg bg-white my-5 ">
           <h1 className=" mb-4 font-medium">Sub-Accounts</h1>
           <div>
             <UserSubAcctRecords

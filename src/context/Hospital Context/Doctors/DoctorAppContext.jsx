@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createContext } from "react";
-import axiosInstance from "../../../utils/axiosInstance";
+import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 import { getHospitalToken } from "../../../services/authService";
 
 export const DoctorAppContext = createContext();
@@ -15,7 +15,7 @@ const DoctorProfileProvider = (props) => {
     if (isUserLoggedIn) {
       const fetchProfile = async () => {
         try {
-          const res = await axiosInstance.get("api/doctors/dashboard");
+          const res = await axiosInstanceHos.get("api/doctors/dashboard");
           setProfile(res.data.doctor);
         } catch (err) {
           console.error("Error fetching profile:", err);
@@ -25,7 +25,7 @@ const DoctorProfileProvider = (props) => {
 
       const fetchDocuHealthHospitals = async (page = 1, pageSize = 100) => {
         try {
-          const res = await axiosInstance.get(
+          const res = await axiosInstanceHos.get(
             `api/hospitals/hospitals?page=${page}&size=${pageSize}`
           );
           console.log("docuhealth hospitals ", res);
@@ -38,7 +38,7 @@ const DoctorProfileProvider = (props) => {
 
       const fetchWards = async (page = 1, pageSize = 10) => {
         try {
-          const res = await axiosInstance.get(
+          const res = await axiosInstanceHos.get(
             `api/hospitals/wards?page=${page}&size=${pageSize}`
           );
           console.log("wards ", res);

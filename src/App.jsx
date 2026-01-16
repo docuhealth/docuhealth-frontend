@@ -36,6 +36,11 @@ import User_Forget_Password from "./Auth/User/User_Forget_Password";
 import User_Verify_OTP from "./Auth/User/User_Verify_OTP";
 import User_Create_New_Password from "./Auth/User/User_Create_New_Password";
 
+import Partner_Create_Account from "./Auth/Partner/Partner_Create_Account";
+import Partner_Sign_In from "./Auth/Partner/Partner_Sign_In";
+
+import Partner_Home_Dashboard from "./Dashboard/Partner_Dashboard/Partner_Home_Dashboard";
+
 
 import Admin_Sign_In from "./Auth/Admin/Admin_Sign_In";
 import Admin_Create_Account from "./Auth/Admin/Admin_Create_Account";
@@ -807,6 +812,11 @@ function App() {
                 }
               />
             </Route>
+
+            <Route path="/partner-create-account" element={<Partner_Create_Account />} />
+            <Route path="/partner-login" element={<Partner_Sign_In />} />
+
+            <Route path="/partner-dashboard" element={<Partner_Home_Dashboard />} />
 
 
             <Route path="/verify-nin" element={<Verify_NIN />} />
