@@ -123,7 +123,7 @@ const Partner_Create_Account = () => {
             // console.log(payload)
     
             console.log(response);
-            toast.success("Pharmacy Registration successful!");
+            toast.success("Partner Registration successful!");
 
             setTimeout(() => {
                 navigate("/partner-login");
