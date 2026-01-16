@@ -52,7 +52,7 @@ import Admin_Create_New_Password from "./Auth/Admin/Admin_Create_New_Password";
 import ProtectedRoute from "./Auth/ProtectedRoute/ProtectedRoute";
 import HospitalProtectedRoute from "./Auth/ProtectedRoute/HospitalProtectedRoute";
 
-import Admin_Dashboard_Layout from "./Layouts/Admin_Dashboard_Layout/Admin_dashboard_Layout";
+import Admin_Dashboard_Layout from "./Layouts/Admin_Dashboard_Layout/Admin_Dashboard_Layout";
 import Admin_Home_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Home_Dashboard";
 import Admin_Users_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Users_Dashboard";
 import Admin_Settings_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Settings_Dashboard";
