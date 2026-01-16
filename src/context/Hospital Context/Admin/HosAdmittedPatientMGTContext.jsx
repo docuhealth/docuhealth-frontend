@@ -13,7 +13,7 @@ const HosAdmittedPatientMGTProvider = (props) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [tab, setTab] = useState('active')
-    const pageSize = 6; // Example page size
+    const pageSize = 6; 
 
     const isUserLoggedIn = !!getHospitalToken();
 
