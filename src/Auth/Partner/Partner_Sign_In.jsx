@@ -79,9 +79,9 @@ const Partner_Sign_In = () => {
 
               toast.success("Login successful");
 
-              // setTimeout(() => {
-              //   window.location.href = "/partner-dashboard";
-              // }, 1000);
+              setTimeout(() => {
+                window.location.href = "/partner-dashboard";
+              }, 1000);
 
             }catch(error){
                 console.log(error);

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaEye, FaEyeSlash, FaSignOutAlt, FaSyncAlt, FaLock } from 'react-icons/fa';
 import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 
@@ -7,9 +8,12 @@ const Partner_Home_Dashboard = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [password, setPassword] = useState("");
 
+    const navigate = useNavigate()
+
     // Mock data - replace with actual state/props
-    const clientCode = "DOCU-PART-9920";
-    const clientSecret = "sk_live_51Npxxxxxxxxxxxxxxxx";
+    const clientCode = "DEMO-DOCU-PART-9920";
+    const clientSecret = "demo_sk_live_51Npxxxxxxxxxxxxxxxx";
+
 
     const handleRotateKeys = (e) => {
         e.preventDefault();
@@ -20,8 +24,10 @@ const Partner_Home_Dashboard = () => {
     };
 
     const handleLogout = () => {
-        // Logic to clear session
-        console.log("Logging out...");
+        // // Logic to clear session
+        // console.log("Logging out...");
+        sessionStorage.clear();   // removes ALL session-based auth data
+        navigate("/partner-login"); 
     };
 
     return (

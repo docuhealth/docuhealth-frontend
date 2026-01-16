@@ -49,6 +49,7 @@ import Admin_Create_New_Password from "./Auth/Admin/Admin_Create_New_Password";
 
 
 import ProtectedRoute from "./Auth/ProtectedRoute/ProtectedRoute";
+import PartnerProtectedRoute from "./Auth/ProtectedRoute/PartnerProtectedRoute";
 import HospitalProtectedRoute from "./Auth/ProtectedRoute/HospitalProtectedRoute";
 
 import Admin_Dashboard_Layout from "./Layouts/Admin_Dashboard_Layout/Admin_Dashboard_Layout";
@@ -166,20 +167,20 @@ function App() {
           <Route
             path="/hospital-admin-home-dashboard"
             element={
-   
+
               <HospitalAdminProviders>
                 <Hospital_Admin_Layout />
               </HospitalAdminProviders>
-           
+
             }
           >
             <Route
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalAdminProviders>
-                  <Hospital_Admin_Home_Dashboard />
-                </HospitalAdminProviders>
+                  <HospitalAdminProviders>
+                    <Hospital_Admin_Home_Dashboard />
+                  </HospitalAdminProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -187,20 +188,20 @@ function App() {
           <Route
             path="/hospital-admin-staff-dashboard"
             element={
-        
+
               <HospitalAdminProviders>
                 <Hospital_Admin_Layout />
               </HospitalAdminProviders>
-    
+
             }
           >
             <Route
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalAdminProviders>
-                  <Hospital_Admin_Staff_Dashboard />
-                </HospitalAdminProviders>
+                  <HospitalAdminProviders>
+                    <Hospital_Admin_Staff_Dashboard />
+                  </HospitalAdminProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -212,79 +213,79 @@ function App() {
               <HospitalAdminProviders>
                 <Hospital_Admin_Layout />
               </HospitalAdminProviders>
-      
+
             }
           >
             <Route
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalAdminProviders>
-                  <Hospital_Admin_Patients_Dashboard />
-                </HospitalAdminProviders>
-              </HospitalProtectedRoute>
+                  <HospitalAdminProviders>
+                    <Hospital_Admin_Patients_Dashboard />
+                  </HospitalAdminProviders>
+                </HospitalProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-admin-messages-dashboard"
             element={
-       
+
               <HospitalAdminProviders>
                 <Hospital_Admin_Layout />
               </HospitalAdminProviders>
-       
+
             }
           >
             <Route
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalAdminProviders>
-                  <Hospital_Admin_Messages_Dashboard />
-                </HospitalAdminProviders>
-         </HospitalProtectedRoute>
+                  <HospitalAdminProviders>
+                    <Hospital_Admin_Messages_Dashboard />
+                  </HospitalAdminProviders>
+                </HospitalProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-admin-appointments-dashboard"
             element={
-     
+
               <HospitalAdminProviders>
                 <Hospital_Admin_Layout />
               </HospitalAdminProviders>
-       
+
             }
           >
             <Route
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalAdminProviders>
-                  <Hospital_Admin_Appointments_Dashboard />
-                </HospitalAdminProviders>
-              </HospitalProtectedRoute>
+                  <HospitalAdminProviders>
+                    <Hospital_Admin_Appointments_Dashboard />
+                  </HospitalAdminProviders>
+                </HospitalProtectedRoute>
               }
             />
           </Route>
           <Route
             path="/hospital-admin-wallet-dashboard"
             element={
-    
+
               <HospitalAdminProviders>
                 <Hospital_Admin_Layout />
               </HospitalAdminProviders>
-   
+
             }
           >
             <Route
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalAdminProviders>
-                  <Hospital_Admin_Wallet_Dashboard />
-                </HospitalAdminProviders>
+                  <HospitalAdminProviders>
+                    <Hospital_Admin_Wallet_Dashboard />
+                  </HospitalAdminProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -296,17 +297,17 @@ function App() {
               <HospitalAdminProviders>
                 <Hospital_Admin_Layout />
               </HospitalAdminProviders>
- 
+
             }
           >
             <Route
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalAdminProviders>
-                  <Hospital_Admin_Settings_Dashboard />
-                </HospitalAdminProviders>
-             </HospitalProtectedRoute>
+                  <HospitalAdminProviders>
+                    <Hospital_Admin_Settings_Dashboard />
+                  </HospitalAdminProviders>
+                </HospitalProtectedRoute>
               }
             />
           </Route>
@@ -322,9 +323,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalAdminProviders>
-                  <Hospital_Admin_Subscriptions_Dashboard />
-                </HospitalAdminProviders>
+                  <HospitalAdminProviders>
+                    <Hospital_Admin_Subscriptions_Dashboard />
+                  </HospitalAdminProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -343,9 +344,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalDoctorProviders>
-                  <Hospital_Doctors_Home_Dashboard />
-                </HospitalDoctorProviders>
+                  <HospitalDoctorProviders>
+                    <Hospital_Doctors_Home_Dashboard />
+                  </HospitalDoctorProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -362,9 +363,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalDoctorProviders>
-                  <Hospital_Doctors_Appointments_Dashboard />
-                </HospitalDoctorProviders>
+                  <HospitalDoctorProviders>
+                    <Hospital_Doctors_Appointments_Dashboard />
+                  </HospitalDoctorProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -381,9 +382,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalDoctorProviders>
-                  <Hospital_Doctors_Patients_Dashboard />
-                </HospitalDoctorProviders>
+                  <HospitalDoctorProviders>
+                    <Hospital_Doctors_Patients_Dashboard />
+                  </HospitalDoctorProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -399,9 +400,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalDoctorProviders>
-                  <Hospital_Doctors_Messages_Dashboard />
-                </HospitalDoctorProviders>
+                  <HospitalDoctorProviders>
+                    <Hospital_Doctors_Messages_Dashboard />
+                  </HospitalDoctorProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -418,9 +419,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalDoctorProviders>
-                  <Hospital_Doctors_Settings_Dashboard />
-                </HospitalDoctorProviders>
+                  <HospitalDoctorProviders>
+                    <Hospital_Doctors_Settings_Dashboard />
+                  </HospitalDoctorProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -437,9 +438,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalDoctorProviders>
-                  <Hospital_Doctors_HealthPersonnel_Dashboard />
-                </HospitalDoctorProviders>
+                  <HospitalDoctorProviders>
+                    <Hospital_Doctors_HealthPersonnel_Dashboard />
+                  </HospitalDoctorProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -456,9 +457,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalDoctorProviders>
-                  <Hospital_Doctors_Lab_Dashboard />
-                </HospitalDoctorProviders>
+                  <HospitalDoctorProviders>
+                    <Hospital_Doctors_Lab_Dashboard />
+                  </HospitalDoctorProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -477,9 +478,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalReceptionistProviders>
-                  <Hospital_Receptionist_Home_Dashboard />
-                </HospitalReceptionistProviders>
+                  <HospitalReceptionistProviders>
+                    <Hospital_Receptionist_Home_Dashboard />
+                  </HospitalReceptionistProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -496,9 +497,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalReceptionistProviders>
-                  <Hospital_Receptionist_Appointments_Dashboard />
-                </HospitalReceptionistProviders>
+                  <HospitalReceptionistProviders>
+                    <Hospital_Receptionist_Appointments_Dashboard />
+                  </HospitalReceptionistProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -515,9 +516,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalReceptionistProviders>
-                  <Hospital_Receptionist_Patients_Dashboard />
-                </HospitalReceptionistProviders>
+                  <HospitalReceptionistProviders>
+                    <Hospital_Receptionist_Patients_Dashboard />
+                  </HospitalReceptionistProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -534,9 +535,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalReceptionistProviders>
-                  <Hospital_Receptionist_Messages_Dashboard />
-                </HospitalReceptionistProviders>
+                  <HospitalReceptionistProviders>
+                    <Hospital_Receptionist_Messages_Dashboard />
+                  </HospitalReceptionistProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -552,9 +553,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalReceptionistProviders>
-                  <Hospital_Receptionist_Settings_Dashboard />
-                </HospitalReceptionistProviders>
+                  <HospitalReceptionistProviders>
+                    <Hospital_Receptionist_Settings_Dashboard />
+                  </HospitalReceptionistProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -570,9 +571,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalReceptionistProviders>
-                  <Hospital_Receptionist_HealthPersonnel_Dashboard />
-                </HospitalReceptionistProviders>
+                  <HospitalReceptionistProviders>
+                    <Hospital_Receptionist_HealthPersonnel_Dashboard />
+                  </HospitalReceptionistProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -588,9 +589,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalReceptionistProviders>
-                  <Hospital_Receptionist_Admission_Dashboard />
-                </HospitalReceptionistProviders>
+                  <HospitalReceptionistProviders>
+                    <Hospital_Receptionist_Admission_Dashboard />
+                  </HospitalReceptionistProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -608,9 +609,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalNursesProviders>
-                  <Hospital_Nurses_Home_Dashboard />
-                </HospitalNursesProviders>
+                  <HospitalNursesProviders>
+                    <Hospital_Nurses_Home_Dashboard />
+                  </HospitalNursesProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -627,9 +628,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalNursesProviders>
-                  <Hospital_Nurses_Patients_Dashboard />
-                </HospitalNursesProviders>
+                  <HospitalNursesProviders>
+                    <Hospital_Nurses_Patients_Dashboard />
+                  </HospitalNursesProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -646,9 +647,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalNursesProviders>
-                  <Hospital_Nurses_Messages_Dashboard />
-                </HospitalNursesProviders>
+                  <HospitalNursesProviders>
+                    <Hospital_Nurses_Messages_Dashboard />
+                  </HospitalNursesProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -666,9 +667,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalNursesProviders>
-                  <Hospital_Nurses_HealthPersonnel_Dashboard />
-                </HospitalNursesProviders>
+                  <HospitalNursesProviders>
+                    <Hospital_Nurses_HealthPersonnel_Dashboard />
+                  </HospitalNursesProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -685,9 +686,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalNursesProviders>
-                  <Hospital_Nurses_Appointments_Dashboard />
-                </HospitalNursesProviders>
+                  <HospitalNursesProviders>
+                    <Hospital_Nurses_Appointments_Dashboard />
+                  </HospitalNursesProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -704,9 +705,9 @@ function App() {
               index
               element={
                 <HospitalProtectedRoute>
-                <HospitalNursesProviders>
-                  <Hospital_Nurses_Settings_Dashboard />
-                </HospitalNursesProviders>
+                  <HospitalNursesProviders>
+                    <Hospital_Nurses_Settings_Dashboard />
+                  </HospitalNursesProviders>
                 </HospitalProtectedRoute>
               }
             />
@@ -720,8 +721,8 @@ function App() {
 
         </Routes>
       ) : (
-        <>   
-         {/* <Snowfall
+        <>
+          {/* <Snowfall
           color="#cfe9ff"
           snowflakeCount={120}
           style={{
@@ -815,7 +816,11 @@ function App() {
             <Route path="/partner-create-account" element={<Partner_Create_Account />} />
             <Route path="/partner-login" element={<Partner_Sign_In />} />
 
-            <Route path="/partner-dashboard" element={<Partner_Home_Dashboard />} />
+            <Route path="/partner-dashboard" element={
+              <PartnerProtectedRoute>
+                <Partner_Home_Dashboard />
+              </PartnerProtectedRoute>
+            } />
 
 
             <Route path="/verify-nin" element={<Verify_NIN />} />
@@ -934,7 +939,7 @@ function App() {
               element={<Admin_Create_New_Password />}
             />
 
-<Route
+            <Route
               path="/admin-home-dashboard"
               element={<Admin_Dashboard_Layout />}
             >
@@ -942,13 +947,13 @@ function App() {
                 index
                 element={
                   // <ProtectedRoute>
-                    <Admin_Home_Dashboard />
+                  <Admin_Home_Dashboard />
                   // </ProtectedRoute>
                 }
               />
             </Route>
 
-<Route
+            <Route
               path="/admin-users-dashboard"
               element={<Admin_Dashboard_Layout />}
             >
@@ -956,12 +961,12 @@ function App() {
                 index
                 element={
                   // <ProtectedRoute>
-                    <Admin_Users_Dashboard />
+                  <Admin_Users_Dashboard />
                   // </ProtectedRoute>
                 }
               />
             </Route>
-<Route
+            <Route
               path="/admin-subscriptions-dashboard"
               element={<Admin_Dashboard_Layout />}
             >
@@ -969,12 +974,12 @@ function App() {
                 index
                 element={
                   // <ProtectedRoute>
-                    <Admin_Subscriptions_Dashboard />
+                  <Admin_Subscriptions_Dashboard />
                   // </ProtectedRoute>
                 }
               />
             </Route>
-<Route
+            <Route
               path="/admin-settings-dashboard"
               element={<Admin_Dashboard_Layout />}
             >
@@ -982,13 +987,13 @@ function App() {
                 index
                 element={
                   // <ProtectedRoute>
-                    <Admin_Settings_Dashboard />
+                  <Admin_Settings_Dashboard />
                   // </ProtectedRoute>
                 }
               />
             </Route>
 
-          
+
             <Route path="*" element={<NotFound />} />
 
           </Routes>
