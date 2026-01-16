@@ -170,7 +170,7 @@ const Admin_Sign_In = () => {
                     </div>
                     <div>
                       <Link
-                        to="/admin-forgot-password"
+                        to="/dhadmin-forgot-password"
                         className="underline text-[#3E4095]"
                       >
                         Forgot Password
@@ -195,16 +195,7 @@ const Admin_Sign_In = () => {
                   </button>
                 </form>
 
-                {/* Sign-Up Prompt */}
-                <p className="text-center text-sm text-gray-600 mt-4">
-                  Haven't Registered Yet?{" "}
-                  <Link
-                    to="/user-create-account"
-                    className="text-[#3E4095] hover:underline"
-                  >
-                    Sign Up
-                  </Link>
-                </p>
+             
               </div>
             </div>
           </div>

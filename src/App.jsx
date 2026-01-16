@@ -43,7 +43,6 @@ import Partner_Home_Dashboard from "./Dashboard/Partner_Dashboard/Partner_Home_D
 
 
 import Admin_Sign_In from "./Auth/Admin/Admin_Sign_In";
-import Admin_Create_Account from "./Auth/Admin/Admin_Create_Account";
 import Admin_Forget_Password from "./Auth/Admin/Admin_Forget_Password";
 import Admin_Verify_OTP from "./Auth/Admin/Admin_Verify_OTP";
 import Admin_Create_New_Password from "./Auth/Admin/Admin_Create_New_Password";
@@ -924,18 +923,14 @@ function App() {
               path="/admin"
               element={<ApproveHospitals />}
             />
+            <Route path="/dhadmin-login" element={<Admin_Sign_In />} />
             <Route
-              path="/admin-create-account"
-              element={<Admin_Create_Account />}
-            />
-            <Route path="/admin-login" element={<Admin_Sign_In />} />
-            <Route
-              path="/admin-forgot-password"
+              path="/dhadmin-forgot-password"
               element={<Admin_Forget_Password />}
             />
-            <Route path="/admin-verify-otp" element={<Admin_Verify_OTP />} />
+            <Route path="/dhadmin-verify-otp" element={<Admin_Verify_OTP />} />
             <Route
-              path="/admin-create-new-password"
+              path="/dhadmin-create-new-password"
               element={<Admin_Create_New_Password />}
             />
 

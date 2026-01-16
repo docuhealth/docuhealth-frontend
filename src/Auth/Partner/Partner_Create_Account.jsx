@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { authAPI } from "../../utils/authAPI";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Country, State, City } from 'country-state-city';
+
 
 const Partner_Create_Account = () => {
 
@@ -117,8 +117,17 @@ const Partner_Create_Account = () => {
         }
 
         try {
+            const response = await authAPI("POST", "api/partners/partner", payload, {
+                headers: { "Content-Type": "application/json" },
+              });
+            // console.log(payload)
+    
+            console.log(response);
+            toast.success("Pharmacy Registration successful!");
 
-            console.log(payload)
+            setTimeout(() => {
+                navigate("/partner-login");
+              }, 1000);
         } catch (error) {
             console.error("Error:", error);
             toast.error(

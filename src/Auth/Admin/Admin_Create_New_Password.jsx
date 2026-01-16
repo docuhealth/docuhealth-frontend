@@ -140,7 +140,7 @@ const ASNW = () => {
 
   const handleNavigation = () => {
     setNotification(false);
-    navigate("/admin-login");
+    navigate("/dhadmin-login");
   };
 
   return (

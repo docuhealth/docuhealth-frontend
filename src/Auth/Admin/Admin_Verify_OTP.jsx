@@ -80,7 +80,7 @@ const Admin_Verify_OTP = () => {
         access_token: response.data.access_token,
       };
       setTimeout(() => {
-        navigate("/admin-create-new-password", { state: navigateData });
+        navigate("/dhadmin-create-new-password", { state: navigateData });
       }, 1000);
     } catch (error) {
       console.error("Error during OTP verification:", error);

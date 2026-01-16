@@ -52,7 +52,7 @@ const AFP = () => {
       // Navigate with appropriate data
       const navigateData = isEmail ? { email } : { phone_num: email };
       setTimeout(() => {
-        navigate("/admin-verify-otp", { state: navigateData });
+        navigate("/dhadmin-verify-otp", { state: navigateData });
       }, 1000);
     } catch (error) {
       // Handle unexpected errors

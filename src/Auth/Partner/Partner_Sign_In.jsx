@@ -71,7 +71,17 @@ const Partner_Sign_In = () => {
 
             try {
 
-                console.log(userData)
+              const data = await login(userData);
+              
+              setToken(data.data.access_token, data.data.role);
+
+              // console.log(data)
+
+              toast.success("Login successful");
+
+              // setTimeout(() => {
+              //   window.location.href = "/partner-dashboard";
+              // }, 1000);
 
             }catch(error){
                 console.log(error);
@@ -84,6 +94,8 @@ const Partner_Sign_In = () => {
                 setInputValue("");
                 setPassword("");
                 setShowToast(false)
+
+                setIsSubmitting(false)
             }
 
         } else {
