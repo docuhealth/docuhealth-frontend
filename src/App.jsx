@@ -47,17 +47,16 @@ import Admin_Create_Account from "./Auth/Admin/Admin_Create_Account";
 import Admin_Forget_Password from "./Auth/Admin/Admin_Forget_Password";
 import Admin_Verify_OTP from "./Auth/Admin/Admin_Verify_OTP";
 import Admin_Create_New_Password from "./Auth/Admin/Admin_Create_New_Password";
-import AdminHomeDashboard from "./Admin Dashboard/AdminHomeDashboard";
-import AdminUsersDashboard from "./Admin Dashboard/AdminUsersDashboard";
-import AdminSettingsDashboard from "./Admin Dashboard/AdminSettingsDashboard";
-import AdminSubscriptionDashboard from "./Admin Dashboard/AdminSubscriptionsdashboard";
-import AdminLogoutDashboard from "./Admin Dashboard/AdminLogOutDashboard";
-
-import AdminProtectedRoute from "./Components/Admin Protected Route/AdminProtectedRoute";
 
 
 import ProtectedRoute from "./Auth/ProtectedRoute/ProtectedRoute";
 import HospitalProtectedRoute from "./Auth/ProtectedRoute/HospitalProtectedRoute";
+
+import Admin_Dashboard_Layout from "./Layouts/Admin_Dashboard_Layout/Admin_dashboard_Layout";
+import Admin_Home_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Home_Dashboard";
+import Admin_Users_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Users_Dashboard";
+import Admin_Settings_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Settings_Dashboard";
+import Admin_Subscriptions_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Subscriptions_Dashboard";
 
 import Patient_Dashboard_Layout from "./Layouts/Patient_Dashboard_Layout/Patient_Dashboard_Layout";
 import Patient_Home_Dashboard from "./Dashboard/Patient_Dashboard/Patient_Home_Dashboard";
@@ -65,6 +64,7 @@ import Patient_SubAccount_Dashboard from "./Dashboard/Patient_Dashboard/Patient_
 import Patient_Appointments_Dashboard from "./Dashboard/Patient_Dashboard/Patient_Appointments_Dashboard";
 import Patient_Settings_Dashboard from "./Dashboard/Patient_Dashboard/Patient_Settings_Dashboard";
 import Patient_Subscriptions_Dashboard from "./Dashboard/Patient_Dashboard/Patient_Subscriptions_Dashboard";
+
 
 {
   /* Hospital Routes */
@@ -935,52 +935,65 @@ function App() {
             />
             <Route path="/admin-verify-otp" element={<Admin_Verify_OTP />} />
             <Route
-              path="/admin-set-new-password"
+              path="/admin-create-new-password"
               element={<Admin_Create_New_Password />}
             />
 
-            <Route
+<Route
               path="/admin-home-dashboard"
-              element={
-                <AdminProtectedRoute>
-                  <AdminHomeDashboard />
-                </AdminProtectedRoute>
-              }
-            />
+              element={<Admin_Dashboard_Layout />}
+            >
+              <Route
+                index
+                element={
+                  // <ProtectedRoute>
+                    <Admin_Home_Dashboard />
+                  // </ProtectedRoute>
+                }
+              />
+            </Route>
 
-            <Route
+<Route
               path="/admin-users-dashboard"
-              element={
-                <AdminProtectedRoute>
-                  <AdminUsersDashboard />
-                </AdminProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin-settings-dashboard"
-              element={
-                <AdminProtectedRoute>
-                  <AdminSettingsDashboard />
-                </AdminProtectedRoute>
-              }
-            />
-
-            <Route
+              element={<Admin_Dashboard_Layout />}
+            >
+              <Route
+                index
+                element={
+                  // <ProtectedRoute>
+                    <Admin_Users_Dashboard />
+                  // </ProtectedRoute>
+                }
+              />
+            </Route>
+<Route
               path="/admin-subscriptions-dashboard"
-              element={
-                <AdminProtectedRoute>
-                  <AdminSubscriptionDashboard />
-                </AdminProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin-logout-dashboard"
-              element={
-                <AdminProtectedRoute>
-                  <AdminLogoutDashboard />
-                </AdminProtectedRoute>
-              }
-            />
+              element={<Admin_Dashboard_Layout />}
+            >
+              <Route
+                index
+                element={
+                  // <ProtectedRoute>
+                    <Admin_Subscriptions_Dashboard />
+                  // </ProtectedRoute>
+                }
+              />
+            </Route>
+<Route
+              path="/admin-settings-dashboard"
+              element={<Admin_Dashboard_Layout />}
+            >
+              <Route
+                index
+                element={
+                  // <ProtectedRoute>
+                    <Admin_Settings_Dashboard />
+                  // </ProtectedRoute>
+                }
+              />
+            </Route>
+
+          
             <Route path="*" element={<NotFound />} />
 
           </Routes>

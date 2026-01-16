@@ -1,31 +1,20 @@
 import React, { useState, useEffect } from "react";
-import logo from "../../assets/img/logo.png";
+import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
+import { FaEnvelope } from "react-icons/fa";
 import dashb from "../../assets/img/dashb.png";
 import { Link, useNavigate } from "react-router-dom";
-import toast from 'react-hot-toast';
+import { authAPI } from "../../utils/authAPI";
+import toast from "react-hot-toast";
 
 const AFP = () => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("admin");
-  const [loading, setLoading] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
-  const [notificationVisible, setNotificationVisible] = useState(false);
-
-  useEffect(() => {
-    const isMobile = window.innerWidth <= 768; // Adjust breakpoint as needed
-    if (isMobile) {
-      const timer = setTimeout(() => {
-        setNotificationVisible(true);
-      }, 2000); // 2 seconds delay
-
-      return () => clearTimeout(timer); // Cleanup on component unmount
-    }
-  }, []);
-
   const handleSubmit = async (e) => {
-    setLoading("Sending Otp");
+    setIsLoading(true);
     e.preventDefault();
 
     // Check if input is an email or phone number
@@ -34,7 +23,7 @@ const AFP = () => {
 
     if (!isEmail && !isPhoneNumber) {
       toast.error("Please enter a valid email or phone number.");
-      setLoading("Send Otp");
+      setIsLoading(false);
       return;
     }
 
@@ -46,162 +35,164 @@ const AFP = () => {
       };
 
       // Make the POST request
-      const response = await fetch(
-        "https://docuhealth-backend-h03u.onrender.com/api/auth/forgot_password",
+      const response = await authAPI(
+        "POST",
+        "api/auth/forgot-password",
+        payload,
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" },
         }
       );
 
-      // Handle the response
-      if (response.ok) {
-        const data = await response.json();
-        setLoading("Send Otp");
-        toast.success(data.message || "OTP sent successfully!");
+      const data = await response;
+      // console.log(response)
+      setIsLoading(false);
+      toast.success(data.message || "OTP sent successfully!");
 
-        // Navigate with appropriate data
-        const navigateData = isEmail ? { email } : { phone_num: email };
-        setTimeout(() => {
-          navigate("/admin-verify-otp", { state: navigateData });
-        }, 1000);
-      } else {
-        const errorData = await response.json().catch(() => null); // Safely parse response
-        const errorMessage =
-          errorData?.message || "Failed to send OTP. Please try again.";
-        toast.error(errorMessage);
-        setLoading("Send Otp");
-      }
+      // Navigate with appropriate data
+      const navigateData = isEmail ? { email } : { phone_num: email };
+      setTimeout(() => {
+        navigate("/admin-verify-otp", { state: navigateData });
+      }, 1000);
     } catch (error) {
       // Handle unexpected errors
       console.error("An error occurred:", error);
-      toast.error("An error occurred. Please try again later.");
-      setLoading("Send Otp");
+      toast.error(
+        error.detail || "An error occurred. Please try again later."
+      );
+      setIsLoading(false);
+    }finally{
+      setIsLoading(false)
     }
   };
 
   return (
     <div>
-      <div className="min-h-screen">
-        <div className="flex">
-          {/* Left Side */}
-          <div className=" hidden sm:flex flex-1 h-screen  items-center justify-center">
-            <div className="w-3/4" id="temp">
-              <div className="pb-10">
-                <img src={logo} alt="Logo" className="" />
+      <div className="hidden h-screen sm:flex">
+        {/* Left Side */}
+        <div className="w-full flex-1">
+          <div className=" hidden sm:flex justify-center items-center py-10 h-screen ">
+            <Link to="/">
+              <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
+                <img src={docuhealth_logo} alt="Logo" className="w-6" />
+                <h1 className="text-xl">DocuHealth</h1>
               </div>
-              <h2 className="text-2xl font-bold mb-2">Forgot Password</h2>
-              <p className="text-gray-600 mb-6">
-                Input your registered email below to receieve an OTP to help you
-                reset your password.
-              </p>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Email Input */}
-                <div className="relative">
-                  <p className="font-semibold pb-1">Enter Email :</p>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      className="w-full px-4 py-3 border rounded-lg pl-5 outline-hidden focus:border-blue-500"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  className={`w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
-                                      
-                                    `}
-                >
-                  {loading ? loading : "Send Otp"}
-                </button>
-              </form>
-            </div>
-          </div>
-
-          {/* Right Side */}
-          <div
-            className="flex-1 h-screen flex flex-col justify-center items-center p-4"
-            style={{
-              background: "linear-gradient(to bottom, #0000FF, #718FCC)",
-            }}
-          >
-            <div className="">
-              <p className="text-white font-semibold text-2xl pb-1">
-                The simplest way to manage <br /> medical records
-              </p>
-              <p className="text-white font-light">
-                No better way to attend to, and keep records of medical records
-              </p>
-            </div>
-
-            <div className="max-h-[470px] flex justify-center items-center pt-2">
-              <img
-                src={dashb}
-                alt="Dashboard"
-                className="object-contain w-full h-full"
-              />
-            </div>
-          </div>
-        </div>
-        {notificationVisible && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-xs flex items-center justify-center z-50">
-            <div className="fixed bottom-0 left-0 right-0 bg-white text-black  py-4 rounded-t-3xl shadow-md animate-slide-up ">
-              <div className="flex justify-center items-center gap-1 pb-4">
-                <div>
-                  <img src={logo} alt="DocuHealth Logo" />
-                </div>
-                <h1 className="text-[#0000FF] text-3xl font-bold">
-                  DocuHealth
-                </h1>
-              </div>
-              <div className="px-5" id="temp">
-                <h2 className=" text-xl sm:text-2xl  mb-2">
-                  Forgot Password ?
-                </h2>
-                <p className="text-gray-600 mb-6">
+            </Link>
+            <div className="px-10 w-full">
+              <div>
+                <h2 className="text-xl font-semibold pb-1">Forgot Password</h2>
+                <p className="text-gray-600 mb-6 text-sm">
                   Input your registered email below to receieve an OTP to help
                   you reset your password.
                 </p>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {/* Email Input */}
-                  <div className="relative">
-                    <p className="pb-1">Enter Email :</p>
+                <form onSubmit={handleSubmit} className="text-sm">
+                  <div className="relative pb-5">
+                    <p className="font-semibold pb-1">Enter Email :</p>
                     <div className="relative">
                       <input
-                        type="email"
-                        className="w-full px-4 py-3 border rounded-lg pl-5 outline-hidden focus:border-blue-500"
+                        type="text"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                         value={email}
-                        placeholder="Jarus@gmail.com"
                         onChange={(e) => setEmail(e.target.value)}
                         required
                       />
+                      <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     </div>
                   </div>
 
-                  {/* Submit Button */}
                   <button
                     type="submit"
-                    className={`w-full py-3 rounded-full bg-[#0000FF] text-white hover:bg-blue-700"
-                                  
-                                `}
+                    className={`w-full py-3 rounded-full bg-[#3E4095] text-white hover:bg-blue-700"
+            ${isLoading ? "cursor-not-allowed bg-gray-300 text-gray-500 " : ""}
+          `}
+                    disabled={isLoading}
                   >
-                    {loading ? loading : "Send Otp"}
+
+                    {isLoading ? (<div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Sending Otp
+                    </div>) : ("Send Otp")}
                   </button>
                 </form>
               </div>
             </div>
           </div>
-        )}
+        </div>
+
+        {/* Right Side */}
+        <div
+          className="flex-1 h-screen flex flex-col justify-center items-center p-4"
+          style={{
+            background: "linear-gradient(to bottom, #3E4095, #718FCC)",
+          }}
+        >
+          <div className="">
+            <p className="text-white font-semibold text-2xl pb-1">
+              The simplest way to manage <br /> medical records
+            </p>
+            <p className="text-white font-light text-sm">
+              No better way to attend to, and keep records of medical records
+            </p>
+          </div>
+
+          <div className="max-h-[420px] flex justify-center items-center pt-2">
+            <img
+              src={dashb}
+              alt="Dashboard"
+              className="object-contain w-full h-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
+        <Link to="/">
+          <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+            <img src={docuhealth_logo} alt="Logo" className="w-6" />
+            <h1 className="text-xl">DocuHealth</h1>
+          </div>
+        </Link>
+        <div className="">
+          <div className="px-5 w-full">
+            <div>
+              <h2 className="text-xl font-semibold pb-1">Forgot Password</h2>
+              <p className="text-gray-600 mb-6 text-sm">
+                Input your registered email below to receieve an OTP to help you
+                reset your password.
+              </p>
+
+              <form onSubmit={handleSubmit} className="text-sm">
+                <div className="relative pb-5">
+                  <p className="font-semibold pb-1">Enter Email :</p>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                    <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className={`w-full py-3 rounded-full bg-[#3E4095]  text-white hover:bg-blue-700"
+            ${isLoading ? "cursor-not-allowed bg-gray-300 text-gray-500 " : ""}
+          `}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (<div className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Sending Otp
+                  </div>) : ("Send Otp")}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

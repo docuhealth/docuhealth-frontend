@@ -59,6 +59,7 @@ const Patient_Sidebar_Mobile = ({
 
   return (
     <>
+    
       <div
         className={`fixed inset-0 z-40 transition-opacity duration-300  ${
           openMobileSidebar

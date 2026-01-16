@@ -100,6 +100,7 @@ const Patient_Dashboard_Sidebar = () => {
               </li>
             </div>
           </Link>
+
           <Link to="" onClick={()=> {
             toast.success('feature coming soon !')
           }}>
@@ -138,6 +139,7 @@ const Patient_Dashboard_Sidebar = () => {
               </li>
             </div>
           </Link>
+
           <Link to="/user-appointments-dashboard">
             <div className="px-4 my-4">
               <li
@@ -174,6 +176,7 @@ const Patient_Dashboard_Sidebar = () => {
               </li>
             </div>
           </Link>
+
           <Link to="" >
             <div className="px-4 my-4" onClick={
               () => {
@@ -214,6 +217,7 @@ const Patient_Dashboard_Sidebar = () => {
               </li>
             </div>
           </Link>
+
           <Link to="/user-subaccount-dashboard">
             <div className="px-4 my-4">
               <li
@@ -250,6 +254,7 @@ const Patient_Dashboard_Sidebar = () => {
               </li>
             </div>
           </Link>
+
           <Link to="/user-settings-dashboard">
             <div className="px-4 my-4">
               <li
@@ -293,6 +298,7 @@ const Patient_Dashboard_Sidebar = () => {
               </li>
             </div>
           </Link>
+          
           <Link to="/user-subscriptions-dashboard">
             <div className="px-4 my-4">
               <li

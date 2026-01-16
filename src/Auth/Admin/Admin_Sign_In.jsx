@@ -170,7 +170,7 @@ const Admin_Sign_In = () => {
                     </div>
                     <div>
                       <Link
-                        to="/user-forgot-password"
+                        to="/admin-forgot-password"
                         className="underline text-[#3E4095]"
                       >
                         Forgot Password

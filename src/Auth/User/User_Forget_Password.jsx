@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEnvelope } from "react-icons/fa";
 import dashb from "../../assets/img/dashb.png";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { authAPI } from "../../utils/authAPI";
 import toast from "react-hot-toast";
