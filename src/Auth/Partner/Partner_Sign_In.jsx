@@ -75,7 +75,7 @@ const Partner_Sign_In = () => {
               
               setToken(data.data.access_token, data.data.role);
 
-              console.log(data)
+            //   console.log(data)
 
               toast.success("Login successful");
 

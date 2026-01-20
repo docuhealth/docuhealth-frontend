@@ -44,7 +44,7 @@ const Partner_Home_Dashboard = () => {
   const rotateKeysMutation = useMutation({
     mutationFn: async (payload) => {
       const res = await axiosInstance.post("api/partners/rotate-key", payload);
-      console.log(res);
+    //   console.log(res);
       return res.data;
     },
     onSuccess: (response) => {
