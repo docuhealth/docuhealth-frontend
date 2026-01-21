@@ -155,7 +155,9 @@ const Hospital_Admin_Sidebar = () => {
               </li>
             </div>
           </Link>
-          <Link to="/hospital-admin-messages-dashboard">
+          <Link to=""  onClick={() => {
+            toast.success('Feature is coming soon')
+          }}>
             <div className="px-4 my-4">
               <li
                 className={`group px-4 py-2   ${currentPath === "/hospital-admin-messages-dashboard"
