@@ -182,7 +182,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                 {staffList.length > 0 ? (
                     isStaffSelected ? (
                         <>
-                            <div className="bg-white rounded-lg shadow-lg  py-6 max-w-md w-full relative text-sm">
+                            <div className="bg-white rounded-lg shadow-lg px-4 py-6 max-w-md w-full relative text-sm">
                                 <div className="flex justify-end">
                                     <button
                                         onClick={() => setBookAppointment(false)}
@@ -400,7 +400,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
 
 
                                 <button
-                                    disabled={ !formData.type || requestLoading || !selectedDay || !selectedMonth || !selectedTime || !selectedYear}
+                                    disabled={ !formData.type || requestLoading || !selectedDay || !selectedMonth || !selectedTime || !selectedYear || !formData.note}
                                     className={`mt-6 w-full cursor-pointer bg-[#3E4095] text-white py-2 rounded-full disabled:bg-[#3E4095]/60 ${requestLoading ? 'bg-[#3E4095]/60 cursor-not-allowed' : ''}} text-sm `}
                                     onClick={handleRequest}
                                 >

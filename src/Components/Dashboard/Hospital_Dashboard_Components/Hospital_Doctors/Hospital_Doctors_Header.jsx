@@ -104,7 +104,7 @@ const Hospital_Doctors_Header = () => {
             )}
           </div>
         </header>
-        <div className="sm:hidden">
+        <div className="lg:hidden">
           <Hospital_Doctors_Sidebar_Mobile
             openMobileSidebar={openMobileSidebar}
             setOpenMobileSidebar={setOpenMobileSidebar}

@@ -1,0 +1,135 @@
+import React, {useState} from "react";
+import DynamicDate from "../../../Components/Dynamic Date/DynamicDate";
+import Wards from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Ward Mangement Dashboard/Wards";
+import { HosAppContext } from "../../../context/Hospital Context/Admin/HosAppContext";
+import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import { X } from "lucide-react";
+import toast from "react-hot-toast";
+
+const Hospital_Admin_Ward_Management_Dashboard = () => {
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({ name: "", total_beds: "" });
+
+  const { fetchWards } = React.useContext(HosAppContext);
+
+  const handleCreateWard = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      // Data being sent to API: name and total_beds
+      await axiosInstanceHos.post("api/hospitals/wards", {
+        name: formData.name,
+        total_beds: parseInt(formData.total_beds),
+      });
+
+      toast.success("Ward created successfully!");
+      setShowOverlay(false);
+      setFormData({ name: "", total_beds: "" });
+      fetchWards(1); // Refresh the list
+    } catch (err) {
+      console.error("Error creating ward:", err);
+      toast.error(err.response?.data?.message || "Failed to create ward");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="py-2 flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm  gap-3 sm:gap-0">
+        <DynamicDate />
+        <div className="w-full sm:w-auto">
+          <button className="flex justify-center items-center gap-2 px-8 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full hover:bg-blue-50 transition w-full sm:w-auto cursor-pointer"
+          onClick={() => setShowOverlay(true)}
+          >
+            Create Ward
+          </button>
+        </div>
+      </div>
+      <div className="bg-white my-5 rounded-lg">
+        <div className=" border rounded-lg p-4 lg:p-6">
+          <h2 className=" mb-4 pb-2 border-b font-medium">Hospital Wards</h2>
+          <div>
+            <Wards />
+          </div>
+        </div>
+      </div>
+      {showOverlay && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-3 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-md rounded-lg shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center p-6 border-b">
+              <h3 className="font-medium text-gray-900">Add New Ward</h3>
+              <button
+                onClick={() => setShowOverlay(false)}
+                className="text-gray-400 hover:text-gray-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateWard} className="p-6 space-y-5 text-sm">
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-2">
+                  Ward Name
+                </label>
+                <div className="relative flex items-center">
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Emergency"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none  focus:border-[#3E4095] transition-all"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                  />
+                  {/* Visual suffix "Ward" for the user */}
+                  <span className="absolute right-4 text-gray-400 text-sm font-medium pointer-events-none">
+                    Ward
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-400 uppercase mb-2">
+                  Total Beds
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="1"
+                  placeholder="Enter number of beds"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none  focus:border-[#3E4095] transition-all cursor-pointer"
+                  value={formData.total_beds}
+                  onChange={(e) =>
+                    setFormData({ ...formData, total_beds: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowOverlay(false)}
+                  className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 font-medium rounded-full hover:bg-gray-50 transition-all text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 px-4 py-2.5 bg-[#3E4095] text-white font-bold rounded-full ] disabled:opacity-50 transition-all text-sm shadow shadow-indigo-100 cursor-pointer"
+                >
+                  {isSubmitting ? "Creating..." : "Create Ward"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default Hospital_Admin_Ward_Management_Dashboard;

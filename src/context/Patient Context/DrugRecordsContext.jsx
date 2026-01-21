@@ -2,19 +2,18 @@ import React, { useState, useEffect } from "react";
 import { createContext } from "react";
 import { getToken } from "../../services/authService";
 import toast from "react-hot-toast";
-import { fetchPatientMedicalRecords } from "../../queries/Patient/patientMedicalRecords";
+import { fetchPatientDrugRecords } from "../../queries/Patient/patientDrugRecords";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
 
-export const MedicalRecordsContext = createContext();
+export const DrugRecordsContext = createContext();
 
-const MedicalRecordsProvider = (props) => {
+const DrugRecordsProvider = (props) => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6; // ✅ 6 per page
 
   const isUserLoggedIn = !!getToken();
-
 
   const {
     data,
@@ -24,8 +23,8 @@ const MedicalRecordsProvider = (props) => {
     error
 
   } = useQuery({
-    queryKey : ["medicalRecords", currentPage, pageSize],
-    queryFn: fetchPatientMedicalRecords,
+    queryKey : ["drugRecords", currentPage, pageSize],
+    queryFn: fetchPatientDrugRecords,
     enabled : isUserLoggedIn,
     placeholderData : keepPreviousData,
   })
@@ -33,19 +32,19 @@ const MedicalRecordsProvider = (props) => {
    // Handle errors via useEffect since onError was removed from useQuery v5
   useEffect(() => {
     if (isError) {
-      toast.error("Error fetching medical records");
+      toast.error("Error fetching drug records");
       console.error(error);
     }
   }, [isError, error]);
 
-  const medicalRecords = data?.results || [];
+  const drugRecords = data?.results || [];
   const count = data?.count || 0;
   const totalPages = Math.ceil(count / pageSize);
 
   return (
-    <MedicalRecordsContext.Provider
+    <DrugRecordsContext.Provider
       value={{
-        medicalRecords,
+        drugRecords,
         isPending,
         isFetching,
         error,
@@ -57,8 +56,8 @@ const MedicalRecordsProvider = (props) => {
       }}
     >
       {props.children}
-    </MedicalRecordsContext.Provider>
+    </DrugRecordsContext.Provider>
   );
 };
 
-export default MedicalRecordsProvider;
+export default DrugRecordsProvider;

@@ -223,7 +223,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-5">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-3">
             <div className="bg-white rounded-md shadow-lg p-6 max-w-xl w-full relative">
                 <div className="mb-5">
                     <p className="text-sm">Step {step} of 2</p>

@@ -120,12 +120,13 @@ const Hospital_Receptionist_Header = () => {
             </div>
         </div>
       </header>
-
+      <div className="lg:hidden">
       {/* Mobile Sidebar Component */}
       <Hospital_Receptionist_Sidebar_Mobile
         openMobileSidebar={openMobileSidebar}
         setOpenMobileSidebar={setOpenMobileSidebar}
       />
+      </div>
     </div>
     
     

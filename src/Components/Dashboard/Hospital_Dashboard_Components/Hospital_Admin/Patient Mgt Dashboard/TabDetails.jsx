@@ -20,7 +20,7 @@ const AdmittedPatientsTab = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-full text-sm">
+            <div className="flex justify-center items-center h-full text-sm my-5">
                 Loading...
             </div>
         );

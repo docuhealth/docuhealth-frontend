@@ -1,18 +1,15 @@
-import React, { useContext } from 'react'
-import { HosStaffsContext } from '../../../../../context/Hospital Context/Admin/HosStaffsContext'
-import { formatFullDate, formatTime } from '../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter'
-import Pagination from '../../../Patient_Dashboard_Components/Pagination/Pagination'
+import React, { useState, useContext } from "react";
+import { HosStaffsContext } from "../../../../../context/Hospital Context/Admin/HosStaffsContext";
+import {
+  formatFullDate,
+  formatTime,
+} from "../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
+import Pagination from "../../../Patient_Dashboard_Components/Pagination/Pagination";
 
-const StaffListHospital = ({selectedStaff,setSelectedStaff }) => {
-
-  const {
-    staffs,
-    loading,
-    count,
-    currentPage,
-    totalPages,
-    fetchStaffs,
-  } = useContext(HosStaffsContext);
+const StaffListHospital = ({ selectedStaff, setSelectedStaff }) => {
+  const { staffs, loading, count, currentPage, totalPages, fetchStaffs } =
+    useContext(HosStaffsContext);
+  const [activeMenu, setActiveMenu] = useState(null);
 
   if (loading) {
     return (
@@ -90,86 +87,326 @@ const StaffListHospital = ({selectedStaff,setSelectedStaff }) => {
     );
   }
 
+const handleBulkRemove = () => {
+  // Map the selected staff_ids back to the full objects for logging
+  const staffObjectsToRemove = staffs.filter((staff) =>
+    selectedStaff.includes(staff.staff_id)
+  );
+
+  console.log("Bulk Removing Staff Details:", staffObjectsToRemove);
+
+  // Trigger your API request here using selectedStaff (the IDs)
+  // deleteStaffsApi(selectedStaff);
+
+  setSelectedStaff([]); // Reset selection
+};
+
+const handleIndividualRemove = (staff) => {
+  // Use the whole object passed in to log details
+  console.log("Removing Staff Member:", staff);
+  
+  // Trigger your API request here using staff.staff_id
+  // deleteStaffApi(staff.staff_id);
+
+  setActiveMenu(null);
+};
+
+const handleUpdateRole = (staff) => {
+  console.log(`Directly updating role for: ${staff.firstname} (${staff.staff_id})`);
+  console.log(`Current role is: ${staff.role}`);
+  
+  // Usually, you would open a modal here. For direct request:
+  // updateRoleApi(staff.staff_id, "New Role");
+
+  setActiveMenu(null);
+};
+
+  // --- SELECTION LOGIC ---
+
   const allChecked = staffs.length > 0 && selectedStaff.length === staffs.length;
 
 const toggleSelectAll = () => {
-  if (allChecked) {
-    setSelectedStaff([]); // uncheck all
-  } else {
-    setSelectedStaff(staffs.map((s) => s.id)); // check all (use a unique field)
-  }
-};
+    if (allChecked) {
+      console.log("Deselected all staff");
+      setSelectedStaff([]);
+    } else {
+      const allIds = staffs.map((s) => s.staff_id);
+      // Log the full objects of everyone being selected
+      console.log("Selected all staff:", staffs);
+      setSelectedStaff(allIds);
+    }
+  };
 
 const toggleStaff = (id) => {
-  setSelectedStaff((prev) =>
-    prev.includes(id)
-      ? prev.filter((x) => x !== id) // remove
-      : [...prev, id]                 // add
-  );
-};
-
-
+    if (!id) {
+    console.error("Error: This staff member has no ID property!");
+    return;
+  }
+  
+    setSelectedStaff((prev) => {
+      const isRemoving = prev.includes(id);
+      
+    if (isRemoving) {
+      console.log(`Unchecked staff ID: ${id}`);
+      return prev.filter((item) => item !== id);
+    } else {
+      // Find the specific staff object using staff_id to log it
+      const staffMember = staffs.find((s) => s.staff_id === id);
+      console.log("Checked staff:", staffMember);
+      return [...prev, id];
+    }
+    });
+  };
 
   return (
     <>
-      <div className='flex flex-col'>
-      <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
-    
-    {/* Checkbox + Name of Staff */}
-    <div className="col-span-2 w-full pl-5 flex items-center gap-2">
-      <input
-        type="checkbox"
-        checked={allChecked}
-        onChange={toggleSelectAll}
-        className="w-3 h-3"
-      />
-      <p>Name of Staff</p>
-    </div>
+      {selectedStaff.length > 0 && (
+        <div
+          className={`transition-all duration-300 mb-4 flex items-center justify-between p-3 rounded-lg ${
+            selectedStaff.length > 0
+              ? "bg-red-50 border border-red-100 opacity-100"
+              : "opacity-0 h-0 overflow-hidden"
+          }`}
+        >
+          <p className="text-sm text-red-700 font-medium">
+            {selectedStaff.length} staff member(s) selected
+          </p>
+          <button
+            onClick={handleBulkRemove}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-xs font-bold transition-colors"
+          >
+            Remove from Team
+          </button>
+        </div>
+      )}
+      <div className="hidden lg:flex lg:flex-col">
+        <div className="grid grid-cols-8 text-left text-sm bg-gray-100 py-5 rounded-md">
+          {/* Checkbox + Name of Staff */}
+          <div className="col-span-2 w-full pl-5 flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={allChecked}
+              onChange={toggleSelectAll}
+              className="w-4 h-4 accent-[#3E4095] cursor-pointer"
+            />
+            <p>Name of Staff</p>
+          </div>
 
-    <p>Staff Id</p>
-    <p>Role</p>
-    <p>Phone no</p>
-    <p>Email Address</p>
-    <p>Sex</p>
-  </div>
-  
-        {
-          staffs.map((staff, index) => (
-            <div key={index} className='relative'>
-              <div className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
-                <div className='font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-1 '>
+          <p>Staff Id</p>
+          <p>Role</p>
+          <p>Phone no</p>
+          <p>Email Address</p>
+          <p>Sex</p>
+        </div>
+
+        {staffs.map((staff, index) => (
+          <div key={index} className="relative">
+            <div className="grid grid-cols-8 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
+              <div className="font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-2 ">
+                {/* ADDED: Individual Checkbox */}
                 <input
-            type="checkbox"
-            checked={selectedStaff.includes(staff.id)}
-            onChange={() => toggleStaff(staff.id)}
-            className="w-3 h-3"
-          />
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" />
+                  type="checkbox"
+                  checked={selectedStaff.includes(staff.staff_id)}
+                  onChange={() => toggleStaff(staff.staff_id)}
+                  className="w-4 h-4 accent-[#3E4095] cursor-pointer"
+                />
+
+                {/* Existing Icon and Name */}
+                <div className="flex items-center gap-1">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z"
+                      fill="#647284"
+                    />
                   </svg>
-
-                  <p> {staff.firstname} {staff.lastname}</p>
+                  <p>
+                    {staff.firstname} {staff.lastname}
+                  </p>
                 </div>
-                <p>
-                  {staff.staff_id}
-                </p>
-                <p>
-                  {staff.role}
-                </p>
-                <p>
-                  {staff.phone_no}
-                </p>
-                <p className='truncate max-w-[120px]'>
-                {staff.email}
-                </p>
-                <p>
-                  {staff.gender}
-                </p>
+              </div>
 
+              <p>{staff.staff_id}</p>
+              <p>{staff.role}</p>
+              <p>{staff.phone_no}</p>
+              <p className="truncate max-w-[120px] ">{staff.email}</p>
+              <p>{staff.gender}</p>
+
+              <div className="relative flex justify-center">
+                <button
+                  onClick={() =>
+                    setActiveMenu(activeMenu === staff.staff_id ? null : staff.staff_id)
+                  }
+                  className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                  </svg>
+                </button>
+
+                {activeMenu === staff.staff_id && (
+                  <div className="absolute right-0 top-10 w-40 bg-white border border-gray-200 rounded-md shadow z-50 ">
+                    <button
+                      onClick={() => handleUpdateRole(index, staff.role)}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 hover:rounded-t-md"
+                    >
+                      Update Role
+                    </button>
+                    <button
+                      onClick={() => handleIndividualRemove(staff)}
+                      className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 font-medium hover:rounded-b-md"
+                    >
+                      Remove from Team
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
-          ))
-        }
+          </div>
+        ))}
+      </div>
+      <div className="lg:hidden">
+        {staffs.length > 0 && (
+          <div className="flex items-center gap-2 mb-4 px-2">
+            <input
+              type="checkbox"
+              checked={allChecked}
+              onChange={toggleSelectAll}
+              className="w-5 h-5 accent-[#3E4095] rounded"
+            />
+            <span className="text-sm font-medium text-gray-700">
+              {allChecked ? "Deselect All" : "Select All Staffs"}
+            </span>
+          </div>
+        )}
+        <div className="flex flex-col gap-4">
+          {staffs.map((staff, index) => (
+            <div
+              key={index}
+              className="bg-white border border-gray-200 rounded-lg p-5   transition-all"
+            >
+              {/* 1. Header: Avatar & Primary Info */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedStaff.includes(staff.staff_id)}
+                    onChange={() => toggleStaff(staff.staff_id)}
+                    className="w-5 h-5 accent-[#3E4095] cursor-pointer"
+                  />
+                  {/* Dynamic Avatar with Initials */}
+                  <div className="h-11 w-11 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#3E4095] font-bold text-sm shadow-inner">
+                    {staff.firstname?.[0]}
+                    {staff.lastname?.[0]}
+                  </div>
+
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-gray-900 text-[15px] truncate">
+                      {staff.firstname} {staff.lastname}
+                    </h3>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] bg-[#3E4095] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                        {staff.role || "Staff"}
+                      </span>
+                      <span className="text-[10px] text-gray-400 font-mono">
+                        #{staff.staff_id || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sex Badge */}
+                <div className="flex items-center gap-2">
+                   <div className="bg-gray-100 px-2 py-1 rounded-lg">
+                  <p className="text-[10px] text-gray-500 font-bold uppercase">
+                    {staff.gender || "—"}
+                  </p>
+                </div>
+                  <div className="relative">
+                  <button onClick={() => setActiveMenu(activeMenu === staff.staff_id ? null : staff.staff_id)} className="p-1">
+                    <svg width="20" height="20" fill="#647284" viewBox="0 0 16 16"><path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+                  </button>
+                  {activeMenu === staff.staff_id && (
+                    <div className="absolute right-0 top-8 w-52 bg-white border border-gray-200 rounded-lg shadow z-50 py-2">
+                      <button  onClick={() => handleUpdateRole(index, staff.role)} className="w-full text-left px-4 py-3 text-sm border-b border-gray-50 hover:rounded-t-md">Update Role</button>
+                      <button onClick={() => handleIndividualRemove(staff)} className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md">Remove from Team</button>
+                    </div>
+                  )}
+                </div>
+                </div>
+               
+
+                
+              </div>
+
+              {/* 2. Contact Quick-Action Box */}
+              <div className="grid grid-cols-1 gap-2 bg-gray-50 rounded-lg p-3 mb-4">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <div className="bg-white p-1.5 rounded-md shadow-sm">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#3E4095"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                  </div>
+                  <p className="text-[12px] font-medium">
+                    {staff.phone_no || "No Phone"}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <div className="bg-white p-1.5 rounded-md shadow-sm">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#3E4095"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                      <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                  </div>
+                  <p className="text-[12px] font-medium truncate">
+                    {staff.email || "No Email"}
+                  </p>
+                </div>
+              </div>
+
+              {/* 3. Footer Action */}
+              <div className="flex gap-2">
+                {/* <a 
+                        href={`tel:${staff.phone_no}`}
+                        className="flex-1 bg-white border border-gray-200 py-2.5 rounded-xl flex items-center justify-center gap-2 text-[12px] font-bold text-gray-700 active:bg-gray-100"
+                    >
+                        Call
+                    </a> */}
+                <button className="flex-1 bg-[#3E4095] py-2.5 rounded-full flex items-center justify-center gap-2 text-[12px] font-bold text-white">
+                  Message
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
       <Pagination
         count={count}
@@ -179,8 +416,9 @@ const toggleStaff = (id) => {
         loading={loading}
       />
 
+     
     </>
-  )
-}
+  );
+};
 
-export default StaffListHospital
+export default StaffListHospital;

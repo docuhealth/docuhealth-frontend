@@ -122,6 +122,39 @@ const Hospital_Admin_Sidebar = () => {
               </li>
             </div>
           </Link>
+          <Link to="/hospital-admin-ward-management-dashboard">
+            <div className="px-4 my-4">
+              <li
+                className={`group px-4 py-2   ${currentPath === "/hospital-admin-ward-management-dashboard"
+                    ? "bg-[#3E4095] text-white"
+                    : "text-gray-700"
+                  } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+              >
+                <span>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`group-hover:fill-white ${currentPath === "/hospital-admin-ward-management-dashboard"
+                        ? "fill-white"
+                        : "fill-[#647284]"
+                      }`}
+                  >
+                    <path 
+    d="M2 20V5H4V16H11V7H20C21.1046 7 22 7.89543 22 9V20H20V18H4V20H2ZM6 12C7.10457 12 8 11.1046 8 10C8 8.89543 7.10457 8 6 8C4.89543 8 4 8.89543 4 10C4 11.1046 4.89543 12 6 12Z"
+                      className={`group-hover:fill-white ${currentPath === "/hospital-admin-ward-management-dashboard"
+                          ? "fill-white"
+                          : "fill-[#647284]"
+                        }`}
+                    />
+                  </svg>
+                </span>
+                Ward Mgt.
+              </li>
+            </div>
+          </Link>
           <Link to="/hospital-admin-messages-dashboard">
             <div className="px-4 my-4">
               <li

@@ -19,13 +19,13 @@ const Hospital_Admin_Staff_Dashboard = () => {
     };
     return (
         <>
-            <div className="py-2 hidden text-sm sm:flex justify-between items-center">
+            <div className="py-2 text-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <DynamicDate />
-                <div className="flex items-center gap-3">
-                    <div className="relative ">
+                <div className="flex flex-col sm:flex-row w-full sm:w-auto items-center gap-3 sm:gap-0">
+                    <div className="relative w-full sm:w-auto">
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="flex items-center gap-2 px-6 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full hover:bg-blue-50 transition"
+                            className="flex justify-center items-center gap-2 px-6 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full hover:bg-blue-50 transition w-full sm:w-auto"
                         >
                             Filter by: {selected}
                             <ChevronDown
@@ -34,7 +34,7 @@ const Hospital_Admin_Staff_Dashboard = () => {
                             />
                         </button>
                         {isOpen && (
-                            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-xs shadow-lg z-10">
+                            <div className="absolute right-0 mt-2 w-full lg:w-40 bg-white border border-gray-200 rounded-xs shadow-lg z-10">
                                 {options.map((option) => (
                                     <button
                                         key={option}
@@ -47,9 +47,9 @@ const Hospital_Admin_Staff_Dashboard = () => {
                             </div>
                         )}
                     </div>
-                    <div>
+                    <div className="w-full sm:w-auto">
                         <button
-                            className="flex items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition cursor-pointer"
+                            className="flex justify-center items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition cursor-pointer w-full sm:w-auto"
                             onClick={() => {
                                 setCreateNewStaff(!createNewStaff)
                             }}
@@ -60,8 +60,8 @@ const Hospital_Admin_Staff_Dashboard = () => {
                 </div>
 
             </div>
-            <div className="bg-white my-5 border rounded-2xl p-5">
-                <div className=" border rounded-lg p-5">
+            <div className="bg-white my-5 rounded-lg">
+                <div className=" border rounded-lg p-4 lg:p-6">
                     <h2 className=" mb-4 pb-2 border-b font-medium">
                         My Staffs
                     </h2>

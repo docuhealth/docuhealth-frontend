@@ -60,6 +60,7 @@ import Admin_Subscriptions_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Sub
 
 import Patient_Dashboard_Layout from "./Layouts/Patient_Dashboard_Layout/Patient_Dashboard_Layout";
 import Patient_Home_Dashboard from "./Dashboard/Patient_Dashboard/Patient_Home_Dashboard";
+import Patient_Drug_Records_Dashboard from "./Dashboard/Patient_Dashboard/Patient_Drug_Records_Dashboard";
 import Patient_SubAccount_Dashboard from "./Dashboard/Patient_Dashboard/Patient_SubAccount_Dashboard";
 import Patient_Appointments_Dashboard from "./Dashboard/Patient_Dashboard/Patient_Appointments_Dashboard";
 import Patient_Settings_Dashboard from "./Dashboard/Patient_Dashboard/Patient_Settings_Dashboard";
@@ -74,6 +75,7 @@ import Hospital_Admin_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_
 import Hospital_Admin_Home_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Home_Dashboard";
 import Hospital_Admin_Staff_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Staff_Dashboard";
 import Hospital_Admin_Patients_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Patients_Dashboard";
+import Hospital_Admin_Ward_Management_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Ward_Management_Dashboard";
 import Hospital_Admin_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Messages_Dashboard";
 import Hospital_Admin_Appointments_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Appointments_Dashboard";
 import Hospital_Admin_Wallet_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Wallet_Dashboard";
@@ -222,6 +224,27 @@ function App() {
                 <HospitalProtectedRoute>
                   <HospitalAdminProviders>
                     <Hospital_Admin_Patients_Dashboard />
+                  </HospitalAdminProviders>
+                </HospitalProtectedRoute>
+              }
+            />
+          </Route>
+          <Route
+            path="/hospital-admin-ward-management-dashboard"
+            element={
+
+              <HospitalAdminProviders>
+                <Hospital_Admin_Layout />
+              </HospitalAdminProviders>
+
+            }
+          >
+            <Route
+              index
+              element={
+                <HospitalProtectedRoute>
+                  <HospitalAdminProviders>
+                    <Hospital_Admin_Ward_Management_Dashboard />
                   </HospitalAdminProviders>
                 </HospitalProtectedRoute>
               }
@@ -863,6 +886,20 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Patient_Home_Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            <Route
+              path="/user-drug-records-dashboard"
+              element={<Patient_Dashboard_Layout />}
+            >
+              <Route
+                index
+                element={
+                  <ProtectedRoute>
+                    <Patient_Drug_Records_Dashboard />
                   </ProtectedRoute>
                 }
               />
