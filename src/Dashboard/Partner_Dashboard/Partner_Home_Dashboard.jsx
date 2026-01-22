@@ -54,9 +54,11 @@ const Partner_Home_Dashboard = () => {
       setShowSuccessModal(true); // Open the success display
       setPassword("");
     },
-    onError: () => {
-     const errorMsg = error.response?.data?.message || "Failed to rotate API Keys.";
-      toast.error(errorMsg);
+    onError: (error) => {
+     console.log(error)
+     if(error.response.data.detail){
+        toast.error(error.response.data.detail);
+     }
     },
   });
 

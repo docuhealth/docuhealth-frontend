@@ -195,7 +195,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
   return (
     <>
       <div className="text-[12px] my-4">
-        <div>
+        <div className='hidden lg:block'>
           {appointments.map((appointment, index) => (
             <div
               key={appointment.id}
@@ -388,6 +388,65 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
             </div>
           ))}
         </div>
+
+        <div className="block lg:hidden space-y-4 px-1">
+    {appointments.map((appointment, index) => (
+      <div key={appointment.id} className="bg-white border border-gray-200 rounded-lg p-4">
+        
+        {/* Mobile Header: Time and Menu */}
+        <div className="flex justify-between items-start mb-4">
+          <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+            <p className="text-[10px] text-slate-400 uppercase font-bold">Scheduled</p>
+            <p className="text-[13px] font-semibold text-slate-700">
+              {formatFullDate(appointment.scheduled_time)} @ {formatTime(appointment.scheduled_time)}
+            </p>
+          </div>
+          
+          <div className="relative">
+            <button 
+              onClick={() => togglePopover(index)}
+              className={`h-9 w-9 flex items-center justify-center rounded-full ${openPopover === index ? "bg-slate-200" : "bg-gray-50"}`}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14 8C14 7.45 13.55 7 13 7C12.45 7 12 7.45 12 8C12 8.55 12.45 9 13 9C13.55 9 14 8.55 14 8ZM4 8C4 7.45 3.55 7 3 7C2.45 7 2 7.45 2 8C2 8.55 2.45 9 3 9C3.55 9 4 8.55 4 8ZM9 8C9 7.45 8.55 7 8 7C7.45 7 7 7.45 7 8C7 8.55 7.45 9 8 9C8.55 9 9 8.55 9 8Z" fill="#1A263E" /></svg>
+            </button>
+
+            {openPopover === index && (
+              <div className="absolute right-0 top-10 w-56 bg-white border border-slate-100 shadow rounded-lg p-1.5 z-50">
+                <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors" onClick={() => { setSelectedPatient(appointment); setOpenPopover(null); }}>See patient's details</button>
+                <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors" onClick={() => { setUpdateVitals(true); setSelectedPatientForVitals(appointment); setOpenPopover(null); }}>Update vitals</button>
+                <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors" onClick={() => { if(!fetchingPersonnel) fetchHealthPersonnel(); setOpenPopover(null); }}>Assign Doctor</button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Body: Patient & Staff */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs border border-indigo-100">
+              {appointment.patient.firstname[0]}{appointment.patient.lastname[0]}
+            </div>
+            <div>
+              <p className="text-[10px] text-slate-400 uppercase font-medium">Patient</p>
+              <p className="text-sm font-semibold text-slate-800">{appointment.patient.firstname} {appointment.patient.lastname}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-50">
+            <div>
+              <p className="text-[10px] text-slate-400 uppercase font-medium">{appointment.staff.role}</p>
+              <p className="text-[13px] text-slate-600">Dr. {appointment.staff.lastname}</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-slate-400 uppercase font-medium">Note</p>
+              <p className="text-[13px] text-slate-600 truncate italic">"{appointment.note || 'No notes'}"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
         <Pagination
           count={count}
           currentPage={currentPage}
@@ -464,8 +523,8 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
       {
         staffList && staffList.length !== 0 && (
           <>
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-5">
-              <div className="bg-white rounded-lg shadow-lg p-6 max-w-5xl w-full relative text-sm">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-3">
+              <div className="bg-white rounded-lg shadow-lg p-4 max-w-5xl w-full relative text-sm">
                 <div className="flex justify-between items-center border-b pb-4">
                   <h2 className="font-medium">Choose a preferred doctor</h2>
                   {/* Close Button */}

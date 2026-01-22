@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 
-const LogOutModal = ({ isOpen, onClose, isFetching, onLogout, staffList, setStaffList, selected, handleFinalRequest }) => {
+const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selected, handleFinalRequest,processingId, isFetching }) => {
     // Internal state for the checkboxes
+
+    
     const [handoverOptions, setHandoverOptions] = useState({
         patientManagement: true,
         myAppointments: true,
@@ -12,10 +14,13 @@ const LogOutModal = ({ isOpen, onClose, isFetching, onLogout, staffList, setStaf
 
     const isAnyOptionSelected = Object.values(handoverOptions).some(value => value === true);
 
+ 
 
     return (
+
         <>
             {staffList ? (
+                
                 <>
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
                         <div className="bg-white rounded-lg shadow-lg p-6 max-w-5xl w-full relative text-sm">
@@ -31,8 +36,12 @@ const LogOutModal = ({ isOpen, onClose, isFetching, onLogout, staffList, setStaf
                                     </button>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-3 my-5 text-sm">
-                                {staffList.map((staff, index) => (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-3 my-5 text-sm gap-3">
+                                {staffList.map((staff, index) => {
+
+                                    const isThisStaffLoading = processingId === staff.staff_id;
+                                    const isAnyLoading = processingId !== null;
+                                    return (
                                     <div key={index} className="border rounded-md p-3">
                                         <div>
                                             <div className="flex justify-between items-center border-b pb-5">
@@ -55,12 +64,12 @@ const LogOutModal = ({ isOpen, onClose, isFetching, onLogout, staffList, setStaf
 
                                             <div className="w-full pt-8">
                                                 <button
-                                                    disabled={isFetching}
-                                                    className={`w-full rounded-full border py-2 border-[#3E4095] flex items-center justify-center gap-2 ${isFetching ? "opacity-50 cursor-not-allowed" : "text-[#3E4095] cursor-pointer hover:bg-blue-50"
+                                                    disabled={isAnyLoading}
+                                                    className={`w-full rounded-full border py-2 border-[#3E4095] flex items-center justify-center gap-2 ${isAnyLoading ? "opacity-50 cursor-not-allowed" : "text-[#3E4095] cursor-pointer hover:bg-blue-50"
                                                         }`}
                                                     onClick={() => handleFinalRequest(staff.staff_id)}
                                                 >
-                                                    {isFetching ? (
+                                                    {isThisStaffLoading ? (
                                                         <>
                                                             <div className="w-4 h-4 border-2 border-[#3E4095]/30 border-t-[#3E4095] rounded-full animate-spin" />
                                                             <span>Assigning...</span>
@@ -72,7 +81,8 @@ const LogOutModal = ({ isOpen, onClose, isFetching, onLogout, staffList, setStaf
                                             </div>
                                         </div>
                                     </div>
-                                ))}
+                                    )
+})}
                             </div>
                         </div>
                     </div>

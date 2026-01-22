@@ -91,7 +91,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
             <div className='py-2 text-sm flex justify-between items-center'>
               <DynamicDate />
             </div>
-            <div className="bg-white my-5 border rounded-2xl p-5">
+            <div className="bg-white my-5 border rounded-lg p-5">
               <TabComponent tabs={getTabs(advanceCheckUp, setAdvanceCheckUp, setSelected)} />
             </div>
           </>

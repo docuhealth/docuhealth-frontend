@@ -91,7 +91,7 @@ const Patient_Home_Dashboard = () => {
           </div>
           <div>
             <button
-              className="flex items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition cursor-pointer"
+              className="flex items-center gap-2 px-6 py-2.5 bg-[#3E4095] text-white font-medium rounded-full transition cursor-pointer"
               onClick={() => {
                 if (profile) {
                   handleSelection(profile)

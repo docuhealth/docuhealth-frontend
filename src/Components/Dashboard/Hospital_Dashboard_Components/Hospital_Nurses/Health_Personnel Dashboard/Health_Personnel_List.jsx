@@ -92,99 +92,146 @@ const Health_Personnel_List = () => {
 
     return (
         <>
-            <div className='hidden lg:flex flex-col'>
-                <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
+           <div className="hidden lg:flex lg:flex-col">
+        <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
+          <div className="col-span-2 w-full pl-5 flex items-center gap-2">
+            <p>Name of Staff</p>
+          </div>
 
-                    <div className="col-span-2 w-full pl-5 flex items-center gap-2">
-                        <p>Name of Staff</p>
+          <p>Staff Id</p>
+          <p>Role</p>
+          <p>Phone no</p>
+          <p>Email Address</p>
+          <p>Sex</p>
+        </div>
+        {healthPersonnelList.map((staff, index) => (
+          <div key={index} className="relative">
+            <div className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
+              <div className="font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-1 ">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z"
+                    fill="#647284"
+                  />
+                </svg>
+
+                <p>
+                  {" "}
+                  {staff.firstname} {staff.lastname}
+                </p>
+              </div>
+              <p>{staff.staff_id}</p>
+              <p>{staff.role}</p>
+              <p>{staff.phone_no}</p>
+              <p className="truncate max-w-[120px]">{staff.email}</p>
+              <p>{staff.gender}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="lg:hidden">
+        <div className="flex flex-col gap-4">
+          {healthPersonnelList.map((staff, index) => (
+            <div
+              key={index}
+              className="bg-white border border-gray-200 rounded-lg p-5  active:bg-gray-50 transition-all"
+            >
+              {/* 1. Header: Avatar & Primary Info */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  {/* Dynamic Avatar with Initials */}
+                  <div className="h-11 w-11 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#3E4095] font-bold text-sm shadow-inner">
+                    {staff.firstname?.[0]}
+                    {staff.lastname?.[0]}
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-gray-900 text-[15px] truncate">
+                      {staff.firstname} {staff.lastname}
+                    </h3>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] bg-[#3E4095] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                        {staff.role || "Staff"}
+                      </span>
+                      <span className="text-[10px] text-gray-400 font-mono">
+                        #{staff.staff_id || "N/A"}
+                      </span>
                     </div>
-
-                    <p>Staff Id</p>
-                    <p>Role</p>
-                    <p>Phone no</p>
-                    <p>Email Address</p>
-                    <p>Sex</p>
+                  </div>
                 </div>
-                {
-                    healthPersonnelList.map((staff, index) => (
-                        <div key={index} className='relative'>
-                            <div className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
-                                <div className='font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-1 '>
 
-                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" />
-                                    </svg>
-
-                                    <p> {staff.firstname} {staff.lastname}</p>
-                                </div>
-                                <p>
-                                    {staff.staff_id}
-                                </p>
-                                <p>
-                                    {staff.role}
-                                </p>
-                                <p>
-                                    {staff.phone_no}
-                                </p>
-                                <p className='truncate max-w-[120px]'>
-                                    {staff.email}
-                                </p>
-                                <p>
-                                    {staff.gender}
-                                </p>
-
-                            </div>
-                        </div>
-                    ))
-                }
-
-            </div>
-            <div className="lg:hidden">
-                <div className="flex flex-col gap-4">
-                    {healthPersonnelList.map((staff, index) => (
-                        <div
-                            key={index}
-                            className="bg-white border border-gray-200 rounded-lg p-4 text-sm text-gray-700"
-                        >
-                            {/* Staff Name */}
-                            <div className="flex items-center gap-2 font-semibold text-gray-900 mb-2">
-                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" /> </svg>
-                                <p>
-                                    {staff.firstname} {staff.lastname}
-                                </p>
-                            </div>
-
-                            {/* Staff details */}
-                            <div className="space-y-1 grid grid-cols-1 sm:grid-cols-2 text-xs">
-                                <p>
-                                    <span className="font-medium">Staff ID:</span>{" "}
-                                    {staff.staff_id || "—"}
-                                </p>
-
-                                <p>
-                                    <span className="font-medium">Role:</span>{" "}
-                                    {staff.role || "—"}
-                                </p>
-
-                                <p>
-                                    <span className="font-medium">Phone:</span>{" "}
-                                    {staff.phone_no || "—"}
-                                </p>
-
-                                <p className="truncate">
-                                    <span className="font-medium">Email:</span>{" "}
-                                    {staff.email || "—"}
-                                </p>
-
-                                <p>
-                                    <span className="font-medium">Sex:</span>{" "}
-                                    {staff.gender || "—"}
-                                </p>
-                            </div>
-                        </div>
-                    ))}
+                {/* Sex Badge */}
+                <div className="bg-gray-100 px-2 py-1 rounded-lg">
+                  <p className="text-[10px] text-gray-500 font-bold uppercase">
+                    {staff.gender || "—"}
+                  </p>
                 </div>
+              </div>
+
+              {/* 2. Contact Quick-Action Box */}
+              <div className="grid grid-cols-1 gap-2 bg-gray-50 rounded-lg p-3 mb-4">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <div className="bg-white p-1.5 rounded-md shadow-sm">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#3E4095"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                  </div>
+                  <p className="text-[12px] font-medium">
+                    {staff.phone_no || "No Phone"}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <div className="bg-white p-1.5 rounded-md shadow-sm">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#3E4095"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                      <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                  </div>
+                  <p className="text-[12px] font-medium truncate">
+                    {staff.email || "No Email"}
+                  </p>
+                </div>
+              </div>
+
+              {/* 3. Footer Action */}
+              <div className="flex gap-2">
+                {/* <a 
+                        href={`tel:${staff.phone_no}`}
+                        className="flex-1 bg-white border border-gray-200 py-2.5 rounded-xl flex items-center justify-center gap-2 text-[12px] font-bold text-gray-700 active:bg-gray-100"
+                    >
+                        Call
+                    </a> */}
+                <button className="flex-1 bg-[#3E4095] py-2.5 rounded-full flex items-center justify-center gap-2 text-[12px] font-bold text-white">
+                  Message
+                </button>
+              </div>
             </div>
+          ))}
+        </div>
+      </div>
             <Pagination
                 count={count}
                 currentPage={currentPage}

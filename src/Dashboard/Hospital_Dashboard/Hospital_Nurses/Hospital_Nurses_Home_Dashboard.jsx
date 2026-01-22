@@ -184,8 +184,8 @@ const Hospital_Nurses_Home_Dashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="bg-white my-5 border rounded-2xl p-5">
-                <div className=" border rounded-lg p-5 ">
+              <div className="bg-white my-5 rounded-lg ">
+                <div className=" border rounded-lg p-4 lg:p-6 ">
                   <div className='flex justify-between items-center border-b pb-2 mb-4'>
                   <h2 className="font-medium">
                     Patients in my ward

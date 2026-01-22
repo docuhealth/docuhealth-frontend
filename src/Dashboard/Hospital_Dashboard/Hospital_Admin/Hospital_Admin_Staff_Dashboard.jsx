@@ -21,7 +21,7 @@ const Hospital_Admin_Staff_Dashboard = () => {
         <>
             <div className="py-2 text-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <DynamicDate />
-                <div className="flex flex-col sm:flex-row w-full sm:w-auto items-center gap-3 sm:gap-0">
+                <div className="flex flex-col sm:flex-row w-full sm:w-auto items-center gap-3 ">
                     <div className="relative w-full sm:w-auto">
                         <button
                             onClick={() => setIsOpen(!isOpen)}
@@ -49,7 +49,7 @@ const Hospital_Admin_Staff_Dashboard = () => {
                     </div>
                     <div className="w-full sm:w-auto">
                         <button
-                            className="flex justify-center items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition cursor-pointer w-full sm:w-auto"
+                            className="flex justify-center items-center gap-2 px-6 py-2.5 bg-[#3E4095] text-white font-medium rounded-full transition cursor-pointer w-full sm:w-auto"
                             onClick={() => {
                                 setCreateNewStaff(!createNewStaff)
                             }}

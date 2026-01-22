@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import LogOutModal from "./LogOut/components/LogOutModal";
 import { fetchStaff } from "../../../../queries/Hospital/fetchStaff";
 import { NursesAppContext } from "../../../../context/Hospital Context/Nurses/NursesAppContext";
+import axiosInstanceHos from "../../../../utils/axiosInstanceHos";
 import toast from 'react-hot-toast'
 
 
@@ -16,7 +17,9 @@ const Hospital_Nurses_Sidebar = () => {
   const [staffList, setStaffList] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
 
-  const [isFinalizing, setIsFinalizing] = useState(false);
+
+  const [processingId, setProcessingId] = useState(null);
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -58,7 +61,9 @@ const Hospital_Nurses_Sidebar = () => {
     setHandoverData(null);
   };
 
-  const handleFinalRequest = (staff_id) => {
+
+
+  const handleFinalRequest = async (staff_id) => {
     console.log(handoverData)
 
     const {patientManagement: handover_appointments_state, myAppointments : handover_patients_state} = handoverData
@@ -74,11 +79,12 @@ const Hospital_Nurses_Sidebar = () => {
       handover_patients : handover_patients_state
     }
 
-    setIsFinalizing(true);
+
+    setProcessingId(staff_id);
 
     try {
       // Replace with your actual axios call
-      // await axiosInstanceHos.post('/api/nurses/handover', payload);
+      const data = await axiosInstanceHos.post('/api/nurses/handover', payload);
       
       toast.success('Handover successful. Logging out...');
       
@@ -89,7 +95,8 @@ const Hospital_Nurses_Sidebar = () => {
       console.error("Handover failed:", error);
       toast.error(error.response?.data?.message || "Handover failed. Please try again.");
     } finally {
-      setIsFinalizing(false);
+    
+      setProcessingId(null)
     }
 
   }
@@ -332,7 +339,8 @@ const Hospital_Nurses_Sidebar = () => {
 
           <LogOutModal
            isOpen={isModalOpen}
-           isFetching={isFetching || isFinalizing}
+           processingId={processingId}
+           isFetching={isFetching}
            onClose={handleCloseModal}
            onLogout={handleLogoutLogic}
            staffList={staffList}

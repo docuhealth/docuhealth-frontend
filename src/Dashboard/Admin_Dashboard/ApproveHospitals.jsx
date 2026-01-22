@@ -22,6 +22,7 @@ const ApproveHospitals = () => {
             const res = await axiosInstance.get(
                 `api/hospitals/verification-request?page=${page}&size=${pageSize}`
             );
+            console.log(res)
             setRequests(res.data.results || []);
             setCount(res.data.count || 0);
             setCurrentPage(page);
@@ -135,7 +136,7 @@ const ApproveHospitals = () => {
                                     rel="noopener noreferrer"
                                     className="text-blue-500 underline text-[12px]"
                                 >
-                                    {doc.name}
+                                    {doc.name || doc.filename}
                                 </a>
                             ))}
                         </div>

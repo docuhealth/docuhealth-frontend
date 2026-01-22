@@ -27,6 +27,8 @@ const Hospital_Nurses_Header = () => {
     const [staffList, setStaffList] = useState(null);
     const [isFetching, setIsFetching] = useState(false);
 
+    const [processingId, setProcessingId] = useState(null);
+
 
     const handleLogoutLogic = async (handoverSelection) => {
       // If user clicked "Just Logout" (handoverSelection is null)
@@ -59,7 +61,7 @@ const Hospital_Nurses_Header = () => {
       setHandoverData(null);
     };
 
-    const handleFinalRequest = (staff_id) => {
+    const handleFinalRequest = async(staff_id) => {
       console.log(handoverData)
   
       const {patientManagement: handover_appointments_state, myAppointments : handover_patients_state} = handoverData
@@ -75,7 +77,24 @@ const Hospital_Nurses_Header = () => {
         handover_patients : handover_patients_state
       }
   
-      console.log(payload)
+      setProcessingId(staff_id);
+
+          try {
+      // Replace with your actual axios call
+      const data = await axiosInstanceHos.post('/api/nurses/handover', payload);
+      
+      toast.success('Handover successful. Logging out...');
+      
+      // Clear session and navigate
+      sessionStorage.clear();
+      navigate("/login");
+    } catch (error) {
+      console.error("Handover failed:", error);
+      toast.error(error.response?.data?.message || "Handover failed. Please try again.");
+    } finally {
+    
+      setProcessingId(null)
+    }
   
     }
   
@@ -181,6 +200,7 @@ const Hospital_Nurses_Header = () => {
         <div>
           <LogOutModal 
                 isOpen={isModalOpen}
+                 processingId={processingId}
                 isFetching={isFetching}
                 onClose={handleCloseModal}
                 onLogout={handleLogoutLogic}
