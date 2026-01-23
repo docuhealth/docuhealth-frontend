@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import DynamicDate from "../../../Components/Dynamic Date/DynamicDate";
 import AppointmentsList from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments Dashboard/AppointmentsList";
 import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments Dashboard/components/PatientInfo";
-import AfterVisitSummary from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments Dashboard/components/AfterVisitSummary";
+import SoapNoteEntry from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments Dashboard/components/SoapNoteEntry";
 import RequestAdmission from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments Dashboard/components/RequestAdmission";
 import OtherMedicalServices from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments Dashboard/components/OtherMedicalServices";
 
 const Hospital_Doctors_Appointments_Dashboard = () => {
   const [seePatientDetails, setSeePatientDetails] = useState(false);
   const [afterVisitSummary, setAfterVisitSummary] = useState(false);
+  const [soapNoteEntry, setSoapNoteEntry] = useState(false);
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
   const [otherMedicalServices, setOtherMedicalServices] = useState(false);
@@ -19,16 +20,16 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
     <>
       {seePatientDetails ? (
         <>
-          <div className="py-2 text-sm flex justify-between items-center">
+          <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
             <DynamicDate />
-            <div className="flex items-center gap-3">
-              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer "  onClick={()=> {
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto "  onClick={()=> {
                   setOtherMedicalServices(true)
                 }}>
                 Other medical services
                
               </button>
-              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer"
+              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto"
               onClick={()=> {
                 setRequestAdmission(true)
               }}
@@ -36,18 +37,18 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
                 Request for admission
               </button>
               <button
-                className="py-2.5 px-10 rounded-full bg-[#3E4095] text-white cursor-pointer"
+                className="py-2.5 px-10 rounded-full bg-[#3E4095] border border-[#3E4095] text-white cursor-pointer w-full lg:w-auto"
                 onClick={() => {
                   console.log("hi");
-                  setAfterVisitSummary(true);
+                  setSoapNoteEntry(true);
                   setSeePatientDetails(false);
                 }}
               >
-                + Add new SOAP note
+                + Add new SOAP Note
               </button>
             </div>
           </div>
-          <div>
+          <div className="my-5">
             <PatientInfo
               setSeePatientDetails={setSeePatientDetails}
               selectedPatientDetails={selectedPatientDetails}
@@ -66,7 +67,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
             )
           }
         </>
-      ) : afterVisitSummary ? (
+      ) : soapNoteEntry ? (
         <>
           <div className="py-2 text-sm flex justify-between items-center">
             <DynamicDate />
@@ -74,16 +75,16 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
               <button
                 className="py-2.5 px-10 rounded-full bg-[#3E4095] text-white cursor-pointer"
                 onClick={() => {
-                  setAfterVisitSummary(false);
+                  setSoapNoteEntry(false);
                 }}
               >
-                + close after-visit summary
+                + close SOAP Note
               </button>
             </div>
           </div>
           <div>
-            <AfterVisitSummary
-              setAfterVisitSummary={setAfterVisitSummary}
+            <SoapNoteEntry
+              setSoapNoteEntry={setSoapNoteEntry}
               selectedPatientDetails={selectedPatientDetails}
             />
           </div>
@@ -93,8 +94,8 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
           <div className="py-2 text-sm flex justify-between items-center">
             <DynamicDate />
           </div>
-          <div className="bg-white my-5 border rounded-2xl p-5">
-            <div className=" border rounded-lg p-5">
+          <div className="bg-white my-5  rounded-lg ">
+        <div className=" border rounded-lg p-4 lg:p-6">
               <h2 className=" mb-4 pb-2 border-b font-medium">
                 Upcoming Appointments List
               </h2>

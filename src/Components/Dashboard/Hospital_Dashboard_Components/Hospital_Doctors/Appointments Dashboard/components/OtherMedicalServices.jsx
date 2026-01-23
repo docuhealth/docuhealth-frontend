@@ -147,7 +147,7 @@ const OtherMedicalServices = ({ setOtherMedicalServices, selectedPatientDetails 
 
     return (
         <>
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-5">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-3">
                 {
                     staffList.length > 0 ? (
                         isStaffSelected ? (

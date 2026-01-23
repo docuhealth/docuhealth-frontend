@@ -6,8 +6,8 @@ import toast from "react-hot-toast";
 import { DoctorAppContext } from "../../../../../../context/Hospital Context/Doctors/DoctorAppContext";
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 
-const AfterVisitSummary = ({
-  setAfterVisitSummary,
+const SoapNoteEntry = ({
+  setSoapNoteEntry,
   selectedPatientDetails,
 }) => {
   const [notes, setNotes] = useState([]); // store all notes
@@ -292,7 +292,7 @@ const AfterVisitSummary = ({
       const res = await axiosInstanceHos.post("api/medical-records", payload);
       console.log(res);
       toast.success("After visit summary created successfully");
-      setAfterVisitSummary(false);
+      setSoapNoteEntry(false);
     } catch (err) {
       console.error("Error uploading after visit summary:", err);
       toast.error("Error uploading after visit summary");
@@ -307,7 +307,7 @@ const AfterVisitSummary = ({
         <div className="flex items-center gap-1 cursor-pointer border-b pb-3">
           <div
             onClick={() => {
-              setAfterVisitSummary(false);
+              setSoapNoteEntry(false);
             }}
           >
             <ArrowLeft className="w-4 h-4 text-gray-800" />
@@ -1080,4 +1080,4 @@ const AfterVisitSummary = ({
   );
 };
 
-export default AfterVisitSummary;
+export default SoapNoteEntry;

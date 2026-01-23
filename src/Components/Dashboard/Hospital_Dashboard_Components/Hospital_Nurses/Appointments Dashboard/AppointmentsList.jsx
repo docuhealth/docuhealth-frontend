@@ -221,6 +221,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                   </p>
                 </div>
               </div>
+
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-gray-100 rounded-md">
                   <UserIcon className="w-4 h-4 text-gray-600" />
@@ -235,6 +236,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                   </p>
                 </div>
               </div>
+
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-gray-100 rounded-md">
                   <User className="w-4 h-4 text-gray-600" />
@@ -416,7 +418,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                       {appointment.staff.role}
                     </p>
                     <p className="text-[13px] text-slate-600">
-                      Dr. {appointment.staff.lastname}
+                      Dr. {appointment.staff.firstname} {appointment.staff.lastname}
                     </p>
                   </div>
                   <div>

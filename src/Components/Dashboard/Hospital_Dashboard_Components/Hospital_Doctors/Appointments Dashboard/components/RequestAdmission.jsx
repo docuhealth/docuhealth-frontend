@@ -62,7 +62,7 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-5 text-sm">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-3 text-sm">
         <div className="bg-white rounded-md shadow-lg p-6 max-w-md w-full relative">
           <div className="flex justify-end">
             <button

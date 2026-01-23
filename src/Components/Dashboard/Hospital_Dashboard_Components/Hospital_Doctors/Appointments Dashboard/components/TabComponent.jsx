@@ -26,7 +26,7 @@ const TabComponent = ({ tabs }) => {
       </div>
 
       {/* Tab Content */}
-      <div className="p-4">{tabs[activeTab].content}</div>
+      <div className="py-4">{tabs[activeTab].content}</div>
     </div>
   );
 };
