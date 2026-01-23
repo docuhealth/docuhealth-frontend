@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { FaEye, FaEyeSlash, FaLock } from 'react-icons/fa'
 import toast from 'react-hot-toast'
 import axios from 'axios'
-import axiosInstance from '../../../../../../utils/axiosInstance'
+import axiosInstanceHos from '../../../../../../utils/axiosInstanceHos'
 import { Country, State, City } from 'country-state-city';
 
 
@@ -184,7 +184,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
         }
 
         try {
-            const res = await axiosInstance.post('api/receptionists/patient/register', payload)
+            const res = await axiosInstanceHos.post('api/receptionists/patient/register', payload)
             toast.success('Patient Registration Successful')
             console.log(res)
             setPatientHIN(res.data.profile.hin)
@@ -245,7 +245,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                                 <p className='pt-1 text-[#0B6011]'>Account Creation Successful</p>
 
                                 <div className='border p-3 rounded-lg my-3 text-xs text-gray-600'>
-                                    <p>You have successfully created an account for a new patient, they can proceed to log into their dashboard using the Email and Password you provided after verifying their email within 24 hrs</p>
+                                    <p>You have successfully created an account for a new patient, they can proceed to log into their dashboard using the Email and Password you provided after verifying their email within 10 mins</p>
                                 </div>
                                 <div className='border p-3 rounded-lg mb-5 text-xs text-gray-600 w-full'>
                                     <p className='pb-1'>Patient's HIN : {patientHIN || 'NIL'} <span></span></p>

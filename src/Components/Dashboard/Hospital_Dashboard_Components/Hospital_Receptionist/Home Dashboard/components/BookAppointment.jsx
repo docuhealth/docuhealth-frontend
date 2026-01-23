@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import axiosInstance from "../../../../../../utils/axiosInstance";
+import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 
 const Doctor_Icon = () => (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -106,7 +106,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
         setLoading(true);
 
         try {
-            const res = await axiosInstance.get(
+            const res = await axiosInstanceHos.get(
                 `api/receptionists/staff/${selected.toLowerCase()}`
             );
 
@@ -157,7 +157,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
 
 
         try {
-            const res = await axiosInstance.post('api/receptionists/appointments', updatedFormData)
+            const res = await axiosInstanceHos.post('api/receptionists/appointments', updatedFormData)
             console.log(res)
             toast.success('You have successfully booked a consultation for a patient')
             setBookAppointment(false)

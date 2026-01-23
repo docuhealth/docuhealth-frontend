@@ -14,7 +14,7 @@ const MedicalRecordsDetail = ({
 
   return (
     <>
-      <div className="bg-white my-5 border rounded-2xl pt-8 px-6 text-sm ">
+      <div className="bg-white my-5 border rounded-lg pt-8 px-6 text-sm ">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 sm:gap-0  border-b pb-4 w-full">
           <div
             className="flex justify-start items-center gap-1 cursor-pointer"
@@ -70,7 +70,7 @@ const MedicalRecordsDetail = ({
             </div>
           </div>
         </div>
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-xl">
+        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
           <p className="text-[12px] mb-4">
             {" "}
             Patient's name :{" "}
@@ -164,7 +164,7 @@ const MedicalRecordsDetail = ({
             </div>
           </div>
         </div>
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-xl ">
+        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
           <p className="font-medium mb-4"> Vital Signs</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[12px]">
@@ -290,7 +290,7 @@ const MedicalRecordsDetail = ({
             </div>
           </div>
         </div>
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-xl">
+        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
           <p className="font-medium mb-4">Clinical Summary</p>
           <div className="pb-1">
             <p className="text-[12px]">
@@ -361,7 +361,7 @@ const MedicalRecordsDetail = ({
             </ul>
           </div>
         </div>
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-xl">
+        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
           <p className="font-medium mb-4">Uploaded Documents / Images</p>
           <div>
 
@@ -425,7 +425,7 @@ const MedicalRecordsDetail = ({
         </div>
 
 
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-xl">
+        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
           <p className="font-medium mb-4">Follow Up / Appointment</p>
           <div className="pb-1">
             <p className="text-[12px]">
@@ -450,7 +450,7 @@ const MedicalRecordsDetail = ({
             </p>
           </div>
         </div>
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-xl">
+        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
           <p className="font-medium mb-4">Referral :</p>
           <div className="pb-1">
             <p className="text-[12px]">

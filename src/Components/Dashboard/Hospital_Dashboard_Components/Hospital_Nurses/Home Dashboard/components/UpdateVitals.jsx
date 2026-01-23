@@ -72,7 +72,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
 
     }
     return (
-        <div className="bg-white my-5 border rounded-2xl pt-8 px-6 text-sm ">
+        <div className="bg-white my-5 border rounded-lg pt-5 lg:pt-8 px-4 lg:px-6 text-sm ">
             <div
                 className="flex justify-start items-center gap-1 cursor-pointer border-b pb-3"
                 onClick={() => setUpdateVitals(false)}

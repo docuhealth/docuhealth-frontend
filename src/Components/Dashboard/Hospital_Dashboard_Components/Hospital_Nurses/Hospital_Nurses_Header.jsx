@@ -6,6 +6,8 @@ import { NursesAppContext } from "../../../../context/Hospital Context/Nurses/Nu
 
 import LogOutModal from "./LogOut/components/LogOutModal";
 import { fetchStaff } from "../../../../queries/Hospital/fetchStaff";
+import toast from "react-hot-toast";
+import axiosInstanceHos from "../../../../utils/axiosInstanceHos";
 
 
 const Hospital_Nurses_Header = () => {

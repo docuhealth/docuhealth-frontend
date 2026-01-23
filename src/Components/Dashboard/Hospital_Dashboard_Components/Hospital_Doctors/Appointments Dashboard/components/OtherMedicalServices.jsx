@@ -228,7 +228,7 @@ const OtherMedicalServices = ({ setOtherMedicalServices, selectedPatientDetails 
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-3 my-5 text-sm">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-3 my-5 text-sm gap-3">
                                         {staffList.map((staff, index) => (
                                             <div key={index} className="border rounded-md p-3">
                                                 <div>

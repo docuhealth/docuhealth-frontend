@@ -2,6 +2,9 @@ import React, { useContext } from 'react'
 import { HosAppointmentsContext } from '../../../../../context/Hospital Context/Admin/HosAppointmentsContext'
 import Pagination from '../../../Patient_Dashboard_Components/Pagination/Pagination'
 import { formatFullDate, formatTime } from '../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter'
+import { CalendarIcon,ClockIcon, UserIcon  } from 'lucide-react'
+
+
 const AppointmentsListHospital = () => {
 
   const {
@@ -91,136 +94,79 @@ const AppointmentsListHospital = () => {
   return (
     <>
       <div className="text-[12px] my-4">
-        {/* <div>
-        {appointments.map((appointment) => (
-        <div
-          key={appointment.id}
-          className="mb-4 p-4 border rounded-md grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-0 "
-        >
-          <div className="flex items-center gap-1">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"
-                fill="#1B2B40"
-              />
-            </svg>
-            <p>Date / Time: {formatFullDate(appointment.scheduled_time)} / {formatTime(appointment.scheduled_time)}</p>
-          </div>
-          <div className="flex items-center gap-1">
-          <svg width="20" height="20" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#1B2B40" />
-                  </svg>
-
-            <p>Patient : {appointment.patient.firstname}{" "}
-            {appointment.patient.lastname}</p>
-          </div>
-          <div className="flex items-center gap-1">
-          <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"
-                fill="#1B2B40"
-              />
-            </svg>
-
-            <p>Last Visit : {appointment.last_visited || 'NIL'}</p>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z" fill="#1B2B40" />
-            </svg>
-
-
-            <p>{'Appointed ' + appointment.staff.role.charAt(0).toUpperCase() + appointment.staff.role.slice(1)}
-              : {appointment.staff.firstname}{" "}
-              {appointment.staff.lastname}</p>
-          </div>
-          <div className="border-l lg:flex lg:justify-center lg:items-center sm:col-span-2 lg:col-span-1 w-full my-4 lg:my-0">
-            <button className="border border-[#3E4095] rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300">
-              <p className="text-[#3E4095]">Send a message</p>
-            </button>
-          </div>
-        </div>
-      ))}
-        </div> */}
+       
          <div className='hidden lg:block'>
         {appointments.map((appointment) => (
           <div
             key={appointment.id}
-            className="mb-4 p-4 border rounded-md grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-0 "
+            className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10 "
           >
-            <div className="flex items-center gap-1">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"
-                  fill="#1B2B40"
-                />
-              </svg>
-              <p className='flex-1'>Date / Time: {formatFullDate(appointment.scheduled_time)} / {formatTime(appointment.scheduled_time)}</p>
-            </div>
-            <div className="flex items-center gap-1">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#1B2B40" />
-              </svg>
 
-              <p>Patient : {appointment.patient.firstname}{" "}
-                {appointment.patient.lastname}</p>
-            </div>
-            <div className="flex items-center gap-1">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"
-                  fill="#1B2B40"
-                />
-              </svg>
-
-              <p>Last Visit : {appointment.last_visited || 'NIL'}</p>
+            <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gray-100 rounded-md">
+                        <CalendarIcon className="w-4 h-4 text-gray-600" />
+                    </div>
+                    <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-semibold">Date / Time</p>
+                           <p className="text-sm font-medium">
+                            {formatFullDate(appointment.scheduled_time)} / {formatTime(appointment.scheduled_time)}
+                           </p>
+                    </div>
             </div>
 
-            <div className="flex items-center gap-1">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z" fill="#1B2B40" />
-              </svg>
-
-
-              <p>{'Appointed ' + appointment.staff.role.charAt(0).toUpperCase() + appointment.staff.role.slice(1)}
-                : {appointment.staff.firstname}{" "}
-                {appointment.staff.lastname}</p>
+            <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gray-100 rounded-md">
+                         <UserIcon className="w-4 h-4 text-gray-600" />
+                    </div>
+                    <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-semibold">Patient</p>
+                           <p className="text-sm font-medium">
+                        {appointment.patient.firstname}{" "}
+                {appointment.patient.lastname}
+                           </p>
+                    </div>
             </div>
-            <div className="lg:border-l lg:flex lg:justify-center lg:items-center sm:col-span-2 lg:col-span-1 w-full my-4 lg:my-0" >
-              <button className="border border-[#3E4095] rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300 cursor-pointer" onClick={() => {
+
+              <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gray-100 rounded-md">
+                        <CalendarIcon className="w-4 h-4 text-gray-600" />
+                    </div>
+                    <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-semibold">Last Visit</p>
+                           <p className="text-sm font-medium">
+                            {appointment.last_visited || 'NIL'}
+                           </p>
+                    </div>
+            </div>
+
+                        <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gray-100 rounded-md">
+                         <UserIcon className="w-4 h-4 text-gray-600" />
+                    </div>
+                    <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-semibold">{'Appointed ' + appointment.staff.role.charAt(0).toUpperCase() + appointment.staff.role.slice(1)}</p>
+                           <p className="text-sm font-medium">
+                        {appointment.staff.role === "doctor" ? "Dr. " : ""} {appointment.staff.firstname}{" "}
+                {appointment.staff.lastname}
+                           </p>
+                    </div>
+            </div>
+
+
+     
+
+
+           
+              <button className="border border-[#3E4095] rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300 cursor-pointer flex-1" onClick={() => {
                 toast.success('Coming Soon !')
               }}>
                 <p className="text-[#3E4095]">Send a message</p>
               </button>
-            </div>
+           
           </div>
         ))}
       </div>
+      
       <div className="block lg:hidden space-y-4 my-4">
         {appointments.map((appointment) => (
           <div
@@ -274,7 +220,7 @@ const AppointmentsListHospital = () => {
                     Appointed {appointment.staff.role}
                   </p>
                   <p className="text-[13px] font-medium text-gray-700">
-                    Dr. {appointment.staff.firstname} {appointment.staff.lastname}
+                   {appointment.staff.role === "doctor" ? "Dr. " : ""} {appointment.staff.firstname} {appointment.staff.lastname}
                   </p>
                 </div>
               </div>

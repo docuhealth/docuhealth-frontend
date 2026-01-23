@@ -89,7 +89,7 @@ const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selec
                 </>
             ) : (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 ">
-                    <div className="bg-white w-full max-w-[500px] rounded-md p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200 ">
+                    <div className="bg-white w-full max-w-[500px] rounded-md p-5 lg:p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200 ">
 
                         {/* Close Button */}
                         <button

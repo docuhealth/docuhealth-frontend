@@ -30,7 +30,7 @@ const TabComponent = ({ tabs }) => {
             </div>
 
             {/* Tab Content */}
-            <div className="">{tabs[activeTab].content}</div>
+            <div className="py-2">{tabs[activeTab].content}</div>
         </div>
     )
 }

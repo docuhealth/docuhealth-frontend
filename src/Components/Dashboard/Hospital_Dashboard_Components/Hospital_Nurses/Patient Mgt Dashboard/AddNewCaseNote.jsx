@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { X } from 'lucide-react';
 import axiosInstanceHos from '../../../../../utils/axiosInstanceHos';
 import toast from 'react-hot-toast'; // or your preferred toast library
 
@@ -10,7 +11,9 @@ const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInput
             {caseNoteData[field].map((item, idx) => (
                 <div key={idx} className="bg-white border border-gray-200 rounded p-2 text-[12px] flex justify-between items-center">
                     <span>{item}</span>
-                    <button type="button" className="text-red-500 font-bold ml-2" onClick={() => handleRemoveItem(field, idx)}>&times;</button>
+                    <button type="button" className="text-red-500 font-bold ml-2 cursor-pointer" onClick={() => handleRemoveItem(field, idx)}>
+                        <X size={11}/>
+                    </button>
                 </div>
             ))}
         </div>
@@ -105,7 +108,7 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
 
         setLoading(true);
         try {
-            console.log(payload)
+            console.log(filteredPayload)
             // End-point from your image: /api/nurses/case-notes
             await axiosInstanceHos.post('/api/nurses/case-notes', filteredPayload);
             
@@ -125,7 +128,7 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
     };
 
     return (
-        <div className="bg-white my-5 border rounded-2xl pt-8 px-6 pb-8 text-sm ">
+        <div className="bg-white my-5 border rounded-lg pt-5 lg:pt-8 px-4 lg:px-6  pb-8 text-sm ">
             <div className='flex items-center justify-between border-b pb-3'>
                 <div className='flex items-center gap-2 cursor-pointer' onClick={() => setNewCaseNote(false)}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4.56528 6.41685H11.6654V7.58352H4.56528L7.69426 10.7125L6.86932 11.5374L2.33203 7.00019L6.86932 2.46289L7.69426 3.28785L4.56528 6.41685Z" fill="#1B2B40" /></svg>

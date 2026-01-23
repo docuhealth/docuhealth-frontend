@@ -8,7 +8,7 @@ const PatientInfo = ({ patientFullInfo }) => {
     console.log(patientFullInfo)
     return (
         <>
-            <div className="my-5 bg-[#FAFAFA] rounded-xl border p-4">
+            <div className="my-5 bg-[#FAFAFA] rounded-lg border p-4">
                 <h2 className="font-medium">General Information</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -95,7 +95,7 @@ const PatientInfo = ({ patientFullInfo }) => {
 
                 </div>
             </div>
-            <div className="my-5 bg-[#FAFAFA] rounded-xl border p-4">
+            <div className="my-5 bg-[#FAFAFA] rounded-lg border p-4">
                 <h2 className="font-medium">Latest vital signs</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[12px] mt-5">
                     <div className=" bg-white border rounded-md p-3">
@@ -221,7 +221,7 @@ const PatientInfo = ({ patientFullInfo }) => {
 
                 </div>
             </div>
-            <div className="my-5 bg-[#FAFAFA] rounded-xl border p-4">
+            <div className="my-5 bg-[#FAFAFA] rounded-lg border p-4">
                 <h2 className="font-medium">Ongoing Medication ({patientFullInfo?.ongoing_drugs?.length})</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[12px] mt-5">
                     {patientFullInfo?.ongoing_drugs?.map((drug, index) => (

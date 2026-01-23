@@ -166,7 +166,7 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
 
                                 <p className="">{formatFullDateTime(admittedPatient.admission_date)}</p>
                             </div>
-                            <button className="text-center mt-3 py-2 border bg-[#1B2B40] text-white w-full rounded-full cursor-pointer"
+                            <button className="text-center mt-3 py-2.5 border bg-[#1B2B40] text-white w-full rounded-full cursor-pointer"
                                 onClick={() => setSelectedPatient(admittedPatient)}
                             >
                                 View patient's details
@@ -185,8 +185,8 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
             </div>
             {selectedPatient && (
                 <>
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 text-sm">
-                        <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 text-sm px-3">
+                        <div className="bg-white rounded-lg shadow-lg p-4 lg:p-6 max-w-md w-full relative text-sm">
                             <div className='flex justify-end'>
                                 <button
                                     onClick={() => setSelectedPatient(null)}
@@ -225,17 +225,17 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
 
                                 <p>
                                     <strong>State of Origin:</strong>{" "}
-                                    {selectedPatient?.patient?.state_of_origin ?? "NIL"}
+                                    {selectedPatient?.patient?.state ?? "NIL"}
                                 </p>
 
                                 <p>
                                     <strong>Contact info:</strong>{" "}
-                                    {selectedPatient?.patient?.phone ?? "NIL"}
+                                    {selectedPatient?.patient?.phone_num ?? "NIL"}
                                 </p>
 
                                 <p>
                                     <strong>Address:</strong>{" "}
-                                    {selectedPatient?.patient?.address ?? "NIL"}
+                                    {selectedPatient?.patient?.street ?? "NIL"}
                                 </p>
 
                                 <p>

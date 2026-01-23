@@ -138,6 +138,10 @@ layer(base);
   background-color: #3E4095 !important; /* DocuHealth purple */
 }
 
+button{
+  cursor: pointer;
+}
+
 
 
 

@@ -3,7 +3,7 @@ import { ReceptionistAdmissionRequestContext } from '../../../../../context/Hosp
 import Pagination from '../../../Patient_Dashboard_Components/Pagination/Pagination'
 import formatRecordDate from '../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate'
 import { formatFullDateTime } from '../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate'
-import axiosInstance from '../../../../../utils/axiosInstance'
+import axiosInstanceHos from '../../../../../utils/axiosInstanceHos'
 import toast from 'react-hot-toast'
 
 const AdmissionRequestList = () => {
@@ -99,7 +99,7 @@ const AdmissionRequestList = () => {
     setLoadingAdmissionId(admissionRequestID); // start loading
 
     try {
-      const res = await axiosInstance.patch(
+      const res = await axiosInstanceHos.patch(
         `api/hospitals/admissions/${admissionRequestID}/confirm`
       );
       toast.success('Patient admitted successfully');

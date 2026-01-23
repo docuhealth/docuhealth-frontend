@@ -171,7 +171,7 @@ const PatientsAssignedToMyWard = () => {
               </div>
               <div>
                 <p className="text-[10px] text-gray-400 uppercase">Assigned Doctor</p>
-                <p className="text-[12px] font-medium text-gray-700">Dr. {patient.staff.lastname}</p>
+                <p className="text-[12px] font-medium text-gray-700">Dr. {patient.staff.firstname} {patient.staff.lastname}</p>
               </div>
               <div>
                 <p className="text-[10px] text-gray-400 uppercase">Email/Info</p>

@@ -1,6 +1,5 @@
 import React, { useState, useContext } from "react";
 import toast from "react-hot-toast";
-import axiosInstance from "../../../../../utils/axiosInstance";
 import Pagination from "../../../Patient_Dashboard_Components/Pagination/Pagination";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
@@ -177,8 +176,8 @@ const AdmittedPatientsTab = () => {
             </div>
             {selectedPatient && (
                 <>
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 text-sm">
-                        <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 text-sm px-3">
+                        <div className="bg-white rounded-lg shadow-lg p-4 lg:p-6 max-w-md w-full relative text-sm">
                             <div className='flex justify-end'>
                                 <button
                                     onClick={() => setSelectedPatient(null)}
@@ -211,23 +210,23 @@ const AdmittedPatientsTab = () => {
                                 <p>
                                     <strong>D.O.B:</strong>{" "}
                                     {selectedPatient?.patient?.dob
-                                        ? formatRecordDate(selectedPatient.patient.dob)
+                                        ? selectedPatient.patient.dob
                                         : "NIL"}
                                 </p>
 
                                 <p>
                                     <strong>State of Origin:</strong>{" "}
-                                    {selectedPatient?.patient?.state_of_origin ?? "NIL"}
+                                   {selectedPatient?.patient?.state ?? "NIL"}
                                 </p>
 
                                 <p>
                                     <strong>Contact info:</strong>{" "}
-                                    {selectedPatient?.patient?.phone ?? "NIL"}
+                                    {selectedPatient?.patient?.phone_num ?? "NIL"}
                                 </p>
 
                                 <p>
                                     <strong>Address:</strong>{" "}
-                                    {selectedPatient?.patient?.address ?? "NIL"}
+                                    {selectedPatient?.patient?.street ?? "NIL"}
                                 </p>
 
                                 <p>
@@ -239,7 +238,7 @@ const AdmittedPatientsTab = () => {
 
                                 <p>
                                     <strong>Ward placed:</strong>{" "}
-                                v
+                                  {selectedPatient?.ward_info?.name ?? "NIL"}
                                 </p>
 
                                 <p>

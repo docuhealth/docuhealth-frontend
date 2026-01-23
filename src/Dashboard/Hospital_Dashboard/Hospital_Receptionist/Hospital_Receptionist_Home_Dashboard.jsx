@@ -4,7 +4,7 @@ import DynamicDate from '../../../Components/Dynamic Date/DynamicDate'
 import template from '../../../assets/img/template.png'
 import OnboardNewPatient from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home Dashboard/components/OnboardNewPatient'
 import toast from 'react-hot-toast'
-import axiosInstance from '../../../utils/axiosInstance'
+import axiosInstanceHos from '../../../utils/axiosInstanceHos'
 import BookAppointment from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home Dashboard/components/BookAppointment'
 import AppointmentsList from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Appointments Dashboard/AppointmentsList'
 import RecentPatients from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home Dashboard/components/RecentPatients'
@@ -38,7 +38,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
     }
 
     try {
-      const res = await axiosInstance.get(`api/receptionists/patient/${patientHIN}`)
+      const res = await axiosInstanceHos.get(`api/receptionists/patient/${patientHIN}`)
       toast.success(" Patient's Details Retrieved Successfully ")
       console.log(res)
       setPatientDetails(res.data)
