@@ -51,7 +51,7 @@ axiosInstanceHos.interceptors.response.use(
         sessionStorage.removeItem("hospital_token");
         sessionStorage.removeItem("hospital_role");
         
-        window.location.href = "/hospital-login"; // Adjust this path to your actual hospital login
+        window.location.href = "/login"; // Adjust this path to your actual hospital login
         return Promise.reject(err);
       }
     }
