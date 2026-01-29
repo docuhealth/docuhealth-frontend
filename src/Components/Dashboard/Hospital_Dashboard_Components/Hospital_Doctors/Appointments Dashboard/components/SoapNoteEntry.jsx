@@ -1,68 +1,89 @@
 import React, { useState, useEffect, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
-import { X, UploadCloud, FileText } from "lucide-react";
+import { X, Plus, UploadCloud, FileText } from "lucide-react";
 import { truncateWords } from "../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import toast from "react-hot-toast";
 import { DoctorAppContext } from "../../../../../../context/Hospital Context/Doctors/DoctorAppContext";
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 
-const SoapNoteEntry = ({
-  setSoapNoteEntry,
-  selectedPatientDetails,
-}) => {
-  const [notes, setNotes] = useState([]); // store all notes
-  const [newNote, setNewNote] = useState(""); // current note being typed
-  const [showInput, setShowInput] = useState(false); // toggle input field
+const NoteSection = ({
+  title,
+  field,
+  placeholder,
+  soapNoteData,
+  inputs,
+  setInputs,
+  handleAddListItem,
+  handleRemoveItem,
+  activeInput,
+  setActiveInput,
+}) => (
+  <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3 bg-gray-50/30">
+    <p className="font-medium text-[#1B2B40] mb-2">{title}</p>
 
+    <div className="space-y-2 max-h-[200px] overflow-y-auto mb-2">
+      {soapNoteData[field].map((item, idx) => (
+        <div
+          key={idx}
+          className="bg-white border border-gray-200 rounded p-2 text-[12px] flex justify-between items-center"
+        >
+          <span>{item}</span>
+          <button
+            type="button"
+            className="text-red-500 font-bold ml-2 cursor-pointer"
+            onClick={() => handleRemoveItem(field, idx)}
+          >
+            <X size={11} />
+          </button>
+        </div>
+      ))}
+    </div>
+
+    {activeInput === field ? (
+      <div className="flex gap-2">
+        <input
+          autoFocus
+          type="text"
+          value={inputs[field]}
+          onChange={(e) => setInputs({ ...inputs, [field]: e.target.value })}
+          placeholder={placeholder}
+          className="flex-1 border rounded p-2 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none"
+        />
+        <button
+          type="button"
+          onClick={() => handleAddListItem(field)}
+          className="bg-[#3E4095] text-white px-3 py-1 rounded text-[12px]"
+        >
+          Add
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveInput(null)}
+          className="text-gray-500 text-[12px]"
+        >
+          Cancel
+        </button>
+      </div>
+    ) : (
+      <button
+        type="button"
+        onClick={() => setActiveInput(field)}
+        className="flex items-center gap-1 text-[#3E4095] font-medium text-[12px]"
+      >
+        <span className="text-lg">+</span> Add Entry
+      </button>
+    )}
+  </div>
+);
+
+const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
   const { profile, hospitals } = useContext(DoctorAppContext);
 
-  console.log(hospitals);
+  // console.log(selectedPatientDetails);
 
-  const handleAddNote = () => {
-    if (newNote.trim() === "") return;
-    setNotes([...notes, newNote.trim()]);
-    setNewNote("");
-    setShowInput(false);
-  };
-
-  const handleRemoveNote = (index) => {
-    const updatedNotes = notes.filter((_, idx) => idx !== index);
-    setNotes(updatedNotes);
-  };
-
-  const [findings, setFindings] = useState([]);
-  const [newFinding, setNewFinding] = useState("");
-  const [showFindingInput, setShowFindingInput] = useState(false);
-
-  const handleAddFinding = () => {
-    if (newFinding.trim() === "") return;
-    setFindings([...findings, newFinding.trim()]);
-    setNewFinding("");
-    setShowFindingInput(false);
-  };
-
-  const handleRemoveFinding = (index) => {
-    const updated = findings.filter((_, idx) => idx !== index);
-    setFindings(updated);
-  };
+  // console.log(hospitals);
 
   const [step, setStep] = useState(1);
-
-  const [instructions, setInstructions] = useState([]);
-  const [newInstruction, setNewInstruction] = useState("");
-  const [showInstructionInput, setShowInstructionInput] = useState(false);
-
-  const handleAddInstruction = () => {
-    if (newInstruction.trim() === "") return;
-    setInstructions([...instructions, newInstruction.trim()]);
-    setNewInstruction("");
-    setShowInstructionInput(false);
-  };
-
-  const handleRemoveInstruction = (index) => {
-    const updated = instructions.filter((_, idx) => idx !== index);
-    setInstructions(updated);
-  };
 
   const [medications, setMedications] = useState([
     {
@@ -119,47 +140,6 @@ const SoapNoteEntry = ({
     setAttachments((prevDocs) => prevDocs.filter((_, i) => i !== index));
   };
 
-  const [formData, setFormData] = useState({
-    chief_complaint: "",
-    history: [],
-    vital_signs: {
-      blood_pressure: "",
-      temp: "",
-      resp_rate: "",
-      height: "",
-      weight: "",
-      heart_rate: "",
-    },
-    physical_exam: [],
-    diagnosis: [],
-    treatment_plan: [],
-    care_instructions: [],
-    drug_records: [
-      {
-        name: "",
-        route: "",
-        quantity: "",
-        frequency: {
-          value: "",
-          rate: "",
-        },
-        duration: {
-          value: "",
-          rate: "",
-        },
-        status: "ongoing",
-      },
-    ],
-    attachments: [],
-    appointment: {
-      staff_id: profile?.staff_id || "",
-      scheduled_time: "2025-11-30T13:31:42.281Z",
-    },
-    doctor: profile?.staff_id || "",
-    referred_docuhealth_hosp: "string",
-    referred_hosp: "string",
-    patient: selectedPatientDetails.patient.hin || "",
-  });
   const today = new Date();
 
   const [selectedDay, setSelectedDay] = useState(String(today.getDate()));
@@ -167,67 +147,120 @@ const SoapNoteEntry = ({
   const [selectedYear, setSelectedYear] = useState(String(today.getFullYear()));
   const [selectedTime, setSelectedTime] = useState("08:00");
 
-  const [otherHospitalInput, setOtherHospitalInput] = useState("");
-  const [selectedDocuHealthHospital, setSelectedDocuHealthHospital] =
-    useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleNextStep = () => {
-    // Gather textarea values
-    const chiefComplaint = document
-      .getElementById("chiefComplaint")
-      ?.value.trim();
-    const investigationInput = document
-      .getElementById("diagnosis")
-      ?.value.trim();
-    const treatmentInput = document.getElementById("treatment")?.value.trim();
+  //   try {
+  //     const res = await axiosInstanceHos.post("api/medical-records", payload);
+  //     console.log(res);
+  //     toast.success("After visit summary created successfully");
+  //     setSoapNoteEntry(false);
 
-    const vitalSigns = {
-      blood_pressure: document.getElementById("bloodPressure")?.value.trim(),
-      temp: document.getElementById("temperature")?.value.trim(),
-      resp_rate: document.getElementById("respRate")?.value.trim(),
-      height: document.getElementById("height")?.value.trim(),
-      weight: document.getElementById("weight")?.value.trim(),
-      heart_rate: document.getElementById("heartRate")?.value.trim(),
-    };
+  const [soapNoteData, setSoapNoteData] = useState({
+    chief_complaint: "",
+    history_of_presenting_complain: "",
+    past_med_history: "",
+    family_history: "",
+    social_history: "",
+    other_history: "",
+    review_of_system: "",
+    primary_diagnosis: "",
+    differential_diagnosis: "",
+    patient_education: "",
+    referred_docuhealth_hosp: "",
+    referred_hosp: "",
+    drug_history_allergies: [],
+    general_exam: [],
+    systemic_exam: [],
+    besides_tests: [],
+    investigations: [],
+    problems_list: [],
+    treatment_plan: [],
+    care_instructions: [],
+  });
 
-    // Check for empty fields
-    if (
-      !chiefComplaint ||
-      notes.length === 0 ||
-      Object.values(vitalSigns).some((v) => !v) ||
-      findings.length === 0 ||
-      !investigationInput ||
-      !treatmentInput
-    ) {
-      toast.error("Please fill in all required fields before proceeding");
-      return; // stop execution
-    }
+  const [inputs, setInputs] = useState({
+    drug_history_allergies: "",
+    general_exam: "",
+    systemic_exam: "",
+    besides_tests: "",
+    investigations: "",
+    problems_list: "",
+    treatment_plan: "",
+    care_instructions: "",
+  });
 
-    // Populate formData
-    setFormData({
-      chief_complaint: chiefComplaint,
-      history: notes,
-      vital_signs: vitalSigns,
-      physical_exam: findings,
-      diagnosis: investigationInput.split(",").map((item) => item.trim()),
-      treatment_plan: treatmentInput.split(",").map((item) => item.trim()),
-    });
-
-    // Move to next step
-    setStep(step + 1);
+  const handleTextChange = (e) => {
+    const { name, value } = e.target;
+    setSoapNoteData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  useEffect(() => {
-    if (step === 2) {
-      console.log("Form Data on Step 2:", formData);
-    }
-  }, [step, formData]);
+  const handleAddListItem = (field) => {
+    if (!inputs[field].trim()) return;
+    setSoapNoteData((prev) => ({
+      ...prev,
+      [field]: [...prev[field], inputs[field]],
+    }));
+    setInputs((prev) => ({ ...prev, [field]: "" }));
+    setActiveInput(null);
+  };
 
-  const [loading, setLoading] = useState(false);
+  const handleRemoveItem = (field, index) => {
+    setSoapNoteData((prev) => ({
+      ...prev,
+      [field]: prev[field].filter((_, i) => i !== index),
+    }));
+  };
+
+  const [activeInput, setActiveInput] = useState(null);
+
+  const handleNextStep = () => {
+    switch (step) {
+      case 1:
+        if (!soapNoteData.chief_complaint?.trim()) {
+          toast.error("Chief Complaint is compulsory before proceeding");
+          return;
+        }
+
+        break;
+
+      case 2:
+        break;
+
+      case 3:
+        // Compulsory: Primary Diagnosis
+        // Note: primary_diagnosis is usually an array in the payload
+        if (
+          !soapNoteData.primary_diagnosis ||
+          soapNoteData.primary_diagnosis.length === 0
+        ) {
+          toast.error("At least one Primary Diagnosis is compulsory");
+          return;
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    // If validation passes, move to the next step
+    setStep((prev) => prev + 1);
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
-    const careInstructions = instructions; // already an array
+
+    if (
+      soapNoteData.care_instructions.length === 0 ||
+      soapNoteData.treatment_plan.length === 0
+    ) {
+      toast.error("Care Instructions and Treatment Plan is required");
+      setLoading(false);
+      return;
+    }
+
     const drugRecords = medications.map((med) => ({
       name: med.drug,
       route: med.route,
@@ -241,6 +274,8 @@ const SoapNoteEntry = ({
         rate: med.durationUnit,
       },
       status: "ongoing",
+      allergies: "",
+      created_at: new Date().toISOString(),
     }));
 
     let uploadedAttachments = [];
@@ -252,7 +287,7 @@ const SoapNoteEntry = ({
       try {
         const response = await axiosInstanceHos.post(
           "api/medical-records/upload-attachments",
-          formDataToUpload
+          formDataToUpload,
         );
         console.log(response.data);
         uploadedAttachments = response.data; // depends on API response
@@ -264,46 +299,89 @@ const SoapNoteEntry = ({
     }
 
     const selectedDate = new Date(
-      `${selectedDay} ${selectedMonth} ${selectedYear} ${selectedTime}`
+      `${selectedDay} ${selectedMonth} ${selectedYear} ${selectedTime}`,
     );
     const scheduled_time = selectedDate.toISOString();
 
-    const referred_docuhealth_hosp = selectedDocuHealthHospital || "";
-    const referred_hosp = otherHospitalInput || "";
-
     const payload = {
-      ...formData,
-      care_instructions: careInstructions,
+      staff: profile?.staff_id || "",
+      patient: selectedPatientDetails.patient.hin || "",
+      investigations_docs: uploadedAttachments,
+      vital_signs: "",
+      referred_docuhealhosp: soapNoteData.referred_docuhealth_hosp,
+      referred_hosp: soapNoteData.referred_hosp,
       drug_records: drugRecords,
-      attachments: uploadedAttachments,
       appointment: {
         staff_id: profile?.staff_id || "",
-        scheduled_time,
+        patient: selectedPatientDetails.patient.hin || "",
+        scheduled_time: scheduled_time,
       },
-      referred_docuhealth_hosp,
-      referred_hosp,
-      doctor: profile?.staff_id || "",
-      patient: selectedPatientDetails.patient.hin || "",
+      investigations: soapNoteData.investigations,
+      problems_list: soapNoteData.problems_list,
+      care_instructions: soapNoteData.care_instructions,
+      drug_history_allergies: soapNoteData.drug_history_allergies,
+      chief_complaint: soapNoteData.chief_complaint,
+      history: soapNoteData.history_of_presenting_complain,
+      past_med_history: soapNoteData.past_med_history,
+      family_history: soapNoteData.family_history,
+      social_history: soapNoteData.social_history,
+      review: soapNoteData.review_of_system,
+      general_exam: soapNoteData.general_exam,
+      systemic_exam: soapNoteData.systemic_exam,
+      besides_tests: soapNoteData.besides_tests,
+      primary_diagnosis: soapNoteData.primary_diagnosis,
+      differential_diagnosis: soapNoteData.differential_diagnosis,
+      treatment_plan: soapNoteData.treatment_plan,
+      patient_education: soapNoteData.patient_education,
     };
 
-    console.log("Final payload:", payload);
-
     try {
-      const res = await axiosInstanceHos.post("api/medical-records", payload);
-      console.log(res);
-      toast.success("After visit summary created successfully");
-      setSoapNoteEntry(false);
+      console.log("Submitting SOAP Note with payload:", payload);
     } catch (err) {
-      console.error("Error uploading after visit summary:", err);
-      toast.error("Error uploading after visit summary");
+      console.error("Error uploading SOAP Note:", err);
+      toast.error("Error uploading SOAP Note");
     } finally {
       setLoading(false);
+      setStep(1);
+      setSoapNoteEntry(false);
+      setSoapNoteData({
+        chief_complaint: "",
+        history_of_presenting_complain: "",
+        past_med_history: "",
+        family_history: "",
+        social_history: "",
+        other_history: "",
+        review_of_system: "",
+        primary_diagnosis: "",
+        differential_diagnosis: "",
+        patient_education: "",
+        referred_docuhealth_hosp: "",
+        referred_hosp: "",
+        drug_history_allergies: [],
+        general_exam: [],
+        systemic_exam: [],
+        besides_tests: [],
+        investigations: [],
+        problems_list: [],
+        treatment_plan: [],
+        care_instructions: [],
+      });
+      setInputs({
+        drug_history_allergies: "",
+        general_exam: "",
+        systemic_exam: "",
+        besides_tests: "",
+        investigations: "",
+        problems_list: "",
+        treatment_plan: "",
+        care_instructions: "",
+      });
     }
   };
 
   return (
     <>
-      <div className="bg-white rounded-xl border mt-3 p-5 text-sm">
+      <div className="bg-white rounded-lg border mt-3 px-3 lg:px-5 py-5 text-sm">
         <div className="flex items-center gap-1 cursor-pointer border-b pb-3">
           <div
             onClick={() => {
@@ -312,235 +390,101 @@ const SoapNoteEntry = ({
           >
             <ArrowLeft className="w-4 h-4 text-gray-800" />
           </div>
-          <p>After visit summary</p>
+          <p>SOAP Note Entry</p>
         </div>
         {step === 1 && (
           <div className="my-5">
-            <div className="border rounded-md p-5">
-              <p className="font-medium">Chief complaint</p>
+            <div className="mb-2 font-medium">
+              <p>Subjective</p>
+            </div>
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5">
+              <p className="font-medium">Chief complaint (compulsory)</p>
               <textarea
-                name=""
-                id="chiefComplaint"
+                name="chief_complaint"
+                value={soapNoteData.chief_complaint}
+                onChange={handleTextChange}
                 className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
                 placeholder="Enter chief complaint..."
               ></textarea>
             </div>
-            <div className="border rounded-md p-5 mt-3">
-              <p className="font-medium">History summary</p>
-
-              {/* Existing notes */}
-              <div className="my-2 space-y-2 max-h-[300px] overflow-y-auto">
-                {notes.length === 0 && (
-                  <p className="text-gray-400 text-[12px]">No notes yet</p>
-                )}
-                {notes.map((note, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-gray-100 rounded p-2 text-[12px] flex justify-between items-center"
-                  >
-                    <span>{note}</span>
-                    <button
-                      className="text-red-500 text-sm font-bold ml-2"
-                      onClick={() => handleRemoveNote(idx)}
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Add note button */}
-              {!showInput && (
-                <button
-                  className="flex items-center gap-1 text-[#3E4095] font-medium text-sm mt-2"
-                  onClick={() => setShowInput(true)}
-                >
-                  <span className="text-lg">+</span> Add note
-                </button>
-              )}
-
-              {/* Input field for new note */}
-              {showInput && (
-                <div className="flex gap-2 mt-2">
-                  <input
-                    type="text"
-                    value={newNote}
-                    onChange={(e) => setNewNote(e.target.value)}
-                    placeholder="Enter note..."
-                    className="flex-1 border rounded p-2 text-[12px] focus:outline-none"
-                  />
-                  <button
-                    className="bg-[#3E4095] text-white px-4 rounded"
-                    onClick={handleAddNote}
-                  >
-                    Add
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="border rounded-md p-5 mt-3">
-              <p className="font-medium">Vital signs</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 my-5 gap-5">
-                <div className="relative">
-                  <p className="pb-1">Blood pressure</p>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      id="bloodPressure"
-                      className="w-full text-sm border px-3 py-2 rounded-sm pr-16 focus:outline-none" // add padding-right for the unit
-                      placeholder="Enter blood pressure"
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-[12px]">
-                      mmHg
-                    </span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <p className="pb-1">Temperature</p>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      id="temperature"
-                      className="w-full text-sm border px-3 py-2 rounded-sm pr-8 focus:outline-none" // add padding-right for the unit
-                      placeholder="Enter temperature"
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-[12px]">
-                      °C
-                    </span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <p className="pb-1">Respiratory Rate</p>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      id="respRate"
-                      className="w-full text-sm border px-3 py-2 rounded-sm pr-14 focus:outline-none" // add padding-right for the unit
-                      placeholder="Enter respiratory rate"
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-[12px]">
-                      /Min
-                    </span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <p className="pb-1">Height</p>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      id="height"
-                      className="w-full text-sm border px-3 py-2 rounded-sm pr-10 focus:outline-none" // add padding-right for the unit
-                      placeholder="Enter height"
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-[12px]">
-                      m
-                    </span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <p className="pb-1">Heart Rate</p>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      id="heartRate"
-                      className="w-full text-sm border px-3 py-2 rounded-sm pr-14 focus:outline-none" // add padding-right for the unit
-                      placeholder="Enter heart rate"
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-[12px]">
-                      Bpm
-                    </span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <p className="pb-1">Weight</p>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      id="weight"
-                      className="w-full text-sm border px-3 py-2 rounded-sm pr-10 focus:outline-none" // add padding-right for the unit
-                      placeholder="Enter weight"
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-[12px]">
-                      Kg
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="border rounded-md p-5 mt-3">
-              <p className="font-medium">Physical examination findings</p>
-
-              {/* Existing findings */}
-              <div className="my-2 space-y-2 max-h-[300px] overflow-y-auto">
-                {findings.length === 0 && (
-                  <p className="text-gray-400 text-[12px]">No findings yet</p>
-                )}
-                {findings.map((finding, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-gray-100 rounded p-2 text-[12px] flex justify-between items-center"
-                  >
-                    <span>{finding}</span>
-                    <button
-                      className="text-red-500 text-sm font-bold ml-2"
-                      onClick={() => handleRemoveFinding(idx)}
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Add finding button */}
-              {!showFindingInput && (
-                <button
-                  className="flex items-center gap-1 text-[#3E4095] font-medium text-sm mt-2"
-                  onClick={() => setShowFindingInput(true)}
-                >
-                  <span className="text-lg">+</span> Add finding
-                </button>
-              )}
-
-              {/* Input field for new finding */}
-              {showFindingInput && (
-                <div className="flex gap-2 mt-2">
-                  <input
-                    type="text"
-                    value={newFinding}
-                    onChange={(e) => setNewFinding(e.target.value)}
-                    placeholder="Enter finding..."
-                    className="flex-1 border rounded p-2 text-[12px] focus:outline-none"
-                  />
-                  <button
-                    className="bg-[#3E4095] text-white px-4 rounded"
-                    onClick={handleAddFinding}
-                  >
-                    Add
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="border rounded-md p-5 mt-3">
-              <p className="font-medium">Investigation / Diagnosis</p>
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
+              <p className="font-medium">History of Presenting Complain</p>
               <textarea
-                name=""
-                id="diagnosis"
+                name="history_of_presenting_complain"
+                value={soapNoteData.history_of_presenting_complain}
+                onChange={handleTextChange}
                 className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
-                placeholder="Enter investigation / diagnosis (separate with a comma)..."
+                placeholder="Enter history of presenting complaint..."
               ></textarea>
             </div>
-            <div className="border rounded-md p-5 mt-3">
-              <p className="font-medium">Treatment plan</p>
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
+              <p className="font-medium">Past Medical History</p>
               <textarea
-                name=""
-                id="treatment"
+                name="past_med_history"
+                value={soapNoteData.past_med_history}
+                onChange={handleTextChange}
                 className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
-                placeholder="Enter treatment plan (separate with a comma)..."
+                placeholder="Enter past medical history..."
               ></textarea>
             </div>
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
+              <p className="font-medium">Family History</p>
+              <textarea
+                name="family_history"
+                value={soapNoteData.family_history}
+                onChange={handleTextChange}
+                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
+                placeholder="Enter family history..."
+              ></textarea>
+            </div>
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
+              <p className="font-medium">Social History</p>
+              <textarea
+                name="social_history"
+                value={soapNoteData.social_history}
+                onChange={handleTextChange}
+                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
+                placeholder="Enter social history..."
+              ></textarea>
+            </div>
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
+              <p className="font-medium">Other History</p>
+              <textarea
+                name="other_history"
+                value={soapNoteData.other_history}
+                onChange={handleTextChange}
+                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
+                placeholder="Enter other history..."
+              ></textarea>
+            </div>
+
+            <NoteSection
+              title="Drug History / Allergies"
+              field="drug_history_allergies"
+              placeholder="e.g. Patient used Amoxicillin but developed rash"
+              soapNoteData={soapNoteData}
+              inputs={inputs}
+              setInputs={setInputs}
+              handleAddListItem={handleAddListItem}
+              handleRemoveItem={handleRemoveItem}
+              activeInput={activeInput}
+              setActiveInput={setActiveInput}
+            />
+
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
+              <p className="font-medium">Review of System</p>
+              <textarea
+                name="review_of_system"
+                value={soapNoteData.review_of_system}
+                onChange={handleTextChange}
+                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
+                placeholder="Enter review of system..."
+              ></textarea>
+            </div>
+
             <div className="flex justify-end cursor-pointer">
               <button
-                className="py-2.5 text-white bg-[#3E4095] rounded-full text-sm px-20 mt-5 cursor-pointer"
+                className="py-2.5 text-white bg-[#3E4095] rounded-full text-sm px-20 mt-5 cursor-pointer w-full lg:w-auto"
                 onClick={() => {
                   handleNextStep();
                 }}
@@ -552,62 +496,260 @@ const SoapNoteEntry = ({
         )}
         {step === 2 && (
           <div className="my-5">
-            <div className="border rounded-md p-5 mt-3">
-              <p className="font-medium">Care instruction</p>
+            <div className="mb-2 font-medium">
+              <p>Subjective</p>
+            </div>
 
-              {/* Existing instructions */}
-              <div className="my-2 space-y-2 max-h-[300px] overflow-y-auto">
-                {instructions.length === 0 && (
-                  <p className="text-gray-400 text-[12px]">
-                    No instructions yet
-                  </p>
-                )}
-                {instructions.map((instruction, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-gray-100 rounded p-2 text-[12px] flex justify-between items-center"
-                  >
-                    <span>{instruction}</span>
-                    <button
-                      className="text-red-500 text-sm font-bold ml-2"
-                      onClick={() => handleRemoveInstruction(idx)}
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5">
+              <p className="font-medium">Vital Signs (auto uploaded)</p>
+            </div>
+
+            <NoteSection
+              title="General Examinations"
+              field="general_exam"
+              placeholder="e.g. Patient is stable but reports mild headache"
+              soapNoteData={soapNoteData}
+              inputs={inputs}
+              setInputs={setInputs}
+              handleAddListItem={handleAddListItem}
+              handleRemoveItem={handleRemoveItem}
+              activeInput={activeInput}
+              setActiveInput={setActiveInput}
+            />
+
+            <NoteSection
+              title="Systemic Examinations"
+              field="systemic_exam"
+              placeholder="e.g. Patient is stable but reports mild headache"
+              soapNoteData={soapNoteData}
+              inputs={inputs}
+              setInputs={setInputs}
+              handleAddListItem={handleAddListItem}
+              handleRemoveItem={handleRemoveItem}
+              activeInput={activeInput}
+              setActiveInput={setActiveInput}
+            />
+
+            <NoteSection
+              title="Relevant Besides Tests"
+              field="besides_tests"
+              placeholder="e.g. Patient is stable but reports mild headache"
+              soapNoteData={soapNoteData}
+              inputs={inputs}
+              setInputs={setInputs}
+              handleAddListItem={handleAddListItem}
+              handleRemoveItem={handleRemoveItem}
+              activeInput={activeInput}
+              setActiveInput={setActiveInput}
+            />
+
+            <NoteSection
+              title="Investigations (Test / Scan results interpretation)"
+              field="investigations"
+              placeholder="e.g. Patient reports mild headache"
+              soapNoteData={soapNoteData}
+              inputs={inputs}
+              setInputs={setInputs}
+              handleAddListItem={handleAddListItem}
+              handleRemoveItem={handleRemoveItem}
+              activeInput={activeInput}
+              setActiveInput={setActiveInput}
+            />
+
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
+              <p className="font-medium">
+                Investigation (Scan and Test result images / documents){" "}
+              </p>
+
+              {/* Click + Drag Area */}
+              <label
+                htmlFor="file-upload"
+                className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-400 rounded-lg p-16 cursor-pointer hover:bg-gray-50 transition my-3"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const files = Array.from(e.dataTransfer.files);
+                  handleFiles(files);
+                }}
+              >
+                <UploadCloud className="w-5 h-5 text-[#3E4095]" />
+                <span className="text-[#3E4095] font-medium">
+                  Drag & drop or click to upload
+                </span>
+              </label>
+
+              {/* Hidden Input */}
+              <input
+                id="file-upload"
+                type="file"
+                multiple
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                onChange={(e) => handleFiles(Array.from(e.target.files))}
+                className="hidden"
+              />
+
+              {/* Preview Section */}
+              {attachments.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
+                  {attachments.map((doc, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded-lg"
                     >
-                      &times;
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Add instruction button */}
-              {!showInstructionInput && (
-                <button
-                  className="flex items-center gap-1 text-[#3E4095] font-medium text-sm mt-2"
-                  onClick={() => setShowInstructionInput(true)}
-                >
-                  <span className="text-lg">+</span> Add instruction
-                </button>
-              )}
-
-              {/* Input field for new instruction */}
-              {showInstructionInput && (
-                <div className="flex gap-2 mt-2">
-                  <input
-                    type="text"
-                    value={newInstruction}
-                    onChange={(e) => setNewInstruction(e.target.value)}
-                    placeholder="Enter instruction..."
-                    className="flex-1 border rounded p-2 text-[12px] focus:outline-none"
-                  />
-                  <button
-                    className="bg-[#3E4095] text-white px-4 rounded"
-                    onClick={handleAddInstruction}
-                  >
-                    Add
-                  </button>
+                      <div className="flex items-center gap-3">
+                        {doc.preview ? (
+                          <img
+                            src={doc.preview}
+                            alt="Preview"
+                            className="w-10 h-10 object-cover rounded-md border"
+                          />
+                        ) : (
+                          <FileText className="w-8 h-8 text-gray-500" />
+                        )}
+                        <span className="truncate text-sm">
+                          {truncateWords(doc.file.name, 10)}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeAttachments(index)}
+                        className="text-gray-500 hover:text-red-600 transition cursor-pointer"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
-            <div className="border rounded-md p-5 mt-3">
+
+            <div className="flex flex-col sm:flex-row items-center lg:justify-end cursor-pointer gap-4 mt-5 sm:mt-0">
+              <button
+                className={`py-2 ${
+                  loading
+                    ? "border border-gray-400 text-gray-400 cursor-not-allowed"
+                    : "text-[#3E4095] border border-[#3E4095] "
+                } rounded-full text-sm px-16 sm:mt-5 w-full lg:w-auto`}
+                disabled={loading}
+                onClick={() => {
+                  setStep(step - 1);
+                }}
+              >
+                Previous
+              </button>
+
+              <button
+                className="py-2.5 text-white bg-[#3E4095] rounded-full text-sm px-20  cursor-pointer lg:w-auto w-full sm:mt-5"
+                onClick={() => {
+                  handleNextStep();
+                }}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+        {step === 3 && (
+          <div className="my-5">
+            <div className="mb-2 font-medium">
+              <p>Assessment</p>
+            </div>
+
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5">
+              <p className="font-medium">Primary diagnosis (compulsory)</p>
+              <textarea
+                name="primary_diagnosis"
+                value={soapNoteData.primary_diagnosis}
+                onChange={handleTextChange}
+                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
+                placeholder="Enter primary diagnosis..."
+              ></textarea>
+            </div>
+
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
+              <p className="font-medium">Differential diagnosis</p>
+              <textarea
+                name="differential_diagnosis"
+                id="differentialDiagnosis"
+                value={soapNoteData.differential_diagnosis}
+                onChange={handleTextChange}
+                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
+                placeholder="Enter differential diagnosis..."
+              ></textarea>
+            </div>
+
+            <NoteSection
+              title="Problems List"
+              field="problems_list"
+              placeholder="e.g. Patient has mild headache"
+              soapNoteData={soapNoteData}
+              inputs={inputs}
+              setInputs={setInputs}
+              handleAddListItem={handleAddListItem}
+              handleRemoveItem={handleRemoveItem}
+              activeInput={activeInput}
+              setActiveInput={setActiveInput}
+            />
+
+            <div className="flex flex-col sm:flex-row items-center lg:justify-end cursor-pointer gap-4 mt-5 sm:mt-0">
+              <button
+                className={`py-2 ${
+                  loading
+                    ? "border border-gray-400 text-gray-400 cursor-not-allowed"
+                    : "text-[#3E4095] border border-[#3E4095] "
+                } rounded-full text-sm px-16 sm:mt-5 w-full lg:w-auto`}
+                disabled={loading}
+                onClick={() => {
+                  setStep(step - 1);
+                }}
+              >
+                Previous
+              </button>
+
+              <button
+                className="py-2.5 text-white bg-[#3E4095] rounded-full text-sm px-20  cursor-pointer lg:w-auto w-full sm:mt-5"
+                onClick={() => {
+                  handleNextStep();
+                }}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+        {step === 4 && (
+          <div className="my-5">
+            <div className="mb-2 font-medium">
+              <p>Plan</p>
+            </div>
+
+            <NoteSection
+              title="Treatment Plan (compulsory)"
+              field="treatment_plan"
+              placeholder="e.g. Patient to take prescribed medication"
+              soapNoteData={soapNoteData}
+              inputs={inputs}
+              setInputs={setInputs}
+              handleAddListItem={handleAddListItem}
+              handleRemoveItem={handleRemoveItem}
+              activeInput={activeInput}
+              setActiveInput={setActiveInput}
+            />
+
+            <NoteSection
+              title="Care Instructions (compulsory)"
+              field="care_instructions"
+              placeholder="e.g. Patient to take prescribed medication"
+              soapNoteData={soapNoteData}
+              inputs={inputs}
+              setInputs={setInputs}
+              handleAddListItem={handleAddListItem}
+              handleRemoveItem={handleRemoveItem}
+              activeInput={activeInput}
+              setActiveInput={setActiveInput}
+            />
+
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
               <p className="font-medium mb-3">Medication</p>
 
               {medications.map((med, index) => (
@@ -723,7 +865,7 @@ const SoapNoteEntry = ({
                       <label className="block text-[12px] pb-1">Duration</label>
                       <input
                         type="text"
-                        placeholder="Medication name..."
+                        placeholder="duration..."
                         value={med.duration}
                         onChange={(e) =>
                           handleChange(index, "duration", e.target.value)
@@ -766,7 +908,7 @@ const SoapNoteEntry = ({
                         onClick={() => handleRemoveMedication(index)}
                         className="text-red-500 text-sm font-bold mt-5 cursor-pointer"
                       >
-                        &times;
+                        <X size={11} />
                       </button>
                     )}
                   </div>
@@ -774,79 +916,15 @@ const SoapNoteEntry = ({
                 </div>
               ))}
 
-              {/* Add more drugs */}
               <button
                 onClick={handleAddMedication}
-                className="text-[#3E4095] font-medium text-sm mt-2 flex items-center gap-1"
+                className="text-[#3E4095] font-medium text-sm mt-3 flex items-center gap-1"
               >
-                + Add more drugs
+                <Plus size={16} /> Add more drugs
               </button>
             </div>
-            <div className="border rounded-md p-5 mt-3">
-              <p className="font-medium">Attachment (optional)</p>
 
-              {/* Click + Drag Area */}
-              <label
-                htmlFor="file-upload"
-                className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-400 rounded-lg p-16 cursor-pointer hover:bg-gray-50 transition my-3"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  const files = Array.from(e.dataTransfer.files);
-                  handleFiles(files);
-                }}
-              >
-                <UploadCloud className="w-5 h-5 text-[#3E4095]" />
-                <span className="text-[#3E4095] font-medium">
-                  Drag & drop or click to upload
-                </span>
-              </label>
-
-              {/* Hidden Input */}
-              <input
-                id="file-upload"
-                type="file"
-                multiple
-                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                onChange={(e) => handleFiles(Array.from(e.target.files))}
-                className="hidden"
-              />
-
-              {/* Preview Section */}
-              {attachments.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
-                  {attachments.map((doc, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        {doc.preview ? (
-                          <img
-                            src={doc.preview}
-                            alt="Preview"
-                            className="w-10 h-10 object-cover rounded-md border"
-                          />
-                        ) : (
-                          <FileText className="w-8 h-8 text-gray-500" />
-                        )}
-                        <span className="truncate text-sm">
-                          {truncateWords(doc.file.name, 10)}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeAttachments(index)}
-                        className="text-gray-500 hover:text-red-600 transition cursor-pointer"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="border rounded-md p-5 mt-3">
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
               <p className="font-medium">Follow up / Next appointment</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mt-3 gap-3">
                 <div className="relative">
@@ -857,7 +935,9 @@ const SoapNoteEntry = ({
                     className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-6"
                   >
                     {[...Array(31)].map((_, i) => (
-                      <option key={i} value={i + 1}>{i + 1}</option>
+                      <option key={i} value={i + 1}>
+                        {i + 1}
+                      </option>
                     ))}
                   </select>
                   <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
@@ -984,24 +1064,24 @@ const SoapNoteEntry = ({
                 </div>
               </div>
             </div>
-            <div className="border rounded-md p-5 mt-3">
+
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
               <p className="font-medium">Referral (optional) </p>
               <div className="relative mt-3">
                 <label className="block text-[12px] pb-1">
                   Refer to (DocuHealth Hospital) :
                 </label>
                 <select
-                  value={selectedDocuHealthHospital}
-                  onChange={(e) =>
-                    setSelectedDocuHealthHospital(e.target.value)
-                  }
+                  name="referred_docuhealth_hosp" // Matches key in state
+                  value={soapNoteData.referred_docuhealth_hosp}
+                  onChange={handleTextChange}
                   className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-6"
                 >
                   {hospitals &&
                     hospitals
                       .filter(
                         (hospital) =>
-                          hospital.name && hospital.name.trim() !== ""
+                          hospital.name && hospital.name.trim() !== "",
                       )
                       .map((hospital, idx) => (
                         <option key={idx} value={hospital.hin}>
@@ -1031,21 +1111,34 @@ const SoapNoteEntry = ({
                   Other hospitals outside Docuhealth
                 </label>
                 <input
-                  type="text"
-                  placeholder="Enter the hospital details (including Name and Address of hospital) "
-                  value={otherHospitalInput}
-                  onChange={(e) => setOtherHospitalInput(e.target.value)}
+                  name="referred_hosp" // Matches key in state
+                  placeholder="Enter the hospital details (including Name and Address)..."
+                  value={soapNoteData.referred_hosp}
+                  onChange={handleTextChange}
                   className="w-full border rounded p-2 text-[12px] focus:outline-none"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-end cursor-pointer gap-4">
+            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
+              <p className="font-medium">Patient's Education</p>
+              <textarea
+                name="patient_education"
+                id="patientEducation"
+                value={soapNoteData.patient_education}
+                onChange={handleTextChange}
+                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
+                placeholder="Enter patient's education..."
+              ></textarea>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center lg:justify-end cursor-pointer gap-4 mt-5 sm:mt-0">
               <button
-                className={`py-2 ${loading
+                className={`py-2 ${
+                  loading
                     ? "border border-gray-400 text-gray-400 cursor-not-allowed"
                     : "text-[#3E4095] border border-[#3E4095] "
-                  } rounded-full text-sm px-20 mt-5 `}
+                } rounded-full text-sm px-16 sm:mt-5 w-full lg:w-auto`}
                 disabled={loading}
                 onClick={() => {
                   setStep(step - 1);
@@ -1055,10 +1148,11 @@ const SoapNoteEntry = ({
               </button>
               <button
                 disabled={loading}
-                className={`py-2.5  rounded-full text-sm px-20 mt-5 text-white  ${loading
+                className={`py-2.5  rounded-full text-sm px-20 sm:mt-5 text-white lg:w-auto w-full ${
+                  loading
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-[#3E4095] cursor-pointer"
-                  }`}
+                }`}
                 onClick={() => {
                   handleSubmit();
                 }}
@@ -1066,7 +1160,7 @@ const SoapNoteEntry = ({
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Creating afer visit summary...
+                    Uploading SOAP Note...
                   </div>
                 ) : (
                   "Submit"
