@@ -88,7 +88,7 @@ const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selec
                     </div>
                 </>
             ) : (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 ">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-3 ">
                     <div className="bg-white w-full max-w-[500px] rounded-md p-5 lg:p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200 ">
 
                         {/* Close Button */}
@@ -150,7 +150,7 @@ const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selec
                         <button
                             disabled={!isAnyOptionSelected || isFetching} // Disable if fetching
                             onClick={() => onLogout(handoverOptions)}
-                            className={`w-full py-3 rounded-full transition-all shadow active:scale-95 flex items-center justify-center gap-2 ${isAnyOptionSelected && !isFetching
+                            className={`w-full py-3 rounded-full transition-all shadow active:scale-95 flex items-center justify-center gap-2 text-sm ${isAnyOptionSelected && !isFetching
                                 ? "bg-[#3E4095] text-white cursor-pointer"
                                 : "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
                                 }`}

@@ -79,9 +79,8 @@ const NoteSection = ({
 const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
   const { profile, hospitals } = useContext(DoctorAppContext);
 
-  // console.log(selectedPatientDetails);
-
-  // console.log(hospitals);
+  // console.log(profile);
+  // console.log(hospitals)
 
   const [step, setStep] = useState(1);
 
@@ -147,13 +146,11 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
   const [selectedYear, setSelectedYear] = useState(String(today.getFullYear()));
   const [selectedTime, setSelectedTime] = useState("08:00");
 
+  const [note, setNote] = useState("Nil");
+
   const [loading, setLoading] = useState(false);
 
-  //   try {
-  //     const res = await axiosInstanceHos.post("api/medical-records", payload);
-  //     console.log(res);
-  //     toast.success("After visit summary created successfully");
-  //     setSoapNoteEntry(false);
+  const [confirmationModal, setConfirmationModal] = useState(false);
 
   const [soapNoteData, setSoapNoteData] = useState({
     chief_complaint: "",
@@ -249,6 +246,31 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
     setStep((prev) => prev + 1);
   };
 
+  const [selectedPatientFetchedInfo, setSelectedPatientFetchedInfo] =
+    useState("");
+
+  useEffect(() => {
+    const fetchSelectedPatientInfo = async () => {
+      if (!selectedPatientDetails.patient.hin) return;
+
+      // setLoading(true);
+      try {
+        const res = await axiosInstanceHos.get(
+          `api/doctors/patient/info/${selectedPatientDetails.patient.hin}`,
+        );
+        // console.log(res.data);
+        setSelectedPatientFetchedInfo(res.data);
+      } catch (err) {
+        console.error("Error fetching patient info:", err);
+        toast.error("Failed to load patient information");
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+    fetchSelectedPatientInfo();
+  }, [selectedPatientDetails]);
+
   const handleSubmit = async () => {
     setLoading(true);
 
@@ -307,13 +329,34 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       staff: profile?.staff_id || "",
       patient: selectedPatientDetails.patient.hin || "",
       investigations_docs: uploadedAttachments,
-      vital_signs: "",
+      vital_signs: selectedPatientFetchedInfo?.latest_vitals.id,
       referred_docuhealhosp: soapNoteData.referred_docuhealth_hosp,
       referred_hosp: soapNoteData.referred_hosp,
       drug_records: drugRecords,
       appointment: {
         staff_id: profile?.staff_id || "",
-        patient: selectedPatientDetails.patient.hin || "",
+        patient_hin: selectedPatientDetails.patient.hin || "",
+        patient: {
+          hin: selectedPatientFetchedInfo?.patient_info.hin,
+          firstname: selectedPatientFetchedInfo?.patient_info.firstname,
+          lastname: selectedPatientFetchedInfo?.patient_info.lastname,
+          gender: selectedPatientFetchedInfo?.patient_info.gender,
+          dob: selectedPatientFetchedInfo?.patient_info.dob,
+        },
+        staff: {
+          firstname: profile?.firstname,
+          lastname: profile?.lastname,
+          email: profile?.email,
+          phone_no: profile?.phone_no,
+          role: profile?.role,
+          staff_id: profile?.staff_id,
+          ward: profile?.ward,
+          gender: profile?.gender,
+          ward_info: profile?.ward_info,
+        },
+        note: note,
+        type: "consultation",
+        hospital: selectedPatientFetchedInfo?.latest_vitals.hospital,
         scheduled_time: scheduled_time,
       },
       investigations: soapNoteData.investigations,
@@ -336,47 +379,156 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       patient_education: soapNoteData.patient_education,
     };
 
+ const formData = new FormData();
+
+/* ---------- SIMPLE STRING FIELDS ---------- */
+const stringFields = [
+  "chief_complaint",
+  "history_of_complain",
+  "past_med_history",
+  "family_history",
+  "social_history",
+  "other_history",
+  "review",
+  "patient_education",
+  "primary_diagnosis",
+  "differential_diagnosis",
+  "referred_docuhealhosp",
+  "referred_hosp",
+];
+
+stringFields.forEach((key) => {
+  if (payload[key]) {
+    formData.append(key, payload[key]);
+  }
+});
+
+/* ---------- ARRAYS OF STRINGS ---------- */
+const arrayStringFields = [
+  "care_instructions",
+  "treatment_plan",
+  "problems_list",
+  "investigations",
+  "drug_history_allergies",
+  "general_exam",
+  "systemic_exam",
+  "besides_tests",
+];
+
+arrayStringFields.forEach((key) => {
+  if (Array.isArray(payload[key])) {
+    payload[key].forEach((item) => {
+      formData.append(key, item);
+    });
+  }
+});
+
+/* ---------- ARRAY OF OBJECTS ---------- */
+payload.drug_records.forEach((record, index) => {
+  // Simple fields
+  formData.append(`drug_records[${index}][name]`, record.name);
+  formData.append(`drug_records[${index}][route]`, record.route);
+  formData.append(`drug_records[${index}][quantity]`, record.quantity);
+  formData.append(
+    `drug_records[${index}][allergies]`,
+    record.allergies || "None"
+  );
+
+  // Frequency (nested)
+  formData.append(
+    `drug_records[${index}][frequency][value]`,
+    record.frequency.value
+  );
+  formData.append(
+    `drug_records[${index}][frequency][rate]`,
+    record.frequency.rate
+  );
+
+  // Duration (nested)
+  formData.append(
+    `drug_records[${index}][duration][value]`,
+    record.duration.value
+  );
+  formData.append(
+    `drug_records[${index}][duration][rate]`,
+    record.duration.rate
+  );
+});
+
+
+
+/* ---------- OBJECTS ---------- */
+formData.append("appointment", JSON.stringify(payload.appointment));
+
+if (payload.vital_signs) {
+  formData.append("vital_signs", payload.vital_signs);
+}
+
+formData.append("staff", payload.staff);
+formData.append("patient", payload.patient);
+
+/* ---------- INVESTIGATION DOCS ---------- */
+uploadedAttachments.forEach((doc, index) => {
+  Object.entries(doc).forEach(([key, value]) => {
+    formData.append(`investigations_docs[${index}][${key}]`, value);
+  });
+});
+
+
+
+
+    
+
+
     try {
-      console.log("Submitting SOAP Note with payload:", payload);
+      console.log("Submitting SOAP Note with payload:", formData);
+      //   try {
+      const res = await axiosInstanceHos.post(
+        "api/medical-records/soap-note",
+        formData
+      );
+      console.log(res);
+      toast.success("SOAP Note created successfully !");
+      setSoapNoteEntry(false);
     } catch (err) {
       console.error("Error uploading SOAP Note:", err);
       toast.error("Error uploading SOAP Note");
     } finally {
       setLoading(false);
-      setStep(1);
-      setSoapNoteEntry(false);
-      setSoapNoteData({
-        chief_complaint: "",
-        history_of_presenting_complain: "",
-        past_med_history: "",
-        family_history: "",
-        social_history: "",
-        other_history: "",
-        review_of_system: "",
-        primary_diagnosis: "",
-        differential_diagnosis: "",
-        patient_education: "",
-        referred_docuhealth_hosp: "",
-        referred_hosp: "",
-        drug_history_allergies: [],
-        general_exam: [],
-        systemic_exam: [],
-        besides_tests: [],
-        investigations: [],
-        problems_list: [],
-        treatment_plan: [],
-        care_instructions: [],
-      });
-      setInputs({
-        drug_history_allergies: "",
-        general_exam: "",
-        systemic_exam: "",
-        besides_tests: "",
-        investigations: "",
-        problems_list: "",
-        treatment_plan: "",
-        care_instructions: "",
-      });
+      // setStep(1);
+      // setSoapNoteEntry(false);
+      // setSoapNoteData({
+      //   chief_complaint: "",
+      //   history_of_presenting_complain: "",
+      //   past_med_history: "",
+      //   family_history: "",
+      //   social_history: "",
+      //   other_history: "",
+      //   review_of_system: "",
+      //   primary_diagnosis: "",
+      //   differential_diagnosis: "",
+      //   patient_education: "",
+      //   referred_docuhealth_hosp: "",
+      //   referred_hosp: "",
+      //   drug_history_allergies: [],
+      //   general_exam: [],
+      //   systemic_exam: [],
+      //   besides_tests: [],
+      //   investigations: [],
+      //   problems_list: [],
+      //   treatment_plan: [],
+      //   care_instructions: [],
+      // });
+      // setInputs({
+      //   drug_history_allergies: "",
+      //   general_exam: "",
+      //   systemic_exam: "",
+      //   besides_tests: "",
+      //   investigations: "",
+      //   problems_list: "",
+      //   treatment_plan: "",
+      //   care_instructions: "",
+      // });
     }
   };
 
@@ -503,6 +655,129 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
 
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5">
               <p className="font-medium">Vital Signs (auto uploaded)</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[12px] mt-5">
+                <div className=" bg-white border rounded-md p-3">
+                  <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M13.1874 2.81468C13.7081 3.33538 13.7081 4.1796 13.1874 4.7003L11.3018 6.58591L9.41615 4.7003L11.3018 2.81468C11.8225 2.29398 12.6667 2.29398 13.1874 2.81468ZM14.1302 1.87187C13.0888 0.83047 11.4004 0.83047 10.359 1.87187L8.47335 3.75748L8.23762 3.52201C7.97728 3.26166 7.55522 3.26166 7.29482 3.52201C7.03448 3.78236 7.03448 4.20446 7.29482 4.46482L7.53055 4.70054L3.38742 8.84364C3.01516 9.21591 2.76141 9.69004 2.65816 10.2063L2.42427 11.3758C2.37265 11.6338 2.24578 11.8709 2.05964 12.057L1.40229 12.7144C1.14194 12.9748 1.14194 13.3969 1.40229 13.6572L2.3451 14.6C2.60545 14.8604 3.02756 14.8604 3.28791 14.6L3.94526 13.9427C4.13139 13.7566 4.36846 13.6297 4.62658 13.578L5.79602 13.3442C6.31226 13.2409 6.78642 12.9872 7.15868 12.6149L11.3018 8.47178L11.5375 8.70744C11.7978 8.96778 12.22 8.96778 12.4803 8.70744C12.7406 8.44711 12.7406 8.02498 12.4803 7.76464L12.2446 7.52898L14.1302 5.6431C15.1716 4.6017 15.1716 2.91326 14.1302 1.87187ZM8.47335 5.64335L10.359 7.52898L6.21585 11.6721C6.02972 11.8582 5.79265 11.9851 5.53453 12.0367L4.36509 12.2706C3.84885 12.3738 3.37472 12.6276 3.00245 12.9999C3.37472 12.6276 3.62846 12.1535 3.73171 11.6372L3.9656 10.4678C4.01722 10.2097 4.1441 9.97264 4.33023 9.78651L8.47335 5.64335Z"
+                        fill="#3E4095"
+                      />
+                    </svg>
+                    Blood Pressure
+                  </p>
+                  <p className="font-medium">
+                    {selectedPatientFetchedInfo?.latest_vitals?.blood_pressure}{" "}
+                    mmHG
+                  </p>
+                </div>
+                <div className=" bg-white border rounded-md p-3">
+                  <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5.33203 3.33317C5.33203 1.86041 6.52594 0.666504 7.9987 0.666504C9.47143 0.666504 10.6654 1.86041 10.6654 3.33317V6.8363C11.8744 7.67957 12.6654 9.0807 12.6654 10.6665C12.6654 13.2438 10.576 15.3332 7.9987 15.3332C5.42137 15.3332 3.33203 13.2438 3.33203 10.6665C3.33203 9.0807 4.12304 7.67957 5.33203 6.8363V3.33317ZM6.09483 7.9299C5.20498 8.55057 4.66536 9.56197 4.66536 10.6665C4.66536 12.5074 6.15775 13.9998 7.9987 13.9998C9.83963 13.9998 11.332 12.5074 11.332 10.6665C11.332 9.56197 10.7924 8.55057 9.90256 7.9299L9.33203 7.5319V3.33317C9.33203 2.59679 8.7351 1.99984 7.9987 1.99984C7.2623 1.99984 6.66536 2.59679 6.66536 3.33317V7.5319L6.09483 7.9299ZM5.33203 10.6665H10.6654C10.6654 12.1392 9.47143 13.3332 7.9987 13.3332C6.52594 13.3332 5.33203 12.1392 5.33203 10.6665Z"
+                        fill="#3E4095"
+                      />
+                    </svg>
+                    Temperature
+                  </p>
+                  <p className="font-medium">
+                    {selectedPatientFetchedInfo?.latest_vitals?.temp} °F
+                  </p>
+                </div>
+                <div className=" bg-white border rounded-md p-3">
+                  <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11.0013 2C13.0264 2 14.668 3.66667 14.668 6C14.668 10.6667 9.66797 13.3333 8.0013 14.3333C6.68304 13.5423 3.2793 11.7087 1.91393 8.66733L0.667969 8.66667V7.33333L1.47494 7.33393C1.38414 6.90887 1.33464 6.46434 1.33464 6C1.33464 3.66667 3.0013 2 5.0013 2C6.24128 2 7.33464 2.66667 8.0013 3.33333C8.66797 2.66667 9.7613 2 11.0013 2ZM11.0013 3.33333C10.284 3.33333 9.5075 3.71274 8.9441 4.27614L8.0013 5.21895L7.0585 4.27614C6.49509 3.71274 5.71857 3.33333 5.0013 3.33333C3.70734 3.33333 2.66797 4.43767 2.66797 6C2.66797 6.45695 2.7282 6.90107 2.84569 7.3336L4.29051 7.33333L5.66797 5.03757L7.66797 8.37087L8.2905 7.33333H11.3346V8.66667H9.04544L7.66797 10.9625L5.66797 7.62913L5.04543 8.66667L3.40656 8.66707C3.93282 9.58247 4.73 10.4454 5.76473 11.2686C6.26131 11.6637 6.79097 12.0323 7.3787 12.4025C7.5777 12.5279 7.77537 12.6486 8.0013 12.7835C8.22724 12.6486 8.4249 12.5279 8.6239 12.4025C9.21164 12.0323 9.7413 11.6637 10.2379 11.2686C12.2238 9.68867 13.3346 7.96233 13.3346 6C13.3346 4.42717 12.31 3.33333 11.0013 3.33333Z"
+                        fill="#3E4095"
+                      />
+                    </svg>
+                    Weight
+                  </p>
+                  <p className="font-medium">
+                    {selectedPatientFetchedInfo?.latest_vitals?.weight} Kg
+                  </p>
+                </div>
+                <div className=" bg-white border rounded-md p-3">
+                  <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M13.4938 3.17157C15.0022 4.68315 15.054 7.09133 13.6511 8.662L7.99863 14.3233L2.34628 8.662C0.943397 7.09133 0.995837 4.67934 2.5036 3.17157C4.01308 1.6621 6.42882 1.61125 7.99936 3.01902C9.56536 1.61333 11.9854 1.66 13.4938 3.17157ZM3.44641 4.11438C2.45325 5.10754 2.40339 6.6982 3.31865 7.7488L7.99863 12.4362L12.6788 7.7488C13.5944 6.6978 13.5447 5.11017 12.55 4.1134C11.5585 3.11986 9.96256 3.07204 8.9149 3.98917L6.11308 6.79127L5.17027 5.84843L7.05336 3.964L6.99883 3.91801C5.949 3.07465 4.41418 3.14662 3.44641 4.11438Z"
+                        fill="#3E4095"
+                      />
+                    </svg>
+                    Respiratory rate
+                  </p>
+                  <p className="font-medium">
+                    {selectedPatientFetchedInfo?.latest_vitals?.resp_rate} / min
+                  </p>
+                </div>
+                <div className=" bg-white border rounded-md p-3">
+                  <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11.0013 2C13.0264 2 14.668 3.66667 14.668 6C14.668 10.6667 9.66797 13.3333 8.0013 14.3333C6.68304 13.5423 3.2793 11.7087 1.91393 8.66733L0.667969 8.66667V7.33333L1.47494 7.33393C1.38414 6.90887 1.33464 6.46434 1.33464 6C1.33464 3.66667 3.0013 2 5.0013 2C6.24128 2 7.33464 2.66667 8.0013 3.33333C8.66797 2.66667 9.7613 2 11.0013 2ZM11.0013 3.33333C10.284 3.33333 9.5075 3.71274 8.9441 4.27614L8.0013 5.21895L7.0585 4.27614C6.49509 3.71274 5.71857 3.33333 5.0013 3.33333C3.70734 3.33333 2.66797 4.43767 2.66797 6C2.66797 6.45695 2.7282 6.90107 2.84569 7.3336L4.29051 7.33333L5.66797 5.03757L7.66797 8.37087L8.2905 7.33333H11.3346V8.66667H9.04544L7.66797 10.9625L5.66797 7.62913L5.04543 8.66667L3.40656 8.66707C3.93282 9.58247 4.73 10.4454 5.76473 11.2686C6.26131 11.6637 6.79097 12.0323 7.3787 12.4025C7.5777 12.5279 7.77537 12.6486 8.0013 12.7835C8.22724 12.6486 8.4249 12.5279 8.6239 12.4025C9.21164 12.0323 9.7413 11.6637 10.2379 11.2686C12.2238 9.68867 13.3346 7.96233 13.3346 6C13.3346 4.42717 12.31 3.33333 11.0013 3.33333Z"
+                        fill="#3E4095"
+                      />
+                    </svg>
+                    Heart rate
+                  </p>
+                  <p className="font-medium">
+                    {selectedPatientFetchedInfo?.latest_vitals?.heart_rate} bpm
+                  </p>
+                </div>
+                <div className=" bg-white border rounded-md p-3">
+                  <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11.3333 12.6667H12.6667V9.33333H6.66667V3.33333H3.33333V4.66667H4.66667V6H3.33333V7.33333H5.33333V8.66667H3.33333V10H4.66667V11.3333H3.33333V12.6667H4.66667V11.3333H6V12.6667H7.33333V10.6667H8.66667V12.6667H10V11.3333H11.3333V12.6667ZM8 8H13.3333C13.7015 8 14 8.29847 14 8.66667V13.3333C14 13.7015 13.7015 14 13.3333 14H2.66667C2.29848 14 2 13.7015 2 13.3333V2.66667C2 2.29848 2.29848 2 2.66667 2H7.33333C7.70153 2 8 2.29848 8 2.66667V8Z"
+                        fill="#3E4095"
+                      />
+                    </svg>
+                    Height
+                  </p>
+                  <p className="font-medium">
+                    {selectedPatientFetchedInfo?.latest_vitals?.height} m
+                  </p>
+                </div>
+              </div>
             </div>
 
             <NoteSection
@@ -883,9 +1158,9 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
                         }
                         className="border rounded p-2 text-[12px] appearance-none pr-5 focus:outline-none"
                       >
-                        <option value="Month">Months</option>
-                        <option value="Week">Weeks</option>
-                        <option value="Day">Days</option>
+                        <option value="Month">Month (s)</option>
+                        <option value="Week">Week (s)</option>
+                        <option value="Day">Day (s)</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
                         <svg
@@ -1063,6 +1338,19 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
                     </svg>
                   </div>
                 </div>
+                <div className="relative col-span-1 sm:col-span-2 lg:col-span-4">
+                  <label className="block text-[12px] ">Note</label>
+                  <textarea
+                    name="note"
+                    id="note"
+                    value={note}
+                    onChange={(e) => {
+                      setNote(e.target.value);
+                    }}
+                    className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px] "
+                    placeholder="Enter patient's education..."
+                  ></textarea>
+                </div>
               </div>
             </div>
 
@@ -1078,6 +1366,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
                   onChange={handleTextChange}
                   className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-6"
                 >
+                  {!soapNoteData.referred_docuhealth_hosp && <option value="">Select Hospital</option>}
                   {hospitals &&
                     hospitals
                       .filter(
@@ -1085,7 +1374,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
                           hospital.name && hospital.name.trim() !== "",
                       )
                       .map((hospital, idx) => (
-                        <option key={idx} value={hospital.hin}>
+                        <option key={idx} value={hospital.hin} >
                           {hospital.name}
                         </option>
                       ))}
@@ -1155,13 +1444,13 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
                     : "bg-[#3E4095] cursor-pointer"
                 }`}
                 onClick={() => {
-                  handleSubmit();
+                  setConfirmationModal(true);
                 }}
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Uploading SOAP Note...
+                    Uploading...
                   </div>
                 ) : (
                   "Submit"
@@ -1171,6 +1460,77 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
           </div>
         )}
       </div>
+
+      {
+        // handleSubmit();
+        confirmationModal && (
+          <>
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-3 ">
+              <div className="bg-white w-full max-w-[500px] rounded-md p-5 lg:p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200 ">
+                <button
+                  onClick={() => {
+                    setConfirmationModal(false);
+                  }}
+                  className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+
+                <div className="flex flex-col items-center mb-6">
+                  <svg
+                    width="50"
+                    height="50"
+                    viewBox="0 0 40 40"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M20.0007 36.6654C10.7959 36.6654 3.33398 29.2034 3.33398 19.9987C3.33398 10.7939 10.7959 3.33203 20.0007 3.33203C29.2053 3.33203 36.6673 10.7939 36.6673 19.9987C36.6673 29.2034 29.2053 36.6654 20.0007 36.6654ZM20.0007 33.332C27.3645 33.332 33.334 27.3625 33.334 19.9987C33.334 12.6349 27.3645 6.66536 20.0007 6.66536C12.6369 6.66536 6.66732 12.6349 6.66732 19.9987C6.66732 27.3625 12.6369 33.332 20.0007 33.332ZM21.6673 17.4987V24.9987H23.334V28.332H16.6673V24.9987H18.334V20.832H16.6673V17.4987H21.6673ZM22.5007 13.332C22.5007 14.7127 21.3813 15.832 20.0007 15.832C18.62 15.832 17.5007 14.7127 17.5007 13.332C17.5007 11.9513 18.62 10.832 20.0007 10.832C21.3813 10.832 22.5007 11.9513 22.5007 13.332Z"
+                      fill="#1B2B40"
+                    />
+                  </svg>
+
+                  <h2 className=" font-medium text-gray-800 mt-2">Take Note</h2>
+                </div>
+                <div className="bg-gray-50 border border-gray-100 rounded-md p-6 mb-6">
+                  <p className="text-gray-500 text-center text-xs leading-relaxed">
+                    You're about to upload the SOAP Note and the After Visit
+                    Summary (AVS) for patients is generated for this. This SOAP
+                    Note can't be edited or deleted.
+                  </p>
+                </div>
+
+                <button
+                  className="w-full py-3 rounded-full transition-all shadow active:scale-95 flex items-center justify-center gap-2 bg-[#3E4095] text-white cursor-pointer text-[12px]"
+                  onClick={() => {
+                    setConfirmationModal(false);
+                    handleSubmit();
+                  }}
+                >
+                  Upload SOAP Note
+                </button>
+                <button
+                  className="w-full mt-3 text-gray-500 text-[12px] hover:text-red-500 transition-colors cursor-pointer"
+                  onClick={() => {
+                    setConfirmationModal(false);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </>
+        )
+      }
     </>
   );
 };
