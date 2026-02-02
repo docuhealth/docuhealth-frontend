@@ -95,6 +95,8 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
     fetchPatientMedRecords(1);
     fetchPatientSoapNotes(1);
   }, []);
+
+  
   useEffect(() => {
     if (viewDetailMedicalRecord) {
       console.log("Selected Medical Record:", selectedMedicalRecord);

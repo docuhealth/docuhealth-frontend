@@ -1,19 +1,19 @@
 import React, { useState, useContext } from "react";
-import { NursesAdmittedPatientMGTContext } from "../../../../../context/Hospital Context/Nurses/NursesAdmittedPatientMGTContext";
+import { DoctorsAdmittedPatientMGTContext } from "../../../../../context/Hospital Context/Doctors/DoctorsAdmittedPatientMGTContext";
 
-const TabComponent = ({ tabs }) => {
+const TabComponent = ({tabs}) => {
 
-    const { setTab } = useContext(NursesAdmittedPatientMGTContext);
-    const [activeTab, setActiveTab] = useState(0);
-
-    const handleTabSwitch = (index, value) => {
-        setActiveTab(index);
-        setTab(value);
-      };
-
+        const { setTab } = useContext(DoctorsAdmittedPatientMGTContext);
+        const [activeTab, setActiveTab] = useState(0);
+    
+        const handleTabSwitch = (index, value) => {
+            setActiveTab(index);
+            setTab(value); 
+          };
+    
 
   return (
-        <div>
+      <div>
             <div className="flex border-b border-gray-200">
                 {tabs.map((tab, index) => (
                     <button

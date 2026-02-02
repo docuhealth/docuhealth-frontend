@@ -39,7 +39,6 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
               <button
                 className="py-2.5 px-10 rounded-full bg-[#3E4095] border border-[#3E4095] text-white cursor-pointer w-full lg:w-auto"
                 onClick={() => {
-                  console.log("hi");
                   setSoapNoteEntry(true);
                   setSeePatientDetails(false);
                 }}
