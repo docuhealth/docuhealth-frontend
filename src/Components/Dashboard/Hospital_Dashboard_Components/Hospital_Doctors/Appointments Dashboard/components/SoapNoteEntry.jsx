@@ -77,10 +77,7 @@ const NoteSection = ({
 );
 
 const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
-  const { profile, hospitals } = useContext(DoctorAppContext);
-
-  // console.log(profile);
-  // console.log(hospitals)
+  const {profile, hospitals } = useContext(DoctorAppContext);
 
   const [step, setStep] = useState(1);
 
@@ -168,7 +165,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
     drug_history_allergies: [],
     general_exam: [],
     systemic_exam: [],
-    besides_tests: [],
+    bedside_tests: [],
     investigations: [],
     problems_list: [],
     treatment_plan: [],
@@ -179,7 +176,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
     drug_history_allergies: "",
     general_exam: "",
     systemic_exam: "",
-    besides_tests: "",
+    bedside_tests: "",
     investigations: "",
     problems_list: "",
     treatment_plan: "",
@@ -258,7 +255,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
         const res = await axiosInstanceHos.get(
           `api/doctors/patient/info/${selectedPatientDetails.patient.hin}`,
         );
-        // console.log(res.data);
+        console.log(res.data);
         setSelectedPatientFetchedInfo(res.data);
       } catch (err) {
         console.error("Error fetching patient info:", err);
@@ -296,69 +293,21 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
         rate: med.durationUnit,
       },
       status: "ongoing",
-      allergies: "",
-      created_at: new Date().toISOString(),
+      allergies: [],
+      // created_at: new Date().toISOString(),
     }));
-
-    let uploadedAttachments = [];
-    if (attachments.length > 0) {
-      const formDataToUpload = new FormData();
-      attachments.forEach((fileObj) => {
-        formDataToUpload.append("files", fileObj.file);
-      });
-      try {
-        const response = await axiosInstanceHos.post(
-          "api/medical-records/upload-attachments",
-          formDataToUpload,
-        );
-        console.log(response.data);
-        uploadedAttachments = response.data; // depends on API response
-      } catch (error) {
-        console.error("Attachment upload failed:", error);
-        toast.error("Failed to upload attachments");
-        return;
-      }
-    }
 
     const selectedDate = new Date(
       `${selectedDay} ${selectedMonth} ${selectedYear} ${selectedTime}`,
     );
-    const scheduled_time = selectedDate.toISOString();
 
     const payload = {
       staff: profile?.staff_id || "",
       patient: selectedPatientDetails.patient.hin || "",
-      investigations_docs: uploadedAttachments,
       vital_signs: selectedPatientFetchedInfo?.latest_vitals.id,
-      referred_docuhealhosp: soapNoteData.referred_docuhealth_hosp,
+      referred_docuhealth_hosp: soapNoteData.referred_docuhealth_hosp,
       referred_hosp: soapNoteData.referred_hosp,
       drug_records: drugRecords,
-      appointment: {
-        staff_id: profile?.staff_id || "",
-        patient_hin: selectedPatientDetails.patient.hin || "",
-        patient: {
-          hin: selectedPatientFetchedInfo?.patient_info.hin,
-          firstname: selectedPatientFetchedInfo?.patient_info.firstname,
-          lastname: selectedPatientFetchedInfo?.patient_info.lastname,
-          gender: selectedPatientFetchedInfo?.patient_info.gender,
-          dob: selectedPatientFetchedInfo?.patient_info.dob,
-        },
-        staff: {
-          firstname: profile?.firstname,
-          lastname: profile?.lastname,
-          email: profile?.email,
-          phone_no: profile?.phone_no,
-          role: profile?.role,
-          staff_id: profile?.staff_id,
-          ward: profile?.ward,
-          gender: profile?.gender,
-          ward_info: profile?.ward_info,
-        },
-        note: note,
-        type: "consultation",
-        hospital: selectedPatientFetchedInfo?.latest_vitals.hospital,
-        scheduled_time: scheduled_time,
-      },
       investigations: soapNoteData.investigations,
       problems_list: soapNoteData.problems_list,
       care_instructions: soapNoteData.care_instructions,
@@ -372,120 +321,81 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       review: soapNoteData.review_of_system,
       general_exam: soapNoteData.general_exam,
       systemic_exam: soapNoteData.systemic_exam,
-      besides_tests: soapNoteData.besides_tests,
+      bedside_tests: soapNoteData.bedside_tests,
       primary_diagnosis: soapNoteData.primary_diagnosis,
       differential_diagnosis: soapNoteData.differential_diagnosis,
       treatment_plan: soapNoteData.treatment_plan,
       patient_education: soapNoteData.patient_education,
     };
 
- const formData = new FormData();
 
-/* ---------- SIMPLE STRING FIELDS ---------- */
-const stringFields = [
-  "chief_complaint",
-  "history_of_complain",
-  "past_med_history",
-  "family_history",
-  "social_history",
-  "other_history",
-  "review",
-  "patient_education",
-  "primary_diagnosis",
-  "differential_diagnosis",
-  "referred_docuhealhosp",
-  "referred_hosp",
-];
+    const formData = new FormData();
 
-stringFields.forEach((key) => {
-  if (payload[key]) {
-    formData.append(key, payload[key]);
-  }
-});
+    const simpleFields = [
+      "chief_complaint",
+      "history_of_complain",
+      "past_med_history",
+      "family_history",
+      "social_history",
+      "other_history",
+      "review",
+      "patient_education",
+      "primary_diagnosis",
+      "differential_diagnosis",
+      "referred_docuhealth_hosp",
+      "referred_hosp",
+    ];
 
-/* ---------- ARRAYS OF STRINGS ---------- */
-const arrayStringFields = [
-  "care_instructions",
-  "treatment_plan",
-  "problems_list",
-  "investigations",
-  "drug_history_allergies",
-  "general_exam",
-  "systemic_exam",
-  "besides_tests",
-];
-
-arrayStringFields.forEach((key) => {
-  if (Array.isArray(payload[key])) {
-    payload[key].forEach((item) => {
-      formData.append(key, item);
+    simpleFields.forEach((key) => {
+      if (payload[key]) {
+        formData.append(key, payload[key]);
+      }
     });
-  }
-});
 
-/* ---------- ARRAY OF OBJECTS ---------- */
-payload.drug_records.forEach((record, index) => {
-  // Simple fields
-  formData.append(`drug_records[${index}][name]`, record.name);
-  formData.append(`drug_records[${index}][route]`, record.route);
-  formData.append(`drug_records[${index}][quantity]`, record.quantity);
-  formData.append(
-    `drug_records[${index}][allergies]`,
-    record.allergies || "None"
-  );
+    const appointment = {
+      scheduled_time: selectedDate.toISOString(),
+      note,
+      type: "consultation",
+    };
 
-  // Frequency (nested)
-  formData.append(
-    `drug_records[${index}][frequency][value]`,
-    record.frequency.value
-  );
-  formData.append(
-    `drug_records[${index}][frequency][rate]`,
-    record.frequency.rate
-  );
+    formData.append("patient", selectedPatientDetails.patient.hin);
+    formData.append("chief_complaint", soapNoteData.chief_complaint);
+    formData.append("primary_diagnosis", soapNoteData.primary_diagnosis);
 
-  // Duration (nested)
-  formData.append(
-    `drug_records[${index}][duration][value]`,
-    record.duration.value
-  );
-  formData.append(
-    `drug_records[${index}][duration][rate]`,
-    record.duration.rate
-  );
-});
+    if (selectedPatientFetchedInfo?.latest_vitals?.id) {
+      formData.append(
+        "vital_signs",
+        selectedPatientFetchedInfo.latest_vitals.id,
+      );
+    }
 
+    const arrayFields = [
+      "investigations",
+      "problems_list",
+      "care_instructions",
+      "drug_history_allergies",
+      "general_exam",
+      "systemic_exam",
+      "bedside_tests",
+      "treatment_plan",
+    ];
 
+    arrayFields.forEach((key) => {
+      formData.append(key, JSON.stringify(soapNoteData[key] || []));
+    });
 
-/* ---------- OBJECTS ---------- */
-formData.append("appointment", JSON.stringify(payload.appointment));
+    formData.append("drug_records", JSON.stringify(drugRecords));
+    formData.append("appointment", JSON.stringify(appointment));
 
-if (payload.vital_signs) {
-  formData.append("vital_signs", payload.vital_signs);
-}
-
-formData.append("staff", payload.staff);
-formData.append("patient", payload.patient);
-
-/* ---------- INVESTIGATION DOCS ---------- */
-uploadedAttachments.forEach((doc, index) => {
-  Object.entries(doc).forEach(([key, value]) => {
-    formData.append(`investigations_docs[${index}][${key}]`, value);
-  });
-});
-
-
-
-
-    
-
+    attachments.forEach((fileObj) => {
+      formData.append("investigation_docs", fileObj.file);
+    });
 
     try {
-      console.log("Submitting SOAP Note with payload:", formData);
-      //   try {
+      // console.log("Submitting SOAP Note with payload:", formData);
       const res = await axiosInstanceHos.post(
         "api/medical-records/soap-note",
-        formData
+        formData,
       );
       console.log(res);
       toast.success("SOAP Note created successfully !");
@@ -495,40 +405,40 @@ uploadedAttachments.forEach((doc, index) => {
       toast.error("Error uploading SOAP Note");
     } finally {
       setLoading(false);
-      // setStep(1);
-      // setSoapNoteEntry(false);
-      // setSoapNoteData({
-      //   chief_complaint: "",
-      //   history_of_presenting_complain: "",
-      //   past_med_history: "",
-      //   family_history: "",
-      //   social_history: "",
-      //   other_history: "",
-      //   review_of_system: "",
-      //   primary_diagnosis: "",
-      //   differential_diagnosis: "",
-      //   patient_education: "",
-      //   referred_docuhealth_hosp: "",
-      //   referred_hosp: "",
-      //   drug_history_allergies: [],
-      //   general_exam: [],
-      //   systemic_exam: [],
-      //   besides_tests: [],
-      //   investigations: [],
-      //   problems_list: [],
-      //   treatment_plan: [],
-      //   care_instructions: [],
-      // });
-      // setInputs({
-      //   drug_history_allergies: "",
-      //   general_exam: "",
-      //   systemic_exam: "",
-      //   besides_tests: "",
-      //   investigations: "",
-      //   problems_list: "",
-      //   treatment_plan: "",
-      //   care_instructions: "",
-      // });
+      setStep(1);
+      setSoapNoteEntry(false);
+      setSoapNoteData({
+        chief_complaint: "",
+        history_of_presenting_complain: "",
+        past_med_history: "",
+        family_history: "",
+        social_history: "",
+        other_history: "",
+        review_of_system: "",
+        primary_diagnosis: "",
+        differential_diagnosis: "",
+        patient_education: "",
+        referred_docuhealth_hosp: "",
+        referred_hosp: "",
+        drug_history_allergies: [],
+        general_exam: [],
+        systemic_exam: [],
+        besides_tests: [],
+        investigations: [],
+        problems_list: [],
+        treatment_plan: [],
+        care_instructions: [],
+      });
+      setInputs({
+        drug_history_allergies: "",
+        general_exam: "",
+        systemic_exam: "",
+        besides_tests: "",
+        investigations: "",
+        problems_list: "",
+        treatment_plan: "",
+        care_instructions: "",
+      });
     }
   };
 
@@ -807,8 +717,8 @@ uploadedAttachments.forEach((doc, index) => {
             />
 
             <NoteSection
-              title="Relevant Besides Tests"
-              field="besides_tests"
+              title="Relevant Bedside Tests"
+              field="bedside_tests"
               placeholder="e.g. Patient is stable but reports mild headache"
               soapNoteData={soapNoteData}
               inputs={inputs}
@@ -1366,7 +1276,9 @@ uploadedAttachments.forEach((doc, index) => {
                   onChange={handleTextChange}
                   className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-6"
                 >
-                  {!soapNoteData.referred_docuhealth_hosp && <option value="">Select Hospital</option>}
+                  {!soapNoteData.referred_docuhealth_hosp && (
+                    <option value="">Select Hospital</option>
+                  )}
                   {hospitals &&
                     hospitals
                       .filter(
@@ -1374,7 +1286,7 @@ uploadedAttachments.forEach((doc, index) => {
                           hospital.name && hospital.name.trim() !== "",
                       )
                       .map((hospital, idx) => (
-                        <option key={idx} value={hospital.hin} >
+                        <option key={idx} value={hospital.hin}>
                           {hospital.name}
                         </option>
                       ))}
