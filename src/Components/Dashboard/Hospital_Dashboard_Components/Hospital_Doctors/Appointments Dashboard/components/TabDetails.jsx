@@ -3,6 +3,11 @@ import Pagination from "../../../../Patient_Dashboard_Components/Pagination/Pagi
 import formatRecordDate from "../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { formatFullDateTime } from "../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { truncateWords } from "../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
+import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
+import {
+  formatFullDate,
+  formatTime,
+} from "../../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
 
 const PatientInfo = ({ patientFullInfo }) => {
   console.log(patientFullInfo);
@@ -546,6 +551,7 @@ const PatientCaseNotes = ({
   soapTotalPages,
   fetchPatientSoapNotes,
 }) => {
+  console.log(patientSoapNotes);
 
   if (soapNotesLoading) {
     return (
@@ -623,17 +629,215 @@ const PatientCaseNotes = ({
     );
   }
 
+  const [openPopover, setOpenPopover] = useState(null);
+  const togglePopover = (index) => {
+    setOpenPopover(openPopover === index ? null : index);
+  };
+
   return (
     <>
       {Array.isArray(patientSoapNotes) && patientSoapNotes.length > 0 ? (
         <>
+          <div className="text-[12px] my-4">
+            <div className="hidden lg:block">
+              {patientSoapNotes.map((soapNote, index) => (
+                <div
+                  key={soapNote.id}
+                  className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10 "
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-100 rounded-md">
+                      <CalendarIcon className="w-4 h-4 text-gray-600" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-500 uppercase font-semibold">
+                        Date / Time
+                      </p>
+                      <p className="text-sm font-medium">
+                        {formatFullDate(soapNote?.created_at)} /{" "}
+                        {formatTime(soapNote?.created_at)}
+                      </p>
+                    </div>
+                  </div>
 
-        <Pagination
-         count={soapCount}
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-100 rounded-md">
+                      <UserIcon className="w-4 h-4 text-gray-600" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-500 uppercase font-semibold">
+                        Patient
+                      </p>
+                      <p className="text-sm font-medium">
+                        {soapNote?.patient_info?.firstname}{" "}
+                        {soapNote?.patient_info?.lastname}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-100 rounded-md">
+                      <User className="w-4 h-4 text-gray-600" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-500 uppercase font-semibold">
+                        Appointed Doctor
+                      </p>
+                      <p className="text-sm font-medium">
+                        Dr. {soapNote?.staff_info?.firstname}{" "}
+                        {soapNote?.staff_info?.lastname}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between relative flex-1">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gray-100 rounded-md">
+                        <FileText className="w-4 h-4 text-gray-600" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-gray-500 uppercase font-semibold">
+                          Chief Complaint
+                        </p>
+                        <p className="text-sm font-medium truncate max-w-[150px]">
+                          {soapNote?.chief_complaint || "NIL"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div
+                      onClick={() => {
+                        togglePopover(index);
+                        setSelectedPatientDetails(soapNote);
+                      }}
+                      className={` hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer
+        ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
+    `}
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                      </svg>
+                    </div>
+
+                    {openPopover === index && (
+                      <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
+                        <p
+                          className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                          // onClick={() => {
+                          //   setSeePatientDetails(true);
+                          // }}
+                        >
+                          See full SOAP Note
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="block lg:hidden space-y-4 px-1">
+            {patientSoapNotes.map((soapNote, index) => (
+              <div
+                key={soapNote.id}
+                className="bg-white border border-gray-200 rounded-lg p-4"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                    <p className="text-[10px] text-slate-400 uppercase font-bold">
+                      Scheduled
+                    </p>
+                    <p className="text-sm font-medium">
+                      {formatFullDate(soapNote?.created_at)} /{" "}
+                      {formatTime(soapNote?.created_at)}
+                    </p>
+                  </div>
+                  <div className="relative">
+                    <button
+                      onClick={() => {
+                        togglePopover(index);
+                        setSelectedPatientDetails(soapNote);
+                      }}
+                      className={`h-9 w-9 flex items-center justify-center rounded-full ${openPopover === index ? "bg-slate-200" : "bg-gray-50"}`}
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                      >
+                        <path
+                          d="M14 8C14 7.45 13.55 7 13 7C12.45 7 12 7.45 12 8C12 8.55 12.45 9 13 9C13.55 9 14 8.55 14 8ZM4 8C4 7.45 3.55 7 3 7C2.45 7 2 7.45 2 8C2 8.55 2.45 9 3 9C3.55 9 4 8.55 4 8ZM9 8C9 7.45 8.55 7 8 7C7.45 7 7 7.45 7 8C7 8.55 7.45 9 8 9C8.55 9 9 8.55 9 8Z"
+                          fill="#1A263E"
+                        />
+                      </svg>
+                    </button>
+                    {openPopover === index && (
+                      <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
+                        <p
+                          className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                          // onClick={() => {
+                          //   setSeePatientDetails(true);
+                          // }}
+                        >
+                          See full SOAP Note
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs border border-indigo-100">
+                      {soapNote?.patient_info?.firstname[0]}
+                      {soapNote?.patient_info?.lastname[0]}
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-slate-400 uppercase font-medium">
+                        Patient
+                      </p>
+                      <p className="text-sm font-semibold text-slate-800">
+                        {soapNote?.patient_info?.firstname}{" "}
+                        {soapNote?.patient_info?.lastname}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-50">
+                    <div>
+                      <p className="text-[10px] text-slate-400 uppercase font-medium">
+                        {soapNote?.staff_info?.role}
+                      </p>
+                      <p className="text-[13px] text-slate-600">
+                        Dr. {soapNote?.staff_info?.firstname}{" "}
+                        {soapNote?.staff_info?.lastname}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-slate-400 uppercase font-medium">
+                        Chief Complaint
+                      </p>
+                      <p className="text-[13px] text-slate-600 truncate italic">
+                        " {soapNote?.chief_complaint || "NIL"}"
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <Pagination
+            count={soapCount}
             currentPage={soapCurrentPage}
             totalPages={soapTotalPages}
             fetchData={fetchPatientSoapNotes}
-        />
+          />
         </>
       ) : (
         <p className="text-center">No soap notes found.</p>
