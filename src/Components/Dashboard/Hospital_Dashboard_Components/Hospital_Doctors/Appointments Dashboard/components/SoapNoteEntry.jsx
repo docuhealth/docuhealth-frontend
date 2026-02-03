@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { ArrowLeft } from "lucide-react";
-import { X, Plus, UploadCloud, FileText } from "lucide-react";
+import { ArrowLeft, X, Plus, UploadCloud, FileText  } from "lucide-react";
 import { truncateWords } from "../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import toast from "react-hot-toast";
 import { DoctorAppContext } from "../../../../../../context/Hospital Context/Doctors/DoctorAppContext";
@@ -941,7 +940,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
               {medications.map((med, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-1 sm:grid-cols-5 gap-2 items-end mt-3"
+                  className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-2 items-end mt-3"
                 >
                   <div>
                     <label className="block text-[12px] pb-1">Drug</label>

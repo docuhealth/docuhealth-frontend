@@ -109,7 +109,7 @@ const Hospital_Admin_Header = () => {
                     <p className="text-xs font-bold text-gray-900 truncate">
                       {profile?.name}
                     </p>
-                    <p className="text-[10px] text-gray-500">Receptionist</p>
+                    <p className="text-[10px] text-gray-500">Hospital Admin</p>
                   </div>
                   {/* <button className="w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-600 hover:bg-gray-50 rounded-lg">
                             <User className="w-3.5 h-3.5" /> Profile

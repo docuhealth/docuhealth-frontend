@@ -5,6 +5,7 @@ import Pagination from "../../../Patient_Dashboard_Components/Pagination/Paginat
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { DoctorsAdmittedPatientMGTContext } from "../../../../../context/Hospital Context/Doctors/DoctorsAdmittedPatientMGTContext";
+import AfterDischargeSummary from "./AfterDischargeSummary";
 
 const AdmittedPatientsTab = ({setAdvanceCheckUp, setSelected}) => {
   const {
@@ -17,6 +18,9 @@ const AdmittedPatientsTab = ({setAdvanceCheckUp, setSelected}) => {
     tab,
   } = useContext(DoctorsAdmittedPatientMGTContext);
   const [selectedPatient, setSelectedPatient] = useState(null);
+
+    const [dischargePatient, setDischargePatient] = useState(false);
+    const [selectedDischargePatient, setSelectedDischargePatient] = useState(null)
 
   if (loading) {
     return (
@@ -211,7 +215,8 @@ const AdmittedPatientsTab = ({setAdvanceCheckUp, setSelected}) => {
             <button
               className="text-center mt-3 py-2 border border-[#1B2B40] text-[#1B2B40] w-full rounded-full cursor-pointer"
               onClick={() => {
-                
+                setDischargePatient(!dischargePatient)
+                setSelectedDischargePatient(admittedPatient)
               }}
             >
               Discharge Patient 
@@ -219,6 +224,14 @@ const AdmittedPatientsTab = ({setAdvanceCheckUp, setSelected}) => {
           </div>
         ))}
       </div>
+
+      {
+        dischargePatient && (
+          <>
+            <AfterDischargeSummary selectedDischargePatient={selectedDischargePatient} setDischargePatient={setDischargePatient} />
+          </>
+        )
+      }
 
       <Pagination
         count={count}

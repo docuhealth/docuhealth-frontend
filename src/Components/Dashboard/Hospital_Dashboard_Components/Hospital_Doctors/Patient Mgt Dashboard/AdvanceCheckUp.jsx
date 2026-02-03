@@ -6,7 +6,7 @@ import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home D
 import TabComponent2 from "./TabComponent2";
 import getTabs from "./TabDetails2";
 
-const AdvanceCheckUp = ({ selected, setAdvanceCheckUp }) => {
+const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry }) => {
   const [patientFullInfo, setPatientFullInfo] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -30,7 +30,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp }) => {
   const [viewDetailMedicalRecord, setViewDetailMedicalRecord] = useState(false);
   const [selectedMedicalRecord, setSelectedMedicalRecord] = useState(null);
 
-  console.log(selected);
+  // console.log(selected);
 
   const fetchPatientInfo = async () => {
     try {
@@ -145,8 +145,10 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp }) => {
               medloading,
               patientSoapNotes,
               soapNotesLoading,
+              
 
               patientFullInfo,
+              selected,
               count,
               currentPage,
               totalPages,
@@ -157,6 +159,11 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp }) => {
               soapCurrentPage,
               soapTotalPages,
               fetchPatientSoapNotes,
+
+              setSoapNoteEntry,
+              setAdvanceCheckUp
+
+              
             })}
           />
         </>
