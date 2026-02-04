@@ -1,14 +1,12 @@
 import React, { useContext } from "react";
-import { SubscriptionsContext } from "../../../../context/Patient Context/SubscriptionsContext";
-import axiosInstance from "../../../../utils/axiosInstance";
-import DynamicDate from "../../../Dynamic Date/DynamicDate";
+import { HosSubscriptionsContext } from '../../../../../context/Hospital Context/Admin/HosSubscriptionsContext'
+import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 import toast from "react-hot-toast";
 
 const SubscriptionPlans = () => {
-  const { subscriptionPlans, isPending } = useContext(SubscriptionsContext);
+      const { subscriptionPlans, loading } = useContext(HosSubscriptionsContext);
 
-  // Payment handler (stub)
-const handlePayment = async (planId) => {
+      const handlePayment = async (planId) => {
   toast.loading("Initializing payment...");
 
   const payload = {
@@ -16,7 +14,7 @@ const handlePayment = async (planId) => {
   };
 
   try {
-    const res = await axiosInstance.post("api/subscriptions/subscribe", payload);
+    const res = await axiosInstanceHos.post("api/subscriptions/subscribe", payload);
     const data = res.data;
 
     toast.dismiss(); // remove loading toast
@@ -46,18 +44,12 @@ const handlePayment = async (planId) => {
     console.log(err);
   }
 };
-
-
   return (
-    <>
-      <div className="bg-white my-5 border rounded-lg py-8 px-6">
-              <div className="border rounded-lg bg-[#F5F8F8] mb-4 p-5">
-            <p className="text-[12px]">
-              Please remain subscribed to enjoy these features. Your <i>Yearly Plan</i> subscription plan also supports the deployment of DocuHealth 24/7 First - Aid Vending Machines in strategic community locations, helping ensure access to essential medications during emergency hours in the near future.
-            </p>
-        </div>
+      <>
+      <div className="bg-white my-5 border rounded-lg p-4 lg:p-6">
+
         {/* ===== Loading State ===== */}
-        {isPending ? (
+        {loading ? (
           <div className="flex justify-center items-center ">
             <p className="text-gray-600 text-sm animate-pulse">
               Loading subscription plans...
@@ -157,9 +149,12 @@ const handlePayment = async (planId) => {
               {/* Features Section */}
               <div className="py-5 space-y-1">
                 {[
-                  "Access to dashboard",
-                  "View basic profile",
-                  "View your HIN ( Health Identification Number )",
+                  "Access to dashboard.",
+                  "View basic hospital profile.",
+                  "Add doctors and nurses under the hospital to team.",
+                  "Identify patients using Health Identification Number (HIN).",
+                  "Register a new Patient.",
+                  "View patient profile (medical summaries from other hospitals)."
                 ].map((feature, i) => (
                   <p key={i} className="flex items-center text-[12px]">
                     <i className="bx bx-check text-[#3E4095] text-xl mr-1"></i>
@@ -167,12 +162,13 @@ const handlePayment = async (planId) => {
                   </p>
                 ))}
                 {[
-                  "No access to medical record summary and dowloads.",
-                  "No access to uploaded documents",
-                  "No access to creating a Kid's account",
-                  "No access to creating or printing ID Card",
-                  "No access to appointments",
-                  "No access to Emergency Mode",
+                  "No access to appointments management (all dashboards).",
+                  "No access to upload SOAP Notes (doctors).",
+                  "Cannot upload nurses’ clinical notes.",
+                  "No access to upload Medical Record Summaries.",
+                  "No access to download any records.",
+                  "No Emergency Mode access to view patient medical summaries from other hospitals (even when patient turn emergency mode on)",
+                  "No access to DocuHealth API for external use.",
                 ].map((feature, i) => (
                   <p key={i} className="flex items-center text-[12px]">
                     <i className="bx bx-x text-xl text-red-600 mr-1"></i>
@@ -256,7 +252,7 @@ const handlePayment = async (planId) => {
   
       </div>
     </>
-  );
-};
+  )
+}
 
-export default SubscriptionPlans;
+export default SubscriptionPlans

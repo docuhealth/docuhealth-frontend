@@ -386,10 +386,9 @@ const Hospital_Admin_Sidebar_Mobile = ({
               </div>
             </Link>
             <Link
-              to=""
+              to="/hospital-admin-subscriptions-dashboard"
               onClick={() => {
                 setOpenMobileSidebar(false);
-                toast.success("Feature is coming soon");
               }}
             >
               <div className="px-4 my-4">
