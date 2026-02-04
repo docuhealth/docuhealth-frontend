@@ -45,7 +45,7 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals}) => {
 
             toast.success("Vitals processed successfully!");
 
-            setUpdateVitals(false);   // close modal
+            setProcessVitals(false);   // close modal
         } catch (err) {
             console.error("Error processing vitals:", err);
 

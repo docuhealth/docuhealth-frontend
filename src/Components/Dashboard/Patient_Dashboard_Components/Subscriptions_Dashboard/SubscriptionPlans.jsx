@@ -51,6 +51,11 @@ const handlePayment = async (planId) => {
   return (
     <>
       <div className="bg-white my-5 border rounded-lg py-8 px-6">
+              <div className="border rounded-lg bg-[#F5F8F8] mb-4 p-5">
+            <p className="text-[12px]">
+              Please remain subscribed to enjoy these features. Your <i>Yearly Plan</i> subscription plan also supports the deployment of DocuHealth 24/7 First - Aid Vending Machines in strategic community locations, helping ensure access to essential medications during emergency hours in the near future.
+            </p>
+        </div>
         {/* ===== Loading State ===== */}
         {isPending ? (
           <div className="flex justify-center items-center ">
@@ -143,18 +148,18 @@ const handlePayment = async (planId) => {
                 </p>
                 <p className="text-[12px] text-gray-600 leading-4">
                   The basic plan is a free, interesting and complete plan. It
-                  has all the necessary features to get you started.
+                  has some features to get you started. 
                 </p>
               </div>
 
               <hr />
 
               {/* Features Section */}
-              <div className="py-5">
+              <div className="py-5 space-y-1">
                 {[
                   "Access to dashboard",
-                  "Unlimited account information update",
-                  "Access to all medical history",
+                  "View basic profile",
+                  "View your HIN ( Health Identification Number )",
                 ].map((feature, i) => (
                   <p key={i} className="flex items-center text-[12px]">
                     <i className="bx bx-check text-[#3E4095] text-xl mr-1"></i>
@@ -162,10 +167,12 @@ const handlePayment = async (planId) => {
                   </p>
                 ))}
                 {[
-                  "Emergency mode access",
-                  "Exporting files as PDF",
-                  "Creation of sub-account",
-                  "Creation of Identity card",
+                  "No access to medical record summary.",
+                  "No access to uploaded documents",
+                  "No access to creating a Kid's account",
+                  "No access to creating or printing ID Card",
+                  "No access to appointments",
+                  "No access to Emergency Mode",
                 ].map((feature, i) => (
                   <p key={i} className="flex items-center text-[12px]">
                     <i className="bx bx-x text-xl text-red-600 mr-1"></i>
@@ -221,7 +228,7 @@ const handlePayment = async (planId) => {
                 <hr />
 
                 {/* Features */}
-                <div className="py-5">
+                <div className="py-5 space-y-1">
                   {plan.features.map((feature, i) => (
                     <p key={i} className="flex items-center text-[12px]">
                       <i className="bx bx-check text-[#3E4095] text-xl mr-1"></i>
@@ -245,6 +252,8 @@ const handlePayment = async (planId) => {
             ))}
           </div>
         )}
+
+  
       </div>
     </>
   );
