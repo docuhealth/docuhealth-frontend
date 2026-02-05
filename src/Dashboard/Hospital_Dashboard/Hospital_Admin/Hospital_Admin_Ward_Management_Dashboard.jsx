@@ -112,14 +112,14 @@ const Hospital_Admin_Ward_Management_Dashboard = () => {
                 <button
                   type="button"
                   onClick={() => setShowOverlay(false)}
-                  className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 font-medium rounded-full hover:bg-gray-50 transition-all text-sm"
+                  className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600  rounded-full hover:bg-gray-50 transition-all text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 px-4 py-2.5 bg-[#3E4095] text-white font-bold rounded-full ] disabled:opacity-50 transition-all text-sm shadow shadow-indigo-100 cursor-pointer"
+                  className="flex-1 px-4 py-2.5 bg-[#3E4095] text-white  rounded-full  disabled:opacity-50 transition-all text-sm shadow shadow-indigo-100 cursor-pointer"
                 >
                   {isSubmitting ? "Creating..." : "Create Ward"}
                 </button>

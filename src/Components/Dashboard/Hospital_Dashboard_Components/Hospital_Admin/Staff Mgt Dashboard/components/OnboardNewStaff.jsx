@@ -31,7 +31,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
 
     const personnelOptions = ["doctor", "nurse", "receptionist"];
-    const specializationOptions = ["surgeon", "pediatrician", "cardiologist"];
+    const specializationOptions = ["surgeon", "pediatrician", "cardiologist", "endocrinologist", "general practitioner" ];
     const gender = ["male", "female"];
 
 

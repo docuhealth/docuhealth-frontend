@@ -226,7 +226,10 @@ const toggleStaff = (id) => {
                     />
                   </svg>
                   <p>
-                    {staff.firstname} {staff.lastname}
+                      {staff.role === 'doctor'
+  ? `Dr. ${staff.firstname} ${staff.lastname}`
+  : `${staff.firstname} ${staff.lastname}`}
+                  {staff.firstname} {staff.lastname}
                   </p>
                 </div>
               </div>
@@ -312,7 +315,10 @@ const toggleStaff = (id) => {
 
                   <div className="min-w-0">
                     <h3 className="font-bold text-gray-900 text-[15px] truncate">
-                      {staff.firstname} {staff.lastname}
+                       {staff.role === 'doctor'
+  ? `Dr. ${staff.firstname} ${staff.lastname}`
+  : `${staff.firstname} ${staff.lastname}`}
+                  {staff.firstname} {staff.lastname}
                     </h3>
                     <div className="flex items-center gap-1.5">
                       <span className="text-[10px] bg-[#3E4095] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">

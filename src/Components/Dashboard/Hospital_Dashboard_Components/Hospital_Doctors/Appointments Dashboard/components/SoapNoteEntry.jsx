@@ -956,7 +956,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
                   <div>
                     <label className="block text-[12px] pb-1">Dosage</label>
                     <input
-                      type="text"
+                      type="number"
                       placeholder="Enter dosage..."
                       value={med.dosage}
                       onChange={(e) =>
