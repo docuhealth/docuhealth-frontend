@@ -53,7 +53,7 @@ const handlePayment = async (planId) => {
       <div className="bg-white my-5 border rounded-lg py-8 px-6">
               <div className="border rounded-lg bg-[#F5F8F8] mb-4 p-5">
             <p className="text-[12px]">
-              Please remain subscribed to enjoy these features. Your <i>Yearly Plan</i> subscription plan also supports the deployment of DocuHealth 24/7 First - Aid Vending Machines in strategic community locations, helping ensure access to essential medications during emergency hours in the near future.
+              Please remain subscribed to enjoy these features. Your <i className="font-bold">Annual Plan</i> subscription plan also supports the deployment of DocuHealth 24/7 First - Aid Vending Machines in strategic community locations, helping ensure access to essential medications during emergency hours in the near future.
             </p>
         </div>
         {/* ===== Loading State ===== */}

@@ -45,7 +45,7 @@ const DocuHealth_Updates_Section = () => {
 
     return (
         <BackgroundTemplate>
-            <section className='py-16 px-12 text-sm text-[#464646] lg:bg-[#F6FCFE]'>
+            <section id='docuhealth_news' className='py-16 px-12 text-sm text-[#464646] lg:bg-[#F6FCFE]'>
                 <div className="text-center">
                     <h2 className="text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-[#3E4095]">
                         Latest DocuHealth News & Updates

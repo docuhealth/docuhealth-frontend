@@ -40,7 +40,7 @@ const FAQ_Section = () => {
   return (
     <>
       <BackgroundTemplate>
-        <section className="py-24 px-5 lg:px-16 text-sm text-[#464646] bg-[#F6FCFE] lg:bg-white" id="faq">
+        <section  className="py-24 px-5 lg:px-16 text-sm text-[#464646] bg-[#F6FCFE] lg:bg-white" id="faq">
           <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-10 ">
             {/* Left side: FAQs */}
             <div className="w-full lg:w-1/2">

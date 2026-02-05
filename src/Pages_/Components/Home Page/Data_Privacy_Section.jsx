@@ -30,7 +30,7 @@ const Data_Privacy_Section = () => {
   return (
     <>
       <BackgroundTemplate>
-        <section className="py-24 px-5 lg:px-16 text-sm text-[#464646] bg-white lg:bg-[#F6FCFE] ">
+        <section id="docuhealth_data_privacy" className="py-24 px-5 lg:px-16 text-sm text-[#464646] bg-white lg:bg-[#F6FCFE] ">
           <div className="w-full flex flex-col-reverse lg:flex-row items-start justify-between gap-10 ">
             <div className="hidden md:flex w-full lg:w-1/2 items-center justify-center">
             <img

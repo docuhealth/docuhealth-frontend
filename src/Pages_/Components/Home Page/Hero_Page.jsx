@@ -11,7 +11,7 @@ const HeroPG = () => {
 
   return (
     <>
-      <div className=" hidden lg:block bg-cover bg-left relative px-5 lg:px-16 py-36 lg:py-20  ">
+      <div id="home" className=" hidden lg:block bg-cover bg-left relative px-5 lg:px-16 py-36 lg:py-20  ">
         <div className="flex flex-col lg:flex-row items-start sm:items-center lg:items-start gap-5 ">
           <div className="flex-1 w-full">
             <h1 className="text-3xl lg:text-5xl 2xl:text-6xl font-bold leading-[50px] lg:leading-[60px] pb-5 text-[#212121] text-center lg:text-left">

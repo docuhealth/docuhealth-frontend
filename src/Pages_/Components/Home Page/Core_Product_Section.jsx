@@ -42,7 +42,7 @@ const Core_Product_Section = () => {
   return (
     <>
       <BackgroundTemplate>
-        <div className="py-24 px-5 lg:px-16 text-sm text-[#464646]" id="our-services">
+        <div  className="py-24 px-5 lg:px-16 text-sm text-[#464646]" id="our-services">
           <h2 className="font-semibold pb-4 text-2xl lg:text-3xl 2xl:text-4xl text-[#3E4095] text-center">
             DocuHealth Core Product
           </h2>
