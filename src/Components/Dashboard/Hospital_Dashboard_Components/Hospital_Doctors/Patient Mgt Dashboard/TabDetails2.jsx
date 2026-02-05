@@ -129,7 +129,7 @@ const PatientInfo = ({ patientFullInfo, selected }) => {
               type="text"
               readOnly
               className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value="Still Admitted"
+              value={selected?.discharge_date ? formatFullDateTime(selected.discharge_date) : 'Still Admitted'}
             />
           </div>
           <div>
@@ -617,7 +617,8 @@ const PatientSOAPNotes = ({
   soapCurrentPage,
   soapTotalPages,
   fetchPatientSoapNotes,
-  setAdvanceCheckUp
+  setAdvanceCheckUp,
+  selected
 }) => {
   if (soapNotesLoading) {
     return (
@@ -1336,7 +1337,9 @@ const PatientSOAPNotes = ({
         </div>
       ) : (
         <>
-        <div className="flex justify-end">
+        {
+          !selected.discharge_date && (
+     <div className="flex justify-end">
                        <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto"
               onClick={()=> {
                 setSoapNoteEntry(true)
@@ -1346,6 +1349,9 @@ const PatientSOAPNotes = ({
                 Create new SOAP Note
               </button>
         </div>
+          )
+        }
+   
 
           {Array.isArray(patientSoapNotes) && patientSoapNotes.length > 0 ? (
             <>
@@ -1614,6 +1620,7 @@ const getTabs = ({
         soapTotalPages={soapTotalPages}
         fetchPatientSoapNotes={fetchPatientSoapNotes}
         setAdvanceCheckUp = {setAdvanceCheckUp}
+        selected = {selected}
       />
     ),
   },

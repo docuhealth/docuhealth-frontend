@@ -4,8 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { login, setHospitalToken } from "../../services/authService";
 import toast from "react-hot-toast";
 import dashb from "../../assets/img/dashb.png";
-import docuhealth_logo from '../../assets/img/docuhealth_logo.png'
-
+import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 
 const Hospital_Sign_In = () => {
   const [email, setEmail] = useState("");
@@ -16,13 +15,12 @@ const Hospital_Sign_In = () => {
 
   const navigate = useNavigate();
 
-  
   useEffect(() => {
     let timer;
     if (showToast) {
       timer = setTimeout(() => {
         toast.success(
-          "Kindly exercise patience, while you are being logged in!"
+          "Kindly exercise patience, while you are being logged in!",
         );
         setShowToast(false); // Reset state after toast is shown
       }, 5000);
@@ -31,8 +29,7 @@ const Hospital_Sign_In = () => {
     return () => clearTimeout(timer); // Cleanup timeout on unmount
   }, [showToast]);
 
-  const isFormValid = email.trim() !== "" &&
-  password.trim().length >= 1;
+  const isFormValid = email.trim() !== "" && password.trim().length >= 1;
 
   const handleSubmit = async (e) => {
     setIsSubmitting(true);
@@ -48,6 +45,16 @@ const Hospital_Sign_In = () => {
 
       try {
         const data = await login(userData);
+
+        const role = data.data.role;
+        const staffRole = data.data.staff_role?.toLowerCase();
+
+        if (role !== "hospital" && role !== "hospital_staff") {
+          toast.error("Invalid credentials for login");
+          setIsSubmitting(false);
+          return;
+        }
+
         setHospitalToken(data.data.access_token, data.data.role);
         // console.log(data)
 
@@ -56,39 +63,34 @@ const Hospital_Sign_In = () => {
         setEmail("");
         setPassword("");
 
-        const role = data.data.role;
-        const staffRole = data.data.staff_role?.toLowerCase();
-    
         // Redirect Logic
         if (role === "hospital") {
-            window.location.href = "/hospital-admin-home-dashboard";
-        }
-    
-        if (role === "hospital_staff") {
-            if (staffRole === "receptionist") {
-                window.location.href = "/hospital-receptionist-home-dashboard";
-            } 
-            else if (staffRole === "doctor") {
-                window.location.href = "/hospital-doctors-home-dashboard";
-            } 
-            else if (staffRole === "nurse") {
-                window.location.href = "/hospital-nurses-home-dashboard";
-            } 
-            else {
-                // default for now
-                window.location.href = " ";
-            }
+          window.location.href = "/hospital-admin-home-dashboard";
         }
 
+        if (role === "hospital_staff") {
+          if (staffRole === "receptionist") {
+            window.location.href = "/hospital-receptionist-home-dashboard";
+          } else if (staffRole === "doctor") {
+            window.location.href = "/hospital-doctors-home-dashboard";
+          } else if (staffRole === "nurse") {
+            window.location.href = "/hospital-nurses-home-dashboard";
+          } else {
+            // default for now
+            window.location.href = " ";
+          }
+        }
       } catch (error) {
         console.log(error);
-        toast.error(error.response.data.detail || "Login failed. Please try again.");
+        toast.error(
+          error.response.data.detail || "Login failed. Please try again.",
+        );
         setIsSubmitting(false);
       } finally {
         setIsSubmitting(false);
         setEmail("");
         setPassword("");
-        setShowToast(false)
+        setShowToast(false);
       }
     } else {
       toast.error("Please ensure all fields are correct.");
@@ -97,228 +99,236 @@ const Hospital_Sign_In = () => {
 
   return (
     <>
-    <div className="hidden h-screen sm:flex">
-    {/* Left Side */}
-    <div className="  w-full flex-1">
-      <div className=" hidden sm:flex justify-center items-center py-10 h-screen ">
-    
-          <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
-            <img src={docuhealth_logo} alt="Logo" className="w-6" />
-            <h1 className="text-xl">DocuHealth</h1>
-          </div>
-     
-        <div className="w-full ">
-          <div className="px-10 w-full">
-            <h2 className="text-xl font-semibold pb-1">
-            Sign Into Your Provider's Account
-            </h2>
-            <p className="text-gray-600 mb-6 text-sm">
-              Input your correct log-in credentials to get access into your
-              dashboard
-            </p>
+      <div className="hidden h-screen sm:flex">
+        {/* Left Side */}
+        <div className="  w-full flex-1">
+          <div className=" hidden sm:flex justify-center items-center py-10 h-screen ">
+            <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
+              <img src={docuhealth_logo} alt="Logo" className="w-6" />
+              <h1 className="text-xl">DocuHealth</h1>
+            </div>
 
-            <form onSubmit={handleSubmit} className="text-sm">
-              {/* Email Input */}
-              <div className="relative pb-3">
-                <p className="font-semibold pb-1">Email :</p>
-                <div className="relative">
-                  <input
-                    type="email"
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
-                    value={email}
-                    onChange={(e)=> setEmail(e.target.value)}
-                    required
-                  />
-                  <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                </div>
-              </div>
+            <div className="w-full ">
+              <div className="px-10 w-full">
+                <h2 className="text-xl font-semibold pb-1">
+                  Sign Into Your Provider's Account
+                </h2>
+                <p className="text-gray-600 mb-6 text-sm">
+                  Input your correct log-in credentials to get access into your
+                  dashboard
+                </p>
 
-              {/* Password Input */}
-              <div className="relative pb-5">
-                <p className="font-semibold pb-1">Password:</p>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <form onSubmit={handleSubmit} className="text-sm">
+                  {/* Email Input */}
+                  <div className="relative pb-3">
+                    <p className="font-semibold pb-1">Email :</p>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                      <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+
+                  {/* Password Input */}
+                  <div className="relative pb-5">
+                    <p className="font-semibold pb-1">Password:</p>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                      <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                      >
+                        {showPassword ? (
+                          <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                        ) : (
+                          <FaEye className="h-4 w-4 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Remember Me Checkbox */}
+                  <div className="flex justify-between items-center pb-5">
+                    <div id="checkbox">
+                      <label className="flex items-center">
+                        <input type="checkbox" className="mr-2" />
+                        Remember me
+                      </label>
+                    </div>
+                    <div>
+                      <Link
+                        to="/forgot-password"
+                        className="underline text-[#3E4095]"
+                      >
+                        Forgot Password
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Submit Button */}
                   <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                    type="submit"
+                    className={`w-full py-3 rounded-full ${
+                      isFormValid && !isSubmitting
+                        ? "bg-[#3E4095] text-white"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
+                    onClick={handleSubmit}
+                    disabled={!isFormValid || isSubmitting}
                   >
-                    {showPassword ? (
-                      <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                    {isSubmitting ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Logging In...
+                      </div>
                     ) : (
-                      <FaEye className="h-4 w-4 text-gray-400" />
+                      "Next"
                     )}
                   </button>
-                </div>
+                </form>
               </div>
+            </div>
+          </div>
+        </div>
 
-              {/* Remember Me Checkbox */}
-              <div className="flex justify-between items-center pb-5">
-                <div id="checkbox">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Remember me
-                  </label>
-                </div>
-                <div>
-                  <Link
-                    to="/forgot-password"
-                    className="underline text-[#3E4095]"
-                  >
-                    Forgot Password
-                  </Link>
-                </div>
-              </div>
+        {/* Right Side */}
+        <div
+          className="flex-1 h-screen flex flex-col justify-center items-center p-4"
+          style={{
+            background: "linear-gradient(to bottom, #3E4095, #718FCC)",
+          }}
+        >
+          <div className="">
+            <p className="text-white font-semibold text-xl pb-1 sm:text-2xl">
+              The simplest way to manage <br /> medical records
+            </p>
+            <p className="text-white font-light text-sm">
+              No better way to attend to, and keep records of medical records
+            </p>
+          </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className={`w-full py-3 rounded-full ${isFormValid && !isSubmitting
-                    ? "bg-[#3E4095] text-white"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
-                onClick={handleSubmit}
-                disabled={!isFormValid || isSubmitting}
-              >
-                {isSubmitting ? (     <div className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Logging In...
-                </div> ): ("Next")}
-              </button>
-            </form>
+          <div className="max-h-[420px] flex justify-center items-center pt-2">
+            <img
+              src={dashb}
+              alt="Dashboard"
+              className="object-contain w-full h-full"
+            />
           </div>
         </div>
       </div>
-    </div>
-
-    {/* Right Side */}
-    <div
-      className="flex-1 h-screen flex flex-col justify-center items-center p-4"
-      style={{
-        background: "linear-gradient(to bottom, #3E4095, #718FCC)",
-      }}
-    >
-      <div className="">
-        <p className="text-white font-semibold text-xl pb-1 sm:text-2xl">
-          The simplest way to manage <br /> medical records
-        </p>
-        <p className="text-white font-light text-sm">
-          No better way to attend to, and keep records of medical records
-        </p>
-      </div>
-
-      <div className="max-h-[420px] flex justify-center items-center pt-2">
-        <img
-          src={dashb}
-          alt="Dashboard"
-          className="object-contain w-full h-full"
-        />
-      </div>
-    </div>
-  </div>
-  <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
+      <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
         <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
           <img src={docuhealth_logo} alt="Logo" className="w-6" />
           <h1 className="text-xl">DocuHealth</h1>
         </div>
-   
-          <div className="px-5 w-full">
-            <h2 className="text-xl font-semibold pb-1">
-              Sign Into Your Provider's Account
-            </h2>
-            <p className="text-gray-600 mb-6 text-sm">
-              Input your correct log-in credentials to get access into your
-              dashboard
-            </p>
 
-            <form onSubmit={handleSubmit} className="text-sm">
-              {/* Email Input */}
-              <div className="relative pb-3">
-                <p className="font-semibold pb-1">Email :</p>
-                <div className="relative">
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                </div>
+        <div className="px-5 w-full">
+          <h2 className="text-xl font-semibold pb-1">
+            Sign Into Your Provider's Account
+          </h2>
+          <p className="text-gray-600 mb-6 text-sm">
+            Input your correct log-in credentials to get access into your
+            dashboard
+          </p>
+
+          <form onSubmit={handleSubmit} className="text-sm">
+            {/* Email Input */}
+            <div className="relative pb-3">
+              <p className="font-semibold pb-1">Email :</p>
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               </div>
+            </div>
 
-              {/* Password Input */}
-              <div className="relative pb-5">
-                <p className="font-semibold pb-1">Password:</p>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute top-1/2 right-3 transform -translate-y-1/2"
-                  >
-                    {showPassword ? (
-                      <FaEyeSlash className="h-4 w-4 text-gray-400" />
-                    ) : (
-                      <FaEye className="h-4 w-4 text-gray-400" />
-                    )}
-                  </button>
-                </div>
+            {/* Password Input */}
+            <div className="relative pb-5">
+              <p className="font-semibold pb-1">Password:</p>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                >
+                  {showPassword ? (
+                    <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <FaEye className="h-4 w-4 text-gray-400" />
+                  )}
+                </button>
               </div>
+            </div>
 
-              {/* Remember Me Checkbox */}
-              <div className="flex justify-between items-center pb-5">
-                <div id="checkbox">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Remember me
-                  </label>
-                </div>
-                <div>
-                  <Link
-                    to="/forgot-password"
-                    className="underline text-[#3E4095]"
-                  >
-                    Forgot Password
-                  </Link>
-                </div>
+            {/* Remember Me Checkbox */}
+            <div className="flex justify-between items-center pb-5">
+              <div id="checkbox">
+                <label className="flex items-center">
+                  <input type="checkbox" className="mr-2" />
+                  Remember me
+                </label>
               </div>
+              <div>
+                <Link
+                  to="/forgot-password"
+                  className="underline text-[#3E4095]"
+                >
+                  Forgot Password
+                </Link>
+              </div>
+            </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className={`w-full py-3 rounded-full ${isFormValid && !isSubmitting
-                    ? "bg-[#3E4095] text-white "
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
-                onClick={handleSubmit}
-                disabled={!isFormValid || isSubmitting}
-              >
-               {isSubmitting ? (     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Logging In...
-                    </div> ): ("Next")}
-              </button>
-            </form>
-
-          </div>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className={`w-full py-3 rounded-full ${
+                isFormValid && !isSubmitting
+                  ? "bg-[#3E4095] text-white "
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+              onClick={handleSubmit}
+              disabled={!isFormValid || isSubmitting}
+            >
+              {isSubmitting ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Logging In...
+                </div>
+              ) : (
+                "Next"
+              )}
+            </button>
+          </form>
+        </div>
       </div>
-  </>
-  )
-}
+    </>
+  );
+};
 
-export default Hospital_Sign_In
+export default Hospital_Sign_In;

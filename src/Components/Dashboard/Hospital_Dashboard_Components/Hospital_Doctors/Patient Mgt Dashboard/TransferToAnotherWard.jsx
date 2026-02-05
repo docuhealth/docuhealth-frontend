@@ -11,13 +11,13 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
       const [availableBeds, setAvailableBeds] = useState([]);
       const [loading, setLoading] = useState(false);
 
+      console.log(selectedPatientDetails)
         const [form, setForm] = useState({
-          ward: "",
-          bed: "",
-          patient_hin: selectedPatientDetails
-            ? selectedPatientDetails?.patient?.hin
+          new_ward: "",
+          new_bed: "",
+          admission: selectedPatientDetails
+            ? selectedPatientDetails?.id
             : "",
-          staff_id: profile ? profile.staff_id : "",
         });
 
           useEffect(() => {
@@ -30,7 +30,7 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
 
-    if (field === "ward") {
+    if (field === "new_ward") {
       const selected = wardOptions.find((w) => w.id === Number(value));
 
       if (selected) {
@@ -45,20 +45,17 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const res = await axiosInstanceHos.post("api/doctors/admissions/reques", form);
+      const res = await axiosInstanceHos.post("api/doctors/admissions/transfer", form);
 
       console.log(res)
-      toast.success("Transfer request successful");
+      toast.success("Transfer successful");
       setLoading(false);
       setRequestAdmission(false);
     } catch (err) {
       console.error("Error submitting transfer request:", err);
       toast.error("Error submitting transfer request");
       setLoading(false);
-    } finally {
-      setLoading(false);
-      setRequestAdmission(false);
-    }
+    } 
   };
 
   return (
@@ -81,8 +78,8 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
           </div>
 
           <select
-            value={form.ward}
-            onChange={(e) => handleChange("ward", e.target.value)}
+            value={form.new_ward}
+            onChange={(e) => handleChange("new_ward", e.target.value)}
             className="border p-2 rounded-lg outline-none text-sm w-full"
           >
             <option value="">Assign to ward</option>
@@ -93,10 +90,10 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
             ))}
           </select>
 
-          {form.ward && (
+          {form.new_ward && (
             <select
-              value={form.bed}
-              onChange={(e) => handleChange("bed", e.target.value)}
+              value={form.new_bed}
+              onChange={(e) => handleChange("new_bed", e.target.value)}
               className="border p-2 rounded-lg outline-none text-sm w-full mt-3"
             >
               <option value="">Select available bed</option>
@@ -117,7 +114,7 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-[#3E4095] cursor-pointer"
                 } rounded-full mt-4  w-full`} 
-          disabled={loading || !form.ward || !form.bed}
+          disabled={loading || !form.new_ward || !form.new_bed}
           onClick={()=> {
             handleSubmit()
           }}>

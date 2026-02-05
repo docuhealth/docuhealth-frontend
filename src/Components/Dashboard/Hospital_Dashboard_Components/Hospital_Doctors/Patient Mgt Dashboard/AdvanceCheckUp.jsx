@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
 import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 import toast from "react-hot-toast";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import TabComponent2 from "./TabComponent2";
 import getTabs from "./TabDetails2";
+import { DoctorsAdmittedPatientMGTContext } from "../../../../../context/Hospital Context/Doctors/DoctorsAdmittedPatientMGTContext";
 
-const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry }) => {
+const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry, advanceCheckUpSource }) => {
+  const { setTab } = useContext(DoctorsAdmittedPatientMGTContext);
+
   const [patientFullInfo, setPatientFullInfo] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -99,6 +102,8 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry }) => {
         <div
           onClick={() => {
             setAdvanceCheckUp(false);
+            // console.log(advanceCheckUpSource)
+            setTab(advanceCheckUpSource)
           }}
         >
           <svg
@@ -145,7 +150,6 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry }) => {
               medloading,
               patientSoapNotes,
               soapNotesLoading,
-              
 
               patientFullInfo,
               selected,
@@ -161,9 +165,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry }) => {
               fetchPatientSoapNotes,
 
               setSoapNoteEntry,
-              setAdvanceCheckUp
-
-              
+              setAdvanceCheckUp,
             })}
           />
         </>

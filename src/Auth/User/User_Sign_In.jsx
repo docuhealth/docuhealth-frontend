@@ -17,7 +17,6 @@ const USI = () => {
 
   const navigate = useNavigate();
 
-
   const handleInputChange = (e) => {
     const value = e.target.value.trim();
     setInputValue(value);
@@ -42,7 +41,7 @@ const USI = () => {
     if (showToast) {
       timer = setTimeout(() => {
         toast.success(
-          "Kindly exercise patience, while you are being logged in!"
+          "Kindly exercise patience, while you are being logged in!",
         );
         setShowToast(false); // Reset state after toast is shown
       }, 5000);
@@ -71,19 +70,25 @@ const USI = () => {
 
         setToken(data.data.access_token, data.data.role);
 
-        toast.success("Login successful");
+        // toast.success("Login successful");
+
+        if (data.data.role === "patient") {
+          toast.success("Login successful");
+          setTimeout(() => {
+            window.location.href = "/user-home-dashboard";
+          }, 1000);
+        } else {
+          toast.error("Invalid credentials for login");
+        }
         setIsSubmitting(false);
         setEmail("");
         setPhone_Num("");
         setPassword("");
-
-        setTimeout(() => {
-          window.location.href = "/user-home-dashboard";
-        }, 1000);
-        // Handle success (e.g., save token, redirect user)
       } catch (error) {
         console.log(error);
-        toast.error(error.response.data.detail || "Login failed. Please try again.");
+        toast.error(
+          error.response.data.detail || "Login failed. Please try again.",
+        );
 
         setIsSubmitting(false);
 
@@ -100,7 +105,7 @@ const USI = () => {
         setPhone_Num("");
         setInputValue("");
         setPassword("");
-        setShowToast(false)
+        setShowToast(false);
       }
     } else {
       toast.error("Please ensure all fields are correct.");
@@ -139,7 +144,7 @@ const USI = () => {
                         value={inputValue}
                         onChange={handleInputChange}
                         onInput={handleInputChange}
-                        autoComplete="email" 
+                        autoComplete="email"
                         required
                       />
                       <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -195,17 +200,22 @@ const USI = () => {
                   {/* Submit Button */}
                   <button
                     type="submit"
-                    className={`w-full py-3 rounded-full ${isFormValid && !isSubmitting
-                      ? "bg-[#3E4095] text-white"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      }`}
+                    className={`w-full py-3 rounded-full ${
+                      isFormValid && !isSubmitting
+                        ? "bg-[#3E4095] text-white"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                     onClick={handleSubmit}
                     disabled={!isFormValid || isSubmitting}
                   >
-                    {isSubmitting ? (<div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Logging In...
-                    </div>) : ("Next")}
+                    {isSubmitting ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Logging In...
+                      </div>
+                    ) : (
+                      "Next"
+                    )}
                   </button>
                 </form>
 
@@ -259,9 +269,7 @@ const USI = () => {
         </Link>
 
         <div className="px-5 w-full">
-          <h2 className="text-xl font-semibold pb-1">
-            Sign Into Your Account
-          </h2>
+          <h2 className="text-xl font-semibold pb-1">Sign Into Your Account</h2>
           <p className="text-gray-600 mb-6 text-sm">
             Input your correct log-in credentials to get access into your
             dashboard
@@ -330,17 +338,22 @@ const USI = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className={`w-full py-3 rounded-full ${isFormValid && !isSubmitting
-                ? "bg-[#3E4095] text-white "
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
+              className={`w-full py-3 rounded-full ${
+                isFormValid && !isSubmitting
+                  ? "bg-[#3E4095] text-white "
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
               onClick={handleSubmit}
               disabled={!isFormValid || isSubmitting}
             >
-              {isSubmitting ? (<div className="flex items-center justify-center gap-2">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Logging In...
-              </div>) : ("Next")}
+              {isSubmitting ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Logging In...
+                </div>
+              ) : (
+                "Next"
+              )}
             </button>
           </form>
 

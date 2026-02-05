@@ -391,7 +391,6 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
     });
 
     try {
-      // console.log("Submitting SOAP Note with payload:", formData);
       const res = await axiosInstanceHos.post(
         "api/medical-records/soap-note",
         formData,

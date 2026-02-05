@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { truncateWords } from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { ArrowLeft, X, Plus, UploadCloud, FileText } from "lucide-react";
+import toast from "react-hot-toast";
+import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 
 const NoteSection = ({
   title,
@@ -78,13 +80,14 @@ const AfterDischargeSummary = ({
 }) => {
   const [soapNoteData, setSoapNoteData] = useState({
     chief_complaint: "",
-    diagnosis: "",
+    diagnosis: [],
     condition_at_discharge: "",
     treatment_plan: [],
     care_instructions: [],
   });
 
   const [inputs, setInputs] = useState({
+    diagnosis : "",
     treatment_plan: "",
     care_instructions: "",
   });
@@ -182,9 +185,125 @@ const AfterDischargeSummary = ({
 
   const [loading, setLoading] = useState(false);
 
+  const handleSubmit = async () => {
+    const drugRecords = medications.map((med) => ({
+      name: med.drug,
+      route: med.route,
+      quantity: med.dosage,
+      frequency: {
+        value: med.frequency,
+        rate: med.frequencyUnit,
+      },
+      duration: {
+        value: med.duration,
+        rate: med.durationUnit,
+      },
+      status: "ongoing",
+      allergies: [],
+      // created_at: new Date().toISOString(),
+    }));
+
+    const selectedDate = new Date(
+      `${selectedDay} ${selectedMonth} ${selectedYear} ${selectedTime}`,
+    );
+
+    const followUpAppointment = {
+      scheduled_time: selectedDate.toISOString(),
+      note,
+      type: "consultation",
+    };
+
+    const hasInvalidMedication = medications.some(
+      (med) => !med.drug?.trim() || !med.dosage?.trim() || !med.duration,
+    );
+
+    if (
+      !soapNoteData.chief_complaint.trim() ||
+      !soapNoteData.diagnosis.length === 0 ||
+      !soapNoteData.condition_at_discharge.trim() ||
+      soapNoteData.treatment_plan.length === 0 ||
+      soapNoteData.care_instructions.length === 0 ||
+      drugRecords.length === 0 ||
+      hasInvalidMedication
+    ) {
+      toast.error("fill all required fields.");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+
+    const formData = new FormData();
+
+    formData.append("admission", selectedDischargePatient.id);
+    formData.append("chief_complaint", soapNoteData.chief_complaint);
+    formData.append("diagnosis", 
+      
+      JSON.stringify(soapNoteData.diagnosis),
+    );
+    formData.append(
+      "condition_on_discharge",
+      soapNoteData.condition_at_discharge,
+    );
+
+    formData.append(
+      "follow_up_appointment",
+      JSON.stringify(followUpAppointment),
+    );
+
+    formData.append(
+      "treatment_plan",
+      JSON.stringify(soapNoteData.treatment_plan),
+    );
+    formData.append(
+      "care_instructions",
+      JSON.stringify(soapNoteData.care_instructions),
+    );
+    formData.append("drug_records", JSON.stringify(drugRecords));
+
+    // attachments (if any)
+    attachments.forEach((fileObj) => {
+      formData.append("attachments", fileObj.file);
+    });
+
+    try {
+      const res = await axiosInstanceHos.post(
+        "api/medical-records/discharge",
+        formData,
+      );
+
+      console.log(res);
+      toast.success("Patient discharged successfully !");
+      setDischargePatient(false);
+
+      setSoapNoteData({
+        chief_complaint: "",
+        diagnosis: [],
+        condition_at_discharge: "",
+        treatment_plan: [],
+        care_instructions: [],
+      });
+
+      setInputs({
+        diagnosis : "",
+        treatment_plan: "",
+        care_instructions: "",
+      });
+
+
+      setAttachments([]);
+
+    } catch (err) {
+      console.error("Error discharging patient", err);
+      toast.error("Error discharging patient");
+    }finally{
+      setLoading(false)
+    }
+  };
+
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 z-50 px-5 lg:px-[15%] backdrop-blur-md  max-h-screen overflow-scroll pb-5">
+      <div className="fixed inset-0 bg-black/50 z-50 px-3 lg:px-[15%] backdrop-blur-md  max-h-screen overflow-scroll pb-5">
         <div className="bg-white rounded-lg border mt-3 px-3 lg:px-5 py-5 text-sm">
           <div className="flex justify-between items-center gap-1 cursor-pointer border-b pb-3">
             <div className="flex items-center gap-1 cursor-pointer">
@@ -197,9 +316,12 @@ const AfterDischargeSummary = ({
               </div>
               <p>After Discharge Summary Note Entry</p>
             </div>
-            <X className="w-4 h-4 text-gray-800"    onClick={() => {
+            <X
+              className="w-4 h-4 text-gray-800"
+              onClick={() => {
                 setDischargePatient(false);
-              }}/>
+              }}
+            />
           </div>
 
           <div className="my-5">
@@ -214,17 +336,18 @@ const AfterDischargeSummary = ({
               ></textarea>
             </div>
 
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium">Diagnosis (compulsory)</p>
-              <textarea
-                name="diagnosis"
-                value={soapNoteData.diagnosis}
-                onChange={handleTextChange}
-                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
-                placeholder="Enter diagnosis..."
-              ></textarea>
-            </div>
-
+            <NoteSection
+              title="Diagnosis (compulsory)"
+              field="diagnosis"
+              placeholder="Enter diagnosis..."
+              soapNoteData={soapNoteData}
+              inputs={inputs}
+              setInputs={setInputs}
+              handleAddListItem={handleAddListItem}
+              handleRemoveItem={handleRemoveItem}
+              activeInput={activeInput}
+              setActiveInput={setActiveInput}
+            />
             <NoteSection
               title="Treatment Plan (compulsory)"
               field="treatment_plan"
@@ -431,7 +554,7 @@ const AfterDischargeSummary = ({
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
               <p className="font-medium">Condition at discharge (compulsory)</p>
               <textarea
-                name="diagnosis"
+                name="condition_at_discharge"
                 value={soapNoteData.condition_at_discharge}
                 onChange={handleTextChange}
                 className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
@@ -670,9 +793,9 @@ const AfterDischargeSummary = ({
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-[#3E4095] cursor-pointer"
                 }`}
-                // onClick={() => {
-                //   setConfirmationModal(true);
-                // }}
+                onClick={() => {
+                  handleSubmit();
+                }}
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
