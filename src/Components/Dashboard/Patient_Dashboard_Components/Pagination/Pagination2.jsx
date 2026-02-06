@@ -7,92 +7,94 @@ const Pagination2 = ({
     setCurrentPage
 }) => {
 
-
     if (totalPages <= 1) return null;
 
     // Logic to determine which page numbers to show
     const getPageNumbers = () => {
         const pages = [];
-        const showMax = 3; // Number of pages to show before/after current
+        const showMax = 3; 
 
-        if (totalPages <= 7) {
-            // If total pages is small, show all
+        if (totalPages <= 5) {
             for (let i = 1; i <= totalPages; i++) pages.push(i);
         } else {
-            // Always show first page
             pages.push(1);
+            if (currentPage > showMax) pages.push("...");
 
-            if (currentPage > showMax + 1) pages.push("...");
-
-            // Range around current page
             const start = Math.max(2, currentPage - 1);
             const end = Math.min(totalPages - 1, currentPage + 1);
 
             for (let i = start; i <= end; i++) pages.push(i);
 
-            if (currentPage < totalPages - showMax) pages.push("...");
-
-            // Always show last page
+            if (currentPage < totalPages - (showMax - 1)) pages.push("...");
             pages.push(totalPages);
         }
         return pages;
     };
 
-
     return (
-        <>
-            <div>
-                {totalPages > 1 && (
-                    <div className="flex flex-col md:flex-row gap-3 justify-between items-center my-5">
-                        <span className="text-gray-500 text-[12px]">
-                            Showing page {currentPage} of {totalPages} ({count} total entries)
-                        </span>
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-center my-6 px-2">
+            {/* Entries Info */}
+            <span className="text-gray-500 text-[12px] order-2 md:order-1">
+                Showing page <span className="font-semibold text-gray-700">{currentPage}</span> of{" "}
+                <span className="font-semibold text-gray-700">{totalPages}</span> ({count} total entries)
+            </span>
 
-                        <div className="flex items-center text-[12px]">
+            {/* Pagination Controls */}
+            <div className="flex items-center gap-1 order-1 md:order-2">
+                {/* Previous Button */}
+                <button
+                    className={`h-8 w-8 flex items-center justify-center rounded-md transition-colors ${
+                        currentPage === 1
+                            ? "text-gray-300 cursor-not-allowed"
+                            : "text-gray-600 hover:bg-gray-100 border border-gray-200"
+                    }`}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+                </button>
 
-                            <button
-                                className={`h-8 w-8 mx-1 rounded-full ${currentPage === 1
-                                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                    : "bg-gray-300 hover:bg-gray-400"
-                                    }`}
-                                onClick={() => setCurrentPage(currentPage - 1)}
-                                disabled={currentPage === 1}
-                            >
-                                &lt;
-                            </button>
-
-                            {getPageNumbers().map((page, index) => (
+                {/* Page Numbers */}
+                <div className="flex items-center gap-1">
+                    {getPageNumbers().map((page, index) => (
+                        <React.Fragment key={index}>
+                            {page === "..." ? (
+                                <span className="px-2 text-gray-400">...</span>
+                            ) : (
                                 <button
-                                    key={index}
-                                    disabled={page === "..."}
-                                    className={`h-8 w-8 mx-1 rounded-full transition-colors ${currentPage === page
-                                            ? "bg-[#3E4095] text-white"
-                                            : page === "..."
-                                                ? "cursor-default text-gray-400"
-                                                : "bg-gray-300 hover:bg-gray-400 text-gray-700"
-                                        }`}
-                                    onClick={() => page !== "..." && setCurrentPage(page)}
+                                    className={`h-8 min-w-[32px] px-2 rounded-md text-[12px] font-medium transition-all ${
+                                        currentPage === page
+                                            ? "bg-[#3E4095] text-white shadow-sm"
+                                            : "text-gray-600 hover:bg-gray-100 border border-transparent hover:border-gray-200"
+                                    }`}
+                                    onClick={() => setCurrentPage(page)}
                                 >
                                     {page}
                                 </button>
-                            ))}
+                            )}
+                        </React.Fragment>
+                    ))}
+                </div>
 
-                            <button
-                                className={`h-8 w-8 mx-1 rounded-full ${currentPage === totalPages
-                                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                    : "bg-gray-300 hover:bg-gray-400"
-                                    }`}
-                                onClick={() => setCurrentPage(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                            >
-                                &gt;
-                            </button>
-                        </div>
-                    </div>
-                )}
+                {/* Next Button */}
+                <button
+                    className={`h-8 w-8 flex items-center justify-center rounded-md transition-colors ${
+                        currentPage === totalPages
+                            ? "text-gray-300 cursor-not-allowed"
+                            : "text-gray-600 hover:bg-gray-100 border border-gray-200"
+                    }`}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </button>
             </div>
-        </>
-    )
-}
+        </div>
+    );
+};
 
-export default Pagination2
+export default Pagination2;

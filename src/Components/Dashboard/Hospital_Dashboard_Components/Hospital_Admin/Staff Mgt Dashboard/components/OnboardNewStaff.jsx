@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HosAppContext } from "../../../../../../context/Hospital Context/Admin/HosAppContext";
-import { HosStaffsContext } from "../../../../../../context/Hospital Context/Admin/HosStaffsContext";
+import {HosWardContext} from "../../../../../../context/Hospital Context/HosWardContext"
+
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import toast from "react-hot-toast";
 
+
 const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const [form, setForm] = useState({
     firstname: "",
@@ -22,8 +25,10 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     password: "",
   });
 
-  const { profile, wards } = useContext(HosAppContext);
-  const { fetchStaffs } = useContext(HosStaffsContext);
+  const { profile } = useContext(HosAppContext);
+  const { wards } = useContext(HosWardContext);
+
+  console.log(wards)
 
   const [passwordRequirements, setPasswordRequirements] = useState({});
   const [isPasswordValid, setIsPasswordValid] = useState(false);
@@ -184,84 +189,55 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     setStep(2);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const createStaffMutation = useMutation({
+  mutationFn: (payload) => 
+    axiosInstanceHos.post("api/hospitals/team-member", payload),
+  onSuccess: () => {
+    toast.success("Team member added successfully");
+    
+    // 🔹 THIS INVALIDATES THE STAFF LIST
+    queryClient.invalidateQueries(["hospital-staffs"]); 
+    
+    // Reset and Close
+    setForm({
+      firstname: "", lastname: "", phone: "", gender: "",
+      role: "", personnel: "", specialization: "", ward: "",
+      email: "", password: "",
+    });
+    setStep(1);
+    setCreateNewStaff(false);
+  },
+  onError: (error) => {
+    toast.error(error.response?.data?.message || "Something went wrong.");
+  }
+});
 
-    if (!form.email) {
-      toast.error("Enter an email address");
-    }
 
-    setLoading(true);
+const handleSubmit = (e) => {
+  e.preventDefault();
 
-    const payload = {
+  if (!form.email) return toast.error("Enter an email address");
+
+  const payload = {
+    email: form.email,
+    password: form.password,
+    profile: {
+      firstname: form.firstname,
+      lastname: form.lastname,
+      phone_num: form.phone,
+      role: form.personnel,
+      gender: form.gender,
+      staff_id: "NIG_101", // Consider generating this dynamically if needed
       email: form.email,
-      password: form.password,
-      profile: {
-        firstname: form.firstname,
-        lastname: form.lastname,
-        phone_num: form.phone,
-        role: form.personnel,
-        gender: form.gender,
-        staff_id: "NIG_101",
-        email: form.email,
-
-        ...(form.specialization && { specialization: form.specialization }),
-
-        // Add ward ONLY if available
-        ...(form.ward && { ward: form.ward }),
-      },
-      login_url: "https://hospital.docuhealthservices.net/login",
-      invitation_message: invitationHTML,
-    };
-
-    // console.log(payload);
-    try {
-      const res = await axiosInstanceHos.post(
-        "api/hospitals/team-member",
-        payload,
-      );
-
-      console.log(res);
-      toast.success(" Team member added successfully ");
-
-      setForm({
-        firstname: "",
-        lastname: "",
-        phone: "",
-        gender: "",
-        role: "",
-        personnel: "",
-        specialization: "",
-        ward: "",
-        email: "",
-        password: "",
-      });
-
-      setStep(1);
-      setCreateNewStaff(false);
-      setLoading(false);
-      fetchStaffs();
-    } catch (error) {
-      toast.error(" Something went wrong. Please try again. ");
-      setCreateNewStaff(false);
-      setLoading(false);
-    } finally {
-      setLoading(false);
-      setStep(1);
-      setForm({
-        firstname: "",
-        lastname: "",
-        phone: "",
-        gender: "",
-        role: "",
-        personnel: "",
-        specialization: "",
-        ward: "",
-        email: "",
-        password: "",
-      });
-    }
+      ...(form.specialization && { specialization: form.specialization }),
+      ...(form.ward && { ward: form.ward }),
+    },
+    login_url: "https://hospital.docuhealthservices.net/login",
+    invitation_message: invitationHTML,
   };
+
+  createStaffMutation.mutate(payload);
+};
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-3">
@@ -303,6 +279,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
               <input
                 placeholder="Phone number"
+                type ='number'
                 value={form.phone}
                 onChange={(e) => handleChange("phone", e.target.value)}
                 className="border p-2 rounded-lg outline-none text-sm focus:border-[#3E4095]"
@@ -427,11 +404,11 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
             </div>
 
             <button
-              className={`mt-5 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#3E4095] cursor-pointer"}  text-white px-4 py-2 rounded-full w-full text-sm `}
-              disabled={loading}
+              className={`mt-5 ${createStaffMutation.isPending ? "bg-gray-400 cursor-not-allowed" : "bg-[#3E4095] cursor-pointer"}  text-white px-4 py-2 rounded-full w-full text-sm `}
+              disabled={createStaffMutation.isPending}
               onClick={handleSubmit}
             >
-              {loading ? (
+              {createStaffMutation.isPending ? (
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   Adding to team...

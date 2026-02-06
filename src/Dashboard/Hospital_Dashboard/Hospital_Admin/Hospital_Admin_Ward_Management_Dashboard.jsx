@@ -1,47 +1,56 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import DynamicDate from "../../../Components/Dynamic Date/DynamicDate";
 import Wards from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Ward Mangement Dashboard/Wards";
 import { HosAppContext } from "../../../context/Hospital Context/Admin/HosAppContext";
 import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Hospital_Admin_Ward_Management_Dashboard = () => {
   const [showOverlay, setShowOverlay] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({ name: "", total_beds: "" });
 
-  const { fetchWards } = React.useContext(HosAppContext);
+  const queryClient = useQueryClient();
+
+  const createWardMutation = useMutation({
+    mutationFn: (createWardData) =>
+      axiosInstanceHos.post("api/hospitals/wards", {
+        name : createWardData.name,
+        total_beds : createWardData.total_beds
+      }),
+    onSuccess: () => {
+      toast.success("Ward created successfully!");
+      queryClient.invalidateQueries(["hospital-wards"])
+      setShowOverlay(false);
+      setFormData({ name: "", total_beds: "" });
+
+    },
+    onError : (err) => {
+         console.error("Error creating ward:", err);
+      toast.error(err.response?.data?.message || "Failed to create ward");
+    }
+  });
 
   const handleCreateWard = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      // Data being sent to API: name and total_beds
-      await axiosInstanceHos.post("api/hospitals/wards", {
-        name: formData.name,
-        total_beds: parseInt(formData.total_beds),
-      });
 
-      toast.success("Ward created successfully!");
-      setShowOverlay(false);
-      setFormData({ name: "", total_beds: "" });
-      fetchWards(1); // Refresh the list
-    } catch (err) {
-      console.error("Error creating ward:", err);
-      toast.error(err.response?.data?.message || "Failed to create ward");
-    } finally {
-      setIsSubmitting(false);
-    }
+    createWardMutation.mutate({
+      name: formData.name,
+      total_beds: parseInt(formData.total_beds),
+    });
   };
+
+
 
   return (
     <>
       <div className="py-2 flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm  gap-3 sm:gap-0">
         <DynamicDate />
         <div className="w-full sm:w-auto">
-          <button className="flex justify-center items-center gap-2 px-8 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full hover:bg-blue-50 transition w-full sm:w-auto cursor-pointer"
-          onClick={() => setShowOverlay(true)}
+          <button
+            className="flex justify-center items-center gap-2 px-8 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full hover:bg-blue-50 transition w-full sm:w-auto cursor-pointer"
+            onClick={() => setShowOverlay(true)}
           >
             Create Ward
           </button>
@@ -56,7 +65,7 @@ const Hospital_Admin_Ward_Management_Dashboard = () => {
         </div>
       </div>
       {showOverlay && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-3 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-100 flex items-center justify-center px-3 bg-black/50 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-lg shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center p-6 border-b">
               <h3 className="font-medium text-gray-900">Add New Ward</h3>
@@ -118,10 +127,10 @@ const Hospital_Admin_Ward_Management_Dashboard = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={createWardMutation.isPending}
                   className="flex-1 px-4 py-2.5 bg-[#3E4095] text-white  rounded-full  disabled:opacity-50 transition-all text-sm shadow shadow-indigo-100 cursor-pointer"
                 >
-                  {isSubmitting ? "Creating..." : "Create Ward"}
+                  {createWardMutation.isPending ? "Creating..." : "Create Ward"}
                 </button>
               </div>
             </form>

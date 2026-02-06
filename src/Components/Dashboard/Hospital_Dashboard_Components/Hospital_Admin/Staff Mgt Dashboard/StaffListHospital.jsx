@@ -4,10 +4,10 @@ import {
   formatFullDate,
   formatTime,
 } from "../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
-import Pagination from "../../../Patient_Dashboard_Components/Pagination/Pagination";
+import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 
 const StaffListHospital = ({ selectedStaff, setSelectedStaff }) => {
-  const { staffs, loading, count, currentPage, totalPages, fetchStaffs } =
+  const { staffs, loading, count, currentPage, totalPages, setCurrentPage } =
     useContext(HosStaffsContext);
   const [activeMenu, setActiveMenu] = useState(null);
 
@@ -416,12 +416,11 @@ const toggleStaff = (id) => {
           ))}
         </div>
       </div>
-      <Pagination
+      <Pagination2
         count={count}
         currentPage={currentPage}
         totalPages={totalPages}
-        fetchData={fetchStaffs}
-        loading={loading}
+        setCurrentPage={setCurrentPage}
       />
 
      

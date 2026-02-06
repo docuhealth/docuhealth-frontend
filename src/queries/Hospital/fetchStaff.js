@@ -1,9 +1,10 @@
-import axiosInstance from "../../utils/axiosInstance";
+import axiosInstanceHos from "../../utils/axiosInstanceHos";
 
-
-export const fetchStaff = async (role) => {
-  const res = await axiosInstance.get(
-    `api/receptionists/staff/${role.toLowerCase()}`
+export const fetchStaff = async ({ queryKey }) => {
+  const [_key, page] = queryKey;
+  const pageSize = 7;
+  const res = await axiosInstanceHos.get(
+    `api/hospitals/team-members?page=${page}&size=${pageSize}`,
   );
   return res.data;
 };

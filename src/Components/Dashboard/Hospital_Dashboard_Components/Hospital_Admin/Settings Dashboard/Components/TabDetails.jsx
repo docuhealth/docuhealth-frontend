@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import { FaTimes } from "react-icons/fa";
 import toast from "react-hot-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const AccountSettingsTab = () => {
   const [formData, setFormData] = useState({
@@ -13,7 +14,7 @@ const AccountSettingsTab = () => {
     otp: "",
   });
 
-  const [loadingName, setLoadingName] = useState(false);
+  const queryClient = useQueryClient();
   const [loadingEmail, setLoadingEmail] = useState(false);
   const [loadingOTP, setLoadingOTP] = useState(false);
   const [loadingPassword, setLoadingPassword] = useState(false);
@@ -76,84 +77,84 @@ const AccountSettingsTab = () => {
     }
   };
 
-  const handleUpdateName = async (e) => {
+  const updateNameMutation = useMutation({
+    mutationFn: (newName) =>
+      axiosInstanceHos.patch("api/auth/hospital-admin-profile", {
+        name: newName,
+      }),
+    onSuccess: () => {
+      toast.success("Profile name updated!");
+      // This is where the magic happens:
+      queryClient.invalidateQueries(["hospital-profile"]);
+      setFormData((prev) => ({ ...prev, name: "" }));
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Failed to update name");
+    },
+  });
+
+  const handleUpdateName = (e) => {
     e.preventDefault();
     if (!formData.name.trim()) return toast.error("Name cannot be empty");
-
-    setLoadingName(true);
-    try {
-      await axiosInstanceHos.patch("api/auth/hospital-admin-profile", {
-        name: formData.name,
-      });
-      toast.success("Profile name updated!");
-      setFormData({
-        name: "",
-      });
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update name");
-    } finally {
-      setLoadingName(false);
-    }
+    updateNameMutation.mutate(formData.name);
   };
 
-  const handleRequestEmailOTP = async (e) => {
-    e.preventDefault();
-    if (!formData.email.trim()) return toast.error("Please enter a new email");
+const requestOtpMutation = useMutation({
+  mutationFn: (emailData) =>
+    axiosInstanceHos.post("api/auth/email/send-otp", emailData),
+  onSuccess: () => {
+    toast.success("OTP sent to your new email!");
+    setShowOtpModal(true);
+  },
+  onError: (err) => {
+    toast.error(err.response?.data?.message || "Error sending OTP");
+  },
+});
 
-    setLoadingEmail(true);
-    try {
-      await axiosInstanceHos.post("api/auth/email/send-otp", {
-        new_email: formData.email,
-      });
-      toast.success("OTP sent to your new email!");
-      setShowOtpModal(true);
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Error sending OTP");
-    } finally {
-      setLoadingEmail(false);
-    }
-  };
+const handleRequestEmailOTP = (e) => {
+  e.preventDefault(); // Don't forget this if it's a form button!
+  
+  if (!formData.email.trim()) {
+    return toast.error("Please enter a new email");
+  }
 
-  const handleVerifyEmail = async () => {
-    setLoadingOTP(true);
-    try {
-      await axiosInstanceHos.patch("api/auth/email/verify-otp", {
-        new_email: formData.email,
-        otp: formData.otp,
-      });
+  requestOtpMutation.mutate({
+    new_email: formData.email,
+  });
+};
+
+  const verifyOtpMutation = useMutation({
+    mutationFn: (otpData) =>
+      axiosInstanceHos.patch("api/auth/email/verify-otp", otpData),
+    onSuccess: () => {
       toast.success("Email updated successfully!");
+      // Invalidate profile because email has now changed
+      queryClient.invalidateQueries(["hospital-profile"]);
       setShowOtpModal(false);
-      setFormData({
-        email: "",
-        otp: "",
-      });
-    } catch (err) {
+      setFormData((prev) => ({ ...prev, email: "", otp: "" }));
+    },
+    onError: (err) => {
       toast.error(err.response?.data?.message || "Invalid OTP");
-    } finally {
-      setLoadingOTP(false);
-    }
+    },
+  });
+
+  const handleVerifyEmail = () => {
+    verifyOtpMutation.mutate({
+      new_email: formData.email,
+      otp: formData.otp,
+    });
   };
 
-  const handleUpdatePassword = async (e) => {
-    e.preventDefault();
-    if (!formData.oldPassword || !formData.newPassword) {
-      return toast.error("Both password fields are required");
-    }
-
-    if (!isPasswordValid) {
-      return toast.error(
-        "Please meet all password security requirements before updating.",
-      );
-    }
-
-    setLoadingPassword(true);
-    try {
-      await axiosInstanceHos.patch("api/auth/hospital/password", {
-        old_password: formData.oldPassword,
-        new_password: formData.newPassword,
-      });
+  const updatePasswordMutation = useMutation({
+    mutationFn: (passwordData) =>
+      axiosInstanceHos.patch("api/auth/hospital/password", {
+        old_password: passwordData.oldPassword,
+        new_password: passwordData.newPassword,
+      }),
+    onSuccess: () => {
       toast.success("Password changed successfully!");
-      setFormData({ ...formData, oldPassword: "", newPassword: "" });
+      // Reset password fields and validation state
+      setFormData((prev) => ({ ...prev, oldPassword: "", newPassword: "" }));
       setIsPasswordValid(false);
       setPasswordRequirements({
         hasLowercase: false,
@@ -162,11 +163,28 @@ const AccountSettingsTab = () => {
         hasSymbol: false,
         hasMinLength: false,
       });
-    } catch (err) {
+    },
+    onError: (err) => {
       toast.error(err.response?.data?.message || "Failed to change password");
-    } finally {
-      setLoadingPassword(false);
+    },
+  });
+
+  // The updated handler
+  const handleUpdatePassword = (e) => {
+    e.preventDefault();
+
+    if (!formData.oldPassword || !formData.newPassword) {
+      return toast.error("Both password fields are required");
     }
+
+    if (!isPasswordValid) {
+      return toast.error("Please meet all password security requirements.");
+    }
+
+    updatePasswordMutation.mutate({
+      oldPassword: formData.oldPassword,
+      newPassword: formData.newPassword,
+    });
   };
 
   return (
@@ -197,10 +215,10 @@ const AccountSettingsTab = () => {
 
               <button
                 onClick={handleUpdateName}
-                disabled={loadingName || !formData.name.trim()}
+                disabled={updateNameMutation.isPending || !formData.name.trim()}
                 className="mt-4 text-[12px] w-full lg:w-[50%] py-2 bg-[#3E4095] text-white rounded-full text-sm disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
-                {loadingName ? (
+                {updateNameMutation.isPending ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Saving...</span>
@@ -236,12 +254,13 @@ const AccountSettingsTab = () => {
                 onClick={handleRequestEmailOTP}
                 // Disable if loading OR if the email doesn't look valid
                 disabled={
-                  loadingEmail ||
-                 !formData?.email?.includes("@") || !formData?.email?.includes(".")
+                  requestOtpMutation.isPending ||
+                  !formData?.email?.includes("@") ||
+                  !formData?.email?.includes(".")
                 }
                 className="mt-4 text-[12px] w-full lg:w-[50%] py-2 bg-[#3E4095] text-white rounded-full text-sm disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
-                {loadingEmail ? (
+                {requestOtpMutation.isPending ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Sending OTP...</span>
@@ -447,15 +466,15 @@ const AccountSettingsTab = () => {
                 <button
                   onClick={handleUpdatePassword}
                   disabled={
-                    loadingPassword || !isPasswordValid || !formData.oldPassword
+                    updatePasswordMutation.isPending || !isPasswordValid || !formData.oldPassword
                   }
                   className={`mt-4 text-[12px] w-full lg:w-[50%] py-2 rounded-full text-white transition-all flex items-center justify-center gap-2 ${
-                    !isPasswordValid || loadingPassword || !formData.oldPassword
+                    !isPasswordValid || updatePasswordMutation.isPending || !formData.oldPassword
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-[#3E4095]"
                   }`}
                 >
-                  {loadingPassword ? (
+                  {updatePasswordMutation.isPending ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       <span>Updating Password...</span>
@@ -499,10 +518,10 @@ const AccountSettingsTab = () => {
               <button
                 onClick={handleVerifyEmail}
                 // Disable if loading OR if OTP field is empty (assumes 4-6 characters usually)
-                disabled={loadingOTP || !formData.otp.trim()}
+                disabled={verifyOtpMutation.isPending || !formData.otp.trim()}
                 className="w-full py-2 bg-[#3E4095] text-white rounded-full text-[12px] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
-                {loadingOTP ? (
+                {verifyOtpMutation.isPending ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Verifying...</span>

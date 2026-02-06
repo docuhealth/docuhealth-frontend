@@ -1,11 +1,12 @@
 import React, { useState, useContext } from "react";
 import { ArrowRight, Bed, Users } from "lucide-react";
 import { HosAppContext } from "../../../../../context/Hospital Context/Admin/HosAppContext";
-import Pagination from "../../../Patient_Dashboard_Components/Pagination/Pagination";
+import { HosWardContext } from "../../../../../context/Hospital Context/HosWardContext"
+import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 
 const Wards = () => {
-  const { wards, count, currentPage, totalPages, fetchWards, loading } =
-    useContext(HosAppContext);
+  const { wards, count, currentPage, totalPages, setCurrentPage, loading } =
+    useContext(HosWardContext);
 
 
       if (loading) {
@@ -163,12 +164,11 @@ const Wards = () => {
           );
         })}
       </div>
-      <Pagination
+      <Pagination2
         count={count}
         currentPage={currentPage}
         totalPages={totalPages}
-        fetchData={fetchWards}
-        loading={loading}
+        setCurrentPage={setCurrentPage}
       />
     </>
   );

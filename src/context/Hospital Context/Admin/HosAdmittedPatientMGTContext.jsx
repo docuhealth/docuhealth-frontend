@@ -1,55 +1,53 @@
-import React, { useEffect, useState, createContext } from "react";
+import React, { useState, createContext } from "react";
+import { useQuery } from "@tanstack/react-query";
 import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 import { getHospitalToken } from "../../../services/authService";
-import toast from "react-hot-toast";
 
-export const HosAdmittedPatientMGTContext = createContext()
+export const HosAdmittedPatientMGTContext = createContext();
 
+const HosAdmittedPatientMGTProvider = ({ children }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [tab, setTab] = useState('active'); // 'active' or 'discharged'
+  const pageSize = 6;
+  const isUserLoggedIn = !!getHospitalToken();
 
-const HosAdmittedPatientMGTProvider = (props) => {
-    const [admittedPatients, setAdmittedPatients] = useState([])
-    const [loading, setLoading] = useState(false);
-    const [count, setCount] = useState(0);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [tab, setTab] = useState('active')
-    const pageSize = 6; 
+  const { data, isLoading: loading } = useQuery({
+    // 🔹 The Key is the secret: it tracks both status and page
+    queryKey: ["hospital-patients", tab, currentPage],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get(
+        `api/hospitals/admissions/${tab}?page=${currentPage}&size=${pageSize}`
+      );
+      return res.data;
+    },
+    enabled: isUserLoggedIn,
+    placeholderData: (previousData) => previousData, // Smooth transition between pages
+  });
 
-    const isUserLoggedIn = !!getHospitalToken();
+  const admittedPatients = data?.results || [];
+  const count = data?.count || 0;
+  const totalPages = Math.ceil(count / pageSize);
 
-    const fetchAdmittedPatients = async (page = 1, status = tab) => {
-        // active or discharge
-        setLoading(true)
+  // 🔹 Helper to switch tabs and reset page
+  const handleTabChange = (newTab) => {
+    setTab(newTab);
+    setCurrentPage(1); 
+  };
 
-        try {
-            const res = await axiosInstanceHos.get(
-                `api/hospitals/admissions/${status}?page=${page}&size=${pageSize}`
-            );
+  return (
+    <HosAdmittedPatientMGTContext.Provider value={{
+      admittedPatients,
+      loading,
+      count,
+      currentPage,
+      totalPages,
+      setCurrentPage, // Pass the setter directly for pagination
+      tab,
+      setTab: handleTabChange
+    }}>
+      {children}
+    </HosAdmittedPatientMGTContext.Provider>
+  );
+};
 
-            setAdmittedPatients(res.data.results || [])
-            console.log('admitted' , res.data)
-            setCount(res.data.count || 0);
-            setCurrentPage(page);
-            setTotalPages(Math.ceil(res.data.count / pageSize));
-        }  catch (err) {
-            console.error("Error fetching admitted patients:", err);
-            toast.error("Error fetching admitted patients");
-          } finally {
-            setLoading(false);
-          }
-    }
-
-    useEffect(() => {
-        if (isUserLoggedIn) {
-            fetchAdmittedPatients(1, tab)
-        }
-        }, [isUserLoggedIn,tab]);
-
-        return (
-            <HosAdmittedPatientMGTContext.Provider value ={{admittedPatients, setAdmittedPatients, loading, count, currentPage, totalPages, fetchAdmittedPatients, tab, setTab}}>
-                {props.children}
-            </HosAdmittedPatientMGTContext.Provider>
-        )
-}
-
-export default HosAdmittedPatientMGTProvider
+export default HosAdmittedPatientMGTProvider;
