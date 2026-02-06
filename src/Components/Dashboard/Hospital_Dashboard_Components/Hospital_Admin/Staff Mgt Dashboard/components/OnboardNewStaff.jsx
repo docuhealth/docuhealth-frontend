@@ -214,7 +214,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
       invitation_message: invitationHTML,
     };
 
-    console.log(payload);
+    // console.log(payload);
     try {
       const res = await axiosInstanceHos.post(
         "api/hospitals/team-member",

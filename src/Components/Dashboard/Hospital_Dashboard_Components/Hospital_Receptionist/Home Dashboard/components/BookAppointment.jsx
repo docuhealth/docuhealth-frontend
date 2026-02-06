@@ -54,8 +54,8 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
     const [selectedTime, setSelectedTime] = useState("08:00");
 
     const [formData, setFormData] = useState({
-        staff_id: "",
-        patient_hin: "",
+        staff: "",
+        patient: "",
         type: "",
         note: "",
         scheduled_time: ""
@@ -132,11 +132,12 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
         }
     };
     const handleAssign = (staffId) => {
+   
         setIsStaffSelected(true); // show next card
 
         setFormData(prev => ({
             ...prev,
-            staff_id: staffId,
+            staff: staffId,
         }));
     };
 
@@ -149,7 +150,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
         setRequestLoading(true)
         const updatedFormData = {
             ...formData,
-            patient_hin: patientDetails.hin,
+            patient: patientDetails.hin,
             scheduled_time: selectedDate.toISOString()
         };
 
@@ -470,7 +471,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
 
                                                     </div>
                                                     <div>
-                                                        <p className="font-medium">{staff.staff_id}</p>
+                                                        <p className="font-medium">{staff.staff_id || 'NIL'}</p>
                                                     </div>
                                                 </div>
 
