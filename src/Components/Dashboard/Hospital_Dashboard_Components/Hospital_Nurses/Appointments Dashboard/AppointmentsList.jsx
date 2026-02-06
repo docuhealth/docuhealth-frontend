@@ -106,7 +106,6 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
     note: "",
     scheduled_time: "",
   });
-  const [appointmentID, setAppointmentID] = useState("");
 
   const today = new Date();
 
@@ -175,10 +174,11 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
 
     console.log("REQUEST PAYLOAD:", updatedFormData);
 
-    // console.log(appointmentID)
+    // console.log(selectedPatientDetails)
+
     try {
       const res = await axiosInstanceHos.patch(
-        `api/nurses/appointments/${appointmentID}/assign`,
+        `api/nurses/appointments/${selectedPatientDetails.id}/assign`,
         updatedFormData,
       );
       console.log(res);
@@ -383,7 +383,9 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                       <button
                         className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"
                         onClick={() => {
-                          if (!fetchingPersonnel) fetchHealthPersonnel();
+                          if (!fetchingPersonnel) 
+                            fetchHealthPersonnel();
+                          setSelectedPatientDetails(appointment)
                           setOpenPopover(null);
                         }}
                       >
@@ -547,7 +549,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                   </button>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-3 my-5 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-3 my-5 gap-3 text-sm">
                 {staffList.map((staff, index) => (
                   <div key={index} className="border rounded-md p-3">
                     <div>

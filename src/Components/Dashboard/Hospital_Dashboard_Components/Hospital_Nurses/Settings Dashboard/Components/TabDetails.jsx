@@ -6,7 +6,8 @@ import toast from "react-hot-toast";
 
 const AccountSettingsTab = () => {
   const [formData, setFormData] = useState({
-    name: "",
+       firstname: "",
+    lastname: "",
     email: "",
     oldPassword: "",
     newPassword: "",
@@ -78,16 +79,19 @@ const AccountSettingsTab = () => {
 
   const handleUpdateName = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim()) return toast.error("Name cannot be empty");
+   
+        const payload = {};
+
+    if (formData.firstname.trim()) payload.firstname = formData.firstname;
+    if (formData.lastname.trim()) payload.lastname = formData.lastname;
 
     setLoadingName(true);
     try {
-      await axiosInstanceHos.patch("api/auth/hospital-admin-profile", {
-        name: formData.name,
-      });
+    await axiosInstanceHos.patch("api/auth/profile", payload);
       toast.success("Profile name updated!");
       setFormData({
-        name: "",
+        firstname: "",
+        lastname: "",
       });
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to update name");
@@ -178,18 +182,34 @@ const AccountSettingsTab = () => {
               <div className="border-b text-xs uppercase text-gray-600 pb-1">
                 <p>Profile Info</p>
               </div>
+               <div className=" mt-3">
+                <label
+                  htmlFor="name"
+                  className="block text-[12px] font-medium text-gray-700 mb-0.5"
+                >
+                  FirstName
+                </label>
+                <input
+                  id="firstname"
+                  name="firstname"
+                  type="text"
+                  value={formData.firstname}
+                  onChange={handleChange}
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
+                />
+              </div>
               <div className=" mt-3">
                 <label
                   htmlFor="name"
                   className="block text-[12px] font-medium text-gray-700 mb-0.5"
                 >
-                  Name
+                  LastName
                 </label>
                 <input
-                  id="name"
-                  name="name"
+                  id="lastname"
+                  name="lastname"
                   type="text"
-                  value={formData.name}
+                  value={formData.lastname}
                   onChange={handleChange}
                   className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
                 />
@@ -197,7 +217,10 @@ const AccountSettingsTab = () => {
 
               <button
                 onClick={handleUpdateName}
-                disabled={loadingName || !formData.name.trim()}
+                     disabled={
+                  loadingName ||
+                  (!formData.firstname.trim() && !formData.lastname.trim())
+                }
                 className="mt-4 text-[12px] w-full lg:w-[50%] py-2 bg-[#3E4095] text-white rounded-full text-sm disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
                 {loadingName ? (

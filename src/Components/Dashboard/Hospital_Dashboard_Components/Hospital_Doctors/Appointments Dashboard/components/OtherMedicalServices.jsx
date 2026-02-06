@@ -177,7 +177,7 @@ const OtherMedicalServices = ({ setOtherMedicalServices, selectedPatientDetails 
                                     ></textarea>
                                 </div>
                                 <button
-                                    disabled={requestLoading}
+                                    disabled={requestLoading || !formData.note}
                                     className={`mt-6 w-full cursor-pointer bg-[#3E4095] text-white py-2 rounded-full disabled:bg-[#3E4095]/60 ${requestLoading ? 'bg-[#3E4095]/60 cursor-not-allowed' : ''}} text-sm `}
                                     onClick={handleRequest}
                                 >
