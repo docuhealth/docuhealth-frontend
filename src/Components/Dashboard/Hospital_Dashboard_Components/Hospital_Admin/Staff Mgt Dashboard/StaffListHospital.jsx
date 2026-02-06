@@ -238,7 +238,7 @@ const toggleStaff = (id) => {
 
               <p>{staff.staff_id}</p>
               <p>{staff.role}</p>
-              <p>{staff.phone_no}</p>
+              <p>{staff.phone_num}</p>
               <p className="truncate max-w-[120px] ">{staff.email}</p>
               <p>{staff.gender}</p>
 
@@ -375,7 +375,7 @@ const toggleStaff = (id) => {
                     </svg>
                   </div>
                   <p className="text-[12px] font-medium">
-                    {staff.phone_no || "No Phone"}
+                    {staff.phone_num || "No Phone"}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">

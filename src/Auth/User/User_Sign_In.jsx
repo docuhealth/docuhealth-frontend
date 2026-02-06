@@ -74,6 +74,7 @@ const USI = () => {
 
         if (data.data.role === "patient") {
           toast.success("Login successful");
+  
           setTimeout(() => {
             window.location.href = "/user-home-dashboard";
           }, 1000);

@@ -53,7 +53,7 @@ const Patient_Sidebar_Mobile = ({
   const handleLogout = () => {
     setOpenMobileSidebar(false);
     queryClient.clear();
-    sessionStorage.removeItem("token");
+    sessionStorage.clear();
     navigate("/user-login"); // 👈 redirect
   };
 
