@@ -199,7 +199,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
       profile: {
         firstname: form.firstname,
         lastname: form.lastname,
-        phone_no: form.phone,
+        phone_num: form.phone,
         role: form.personnel,
         gender: form.gender,
         staff_id: "NIG_101",

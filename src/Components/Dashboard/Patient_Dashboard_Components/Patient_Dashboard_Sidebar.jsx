@@ -47,7 +47,7 @@ const Patient_Dashboard_Sidebar = () => {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem("token");
+       sessionStorage.clear();
     queryClient.clear();
     navigate("/user-login"); // 👈 redirect
   };

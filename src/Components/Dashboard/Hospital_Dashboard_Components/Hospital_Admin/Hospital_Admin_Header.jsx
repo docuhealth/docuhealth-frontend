@@ -18,7 +18,7 @@ const Hospital_Admin_Header = () => {
   const navigate = useNavigate();
 
   const initials = profile
-    ? `${profile.name?.[0] || ""}${profile.lastname?.[0] || ""}`.toUpperCase()
+    ? `${profile.name?.[0] || ""}${profile.name?.[1] || ""}`.toUpperCase()
     : "NA";
 
   const handleLogout = () => {

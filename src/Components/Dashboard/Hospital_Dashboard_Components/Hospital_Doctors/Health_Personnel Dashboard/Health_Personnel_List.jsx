@@ -124,7 +124,7 @@ const Health_Personnel_List = () => {
                  {staff.role === 'doctor'
   ? `Dr. ${staff.firstname} ${staff.lastname}`
   : `${staff.firstname} ${staff.lastname}`}
-                  {staff.firstname} {staff.lastname}
+          
                 </p>
               </div>
               <p>{staff.staff_id}</p>
@@ -156,7 +156,7 @@ const Health_Personnel_List = () => {
                        {staff.role === 'doctor'
   ? `Dr. ${staff.firstname} ${staff.lastname}`
   : `${staff.firstname} ${staff.lastname}`}
-                  {staff.firstname} {staff.lastname}
+               
                     </h3>
                     <div className="flex items-center gap-1.5">
                       <span className="text-[10px] bg-[#3E4095] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
