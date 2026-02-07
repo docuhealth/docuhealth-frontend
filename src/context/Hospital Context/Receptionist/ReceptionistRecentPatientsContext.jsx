@@ -1,52 +1,59 @@
-import React, { useEffect, useState, createContext } from "react";
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import React, { useState, useEffect, createContext } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getHospitalToken } from "../../../services/authService";
+import { fetchRecentPatients } from "../../../queries/Hospital/receptionist/recentPatients";
 
+export const ReceptionistRecentPatientsContext = createContext();
 
-export const ReceptionistRecentPatientsContext = createContext()
+const ReceptionistRecentPatientsProvider = (props) => {
 
-const ReceptionistRecentPatientsProvider = (props) =>{
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 7;
 
-    const [recentPatients, setRecentPatients] = useState([])
-    const [loading, setLoading] = useState(false);
-    const [count, setCount] = useState(0);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const pageSize = 7; // Example page size
+  const isUserLoggedIn = !!getHospitalToken();
 
-    const isUserLoggedIn = !!getHospitalToken();
+  const {
+    data,
+    isPending,
+    isFetching,
+     isError,
+    error
+  } = useQuery({
+    queryKey : ["receptionist-recent-patients", currentPage],
+    queryFn : fetchRecentPatients,
+    enabled : isUserLoggedIn,
+    placeholderData : keepPreviousData
+  });
 
-    const fetchRecentPatients = async(page = 1) => {
-        setLoading(true)
-
-        try {
-            const res = await axiosInstanceHos.get(
-                `api/receptionists/patients/recent?page=${page}&size=${pageSize}`
-            );
-console.log(res.data)
-            setRecentPatients(res.data.results || [])
-            setCount(res.data.count || 0);
-            setCurrentPage(page);
-            setTotalPages(Math.ceil(res.data.count / pageSize));
-        }  catch (err) {
-            console.error("Error fetching recent patients", err);
-            toast.error("Error fetching recent patients");
-          } finally {
-            setLoading(false);
-          }
-    }
 
     useEffect(() => {
-        if (isUserLoggedIn) {
-            fetchRecentPatients(1)
-        }
-        }, [isUserLoggedIn]);
+    if (isError) {
+      toast.error(error?.response?.data?.message || "Error fetching recent patients");
+      console.error(error);
+    }
+  }, [isError, error]);
 
-    return(
-        <ReceptionistRecentPatientsContext.Provider value={{recentPatients, setRecentPatients, fetchRecentPatients, loading, count, setCount, currentPage, setCurrentPage, totalPages, setTotalPages }}>
-            {props.children}
-        </ReceptionistRecentPatientsContext.Provider>
-    )
-}
 
-export default ReceptionistRecentPatientsProvider
+    const recentPatients = data?.results || [];
+  const count = data?.count || 0;
+  const totalPages = Math.ceil(count / pageSize)
+
+
+
+  return (
+    <ReceptionistRecentPatientsContext.Provider
+      value={{
+        recentPatients,
+        loading : isPending,
+        count,
+        currentPage,
+        setCurrentPage,
+        totalPages,
+      }}
+    >
+      {props.children}
+    </ReceptionistRecentPatientsContext.Provider>
+  );
+};
+
+export default ReceptionistRecentPatientsProvider;

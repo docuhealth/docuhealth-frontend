@@ -1,7 +1,6 @@
 import React, { useEffect, useState, createContext } from "react";
-import { getHospitalToken } from "../../../services/authService";
-// import axiosInstanceHos from "../../../utils/axiosInstanceHos";
-import { fetchStaff } from "../../../queries/Hospital/fetchStaff";
+import { getHospitalToken } from "../../services/authService";
+import { fetchStaff } from "../../queries/Hospital/fetchStaff";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 

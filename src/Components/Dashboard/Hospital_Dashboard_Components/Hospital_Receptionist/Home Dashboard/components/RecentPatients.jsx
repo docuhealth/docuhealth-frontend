@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { ReceptionistRecentPatientsContext } from '../../../../../../context/Hospital Context/Receptionist/ReceptionistRecentPatientsContext'
-import Pagination from '../../../../Patient_Dashboard_Components/Pagination/Pagination';
+import Pagination2 from '../../../../Patient_Dashboard_Components/Pagination/Pagination2';
 import { formatFullDate, formatTime } from '../../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter';
 
 const RecentPatients = () => {
@@ -11,7 +11,7 @@ const RecentPatients = () => {
         count,
         currentPage,
         totalPages,
-        fetchRecentPatients,
+        setCurrentPage,
     } = useContext(ReceptionistRecentPatientsContext);
 
     if (loading) {
@@ -214,12 +214,12 @@ const RecentPatients = () => {
             </div>
 
 
-            <Pagination
+            <Pagination2
 
                 count={count}
                 currentPage={currentPage}
                 totalPages={totalPages}
-                fetchData={fetchRecentPatients}
+                setCurrentPage = {setCurrentPage}
             />
         </>
     )

@@ -3,34 +3,30 @@ import { ReceptionistAdmittedPatientMGTContext } from "../../../../../context/Ho
 
 const TabComponent = ({ tabs }) => {
 
-    const { setTab } = useContext(ReceptionistAdmittedPatientMGTContext);
-    const [activeTab, setActiveTab] = useState(0);
-
-    const handleTabSwitch = (index, value) => {
-        setActiveTab(index);
-        setTab(value);   // 🔥 Tell context which status to fetch
-      };
+    const { tab: activeStatus, setTab } = useContext(ReceptionistAdmittedPatientMGTContext);
+   
 
     return (
         <div>
             <div className="flex border-b border-gray-200">
-                {tabs.map((tab, index) => (
-                    <button
-                        key={index}
-                        onClick={() => handleTabSwitch(index, tab.status)}
-                        className={`text-sm px-2 sm:px-4  py-2 sm:text-sm font-medium transition-colors duration-200 cursor-pointer
-              ${activeTab === index
-                                ? "text-[#3E4095]  border-b-2 border-[#3E4095] font-semibold"
-                                : "text-gray-600 hover:text-gray-800"
-                            }`}
-                    >
-                        {tab.title}
-                    </button>
+                {tabs.map((t, index) => (
+                     <button
+            key={index}
+            onClick={() => setTab(t.status)}
+            className={`text-sm px-4 py-2 font-medium transition-all duration-200 
+              ${activeStatus === t.status 
+                ? "text-[#3E4095] border-b-2 border-[#3E4095] font-semibold" 
+                : "text-gray-600 hover:text-gray-800"}`}
+          >
+            {t.title}
+          </button>
                 ))}
             </div>
 
             {/* Tab Content */}
-            <div className="py-2">{tabs[activeTab].content}</div>
+             <div className="py-2">
+        {tabs.find(t => t.status === activeStatus)?.content}
+      </div>
         </div>
     )
 }

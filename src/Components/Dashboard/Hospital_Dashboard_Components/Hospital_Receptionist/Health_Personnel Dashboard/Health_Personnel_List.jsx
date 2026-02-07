@@ -1,16 +1,16 @@
 import React, { useContext } from "react";
-import { ReceptionistHealthPersonnelContext } from "../../../../../context/Hospital Context/Receptionist/ReceptionistHealthPersonnelContext";
-import Pagination from "../../../Patient_Dashboard_Components/Pagination/Pagination";
+import { HosStaffsContext } from "../../../../../context/Hospital Context/HosStaffsContext"
+import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 
 const Health_Personnel_List = () => {
   const {
-    healthPersonnelList,
+    staffs : healthPersonnelList,
     loading,
     count,
     currentPage,
     totalPages,
-    fetchHealthPersonnel,
-  } = useContext(ReceptionistHealthPersonnelContext);
+    setCurrentPage,
+  } = useContext(HosStaffsContext);
 
   if (loading) {
     return (
@@ -129,7 +129,7 @@ const Health_Personnel_List = () => {
               </div>
               <p>{staff.staff_id}</p>
               <p>{staff.role}</p>
-              <p>{staff.phone_no}</p>
+              <p>{staff.phone_num}</p>
               <p className="truncate max-w-[120px]">{staff.email}</p>
               <p>{staff.gender}</p>
             </div>
@@ -195,7 +195,7 @@ const Health_Personnel_List = () => {
                     </svg>
                   </div>
                   <p className="text-[12px] font-medium">
-                    {staff.phone_no || "No Phone"}
+                    {staff.phone_num || "No Phone"}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
@@ -237,11 +237,11 @@ const Health_Personnel_List = () => {
         </div>
       </div>
 
-      <Pagination
+      <Pagination2
         count={count}
         currentPage={currentPage}
         totalPages={totalPages}
-        fetchData={fetchHealthPersonnel}
+        setCurrentPage = {setCurrentPage}
       />
     </>
   );

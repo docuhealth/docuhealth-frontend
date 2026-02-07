@@ -1,55 +1,55 @@
 import React, { useEffect, useState, createContext } from "react";
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import { fetchAppointments } from "../../../queries/Hospital/receptionist/appointments";
 import { getHospitalToken } from "../../../services/authService";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
-
-export const ReceptionistAppointmentsListContext = createContext()
-
+export const ReceptionistAppointmentsListContext = createContext();
 
 const ReceptionistAppointmentsListProvider = (props) => {
-    const [appointments, setAppointments] = useState([])
-    const [loading, setLoading] = useState(false);
-    const [count, setCount] = useState(0);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const pageSize = 7; // Example page size
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 7;
 
-    const isUserLoggedIn = !!getHospitalToken();
+  const isUserLoggedIn = !!getHospitalToken();
 
+  const { data, isPending, isFetching, isError, error } = useQuery({
+    queryKey: ["receptionist-appointments", currentPage],
+    queryFn: fetchAppointments,
+    enabled: isUserLoggedIn,
+    placeholderData: keepPreviousData,
+  });
 
-    const fetchAppointmentsList = async (page = 1) => {
-        setLoading(true)
-
-        try {
-            const res = await axiosInstanceHos.get(
-                `api/receptionists/appointments/upcoming?page=${page}&size=${pageSize}`
-            );
-            console.log(res.data)
-
-            setAppointments(res.data.results || [])
-            setCount(res.data.count || 0);
-            setCurrentPage(page);
-            setTotalPages(Math.ceil(res.data.count / pageSize));
-        }  catch (err) {
-            console.error("Error fetching appointments", err);
-            toast.error("Error fetching appointments");
-          } finally {
-            setLoading(false);
-          }
+  useEffect(() => {
+    if (isError) {
+      toast.error(
+        error?.response?.data?.message || "Error fetching appointments",
+      );
+      console.error(error);
     }
-
-    useEffect(() => {
-        if (isUserLoggedIn) {
-            fetchAppointmentsList(1)
-        }
-        }, [isUserLoggedIn]);
+  }, [isError, error]);
 
 
-    return(
-        <ReceptionistAppointmentsListContext.Provider value={{appointments, setAppointments, fetchAppointmentsList, loading, count, setCount, currentPage, setCurrentPage, totalPages, setTotalPages }}>
-            {props.children}
-        </ReceptionistAppointmentsListContext.Provider>
-    )
-}
+   const appointments = data?.results || [];
+  const count = data?.count || 0;
+  const totalPages = Math.ceil(count / pageSize)
 
-export default ReceptionistAppointmentsListProvider
+  const value = {
+    appointments,
+    count,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    loading: isPending,    // Initial load spinner
+    isRefreshing: isFetching // Background refresh indicator
+  };
+
+  return (
+    <ReceptionistAppointmentsListContext.Provider
+      value={value}
+    >
+      {props.children}
+    </ReceptionistAppointmentsListContext.Provider>
+  );
+};
+
+export default ReceptionistAppointmentsListProvider;

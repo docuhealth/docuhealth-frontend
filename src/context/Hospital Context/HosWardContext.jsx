@@ -9,11 +9,7 @@ const HosWardProvider = ({ children }) => {
   const isUserLoggedIn = !!getHospitalToken();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
-
-  console.log('ki')
-
-  // 🔹 Centralized Wards Query
-// ✅ THE CORRECT WAY
+  
 const { 
   data: wardsData, 
   isPending: wardsLoading,

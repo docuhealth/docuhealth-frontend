@@ -1,21 +1,20 @@
 import React, { useState, useContext } from "react";
 import toast from "react-hot-toast";
-import Pagination from "../../../Patient_Dashboard_Components/Pagination/Pagination";
+import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { ReceptionistAdmittedPatientMGTContext } from "../../../../../context/Hospital Context/Receptionist/ReceptionistAdmittedPatientMGTContext";
 
 
 const AdmittedPatientsTab = () => {
-    const {
-        admittedPatients,
-        loading,
-        count,
-        currentPage,
-        totalPages,
-        fetchAdmittedPatients,
-        tab
-    } = useContext(ReceptionistAdmittedPatientMGTContext);
+  const {
+    admittedPatients,
+    loading,
+    count,
+    currentPage,
+    totalPages,
+    setCurrentPage
+  } = useContext(ReceptionistAdmittedPatientMGTContext);
     const [selectedPatient, setSelectedPatient] = useState(null);
 
 
@@ -269,11 +268,12 @@ const AdmittedPatientsTab = () => {
                     </div>
                 </>
             )}
-            <Pagination count={count}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                fetchData={fetchAdmittedPatients}
-                tab={tab} />
+                <Pagination2
+        count={count}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
         </>
     )
 }
@@ -281,13 +281,12 @@ const AdmittedPatientsTab = () => {
 const DischargedPatientsTab = () => {
 
     const {
-        admittedPatients,
-        loading,
-        count,
-        currentPage,
-        totalPages,
-        fetchAdmittedPatients,
-        tab
+       admittedPatients,
+    loading,
+    count,
+    currentPage,
+    totalPages,
+    setCurrentPage,
     } = useContext(ReceptionistAdmittedPatientMGTContext);
 
     const[selectedPatient, setSelectedPatient] = useState('')
@@ -546,11 +545,12 @@ const DischargedPatientsTab = () => {
             )}
             </div>
 
-            <Pagination count={count}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                fetchData={fetchAdmittedPatients}
-                tab={tab} />
+             <Pagination2
+      count={count}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
         </>
 
     )

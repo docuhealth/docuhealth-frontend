@@ -9,11 +9,14 @@ const Hospital_Receptionist_Header = () => {
 
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
     const [openMobileSidebar, setOpenMobileSidebar] = useState(false);
+
       const togglePopover = () => {
       setIsPopoverOpen(!isPopoverOpen);
       };
   
       const {profile} = useContext(ReceptionistAppContext);
+
+      console.log(profile)
 
       const navigate = useNavigate()
 

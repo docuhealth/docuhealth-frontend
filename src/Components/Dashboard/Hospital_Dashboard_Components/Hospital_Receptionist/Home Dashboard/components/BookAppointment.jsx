@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 
@@ -38,9 +39,9 @@ const Pharmacist_Icon = () => (
 )
 
 const BookAppointment = ({ setBookAppointment, patientDetails }) => {
+    const queryClient = useQueryClient();
     const [selected, setSelected] = useState(null);
     const [loading, setLoading] = useState(false)
-    const [requestLoading, setRequestLoading] = useState(false)
     const [staffList, setStaffList] = useState([]);
     const [isStaffSelected, setIsStaffSelected] = useState(false)
     const [isStaffSelectedRole, setIsStaffSelectedRole] = useState(false)
@@ -97,40 +98,40 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
         },
     ];
 
-    const handleSubmit = async () => {
-        if (!selected) {
-            toast.error("Please select a personnel type.");
-            return;
-        }
 
-        setLoading(true);
+    //     if (!selected) {
+    //         toast.error("Please select a personnel type.");
+    //         return;
+    //     }
 
-        try {
-            const res = await axiosInstanceHos.get(
-                `api/receptionists/staff/${selected.toLowerCase()}`
-            );
+    //     setLoading(true);
 
-            const data = res.data;
+    //     try {
+    //         const res = await axiosInstanceHos.get(
+    //             `api/receptionists/staff/${selected.toLowerCase()}`
+    //         );
 
-            console.log(res.data)
-            // Check if empty
-            if (!data || data.length === 0) {
-                toast.error(`No ${selected} currently available.`);
-                setLoading(false);
-                return;
-            }
+    //         const data = res.data;
 
-            // Store the data
-            setStaffList(data);
-            setIsStaffSelectedRole(selected.toLowerCase());
-            toast.success(`${selected} fetched successfully.`);
-        } catch (err) {
-            console.error("Error fetching medical personnel:", err);
-            toast.error(err.response?.data?.message || "Error fetching medical personnel.");
-        } finally {
-            setLoading(false);
-        }
-    };
+    //         console.log(res.data)
+    //         // Check if empty
+    //         if (!data || data.length === 0) {
+    //             toast.error(`No ${selected} currently available.`);
+    //             setLoading(false);
+    //             return;
+    //         }
+
+    //         // Store the data
+    //         setStaffList(data);
+    //         setIsStaffSelectedRole(selected.toLowerCase());
+    //         toast.success(`${selected} fetched successfully.`);
+    //     } catch (err) {
+    //         console.error("Error fetching medical personnel:", err);
+    //         toast.error(err.response?.data?.message || "Error fetching medical personnel.");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
     const handleAssign = (staffId) => {
    
         setIsStaffSelected(true); // show next card
@@ -141,38 +142,58 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
         }));
     };
 
-    const handleRequest = async () => {
+    const handleSubmit = async () => {
+        if (!selected) {
+            toast.error("Please select a personnel type.");
+            return;
+        }
+        setLoading(true)
+        try {
+            const res = await axiosInstanceHos.get(`api/receptionists/staff/${selected.toLowerCase()}`);
+            if (!res.data || res.data.length === 0) {
+                toast.error(`No ${selected} currently available.`);
+                return;
+            }
+            setStaffList(res.data);
+            setIsStaffSelectedRole(selected.toLowerCase());
+            toast.success(`${selected} fetched successfully.`);
+            setLoading(false)
+        } catch (err) {
+            toast.error("Error fetching medical personnel.");
+            setLoading(false)
+        }
+    };
 
+        const mutation = useMutation({
+        mutationFn: (newAppointment) => {
+            return axiosInstanceHos.post('api/receptionists/appointments', newAppointment);
+        },
+        onSuccess: () => {
+
+            queryClient.invalidateQueries({ queryKey: ['receptionist-appointments'] });
+            
+            toast.success('You have successfully booked a consultation for a patient');
+            setBookAppointment(false);
+        },
+        onError: (err) => {
+            console.error("Error booking consultation:", err);
+            toast.error(err.response?.data?.message || "Appointment Request failed.");
+        }
+    });
+
+    const handleRequest = () => {
         const selectedDate = new Date(
             `${selectedMonth} ${selectedDay}, ${selectedYear} ${selectedTime}`
-       );
+        );
 
-        setRequestLoading(true)
-        const updatedFormData = {
+        const payload = {
             ...formData,
             patient: patientDetails.hin,
             scheduled_time: selectedDate.toISOString()
         };
 
-        console.log("REQUEST PAYLOAD:", updatedFormData);
-
-
-        try {
-            const res = await axiosInstanceHos.post('api/receptionists/appointments', updatedFormData)
-            console.log(res)
-            toast.success('You have successfully booked a consultation for a patient')
-            setBookAppointment(false)
-            setRequestLoading(false)
-        } catch (err) {
-            console.error("Error booking consultation:", err);
-            toast.error(err.response?.data?.message || "Appointment Request failed.");
-            setBookAppointment(false)
-            setRequestLoading(false)
-        } finally {
-            setBookAppointment(false)
-            setRequestLoading(false)
-        }
-    }
+        mutation.mutate(payload);
+    };
 
 
 
@@ -401,11 +422,11 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
 
 
                                 <button
-                                    disabled={ !formData.type || requestLoading || !selectedDay || !selectedMonth || !selectedTime || !selectedYear || !formData.note}
-                                    className={`mt-6 w-full cursor-pointer bg-[#3E4095] text-white py-2 rounded-full disabled:bg-[#3E4095]/60 ${requestLoading ? 'bg-[#3E4095]/60 cursor-not-allowed' : ''}} text-sm `}
+                                    disabled={ !formData.type || mutation.isPending || !selectedDay || !selectedMonth || !selectedTime || !selectedYear || !formData.note}
+                                    className={`mt-6 w-full cursor-pointer bg-[#3E4095] text-white py-2 rounded-full disabled:bg-[#3E4095]/60 ${mutation.isPending ? 'bg-[#3E4095]/60 cursor-not-allowed' : ''}} text-sm `}
                                     onClick={handleRequest}
                                 >
-                                    {requestLoading ? (
+                                    {mutation.isPending ? (
                                         <span className="flex items-center justify-center gap-2">
                                             <svg
                                                 className="animate-spin h-4 w-4 text-white"

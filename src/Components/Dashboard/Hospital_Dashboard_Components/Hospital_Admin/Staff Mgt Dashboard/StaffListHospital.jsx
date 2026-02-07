@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { HosStaffsContext } from "../../../../../context/Hospital Context/Admin/HosStaffsContext";
+import { HosStaffsContext } from "../../../../../context/Hospital Context/HosStaffsContext";
 import {
   formatFullDate,
   formatTime,

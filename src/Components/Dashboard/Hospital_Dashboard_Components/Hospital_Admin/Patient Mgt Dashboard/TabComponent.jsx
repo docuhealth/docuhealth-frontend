@@ -22,7 +22,7 @@ const TabComponent = ({ tabs }) => {
         ))}
       </div>
       {/* Render the content based on the active status */}
-      <div className="py-4">
+      <div className="py-2">
         {tabs.find(t => t.status === activeStatus)?.content}
       </div>
     </div>
