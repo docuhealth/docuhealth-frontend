@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import axiosInstanceHos from '../../../../../utils/axiosInstanceHos';
 import toast from 'react-hot-toast'; // or your preferred toast library
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInputs, handleAddListItem, handleRemoveItem, activeInput, setActiveInput }) => (
     <div className="border rounded-md p-4 mt-3 bg-gray-50/30">
@@ -45,7 +46,9 @@ const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInput
 
 // Added patientId prop so we know which patient to save the note for
 const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
-    const [loading, setLoading] = useState(false);
+    const queryClient = useQueryClient();
+
+
     const [caseNoteData, setCaseNoteData] = useState({
         observations: [],
         nursingCare: [],
@@ -81,8 +84,26 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
         }));
     };
 
-    const handleSubmit = async () => {
-       
+   const { mutate, isPending } = useMutation({
+        mutationFn: (payload) => axiosInstanceHos.post('/api/nurses/case-notes', payload),
+        onSuccess: () => {
+            toast.success("Case note uploaded successfully!");
+            
+            // 2. Invalidate the specific patient's case notes list
+            queryClient.invalidateQueries({ 
+                queryKey: ["patient-case-notes", selected?.patient?.hin] 
+            });
+
+            // 3. Reset and Close
+            setNewCaseNote(false);
+        },
+        onError: (error) => {
+            console.error("Upload error:", error);
+            toast.error(error.response?.data?.message || "Failed to upload case note");
+        }
+    });
+
+    const handleSubmit = () => {
         const fullPayload = {
             patient: selected?.patient?.hin,
             observation: caseNoteData.observations,
@@ -92,39 +113,21 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
             follow_up: caseNoteData.followUp
         };
 
+        // Filter out empty arrays
         const filteredPayload = Object.fromEntries(
             Object.entries(fullPayload).filter(([_, value]) => {
-                if (Array.isArray(value)) return value.length > 0; // Keep non-empty arrays
-                return value !== null && value !== undefined;    // Keep the patient ID
+                if (Array.isArray(value)) return value.length > 0;
+                return value !== null && value !== undefined;
             })
         );
 
+        // Validation: At least one category must have data (length > 1 because patient ID is always there)
         if (Object.keys(filteredPayload).length <= 1) {
             toast.error("Please add at least one entry before uploading.");
             return;
         }
-    
-        // console.log("Sending filtered payload:", filteredPayload);
 
-        setLoading(true);
-        try {
-            console.log(filteredPayload)
-            // End-point from your image: /api/nurses/case-notes
-            await axiosInstanceHos.post('/api/nurses/case-notes', filteredPayload);
-            
-            toast.success("Case note uploaded successfully!");
-            
-            // 3. RESET & CLOSE
-            setCaseNoteData({
-                observations: [], nursingCare: [], patientResponse: [], concerns: [], followUp: []
-            });
-            setNewCaseNote(false);
-        } catch (error) {
-            console.error("Upload error:", error);
-            toast.error(error.response?.data?.message || "Failed to upload case note");
-        } finally {
-            setLoading(false);
-        }
+        mutate(filteredPayload);
     };
 
     return (
@@ -147,10 +150,10 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
             <div className='flex justify-end'>
                 <button
                     onClick={handleSubmit}
-                    disabled={loading}
-                    className={`w-full lg:w-auto bg-[#3E4095] text-white py-2.5 px-20 rounded-full mt-5 text-sm cursor-pointer transition-opacity ${loading ? 'opacity-50' : 'opacity-100'}`}
+                    disabled={isPending}
+                    className={`w-full lg:w-auto bg-[#3E4095] text-white py-2.5 px-20 rounded-full mt-5 text-sm cursor-pointer transition-opacity ${isPending ? 'opacity-50' : 'opacity-100'}`}
                 >
-                    {loading ? "Uploading..." : "Upload Case Note"}
+                    {isPending ? "Uploading..." : "Upload Case Note"}
                 </button>
             </div>
         </div>

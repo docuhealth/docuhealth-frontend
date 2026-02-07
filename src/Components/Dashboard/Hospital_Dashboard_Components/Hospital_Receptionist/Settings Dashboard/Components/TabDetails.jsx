@@ -16,12 +16,6 @@ const AccountSettingsTab = () => {
   });
 
   const queryClient = useQueryClient();
-
-  const [loadingName, setLoadingName] = useState(false);
-  const [loadingEmail, setLoadingEmail] = useState(false);
-  const [loadingOTP, setLoadingOTP] = useState(false);
-  const [loadingPassword, setLoadingPassword] = useState(false);
-
   const [showOtpModal, setShowOtpModal] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);

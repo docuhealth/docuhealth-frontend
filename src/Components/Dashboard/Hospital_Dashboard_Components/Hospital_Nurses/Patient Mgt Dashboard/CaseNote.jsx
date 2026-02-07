@@ -1,15 +1,29 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 import toast from "react-hot-toast";
-import { CalendarIcon, ClockIcon, UserIcon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { CalendarIcon, ClockIcon, UserIcon, MoreVertical } from "lucide-react";
 
 const CaseNote = ({ selected, setCaseNoteHistory, setCaseNoteDetail }) => {
-  const [caseNotes, setCaseNotes] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const [openMenuId, setOpenMenuId] = useState(null);
+const [openMenuId, setOpenMenuId] = useState(null);
   const menuRef = useRef(null);
+  const hin = selected?.patient?.hin;
 
+
+  const { data: caseNotes, isLoading } = useQuery({
+    queryKey: ["patient-case-notes", hin],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get(`api/nurses/case-notes/patient/${hin}`);
+      return res.data.results;
+    },
+    enabled: !!hin,
+    onError: (err) => {
+      console.error("Error fetching patient's case notes:", err);
+      toast.error("Failed to load patient's case notes");
+    }
+  });
+
+ 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -19,30 +33,6 @@ const CaseNote = ({ selected, setCaseNoteHistory, setCaseNoteDetail }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  useEffect(() => {
-    const fetchPatientCaseNotes = async () => {
-      // Ensure we have a HIN before calling
-      const hin = selected?.patient?.hin;
-      if (!hin) return;
-
-      setLoading(true);
-      try {
-        const res = await axiosInstanceHos.get(
-          `api/nurses/case-notes/patient/${hin}`,
-        );
-        console.log(res.data);
-        setCaseNotes(res.data.results);
-      } catch (err) {
-        console.error("Error fetching patient's case notes:", err);
-        toast.error("Failed to load patient's case notes");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPatientCaseNotes();
-  }, [selected]);
 
   return (
     <div className="bg-white my-5 border rounded-lg pt-5 lg:pt-8 px-4 lg:px-6 text-sm ">
@@ -70,15 +60,15 @@ const CaseNote = ({ selected, setCaseNoteHistory, setCaseNoteDetail }) => {
           <h2 className="font-medium ">Case Notes</h2>
         </div>
 
-        {loading ? (
+        {isLoading ? (
           <>
             <div className="flex justify-center items-center gap-3 px-2 py-3">
               <p className="text-sm text-gray-500 pt-3">
-                Loading patient's case note...
+                loading patient's case note...
               </p>
             </div>
           </>
-        ) : caseNotes?.length === 0 && !loading ? (
+        ) : caseNotes?.length === 0 && !isLoading ? (
           <>
             <div className="flex flex-col justify-center items-center text-center  my-2">
               <svg

@@ -1,58 +1,53 @@
 import React, { useEffect, useState, createContext } from "react";
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 import { getHospitalToken } from "../../../services/authService";
+import { fetchPatientsInMyWard } from "../../../queries/Hospital/nurse/patientsInWard";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
-
-export const NursesPatientsAssignedToWardContext = createContext()
-
+export const NursesPatientsAssignedToWardContext = createContext();
 
 const NursesPatientsAssignedToWardProvider = (props) => {
-    const [assignedPatientsToWard, setAssignedPatientsToWard] = useState([])
-    const [loading, setLoading] = useState(false);
-    const [count, setCount] = useState(0);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const pageSize = 7; // Example page size
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 7; // Example page size
 
-    const isUserLoggedIn = !!getHospitalToken();
+  const isUserLoggedIn = !!getHospitalToken();
 
+  const { data, isPending, isFetching, isError, error } = useQuery({
+    queryKey: ["patients-in-ward", currentPage],
+    queryFn: fetchPatientsInMyWard,
+    enabled: isUserLoggedIn,
+    placeholderData: keepPreviousData,
+  });
 
-    const fetchAssignedPatientsToWard = async (page = 1) => {
-        setLoading(true)
-
-        try {
-            const res = await axiosInstanceHos.get(
-                `api/nurses/admissions?page=${page}&size=${pageSize}`
-            );
-            console.log(res.data)
-
-            setAssignedPatientsToWard(res.data.results || [])
-            setCount(res.data.count || 0);
-            setCurrentPage(page);
-            setTotalPages(Math.ceil(res.data.count / pageSize));
-        }  catch (err) {
-            console.error("Error fetching assigned patients to ward", err);
-            toast.error("Error fetching assigned patients to ward");
-          } finally {
-            setLoading(false);
-          }
+  useEffect(() => {
+    if (isError) {
+      toast.error(
+        error?.response?.data?.message ||
+          "Error fetching patients in my ward !",
+      );
+      console.error(error);
     }
+  }, [isError, error]);
 
+  const assignedPatientsToWard = data?.results || [];
+  const count = data?.count || 0;
+  const totalPages = Math.ceil(count / pageSize);
 
-    useEffect(() => {
-        if (isUserLoggedIn) {
-            fetchAssignedPatientsToWard(1)
-        }
-        }, [isUserLoggedIn]);
+  return (
+    <NursesPatientsAssignedToWardContext.Provider
+      value={{
+        assignedPatientsToWard,
+        count,
+        currentPage,
+        setCurrentPage,
+        totalPages,
+        loading: isPending,
+        isRefreshing: isFetching,
+      }}
+    >
+      {props.children}
+    </NursesPatientsAssignedToWardContext.Provider>
+  );
+};
 
-        return (
-            <NursesPatientsAssignedToWardContext.Provider value ={{
-                assignedPatientsToWard, setAssignedPatientsToWard, fetchAssignedPatientsToWard, loading, count, setCount, currentPage, setCurrentPage, totalPages, setTotalPages 
-            }}>
-                {props.children}
-            </NursesPatientsAssignedToWardContext.Provider>
-        )
-
-}
-
-export default NursesPatientsAssignedToWardProvider
+export default NursesPatientsAssignedToWardProvider;

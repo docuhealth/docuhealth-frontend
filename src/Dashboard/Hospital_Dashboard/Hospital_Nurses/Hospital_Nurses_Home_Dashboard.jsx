@@ -3,7 +3,6 @@ import {Link} from 'react-router-dom'
 import DynamicDate from '../../../Components/Dynamic Date/DynamicDate'
 import template from '../../../assets/img/template.png'
 import { NursesAppContext } from '../../../context/Hospital Context/Nurses/NursesAppContext'
-import AdmissionRequests from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/AdmissionRequests'
 import Vitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/Vitals'
 import PatientVitalsDetails from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/PatientVitalsDetails'
 import UpdateVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/UpdateVitals'
@@ -13,7 +12,6 @@ import ProcessVitals from '../../../Components/Dashboard/Hospital_Dashboard_Comp
 const Hospital_Nurses_Home_Dashboard = () => {
 
   const { profile, wardInfo } = useContext(NursesAppContext);
-  const [admissionRequest, setAdmissionRequest] = useState(false)
   const [vitals, setVitals] = useState(false)
   const [updateVitals, setUpdateVitals] = useState(false)
 
@@ -28,17 +26,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
   return (
     <>
       {
-        admissionRequest ? (
-          <>
-            <div className='py-2 text-sm '>
-              <DynamicDate />
-              <div>
-                <AdmissionRequests setAdmissionRequest={setAdmissionRequest} />
-              </div>
-
-            </div>
-          </>
-        ) : vitals ? (
+         vitals ? (
           <>
             <div
               className={`py-2 text-sm ${selectedPatient ? "flex flex-col lg:flex-row justify-between items-start lg:items-center gap-2" : ""
@@ -81,7 +69,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
                     <>
                       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 text-sm">
                         <div className="bg-white rounded-lg shadow-lg p-4 max-w-md w-full relative text-sm mx-3">
-                          <div className='border rounded-md p-4 text-sm'>
+                          <div className='text-sm'>
                             <div className='flex justify-end'>
                               <button
                                 onClick={() => setCheckAdditionalNote(false)}
@@ -137,13 +125,6 @@ const Hospital_Nurses_Home_Dashboard = () => {
                 <img src={template} alt='img' />
               </div>
               <div className='text-sm grid grid-cols-1 lg:flex lg:justify-end lg:items-center gap-2 lg:gap-5 mt-5'>
-                {/* <button className='border border-[#3E4095] rounded-full py-2 px-12 text-[#3E4095] cursor-pointer'
-                  onClick={() => {
-                    setAdmissionRequest(true)
-                  }}
-                >
-                  Admission Request
-                </button> */}
                 <button className='bg-[#3E4095] text-white cursor-pointer py-2.5 px-12 rounded-full' onClick={() => {
                   setVitals(true)
                 }}>

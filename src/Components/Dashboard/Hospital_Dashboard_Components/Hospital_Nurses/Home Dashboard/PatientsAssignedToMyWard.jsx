@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { NursesPatientsAssignedToWardContext } from '../../../../../context/Hospital Context/Nurses/NursesPatientsAssignedToWardContext'
 import { formatFullDate, formatTime } from '../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter'
-import Pagination from '../../../Patient_Dashboard_Components/Pagination/Pagination'
+import Pagination2 from '../../../Patient_Dashboard_Components/Pagination/Pagination2'
 import toast from 'react-hot-toast'
 
 const PatientsAssignedToMyWard = () => {
@@ -12,7 +12,7 @@ const PatientsAssignedToMyWard = () => {
     count,
     currentPage,
     totalPages,
-    fetchAssignedPatientsToWard
+    setCurrentPage,
   } = useContext(NursesPatientsAssignedToWardContext);
 
   console.log(assignedPatientsToWard)
@@ -106,7 +106,7 @@ const PatientsAssignedToMyWard = () => {
           <p>Date of Adm.</p>
           <p>Time of Adm.</p>
           <p>Assigned Doc</p>
-          <p>Diagnosis</p>
+          <p>Patient's Email</p>
           <p>Sex</p>
         </div>
         {
@@ -131,7 +131,7 @@ const PatientsAssignedToMyWard = () => {
                     {patient.staff.firstname} {patient.staff.lastname}
                     </p>
                     <p className='truncate max-w-[120px]'>
-                        {patient.email ||"NIL"} 
+                        {patient.patient.email ||"NIL"} 
                     </p>
                     <p>
                         {patient.patient.gender}
@@ -175,17 +175,17 @@ const PatientsAssignedToMyWard = () => {
               </div>
               <div>
                 <p className="text-[10px] text-gray-400 uppercase">Email/Info</p>
-                <p className="text-[12px] font-medium text-gray-700 truncate">{patient.email || "NIL"}</p>
+                <p className="text-[12px] font-medium text-gray-700 truncate">{patient.patient.email || "NIL"}</p>
               </div>
             </div>
           </div>
         ))}
       </div>
-      <Pagination
+      <Pagination2
         count={count}
         currentPage={currentPage}
         totalPages={totalPages}
-        fetchData={fetchAssignedPatientsToWard}
+        setCurrentPage={ setCurrentPage}
       />
     </>
 

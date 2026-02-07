@@ -125,7 +125,7 @@ const AdmittedPatientsTab = () => {
                                 <p className="">
                                     {" "}
                                     {admittedPatient?.staff
-                                        ? `${admittedPatient.staff.firstname} ${admittedPatient.staff.lastname}`
+                                        ? `${'Dr. ' + admittedPatient.staff.firstname} ${admittedPatient.staff.lastname}`
                                         : "NIL"}
                                 </p>
                             </div>
@@ -399,7 +399,7 @@ const DischargedPatientsTab = () => {
                                 <p className="">
                                     {" "}
                                     {admittedPatient?.staff
-                                        ? `${admittedPatient.staff.firstname} ${admittedPatient.staff.lastname}`
+                                        ? `${'Dr. ' + admittedPatient.staff.firstname} ${admittedPatient.staff.lastname}`
                                         : "NIL"}
                                 </p>
                             </div>

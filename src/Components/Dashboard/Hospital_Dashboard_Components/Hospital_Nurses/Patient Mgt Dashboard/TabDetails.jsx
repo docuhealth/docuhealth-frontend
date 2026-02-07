@@ -1,7 +1,6 @@
 import React, { useState, useContext } from "react";
 import toast from "react-hot-toast";
-import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
-import Pagination from "../../../Patient_Dashboard_Components/Pagination/Pagination";
+import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { NursesAdmittedPatientMGTContext } from "../../../../../context/Hospital Context/Nurses/NursesAdmittedPatientMGTContext";
@@ -14,8 +13,7 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
         count,
         currentPage,
         totalPages,
-        fetchAdmittedPatients,
-        tab
+       setCurrentPage
     } = useContext(NursesAdmittedPatientMGTContext);
     const [selectedPatient, setSelectedPatient] = useState(null);
 
@@ -127,7 +125,7 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
                                 <p className="">
                                     {" "}
                                     {admittedPatient?.staff
-                                        ? `${admittedPatient.staff.firstname} ${admittedPatient.staff.lastname}`
+                                        ? `${'Dr. ' + admittedPatient.staff.firstname} ${admittedPatient.staff.lastname}`
                                         : "NIL"}
                                 </p>
                             </div>
@@ -186,7 +184,7 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
             {selectedPatient && (
                 <>
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 text-sm px-3">
-                        <div className="bg-white rounded-lg shadow-lg p-4 lg:p-6 max-w-md w-full relative text-sm">
+                        <div className="bg-white rounded-lg shadow-lg p-4  max-w-md w-full relative text-sm">
                             <div className='flex justify-end'>
                                 <button
                                     onClick={() => setSelectedPatient(null)}
@@ -278,11 +276,10 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
                     </div>
                 </>
             )}
-            <Pagination count={count}
+            <Pagination2 count={count}
                 currentPage={currentPage}
                 totalPages={totalPages}
-                fetchData={fetchAdmittedPatients}
-                tab={tab} />
+                setCurrentPage = {setCurrentPage} />
         </>
     )
 }
@@ -290,13 +287,12 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
 const DischargedPatientsTab = () => {
 
     const {
-        admittedPatients,
-        loading,
-        count,
-        currentPage,
-        totalPages,
-        fetchAdmittedPatients,
-        tab
+ admittedPatients,
+    loading,
+    count,
+    currentPage,
+    totalPages,
+    setCurrentPage,
     } = useContext(NursesAdmittedPatientMGTContext);
 
 
@@ -388,7 +384,7 @@ const DischargedPatientsTab = () => {
                             <div className='flex justify-between items-center'>
                                 <p>{admittedPatient.patient.firstname} {admittedPatient.patient.lastname} </p>
                                 <div className="bg-[#D2F5DB] px-2 rounded-full">
-                                    <p className="text-[#08A913] ">{formatRecordDate(admittedPatient.discharge_date)}</p>
+                                    <p className="text-[#08A913] ">{formatRecordDate(admittedPatient.discharge_date) || 'Pending'}</p>
                                 </div>
                             </div>
                             <div className='border-b py-2'>
@@ -410,7 +406,7 @@ const DischargedPatientsTab = () => {
                                 <p className="">
                                     {" "}
                                     {admittedPatient?.staff
-                                        ? `${admittedPatient.staff.firstname} ${admittedPatient.staff.lastname}`
+                                        ? `${'Dr. ' + admittedPatient.staff.firstname} ${admittedPatient.staff.lastname}`
                                         : "NIL"}
                                 </p>
                             </div>
@@ -461,7 +457,7 @@ const DischargedPatientsTab = () => {
                    {selectedPatient && (
                 <>
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 text-sm px-3">
-                        <div className="bg-white rounded-lg shadow-lg p-4 lg:p-6 max-w-md w-full relative text-sm">
+                        <div className="bg-white rounded-lg shadow-lg p-4  max-w-md w-full relative text-sm">
                             <div className='flex justify-end'>
                                 <button
                                     onClick={() => setSelectedPatient(null)}
@@ -555,11 +551,10 @@ const DischargedPatientsTab = () => {
             )}
             </div>
 
-            <Pagination count={count}
+            <Pagination2 count={count}
                 currentPage={currentPage}
                 totalPages={totalPages}
-                fetchData={fetchAdmittedPatients}
-                tab={tab} />
+                setCurrentPage ={setCurrentPage} />
         </>
 
     )

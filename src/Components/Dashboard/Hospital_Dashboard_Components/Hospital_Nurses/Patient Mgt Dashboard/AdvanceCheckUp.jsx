@@ -1,37 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
 import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
 
 const AdvanceCheckUp = ({ selected, setAdvanceCheckUp }) => {
-  const [patientFullInfo, setPatientFullInfo] = useState(null);
-  const [loading, setLoading] = useState(false);
+const hin = selected?.patient?.hin;
 
-  useEffect(() => {
-    const fetchPatientInfo = async () => {
-      // Ensure we have a HIN before calling
-      const hin = selected?.patient?.hin;
-      if (!hin) return;
 
-      setLoading(true);
-      try {
-        const res = await axiosInstanceHos.get(
-          `api/doctors/patient/info/${hin}`,
-        );
-        console.log(res.data);
-        setPatientFullInfo(res.data);
-      } catch (err) {
-        console.error("Error fetching patient info:", err);
-        toast.error("Failed to load patient information");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { data: patientFullInfo, isLoading, isError } = useQuery({
+    queryKey: ["patient-info", hin],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get(`api/doctors/patient/info/${hin}`);
+      return res.data;
+    },
+    enabled: !!hin, 
+    staleTime: 5 * 60 * 1000, 
+  });
 
-    fetchPatientInfo();
-  }, [selected]);
+  if (isError) {
+    toast.error("Failed to load patient information");
+  }
 
-  const patient = patientFullInfo?.patient_info;
+
 
   return (
     <>
@@ -57,7 +47,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp }) => {
 
         <p>Advance CheckUp</p>
       </div>
-      {loading ? (
+      {isLoading ? (
         /* Basic Loading State */
         <div className="flex justify-center items-center gap-3 px-2 py-3">
           <p className="text-sm text-gray-500 pt-2">Loading patient data...</p>

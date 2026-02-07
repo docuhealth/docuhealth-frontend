@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import Pagination from "../../../Patient_Dashboard_Components/Pagination/Pagination";
+import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import { NursesAppointmentsListContext } from "../../../../../context/Hospital Context/Nurses/NursesAppointmentsListContext";
 import {
   formatFullDate,
@@ -8,15 +8,16 @@ import {
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
   const {
     appointments,
-    loading,
     count,
     currentPage,
+    setCurrentPage,
     totalPages,
-    fetchAppointments,
+    loading,
   } = useContext(NursesAppointmentsListContext);
 
   if (loading) {
@@ -95,6 +96,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
     );
   }
 
+  const queryClient = useQueryClient();
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [staffList, setStaffList] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -121,6 +123,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
 
   const [fetchingPersonnel, setFetchingPersonnel] = useState(false);
   const [isStaffSelected, setIsStaffSelected] = useState(false);
+
   const fetchHealthPersonnel = async () => {
     setFetchingPersonnel(true);
     try {
@@ -156,46 +159,53 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
     }));
   };
 
-  const [requestLoading, setRequestLoading] = useState(false);
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
+  const assignDoctorMutation = useMutation({
+    mutationFn: (payload) =>
+      axiosInstanceHos.patch(
+        `api/nurses/appointments/${selectedPatientDetails.id}/assign`,
+        payload,
+      ),
+    onSuccess: () => {
+      toast.success("Consultation booked successfully!");
+      queryClient.invalidateQueries({ queryKey: ["nurse-appointments"] });
+
+      setIsStaffSelected(false);
+      setOpenPopover(null);
+    },
+    onError: (err) => {
+      console.error("Error booking consultation:", err);
+      toast.error(err.response?.data?.message || "Error booking consultation.");
+    },
+  });
+
   const handleRequest = async () => {
+    // Basic Validation
+    if (
+      !formData.type ||
+      !selectedDay ||
+      !selectedMonth ||
+      !selectedTime ||
+      !selectedYear ||
+      !formData.note
+    ) {
+      return toast.error("Please fill all details.");
+    }
+
     const selectedDate = new Date(
       `${selectedMonth} ${selectedDay}, ${selectedYear} ${selectedTime}`,
     );
 
-    setRequestLoading(true);
-    const updatedFormData = {
+    const payload = {
       note: formData.note,
       type: formData.type,
       doctor_id: formData.staff_id,
       scheduled_time: selectedDate.toISOString(),
     };
 
-    console.log("REQUEST PAYLOAD:", updatedFormData);
-
-    // console.log(selectedPatientDetails)
-
-    try {
-      const res = await axiosInstanceHos.patch(
-        `api/nurses/appointments/${selectedPatientDetails.id}/assign`,
-        updatedFormData,
-      );
-      console.log(res);
-      toast.success(
-        "You have successfully booked a consultation for a patient",
-      );
-      setIsStaffSelected(false);
-      setRequestLoading(false);
-    } catch (err) {
-      console.error("Error booking consultation:", err);
-      toast.error(err.response?.data?.message || "Appointment Request failed.");
-      setIsStaffSelected(false);
-      setRequestLoading(false);
-    } finally {
-      setIsStaffSelected(false);
-      setRequestLoading(false);
-    }
+    // Execute the mutation
+    assignDoctorMutation.mutate(payload);
   };
 
   return (
@@ -265,24 +275,24 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                   </div>
                 </div>
                 <div
-                 onClick={() => {
+                  onClick={() => {
                     togglePopover(index);
                   }}
                   className={` hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer
         ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
     `}
                 >
-                      <svg
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        viewBox="0 0 16 16"
-                      >
-                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-                      </svg>
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                  </svg>
                 </div>
 
-                   {openPopover === index && (
+                {openPopover === index && (
                   <div className="hidden lg:block lg:absolute top-0 lg:top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
                     <p
                       className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
@@ -381,15 +391,16 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                         Update vitals
                       </button>
                       <button
-                        className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"
+                        className={`w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors     ${fetchingPersonnel ? "pointer-events-none opacity-50" : ""}`}
                         onClick={() => {
-                          if (!fetchingPersonnel) 
-                            fetchHealthPersonnel();
-                          setSelectedPatientDetails(appointment)
+                          if (!fetchingPersonnel) fetchHealthPersonnel();
+                          setSelectedPatientDetails(appointment);
                           setOpenPopover(null);
                         }}
                       >
-                        Assign Doctor
+                         {fetchingPersonnel
+                        ? "Fetching Doctor…"
+                        : "Assign to a Doctor"}
                       </button>
                     </div>
                   )}
@@ -420,7 +431,8 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                       {appointment.staff.role}
                     </p>
                     <p className="text-[13px] text-slate-600">
-                      Dr. {appointment.staff.firstname} {appointment.staff.lastname}
+                      Dr. {appointment.staff.firstname}{" "}
+                      {appointment.staff.lastname}
                     </p>
                   </div>
                   <div>
@@ -437,18 +449,18 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
           ))}
         </div>
 
-        <Pagination
+        <Pagination2
           count={count}
           currentPage={currentPage}
           totalPages={totalPages}
-          fetchData={fetchAppointments}
+          setCurrentPage={setCurrentPage}
         />
       </div>
       {selectedPatient && (
         <>
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 text-sm">
-            <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm mx-3">
-              <div className="text-sm">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 text-sm">
+            <div className="bg-white rounded-lg shadow-lg p-4 max-w-md w-full relative text-sm mx-3">
+              <div className="text-[13px]">
                 <div className="flex justify-end">
                   <button
                     onClick={() => setSelectedPatient(null)}
@@ -517,6 +529,12 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                         selectedPatient?.patient?.state +
                         ", " +
                         selectedPatient?.patient?.country || "NIL"}
+                    </p>
+                  </div>
+                  <div className="mb-1 flex items-center gap-1">
+                    <p className="font-medium">Note:</p>
+                    <p className=" text-gray-600">
+                      {selectedPatient?.note ?? "NIL"}
                     </p>
                   </div>
                 </div>
@@ -629,7 +647,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                   onChange={(e) =>
                     setFormData({ ...formData, note: e.target.value })
                   }
-                  placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
+                  placeholder="Enter note...."
                 ></textarea>
               </div>
 
@@ -817,18 +835,11 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
               </div>
 
               <button
-                disabled={
-                  !formData.type ||
-                  requestLoading ||
-                  !selectedDay ||
-                  !selectedMonth ||
-                  !selectedTime ||
-                  !selectedYear
-                }
-                className={`mt-6 w-full cursor-pointer bg-[#3E4095] text-white py-2 rounded-full disabled:bg-[#3E4095]/60 ${requestLoading ? "bg-[#3E4095]/60 cursor-not-allowed" : ""}} text-sm `}
+                disabled={assignDoctorMutation.isPending}
+                className={`mt-6 w-full cursor-pointer bg-[#3E4095] text-white py-2 rounded-full disabled:bg-[#3E4095]/60 ${assignDoctorMutation.isPending ? "bg-[#3E4095]/60 cursor-not-allowed" : ""}} text-sm `}
                 onClick={handleRequest}
               >
-                {requestLoading ? (
+                {assignDoctorMutation.isPending ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg
                       className="animate-spin h-4 w-4 text-white"

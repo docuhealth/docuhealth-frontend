@@ -6,17 +6,19 @@ import HosSubscriptionsProvider from "../../context/Hospital Context/Admin/HosSu
 import HosWardProvider from "../../context/Hospital Context/HosWardContext";
 
 const HospitalAdminProviders = ({ children }) => (
+  <HosWardProvider>
   <HosProfileProvider>
     <HosAdmittedPatientMGTProvider>
       <HosStaffsProvider>
         <HosAppointmentsProvider>
-          <HosSubscriptionsProvider>
-            <HosWardProvider>{children}</HosWardProvider>
+          <HosSubscriptionsProvider>        
+              {children}
           </HosSubscriptionsProvider>
         </HosAppointmentsProvider>
       </HosStaffsProvider>
     </HosAdmittedPatientMGTProvider>
   </HosProfileProvider>
+  </HosWardProvider>
 );
 
 export default HospitalAdminProviders;

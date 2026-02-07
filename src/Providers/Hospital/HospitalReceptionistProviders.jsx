@@ -8,21 +8,21 @@ import HosWardProvider from "../../context/Hospital Context/HosWardContext";
 import HosStaffsProvider from "../../context/Hospital Context/HosStaffsContext";
 
 const HospitalReceptionistProviders = ({ children }) => (
-  <ReceptionistProfileProvider>
-    <ReceptionistAdmissionRequestProvider>
-        <ReceptionistAppointmentsListProvider>
-          <ReceptionistRecentPatientsProvider>
-            <ReceptionistAdmittedPatientMGTProvider>
-              <HosWardProvider>
-                <HosStaffsProvider>
-              {children}
-              </HosStaffsProvider>
-              </HosWardProvider>
-            </ReceptionistAdmittedPatientMGTProvider>
-          </ReceptionistRecentPatientsProvider>
-        </ReceptionistAppointmentsListProvider>
-    </ReceptionistAdmissionRequestProvider>
-  </ReceptionistProfileProvider>
+  <HosWardProvider>
+    <HosStaffsProvider>
+      <ReceptionistProfileProvider>
+        <ReceptionistAdmissionRequestProvider>
+          <ReceptionistAppointmentsListProvider>
+            <ReceptionistRecentPatientsProvider>
+              <ReceptionistAdmittedPatientMGTProvider>
+                {children}
+              </ReceptionistAdmittedPatientMGTProvider>
+            </ReceptionistRecentPatientsProvider>
+          </ReceptionistAppointmentsListProvider>
+        </ReceptionistAdmissionRequestProvider>
+      </ReceptionistProfileProvider>
+    </HosStaffsProvider>
+  </HosWardProvider>
 );
 
 export default HospitalReceptionistProviders;

@@ -39,8 +39,8 @@ const ReceptionistAppointmentsListProvider = (props) => {
     currentPage,
     setCurrentPage,
     totalPages,
-    loading: isPending,    // Initial load spinner
-    isRefreshing: isFetching // Background refresh indicator
+    loading: isPending, 
+    isRefreshing: isFetching 
   };
 
   return (
