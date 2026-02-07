@@ -24,6 +24,7 @@ const HosStaffsProvider = (props) => {
     queryFn : fetchStaff,
     enabled : isUserLoggedIn,
     placeholderData : keepPreviousData,
+    staleTime: 1000 * 60 * 10,
   })
 
     useEffect(() => {

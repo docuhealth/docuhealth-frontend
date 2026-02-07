@@ -9,101 +9,54 @@ import {
   formatFullDateTime,
   getAge,
 } from "../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
+import { useQuery } from "@tanstack/react-query";
 
 import { Image, FileText, Eye, ArrowDownToLine } from "lucide-react";
 
 const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
-  const [patientFullInfo, setPatientFullInfo] = useState(null);
-  const [patientMedRecords, setPatientMedRecords] = useState(null);
-  const [patientSoapNotes, setPatientSoapNotes] = useState(null);
-
-  const [count, setCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-
-  const [soapCount, setSoapCount] = useState(0);
-  const [soapCurrentPage, setSoapCurrentPage] = useState(1);
-  const [soapTotalPages, setSoapTotalPages] = useState(1);
-
+  const hin = selectedPatientDetails?.patient?.hin;
   const pageSize = 6;
 
-  const [loading, setLoading] = useState(false);
-  const [medloading, setMedLoading] = useState(false);
-
-  const [soapNotesLoading, setSoapNotesLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [soapCurrentPage, setSoapCurrentPage] = useState(1);
 
   const [viewDetailMedicalRecord, setViewDetailMedicalRecord] = useState(false);
   const [selectedMedicalRecord, setSelectedMedicalRecord] = useState(null);
 
-  const fetchPatientInfo = async () => {
-    try {
-      setLoading(true);
+  const { data: patientFullInfo, isLoading: loadingInfo } = useQuery({
+    queryKey: ["patient-info", hin],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get(`api/doctors/patient/info/${hin}`);
+      return res.data;
+    },
+    enabled: !!hin,
+    onError: () => toast.error("Error fetching patient's details"),
+  });
+
+  const { data: medRecordsData, isLoading: medLoading } = useQuery({
+    queryKey: ["patient-med-records", hin, currentPage],
+    queryFn: async () => {
       const res = await axiosInstanceHos.get(
-        `api/doctors/patient/info/${selectedPatientDetails.patient.hin}`,
+        `api/doctors/patient/records/${hin}?page=${currentPage}&size=${pageSize}`,
       );
+      return res.data;
+    },
+    enabled: !!hin,
+    keepPreviousData: true,
+  });
 
-      console.log(res.data);
-      setPatientFullInfo(res.data);
-    } catch (err) {
-      console.error("Error fetching patient's details", err);
-      toast.error("Error fetching patient's details");
-    } finally {
-      setLoading(false);
-    }
-  };
-  const fetchPatientMedRecords = async (page = 1) => {
-    try {
-      setMedLoading(true);
+  const { data: soapNotesData, isLoading: soapLoading } = useQuery({
+    queryKey: ["patient-soap-notes", hin, soapCurrentPage],
+    queryFn: async () => {
       const res = await axiosInstanceHos.get(
-        `api/doctors/patient/records/${selectedPatientDetails.patient.hin}?page=${page}&size=${pageSize}`,
+        `api/medical-records/soap-note/${hin}?page=${soapCurrentPage}&size=${pageSize}`,
       );
+      return res.data;
+    },
+    enabled: !!hin,
+  });
 
-      console.log(res.data);
-      setPatientMedRecords(res.data.results || []);
-      setCount(res.data.count || 0);
-      setCurrentPage(page);
-      setTotalPages(Math.ceil(res.data.count / pageSize));
-    } catch (err) {
-      console.error("Error fetching patient's medical records", err);
-      toast.error("Error fetching patient's medical records");
-    } finally {
-      setMedLoading(false);
-    }
-  };
-
-  const fetchPatientSoapNotes = async (page = 1) => {
-    try {
-      setSoapNotesLoading(true);
-      const res = await axiosInstanceHos.get(
-        `api/medical-records/soap-note/${selectedPatientDetails.patient.hin}?page=${page}&size=${pageSize}`,
-      );
-      console.log(res.data);
-      setPatientSoapNotes(res.data.results || []);
-      setSoapCount(res.data.count || 0);
-      setSoapCurrentPage(page);
-      setSoapTotalPages(Math.ceil(res.data.count / pageSize));
-    } catch (err) {
-      console.error("Error fetching patient's soap notes", err);
-      toast.error("Error fetching patient's soap notes");
-    } finally {
-      setSoapNotesLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchPatientInfo();
-    fetchPatientMedRecords(1);
-    fetchPatientSoapNotes(1);
-  }, []);
-
-  
-  useEffect(() => {
-    if (viewDetailMedicalRecord) {
-      console.log("Selected Medical Record:", selectedMedicalRecord);
-    }
-  }, [viewDetailMedicalRecord, selectedMedicalRecord]);
-
-  if (loading) {
+  if (loadingInfo) {
     return (
       <div className="flex justify-center items-center h-full text-sm pt-10">
         Loading...
@@ -625,22 +578,33 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
             <div>
               <TabComponent
                 tabs={getTabs({
-                  patientMedRecords,
-                  medloading,
-                  patientSoapNotes,
-                  soapNotesLoading,
-
+                 
+                  medloading: medLoading,
+                  soapNotesLoading: soapLoading,
+                  patientMedRecords: medRecordsData?.results || [],
+                  patientSoapNotes: soapNotesData?.results || [],
                   patientFullInfo,
-                  count,
+
+                  
+                  count: medRecordsData?.count || 0,
                   currentPage,
-                  totalPages,
-                  fetchPatientMedRecords,
-                  setSelectedMedicalRecord, // first
-                  setViewDetailMedicalRecord, // second
-                  soapCount,
+                  totalPages: Math.ceil(
+                    (medRecordsData?.count || 0) / pageSize,
+                  ),
+                  
+                  setCurrentPage,
+
+                 
+                  soapCount: soapNotesData?.count || 0,
                   soapCurrentPage,
-                  soapTotalPages,
-                  fetchPatientSoapNotes,
+                  soapTotalPages: Math.ceil(
+                    (soapNotesData?.count || 0) / pageSize,
+                  ),
+               
+                  setSoapCurrentPage,
+
+                  setSelectedMedicalRecord,
+                  setViewDetailMedicalRecord,
                 })}
               />
             </div>

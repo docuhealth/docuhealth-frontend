@@ -1,12 +1,21 @@
 import React, { useState } from "react";
 import Pagination from "../../../../Patient_Dashboard_Components/Pagination/Pagination";
+import Pagination2 from "../../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import {
   formatFullDateTime,
   getAge,
 } from "../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { truncateWords } from "../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
-import { CalendarIcon, User, UserIcon, Image, FileText, Eye, ArrowDownToLine } from "lucide-react";
+import {
+  CalendarIcon,
+  User,
+  UserIcon,
+  Image,
+  FileText,
+  Eye,
+  ArrowDownToLine,
+} from "lucide-react";
 import {
   formatFullDate,
   formatTime,
@@ -323,7 +332,7 @@ const PatientMedicalRecord = ({
   count,
   currentPage,
   totalPages,
-  fetchPatientMedRecords,
+  setCurrentPage,
   setSelectedMedicalRecord,
   setViewDetailMedicalRecord,
   medloading,
@@ -532,11 +541,11 @@ const PatientMedicalRecord = ({
             ))}
           </div>
 
-          <Pagination
+          <Pagination2
             count={count}
             currentPage={currentPage}
             totalPages={totalPages}
-            fetchData={fetchPatientMedRecords}
+            setCurrentPage={setCurrentPage}
           />
         </>
       ) : (
@@ -552,7 +561,7 @@ const PatientSOAPNotes = ({
   soapCount,
   soapCurrentPage,
   soapTotalPages,
-  fetchPatientSoapNotes,
+  setSoapCurrentPage
 }) => {
   console.log(patientSoapNotes);
 
@@ -1133,8 +1142,8 @@ const PatientSOAPNotes = ({
               Uploaded Documents / Images
             </p>
             <div>
-              {selectedPatientDetails?.investigations_docs?.length > 0 ? (
-                selectedPatientDetails.investigations_docs.map(
+              {selectedPatientDetails?.investigation_docs?.length > 0 ? (
+                selectedPatientDetails.investigation_docs.map(
                   (attachment, index) => {
                     // Correctly mapping your payload fields
                     const fileName =
@@ -1366,7 +1375,7 @@ const PatientSOAPNotes = ({
                               className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
                                 setSeePatientDetails(true);
-                                setOpenPopover(null)
+                                setOpenPopover(null);
                               }}
                             >
                               See full SOAP Note
@@ -1470,11 +1479,11 @@ const PatientSOAPNotes = ({
                 ))}
               </div>
 
-              <Pagination
+              <Pagination2
                 count={soapCount}
                 currentPage={soapCurrentPage}
                 totalPages={soapTotalPages}
-                fetchData={fetchPatientSoapNotes}
+                setCurrentPage = {setSoapCurrentPage}
               />
             </>
           ) : (
@@ -1494,14 +1503,14 @@ const getTabs = ({
   count,
   currentPage,
   totalPages,
-  fetchPatientMedRecords,
-  setSelectedMedicalRecord, // first
-  setViewDetailMedicalRecord, // second
+  setCurrentPage, // Use the setter here
+  setSelectedMedicalRecord,
+  setViewDetailMedicalRecord,
   patientSoapNotes,
   soapCount,
   soapCurrentPage,
   soapTotalPages,
-  fetchPatientSoapNotes,
+  setSoapCurrentPage,
 }) => [
   {
     title: "Patient Info",
@@ -1511,12 +1520,12 @@ const getTabs = ({
     title: "Med Records",
     content: (
       <PatientMedicalRecord
-        medloading={medloading}
+    medloading={medloading}
         patientMedRecords={patientMedRecords}
         count={count}
         currentPage={currentPage}
         totalPages={totalPages}
-        fetchPatientMedRecords={fetchPatientMedRecords}
+        setCurrentPage={setCurrentPage} 
         setSelectedMedicalRecord={setSelectedMedicalRecord}
         setViewDetailMedicalRecord={setViewDetailMedicalRecord}
       />
@@ -1525,13 +1534,13 @@ const getTabs = ({
   {
     title: "SOAP Notes",
     content: (
-      <PatientSOAPNotes
+<PatientSOAPNotes
         soapNotesLoading={soapNotesLoading}
         patientSoapNotes={patientSoapNotes}
         soapCount={soapCount}
         soapCurrentPage={soapCurrentPage}
         soapTotalPages={soapTotalPages}
-        fetchPatientSoapNotes={fetchPatientSoapNotes}
+        setSoapCurrentPage={setSoapCurrentPage} 
       />
     ),
   },

@@ -12,6 +12,7 @@ const ReceptionistProfileProvider = (props) => {
     queryKey: ["receptionist-profile"],
     queryFn: fetchReceptionistProfile,
     enabled: isUserLoggedIn,
+    staleTime: 1000 * 60 * 30, 
   });
 
       return(

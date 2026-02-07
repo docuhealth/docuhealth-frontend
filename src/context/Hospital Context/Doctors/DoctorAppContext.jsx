@@ -1,63 +1,36 @@
-import React, { useEffect, useState } from "react";
-import { createContext } from "react";
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import React, { createContext } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchDoctorProfile, fetchDocuHealthHospitals } from "../../../queries/Hospital/doctor/profile"; 
 import { getHospitalToken } from "../../../services/authService";
 
 export const DoctorAppContext = createContext();
 
-const DoctorProfileProvider = (props) => {
-  const [profile, setProfile] = useState(null);
-  const [hospitals, setHospitals] = useState([]);
-  const [wards, setWards] = useState([]);
+const DoctorProfileProvider = ({ children }) => {
   const isUserLoggedIn = !!getHospitalToken();
 
-  useEffect(() => {
-    if (isUserLoggedIn) {
-      const fetchProfile = async () => {
-        try {
-          const res = await axiosInstanceHos.get("api/doctors/dashboard");
-          setProfile(res.data.doctor);
-        } catch (err) {
-          console.error("Error fetching profile:", err);
-        }
-      };
-      fetchProfile();
 
-      const fetchDocuHealthHospitals = async (page = 1, pageSize = 100) => {
-        try {
-          const res = await axiosInstanceHos.get(
-            `api/hospitals/hospitals?page=${page}&size=${pageSize}`
-          );
-          console.log("docuhealth hospitals ", res);
-          setHospitals(res.data.results);
-        } catch (err) {
-          console.error("Error fetching profile:", err);
-        }
-      };
-      fetchDocuHealthHospitals();
+  const { data: profile } = useQuery({
+    queryKey: ["doctor-profile"],
+    queryFn: fetchDoctorProfile,
+    enabled: isUserLoggedIn, 
+    staleTime: 1000 * 60 * 30, 
+  });
 
-      const fetchWards = async (page = 1, pageSize = 10) => {
-        try {
-          const res = await axiosInstanceHos.get(
-            `api/hospitals/wards?page=${page}&size=${pageSize}`
-          );
-          console.log("wards ", res);
-          setWards(res.data.results);
-        } catch (err) {
-          console.error("Error fetching wards:", err);
-          toast.error("Error fetching wards");
-        }
-      };
 
-      fetchWards(1);
-    } else {
-      return;
-    }
-  }, [isUserLoggedIn]);
+  const { data: hospitals } = useQuery({
+    queryKey: ["docuhealth-hospitals-list"],
+    queryFn: fetchDocuHealthHospitals,
+    enabled: isUserLoggedIn,
+    placeholderData: [], 
+  });
 
   return (
-    <DoctorAppContext.Provider value={{ profile, hospitals, wards }}>
-      {props.children}
+    <DoctorAppContext.Provider value={{ 
+      profile: profile || null, 
+      hospitals: hospitals || [],
+      isLoading: !profile && isUserLoggedIn 
+    }}>
+      {children}
     </DoctorAppContext.Provider>
   );
 };

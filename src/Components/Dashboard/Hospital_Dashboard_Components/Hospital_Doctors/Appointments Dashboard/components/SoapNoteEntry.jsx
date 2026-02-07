@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
-import { ArrowLeft, X, Plus, UploadCloud, FileText  } from "lucide-react";
+import { ArrowLeft, X, Plus, UploadCloud, FileText } from "lucide-react";
 import { truncateWords } from "../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import toast from "react-hot-toast";
 import { DoctorAppContext } from "../../../../../../context/Hospital Context/Doctors/DoctorAppContext";
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const NoteSection = ({
   title,
@@ -76,7 +77,9 @@ const NoteSection = ({
 );
 
 const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
-  const {profile, hospitals } = useContext(DoctorAppContext);
+  const { profile, hospitals } = useContext(DoctorAppContext);
+
+  const queryClient = useQueryClient();
 
   const [step, setStep] = useState(1);
 
@@ -143,8 +146,6 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
   const [selectedTime, setSelectedTime] = useState("08:00");
 
   const [note, setNote] = useState("Nil");
-
-  const [loading, setLoading] = useState(false);
 
   const [confirmationModal, setConfirmationModal] = useState(false);
 
@@ -242,34 +243,74 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
     setStep((prev) => prev + 1);
   };
 
-  const [selectedPatientFetchedInfo, setSelectedPatientFetchedInfo] =
-    useState("");
+  const { data: selectedPatientFetchedInfo, isLoading } = useQuery({
+    queryKey: ["patient-details-soap", selectedPatientDetails.patient.hin],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get(
+            `api/doctors/patient/info/${selectedPatientDetails.patient.hin}`,
+      );
+      return res.data;
+    },
+    enabled : !!selectedPatientDetails.patient.hin,
+    keeepPreviousData : true
+  });
 
-  useEffect(() => {
-    const fetchSelectedPatientInfo = async () => {
-      if (!selectedPatientDetails.patient.hin) return;
 
-      // setLoading(true);
-      try {
-        const res = await axiosInstanceHos.get(
-          `api/doctors/patient/info/${selectedPatientDetails.patient.hin}`,
-        );
-        console.log(res.data);
-        setSelectedPatientFetchedInfo(res.data);
-      } catch (err) {
-        console.error("Error fetching patient info:", err);
-        toast.error("Failed to load patient information");
-      } finally {
-        // setLoading(false);
-      }
-    };
+  const { mutate, isPending } = useMutation({
+    mutationFn: (formData) =>
+      axiosInstanceHos.post("api/medical-records/soap-note", formData),
+    onSuccess: () => {
+      toast.success("SOAP Note created successfully !");
+      setSoapNoteEntry(false);
+      queryClient.invalidateQueries({
+        queryKey: ["patient-med-records", selectedPatientDetails.patient.hin],
+        queryKey: ["patient-soap-notes", selectedPatientDetails.patient.hin],
+      });
 
-    fetchSelectedPatientInfo();
-  }, [selectedPatientDetails]);
+      setStep(1);
+      setSoapNoteEntry(false);
+      setSoapNoteData({
+        chief_complaint: "",
+        history_of_presenting_complain: "",
+        past_med_history: "",
+        family_history: "",
+        social_history: "",
+        other_history: "",
+        review_of_system: "",
+        primary_diagnosis: "",
+        differential_diagnosis: "",
+        patient_education: "",
+        referred_docuhealth_hosp: "",
+        referred_hosp: "",
+        drug_history_allergies: [],
+        general_exam: [],
+        systemic_exam: [],
+        besides_tests: [],
+        investigations: [],
+        problems_list: [],
+        treatment_plan: [],
+        care_instructions: [],
+      });
+      setInputs({
+        drug_history_allergies: "",
+        general_exam: "",
+        systemic_exam: "",
+        besides_tests: "",
+        investigations: "",
+        problems_list: "",
+        treatment_plan: "",
+        care_instructions: "",
+      });
+    },
+    onError: (error) => {
+      console.error("Upload error:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to upload soap note",
+      );
+    },
+  });
 
   const handleSubmit = async () => {
-    setLoading(true);
-
     if (
       soapNoteData.care_instructions.length === 0 ||
       soapNoteData.treatment_plan.length === 0
@@ -278,7 +319,6 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       setLoading(false);
       return;
     }
-
     const drugRecords = medications.map((med) => ({
       name: med.drug,
       route: med.route,
@@ -326,7 +366,6 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       treatment_plan: soapNoteData.treatment_plan,
       patient_education: soapNoteData.patient_education,
     };
-
 
     const formData = new FormData();
 
@@ -390,54 +429,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       formData.append("investigation_docs", fileObj.file);
     });
 
-    try {
-      const res = await axiosInstanceHos.post(
-        "api/medical-records/soap-note",
-        formData,
-      );
-      console.log(res);
-      toast.success("SOAP Note created successfully !");
-      setSoapNoteEntry(false);
-    } catch (err) {
-      console.error("Error uploading SOAP Note:", err);
-      toast.error("Error uploading SOAP Note");
-    } finally {
-      setLoading(false);
-      setStep(1);
-      setSoapNoteEntry(false);
-      setSoapNoteData({
-        chief_complaint: "",
-        history_of_presenting_complain: "",
-        past_med_history: "",
-        family_history: "",
-        social_history: "",
-        other_history: "",
-        review_of_system: "",
-        primary_diagnosis: "",
-        differential_diagnosis: "",
-        patient_education: "",
-        referred_docuhealth_hosp: "",
-        referred_hosp: "",
-        drug_history_allergies: [],
-        general_exam: [],
-        systemic_exam: [],
-        besides_tests: [],
-        investigations: [],
-        problems_list: [],
-        treatment_plan: [],
-        care_instructions: [],
-      });
-      setInputs({
-        drug_history_allergies: "",
-        general_exam: "",
-        systemic_exam: "",
-        besides_tests: "",
-        investigations: "",
-        problems_list: "",
-        treatment_plan: "",
-        care_instructions: "",
-      });
-    }
+    mutate(formData);
   };
 
   return (
@@ -810,11 +802,11 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
             <div className="flex flex-col sm:flex-row items-center lg:justify-end cursor-pointer gap-4 mt-5 sm:mt-0">
               <button
                 className={`py-2 ${
-                  loading
+                  isPending
                     ? "border border-gray-400 text-gray-400 cursor-not-allowed"
                     : "text-[#3E4095] border border-[#3E4095] "
                 } rounded-full text-sm px-16 sm:mt-5 w-full lg:w-auto`}
-                disabled={loading}
+                disabled={isPending}
                 onClick={() => {
                   setStep(step - 1);
                 }}
@@ -878,11 +870,11 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
             <div className="flex flex-col sm:flex-row items-center lg:justify-end cursor-pointer gap-4 mt-5 sm:mt-0">
               <button
                 className={`py-2 ${
-                  loading
+                  isPending
                     ? "border border-gray-400 text-gray-400 cursor-not-allowed"
                     : "text-[#3E4095] border border-[#3E4095] "
                 } rounded-full text-sm px-16 sm:mt-5 w-full lg:w-auto`}
-                disabled={loading}
+                disabled={isPending}
                 onClick={() => {
                   setStep(step - 1);
                 }}
@@ -1335,11 +1327,11 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
             <div className="flex flex-col sm:flex-row items-center lg:justify-end cursor-pointer gap-4 mt-5 sm:mt-0">
               <button
                 className={`py-2 ${
-                  loading
+                  isPending
                     ? "border border-gray-400 text-gray-400 cursor-not-allowed"
                     : "text-[#3E4095] border border-[#3E4095] "
                 } rounded-full text-sm px-16 sm:mt-5 w-full lg:w-auto`}
-                disabled={loading}
+                disabled={isPending}
                 onClick={() => {
                   setStep(step - 1);
                 }}
@@ -1347,9 +1339,9 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
                 Previous
               </button>
               <button
-                disabled={loading}
+                disabled={isPending}
                 className={`py-2.5  rounded-full text-sm px-20 sm:mt-5 text-white lg:w-auto w-full ${
-                  loading
+                  isPending
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-[#3E4095] cursor-pointer"
                 }`}
@@ -1357,7 +1349,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
                   setConfirmationModal(true);
                 }}
               >
-                {loading ? (
+                {isPending ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     Uploading...

@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DoctorAppContext } from "../../../../../../context/Hospital Context/Doctors/DoctorAppContext";
+import { HosWardContext } from "../../../../../../context/Hospital Context/HosWardContext";
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import { toast } from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
 
 const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
-  const { profile, wards } = useContext(DoctorAppContext);
+  const { profile } = useContext(DoctorAppContext);
+  const { wards } = useContext(HosWardContext);
 
   const [wardOptions, setWardOptions] = useState([]);
   const [availableBeds, setAvailableBeds] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     ward: "",
@@ -41,23 +43,27 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
     }
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      const res = await axiosInstanceHos.post("api/doctors/admissions/request", form);
-
-      console.log(res)
+    const { mutate, isPending } = useMutation({
+    mutationFn: (post) => {
+      return axiosInstanceHos.post("api/doctors/admissions/request", form);;
+    },
+    onSuccess: () => {
       toast.success("Admission request successful");
-      setLoading(false);
       setRequestAdmission(false);
-    } catch (err) {
-      console.error("Error submitting admission request:", err);
-      toast.error("Error submitting admission request");
-      setLoading(false);
-    } finally {
-      setLoading(false);
-      setRequestAdmission(false);
-    }
+    },
+    onError: (err) => {
+      console.error(
+        "Error assigning patient to nurse for vitals checkup:",
+        err,
+      );
+      toast.error(
+        err.response?.data?.message || "Error submitting admission request.",
+      );
+    },
+  });
+
+  const handleSubmit = async () => {
+    mutate(form)
   };
 
   return (
@@ -112,15 +118,15 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
           )}
 
           <button className={`py-2  text-white  ${
-                  loading
+                  isPending
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-[#3E4095] cursor-pointer"
                 } rounded-full mt-4  w-full`} 
-          disabled={loading || !form.ward || !form.bed}
+          disabled={isPending || !form.ward || !form.bed}
           onClick={()=> {
             handleSubmit()
           }}>
-               {loading ? (
+               {isPending ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     Requesting admission...

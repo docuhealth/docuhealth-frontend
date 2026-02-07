@@ -98,40 +98,6 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
         },
     ];
 
-
-    //     if (!selected) {
-    //         toast.error("Please select a personnel type.");
-    //         return;
-    //     }
-
-    //     setLoading(true);
-
-    //     try {
-    //         const res = await axiosInstanceHos.get(
-    //             `api/receptionists/staff/${selected.toLowerCase()}`
-    //         );
-
-    //         const data = res.data;
-
-    //         console.log(res.data)
-    //         // Check if empty
-    //         if (!data || data.length === 0) {
-    //             toast.error(`No ${selected} currently available.`);
-    //             setLoading(false);
-    //             return;
-    //         }
-
-    //         // Store the data
-    //         setStaffList(data);
-    //         setIsStaffSelectedRole(selected.toLowerCase());
-    //         toast.success(`${selected} fetched successfully.`);
-    //     } catch (err) {
-    //         console.error("Error fetching medical personnel:", err);
-    //         toast.error(err.response?.data?.message || "Error fetching medical personnel.");
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
     const handleAssign = (staffId) => {
    
         setIsStaffSelected(true); // show next card

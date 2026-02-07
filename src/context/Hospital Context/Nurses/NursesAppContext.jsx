@@ -15,6 +15,7 @@ const NursesProfileProvider = (props) => {
         queryKey: ["nurse-profile"],
         queryFn: fetchNurseProfile,
         enabled: isUserLoggedIn,
+        staleTime: 1000 * 60 * 30, 
       });
 
       const profile = data?.nurse ;
