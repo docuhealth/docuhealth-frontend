@@ -5,6 +5,7 @@ import { getToken } from "../../services/authService";
 import toast from "react-hot-toast";
 import { fetchPatientProfile } from "../../queries/Patient/patientProfile";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { setSubscriptionStatus } from "../../services/authService";
 
 export const AppContext = createContext();
 
@@ -28,6 +29,7 @@ const ProfileProvider = (props) => {
 
   })
 
+  setSubscriptionStatus(profile?.is_subscribed)
 
   const toggleEmergencyMutation = useMutation({
     mutationFn: async () => {

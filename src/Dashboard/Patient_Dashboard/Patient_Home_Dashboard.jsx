@@ -8,6 +8,7 @@ import NoticeDisplay from "../../Components/Dashboard/Patient_Dashboard_Componen
 import MedicalRecords from "../../Components/Dashboard/Patient_Dashboard_Components/Home Dashboard/MedicalRecords";
 import MedicalRecordsDetail from "../../Components/Dashboard/Patient_Dashboard_Components/Home Dashboard/MedicalRecordsDetail";
 import Id_Card from "../../Components/Dashboard/Patient_Dashboard_Components/Home Dashboard/Components/Id Card/Id_Card";
+import { fetchSubscriptionStatus } from "../../services/authService";
 
 const Patient_Home_Dashboard = () => {
   const options = ["Latest", "Oldest", "A-Z", "Z-A"];
@@ -71,8 +72,9 @@ const Patient_Home_Dashboard = () => {
             >
               Sort by: {selected}
               <ChevronDown
-                className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""
-                  }`}
+                className={`w-4 h-4 transition-transform ${
+                  isOpen ? "rotate-180" : ""
+                }`}
               />
             </button>
             {isOpen && (
@@ -94,15 +96,17 @@ const Patient_Home_Dashboard = () => {
               className="flex items-center gap-2 px-6 py-2.5 bg-[#3E4095] text-white font-medium rounded-full transition cursor-pointer"
               onClick={() => {
                 if (profile) {
-                  handleSelection(profile)
+                  const is_subscribed = fetchSubscriptionStatus();
+                  if (!is_subscribed) {
+                    toast.error("Please subscribe to access feature");
+                    return;
+                  }
+                  handleSelection(profile);
                 } else {
-                  console.log(
-                    'no profile'
-                  )
-                  toast.error("We couldn't find a profile. Try again")
+                  console.log("no profile");
+                  toast.error("We couldn't find a profile. Try again");
                 }
               }}
-
             >
               Get Identity Card
             </button>
@@ -128,8 +132,9 @@ const Patient_Home_Dashboard = () => {
             >
               Sort by: {selected}
               <ChevronDown
-                className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""
-                  }`}
+                className={`w-4 h-4 transition-transform ${
+                  isOpen ? "rotate-180" : ""
+                }`}
               />
             </button>
             {isOpen && (
@@ -151,12 +156,10 @@ const Patient_Home_Dashboard = () => {
               className="flex justify-center items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition w-full cursor-pointer"
               onClick={() => {
                 if (profile) {
-                  handleSelection(profile)
+                  handleSelection(profile);
                 } else {
-                  console.log(
-                    'no profile'
-                  )
-                  toast.error("We couldn't find a profile. Try again")
+                  console.log("no profile");
+                  toast.error("We couldn't find a profile. Try again");
                 }
               }}
             >

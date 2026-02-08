@@ -1,53 +1,42 @@
-import React, { useContext } from "react";
-import { HosSubscriptionsContext } from '../../../../../context/Hospital Context/Admin/HosSubscriptionsContext'
+import React, { useState, useContext } from "react";
+import { HosSubscriptionsContext } from "../../../../../context/Hospital Context/Admin/HosSubscriptionsContext";
 import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 import toast from "react-hot-toast";
 
 const SubscriptionPlans = () => {
-      const { subscriptionPlans, loading } = useContext(HosSubscriptionsContext);
+  const { subscriptionPlans, loading } = useContext(HosSubscriptionsContext);
 
-      const handlePayment = async (planId) => {
-  toast.loading("Initializing payment...");
+  const [paymentUrl, setPaymentUrl] = useState(null);
 
-  const payload = {
-    plan: planId,
+  const handlePayment = async (planId) => {
+    const loadingToast = toast.loading("Initializing payment...");
+
+    try {
+      const res = await axiosInstanceHos.post("api/subscriptions/subscribe", {
+        plan: planId,
+      });
+
+      const { authorization_url } = res.data;
+
+      if (authorization_url) {
+        toast.success("Opening checkout...", { id: loadingToast });
+        setPaymentUrl(authorization_url);
+      } else {
+        toast.error("Initialization failed. No payment link received.", {
+          id: loadingToast,
+        });
+      }
+    } catch (err) {
+      const errorMsg =
+        err.response?.data?.message || "Payment initialization failed.";
+      toast.error(errorMsg, { id: loadingToast });
+      console.error("Payment Error:", err);
+    }
   };
 
-  try {
-    const res = await axiosInstanceHos.post("api/subscriptions/subscribe", payload);
-    const data = res.data;
-
-    toast.dismiss(); // remove loading toast
-
-    if (data.authorization_url) {
-      toast.success("Redirecting to Paystack checkout...");
-      // redirect to Paystack payment page
-      setTimeout(() => {
-        window.open(data.authorization_url, "_blank"); // 👈 opens in new tab
-      }, 1200);
-    } else {
-      toast.error("Payment initialization failed. Please try again.");
-    }
-
-  } catch (err) {
-    toast.dismiss();
-    if (err.response) {
-      // server responded with an error
-      toast.error(
-        err.response.data?.message || "An error occurred while initializing payment."
-      );
-    } else if (err.request) {
-      toast.error("Network error. Please check your internet connection.");
-    } else {
-      toast.error("Unexpected error occurred.");
-    }
-    console.log(err);
-  }
-};
   return (
-      <>
+    <>
       <div className="bg-white my-5 border rounded-lg p-4 lg:p-6">
-
         {/* ===== Loading State ===== */}
         {loading ? (
           <div className="flex justify-center items-center ">
@@ -140,7 +129,7 @@ const SubscriptionPlans = () => {
                 </p>
                 <p className="text-[12px] text-gray-600 leading-4">
                   The basic plan is a free, interesting and complete plan. It
-                  has some features to get you started. 
+                  has some features to get you started.
                 </p>
               </div>
 
@@ -154,7 +143,7 @@ const SubscriptionPlans = () => {
                   "Add doctors and nurses under the hospital to team.",
                   "Identify patients using Health Identification Number (HIN).",
                   "Register a new Patient.",
-                  "View patient profile (medical summaries from other hospitals)."
+                  "View patient profile (medical summaries from other hospitals).",
                 ].map((feature, i) => (
                   <p key={i} className="flex items-center text-[12px]">
                     <i className="bx bx-check text-[#3E4095] text-xl mr-1"></i>
@@ -248,11 +237,36 @@ const SubscriptionPlans = () => {
             ))}
           </div>
         )}
-
-  
       </div>
-    </>
-  )
-}
+      {paymentUrl && (
+  <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 ">
+    <div className="bg-white w-full max-w-lg h-full rounded-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 ">
+      <button 
+        onClick={() => {
+           setPaymentUrl(null);
+        }}
+        className="absolute top-2 right-2 z-50 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
 
-export default SubscriptionPlans
+      {/* Payment Iframe */}
+      <div className="relative h-full  bg-gray-50">
+        <iframe
+          src={paymentUrl}
+          className="w-full h-full"
+          title="Payment Checkout"
+          allow="payment"
+        />
+      </div>
+
+    </div>
+  </div>
+)}
+    </>
+  );
+};
+
+export default SubscriptionPlans;

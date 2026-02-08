@@ -1,18 +1,16 @@
-import React, {useContext} from "react";
-import toast from 'react-hot-toast';
+import React, { useContext } from "react";
+import toast from "react-hot-toast";
 import { AppContext } from "../../../../../../context/Patient Context/AppContext";
+import { fetchSubscriptionStatus } from "../../../../../../services/authService";
 
 const NoticeDisplay = ({
   noticeDisplay,
   paymentStatus,
   closeNoticeMessage,
   setGenerateIDCardForm,
-  handleSelection
+  handleSelection,
 }) => {
-
-    const {profile} = useContext(AppContext);
-  
-
+  const { profile } = useContext(AppContext);
 
   const noticeMessage = [
     {
@@ -22,7 +20,6 @@ const NoticeDisplay = ({
       by: "DocuHealth (admin)",
     },
   ];
-
 
   return (
     <div>
@@ -56,26 +53,21 @@ const NoticeDisplay = ({
                 <div
                   className=" bg-[#3E4095]  text-center text-white rounded-full py-2 cursor-pointer"
                   onClick={() => {
-                    // if (paymentStatus) {
-                    //   closeNoticeMessage(); // Call the function properly
-                    //   setGenerateIDCardForm(true);
-                    //   return;
-                    // }else{
-                    //   toast.success('Kindly subscribe to a plan to access this feature')
-                    // }
-
-                    if(profile){
-                      closeNoticeMessage()
-                      handleSelection(profile)
-                    }else{
-                      console.log(
-                        'no profile'
-                      )
-                      toast.error("We couldn't find a profile. Try again")
+                    if (profile) {
+                      const is_subscribed = fetchSubscriptionStatus();
+                      if (!is_subscribed) {
+                        toast.error("Please subscribe to access feature");
+                        closeNoticeMessage();
+                        return;
+                      }
+                      closeNoticeMessage();
+                      handleSelection(profile);
+                    } else {
+                      console.log("no profile");
+                      toast.error("We couldn't find a profile. Try again");
                     }
-                    // 
-                    // 
-                
+                    //
+                    //
                   }}
                 >
                   <p className="text-sm">Get Identity Card</p>

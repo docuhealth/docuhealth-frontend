@@ -15,6 +15,7 @@ const HosProfileProvider = ({ children }) => {
     staleTime: 1000 * 60 * 30, 
   });
 
+  console.log(profile)
   return (
     <HosAppContext.Provider value={{ profile, loading: profileLoading }}>
       {children}

@@ -47,10 +47,17 @@ export async function login(userData) {
     withCredentials: true,
   });
   const data = response.data;
-
   return data;
 }
 
+export function setSubscriptionStatus(subscriptionStatus){
+  sessionStorage.setItem("is_subscribed", String(subscriptionStatus))
+}
+
+export function fetchSubscriptionStatus(){
+  const is_subscribed = sessionStorage.getItem("is_subscribed");
+  return is_subscribed === "true"; // convert back to boolean
+}
 // Refresh
 export async function refreshToken() {
   const savedToken = getToken();

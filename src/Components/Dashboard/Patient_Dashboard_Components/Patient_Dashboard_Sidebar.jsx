@@ -4,6 +4,7 @@ import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { fetchSubscriptionStatus } from "../../../services/authService";
 
 const Patient_Dashboard_Sidebar = () => {
   const { profile, toggleEmergencyStatus, newEmergencyStatus } =
@@ -32,10 +33,16 @@ const Patient_Dashboard_Sidebar = () => {
   }, [newEmergencyStatus]);
 
   const handleToggle = async () => {
+    const is_subscribed = fetchSubscriptionStatus()
     if (isLoading) {
       toast.error("Please wait, loading your profile...");
       return;
     }
+
+     if (!is_subscribed) {
+    toast.error("Please subscribe to access feature");
+    return;
+  }
 
     try {
       // Optimistic UI update
