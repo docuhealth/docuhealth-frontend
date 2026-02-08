@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useState, useContext } from "react";
 import { SubscriptionsContext } from "../../../../context/Patient Context/SubscriptionsContext";
 import axiosInstance from "../../../../utils/axiosInstance";
 import DynamicDate from "../../../Dynamic Date/DynamicDate";
@@ -7,43 +7,29 @@ import toast from "react-hot-toast";
 const SubscriptionPlans = () => {
   const { subscriptionPlans, isPending } = useContext(SubscriptionsContext);
 
-  // Payment handler (stub)
-const handlePayment = async (planId) => {
-  toast.loading("Initializing payment...");
+// Add this state to your component
+const [paymentUrl, setPaymentUrl] = useState(null);
 
-  const payload = {
-    plan: planId,
-  };
+const handlePayment = async (planId) => {
+  const loadingToast = toast.loading("Initializing payment...");
 
   try {
-    const res = await axiosInstance.post("api/subscriptions/subscribe", payload);
-    const data = res.data;
+    const res = await axiosInstance.post("api/subscriptions/subscribe", {
+      plan: planId,
+    });
+    
+    const { authorization_url } = res.data;
 
-    toast.dismiss(); // remove loading toast
-
-    if (data.authorization_url) {
-      toast.success("Redirecting to Paystack checkout...");
-      // redirect to Paystack payment page
-      setTimeout(() => {
-        window.open(data.authorization_url, "_blank"); // 👈 opens in new tab
-      }, 1200);
+    if (authorization_url) {
+      toast.success("Opening checkout...", { id: loadingToast });
+      setPaymentUrl(authorization_url);
     } else {
-      toast.error("Payment initialization failed. Please try again.");
+      toast.error("Initialization failed. No payment link received.", { id: loadingToast });
     }
-
   } catch (err) {
-    toast.dismiss();
-    if (err.response) {
-      // server responded with an error
-      toast.error(
-        err.response.data?.message || "An error occurred while initializing payment."
-      );
-    } else if (err.request) {
-      toast.error("Network error. Please check your internet connection.");
-    } else {
-      toast.error("Unexpected error occurred.");
-    }
-    console.log(err);
+    const errorMsg = err.response?.data?.message || "Payment initialization failed.";
+    toast.error(errorMsg, { id: loadingToast });
+    console.error("Payment Error:", err);
   }
 };
 
@@ -255,6 +241,34 @@ const handlePayment = async (planId) => {
 
   
       </div>
+      {/* Payment Modal Overlay */}
+{paymentUrl && (
+  <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 ">
+    <div className="bg-white w-full max-w-lg h-full rounded-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 ">
+      <button 
+        onClick={() => {
+           setPaymentUrl(null);
+        }}
+        className="absolute top-2 right-2 z-50 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      {/* Payment Iframe */}
+      <div className="relative h-full  bg-gray-50">
+        <iframe
+          src={paymentUrl}
+          className="w-full h-full"
+          title="Payment Checkout"
+          allow="payment"
+        />
+      </div>
+
+    </div>
+  </div>
+)}
     </>
   );
 };

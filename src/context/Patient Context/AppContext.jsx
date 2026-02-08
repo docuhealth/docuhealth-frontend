@@ -4,7 +4,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import { getToken } from "../../services/authService";
 import toast from "react-hot-toast";
 import { fetchPatientProfile } from "../../queries/Patient/patientProfile";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 
 export const AppContext = createContext();
 
@@ -16,14 +16,15 @@ const ProfileProvider = (props) => {
 
   const {
     data: profile,
-    isFetching,
+    isPending,
     isError,
     error
 
   } = useQuery({
     queryKey: ['patient-profile'],
     queryFn: fetchPatientProfile,
-    enabled : isUserLoggedIn
+    enabled : isUserLoggedIn,
+    placeholderData : keepPreviousData
 
   })
 
@@ -47,7 +48,7 @@ const ProfileProvider = (props) => {
     <AppContext.Provider
       value={{
         profile,
-        isFetching,
+        isPending,
         isError,
         toggleEmergencyStatus: toggleEmergencyMutation.mutate,
       }}

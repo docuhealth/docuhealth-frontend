@@ -6,12 +6,6 @@ import SubscriptionPlans from "../../Components/Dashboard/Patient_Dashboard_Comp
 
 const Patient_Subscriptions_Dashboard = () => {
 
-
-  // Payment handler (stub)
-  const handlePayment = (planId) => {
-    toast.success(`Selected plan: ${planId}`);
-  };
-
   return (
     <>
       <div className="py-2">

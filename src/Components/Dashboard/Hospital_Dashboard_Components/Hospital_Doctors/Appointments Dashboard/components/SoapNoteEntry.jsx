@@ -247,14 +247,13 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
     queryKey: ["patient-details-soap", selectedPatientDetails.patient.hin],
     queryFn: async () => {
       const res = await axiosInstanceHos.get(
-            `api/doctors/patient/info/${selectedPatientDetails.patient.hin}`,
+        `api/doctors/patient/info/${selectedPatientDetails.patient.hin}`,
       );
       return res.data;
     },
-    enabled : !!selectedPatientDetails.patient.hin,
-    keeepPreviousData : true
+    enabled: !!selectedPatientDetails.patient.hin,
+    keeepPreviousData: true,
   });
-
 
   const { mutate, isPending } = useMutation({
     mutationFn: (formData) =>
@@ -264,6 +263,8 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       setSoapNoteEntry(false);
       queryClient.invalidateQueries({
         queryKey: ["patient-med-records", selectedPatientDetails.patient.hin],
+      });
+      queryClient.invalidateQueries({
         queryKey: ["patient-soap-notes", selectedPatientDetails.patient.hin],
       });
 
@@ -316,7 +317,6 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       soapNoteData.treatment_plan.length === 0
     ) {
       toast.error("Care Instructions and Treatment Plan is required");
-      setLoading(false);
       return;
     }
     const drugRecords = medications.map((med) => ({
