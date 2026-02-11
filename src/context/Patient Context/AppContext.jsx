@@ -5,13 +5,16 @@ import { getToken } from "../../services/authService";
 import toast from "react-hot-toast";
 import { fetchPatientProfile } from "../../queries/Patient/patientProfile";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
-import { setSubscriptionStatus } from "../../services/authService";
+import { setSubscriptionStatus, fetchSubscriptionStatus } from "../../services/authService";
 
 export const AppContext = createContext();
 
 const ProfileProvider = (props) => {
   const isUserLoggedIn = !!getToken();
 
+  const [subscriptionStatus, setSubscriptionStatusState] = useState(
+  fetchSubscriptionStatus() // previous stored value
+);
 
   const queryClient = useQueryClient()
 
@@ -29,7 +32,13 @@ const ProfileProvider = (props) => {
 
   })
 
-  setSubscriptionStatus(profile?.is_subscribed)
+  useEffect(() => {
+  if (profile?.is_subscribed !== undefined) {
+    setSubscriptionStatus(profile.is_subscribed);
+    setSubscriptionStatusState(profile.is_subscribed); 
+  }
+}, [profile]);
+
 
   const toggleEmergencyMutation = useMutation({
     mutationFn: async () => {
