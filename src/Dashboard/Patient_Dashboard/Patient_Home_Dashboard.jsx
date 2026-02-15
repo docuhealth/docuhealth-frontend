@@ -33,15 +33,21 @@ const Patient_Home_Dashboard = () => {
     selectedProfile,
   } = useContext(IdCardContext);
 
-  useEffect(() => {
-    // Show notice immediately when the dashboard loads
-    setNoticeDisplay(true);
+useEffect(() => {
+    // 1. Delay the initial appearance by 3 seconds (3000ms)
+    const initialDelay = setTimeout(() => {
+      setNoticeDisplay(true);
+    }, 2000);
+
 
     const interval = setInterval(() => {
       setNoticeDisplay(true);
     }, 86400000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(initialDelay);
+      clearInterval(interval);
+    };
   }, []);
 
   const handleSelect = (option) => {

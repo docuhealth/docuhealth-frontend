@@ -5,9 +5,7 @@ import { fetchSubscriptionStatus } from "../../../../../../services/authService"
 
 const NoticeDisplay = ({
   noticeDisplay,
-  paymentStatus,
   closeNoticeMessage,
-  setGenerateIDCardForm,
   handleSelection,
 }) => {
   const { profile } = useContext(AppContext);
