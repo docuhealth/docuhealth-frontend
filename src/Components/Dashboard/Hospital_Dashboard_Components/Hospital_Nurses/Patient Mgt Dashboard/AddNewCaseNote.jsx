@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import axiosInstanceHos from '../../../../../utils/axiosInstanceHos';
 import toast from 'react-hot-toast'; // or your preferred toast library
@@ -13,7 +13,7 @@ const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInput
                 <div key={idx} className="bg-white border border-gray-200 rounded p-2 text-[12px] flex justify-between items-center">
                     <span>{item}</span>
                     <button type="button" className="text-red-500 font-bold ml-2 cursor-pointer" onClick={() => handleRemoveItem(field, idx)}>
-                        <X size={11}/>
+                        <X size={11} />
                     </button>
                 </div>
             ))}
@@ -48,8 +48,9 @@ const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInput
 const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
     const queryClient = useQueryClient();
 
+    const [isRestored, setIsRestored] = useState(false);
 
-    const [caseNoteData, setCaseNoteData] = useState({
+        const [caseNoteData, setCaseNoteData] = useState({
         observations: [],
         nursingCare: [],
         patientResponse: [],
@@ -66,6 +67,40 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
     });
 
     const [activeInput, setActiveInput] = useState(null);
+
+    useEffect(() => {
+        const hin = selected?.patient?.hin;
+        if (hin) {
+            const savedDraft = sessionStorage.getItem(`case_note_draft_${hin}`);
+            if (savedDraft) {
+                const data = JSON.parse(savedDraft);
+                if (data.caseNoteData) setCaseNoteData(data.caseNoteData);
+                if (data.inputs) setInputs(data.inputs);
+            }
+
+            setIsRestored(true);
+        }
+    }, [selected?.patient?.hin]);
+
+
+    useEffect(() => {
+        if (!isRestored) return;
+
+        const hin = selected?.patient?.hin;
+        if (hin) {
+            const draft = {
+                caseNoteData,
+                inputs
+            };
+            sessionStorage.setItem(`case_note_draft_${hin}`, JSON.stringify(draft));
+        }
+    }, [caseNoteData, inputs, isRestored, selected?.patient?.hin]);
+
+
+
+
+
+    
 
     const handleAddListItem = (field) => {
         if (!inputs[field].trim()) return;
@@ -84,14 +119,21 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
         }));
     };
 
-   const { mutate, isPending } = useMutation({
+    const { mutate, isPending } = useMutation({
         mutationFn: (payload) => axiosInstanceHos.post('/api/nurses/case-notes', payload),
         onSuccess: () => {
             toast.success("Case note uploaded successfully!");
-            
+
+            if (selected?.patient?.hin) {
+        sessionStorage.removeItem(`case_note_draft_${selected.patient.hin}`);
+    }
+
+
+    setIsRestored(false);
+
             // 2. Invalidate the specific patient's case notes list
-            queryClient.invalidateQueries({ 
-                queryKey: ["patient-case-notes", selected?.patient?.hin] 
+            queryClient.invalidateQueries({
+                queryKey: ["patient-case-notes", selected?.patient?.hin]
             });
 
             // 3. Reset and Close
@@ -129,6 +171,8 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
 
         mutate(filteredPayload);
     };
+
+ 
 
     return (
         <div className="bg-white my-5 border rounded-lg pt-5 lg:pt-8 px-4 lg:px-6  pb-8 text-sm ">

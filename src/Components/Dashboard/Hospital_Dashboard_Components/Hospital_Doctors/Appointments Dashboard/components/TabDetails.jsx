@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Pagination from "../../../../Patient_Dashboard_Components/Pagination/Pagination";
 import Pagination2 from "../../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import {
@@ -20,6 +19,7 @@ import {
   formatFullDate,
   formatTime,
 } from "../../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
+import toast from "react-hot-toast";
 
 const PatientInfo = ({ patientFullInfo }) => {
   console.log(patientFullInfo);
@@ -97,12 +97,12 @@ const PatientInfo = ({ patientFullInfo }) => {
               className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
               value={
                 patientFullInfo?.patient_info?.street +
-                  ", " +
-                  patientFullInfo?.patient_info?.city +
-                  ", " +
-                  patientFullInfo?.patient_info?.state +
-                  ", " +
-                  patientFullInfo?.patient_info?.country || "NIL"
+                ", " +
+                patientFullInfo?.patient_info?.city +
+                ", " +
+                patientFullInfo?.patient_info?.state +
+                ", " +
+                patientFullInfo?.patient_info?.country || "NIL"
               }
             />
           </div>
@@ -644,6 +644,9 @@ const PatientSOAPNotes = ({
   const [seePatientDetails, setSeePatientDetails] = useState(false);
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
+  const [createAdditionalNotes, setCreateAdditionalNotes] = useState(false);
+  const [noteDescription, setNoteDescription] = useState("");
+
   const [openPopover, setOpenPopover] = useState(null);
   const togglePopover = (index) => {
     setOpenPopover(openPopover === index ? null : index);
@@ -676,37 +679,45 @@ const PatientSOAPNotes = ({
               <h2 className=" text-sm">SOAP Note Overview</h2>
             </div>
             <div className=" flex flex-col sm:flex-row justify-end items-center gap-3 w-full sm:w-auto">
-              <div className="flex justify-center items-center gap-1 border border-[#3E4095] py-1.5 px-4 rounded-full w-full sm:w-auto text-[#3E4095]">
+              <div className="flex justify-center items-center gap-1 border border-[#3E4095] py-1.5 px-4 rounded-full w-full sm:w-auto text-[#3E4095] cursor-pointer" onClick={() => setCreateAdditionalNotes(true)}>
                 <svg
                   width="14"
                   height="14"
-                  viewBox="0 0 12 12"
+                  viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M8.5 1C8.77615 1 9 1.22386 9 1.5V3.5H10.5C10.7761 3.5 11 3.72386 11 4V9C11 9.27615 10.7761 9.5 10.5 9.5H9V10.5C9 10.7761 8.77615 11 8.5 11H3.5C3.22386 11 3 10.7761 3 10.5V9.5H1.5C1.22386 9.5 1 9.27615 1 9V4C1 3.72386 1.22386 3.5 1.5 3.5H3V1.5C3 1.22386 3.22386 1 3.5 1H8.5ZM8 8.5H4V10H8V8.5ZM10 4.5H2V8.5H3V8C3 7.72385 3.22386 7.5 3.5 7.5H8.5C8.77615 7.5 9 7.72385 9 8V8.5H10V4.5ZM4 5V6H2.5V5H4ZM8 2H4V3.5H8V2Z"
-                    fill="#3E4095"
+                    d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
+                    stroke="#3E4095"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                   />
-                </svg>
-
-                <p>Print summary</p>
-              </div>
-              <div className="flex justify-center items-center gap-1 border border-[#3E4095] py-1.5 px-4 rounded-full text-white bg-[#3E4095] w-full sm:w-auto">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 12 12"
-                  fill="#3E4095"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
                   <path
-                    d="M0.5 7.25C0.5 6.0858 1.11215 5.06455 2.03213 4.4906C2.28235 2.522 3.96343 1 6 1C8.03655 1 9.71765 2.522 9.96785 4.4906C10.8878 5.06455 11.5 6.0858 11.5 7.25C11.5 8.9608 10.1781 10.3629 8.5 10.4906L3.5 10.5C1.82189 10.3629 0.5 8.9608 0.5 7.25ZM8.42415 9.4934C9.59085 9.40465 10.5 8.42805 10.5 7.25C10.5 6.4635 10.0942 5.7481 9.43855 5.33905L9.0357 5.0877L8.97585 4.61669C8.78675 3.12902 7.5144 2 6 2C4.48558 2 3.21323 3.12902 3.02415 4.61669L2.96428 5.0877L2.56144 5.33905C1.90578 5.7481 1.5 6.4635 1.5 7.25C1.5 8.42805 2.40917 9.40465 3.57585 9.4934L3.6625 9.5H8.3375L8.42415 9.4934ZM6.5 6H8L6 8.5L4 6H5.5V4H6.5V6Z"
-                    fill="#FFF"
+                    d="M14 2V8H20"
+                    stroke="#3E4095"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M12 18V12"
+                    stroke="#3E4095"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M9 15H15"
+                    stroke="#3E4095"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                   />
                 </svg>
 
-                <p>Download PDF</p>
+                <p>Create additional notes</p>
               </div>
             </div>
           </div>
@@ -1085,8 +1096,8 @@ const PatientSOAPNotes = ({
                 {/* Logic to handle the character array in your payload */}
                 {Array.isArray(selectedPatientDetails?.drug_history_allergies)
                   ? selectedPatientDetails.drug_history_allergies
-                      .join("")
-                      .replace(/['\[\]]/g, "")
+                    .join("")
+                    .replace(/['\[\]]/g, "")
                   : "NIL"}
               </p>
             </div>
@@ -1229,8 +1240,8 @@ const PatientSOAPNotes = ({
                 <span className="font-medium text-gray-900">
                   {selectedPatientDetails?.appointment?.scheduled_time
                     ? formatFullDateTime(
-                        selectedPatientDetails.appointment.scheduled_time,
-                      )
+                      selectedPatientDetails.appointment.scheduled_time,
+                    )
                     : "NIL"}
                 </span>
               </p>
@@ -1254,15 +1265,14 @@ const PatientSOAPNotes = ({
               <div className="flex items-center gap-2">
                 <p className="text-[12px] text-gray-500">Referral Status:</p>
                 <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                    selectedPatientDetails?.referred_hosp ||
+                  className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${selectedPatientDetails?.referred_hosp ||
                     selectedPatientDetails?.referred_docuhealth_hosp
-                      ? "bg-green-100 text-green-700"
-                      : "bg-gray-100 text-gray-500"
-                  }`}
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-500"
+                    }`}
                 >
                   {selectedPatientDetails?.referred_hosp ||
-                  selectedPatientDetails?.referred_docuhealth_hosp
+                    selectedPatientDetails?.referred_docuhealth_hosp
                     ? "Active"
                     : "None"}
                 </span>
@@ -1483,12 +1493,64 @@ const PatientSOAPNotes = ({
                 count={soapCount}
                 currentPage={soapCurrentPage}
                 totalPages={soapTotalPages}
-                setCurrentPage = {setSoapCurrentPage}
+                setCurrentPage={setSoapCurrentPage}
               />
             </>
           ) : (
             <p className="text-center">No soap notes found.</p>
           )}
+        </>
+      )}
+
+      {createAdditionalNotes && (
+        <>
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 text-sm">
+            <div className="bg-white rounded-xs shadow-lg p-6 max-w-md w-full relative max-h-[80vh] overflow-y-auto mx-3">
+              <div className="flex justify-between items-center gap-2 pb-4">
+                <div className="flex justify-center items-center">
+                  <p className="font-medium text-sm">
+                    Create Additional Notes
+                  </p>
+                </div>
+                <div>
+                  <i
+                    class="bx bx-x text-xl cursor-pointer"
+                    onClick={() => {
+                      setCreateAdditionalNotes(false);
+                    }}
+                  ></i>
+                </div>
+              </div>
+              <div>
+  <label className="block text-[12px] font-medium text-gray-600 mb-1">
+    Note Description
+  </label>
+  <textarea
+    rows="5"
+    className="w-full p-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095] resize-none transition-all placeholder:text-gray-400"
+    placeholder="Enter patient observations, medical history updates, or specific care instructions..."
+    value={noteDescription} // Ensure you have this state defined
+    onChange={(e) => setNoteDescription(e.target.value)}
+  ></textarea>
+  
+  <div className="flex justify-end mt-1">
+    <p className="text-[10px] text-gray-400">
+      {noteDescription?.length || 0} characters
+    </p>
+  </div>
+
+  <button
+    className="w-full mt-4 bg-[#3E4095] text-white py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-colors"
+    onClick={() => {
+      toast.success("Work in Progress...");
+      setCreateAdditionalNotes(false);
+    }}
+  >
+    Save Note
+  </button>
+</div>
+            </div>
+          </div>
         </>
       )}
     </div>
@@ -1512,38 +1574,38 @@ const getTabs = ({
   soapTotalPages,
   setSoapCurrentPage,
 }) => [
-  {
-    title: "Patient Info",
-    content: <PatientInfo patientFullInfo={patientFullInfo} />,
-  },
-  {
-    title: "Med Records",
-    content: (
-      <PatientMedicalRecord
-    medloading={medloading}
-        patientMedRecords={patientMedRecords}
-        count={count}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        setCurrentPage={setCurrentPage} 
-        setSelectedMedicalRecord={setSelectedMedicalRecord}
-        setViewDetailMedicalRecord={setViewDetailMedicalRecord}
-      />
-    ),
-  },
-  {
-    title: "SOAP Notes",
-    content: (
-<PatientSOAPNotes
-        soapNotesLoading={soapNotesLoading}
-        patientSoapNotes={patientSoapNotes}
-        soapCount={soapCount}
-        soapCurrentPage={soapCurrentPage}
-        soapTotalPages={soapTotalPages}
-        setSoapCurrentPage={setSoapCurrentPage} 
-      />
-    ),
-  },
-];
+    {
+      title: "Patient Info",
+      content: <PatientInfo patientFullInfo={patientFullInfo} />,
+    },
+    {
+      title: "Med Records",
+      content: (
+        <PatientMedicalRecord
+          medloading={medloading}
+          patientMedRecords={patientMedRecords}
+          count={count}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+          setSelectedMedicalRecord={setSelectedMedicalRecord}
+          setViewDetailMedicalRecord={setViewDetailMedicalRecord}
+        />
+      ),
+    },
+    {
+      title: "SOAP Notes",
+      content: (
+        <PatientSOAPNotes
+          soapNotesLoading={soapNotesLoading}
+          patientSoapNotes={patientSoapNotes}
+          soapCount={soapCount}
+          soapCurrentPage={soapCurrentPage}
+          soapTotalPages={soapTotalPages}
+          setSoapCurrentPage={setSoapCurrentPage}
+        />
+      ),
+    },
+  ];
 
 export default getTabs;

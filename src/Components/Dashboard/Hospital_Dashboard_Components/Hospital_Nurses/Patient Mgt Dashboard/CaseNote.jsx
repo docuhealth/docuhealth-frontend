@@ -55,10 +55,7 @@ const [openMenuId, setOpenMenuId] = useState(null);
 
         <h2 className=" text-sm">Case Note History</h2>
       </div>
-      <div className="border rounded-md p-5 my-5">
-        <div className="border-b pb-3">
-          <h2 className="font-medium ">Case Notes</h2>
-        </div>
+      <div className=" my-5">
 
         {isLoading ? (
           <>

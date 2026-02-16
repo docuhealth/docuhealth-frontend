@@ -123,7 +123,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
 
   const [attachments, setAttachments] = useState([]);
 
-  // New handler for both click & drop
+
   const handleFiles = (files) => {
     const newFiles = files.map((file) => ({
       file,
@@ -260,6 +260,8 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       axiosInstanceHos.post("api/medical-records/soap-note", formData),
     onSuccess: () => {
       toast.success("SOAP Note created successfully !");
+
+      sessionStorage.removeItem(`soap_draft_${selectedPatientDetails.patient.hin}`);
       setSoapNoteEntry(false);
       queryClient.invalidateQueries({
         queryKey: ["patient-med-records", selectedPatientDetails.patient.hin],
@@ -431,6 +433,54 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
 
     mutate(formData);
   };
+
+  const [isRestored, setIsRestored] = useState(false);
+  // Automatically save changes as the doctor types
+useEffect(() => {
+
+  if (!isRestored) return;
+
+  const soapDraft = {
+    step,
+    medications,
+    soapNoteData,
+    selectedDay,
+    selectedMonth,
+    selectedYear,
+    selectedTime,
+    note,
+    inputs // Saving current input field text too
+  };
+  
+  if (selectedPatientDetails?.patient?.hin) {
+    sessionStorage.setItem(
+      `soap_draft_${selectedPatientDetails.patient.hin}`, 
+      JSON.stringify(soapDraft)
+    );
+  }
+}, [isRestored,step, medications, soapNoteData, selectedDay, selectedMonth, selectedYear, selectedTime, note, inputs, selectedPatientDetails.patient.hin]);
+
+
+useEffect(() => {
+  const hin = selectedPatientDetails?.patient?.hin;
+  if (hin) {
+    const savedDraft = sessionStorage.getItem(`soap_draft_${hin}`);
+    if (savedDraft) {
+      const data = JSON.parse(savedDraft);
+      
+      if (data.step) setStep(data.step);
+      if (data.medications) setMedications(data.medications);
+      if (data.soapNoteData) setSoapNoteData(data.soapNoteData);
+      if (data.selectedDay) setSelectedDay(data.selectedDay);
+      if (data.selectedMonth) setSelectedMonth(data.selectedMonth);
+      if (data.selectedYear) setSelectedYear(data.selectedYear);
+      if (data.selectedTime) setSelectedTime(data.selectedTime);
+      if (data.note) setNote(data.note);
+      if (data.inputs) setInputs(data.inputs);
+    }
+    setIsRestored(true);
+  }
+}, [selectedPatientDetails?.patient?.hin]);
 
   return (
     <>

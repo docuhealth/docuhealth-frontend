@@ -100,12 +100,12 @@ const PatientInfo = ({ patientFullInfo, selected }) => {
               className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
               value={
                 patientFullInfo?.patient_info?.street +
-                  ", " +
-                  patientFullInfo?.patient_info?.city +
-                  ", " +
-                  patientFullInfo?.patient_info?.state +
-                  ", " +
-                  patientFullInfo?.patient_info?.country || "NIL"
+                ", " +
+                patientFullInfo?.patient_info?.city +
+                ", " +
+                patientFullInfo?.patient_info?.state +
+                ", " +
+                patientFullInfo?.patient_info?.country || "NIL"
               }
             />
           </div>
@@ -399,7 +399,7 @@ const PatientMedicalRecord = ({
     );
   }
 
-  if (patientMedRecords.length === 0) {
+  if (!patientMedRecords || patientMedRecords.length === 0) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
@@ -1140,8 +1140,8 @@ const PatientSOAPNotes = ({
                 {/* Logic to handle the character array in your payload */}
                 {Array.isArray(selectedPatientDetails?.drug_history_allergies)
                   ? selectedPatientDetails.drug_history_allergies
-                      .join("")
-                      .replace(/['\[\]]/g, "")
+                    .join("")
+                    .replace(/['\[\]]/g, "")
                   : "NIL"}
               </p>
             </div>
@@ -1285,8 +1285,8 @@ const PatientSOAPNotes = ({
                 <span className="font-medium text-gray-900">
                   {selectedPatientDetails?.appointment?.scheduled_time
                     ? formatFullDateTime(
-                        selectedPatientDetails.appointment.scheduled_time,
-                      )
+                      selectedPatientDetails.appointment.scheduled_time,
+                    )
                     : "NIL"}
                 </span>
               </p>
@@ -1310,15 +1310,14 @@ const PatientSOAPNotes = ({
               <div className="flex items-center gap-2">
                 <p className="text-[12px] text-gray-500">Referral Status:</p>
                 <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                    selectedPatientDetails?.referred_hosp ||
-                    selectedPatientDetails?.referred_docuhealth_hosp
+                  className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${selectedPatientDetails?.referred_hosp ||
+                      selectedPatientDetails?.referred_docuhealth_hosp
                       ? "bg-green-100 text-green-700"
                       : "bg-gray-100 text-gray-500"
-                  }`}
+                    }`}
                 >
                   {selectedPatientDetails?.referred_hosp ||
-                  selectedPatientDetails?.referred_docuhealth_hosp
+                    selectedPatientDetails?.referred_docuhealth_hosp
                     ? "Active"
                     : "None"}
                 </span>
@@ -1337,21 +1336,21 @@ const PatientSOAPNotes = ({
         </div>
       ) : (
         <>
-        {
-          !selected.discharge_date && (
-     <div className="flex justify-end">
-                       <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto"
-              onClick={()=> {
-                setSoapNoteEntry(true)
-                setAdvanceCheckUp(false)
-              }}
-              >
-                Create new SOAP Note
-              </button>
-        </div>
-          )
-        }
-   
+          {
+            !selected.discharge_date && (
+              <div className="flex justify-end">
+                <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto"
+                  onClick={() => {
+                    setSoapNoteEntry(true)
+                    setAdvanceCheckUp(false)
+                  }}
+                >
+                  Create new SOAP Note
+                </button>
+              </div>
+            )
+          }
+
 
           {Array.isArray(patientSoapNotes) && patientSoapNotes.length > 0 ? (
             <>
@@ -1587,43 +1586,43 @@ const getTabs = ({
   setSoapNoteEntry,
   setAdvanceCheckUp
 }) => [
-  {
-    title: "Patient Info",
-    content: (
-      <PatientInfo patientFullInfo={patientFullInfo} selected={selected} />
-    ),
-  },
-  {
-    title: "Med Records",
-    content: (
-      <PatientMedicalRecord
-        medloading={medloading}
-        patientMedRecords={patientMedRecords}
-        count={count}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        fetchPatientMedRecords={fetchPatientMedRecords}
-        setSelectedMedicalRecord={setSelectedMedicalRecord}
-        setViewDetailMedicalRecord={setViewDetailMedicalRecord}
-      />
-    ),
-  },
-  {
-    title: "SOAP Notes",
-    content: (
-      <PatientSOAPNotes
-      setSoapNoteEntry = {setSoapNoteEntry}
-        soapNotesLoading={soapNotesLoading}
-        patientSoapNotes={patientSoapNotes}
-        soapCount={soapCount}
-        soapCurrentPage={soapCurrentPage}
-        soapTotalPages={soapTotalPages}
-        fetchPatientSoapNotes={fetchPatientSoapNotes}
-        setAdvanceCheckUp = {setAdvanceCheckUp}
-        selected = {selected}
-      />
-    ),
-  },
-];
+    {
+      title: "Patient Info",
+      content: (
+        <PatientInfo patientFullInfo={patientFullInfo} selected={selected} />
+      ),
+    },
+    {
+      title: "Med Records",
+      content: (
+        <PatientMedicalRecord
+          medloading={medloading}
+          patientMedRecords={patientMedRecords}
+          count={count}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          fetchPatientMedRecords={fetchPatientMedRecords}
+          setSelectedMedicalRecord={setSelectedMedicalRecord}
+          setViewDetailMedicalRecord={setViewDetailMedicalRecord}
+        />
+      ),
+    },
+    {
+      title: "SOAP Notes",
+      content: (
+        <PatientSOAPNotes
+          setSoapNoteEntry={setSoapNoteEntry}
+          soapNotesLoading={soapNotesLoading}
+          patientSoapNotes={patientSoapNotes}
+          soapCount={soapCount}
+          soapCurrentPage={soapCurrentPage}
+          soapTotalPages={soapTotalPages}
+          fetchPatientSoapNotes={fetchPatientSoapNotes}
+          setAdvanceCheckUp={setAdvanceCheckUp}
+          selected={selected}
+        />
+      ),
+    },
+  ];
 
 export default getTabs;

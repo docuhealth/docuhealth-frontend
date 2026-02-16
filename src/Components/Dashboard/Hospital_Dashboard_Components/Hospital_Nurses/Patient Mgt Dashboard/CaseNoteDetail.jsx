@@ -9,7 +9,7 @@ const CaseNoteDetail = ({ caseNoteDetail, setCaseNoteDetail }) => {
   console.log("caseNoteDetail", caseNoteDetail);
   return (
     <div className="bg-white my-5 border rounded-lg pt-5 lg:pt-8 px-4 lg:px-6 text-sm ">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 sm:gap-0  border-b pb-4 w-full">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap sm:gap-0  border-b pb-4 w-full">
         <div
           className="flex justify-start items-center gap-1 cursor-pointer"
           onClick={() => setCaseNoteDetail(null)}
@@ -29,7 +29,7 @@ const CaseNoteDetail = ({ caseNoteDetail, setCaseNoteDetail }) => {
 
           <h2 className=" text-sm">Detailed Case Note Overview</h2>
         </div>
-        <div className=" flex flex-col sm:flex-row justify-end items-center gap-3 w-full sm:w-auto">
+        {/* <div className=" flex flex-col sm:flex-row justify-end items-center gap-3 w-full sm:w-auto">
           <div className="flex justify-center items-center gap-1 border border-[#3E4095] py-1.5 px-4 rounded-full w-full sm:w-auto text-[#3E4095]">
             <svg
               width="14"
@@ -62,7 +62,7 @@ const CaseNoteDetail = ({ caseNoteDetail, setCaseNoteDetail }) => {
 
             <p>Download PDF</p>
           </div>
-        </div>
+        </div> */}
       </div>
       <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
         <p className="text-[12px] mb-4">
