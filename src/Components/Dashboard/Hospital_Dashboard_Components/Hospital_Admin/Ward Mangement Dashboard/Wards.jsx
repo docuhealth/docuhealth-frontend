@@ -89,7 +89,7 @@ const Wards = () => {
   return (
     <>
     <div className="flex justify-end items-center mb-6">
-        <span className="bg-indigo-100 text-[#3E4095] text-xs font-bold px-3 py-1 rounded-full">
+        <span className="bg-indigo-100 text-[#3E4095] text-xs font-semibold px-3 py-1 rounded-full">
           Total: {count}
         </span>
       </div>
@@ -110,12 +110,12 @@ const Wards = () => {
                     <Bed className="w-5 h-5 text-[#3E4095]" />
                   </div>
                   <div>
-                      <h3 className=" font-bold text-gray-900 truncate">{ward.name || "General Ward"}</h3>
+                      <h3 className=" font-semibold text-gray-900 truncate">{ward.name || "General Ward"}</h3>
                 <p className="text-xs text-gray-400 mt-">Ref ID: {ward.id}</p>
                   </div>
                     </div>
                
-                  <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wide ${
+                  <span className={`text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wide ${
                     freeBeds > 0 ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
                   }`}>
                     {freeBeds > 0 ? "Active" : "Full"}
@@ -127,18 +127,18 @@ const Wards = () => {
                 {/* Metrics */}
                 <div className="mt-6 flex justify-between items-end">
                   <div>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase mb-1">Available</p>
-                    <p className="text-sm font-bold text-gray-900">{freeBeds}</p>
+                    <p className="text-[10px] text-gray-400 font-semibold uppercase mb-1">Available</p>
+                    <p className="text-sm font-semibold text-gray-900">{freeBeds}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] text-gray-400 font-bold uppercase mb-1">Total Capacity</p>
-                    <p className="text-sm font-bold text-gray-900">{totalBeds} Beds</p>
+                    <p className="text-[10px] text-gray-400 font-semibold uppercase mb-1">Total Capacity</p>
+                    <p className="text-sm font-semibold text-gray-900">{totalBeds} Beds</p>
                   </div>
                 </div>
 
                 {/* Occupancy Bar */}
                 <div className="mt-4">
-                  <div className="flex justify-between text-[10px] font-bold mb-1">
+                  <div className="flex justify-between text-[10px] font-semibold mb-1">
                     <span className="text-gray-400">OCCUPANCY</span>
                     <span className={percentage > 90 ? "text-red-500" : "text-gray-600"}>{Math.round(percentage)}%</span>
                   </div>
@@ -155,7 +155,7 @@ const Wards = () => {
 
               {/* Action Button */}
               <button 
-                className="w-full py-4 bg-white border-t border-gray-100 text-[#3E4095] text-xs font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 mt-auto"
+                className="w-full py-4 bg-white border-t border-gray-100 text-[#3E4095] text-xs font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 mt-auto"
                 onClick={() => console.log(`Managing Ward ${ward.id}`)}
               >
                 MANAGE WARD <ArrowRight className="w-3.5 h-3.5" />

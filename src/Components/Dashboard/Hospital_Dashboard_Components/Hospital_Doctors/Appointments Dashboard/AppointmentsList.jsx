@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import { DoctorAppointmentsListContext } from "../../../../../context/Hospital Context/Doctors/DoctorAppointmentsListContext";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import {
@@ -6,6 +6,7 @@ import {
   formatTime,
 } from "../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
 import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
+import SearchBar from "../../../../SearchBar/SearchBar";
 
 const AppointmentsList = ({
   setSeePatientDetails,
@@ -19,6 +20,31 @@ const AppointmentsList = ({
     setCurrentPage,
     totalPages,
   } = useContext(DoctorAppointmentsListContext);
+
+    const [searchQuery, setSearchQuery] = useState("");
+  
+    const processedAppointments = useMemo(() => {
+      // 1. Filter based on search query
+      let filtered = appointments.filter((app) => {
+        const searchStr = searchQuery.toLowerCase();
+        return (
+          app.patient.firstname?.toLowerCase().includes(searchStr) ||
+          app.patient.lastname?.toLowerCase().includes(searchStr) ||
+          app.staff.firstname?.toLowerCase().includes(searchStr) ||
+          app.staff.lastname?.toLowerCase().includes(searchStr) ||
+          app.note?.toLowerCase().includes(searchStr)
+        );
+      });
+  
+      // 2. Sort by proximity to current time
+      const now = new Date().getTime();
+      return [...filtered].sort((a, b) => {
+        const dateA = new Date(a.scheduled_time).getTime();
+        const dateB = new Date(b.scheduled_time).getTime();
+        return Math.abs(dateA - now) - Math.abs(dateB - now);
+      });
+    }, [appointments, searchQuery]);
+  
 
   if (loading) {
     return (
@@ -102,9 +128,17 @@ const AppointmentsList = ({
   };
 
   return (
+    <>
+     <div className="mb-4 w-full">
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search patient's name, doctor's name, or notes..."
+        />
+      </div>
     <div className="text-[12px] my-4">
       <div className="hidden lg:block">
-        {appointments.map((appointment, index) => (
+        {processedAppointments.map((appointment, index) => (
           <div
             key={appointment.id}
             className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10 "
@@ -208,7 +242,7 @@ const AppointmentsList = ({
       </div>
 
       <div className="block lg:hidden space-y-4 px-1">
-        {appointments.map((appointment, index) => (
+        {processedAppointments.map((appointment, index) => (
           <div
             key={appointment.id}
             className="bg-white border border-gray-200 rounded-lg p-4"
@@ -305,6 +339,7 @@ const AppointmentsList = ({
         setCurrentPage ={setCurrentPage}
       />
     </div>
+        </>
   );
 };
 

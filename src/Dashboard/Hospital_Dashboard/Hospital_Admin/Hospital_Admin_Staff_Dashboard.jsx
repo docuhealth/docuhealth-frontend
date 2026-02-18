@@ -7,7 +7,7 @@ import OnboardNewStaff from "../../../Components/Dashboard/Hospital_Dashboard_Co
 
 const Hospital_Admin_Staff_Dashboard = () => {
 
-    const options = ["All Staffs", "Oldest", "A-Z", "Z-A"];
+    const options = ["All Staffs", "A-Z", "Z-A"];
     const [isOpen, setIsOpen] = useState(false);
     const [selected, setSelected] = useState("All Staffs");
     const [createNewStaff, setCreateNewStaff] = useState(false)
@@ -67,7 +67,7 @@ const Hospital_Admin_Staff_Dashboard = () => {
                         My Staffs
                     </h2>
                     <div>
-                        <StaffListHospital selectedStaff={selectedStaff} setSelectedStaff={setSelectedStaff} />
+                        <StaffListHospital selectedStaff={selectedStaff} setSelectedStaff={setSelectedStaff} filterType={selected} />
                     </div>
                 </div>
             </div>

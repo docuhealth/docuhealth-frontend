@@ -1,17 +1,49 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import { HosStaffsContext } from "../../../../../context/Hospital Context/HosStaffsContext";
-import {
-  formatFullDate,
-  formatTime,
-} from "../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
-import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 
-const StaffListHospital = ({ selectedStaff, setSelectedStaff }) => {
+import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
+import SearchBar from "../../../../SearchBar/SearchBar";
+
+const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
   const { staffs, loading, count, currentPage, totalPages, setCurrentPage } =
     useContext(HosStaffsContext);
-  const [activeMenu, setActiveMenu] = useState(null);
 
-  console.log(staffs)
+    console.log(staffs)
+
+const [activeMenu, setActiveMenu] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+ const processedStaffs = useMemo(() => {
+  let result = staffs.filter((staff) => {
+    const searchStr = searchQuery.toLowerCase();
+    return (
+      staff.firstname?.toLowerCase().includes(searchStr) ||
+      staff.lastname?.toLowerCase().includes(searchStr) ||
+      staff.staff_id?.toLowerCase().includes(searchStr) ||
+      staff.email?.toLowerCase().includes(searchStr)
+    );
+  });
+
+  const getDisplayName = (staff) => {
+    const title = staff.role === 'doctor' ? 'Dr. ' : '';
+    return `${title}${staff.firstname} ${staff.lastname}`.toLowerCase();
+  };
+
+  switch (filterType) {
+    case "A-Z":
+      return [...result].sort((a, b) => 
+        getDisplayName(a).localeCompare(getDisplayName(b), undefined, { sensitivity: 'base' })
+      );
+    case "Z-A":
+      return [...result].sort((a, b) => 
+        getDisplayName(b).localeCompare(getDisplayName(a), undefined, { sensitivity: 'base' })
+      );
+    case "Oldest":
+      return [...result].sort((a, b) => a.staff_id.localeCompare(b.staff_id));
+    default:
+      return result;
+  }
+}, [staffs, searchQuery, filterType]);
 
   if (loading) {
     return (
@@ -89,74 +121,73 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff }) => {
     );
   }
 
-const handleBulkRemove = () => {
-  // Map the selected staff_ids back to the full objects for logging
-  const staffObjectsToRemove = staffs.filter((staff) =>
-    selectedStaff.includes(staff.staff_id)
-  );
+  const handleBulkRemove = () => {
+    // Map the selected staff_ids back to the full objects for logging
+    const staffObjectsToRemove = staffs.filter((staff) =>
+      selectedStaff.includes(staff.staff_id)
+    );
 
-  console.log("Bulk Removing Staff Details:", staffObjectsToRemove);
+    console.log("Bulk Removing Staff Details:", staffObjectsToRemove);
 
-  // Trigger your API request here using selectedStaff (the IDs)
-  // deleteStaffsApi(selectedStaff);
+    // Trigger your API request here using selectedStaff (the IDs)
+    // deleteStaffsApi(selectedStaff);
 
-  setSelectedStaff([]); // Reset selection
-};
+    setSelectedStaff([]); // Reset selection
+  };
 
-const handleIndividualRemove = (staff) => {
-  // Use the whole object passed in to log details
-  console.log("Removing Staff Member:", staff);
-  
-  // Trigger your API request here using staff.staff_id
-  // deleteStaffApi(staff.staff_id);
+  const handleIndividualRemove = (staff) => {
+    // Use the whole object passed in to log details
+    console.log("Removing Staff Member:", staff);
 
-  setActiveMenu(null);
-};
+    // Trigger your API request here using staff.staff_id
+    // deleteStaffApi(staff.staff_id);
 
-const handleUpdateRole = (staff) => {
-  console.log(`Directly updating role for: ${staff.firstname} (${staff.staff_id})`);
-  console.log(`Current role is: ${staff.role}`);
-  
-  // Usually, you would open a modal here. For direct request:
-  // updateRoleApi(staff.staff_id, "New Role");
+    setActiveMenu(null);
+  };
 
-  setActiveMenu(null);
-};
+  const handleUpdateRole = (staff) => {
+    console.log(`Directly updating role for: ${staff.firstname} (${staff.staff_id})`);
+    console.log(`Current role is: ${staff.role}`);
+
+    // Usually, you would open a modal here. For direct request:
+    // updateRoleApi(staff.staff_id, "New Role");
+
+    setActiveMenu(null);
+  };
 
   // --- SELECTION LOGIC ---
 
   const allChecked = staffs.length > 0 && selectedStaff.length === staffs.length;
 
-const toggleSelectAll = () => {
+  const toggleSelectAll = () => {
     if (allChecked) {
       console.log("Deselected all staff");
       setSelectedStaff([]);
     } else {
       const allIds = staffs.map((s) => s.staff_id);
-      // Log the full objects of everyone being selected
-      console.log("Selected all staff:", staffs);
+      // console.log("Selected all staff:", staffs);
       setSelectedStaff(allIds);
     }
   };
 
-const toggleStaff = (id) => {
+  const toggleStaff = (id) => {
     if (!id) {
-    console.error("Error: This staff member has no ID property!");
-    return;
-  }
-  
+      console.error("Error: This staff member has no ID property!");
+      return;
+    }
+
     setSelectedStaff((prev) => {
       const isRemoving = prev.includes(id);
-      
-    if (isRemoving) {
-      console.log(`Unchecked staff ID: ${id}`);
-      return prev.filter((item) => item !== id);
-    } else {
-      // Find the specific staff object using staff_id to log it
-      const staffMember = staffs.find((s) => s.staff_id === id);
-      console.log("Checked staff:", staffMember);
-      return [...prev, id];
-    }
+
+      if (isRemoving) {
+        console.log(`Unchecked staff ID: ${id}`);
+        return prev.filter((item) => item !== id);
+      } else {
+        // Find the specific staff object using staff_id to log it
+        const staffMember = staffs.find((s) => s.staff_id === id);
+        console.log("Checked staff:", staffMember);
+        return [...prev, id];
+      }
     });
   };
 
@@ -164,11 +195,10 @@ const toggleStaff = (id) => {
     <>
       {selectedStaff.length > 0 && (
         <div
-          className={`transition-all duration-300 mb-4 flex items-center justify-between p-3 rounded-lg ${
-            selectedStaff.length > 0
+          className={`transition-all duration-300 mb-4 flex items-center justify-between p-3 rounded-lg ${selectedStaff.length > 0
               ? "bg-red-50 border border-red-100 opacity-100"
               : "opacity-0 h-0 overflow-hidden"
-          }`}
+            }`}
         >
           <p className="text-sm text-red-700 font-medium">
             {selectedStaff.length} staff member(s) selected
@@ -181,6 +211,15 @@ const toggleStaff = (id) => {
           </button>
         </div>
       )}
+      <div className="mb-4 w-full">
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search by name, Staff ID or email..."
+        />
+      </div>
+
+
       <div className="hidden lg:flex lg:flex-col">
         <div className="grid grid-cols-8 text-left text-sm bg-gray-100 py-5 rounded-md">
           {/* Checkbox + Name of Staff */}
@@ -201,7 +240,7 @@ const toggleStaff = (id) => {
           <p>Sex</p>
         </div>
 
-        {staffs.map((staff, index) => (
+        {processedStaffs.map((staff, index) => (
           <div key={index} className="relative">
             <div className="grid grid-cols-8 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
               <div className="font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-2 ">
@@ -228,10 +267,10 @@ const toggleStaff = (id) => {
                     />
                   </svg>
                   <p>
-                      {staff.role === 'doctor'
-  ? `Dr. ${staff.firstname} ${staff.lastname}`
-  : `${staff.firstname} ${staff.lastname}`}
-                
+                    {staff.role === 'doctor'
+                      ? `Dr. ${staff.firstname} ${staff.lastname}`
+                      : `${staff.firstname} ${staff.lastname}`}
+
                   </p>
                 </div>
               </div>
@@ -295,7 +334,7 @@ const toggleStaff = (id) => {
           </div>
         )}
         <div className="flex flex-col gap-4">
-          {staffs.map((staff, index) => (
+          {processedStaffs.map((staff, index) => (
             <div
               key={index}
               className="bg-white border border-gray-200 rounded-lg p-5   transition-all"
@@ -317,10 +356,10 @@ const toggleStaff = (id) => {
 
                   <div className="min-w-0">
                     <h3 className="font-bold text-gray-900 text-[15px] truncate">
-                       {staff.role === 'doctor'
-  ? `Dr. ${staff.firstname} ${staff.lastname}`
-  : `${staff.firstname} ${staff.lastname}`}
-               
+                      {staff.role === 'doctor'
+                        ? `Dr. ${staff.firstname} ${staff.lastname}`
+                        : `${staff.firstname} ${staff.lastname}`}
+
                     </h3>
                     <div className="flex items-center gap-1.5">
                       <span className="text-[10px] bg-[#3E4095] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
@@ -335,26 +374,26 @@ const toggleStaff = (id) => {
 
                 {/* Sex Badge */}
                 <div className="flex items-center gap-2">
-                   <div className="bg-gray-100 px-2 py-1 rounded-lg">
-                  <p className="text-[10px] text-gray-500 font-bold uppercase">
-                    {staff.gender || "—"}
-                  </p>
-                </div>
+                  <div className="bg-gray-100 px-2 py-1 rounded-lg">
+                    <p className="text-[10px] text-gray-500 font-bold uppercase">
+                      {staff.gender || "—"}
+                    </p>
+                  </div>
                   <div className="relative">
-                  <button onClick={() => setActiveMenu(activeMenu === staff.staff_id ? null : staff.staff_id)} className="p-1">
-                    <svg width="20" height="20" fill="#647284" viewBox="0 0 16 16"><path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
-                  </button>
-                  {activeMenu === staff.staff_id && (
-                    <div className="absolute right-0 top-8 w-52 bg-white border border-gray-200 rounded-lg shadow z-50 py-2">
-                      <button  onClick={() => handleUpdateRole(index, staff.role)} className="w-full text-left px-4 py-3 text-sm border-b border-gray-50 hover:rounded-t-md">Update Role</button>
-                      <button onClick={() => handleIndividualRemove(staff)} className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md">Remove from Team</button>
-                    </div>
-                  )}
+                    <button onClick={() => setActiveMenu(activeMenu === staff.staff_id ? null : staff.staff_id)} className="p-1">
+                      <svg width="20" height="20" fill="#647284" viewBox="0 0 16 16"><path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" /></svg>
+                    </button>
+                    {activeMenu === staff.staff_id && (
+                      <div className="absolute right-0 top-8 w-52 bg-white border border-gray-200 rounded-lg shadow z-50 py-2">
+                        <button onClick={() => handleUpdateRole(index, staff.role)} className="w-full text-left px-4 py-3 text-sm border-b border-gray-50 hover:rounded-t-md">Update Role</button>
+                        <button onClick={() => handleIndividualRemove(staff)} className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md">Remove from Team</button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                </div>
-               
 
-                
+
+
               </div>
 
               {/* 2. Contact Quick-Action Box */}
@@ -423,7 +462,7 @@ const toggleStaff = (id) => {
         setCurrentPage={setCurrentPage}
       />
 
-     
+
     </>
   );
 };

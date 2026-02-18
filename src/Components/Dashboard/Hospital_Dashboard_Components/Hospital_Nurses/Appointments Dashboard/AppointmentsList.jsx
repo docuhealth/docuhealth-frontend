@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import { NursesAppointmentsListContext } from "../../../../../context/Hospital Context/Nurses/NursesAppointmentsListContext";
 import {
@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import SearchBar from "../../../../SearchBar/SearchBar";
 
 const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
   const {
@@ -19,6 +20,31 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
     totalPages,
     loading,
   } = useContext(NursesAppointmentsListContext);
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const processedAppointments = useMemo(() => {
+    // 1. Filter based on search query
+    let filtered = appointments.filter((app) => {
+      const searchStr = searchQuery.toLowerCase();
+      return (
+        app.patient.firstname?.toLowerCase().includes(searchStr) ||
+        app.patient.lastname?.toLowerCase().includes(searchStr) ||
+        app.staff.firstname?.toLowerCase().includes(searchStr) ||
+        app.staff.lastname?.toLowerCase().includes(searchStr) ||
+        app.note?.toLowerCase().includes(searchStr)
+      );
+    });
+
+    // 2. Sort by proximity to current time
+    const now = new Date().getTime();
+    return [...filtered].sort((a, b) => {
+      const dateA = new Date(a.scheduled_time).getTime();
+      const dateB = new Date(b.scheduled_time).getTime();
+      return Math.abs(dateA - now) - Math.abs(dateB - now);
+    });
+  }, [appointments, searchQuery]);
+
 
   if (loading) {
     return (
@@ -210,9 +236,16 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
 
   return (
     <>
+      <div className="mb-4 w-full">
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search patient's name, doctor's name, or notes..."
+        />
+      </div>
       <div className="text-[12px] my-4">
         <div className="hidden lg:block">
-          {appointments.map((appointment, index) => (
+          {processedAppointments.map((appointment, index) => (
             <div
               key={appointment.id}
               className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10 "
@@ -339,7 +372,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
         </div>
 
         <div className="block lg:hidden space-y-4 px-1">
-          {appointments.map((appointment, index) => (
+          {processedAppointments.map((appointment, index) => (
             <div
               key={appointment.id}
               className="bg-white border border-gray-200 rounded-lg p-4"
@@ -398,9 +431,9 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                           setOpenPopover(null);
                         }}
                       >
-                         {fetchingPersonnel
-                        ? "Fetching Doctor…"
-                        : "Assign to a Doctor"}
+                        {fetchingPersonnel
+                          ? "Fetching Doctor…"
+                          : "Assign to a Doctor"}
                       </button>
                     </div>
                   )}
@@ -490,7 +523,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                     <p className=" text-gray-600">
                       {" "}
                       {selectedPatient?.patient?.firstname &&
-                      selectedPatient?.patient?.lastname
+                        selectedPatient?.patient?.lastname
                         ? `${selectedPatient.patient.firstname} ${selectedPatient.patient.lastname}`
                         : "NIL"}
                     </p>
@@ -676,9 +709,8 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
 
                 {/* Custom dropdown arrow */}
                 <div
-                  className={`w-3 h-3 text-gray-400 transform transition-transform duration-200 absolute inset-y-8 right-2 ${
-                    isOpen ? "rotate-180" : "rotate-0"
-                  }`}
+                  className={`w-3 h-3 text-gray-400 transform transition-transform duration-200 absolute inset-y-8 right-2 ${isOpen ? "rotate-180" : "rotate-0"
+                    }`}
                 >
                   <svg
                     className="w-3 h-3 text-gray-400"

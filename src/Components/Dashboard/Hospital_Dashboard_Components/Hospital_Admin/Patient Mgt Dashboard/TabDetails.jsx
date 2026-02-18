@@ -413,7 +413,7 @@ const DischargedPatientsTab = () => {
               </p>
               <div className="bg-[#D2F5DB] px-2 rounded-full">
                 <p className="text-[#08A913] ">
-                  {formatRecordDate(admittedPatient.discharge_date)}
+                  {formatRecordDate(admittedPatient.discharge_date) || 'NIL'}
                 </p>
               </div>
             </div>

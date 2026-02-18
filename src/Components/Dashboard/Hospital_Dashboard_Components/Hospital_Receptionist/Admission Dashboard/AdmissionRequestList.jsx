@@ -41,7 +41,7 @@ const AdmissionRequestList = () => {
     },
     onError: (err) => {
       console.error("Error admitting patient:", err);
-      toast.error(err.response?.data?.message || "Error admitting patient");
+      toast.error(err.response?.data?.message ||err.response?.data?.detail|| "Error admitting patient");
     },
   });
 

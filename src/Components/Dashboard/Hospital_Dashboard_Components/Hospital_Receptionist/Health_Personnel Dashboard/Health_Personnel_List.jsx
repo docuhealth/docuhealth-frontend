@@ -1,6 +1,7 @@
-import React, { useContext } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import { HosStaffsContext } from "../../../../../context/Hospital Context/HosStaffsContext"
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
+import SearchBar from "../../../../SearchBar/SearchBar";
 
 const Health_Personnel_List = () => {
   const {
@@ -11,6 +12,27 @@ const Health_Personnel_List = () => {
     totalPages,
     setCurrentPage,
   } = useContext(HosStaffsContext);
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredStaffs = useMemo(() => {
+    return healthPersonnelList.filter((staff) => {
+      const query = searchQuery.toLowerCase();
+      const name = `${staff.firstname} ${staff.lastname}`.toLowerCase();
+      const staffId = staff.staff_id.toLowerCase();
+      const role = staff.role.toLowerCase();
+      const phone = staff.phone_num.toLowerCase();
+      const email = staff.email.toLowerCase();
+
+      return (
+        name.includes(query) ||
+        staffId.includes(query) ||
+        role.includes(query) ||
+        phone.includes(query) ||
+        email.includes(query)
+      );
+    });
+  }, [healthPersonnelList, searchQuery]);
 
   if (loading) {
     return (
@@ -90,6 +112,13 @@ const Health_Personnel_List = () => {
 
   return (
     <>
+    <div className="mb-4 w-full">
+      <SearchBar 
+                    value={searchQuery} 
+                    onChange={setSearchQuery} 
+                    placeholder="Search by name, staff ID, role, phone number, or email ..." 
+                />
+      </div>
       <div className="hidden lg:flex lg:flex-col">
         <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
           <div className="col-span-2 w-full pl-5 flex items-center gap-2">
@@ -102,7 +131,7 @@ const Health_Personnel_List = () => {
           <p>Email Address</p>
           <p>Sex</p>
         </div>
-        {healthPersonnelList.map((staff, index) => (
+        {filteredStaffs.map((staff, index) => (
           <div key={index} className="relative">
             <div className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
               <div className="font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-1 ">
@@ -138,7 +167,7 @@ const Health_Personnel_List = () => {
       </div>
       <div className="lg:hidden">
         <div className="flex flex-col gap-4">
-          {healthPersonnelList.map((staff, index) => (
+          {filteredStaffs.map((staff, index) => (
             <div
               key={index}
               className="bg-white border border-gray-200 rounded-lg p-5  active:bg-gray-50 transition-all"

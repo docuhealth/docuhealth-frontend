@@ -377,7 +377,7 @@ const DischargedPatientsTab = () => {
                             <div className='flex justify-between items-center'>
                                 <p>{admittedPatient.patient.firstname} {admittedPatient.patient.lastname} </p>
                                 <div className="bg-[#D2F5DB] px-2 rounded-full">
-                                    <p className="text-[#08A913] ">{formatRecordDate(admittedPatient.discharge_date)}</p>
+                                    <p className="text-[#08A913] ">{formatRecordDate(admittedPatient.discharge_date) || 'NIL'}</p>
                                 </div>
                             </div>
                             <div className='border-b py-2'>

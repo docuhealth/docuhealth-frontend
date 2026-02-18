@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import { ReceptionistAppointmentsListContext } from "../../../../../context/Hospital Context/Receptionist/ReceptionistAppointmentsListContext";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import {
@@ -7,6 +7,7 @@ import {
 } from "../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
 import toast from "react-hot-toast";
 import { CalendarIcon, UserIcon } from "lucide-react";
+import SearchBar from "../../../../../Components/SearchBar/SearchBar";
 
 const AppointmentsList = () => {
   const {
@@ -17,6 +18,33 @@ const AppointmentsList = () => {
     totalPages,
     setCurrentPage,
   } = useContext(ReceptionistAppointmentsListContext);
+  
+    const [searchQuery, setSearchQuery] = useState("");
+  
+  const processedAppointments = useMemo(() => {
+   
+    let filtered = appointments.filter((app) => {
+      const searchStr = searchQuery.toLowerCase();
+      return (
+        app.patient.firstname?.toLowerCase().includes(searchStr) ||
+        app.patient.lastname?.toLowerCase().includes(searchStr) ||
+        app.staff.firstname?.toLowerCase().includes(searchStr) ||
+        app.staff.lastname?.toLowerCase().includes(searchStr) ||
+        app.staff.role?.toLowerCase().includes(searchStr)
+      );
+    });
+  
+    const now = new Date().getTime();
+  
+    return [...filtered].sort((a, b) => {
+      const dateA = new Date(a.scheduled_time).getTime();
+      const dateB = new Date(b.scheduled_time).getTime();
+  
+  
+      return Math.abs(dateA - now) - Math.abs(dateB - now);
+    });
+  }, [appointments, searchQuery]);
+  
 
   if (loading) {
     return (
@@ -95,9 +123,17 @@ const AppointmentsList = () => {
   }
 
   return (
+    <>
+        <div className="mb-4 w-full">
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search by name, role or email..."
+        />
+      </div>
     <div className="text-[12px] my-4">
       <div className="hidden lg:block">
-        {appointments.map((appointment) => (
+        {processedAppointments.map((appointment) => (
           <div
             key={appointment.id}
             className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10 "
@@ -174,7 +210,7 @@ const AppointmentsList = () => {
         ))}
       </div>
       <div className="block lg:hidden space-y-4 my-4">
-        {appointments.map((appointment) => (
+        {processedAppointments.map((appointment) => (
           <div
             key={appointment.id}
             className="bg-white border border-gray-200 rounded-md p-4  transition-transform"
@@ -299,6 +335,7 @@ const AppointmentsList = () => {
         setCurrentPage = {setCurrentPage}
       />
     </div>
+    </>
   );
 };
 
