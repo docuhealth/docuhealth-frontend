@@ -22,6 +22,31 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
   } = useContext(NursesAppointmentsListContext);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const queryClient = useQueryClient();
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [staffList, setStaffList] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const [formData, setFormData] = useState({
+    staff_id: "",
+    patient_hin: "",
+    type: "",
+    note: "",
+    scheduled_time: "",
+  });
+
+  const today = new Date();
+
+  const [selectedDay, setSelectedDay] = useState(String(today.getDate()));
+  const [selectedMonth, setSelectedMonth] = useState("January");
+  const [selectedYear, setSelectedYear] = useState(String(today.getFullYear()));
+  const [selectedTime, setSelectedTime] = useState("08:00");
+
+  const [openPopover, setOpenPopover] = useState(null);
+  const [fetchingPersonnel, setFetchingPersonnel] = useState(false);
+  const [isStaffSelected, setIsStaffSelected] = useState(false);
+
+  const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
   const processedAppointments = useMemo(() => {
     // 1. Filter based on search query
@@ -45,6 +70,91 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
     });
   }, [appointments, searchQuery]);
 
+    const togglePopover = (index) => {
+    setOpenPopover(openPopover === index ? null : index);
+  };
+
+  const fetchHealthPersonnel = async () => {
+    setFetchingPersonnel(true);
+    try {
+      const res = await axiosInstanceHos.get(`api/receptionists/staff/doctor`);
+      const data = res.data;
+
+      console.log(res.data);
+      // Check if empty
+      if (!data || data.length === 0) {
+        toast.error(`No doctors currently available.`);
+        setFetchingPersonnel(false);
+        return;
+      }
+      setStaffList(data);
+      toast.success(`Doctors fetched successfully.`);
+      setOpenPopover(null);
+    } catch (err) {
+      console.error("Error fetching medical personnel:", err);
+      toast.error(
+        err.response?.data?.message || "Error fetching medical personnel.",
+      );
+    } finally {
+      setFetchingPersonnel(false);
+    }
+  };
+
+  const handleAssign = (staffId) => {
+    setIsStaffSelected(true); // show next card
+
+    setFormData((prev) => ({
+      ...prev,
+      staff_id: staffId,
+    }));
+  };
+
+  const assignDoctorMutation = useMutation({
+    mutationFn: (payload) =>
+      axiosInstanceHos.patch(
+        `api/nurses/appointments/${selectedPatientDetails.id}/assign`,
+        payload,
+      ),
+    onSuccess: () => {
+      toast.success("Consultation booked successfully!");
+      queryClient.invalidateQueries({ queryKey: ["nurse-appointments"] });
+
+      setIsStaffSelected(false);
+      setOpenPopover(null);
+    },
+    onError: (err) => {
+      console.error("Error booking consultation:", err);
+      toast.error(err.response?.data?.message || "Error booking consultation.");
+    },
+  });
+
+  const handleRequest = async () => {
+    // Basic Validation
+    if (
+      !formData.type ||
+      !selectedDay ||
+      !selectedMonth ||
+      !selectedTime ||
+      !selectedYear ||
+      !formData.note
+    ) {
+      return toast.error("Please fill all details.");
+    }
+
+    const selectedDate = new Date(
+      `${selectedMonth} ${selectedDay}, ${selectedYear} ${selectedTime}`,
+    );
+
+    const payload = {
+      note: formData.note,
+      type: formData.type,
+      doctor_id: formData.staff_id,
+      scheduled_time: selectedDate.toISOString(),
+    };
+
+    // Execute the mutation
+    assignDoctorMutation.mutate(payload);
+  };
 
   if (loading) {
     return (
@@ -121,118 +231,6 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
       </div>
     );
   }
-
-  const queryClient = useQueryClient();
-  const [selectedPatient, setSelectedPatient] = useState(null);
-  const [staffList, setStaffList] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
-
-  const [formData, setFormData] = useState({
-    staff_id: "",
-    patient_hin: "",
-    type: "",
-    note: "",
-    scheduled_time: "",
-  });
-
-  const today = new Date();
-
-  const [selectedDay, setSelectedDay] = useState(String(today.getDate()));
-  const [selectedMonth, setSelectedMonth] = useState("January");
-  const [selectedYear, setSelectedYear] = useState(String(today.getFullYear()));
-  const [selectedTime, setSelectedTime] = useState("08:00");
-
-  const [openPopover, setOpenPopover] = useState(null);
-  const togglePopover = (index) => {
-    setOpenPopover(openPopover === index ? null : index);
-  };
-
-  const [fetchingPersonnel, setFetchingPersonnel] = useState(false);
-  const [isStaffSelected, setIsStaffSelected] = useState(false);
-
-  const fetchHealthPersonnel = async () => {
-    setFetchingPersonnel(true);
-    try {
-      const res = await axiosInstanceHos.get(`api/receptionists/staff/doctor`);
-      const data = res.data;
-
-      console.log(res.data);
-      // Check if empty
-      if (!data || data.length === 0) {
-        toast.error(`No doctors currently available.`);
-        setFetchingPersonnel(false);
-        return;
-      }
-      setStaffList(data);
-      toast.success(`Doctors fetched successfully.`);
-      setOpenPopover(null);
-    } catch (err) {
-      console.error("Error fetching medical personnel:", err);
-      toast.error(
-        err.response?.data?.message || "Error fetching medical personnel.",
-      );
-    } finally {
-      setFetchingPersonnel(false);
-    }
-  };
-
-  const handleAssign = (staffId) => {
-    setIsStaffSelected(true); // show next card
-
-    setFormData((prev) => ({
-      ...prev,
-      staff_id: staffId,
-    }));
-  };
-
-  const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
-
-  const assignDoctorMutation = useMutation({
-    mutationFn: (payload) =>
-      axiosInstanceHos.patch(
-        `api/nurses/appointments/${selectedPatientDetails.id}/assign`,
-        payload,
-      ),
-    onSuccess: () => {
-      toast.success("Consultation booked successfully!");
-      queryClient.invalidateQueries({ queryKey: ["nurse-appointments"] });
-
-      setIsStaffSelected(false);
-      setOpenPopover(null);
-    },
-    onError: (err) => {
-      console.error("Error booking consultation:", err);
-      toast.error(err.response?.data?.message || "Error booking consultation.");
-    },
-  });
-
-  const handleRequest = async () => {
-    // Basic Validation
-    if (
-      !formData.type ||
-      !selectedDay ||
-      !selectedMonth ||
-      !selectedTime ||
-      !selectedYear ||
-      !formData.note
-    ) {
-      return toast.error("Please fill all details.");
-    }
-
-    const selectedDate = new Date(
-      `${selectedMonth} ${selectedDay}, ${selectedYear} ${selectedTime}`,
-    );
-
-    const payload = {
-      note: formData.note,
-      type: formData.type,
-      doctor_id: formData.staff_id,
-      scheduled_time: selectedDate.toISOString(),
-    };
-
-    // Execute the mutation
-    assignDoctorMutation.mutate(payload);
-  };
 
   return (
     <>

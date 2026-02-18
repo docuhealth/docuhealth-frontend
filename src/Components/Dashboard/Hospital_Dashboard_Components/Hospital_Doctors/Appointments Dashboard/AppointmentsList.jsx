@@ -44,6 +44,11 @@ const AppointmentsList = ({
         return Math.abs(dateA - now) - Math.abs(dateB - now);
       });
     }, [appointments, searchQuery]);
+
+      const [openPopover, setOpenPopover] = useState(null);
+  const togglePopover = (index) => {
+    setOpenPopover(openPopover === index ? null : index);
+  };
   
 
   if (loading) {
@@ -122,10 +127,6 @@ const AppointmentsList = ({
     );
   }
 
-  const [openPopover, setOpenPopover] = useState(null);
-  const togglePopover = (index) => {
-    setOpenPopover(openPopover === index ? null : index);
-  };
 
   return (
     <>
