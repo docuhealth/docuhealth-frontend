@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Pagination from "../../../Patient_Dashboard_Components/Pagination/Pagination";
+import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import {
   formatFullDateTime,
@@ -140,7 +140,7 @@ const PatientInfo = ({ patientFullInfo, selected }) => {
               type="text"
               readOnly
               className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={selected?.ward_info?.name}
+              value={selected?.ward_info?.name + ' ward'}
             />
           </div>
           <div>
@@ -386,7 +386,7 @@ const PatientMedicalRecord = ({
   count,
   currentPage,
   totalPages,
-  fetchPatientMedRecords,
+  setCurrentPage,
   setSelectedMedicalRecord,
   setViewDetailMedicalRecord,
   medloading,
@@ -595,11 +595,11 @@ const PatientMedicalRecord = ({
             ))}
           </div>
 
-          <Pagination
+          <Pagination2
             count={count}
             currentPage={currentPage}
             totalPages={totalPages}
-            fetchData={fetchPatientMedRecords}
+          setCurrentPage={setCurrentPage}
           />
         </>
       ) : (
@@ -616,7 +616,7 @@ const PatientSOAPNotes = ({
   soapCount,
   soapCurrentPage,
   soapTotalPages,
-  fetchPatientSoapNotes,
+  setSoapCurrentPage,
   setAdvanceCheckUp,
   selected
 }) => {
@@ -1577,11 +1577,11 @@ const PatientSOAPNotes = ({
                 ))}
               </div>
 
-              <Pagination
+              <Pagination2
                 count={soapCount}
                 currentPage={soapCurrentPage}
                 totalPages={soapTotalPages}
-                fetchData={fetchPatientSoapNotes}
+           setCurrentPage={setSoapCurrentPage}
               />
             </>
           ) : (
@@ -1654,14 +1654,14 @@ const getTabs = ({
   count,
   currentPage,
   totalPages,
-  fetchPatientMedRecords,
+  setCurrentPage, // Use the setter here
   setSelectedMedicalRecord, // first
   setViewDetailMedicalRecord, // second
   patientSoapNotes,
   soapCount,
   soapCurrentPage,
   soapTotalPages,
-  fetchPatientSoapNotes,
+  setSoapCurrentPage,
   setSoapNoteEntry,
   setAdvanceCheckUp
 }) => [
@@ -1680,7 +1680,7 @@ const getTabs = ({
           count={count}
           currentPage={currentPage}
           totalPages={totalPages}
-          fetchPatientMedRecords={fetchPatientMedRecords}
+         setCurrentPage={setCurrentPage}
           setSelectedMedicalRecord={setSelectedMedicalRecord}
           setViewDetailMedicalRecord={setViewDetailMedicalRecord}
         />
@@ -1696,7 +1696,7 @@ const getTabs = ({
           soapCount={soapCount}
           soapCurrentPage={soapCurrentPage}
           soapTotalPages={soapTotalPages}
-          fetchPatientSoapNotes={fetchPatientSoapNotes}
+              setSoapCurrentPage={setSoapCurrentPage}
           setAdvanceCheckUp={setAdvanceCheckUp}
           selected={selected}
         />

@@ -1,55 +1,50 @@
-import React, { useEffect, useState, createContext } from "react";
-import { getHospitalToken } from "../../../services/authService";
+import React, { createContext, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import axiosInstanceHos from "../../../utils/axiosInstanceHos";
-import toast from "react-hot-toast";
+import { getHospitalToken } from "../../../services/authService";
 
 export const DoctorsAdmittedPatientMGTContext = createContext();
 
-const DoctorsAdmittedPatientMGTProvider = (props) => {
-  const [admittedPatients, setAdmittedPatients] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [count, setCount] = useState(0);
+const DoctorsAdmittedPatientMGTProvider = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [tab, setTab] = useState("active");
-  const pageSize = 6; // Example page size
-
+  const pageSize = 6;
   const isUserLoggedIn = !!getHospitalToken();
 
-      const fetchAdmittedPatients = async (page = 1, status = tab) => {
-        // active or discharge
-        setLoading(true)
+  const { data, isLoading: loading, refetch } = useQuery({
+    queryKey: ["hospital-patients-doctor", tab, currentPage],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get(
+        `api/hospitals/admissions/${tab}?page=${currentPage}&size=${pageSize}`
+      );
+      return res.data;
+    },
+    enabled: isUserLoggedIn,
+    placeholderData: (previousData) => previousData,
+  });
 
-        try {
-            const res = await axiosInstanceHos.get(
-                `api/hospitals/admissions/${status}?page=${page}&size=${pageSize}`
-            );
+  const handleTabChange = (newTab) => {
+    setTab(newTab);
+    setCurrentPage(1); // Reset page on tab switch
+  };
 
-            setAdmittedPatients(res.data.results || [])
-            console.log('admitted' , res.data)
-            setCount(res.data.count || 0);
-            setCurrentPage(page);
-            setTotalPages(Math.ceil(res.data.count / pageSize));
-        }  catch (err) {
-            console.error("Error fetching admitted patients:", err);
-            toast.error("Error fetching admitted patients");
-          } finally {
-            setLoading(false);
-          }
-    }
-
-    useEffect(() => {
-        if (isUserLoggedIn) {
-            fetchAdmittedPatients(1, tab)
-        }
-        }, [isUserLoggedIn,tab]);
-
-    return (
-        <DoctorsAdmittedPatientMGTContext.Provider  value ={{admittedPatients, setAdmittedPatients, loading, count, currentPage, totalPages, fetchAdmittedPatients, tab, setTab}}>
-            {props.children}
-        </DoctorsAdmittedPatientMGTContext.Provider>
-    )
-
+  return (
+    <DoctorsAdmittedPatientMGTContext.Provider
+      value={{
+        admittedPatients: data?.results || [],
+        loading,
+        count: data?.count || 0,
+        currentPage,
+        totalPages: Math.ceil((data?.count || 0) / pageSize),
+        setCurrentPage,
+        tab,
+        setTab: handleTabChange,
+        refetch, 
+      }}
+    >
+      {children}
+    </DoctorsAdmittedPatientMGTContext.Provider>
+  );
 };
 
 export default DoctorsAdmittedPatientMGTProvider;

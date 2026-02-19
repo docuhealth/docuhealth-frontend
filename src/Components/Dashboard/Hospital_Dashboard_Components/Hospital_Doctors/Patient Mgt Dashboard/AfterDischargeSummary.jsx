@@ -3,6 +3,7 @@ import { truncateWords } from "../../../Patient_Dashboard_Components/Home Dashbo
 import { ArrowLeft, X, Plus, UploadCloud, FileText } from "lucide-react";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const NoteSection = ({
   title,
@@ -78,6 +79,8 @@ const AfterDischargeSummary = ({
   selectedDischargePatient,
   setDischargePatient,
 }) => {
+
+  const queryClient = useQueryClient();
   const [soapNoteData, setSoapNoteData] = useState({
     chief_complaint: "",
     diagnosis: [],
@@ -183,10 +186,38 @@ const AfterDischargeSummary = ({
 
   const [note, setNote] = useState("Nil");
 
-  const [loading, setLoading] = useState(false);
+  const dischargeMutation = useMutation({
+    mutationFn: async (formData) => {
+      const res = await axiosInstanceHos.post("api/medical-records/discharge", formData);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["hospital-patients-doctor"] });
 
-  const handleSubmit = async () => {
-    const drugRecords = medications.map((med) => ({
+      toast.success("Patient discharged successfully!");
+      
+      setDischargePatient(false);
+      resetForm();
+    },
+    onError: (err) => {
+      console.error("Error discharging patient", err);
+      toast.error(err.response?.data?.message || "Error discharging patient");
+    }
+  });
+
+  const resetForm = () => {
+    setSoapNoteData({
+      chief_complaint: "",
+      diagnosis: [],
+      condition_at_discharge: "",
+      treatment_plan: [],
+      care_instructions: [],
+    });
+    setAttachments([]);
+  };
+
+  const handleSubmit = () => {
+      const drugRecords = medications.map((med) => ({
       name: med.drug,
       route: med.route,
       quantity: med.dosage,
@@ -227,11 +258,8 @@ const AfterDischargeSummary = ({
       hasInvalidMedication
     ) {
       toast.error("fill all required fields.");
-      setLoading(false);
       return;
     }
-
-    setLoading(true);
 
     const formData = new FormData();
 
@@ -266,39 +294,8 @@ const AfterDischargeSummary = ({
       formData.append("attachments", fileObj.file);
     });
 
-    try {
-      const res = await axiosInstanceHos.post(
-        "api/medical-records/discharge",
-        formData,
-      );
 
-      console.log(res);
-      toast.success("Patient discharged successfully !");
-      setDischargePatient(false);
-
-      setSoapNoteData({
-        chief_complaint: "",
-        diagnosis: [],
-        condition_at_discharge: "",
-        treatment_plan: [],
-        care_instructions: [],
-      });
-
-      setInputs({
-        diagnosis : "",
-        treatment_plan: "",
-        care_instructions: "",
-      });
-
-
-      setAttachments([]);
-
-    } catch (err) {
-      console.error("Error discharging patient", err);
-      toast.error("Error discharging patient");
-    }finally{
-      setLoading(false)
-    }
+    dischargeMutation.mutate(formData);
   };
 
   return (
@@ -787,9 +784,9 @@ const AfterDischargeSummary = ({
 
             <div className="mt-5">
               <button
-                disabled={loading}
+                disabled={dischargeMutation.isPending}
                 className={`py-2.5  rounded-full text-sm px-20 sm:mt-5 text-white  w-full ${
-                  loading
+                  dischargeMutation.isPending
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-[#3E4095] cursor-pointer"
                 }`}
@@ -797,7 +794,7 @@ const AfterDischargeSummary = ({
                   handleSubmit();
                 }}
               >
-                {loading ? (
+                {dischargeMutation.isPending ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     Discharging Patient...

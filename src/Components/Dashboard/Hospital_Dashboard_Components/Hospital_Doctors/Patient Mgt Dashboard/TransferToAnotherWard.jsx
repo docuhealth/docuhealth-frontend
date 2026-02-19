@@ -1,26 +1,26 @@
 import React, { useState, useEffect, useContext } from "react";
 import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
-import {toast} from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { HosWardContext } from "../../../../../context/Hospital Context/HosWardContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) => {
 
-      const { wards } = useContext(HosWardContext);
-    
-      const [wardOptions, setWardOptions] = useState([]);
-      const [availableBeds, setAvailableBeds] = useState([]);
-      const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const { wards } = useContext(HosWardContext);
 
-      console.log(selectedPatientDetails)
-        const [form, setForm] = useState({
-          new_ward: "",
-          new_bed: "",
-          admission: selectedPatientDetails
-            ? selectedPatientDetails?.id
-            : "",
-        });
+  const [wardOptions, setWardOptions] = useState([]);
+  const [availableBeds, setAvailableBeds] = useState([]);
 
-          useEffect(() => {
+  const [form, setForm] = useState({
+    new_ward: "",
+    new_bed: "",
+    admission: selectedPatientDetails
+      ? selectedPatientDetails?.id
+      : "",
+  });
+
+  useEffect(() => {
     if (Array.isArray(wards)) {
       setWardOptions(wards);
       console.log(selectedPatientDetails);
@@ -42,20 +42,30 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
     }
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      const res = await axiosInstanceHos.post("api/doctors/admissions/transfer", form);
-
-      console.log(res)
+  const mutation = useMutation({
+    mutationFn: (formData) => {
+      return axiosInstanceHos.post("api/doctors/admissions/transfer", formData);
+    },
+    onSuccess: () => {
       toast.success("Transfer successful");
-      setLoading(false);
+      queryClient.invalidateQueries({ queryKey: ["patient-info",selectedPatientDetails.patient.hin] });
+
       setRequestAdmission(false);
-    } catch (err) {
+    },
+    onError: (err) => {
       console.error("Error submitting transfer request:", err);
       toast.error("Error submitting transfer request");
-      setLoading(false);
-    } 
+    },
+  });
+
+  useEffect(() => {
+    if (Array.isArray(wards)) {
+      setWardOptions(wards);
+    }
+  }, [wards]);
+
+  const handleSubmit = () => {
+    mutation.mutate(form);
   };
 
   return (
@@ -109,23 +119,22 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
             </select>
           )}
 
-          <button className={`py-2  text-white  ${
-                  loading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-[#3E4095] cursor-pointer"
-                } rounded-full mt-4  w-full`} 
-          disabled={loading || !form.new_ward || !form.new_bed}
-          onClick={()=> {
-            handleSubmit()
-          }}>
-               {loading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Transferring patient...
-                  </div>
-                ) : (
-                  "Proceed"
-                )}
+          <button className={`py-2  text-white  ${mutation.isPending
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-[#3E4095] cursor-pointer"
+            } rounded-full mt-4  w-full`}
+            disabled={mutation.isPending || !form.new_ward || !form.new_bed}
+            onClick={() => {
+              handleSubmit()
+            }}>
+            {mutation.isPending ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Transferring patient...
+              </div>
+            ) : (
+              "Proceed"
+            )}
           </button>
         </div>
       </div>
