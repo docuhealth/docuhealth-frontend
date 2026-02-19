@@ -26,10 +26,10 @@ const Patient_Appointments_Dashboard = () => {
           <p>
             HIN : <span># {profile ? profile.hin : "loading.."}</span>
           </p>
-          {/* <div className="relative w-full sm:w-auto">
+          <div className="relative w-full sm:w-auto">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="flex justify-center  items-center gap-2 px-6 py-2 border border-[#0000FF] text-[#0000FF] font-medium rounded-full hover:bg-blue-50 transition w-full "
+              className="flex justify-center  items-center gap-2 px-6 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full hover:bg-blue-50 transition w-full "
             >
               Sort by: {selected}
               <ChevronDown
@@ -51,7 +51,7 @@ const Patient_Appointments_Dashboard = () => {
                 ))}
               </div>
             )}
-          </div> */}
+          </div>
         </div>
       </div>
       <div className="bg-white my-5 rounded-lg">
@@ -60,7 +60,7 @@ const Patient_Appointments_Dashboard = () => {
             My Upcoming Appointments
           </h2>
           <div>
-            <PatientAppointmentsList />
+            <PatientAppointmentsList selected={selected} />
           </div>
         </div>
       </div>

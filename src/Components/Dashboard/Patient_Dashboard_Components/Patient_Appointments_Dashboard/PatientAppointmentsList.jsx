@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import { AppointmentsContext } from "../../../../context/Patient Context/AppointmentsContext";
 import Pagination2 from "../Pagination/Pagination2";
 import { formatFullDate, formatTime } from "./Components/Date_Time_Formatter";
 import { CalendarIcon, UserIcon, Building2, MessageSquare } from "lucide-react";
 import { toast } from "react-hot-toast";
+import SearchBar from "../../../../Components/SearchBar/SearchBar";
 
-const PatientAppointmentsList = () => {
+const PatientAppointmentsList = ({selected}) => {
   const {
     appointments,
     isPending,
@@ -15,6 +16,41 @@ const PatientAppointmentsList = () => {
     totalPages,
     setCurrentPage,
   } = useContext(AppointmentsContext);
+
+   const [searchQuery, setSearchQuery] = useState("");
+  
+   const processedAppointments = useMemo(() => {
+    // 1. Filter by search query
+    let filtered = appointments.filter((app) => {
+      const searchStr = searchQuery.toLowerCase();
+      return (
+        app.staff?.firstname?.toLowerCase().includes(searchStr) ||
+        app.staff?.lastname?.toLowerCase().includes(searchStr) ||
+        app?.hospital_info?.name?.toLowerCase().includes(searchStr)
+      );
+    });
+
+    // 2. Sort based on the "selected" prop from parent
+    return [...filtered].sort((a, b) => {
+      const dateA = new Date(a.scheduled_time).getTime();
+      const dateB = new Date(b.scheduled_time).getTime();
+      const nameA = `${a.staff?.firstname} ${a.staff?.lastname}`.toLowerCase();
+      const nameB = `${b.staff?.firstname} ${b.staff?.lastname}`.toLowerCase();
+
+      switch (selected) {
+        case "Latest":
+          return dateB - dateA; // Newest first
+        case "Oldest":
+          return dateA - dateB; // Oldest first
+        case "A-Z":
+          return nameA.localeCompare(nameB);
+        case "Z-A":
+          return nameB.localeCompare(nameA);
+        default:
+          return 0;
+      }
+    });
+  }, [appointments, searchQuery, selected]);
 
   if (isPending) {
     return (
@@ -93,11 +129,16 @@ const PatientAppointmentsList = () => {
   }
   return (
     <>
+       <div className="mb-4 w-full">
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+     placeholder="Search by doctor or hospital..."
+        />
+      </div>
    <div className="my-4">
-
-      {/* --- DESKTOP VIEW (Horizontal Rows) --- */}
       <div className="hidden lg:block">
-        {appointments.map((apt) => (
+        {processedAppointments.map((apt) => (
           <div key={apt.id} className="flex items-center justify-between p-4 mb-4 border border-gray-200 rounded-md transition-shadow bg-white ">
             <div className="flex items-center gap-6 flex-1">
               <InfoGroup icon={<CalendarIcon size={16}/>} label="Date / Time" value={`${formatFullDate(apt.scheduled_time)} | ${formatTime(apt.scheduled_time)}`} />
@@ -116,7 +157,7 @@ const PatientAppointmentsList = () => {
 
       {/* --- MOBILE VIEW (Vertical Cards) --- */}
       <div className="block lg:hidden space-y-4">
-        {appointments.map((apt) => (
+        {processedAppointments.map((apt) => (
           <div key={apt.id} className="p-4 border border-gray-200 rounded-md bg-white ">
             <div className="flex justify-between items-start mb-4">
               <div>
