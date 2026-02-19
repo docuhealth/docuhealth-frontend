@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AppointmentsContext } from "../../../../context/Patient Context/AppointmentsContext";
-// import Pagination from "../Pagination/Pagination";
 import Pagination2 from "../Pagination/Pagination2";
 import { formatFullDate, formatTime } from "./Components/Date_Time_Formatter";
+import { CalendarIcon, UserIcon, Building2, MessageSquare } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 const PatientAppointmentsList = () => {
   const {
     appointments,
     isPending,
     isFetching,
-    isError,
-    error,
     count,
     currentPage,
     totalPages,
@@ -94,91 +93,84 @@ const PatientAppointmentsList = () => {
   }
   return (
     <>
-      <div className="text-[12px] my-4">
-        {isFetching && !isPending && (
-          <p className="text-gray-500 text-sm mb-2">Loading new page...</p>
-        )}
-        <div>
-          {appointments.map((appointment) => (
-            <div
-              key={appointment.id}
-              className="mb-4 p-4 border rounded-md grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 lg:gap-0 "
+   <div className="my-4">
+
+      {/* --- DESKTOP VIEW (Horizontal Rows) --- */}
+      <div className="hidden lg:block">
+        {appointments.map((apt) => (
+          <div key={apt.id} className="flex items-center justify-between p-4 mb-4 border border-gray-200 rounded-md transition-shadow bg-white ">
+            <div className="flex items-center gap-6 flex-1">
+              <InfoGroup icon={<CalendarIcon size={16}/>} label="Date / Time" value={`${formatFullDate(apt.scheduled_time)} | ${formatTime(apt.scheduled_time)}`} />
+              <InfoGroup icon={<Building2 size={16}/>} label="Hospital" value={apt?.hospital_info?.name} />
+              <InfoGroup icon={<UserIcon size={16}/>} label="Doctor" value={`Dr. ${apt?.staff?.firstname} ${apt?.staff?.lastname}`} />
+            </div>
+            <button 
+              onClick={() => toast.success("Coming Soon!")}
+              className="border border-[#3E4095] text-[#3E4095] rounded-full py-2 px-6 hover:bg-blue-50 transition-colors text-sm font-medium"
             >
-              <div className="flex items-center gap-1">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"
-                    fill="#1B2B40"
-                  />
-                </svg>
-                <p>Date: {formatFullDate(appointment.scheduled_time)}</p>
-              </div>
-              <div className="flex items-center gap-1">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM13 12H17V14H11V7H13V12Z"
-                    fill="#1B2B40"
-                  />
-                </svg>
+              Send message
+            </button>
+          </div>
+        ))}
+      </div>
 
-                <p>Time: {formatTime(appointment.scheduled_time)}</p>
+      {/* --- MOBILE VIEW (Vertical Cards) --- */}
+      <div className="block lg:hidden space-y-4">
+        {appointments.map((apt) => (
+          <div key={apt.id} className="p-4 border border-gray-200 rounded-md bg-white ">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <p className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Schedule</p>
+                <p className="text-sm font-semibold">{formatFullDate(apt.scheduled_time)}</p>
+                <p className="text-xs text-gray-500">{formatTime(apt.scheduled_time)}</p>
               </div>
-              <div className="flex items-center gap-1 lg:col-span-2">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8 20V14H16V20H19V4H5V20H8ZM10 20H14V16H10V20ZM21 20H23V22H1V20H3V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V20ZM11 8V6H13V8H15V10H13V12H11V10H9V8H11Z"
-                    fill="#1B2B40"
-                  />
-                </svg>
-
-                <p>
-                  Hospital: {appointment?.hospital_info?.name}{" "}
-                </p>
-              </div>
-              <div className="flex items-center gap-1">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z" fill="#1B2B40" />
-                </svg>
-
-
-                <p>Doctor: {appointment?.staff?.firstname}{" "}
-                  {appointment?.staff?.lastname}</p>
-              </div>
-              <div className="border-l lg:flex lg:justify-center lg:items-center sm:col-span-2 lg:col-span-1 w-full my-4 lg:my-0">
-                <button className="border border-[#3E4095] rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300">
-                  <p className="text-[#3E4095]">Send a message</p>
-                </button>
+              <div className="bg-blue-50 p-2 rounded-lg">
+                <CalendarIcon size={18} className="text-[#3E4095]" />
               </div>
             </div>
-          ))}
-        </div>
-        <Pagination2
-          count={count}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          setCurrentPage={setCurrentPage}
-        />
+            
+            <div className="space-y-3 mb-4">
+              <div className="flex items-center gap-3">
+                <Building2 size={14} className="text-gray-400" />
+                <p className="text-sm text-gray-700">{apt?.hospital_info?.name}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <UserIcon size={14} className="text-gray-400" />
+                <p className="text-sm text-gray-700">Dr. {apt?.staff?.firstname} {apt?.staff?.lastname}</p>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => toast.success("Coming Soon!")}
+              className="w-full flex items-center justify-center gap-2 bg-[#3E4095] text-white rounded-full py-2.5 text-[13px] font-medium"
+            >
+              <MessageSquare size={16} />
+              Send a message
+            </button>
+          </div>
+        ))}
       </div>
+
+      <Pagination2
+        count={count}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
+    </div>
     </>
   );
 };
+
+const InfoGroup = ({ icon, label, value }) => (
+  <div className="flex items-center gap-3 min-w-[150px]">
+    <div className="p-2 bg-gray-100 rounded-md text-gray-600">{icon}</div>
+    <div>
+      <p className="text-[10px] text-gray-400 uppercase font-bold">{label}</p>
+      <p className="text-sm font-medium text-gray-800 truncate max-w-[180px]">{value || "N/A"}</p>
+    </div>
+  </div>
+);
+
 
 export default PatientAppointmentsList;

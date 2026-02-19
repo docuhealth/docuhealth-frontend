@@ -93,7 +93,9 @@ const Drug_Records = () => {
           </div>
         ) :(
             <>
-            <p>Drug Records...</p>
+           <h2 className=" mb-4 pb-2 border-b font-medium">
+            My Drug Records
+          </h2>
             </>
         )
         }
