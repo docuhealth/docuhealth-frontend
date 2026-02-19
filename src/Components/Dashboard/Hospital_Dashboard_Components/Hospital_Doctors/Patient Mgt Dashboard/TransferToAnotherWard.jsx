@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import { DoctorAppContext } from "../../../../../context/Hospital Context/Doctors/DoctorAppContext";
 import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 import {toast} from "react-hot-toast";
+import { HosWardContext } from "../../../../../context/Hospital Context/HosWardContext";
 
 const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) => {
 
-      const { profile, wards } = useContext(DoctorAppContext);
+      const { wards } = useContext(HosWardContext);
     
       const [wardOptions, setWardOptions] = useState([]);
       const [availableBeds, setAvailableBeds] = useState([]);

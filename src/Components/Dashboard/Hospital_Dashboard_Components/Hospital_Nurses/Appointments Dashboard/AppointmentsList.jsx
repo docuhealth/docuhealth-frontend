@@ -462,7 +462,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                       {appointment.staff.role}
                     </p>
                     <p className="text-[13px] text-slate-600">
-                      Dr. {appointment.staff.firstname}{" "}
+                      {appointment.staff.firstname}{" "}
                       {appointment.staff.lastname}
                     </p>
                   </div>
