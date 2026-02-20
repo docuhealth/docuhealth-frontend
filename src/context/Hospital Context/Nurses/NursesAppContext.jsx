@@ -20,10 +20,12 @@ const NursesProfileProvider = (props) => {
 
       const profile = data?.nurse ;
       const wardInfo = data?.ward_info
+      const backgroundImage = data?.theme?.bg_image
+        const hospitalName = data?.theme?.name;
 
 
   return (
-    <NursesAppContext.Provider value={{ profile, wardInfo }}>
+    <NursesAppContext.Provider value={{ profile, wardInfo, backgroundImage, hospitalName }}>
         {props.children}
     </NursesAppContext.Provider>
   )

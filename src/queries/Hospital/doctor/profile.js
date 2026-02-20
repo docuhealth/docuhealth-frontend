@@ -3,7 +3,7 @@ import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 
 export const fetchDoctorProfile = async () => {
   const res = await axiosInstanceHos.get("api/doctors/dashboard");
-  return res.data.doctor;
+  return res.data;
 };
 
 export const fetchDocuHealthHospitals = async () => {

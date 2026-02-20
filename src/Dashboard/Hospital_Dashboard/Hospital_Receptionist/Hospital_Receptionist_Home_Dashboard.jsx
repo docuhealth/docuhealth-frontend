@@ -9,6 +9,7 @@ import BookAppointment from "../../../Components/Dashboard/Hospital_Dashboard_Co
 import AppointmentsList from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Appointments Dashboard/AppointmentsList";
 import RecentPatients from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home Dashboard/components/RecentPatients";
 import { HosWardContext } from "../../../context/Hospital Context/HosWardContext";
+import { ReceptionistAppContext } from "../../../context/Hospital Context/Receptionist/ReceptionistAppContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const Hospital_Receptionist_Home_Dashboard = () => {
@@ -21,6 +22,10 @@ const Hospital_Receptionist_Home_Dashboard = () => {
   const [bookAppointment, setBookAppointment] = useState(false);
 
   const { wards } = useContext(HosWardContext);
+  const { hospitalName, backgroundImage } = useContext(ReceptionistAppContext);
+
+    const backgroundImageUrl = backgroundImage || template
+  
 
   const totalBeds = wards?.reduce((sum, w) => sum + w.total_beds, 0) || 0;
   const availableBeds =
@@ -219,9 +224,20 @@ const Hospital_Receptionist_Home_Dashboard = () => {
         <>
           <div className="py-2">
             <DynamicDate />
-            <div className="pt-4">
-              <img src={template} alt="img" />
-            </div>
+             <div
+          className="relative mt-4 w-full h-[300px] rounded-xl bg-cover bg-center flex flex-col items-center justify-center border border-gray-300"
+          style={{
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${backgroundImageUrl})`
+          }}
+        >
+          {/* Watermark / Helper Text */}
+          <div className="text-white text-center mb-4">
+            <p className="text-xl font-semibold opacity-90 uppercase tracking-widest">
+              {hospitalName || 'NIL'}  Hospital
+            </p>
+          </div>
+        </div>
+
             <div className="text-sm grid grid-cols-1 lg:flex lg:justify-end lg:items-center gap-2 lg:gap-5 mt-5">
               <button
                 className=" border border-[#3E4095] rounded-full py-2.5 px-4 lg:px-8 text-[#3E4095] cursor-pointer"

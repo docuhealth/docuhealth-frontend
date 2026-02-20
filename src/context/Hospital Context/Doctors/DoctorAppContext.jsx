@@ -1,6 +1,6 @@
 import React, { createContext } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchDoctorProfile, fetchDocuHealthHospitals } from "../../../queries/Hospital/doctor/profile"; 
+import { fetchDoctorProfile, fetchDocuHealthHospitals } from "../../../queries/Hospital/doctor/profile";
 import { getHospitalToken } from "../../../services/authService";
 
 export const DoctorAppContext = createContext();
@@ -9,11 +9,11 @@ const DoctorProfileProvider = ({ children }) => {
   const isUserLoggedIn = !!getHospitalToken();
 
 
-  const { data: profile } = useQuery({
+  const { data } = useQuery({
     queryKey: ["doctor-profile"],
     queryFn: fetchDoctorProfile,
-    enabled: isUserLoggedIn, 
-    staleTime: 1000 * 60 * 30, 
+    enabled: isUserLoggedIn,
+    staleTime: 1000 * 60 * 30,
   });
 
 
@@ -21,14 +21,23 @@ const DoctorProfileProvider = ({ children }) => {
     queryKey: ["docuhealth-hospitals-list"],
     queryFn: fetchDocuHealthHospitals,
     enabled: isUserLoggedIn,
-    placeholderData: [], 
+    placeholderData: [],
   });
 
+  const profile = data?.doctor;
+  const backgroundImage = data?.theme?.bg_image;
+  const hospitalName = data?.theme?.name;
+
+  console.log(data)
+
+
   return (
-    <DoctorAppContext.Provider value={{ 
-      profile: profile || null, 
+    <DoctorAppContext.Provider value={{
+      profile: profile || null,
       hospitals: hospitals || [],
-      isLoading: !profile && isUserLoggedIn 
+      isLoading: !profile && isUserLoggedIn,
+      backgroundImage,
+      hospitalName
     }}>
       {children}
     </DoctorAppContext.Provider>

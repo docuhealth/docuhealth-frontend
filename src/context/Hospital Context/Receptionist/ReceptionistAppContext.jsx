@@ -8,15 +8,20 @@ export const ReceptionistAppContext = createContext();
 const ReceptionistProfileProvider = (props) => {
   const isUserLoggedIn = !!getHospitalToken();
 
-  const { data: profile, isPending: profileLoading } = useQuery({
+  const { data, isPending: profileLoading } = useQuery({
     queryKey: ["receptionist-profile"],
     queryFn: fetchReceptionistProfile,
     enabled: isUserLoggedIn,
     staleTime: 1000 * 60 * 30, 
   });
 
+  const profile = data?.receptionist;
+  const backgroundImage = data?.theme?.bg_image;
+  const hospitalName = data?.theme?.name;
+ 
+
       return(
-        <ReceptionistAppContext.Provider value={{ profile, loading: profileLoading }}>{props.children}</ReceptionistAppContext.Provider>
+        <ReceptionistAppContext.Provider value={{ profile, backgroundImage, hospitalName, loading: profileLoading }}>{props.children}</ReceptionistAppContext.Provider>
       )
 }
 
