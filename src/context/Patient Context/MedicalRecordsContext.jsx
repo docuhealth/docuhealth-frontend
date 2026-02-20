@@ -38,8 +38,10 @@ const MedicalRecordsProvider = (props) => {
     }
   }, [isError, error]);
 
-  const medicalRecords = data?.results || [];
-  const count = data?.count || 0;
+  console.log(data)
+
+  const medicalRecords = data?.medical_records?.results || [];
+  const count = data?.medical_records?.count || 0;
   const totalPages = Math.ceil(count / pageSize);
 
   return (

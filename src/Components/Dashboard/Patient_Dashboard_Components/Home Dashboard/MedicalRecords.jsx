@@ -4,6 +4,9 @@ import Pagination2 from "../Pagination/Pagination2";
 import formatRecordDate from "./Components/formatRecordDate";
 import { formatFullDateTime } from "./Components/formatRecordDate";
 import { truncateWords } from "./Components/formatRecordDate";
+import toast from "react-hot-toast";
+import { AppContext } from "../../../../context/Patient Context/AppContext";
+import { fetchSubscriptionStatus } from "../../../../services/authService";
 
 const MedicalRecords = ({
   selected,
@@ -19,12 +22,13 @@ const MedicalRecords = ({
   const { setCurrentPage } = useContext(MedicalRecordsContext);
   const { totalPages } = useContext(MedicalRecordsContext);
 
+  const { profile } = useContext(AppContext);
 
   const sortedRecords = React.useMemo(() => {
     if (!medicalRecords) return [];
-  
+
     let sorted = [...medicalRecords];
-  
+
     switch (selected) {
       case "Latest":
         sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -41,9 +45,11 @@ const MedicalRecords = ({
       default:
         break;
     }
-  
+
     return sorted;
   }, [medicalRecords, selected]);
+
+
 
   if (isPending) {
     return (
@@ -121,14 +127,13 @@ const MedicalRecords = ({
   }
 
   return (
-    <div className="bg-white my-5 border rounded-2xl pt-8 px-6 ">
-      {isFetching && !isPending && (
-        <p className="text-gray-500 text-sm mb-2">Loading new page...</p>
-      )}
-      <h1 className="mb-4 font-medium">Medical Records</h1>
-      <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div className="bg-white my-5 border rounded-lg py-5 px-5 ">
+      <h2 className=" mb-4 pb-2 border-b font-medium">
+        My Medical Records
+      </h2>
+      <div className="-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {sortedRecords.map((record) => (
-          <div key={record.id} className="bg-[#FAFEFF] border rounded-xl p-5">
+          <div key={record.id} className="bg-[#FAFEFF] border rounded-lg p-4">
             <div className="flex justify-between items-center ">
               <div className="flex items-center gap-1">
                 <svg
@@ -145,8 +150,8 @@ const MedicalRecords = ({
                 </svg>
                 <p className="font-medium">
                   {" "}
-                  {record?.doctor_info
-                    ? `${record.doctor_info.firstname} ${record.doctor_info.lastname}`
+                  {record?.staff_info
+                    ? `Dr. ${record.staff_info.firstname} ${record.staff_info.lastname}`
                     : "NIL"}
                 </p>
               </div>
@@ -210,19 +215,35 @@ const MedicalRecords = ({
               <p className="">{formatFullDateTime(record.created_at)}</p>
             </div>
             <div className="py-5">
-              <p>{truncateWords(record.chief_complaint, 20)}</p>
+              <p>{truncateWords(record.chief_complaint, 100)}</p>
             </div>
             <div className="grid grid-cols-2 gap-3 ">
               <button
                 className="bg-[#1B2B40] py-2 text-white rounded-full "
                 onClick={() => {
-                  setSelectedMedicalRecord(record);
-                  setViewDetailMedicalRecord(true);
+                  if (profile) {
+                    const is_subscribed = fetchSubscriptionStatus();
+                    if (!is_subscribed) {
+                      toast.error("Please subscribe to access feature");
+                      return;
+                    }
+                    setSelectedMedicalRecord(record);
+                    setViewDetailMedicalRecord(true);
+                  } else {
+                    console.log("no profile");
+                    toast.error("We couldn't find a profile. Try again");
+                  }
                 }}
+
+
               >
                 <p>View details</p>
               </button>
-              <button className="flex justify-center items-center gap-1 py-2 border border-[#1B2B40] rounded-full">
+              <button className="flex justify-center items-center gap-1 py-2 border border-[#1B2B40] rounded-full"
+                onClick={() => {
+                  toast.success("Coming soon !")
+                }}
+              >
                 <svg
                   width="12"
                   height="12"
