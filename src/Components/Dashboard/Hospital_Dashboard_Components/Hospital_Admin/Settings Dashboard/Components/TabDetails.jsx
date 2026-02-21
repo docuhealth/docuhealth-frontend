@@ -75,10 +75,11 @@ const AccountSettingsTab = () => {
   };
 
   const updateNameMutation = useMutation({
-    mutationFn: (newName) =>
-      axiosInstanceHos.patch("api/auth/hospital-admin-profile", {
-        name: newName,
-      }),
+    mutationFn: (newName) =>{
+      const formData = new FormData();
+
+    formData.append("name", newName);
+      axiosInstanceHos.patch("api/auth/hospital-admin-profile", formData)},
     onSuccess: () => {
       toast.success("Profile name updated!");
       // This is where the magic happens:
@@ -93,6 +94,7 @@ const AccountSettingsTab = () => {
   const handleUpdateName = (e) => {
     e.preventDefault();
     if (!formData.name.trim()) return toast.error("Name cannot be empty");
+    console.log(formData.name)
     updateNameMutation.mutate(formData.name);
   };
 
