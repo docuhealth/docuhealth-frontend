@@ -1,49 +1,165 @@
 import React, { useState, useContext, useMemo } from "react";
 import { HosStaffsContext } from "../../../../../context/Hospital Context/HosStaffsContext";
-
+import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import SearchBar from "../../../../SearchBar/SearchBar";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
   const { staffs, loading, count, currentPage, totalPages, setCurrentPage } =
     useContext(HosStaffsContext);
 
-    console.log(staffs)
+  // console.log(staffs)
 
-const [activeMenu, setActiveMenu] = useState(null);
+  const [activeMenu, setActiveMenu] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
- const processedStaffs = useMemo(() => {
-  let result = staffs.filter((staff) => {
-    const searchStr = searchQuery.toLowerCase();
-    return (
-      staff.firstname?.toLowerCase().includes(searchStr) ||
-      staff.lastname?.toLowerCase().includes(searchStr) ||
-      staff.staff_id?.toLowerCase().includes(searchStr) ||
-      staff.email?.toLowerCase().includes(searchStr)
-    );
+  const [selectedStaffForRole, setSelectedStaffForRole] = useState(null);
+  const [newRole, setNewRole] = useState("");
+
+  const queryClient = useQueryClient();
+
+  const processedStaffs = useMemo(() => {
+    let result = staffs.filter((staff) => {
+      const searchStr = searchQuery.toLowerCase();
+      return (
+        staff.firstname?.toLowerCase().includes(searchStr) ||
+        staff.lastname?.toLowerCase().includes(searchStr) ||
+        staff.staff_id?.toLowerCase().includes(searchStr) ||
+        staff.email?.toLowerCase().includes(searchStr)
+      );
+    });
+
+
+    const getDisplayName = (staff) => {
+      const title = staff.role === 'doctor' ? 'Dr. ' : '';
+      return `${title}${staff.firstname} ${staff.lastname}`.toLowerCase();
+    };
+
+    switch (filterType) {
+      case "A-Z":
+        return [...result].sort((a, b) =>
+          getDisplayName(a).localeCompare(getDisplayName(b), undefined, { sensitivity: 'base' })
+        );
+      case "Z-A":
+        return [...result].sort((a, b) =>
+          getDisplayName(b).localeCompare(getDisplayName(a), undefined, { sensitivity: 'base' })
+        );
+      case "Oldest":
+        return [...result].sort((a, b) => a.staff_id.localeCompare(b.staff_id));
+      default:
+        return result;
+    }
+  }, [staffs, searchQuery, filterType]);
+
+
+  const { mutate: removeStaff, isPending: isRemoving } = useMutation({
+    mutationFn: (ids) =>
+      axiosInstanceHos.post("/api/hospitals/team-members/remove", {
+        staff_ids: ids // The API expects an object with a staff_ids array
+      }),
+    onSuccess: () => {
+      toast.success("Staff member(s) removed successfully");
+      // Invalidate the specific page of the staff list to trigger a refetch
+      queryClient.invalidateQueries(["hospital-staffs", currentPage]);
+      setSelectedStaff([]); // Clear checkboxes after bulk removal
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Failed to remove staff");
+    }
   });
 
-  const getDisplayName = (staff) => {
-    const title = staff.role === 'doctor' ? 'Dr. ' : '';
-    return `${title}${staff.firstname} ${staff.lastname}`.toLowerCase();
+
+  // const staffObjectsToRemove = staffs.filter((staff) =>
+  //   selectedStaff.includes(staff.staff_id)
+  // );
+
+  // console.log("Bulk Removing Staff Details:", staffObjectsToRemove);
+
+
+  const handleBulkRemove = () => {
+    if (selectedStaff.length === 0) return toast.error("Please select staff to remove");
+
+    removeStaff(selectedStaff);
   };
 
-  switch (filterType) {
-    case "A-Z":
-      return [...result].sort((a, b) => 
-        getDisplayName(a).localeCompare(getDisplayName(b), undefined, { sensitivity: 'base' })
-      );
-    case "Z-A":
-      return [...result].sort((a, b) => 
-        getDisplayName(b).localeCompare(getDisplayName(a), undefined, { sensitivity: 'base' })
-      );
-    case "Oldest":
-      return [...result].sort((a, b) => a.staff_id.localeCompare(b.staff_id));
-    default:
-      return result;
-  }
-}, [staffs, searchQuery, filterType]);
+  const handleIndividualRemove = (staff) => {
+    removeStaff([staff.staff_id]);
+    setActiveMenu(null);
+  };
+
+  const { mutate: updateRole, isPending: isUpdatingRole } = useMutation({
+    mutationFn: ({ staff_id, role }) =>
+      // The staff_id goes in the URL path, not the body
+      axiosInstanceHos.patch(`/api/hospitals/team-member/${staff_id}/update-role`, {
+        role: role, // Body only contains the role
+      }),
+    onSuccess: () => {
+      toast.success("Role updated successfully");
+      queryClient.invalidateQueries(["hospital-staffs", currentPage]);
+      setSelectedStaffForRole(null);
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Failed to update role");
+    },
+  });
+
+  const handleUpdateRole = (staff) => {
+    setSelectedStaffForRole(staff);
+    setNewRole(staff.role); // Pre-fill with current role
+
+    // console.log(staff)
+    setActiveMenu(null);
+  };
+
+  const submitRoleUpdate = (e) => {
+    e.preventDefault();
+    if (!newRole) return toast.error("Please select a role");
+
+    updateRole({
+      staff_id: selectedStaffForRole.staff_id,
+      role: newRole
+    });
+  };
+
+  // --- SELECTION LOGIC ---
+
+  const allChecked = staffs.length > 0 && selectedStaff.length === staffs.length;
+
+  const toggleSelectAll = () => {
+    if (allChecked) {
+      console.log("Deselected all staff");
+      setSelectedStaff([]);
+    } else {
+      const allIds = staffs.map((s) => s.staff_id);
+      // console.log("Selected all staff:", staffs);
+      setSelectedStaff(allIds);
+    }
+  };
+
+  const toggleStaff = (id) => {
+    if (!id) {
+      console.error("Error: This staff member has no ID property!");
+      return;
+    }
+
+    setSelectedStaff((prev) => {
+      const isRemoving = prev.includes(id);
+
+      if (isRemoving) {
+        console.log(`Unchecked staff ID: ${id}`);
+        return prev.filter((item) => item !== id);
+      } else {
+        // Find the specific staff object using staff_id to log it
+        const staffMember = staffs.find((s) => s.staff_id === id);
+        console.log("Checked staff:", staffMember);
+        return [...prev, id];
+      }
+    });
+  };
+
+
 
   if (loading) {
     return (
@@ -121,83 +237,14 @@ const [activeMenu, setActiveMenu] = useState(null);
     );
   }
 
-  const handleBulkRemove = () => {
-    // Map the selected staff_ids back to the full objects for logging
-    const staffObjectsToRemove = staffs.filter((staff) =>
-      selectedStaff.includes(staff.staff_id)
-    );
-
-    console.log("Bulk Removing Staff Details:", staffObjectsToRemove);
-
-    // Trigger your API request here using selectedStaff (the IDs)
-    // deleteStaffsApi(selectedStaff);
-
-    setSelectedStaff([]); // Reset selection
-  };
-
-  const handleIndividualRemove = (staff) => {
-    // Use the whole object passed in to log details
-    console.log("Removing Staff Member:", staff);
-
-    // Trigger your API request here using staff.staff_id
-    // deleteStaffApi(staff.staff_id);
-
-    setActiveMenu(null);
-  };
-
-  const handleUpdateRole = (staff) => {
-    console.log(`Directly updating role for: ${staff.firstname} (${staff.staff_id})`);
-    console.log(`Current role is: ${staff.role}`);
-
-    // Usually, you would open a modal here. For direct request:
-    // updateRoleApi(staff.staff_id, "New Role");
-
-    setActiveMenu(null);
-  };
-
-  // --- SELECTION LOGIC ---
-
-  const allChecked = staffs.length > 0 && selectedStaff.length === staffs.length;
-
-  const toggleSelectAll = () => {
-    if (allChecked) {
-      console.log("Deselected all staff");
-      setSelectedStaff([]);
-    } else {
-      const allIds = staffs.map((s) => s.staff_id);
-      // console.log("Selected all staff:", staffs);
-      setSelectedStaff(allIds);
-    }
-  };
-
-  const toggleStaff = (id) => {
-    if (!id) {
-      console.error("Error: This staff member has no ID property!");
-      return;
-    }
-
-    setSelectedStaff((prev) => {
-      const isRemoving = prev.includes(id);
-
-      if (isRemoving) {
-        console.log(`Unchecked staff ID: ${id}`);
-        return prev.filter((item) => item !== id);
-      } else {
-        // Find the specific staff object using staff_id to log it
-        const staffMember = staffs.find((s) => s.staff_id === id);
-        console.log("Checked staff:", staffMember);
-        return [...prev, id];
-      }
-    });
-  };
 
   return (
     <>
       {selectedStaff.length > 0 && (
         <div
           className={`transition-all duration-300 mb-4 flex items-center justify-between p-3 rounded-lg ${selectedStaff.length > 0
-              ? "bg-red-50 border border-red-100 opacity-100"
-              : "opacity-0 h-0 overflow-hidden"
+            ? "bg-red-50 border border-red-100 opacity-100"
+            : "opacity-0 h-0 overflow-hidden"
             }`}
         >
           <p className="text-sm text-red-700 font-medium">
@@ -205,9 +252,17 @@ const [activeMenu, setActiveMenu] = useState(null);
           </p>
           <button
             onClick={handleBulkRemove}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-xs font-bold transition-colors"
+            disabled={isRemoving} // Prevent clicks while loading
+            className={`${isRemoving ? "bg-red-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+              } text-white px-4 py-2 rounded-full text-xs font-bold transition-colors flex items-center gap-2`}
           >
-            Remove from Team
+            {isRemoving ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Removing...
+              </>
+            ) : (
+              "Remove from Team"
+            )}
           </button>
         </div>
       )}
@@ -301,7 +356,7 @@ const [activeMenu, setActiveMenu] = useState(null);
                 {activeMenu === staff.staff_id && (
                   <div className="absolute right-0 top-10 w-40 bg-white border border-gray-200 rounded-md shadow z-50 ">
                     <button
-                      onClick={() => handleUpdateRole(index, staff.role)}
+                      onClick={() => handleUpdateRole(staff)}
                       className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 hover:rounded-t-md"
                     >
                       Update Role
@@ -385,7 +440,7 @@ const [activeMenu, setActiveMenu] = useState(null);
                     </button>
                     {activeMenu === staff.staff_id && (
                       <div className="absolute right-0 top-8 w-52 bg-white border border-gray-200 rounded-lg shadow z-50 py-2">
-                        <button onClick={() => handleUpdateRole(index, staff.role)} className="w-full text-left px-4 py-3 text-sm border-b border-gray-50 hover:rounded-t-md">Update Role</button>
+                        <button onClick={() => handleUpdateRole(staff)} className="w-full text-left px-4 py-3 text-sm border-b border-gray-50 hover:rounded-t-md">Update Role</button>
                         <button onClick={() => handleIndividualRemove(staff)} className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md">Remove from Team</button>
                       </div>
                     )}
@@ -455,6 +510,61 @@ const [activeMenu, setActiveMenu] = useState(null);
           ))}
         </div>
       </div>
+
+      {selectedStaffForRole && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+          <div className="bg-white rounded-lg p-5 w-full max-w-sm shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-medium text-md text-gray-800">Update Staff Role</h3>
+              <button
+                onClick={() => setSelectedStaffForRole(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M18 6L6 18M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-500 mb-6">
+              Changing role for <span className="font-semibold text-gray-700">{selectedStaffForRole.firstname} {selectedStaffForRole.lastname}</span>
+            </p>
+
+            <form onSubmit={submitRoleUpdate} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-400 uppercase mb-2">Select New Role</label>
+                <select
+                  value={newRole}
+                  onChange={(e) => setNewRole(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-[#3E4095] outline-none"
+                >
+                  <option value="doctor">Doctor</option>
+                  <option value="nurse">Nurse</option>
+                  {/* <option value="admin">Admin</option> */}
+                  <option value="receptionist">Receptionist</option>
+                  {/* <option value="pharmacist">Pharmacist</option>
+                  <option value="lab_technician">Lab Technician</option> */}
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isUpdatingRole}
+                className="w-full bg-[#3E4095] text-white py-2.5 rounded-full font-medium text-sm hover:bg-[#2e3070] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+              >
+                {isUpdatingRole ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Updating role
+                  </div>
+                ) : "Confirm Update"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+
       <Pagination2
         count={count}
         currentPage={currentPage}

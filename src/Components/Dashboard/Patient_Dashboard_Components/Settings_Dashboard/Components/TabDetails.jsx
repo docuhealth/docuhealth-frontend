@@ -210,7 +210,7 @@ const AccountSettingsTab = () => {
           <form className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 py-2">
               {/* Name Input */}
-              <div className="">
+              {/* <div className="">
                 <label
                   htmlFor="fname"
                   className="block text-sm font-medium text-gray-700 mb-1"
@@ -257,7 +257,7 @@ const AccountSettingsTab = () => {
                   onChange={handleChange}
                   className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
                 />
-              </div>
+              </div> */}
 
               {/* Email Input */}
               <div className="">
