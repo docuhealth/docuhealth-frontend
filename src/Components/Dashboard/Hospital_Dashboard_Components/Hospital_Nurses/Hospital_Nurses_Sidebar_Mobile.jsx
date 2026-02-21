@@ -8,47 +8,10 @@ const Hospital_Nurses_Sidebar_Mobile = ({ openMobileSidebar,
   setOpenMobileSidebar, setIsModalOpen
 }) => {
 
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [selected, setSelected] = useState('nurse')
-  // const [handoverData, setHandoverData] = useState(null);
-
-  // const [staffList, setStaffList] = useState(null);
-  // const [isFetching, setIsFetching] = useState(false);
-
   const location = useLocation();
   const currentPath = location.pathname;
   const navigate = useNavigate();
 
-  // const handleLogoutLogic = async (handoverSelection) => {
-  //   // If user clicked "Just Logout" (handoverSelection is null)
-  //   if (!handoverSelection) {
-  //     sessionStorage.clear();
-  //     navigate("/login");
-  //     return;
-  //   }
-
-  //   // If they clicked "Proceed to assign"
-  //   setHandoverData(handoverSelection);
-  //   setIsFetching(true);
-
-  //   try {
-  //     console.log("Fetching staff manually...");
-  //     const data = await fetchStaff(selected);
-  //     setStaffList(data);
-  //     console.log("Staff list loaded:", data);
-  //   } catch (error) {
-  //     console.error("Error fetching staff:", error);
-  //     alert("Failed to load staff list. Please try again.");
-  //   } finally {
-  //     setIsFetching(false);
-  //   }
-  // };
-
-  // const handleCloseModal = () => {
-  //   setIsModalOpen(false);
-  //   setStaffList(null); // Reset data so it starts from the checkbox view next time
-  //   setHandoverData(null);
-  // };
 
   return (
     <>

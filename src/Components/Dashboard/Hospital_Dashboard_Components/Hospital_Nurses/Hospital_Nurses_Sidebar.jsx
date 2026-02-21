@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import LogOutModal from "./LogOut/components/LogOutModal";
-import { fetchStaff } from "../../../../queries/Hospital/fetchStaff";
 import { NursesAppContext } from "../../../../context/Hospital Context/Nurses/NursesAppContext";
 import axiosInstanceHos from "../../../../utils/axiosInstanceHos";
 import toast from 'react-hot-toast'
@@ -44,8 +43,8 @@ const Hospital_Nurses_Sidebar = () => {
 
     try {
       console.log("Fetching staff manually...");
-      const data = await fetchStaff(selected);
-      setStaffList(data);
+      const data = await axiosInstanceHos.get('/api/receptionists/staff/nurse')
+      setStaffList(data.data);
       console.log("Staff list loaded:", data);
     } catch (error) {
       console.error("Error fetching staff:", error);
