@@ -153,7 +153,7 @@ const handlePayment = async (planId) => {
                   </p>
                 ))}
                 {[
-                  "No access to medical record summary and dowloads.",
+                  "No access to medical record summary.",
                   "No access to uploaded documents",
                   "No access to creating a Kid's account",
                   "No access to creating or printing ID Card",
