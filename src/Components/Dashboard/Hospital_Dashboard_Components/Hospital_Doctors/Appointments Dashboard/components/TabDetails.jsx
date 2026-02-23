@@ -415,7 +415,7 @@ const PatientMedicalRecord = ({
 
   return (
     <>
-      {Array.isArray(patientMedRecords) && patientMedRecords.length > 0 ? (
+      {/* {Array.isArray(patientMedRecords) && patientMedRecords.length > 0 ? (
         <>
           <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {patientMedRecords.map((record) => (
@@ -550,7 +550,8 @@ const PatientMedicalRecord = ({
         </>
       ) : (
         <p className="text-center">No medical records found.</p>
-      )}
+      )} */}
+      <p className="text-center text-sm">Coming Soon !!!</p>
     </>
   );
 };

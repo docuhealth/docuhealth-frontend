@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HosAppContext } from "../../../../../../context/Hospital Context/Admin/HosAppContext";
-import {HosWardContext} from "../../../../../../context/Hospital Context/HosWardContext"
+import { HosWardContext } from "../../../../../../context/Hospital Context/HosWardContext"
 
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import toast from "react-hot-toast";
@@ -38,6 +38,8 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
   const doctorSpecializations = [
     "Surgeon",
+    "Gynecologist",
+    "Obstetrician",
     "Pediatrician",
     "Cardiologist",
     "Endocrinologist",
@@ -46,7 +48,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     "Dermatologist",
     "Orthopedic",
     "Radiologist",
-    "Anesthesiologist",
+    "Anesthesiologist"
   ];
 
   const nurseSpecializations = [
@@ -70,11 +72,11 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   ];
 
   const specializationOptions =
-  form.personnel === "doctor"
-    ? doctorSpecializations
-    : form.personnel === "nurse"
-    ? nurseSpecializations
-    : [];
+    form.personnel === "doctor"
+      ? doctorSpecializations
+      : form.personnel === "nurse"
+        ? nurseSpecializations
+        : [];
 
 
   const gender = ["male", "female"];
@@ -143,11 +145,11 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   };
 
   const handleChange = (field, value) => {
-   setForm((prev) => ({
-    ...prev,
-    [field]: value,
-    ...(field === "personnel" && { specialization: "", ward: "" })
-  }));
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+      ...(field === "personnel" && { specialization: "", ward: "" })
+    }));
   };
 
   const invitationHTML = `
@@ -190,54 +192,54 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   };
 
   const createStaffMutation = useMutation({
-  mutationFn: (payload) => 
-    axiosInstanceHos.post("api/hospitals/team-member", payload),
-  onSuccess: () => {
-    toast.success("Team member added successfully");
-    
-    // 🔹 THIS INVALIDATES THE STAFF LIST
-    queryClient.invalidateQueries(["hospital-staffs"]); 
-    
-    // Reset and Close
-    setForm({
-      firstname: "", lastname: "", phone: "", gender: "",
-      role: "", personnel: "", specialization: "", ward: "",
-      email: "", password: "",
-    });
-    setStep(1);
-    setCreateNewStaff(false);
-  },
-  onError: (error) => {
-    toast.error(error.response?.data?.message || "Something went wrong.");
-  }
-});
+    mutationFn: (payload) =>
+      axiosInstanceHos.post("api/hospitals/team-member", payload),
+    onSuccess: () => {
+      toast.success("Team member added successfully");
 
+      // 🔹 THIS INVALIDATES THE STAFF LIST
+      queryClient.invalidateQueries(["hospital-staffs"]);
 
-const handleSubmit = (e) => {
-  e.preventDefault();
-
-  if (!form.email) return toast.error("Enter an email address");
-
-  const payload = {
-    email: form.email,
-    password: form.password,
-    profile: {
-      firstname: form.firstname,
-      lastname: form.lastname,
-      phone_num: form.phone,
-      role: form.personnel,
-      gender: form.gender,
-      staff_id: "NIG_101", // Consider generating this dynamically if needed
-      email: form.email,
-      ...(form.specialization && { specialization: form.specialization }),
-      ...(form.ward && { ward: form.ward }),
+      // Reset and Close
+      setForm({
+        firstname: "", lastname: "", phone: "", gender: "",
+        role: "", personnel: "", specialization: "", ward: "",
+        email: "", password: "",
+      });
+      setStep(1);
+      setCreateNewStaff(false);
     },
-    login_url: "https://hospital.docuhealthservices.net/login",
-    invitation_message: invitationHTML,
-  };
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Something went wrong.");
+    }
+  });
 
-  createStaffMutation.mutate(payload);
-};
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!form.email) return toast.error("Enter an email address");
+
+    const payload = {
+      email: form.email,
+      password: form.password,
+      profile: {
+        firstname: form.firstname,
+        lastname: form.lastname,
+        phone_num: form.phone,
+        role: form.personnel,
+        gender: form.gender,
+        staff_id: "NIG_101", // Consider generating this dynamically if needed
+        email: form.email,
+        ...(form.specialization && { specialization: form.specialization }),
+        ...(form.ward && { ward: form.ward }),
+      },
+      login_url: "https://hospital.docuhealthservices.net/login",
+      invitation_message: invitationHTML,
+    };
+
+    createStaffMutation.mutate(payload);
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-3">
@@ -279,7 +281,7 @@ const handleSubmit = (e) => {
 
               <input
                 placeholder="Phone number"
-                type ='number'
+                type='number'
                 value={form.phone}
                 onChange={(e) => handleChange("phone", e.target.value)}
                 className="border p-2 rounded-lg outline-none text-sm focus:border-[#3E4095]"
@@ -317,9 +319,8 @@ const handleSubmit = (e) => {
                 disabled={form.personnel === "receptionist" || !form.personnel}
                 value={form.specialization}
                 onChange={(e) => handleChange("specialization", e.target.value)}
-                className={`border p-2 rounded-lg outline-none text-sm col-span-2 ${
-                  form.personnel === "receptionist" ? "bg-gray-100" : ""
-                }`}
+                className={`border p-2 rounded-lg outline-none text-sm col-span-2 ${form.personnel === "receptionist" ? "bg-gray-100" : ""
+                  }`}
               >
                 <option value="">Area of specialization</option>
                 {specializationOptions.map((s) => (
@@ -334,9 +335,8 @@ const handleSubmit = (e) => {
                 disabled={form.personnel === "receptionist"}
                 value={form.ward}
                 onChange={(e) => handleChange("ward", e.target.value)}
-                className={`border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-[#3E4095] ${
-                  form.personnel === "receptionist" ? "bg-gray-100" : ""
-                }`}
+                className={`border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-[#3E4095] ${form.personnel === "receptionist" ? "bg-gray-100" : ""
+                  }`}
               >
                 <option value="">Assign to ward</option>
                 {wardOptions.map((w) => (
