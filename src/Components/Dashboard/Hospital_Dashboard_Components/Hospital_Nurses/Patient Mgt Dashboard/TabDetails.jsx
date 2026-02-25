@@ -1,9 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import toast from "react-hot-toast";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home Dashboard/Components/formatRecordDate";
 import { NursesAdmittedPatientMGTContext } from "../../../../../context/Hospital Context/Nurses/NursesAdmittedPatientMGTContext";
+import SearchBar from "../../../../SearchBar/SearchBar";
 
 
 const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) => {
@@ -17,7 +18,30 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
     } = useContext(NursesAdmittedPatientMGTContext);
     const [selectedPatient, setSelectedPatient] = useState(null);
 
+  const [searchQuery, setSearchQuery] = useState("");
 
+ const processedAdmittedPatients = useMemo(() => {
+  // 1. Filter based on search query
+  const filtered = admittedPatients.filter((item) => {
+    const searchStr = searchQuery.toLowerCase();
+    
+    return (
+      item.patient.firstname?.toLowerCase().includes(searchStr) ||
+      item.patient.lastname?.toLowerCase().includes(searchStr) ||
+      item.patient.hin?.toLowerCase().includes(searchStr) ||
+      item.staff?.firstname?.toLowerCase().includes(searchStr) ||
+      item.staff?.lastname?.toLowerCase().includes(searchStr) ||
+      item.ward_info?.name?.toLowerCase().includes(searchStr)
+    );
+  });
+
+  // 2. Sort by admission date (Most recent first)
+  return [...filtered].sort((a, b) => {
+    const dateA = new Date(a.admission_date).getTime();
+    const dateB = new Date(b.admission_date).getTime();
+    return dateB - dateA; // Use dateA - dateB for oldest first
+  });
+}, [admittedPatients, searchQuery]);
 
     if (loading) {
         return (
@@ -96,9 +120,14 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
     }
     return (
         <>
+             <SearchBar
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder="Search patient's name, HIN, or ward name..."
+      />
             <div className='my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
                 {
-                    admittedPatients.map((admittedPatient, index) => (
+                    processedAdmittedPatients.map((admittedPatient, index) => (
                         <div key={index} className="border p-3 rounded-xl">
                             <div className='flex justify-between items-center'>
                                 <p>{admittedPatient.patient.firstname} {admittedPatient.patient.lastname} </p>
@@ -298,6 +327,31 @@ const DischargedPatientsTab = () => {
 
     const [selectedPatient, setSelectedPatient] = useState('')
 
+      const [searchQuery, setSearchQuery] = useState("");
+    
+     const processedAdmittedPatients = useMemo(() => {
+      // 1. Filter based on search query
+      const filtered = admittedPatients.filter((item) => {
+        const searchStr = searchQuery.toLowerCase();
+        
+        return (
+          item.patient.firstname?.toLowerCase().includes(searchStr) ||
+          item.patient.lastname?.toLowerCase().includes(searchStr) ||
+          item.patient.hin?.toLowerCase().includes(searchStr) ||
+          item.staff?.firstname?.toLowerCase().includes(searchStr) ||
+          item.staff?.lastname?.toLowerCase().includes(searchStr) ||
+          item.ward_info?.name?.toLowerCase().includes(searchStr)
+        );
+      });
+    
+      // 2. Sort by admission date (Most recent first)
+      return [...filtered].sort((a, b) => {
+        const dateA = new Date(a.admission_date).getTime();
+        const dateB = new Date(b.admission_date).getTime();
+        return dateB - dateA; // Use dateA - dateB for oldest first
+      });
+    }, [admittedPatients, searchQuery]);
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-full text-sm">
@@ -376,10 +430,17 @@ const DischargedPatientsTab = () => {
 
 
     return (
-        <>
+
+<>
+
+             <SearchBar
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder="Search patient's name, HIN, or ward name..."
+      />
             <div className='my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
                 {
-                    admittedPatients.map((admittedPatient, index) => (
+                    processedAdmittedPatients.map((admittedPatient, index) => (
                         <div key={index} className="border p-3 rounded-xl">
                             <div className='flex justify-between items-center'>
                                 <p>{admittedPatient.patient.firstname} {admittedPatient.patient.lastname} </p>

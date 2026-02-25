@@ -5,7 +5,7 @@ import { HosAppContext } from "../../../context/Hospital Context/Admin/HosAppCon
 
 const Hospital_Admin_Settings_Dashboard = () => {
 
-  const {profile} = useContext(HosAppContext)
+  const {profile, hospital_email} = useContext(HosAppContext)
 
   console.log(profile)
   return (
@@ -32,8 +32,7 @@ const Hospital_Admin_Settings_Dashboard = () => {
                 Hospital
               </p>
               <p className="ml-2 text-[12px] text-gray-500">
-                {profile ? `${profile.email} ` : `loading...`}
-                hospital@gmail.com
+                {hospital_email ? `${hospital_email} ` : `loading...`}
               </p>
             </div>
           </div>
