@@ -69,6 +69,21 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       toast.error(err.response?.data?.message || "Failed to remove staff");
     }
   });
+  const { mutate: deactivateStaff, isPending: isDeactivating } = useMutation({
+    mutationFn: (ids) =>
+      axiosInstanceHos.post("/api/hospitals/team-members/deactivate", {
+        staff_ids: ids // The API expects an object with a staff_ids array
+      }),
+    onSuccess: () => {
+      toast.success("Staff member account deactivated successfully");
+      // Invalidate the specific page of the staff list to trigger a refetch
+      queryClient.invalidateQueries(["hospital-staffs", currentPage]);
+      setSelectedStaff([]); // Clear checkboxes after bulk removal
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Failed to deactivate staff");
+    }
+  });
 
 
   // const staffObjectsToRemove = staffs.filter((staff) =>
@@ -88,6 +103,11 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     removeStaff([staff.staff_id]);
     setActiveMenu(null);
   };
+
+  const handleDeativate = (staff) => {
+    deactivateStaff([staff.staff_id]);
+    setActiveMenu(null);
+  }
 
   const { mutate: updateRole, isPending: isUpdatingRole } = useMutation({
     mutationFn: ({ staff_id, role }) =>
@@ -362,6 +382,12 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                       Update Role
                     </button>
                     <button
+                      onClick={() => handleDeativate(staff)}
+                      className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 font-medium hover:rounded-b-md"
+                    >
+                      Deactivate Account
+                    </button>
+                    <button
                       onClick={() => handleIndividualRemove(staff)}
                       className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 font-medium hover:rounded-b-md"
                     >
@@ -441,6 +467,9 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                     {activeMenu === staff.staff_id && (
                       <div className="absolute right-0 top-8 w-52 bg-white border border-gray-200 rounded-lg shadow z-50 py-2">
                         <button onClick={() => handleUpdateRole(staff)} className="w-full text-left px-4 py-3 text-sm border-b border-gray-50 hover:rounded-t-md">Update Role</button>
+                        
+                        <button onClick={() => handleDeativate(staff)} className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md">Deactivate Account</button>
+
                         <button onClick={() => handleIndividualRemove(staff)} className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md">Remove from Team</button>
                       </div>
                     )}
