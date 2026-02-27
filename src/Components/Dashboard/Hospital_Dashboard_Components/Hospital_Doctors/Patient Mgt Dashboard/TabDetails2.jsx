@@ -387,7 +387,7 @@ const PatientMedicalRecord = ({
   currentPage,
   totalPages,
   setCurrentPage,
-  setSelectedMedicalRecord,
+  setselectedPatientDetails,
   setViewDetailMedicalRecord,
   medloading,
 }) => {
@@ -567,7 +567,7 @@ const PatientMedicalRecord = ({
                   <button
                     className="bg-[#1B2B40] py-2 text-white rounded-full cursor-pointer"
                     onClick={() => {
-                      setSelectedMedicalRecord(record); // ✅ single record
+                      setselectedPatientDetails(record); // ✅ single record
                       setViewDetailMedicalRecord(true);
                       console.log("Selected Medical Record:", record); // logs the record immediately
                     }}
@@ -1225,8 +1225,8 @@ const PatientSOAPNotes = ({
               Uploaded Documents / Images
             </p>
             <div>
-              {selectedPatientDetails?.investigations_docs?.length > 0 ? (
-                selectedPatientDetails.investigations_docs.map(
+              {selectedPatientDetails?.investigation_docs?.length > 0 ? (
+                selectedPatientDetails.investigation_docs.map(
                   (attachment, index) => {
                     // Correctly mapping your payload fields
                     const fileName =
@@ -1276,7 +1276,7 @@ const PatientSOAPNotes = ({
                             <Eye className="w-3 h-3" />
                             View
                           </a>
-                          <a
+                          {/* <a
                             href={fileUrl}
                             target="_blank"
                             download
@@ -1284,7 +1284,7 @@ const PatientSOAPNotes = ({
                           >
                             <ArrowDownToLine className="w-3 h-3" />
                             Download
-                          </a>
+                          </a> */}
                         </div>
                       </div>
                     );
@@ -1295,6 +1295,85 @@ const PatientSOAPNotes = ({
               )}
             </div>
           </div>
+
+              {/* Drug Records */}
+        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+          <div className=" mb-4">    <p className="font-medium text-[#1B2B40]">Medication / Drug Records</p>
+          </div>
+
+          <div className="overflow-x-auto">
+            {selectedPatientDetails?.drug_records?.length > 0 ? (
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="text-[12px] text-gray-400 border-b">
+                    <th className="pb-2 font-normal">Drug Name</th>
+                    <th className="pb-2 font-normal">Route</th>
+                    <th className="pb-2 font-normal">Qty</th>
+                    <th className="pb-2 font-normal">Frequency</th>
+                    <th className="pb-2 font-normal">Duration</th>
+                  </tr>
+                </thead>
+                <tbody className="text-[12px]">
+                  {selectedPatientDetails.drug_records.map((drug, index) => (
+                    <tr key={index} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
+                      <td className="py-3 font-medium text-[#3E4095]">
+                        {drug.name}
+                      </td>
+                      <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
+                      <td className="py-3 text-gray-600">{drug.quantity}</td>
+                      <td className="py-3 text-gray-600">
+                        {/* Handling nested frequency object */}
+                        {typeof drug.frequency === 'object'
+                          ? `${drug.frequency.value || ''} ${drug.frequency.unit || ''}`
+                          : drug.frequency || "N/A"}
+                      </td>
+                      <td className="py-3 text-gray-600">
+                        {/* Handling nested duration object */}
+                        {typeof drug.duration === 'object'
+                          ? `${drug.duration.value || ''} ${drug.duration.unit || ''}`
+                          : drug.duration || "N/A"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className="text-[12px] text-gray-500 italic">No medication records available.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Care Instructions */}
+        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+          <p className="font-medium mb-4 text-[#1B2B40]">Care Instructions</p>
+          <div className="text-[12px] text-gray-700">
+            {selectedPatientDetails?.care_instructions?.length > 0 ? (
+              <ul className="list-disc pl-5 space-y-1">
+                {selectedPatientDetails.care_instructions.map((instruction, index) => (
+                  <li key={index}>{instruction}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>NIL</p>
+            )}
+          </div>
+        </div>
+
+        {/* Treatment Plan */}
+        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+          <p className="font-medium mb-4 text-[#1B2B40]">Treatment Plan</p>
+          <div className="text-[12px] text-gray-700">
+            {selectedPatientDetails?.treatment_plan?.length > 0 ? (
+              <ul className="list-disc pl-5 space-y-1">
+                {selectedPatientDetails.treatment_plan.map((plan, index) => (
+                  <li key={index}>{plan}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>NIL</p>
+            )}
+          </div>
+        </div>
 
           {/* 7. Follow Up / Appointment */}
           <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
@@ -1656,7 +1735,7 @@ const getTabs = ({
   currentPage,
   totalPages,
   setCurrentPage, // Use the setter here
-  setSelectedMedicalRecord, // first
+  setselectedPatientDetails, // first
   setViewDetailMedicalRecord, // second
   patientSoapNotes,
   soapCount,
@@ -1682,7 +1761,7 @@ const getTabs = ({
           currentPage={currentPage}
           totalPages={totalPages}
          setCurrentPage={setCurrentPage}
-          setSelectedMedicalRecord={setSelectedMedicalRecord}
+          setselectedPatientDetails={setselectedPatientDetails}
           setViewDetailMedicalRecord={setViewDetailMedicalRecord}
         />
       ),
