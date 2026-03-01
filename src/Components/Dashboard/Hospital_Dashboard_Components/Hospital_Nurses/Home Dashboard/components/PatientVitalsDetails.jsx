@@ -1,6 +1,7 @@
 import React from 'react'
 
 const PatientVitalsDetails = ({ selectedPatient, setSelectedPatient }) => {
+
     return (
         <div className="bg-white my-5 border rounded-2xl pt-8 px-6 text-sm ">
           
@@ -115,7 +116,7 @@ const PatientVitalsDetails = ({ selectedPatient, setSelectedPatient }) => {
                   </div>
 
                     <div className='lg:col-span-2'>
-                        <p className="text-sm font-medium text-gray-500 mb-1  ">Assigned doctor</p>
+                        <p className="text-sm font-medium text-gray-500 mb-1  ">Assigned staff</p>
                         <input
                             type="text"
                             readOnly

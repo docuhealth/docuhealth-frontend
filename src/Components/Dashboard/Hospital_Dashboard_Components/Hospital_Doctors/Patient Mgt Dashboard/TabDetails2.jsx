@@ -19,6 +19,9 @@ import {
   formatFullDate,
   formatTime,
 } from "../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
+import toast from "react-hot-toast";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 
 
 const PatientInfo = ({ patientFullInfo, selected }) => {
@@ -605,7 +608,7 @@ const PatientMedicalRecord = ({
       ) : (
         <p className="text-center">No medical records found.</p>
       )} */}
-          <p className="text-center">Coming Soon !!!</p>
+      <p className="text-center">Coming Soon !!!</p>
     </>
   );
 };
@@ -714,7 +717,7 @@ const PatientSOAPNotes = ({
   }
 
   const [seePatientDetails, setSeePatientDetails] = useState(false);
-  const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
+  const [selectedNoteId, setSelectedNoteId] = useState(null);
 
   const [createAdditionalNotes, setCreateAdditionalNotes] = useState(false);
   const [noteDescription, setNoteDescription] = useState("");
@@ -724,7 +727,50 @@ const PatientSOAPNotes = ({
     setOpenPopover(openPopover === index ? null : index);
   };
 
-  console.log(selectedPatientDetails);
+  const selectedPatientDetails = patientSoapNotes?.find(soapNote => soapNote.id === selectedNoteId);
+  const queryClient = useQueryClient()
+
+
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (payload) =>
+      axiosInstanceHos.post("api/medical-records/soap-note/additional-notes", payload),
+    onSuccess: () => {
+      toast.success("Additional Note created successfully !");
+
+      setCreateAdditionalNotes(false);
+      setNoteDescription('')
+
+      const hin = selectedPatientDetails.patient_info.hin
+
+      queryClient.invalidateQueries({
+        queryKey: ["patient-med-records", hin],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["patient-soap-notes", hin],
+      });
+
+    },
+    onError: (error) => {
+      console.error("Upload error:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to create additional note",
+      );
+    },
+  });
+
+  const handleCreateAdditionalNote = () => {
+    if (!noteDescription) {
+      toast.error('Please enter a note.')
+    }
+
+    const payload = {
+      soap_note: selectedPatientDetails.id,
+      note: noteDescription
+    }
+
+    mutate(payload)
+  }
 
   return (
     <div>
@@ -1023,423 +1069,443 @@ const PatientSOAPNotes = ({
             </div>
           </div>
 
-          {/* 1. Extended Clinical History */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <p className="font-medium mb-4 text-[#1B2B40]">
-              Clinical History Details
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="text-[12px] pb-2">
-                <h4 className="text-gray-400 font-normal mb-1">
-                  History of Complaint:
-                </h4>
-                <p className="font-medium">
-                  {selectedPatientDetails?.history_of_complain || "NIL"}
-                </p>
-              </div>
-
-              <div className="text-[12px] pb-2">
-                <h4 className="text-gray-400 font-normal mb-1">
-                  Past Medical History:
-                </h4>
-                <p className="font-medium">
-                  {selectedPatientDetails?.past_med_history || "NIL"}
-                </p>
-              </div>
-
-              <div className="text-[12px] pb-2">
-                <h4 className="text-gray-400 font-normal mb-1">
-                  Family History:
-                </h4>
-                <p className="font-medium">
-                  {selectedPatientDetails?.family_history || "NIL"}
-                </p>
-              </div>
-
-              <div className="text-[12px] pb-2">
-                <h4 className="text-gray-400 font-normal mb-1">
-                  Social History:
-                </h4>
-                <p className="font-medium">
-                  {selectedPatientDetails?.social_history || "NIL"}
-                </p>
-              </div>
-            </div>
-
-            <div className="text-[12px] pt-2 border-t mt-2">
-              <h4 className="text-gray-400 font-normal mb-1">
-                Other Relevant History:
-              </h4>
-              <p className="font-medium">
-                {selectedPatientDetails?.other_history || "NIL"}
-              </p>
-            </div>
-          </div>
-
-          {/* 2. Physical Examinations & Review */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <p className="font-medium mb-4">Examination Findings</p>
-
-            <div className="text-[12px] pb-3">
-              <h4 className="text-gray-400 font-normal mb-1">
-                General Examination:
-              </h4>
+               {/* 1. Extended Clinical History */}
+               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+                 <p className="font-medium mb-4 text-[#1B2B40]">
+                   Clinical History Details
+                 </p>
+     
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <div className="text-[12px] pb-2">
+                     <h4 className="text-gray-400 font-normal mb-1">
+                       History of Complaint:
+                     </h4>
+                     <p className="font-medium">
+                       {selectedPatientDetails?.history_of_complain || "NIL"}
+                     </p>
+                   </div>
+     
+                   <div className="text-[12px] pb-2">
+                     <h4 className="text-gray-400 font-normal mb-1">
+                       Past Medical History:
+                     </h4>
+                     <p className="font-medium">
+                       {selectedPatientDetails?.past_med_history || "NIL"}
+                     </p>
+                   </div>
+     
+                   <div className="text-[12px] pb-2">
+                     <h4 className="text-gray-400 font-normal mb-1">
+                       Family History:
+                     </h4>
+                     <p className="font-medium">
+                       {selectedPatientDetails?.family_history || "NIL"}
+                     </p>
+                   </div>
+     
+                   <div className="text-[12px] pb-2">
+                     <h4 className="text-gray-400 font-normal mb-1">
+                       Social History:
+                     </h4>
+                     <p className="font-medium">
+                       {selectedPatientDetails?.social_history || "NIL"}
+                     </p>
+                   </div>
+                 </div>
+     
+                 <div className="text-[12px] pt-2 border-t mt-2">
+                   <h4 className="text-gray-400 font-normal mb-1">
+                     Other Relevant History:
+                   </h4>
+                   <p className="font-medium">
+                     {selectedPatientDetails?.other_history || "NIL"}
+                   </p>
+                 </div>
+               </div>
+     
+               {/* 2. Physical Examinations & Review */}
+               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+                 <p className="font-medium mb-4">Examination Findings</p>
+     
+                 <div className="text-[12px] pb-3">
+                   <h4 className="text-gray-400 font-normal mb-1">
+                     General Examination:
+                   </h4>
               <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.general_exam?.map((item, index) => (
-                  <li key={index}>{item}</li>
-                )) || <li>NIL</li>}
-              </ul>
-            </div>
-
-            <div className="text-[12px] pb-3">
-              <h4 className="text-gray-400 font-normal mb-1">
-                Systemic Examination:
-              </h4>
+       {selectedPatientDetails?.general_exam?.map((item, index) => (
+         <li key={index}>
+           {/* If item is an object, use item.note. If it's a string, use item */}
+           {typeof item === 'object' ? item.note : item}
+         </li>
+       )) || <li>NIL</li>}
+     </ul>
+                 </div>
+     
+                 <div className="text-[12px] pb-3">
+                   <h4 className="text-gray-400 font-normal mb-1">
+                     Systemic Examination:
+                   </h4>
               <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.systemic_exam?.map((item, index) => (
-                  <li key={index}>{item}</li>
-                )) || <li>NIL</li>}
-              </ul>
-            </div>
-
-            <div className="text-[12px]">
-              <h4 className="text-gray-400 font-normal mb-1">
-                Review of Systems:
-              </h4>
-              <p className="font-medium">
-                {selectedPatientDetails?.review || "NIL"}
-              </p>
-            </div>
-          </div>
-
-          {/* 3. Diagnosis & Testing */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <p className="font-medium mb-4">Diagnosis & Investigations</p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div className="text-[12px]">
-                <h4 className="text-gray-400 font-normal mb-1">
-                  Primary Diagnosis:
-                </h4>
-                <p className="font-medium text-[#3E4095]">
-                  {selectedPatientDetails?.primary_diagnosis || "NIL"}
-                </p>
-              </div>
-              <div className="text-[12px]">
-                <h4 className="text-gray-400 font-normal mb-1">
-                  Differential Diagnosis:
-                </h4>
-                <p className="font-medium">
-                  {selectedPatientDetails?.differential_diagnosis || "NIL"}
-                </p>
-              </div>
-            </div>
-
-            <div className="text-[12px] pb-3">
-              <h4 className="text-gray-400 font-normal mb-1">
-                Investigations Required:
-              </h4>
-              <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.investigations?.map((item, index) => (
-                  <li key={index}>{item}</li>
-                )) || <li>NIL</li>}
-              </ul>
-            </div>
-
-            <div className="text-[12px]">
-              <h4 className="text-gray-400 font-normal mb-1">Bedside Tests:</h4>
-              <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.bedside_tests?.map((item, index) => (
-                  <li key={index}>{item}</li>
-                )) || <li>NIL</li>}
-              </ul>
-            </div>
-          </div>
-
-          {/* 4. Drug History & Allergies */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <p className="font-medium mb-4">Drug History / Allergies</p>
-            <div className="text-[12px]">
-              <h4 className="text-gray-400 font-normal mb-1">
-                Known Allergies & Sensitivities:
-              </h4>
-              <p className="font-medium text-red-600 italic">
-                {/* Logic to handle the character array in your payload */}
-                {Array.isArray(selectedPatientDetails?.drug_history_allergies)
-                  ? selectedPatientDetails.drug_history_allergies
-                    .join("")
-                    .replace(/['\[\]]/g, "")
-                  : "NIL"}
-              </p>
-            </div>
-          </div>
-
-          {/* 5. Patient Education & Problems List */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <div className="text-[12px] pb-3">
-              <h4 className="text-gray-400 font-normal mb-1">
-                Active Problems List:
-              </h4>
-              <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.problems_list?.map((item, index) => (
-                  <li key={index}>{item}</li>
-                )) || <li>NIL</li>}
-              </ul>
-            </div>
-
-            <div className="text-[12px] pt-3 border-t">
-              <h4 className="text-gray-400 font-normal mb-1">
-                Patient Education/Counselling:
-              </h4>
-              <p className="font-medium">
-                {selectedPatientDetails?.patient_education || "NIL"}
-              </p>
-            </div>
-
-            {selectedPatientDetails?.additional_notes?.length > 0 ? (
-              <div className="text-[12px] pt-3 mt-3 border-t">
-                <h4 className="text-gray-400 font-normal mb-1">
-                  Additional Notes:
-                </h4>
+       {selectedPatientDetails?.systemic_exam?.map((item, index) => (
+         <li key={index}>
+           {typeof item === 'object' ? item.note : item}
+         </li>
+       )) || <li>NIL</li>}
+     </ul>
+                 </div>
+     
+                 <div className="text-[12px]">
+                   <h4 className="text-gray-400 font-normal mb-1">
+                     Review of Systems:
+                   </h4>
+                   <p className="font-medium">
+                     {selectedPatientDetails?.review || "NIL"}
+                   </p>
+                 </div>
+               </div>
+     
+               {/* 3. Diagnosis & Testing */}
+               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+                 <p className="font-medium mb-4">Diagnosis & Investigations</p>
+     
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                   <div className="text-[12px]">
+                     <h4 className="text-gray-400 font-normal mb-1">
+                       Primary Diagnosis:
+                     </h4>
+                     <p className="font-medium text-[#3E4095]">
+                       {selectedPatientDetails?.primary_diagnosis || "NIL"}
+                     </p>
+                   </div>
+                   <div className="text-[12px]">
+                     <h4 className="text-gray-400 font-normal mb-1">
+                       Differential Diagnosis:
+                     </h4>
+                     <p className="font-medium">
+                       {selectedPatientDetails?.differential_diagnosis || "NIL"}
+                     </p>
+                   </div>
+                 </div>
+     
+                 <div className="text-[12px] pb-3">
+                   <h4 className="text-gray-400 font-normal mb-1">
+                     Investigations Required:
+                   </h4>
                 <ul className="list-disc list-outside pl-5 font-medium">
-                  {selectedPatientDetails.additional_notes.map(
-                    (note, index) => (
-                      <li key={index}>{note}</li>
-                    ),
-                  )}
-                </ul>
-              </div>
-            ) : (
-              <>
-                <p className="text-sm pt-4 font-medium">
-                  No additional notes...
-                </p>
-              </>
-            )}
-          </div>
-
-          {/* 6. Uploaded Documents / Images */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <p className="font-medium mb-4 text-[#1B2B40]">
-              Uploaded Documents / Images
-            </p>
-            <div>
-              {selectedPatientDetails?.investigation_docs?.length > 0 ? (
-                selectedPatientDetails.investigation_docs.map(
-                  (attachment, index) => {
-                    // Correctly mapping your payload fields
-                    const fileName =
-                      attachment.filename || `Document_${index + 1}`;
-                    const fileUrl = attachment.file || attachment.url; // Supporting both common keys
-                    const fileSizeMB = attachment.size
-                      ? (attachment.size / (1024 * 1024)).toFixed(1) + " MB"
-                      : "0.5 MB"; // Fallback placeholder if size is missing
-                    const fileDate = formatFullDateTime(
-                      selectedPatientDetails.created_at,
-                    );
-
-                    const isImage =
-                      /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName) ||
-                      attachment.file_type?.includes("image");
-                    const isPdf =
-                      /\.pdf$/i.test(fileName) ||
-                      attachment.file_type?.includes("pdf");
-                    const Icon = isImage ? Image : isPdf ? FileText : FileText;
-
-                    return (
-                      <div
-                        key={index}
-                        className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 sm:items-center bg-white border rounded-lg px-4 py-3 mb-3 "
-                      >
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-[12px]">
-                          <div className="p-2 bg-[#3E4095]/10 rounded-md">
-                            <Icon className="text-[#3E4095]" size={20} />
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-800">
-                              {fileName}
-                            </p>
-                            <p className="text-gray-500">
-                              {fileDate} • {fileSizeMB}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row gap-3 text-[12px] w-full sm:w-auto">
-                          <a
-                            href={fileUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-1 border border-[#3E4095] text-[#3E4095] rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28"
-                          >
-                            <Eye className="w-3 h-3" />
-                            View
-                          </a>
-                          {/* <a
-                            href={fileUrl}
-                            target="_blank"
-                            download
-                            className="flex items-center justify-center gap-1 bg-[#3E4095] text-white rounded-full font-medium hover:bg-[#2e3070] transition py-1 px-3 w-full sm:w-28"
-                          >
-                            <ArrowDownToLine className="w-3 h-3" />
-                            Download
-                          </a> */}
-                        </div>
-                      </div>
-                    );
-                  },
-                )
-              ) : (
-                <p className="text-[12px] text-gray-500">NIL</p>
-              )}
-            </div>
-          </div>
-
-              {/* Drug Records */}
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-          <div className=" mb-4">    <p className="font-medium text-[#1B2B40]">Medication / Drug Records</p>
-          </div>
-
-          <div className="overflow-x-auto">
-            {selectedPatientDetails?.drug_records?.length > 0 ? (
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="text-[12px] text-gray-400 border-b">
-                    <th className="pb-2 font-normal">Drug Name</th>
-                    <th className="pb-2 font-normal">Route</th>
-                    <th className="pb-2 font-normal">Qty</th>
-                    <th className="pb-2 font-normal">Frequency</th>
-                    <th className="pb-2 font-normal">Duration</th>
-                  </tr>
-                </thead>
-                <tbody className="text-[12px]">
-                  {selectedPatientDetails.drug_records.map((drug, index) => (
-                    <tr key={index} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
-                      <td className="py-3 font-medium text-[#3E4095]">
-                        {drug.name}
-                      </td>
-                      <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
-                      <td className="py-3 text-gray-600">{drug.quantity}</td>
-                      <td className="py-3 text-gray-600">
-                        {/* Handling nested frequency object */}
-                        {typeof drug.frequency === 'object'
-                          ? `${drug.frequency.value || ''} ${drug.frequency.unit || ''}`
-                          : drug.frequency || "N/A"}
-                      </td>
-                      <td className="py-3 text-gray-600">
-                        {/* Handling nested duration object */}
-                        {typeof drug.duration === 'object'
-                          ? `${drug.duration.value || ''} ${drug.duration.unit || ''}`
-                          : drug.duration || "N/A"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className="text-[12px] text-gray-500 italic">No medication records available.</p>
-            )}
-          </div>
-        </div>
-
-        {/* Care Instructions */}
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-          <p className="font-medium mb-4 text-[#1B2B40]">Care Instructions</p>
-          <div className="text-[12px] text-gray-700">
-            {selectedPatientDetails?.care_instructions?.length > 0 ? (
-              <ul className="list-disc pl-5 space-y-1">
-                {selectedPatientDetails.care_instructions.map((instruction, index) => (
-                  <li key={index}>{instruction}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>NIL</p>
-            )}
-          </div>
-        </div>
-
-        {/* Treatment Plan */}
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-          <p className="font-medium mb-4 text-[#1B2B40]">Treatment Plan</p>
-          <div className="text-[12px] text-gray-700">
-            {selectedPatientDetails?.treatment_plan?.length > 0 ? (
-              <ul className="list-disc pl-5 space-y-1">
-                {selectedPatientDetails.treatment_plan.map((plan, index) => (
-                  <li key={index}>{plan}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>NIL</p>
-            )}
-          </div>
-        </div>
-
-          {/* 7. Follow Up / Appointment */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <p className="font-medium mb-4 text-[#1B2B40]">
-              Follow Up / Appointment
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <p className="text-[12px] text-gray-500">
-                Type:{" "}
-                <span className="font-medium text-gray-900 capitalize">
-                  {selectedPatientDetails?.appointment?.type || "NIL"}
-                </span>
-              </p>
-              <p className="text-[12px] text-gray-500">
-                Scheduled:{" "}
-                <span className="font-medium text-gray-900">
-                  {selectedPatientDetails?.appointment?.scheduled_time
-                    ? formatFullDateTime(
-                      selectedPatientDetails.appointment.scheduled_time,
-                    )
-                    : "NIL"}
-                </span>
-              </p>
-              {selectedPatientDetails?.appointment?.note && (
-                <p className="text-[12px] text-gray-500 col-span-2 mt-1">
-                  Note:{" "}
-                  <span className="font-medium text-gray-900 italic">
-                    "{selectedPatientDetails.appointment.note}"
-                  </span>
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* 8. Referral Status */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <p className="font-medium mb-4 text-[#1B2B40]">
-              Referral Information
-            </p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <p className="text-[12px] text-gray-500">Referral Status:</p>
-                <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${selectedPatientDetails?.referred_hosp ||
-                    selectedPatientDetails?.referred_docuhealth_hosp
-                    ? "bg-green-100 text-green-700"
-                    : "bg-gray-100 text-gray-500"
-                    }`}
-                >
-                  {selectedPatientDetails?.referred_hosp ||
-                    selectedPatientDetails?.referred_docuhealth_hosp
-                    ? "Active"
-                    : "None"}
-                </span>
-              </div>
-
-              <p className="text-[12px] text-gray-500">
-                Referred Hospital:{" "}
-                <span className="font-medium text-gray-900">
-                  {selectedPatientDetails?.referred_docuhealth_hosp
-                    ? `${selectedPatientDetails.referred_docuhealth_hosp} (DocuHealth Provider)`
-                    : selectedPatientDetails?.referred_hosp || "NIL"}
-                </span>
-              </p>
-            </div>
-          </div>
+       {selectedPatientDetails?.investigations?.map((item, index) => (
+         <li key={index}>
+           {typeof item === 'object' ? item.note : item}
+         </li>
+       )) || <li>NIL</li>}
+     </ul>
+                 </div>
+     
+                 <div className="text-[12px]">
+                   <h4 className="text-gray-400 font-normal mb-1">Bedside Tests:</h4>
+                   <ul className="list-disc list-outside pl-5 font-medium">
+                     {selectedPatientDetails?.bedside_tests?.map((item, index) => (
+                   <li key={index}>
+           {typeof item === 'object' ? item.note : item}
+         </li>
+                     )) || <li>NIL</li>}
+                   </ul>
+                 </div>
+               </div>
+     
+               {/* 4. Drug History & Allergies */}
+               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+                 <p className="font-medium mb-4">Drug History / Allergies</p>
+                 <div className="text-[12px]">
+                   <h4 className="text-gray-400 font-normal mb-1">
+                     Known Allergies & Sensitivities:
+                   </h4>
+                   <p className="font-medium text-red-600 italic">
+                     {/* Logic to handle the character array in your payload */}
+                     {Array.isArray(selectedPatientDetails?.drug_history_allergies)
+                       ? selectedPatientDetails.drug_history_allergies
+                         .join("")
+                         .replace(/['\[\]]/g, "")
+                       : "NIL"}
+                   </p>
+                 </div>
+               </div>
+     
+               {/* 5. Patient Education & Problems List */}
+               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+                 <div className="text-[12px] pb-3">
+                   <h4 className="text-gray-400 font-normal mb-1">
+                     Active Problems List:
+                   </h4>
+                   <ul className="list-disc list-outside pl-5 font-medium">
+                 {selectedPatientDetails?.problems_list?.map((item, index) => (
+           <li key={index}>
+             {/* ADD THE CHECK HERE TOO */}
+             {typeof item === 'object' ? item.note : item}
+           </li>
+         )) || <li>NIL</li>}
+                   </ul>
+                 </div>
+     
+                 <div className="text-[12px] pt-3 border-t">
+                   <h4 className="text-gray-400 font-normal mb-1">
+                     Patient Education/Counselling:
+                   </h4>
+                   <p className="font-medium">
+                     {selectedPatientDetails?.patient_education || "NIL"}
+                   </p>
+                 </div>
+     
+                 {selectedPatientDetails?.additional_notes?.length > 0 ? (
+                   <div className="text-[12px] pt-3 mt-3 border-t">
+                     <h4 className="text-gray-400 font-normal mb-1">
+                       Additional Notes:
+                     </h4>
+                     <ul className="list-disc list-outside pl-5 font-medium">
+                       {selectedPatientDetails.additional_notes.map(
+                         (note, index) => (
+                          <li key={index}>
+             {/* ADD THE CHECK HERE TOO */}
+             {typeof note === 'object' ? note.note : note}
+           </li>
+                         ),
+                       )}
+                     </ul>
+                   </div>
+                 ) : (
+                   <>
+                     <p className="text-sm pt-4 font-medium">
+                       No additional notes...
+                     </p>
+                   </>
+                 )}
+               </div>
+     
+               {/* 6. Uploaded Documents / Images */}
+               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+                 <p className="font-medium mb-4 text-[#1B2B40]">
+                   Uploaded Documents / Images
+                 </p>
+                 <div>
+                   {selectedPatientDetails?.investigation_docs?.length > 0 ? (
+                     selectedPatientDetails.investigation_docs.map(
+                       (attachment, index) => {
+                         // Correctly mapping your payload fields
+                         const fileName =
+                           attachment.filename || `Document_${index + 1}`;
+                         const fileUrl = attachment.file || attachment.url; // Supporting both common keys
+                         const fileSizeMB = attachment.size
+                           ? (attachment.size / (1024 * 1024)).toFixed(1) + " MB"
+                           : "0.5 MB"; // Fallback placeholder if size is missing
+                         const fileDate = formatFullDateTime(
+                           selectedPatientDetails.created_at,
+                         );
+     
+                         const isImage =
+                           /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName) ||
+                           attachment.file_type?.includes("image");
+                         const isPdf =
+                           /\.pdf$/i.test(fileName) ||
+                           attachment.file_type?.includes("pdf");
+                         const Icon = isImage ? Image : isPdf ? FileText : FileText;
+     
+                         return (
+                           <div
+                             key={index}
+                             className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 sm:items-center bg-white border rounded-lg px-4 py-3 mb-3 "
+                           >
+                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-[12px]">
+                               <div className="p-2 bg-[#3E4095]/10 rounded-md">
+                                 <Icon className="text-[#3E4095]" size={20} />
+                               </div>
+                               <div>
+                                 <p className="font-medium text-gray-800">
+                                   {fileName}
+                                 </p>
+                                 <p className="text-gray-500">
+                                   {fileDate} • {fileSizeMB}
+                                 </p>
+                               </div>
+                             </div>
+     
+                             <div className="flex flex-col sm:flex-row gap-3 text-[12px] w-full sm:w-auto">
+                               <a
+                                 href={fileUrl}
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 className="flex items-center justify-center gap-1 border border-[#3E4095] text-[#3E4095] rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28"
+                               >
+                                 <Eye className="w-3 h-3" />
+                                 View
+                               </a>
+                               <a
+                                 href={fileUrl}
+                                 download
+                                 className="flex items-center justify-center gap-1 bg-[#3E4095] text-white rounded-full font-medium hover:bg-[#2e3070] transition py-1 px-3 w-full sm:w-28"
+                               >
+                                 <ArrowDownToLine className="w-3 h-3" />
+                                 Download
+                               </a>
+                             </div>
+                           </div>
+                         );
+                       },
+                     )
+                   ) : (
+                     <p className="text-[12px] text-gray-500">NIL</p>
+                   )}
+                 </div>
+               </div>
+     
+               {/* Drug Records */}
+               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+                 <div className=" mb-4">    <p className="font-medium text-[#1B2B40]">Medication / Drug Records</p>
+                 </div>
+     
+                 <div className="overflow-x-auto">
+                   {selectedPatientDetails?.drug_records?.length > 0 ? (
+                     <table className="w-full text-left border-collapse">
+                       <thead>
+                         <tr className="text-[12px] text-gray-400 border-b">
+                           <th className="pb-2 font-normal">Drug Name</th>
+                           <th className="pb-2 font-normal">Route</th>
+                           <th className="pb-2 font-normal">Qty</th>
+                           <th className="pb-2 font-normal">Frequency</th>
+                           <th className="pb-2 font-normal">Duration</th>
+                         </tr>
+                       </thead>
+                       <tbody className="text-[12px]">
+                         {selectedPatientDetails.drug_records.map((drug, index) => (
+                           <tr key={index} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
+                             <td className="py-3 font-medium text-[#3E4095]">
+                               {drug.name}
+                             </td>
+                             <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
+                             <td className="py-3 text-gray-600">{drug.quantity}</td>
+                             <td className="py-3 text-gray-600">
+                               {/* Handling nested frequency object */}
+                               {typeof drug.frequency === 'object'
+                                 ? `${drug.frequency.value || ''} ${drug.frequency.unit || ''}`
+                                 : drug.frequency || "N/A"}
+                             </td>
+                             <td className="py-3 text-gray-600">
+                               {/* Handling nested duration object */}
+                               {typeof drug.duration === 'object'
+                                 ? `${drug.duration.value || ''} ${drug.duration.unit || ''}`
+                                 : drug.duration || "N/A"}
+                             </td>
+                           </tr>
+                         ))}
+                       </tbody>
+                     </table>
+                   ) : (
+                     <p className="text-[12px] text-gray-500 italic">No medication records available.</p>
+                   )}
+                 </div>
+               </div>
+     
+               {/* Care Instructions */}
+               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+                 <p className="font-medium mb-4 text-[#1B2B40]">Care Instructions</p>
+                 <div className="text-[12px] text-gray-700">
+                   {selectedPatientDetails?.care_instructions?.length > 0 ? (
+                     <ul className="list-disc pl-5 space-y-1">
+                       {selectedPatientDetails.care_instructions.map((instruction, index) => (
+                               <li key={index}>
+             {/* ADD THE CHECK HERE TOO */}
+             {typeof instruction === 'object' ? instruction.note : instruction}
+           </li>
+                       ))}
+                     </ul>
+                   ) : (
+                     <p>NIL</p>
+                   )}
+                 </div>
+               </div>
+     
+               {/* Treatment Plan */}
+               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+                 <p className="font-medium mb-4 text-[#1B2B40]">Treatment Plan</p>
+                 <div className="text-[12px] text-gray-700">
+                   {selectedPatientDetails?.treatment_plan?.length > 0 ? (
+                     <ul className="list-disc pl-5 space-y-1">
+                       {selectedPatientDetails.treatment_plan.map((plan, index) => (
+                     <li key={index}>
+             {/* ADD THE CHECK HERE TOO */}
+             {typeof plan === 'object' ? plan.note : plan}
+           </li>
+                       ))}
+                     </ul>
+                   ) : (
+                     <p>NIL</p>
+                   )}
+                 </div>
+               </div>
+     
+               {/* 7. Follow Up / Appointment */}
+               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+                 <p className="font-medium mb-4 text-[#1B2B40]">
+                   Follow Up / Appointment
+                 </p>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                   <p className="text-[12px] text-gray-500">
+                     Type:{" "}
+                     <span className="font-medium text-gray-900 capitalize">
+                       {selectedPatientDetails?.appointment?.type || "NIL"}
+                     </span>
+                   </p>
+                   <p className="text-[12px] text-gray-500">
+                     Scheduled:{" "}
+                     <span className="font-medium text-gray-900">
+                       {selectedPatientDetails?.appointment?.scheduled_time
+                         ? formatFullDateTime(
+                           selectedPatientDetails.appointment.scheduled_time,
+                         )
+                         : "NIL"}
+                     </span>
+                   </p>
+                   {selectedPatientDetails?.appointment?.note && (
+                     <p className="text-[12px] text-gray-500 col-span-2 mt-1">
+                       Note:{" "}
+                       <span className="font-medium text-gray-900 italic">
+                         "{selectedPatientDetails.appointment.note}"
+                       </span>
+                     </p>
+                   )}
+                 </div>
+               </div>
+     
+               {/* 8. Referral Status */}
+               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+                 <p className="font-medium mb-4 text-[#1B2B40]">
+                   Referral Information
+                 </p>
+                 <div className="space-y-2">
+                   <div className="flex items-center gap-2">
+                     <p className="text-[12px] text-gray-500">Referral Status:</p>
+                     <span
+                       className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${selectedPatientDetails?.referred_hosp ||
+                         selectedPatientDetails?.referred_docuhealth_hosp
+                         ? "bg-green-100 text-green-700"
+                         : "bg-gray-100 text-gray-500"
+                         }`}
+                     >
+                       {selectedPatientDetails?.referred_hosp ||
+                         selectedPatientDetails?.referred_docuhealth_hosp
+                         ? "Active"
+                         : "None"}
+                     </span>
+                   </div>
+     
+                   <p className="text-[12px] text-gray-500">
+                     Referred Hospital:{" "}
+                     <span className="font-medium text-gray-900">
+                       {selectedPatientDetails?.referred_docuhealth_hosp
+                         ? `${selectedPatientDetails.referred_docuhealth_hosp} (DocuHealth Provider)`
+                         : selectedPatientDetails?.referred_hosp || "NIL"}
+                     </span>
+                   </p>
+                 </div>
+               </div>
         </div>
       ) : (
         <>
@@ -1531,7 +1597,7 @@ const PatientSOAPNotes = ({
                         <div
                           onClick={() => {
                             togglePopover(index);
-                            setSelectedPatientDetails(soapNote);
+                            setSelectedNoteId(soapNote.id);
                           }}
                           className={` hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer
         ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
@@ -1552,6 +1618,7 @@ const PatientSOAPNotes = ({
                             <p
                               className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
+                                setSelectedNoteId(soapNote.id);
                                 setSeePatientDetails(true);
                                 setOpenPopover(null);
                               }}
@@ -1586,7 +1653,7 @@ const PatientSOAPNotes = ({
                         <button
                           onClick={() => {
                             togglePopover(index);
-                            setSelectedPatientDetails(soapNote);
+                            setSelectedNoteId(soapNote.id);
                           }}
                           className={`h-9 w-9 flex items-center justify-center rounded-full ${openPopover === index ? "bg-slate-200" : "bg-gray-50"}`}
                         >
@@ -1607,7 +1674,9 @@ const PatientSOAPNotes = ({
                             <p
                               className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
+                                setSelectedNoteId(soapNote.id);
                                 setSeePatientDetails(true);
+                                setOpenPopover(null);
                               }}
                             >
                               See full SOAP Note
@@ -1661,7 +1730,7 @@ const PatientSOAPNotes = ({
                 count={soapCount}
                 currentPage={soapCurrentPage}
                 totalPages={soapTotalPages}
-           setCurrentPage={setSoapCurrentPage}
+                setCurrentPage={setSoapCurrentPage}
               />
             </>
           ) : (
@@ -1708,13 +1777,18 @@ const PatientSOAPNotes = ({
                 </div>
 
                 <button
-                  className="w-full mt-4 bg-[#3E4095] text-white py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-colors"
-                  onClick={() => {
-                    toast.success("Work in Progress...");
-                    setCreateAdditionalNotes(false);
-                  }}
+                  className={`w-full mt-4 ${isPending ? 'border border-gray-400 bg-gray-400 text-white cursor-not-allowed' : 'bg-[#3E4095] text-white '} py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-colors`}
+                  onClick={handleCreateAdditionalNote}
+                  disabled={isPending}
                 >
-                  Save Note
+                  {isPending ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Saving Note...
+                    </div>
+                  ) : (
+                    "Save Note"
+                  )}
                 </button>
               </div>
             </div>
@@ -1760,7 +1834,7 @@ const getTabs = ({
           count={count}
           currentPage={currentPage}
           totalPages={totalPages}
-         setCurrentPage={setCurrentPage}
+          setCurrentPage={setCurrentPage}
           setselectedPatientDetails={setselectedPatientDetails}
           setViewDetailMedicalRecord={setViewDetailMedicalRecord}
         />
@@ -1776,7 +1850,7 @@ const getTabs = ({
           soapCount={soapCount}
           soapCurrentPage={soapCurrentPage}
           soapTotalPages={soapTotalPages}
-              setSoapCurrentPage={setSoapCurrentPage}
+          setSoapCurrentPage={setSoapCurrentPage}
           setAdvanceCheckUp={setAdvanceCheckUp}
           selected={selected}
         />

@@ -261,13 +261,15 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
     onSuccess: () => {
       toast.success("SOAP Note created successfully !");
 
+      const hin = selectedPatientDetails.patient.hin
+      
       sessionStorage.removeItem(`soap_draft_${selectedPatientDetails.patient.hin}`);
       setSoapNoteEntry(false);
       queryClient.invalidateQueries({
-        queryKey: ["patient-med-records", selectedPatientDetails.patient.hin],
+        queryKey: ["patient-med-records", hin],
       });
       queryClient.invalidateQueries({
-        queryKey: ["patient-soap-notes", selectedPatientDetails.patient.hin],
+        queryKey: ["patient-soap-notes", hin],
       });
 
       setStep(1);

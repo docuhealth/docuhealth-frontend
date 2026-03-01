@@ -20,6 +20,9 @@ import {
   formatTime,
 } from "../../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
 import toast from "react-hot-toast";
+import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import {useMutation, useQueryClient } from "@tanstack/react-query";
+
 
 const PatientInfo = ({ patientFullInfo }) => {
   console.log(patientFullInfo);
@@ -642,8 +645,8 @@ const PatientSOAPNotes = ({
     );
   }
 
-  const [seePatientDetails, setSeePatientDetails] = useState(false);
-  const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
+const [seePatientDetails, setSeePatientDetails] = useState(false);
+const [selectedNoteId, setSelectedNoteId] = useState(null);
 
   const [createAdditionalNotes, setCreateAdditionalNotes] = useState(false);
   const [noteDescription, setNoteDescription] = useState("");
@@ -653,7 +656,51 @@ const PatientSOAPNotes = ({
     setOpenPopover(openPopover === index ? null : index);
   };
 
-  console.log(selectedPatientDetails);
+  const selectedPatientDetails = patientSoapNotes?.find(soapNote => soapNote.id === selectedNoteId);
+  const queryClient = useQueryClient()
+
+
+
+    const { mutate, isPending } = useMutation({
+      mutationFn: (payload) =>
+        axiosInstanceHos.post("api/medical-records/soap-note/additional-notes", payload),
+      onSuccess: () => {
+        toast.success("Additional Note created successfully !");
+
+        setCreateAdditionalNotes(false);
+        setNoteDescription ('')
+
+        const hin  = selectedPatientDetails.patient_info.hin
+
+        queryClient.invalidateQueries({
+          queryKey: ["patient-med-records", hin],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["patient-soap-notes", hin],
+        });
+
+      },
+      onError: (error) => {
+        console.error("Upload error:", error);
+        toast.error(
+          error.response?.data?.message || "Failed to create additional note",
+        );
+      },
+    });
+
+  const handleCreateAdditionalNote = () => {
+    if(!noteDescription) {
+      toast.error('Please enter a note.')
+    }
+
+    const payload = {
+      soap_note : selectedPatientDetails.id, 
+      note : noteDescription
+    }
+    
+    mutate(payload)
+  }
+
 
   return (
     <div>
@@ -1014,22 +1061,27 @@ const PatientSOAPNotes = ({
               <h4 className="text-gray-400 font-normal mb-1">
                 General Examination:
               </h4>
-              <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.general_exam?.map((item, index) => (
-                  <li key={index}>{item}</li>
-                )) || <li>NIL</li>}
-              </ul>
+         <ul className="list-disc list-outside pl-5 font-medium">
+  {selectedPatientDetails?.general_exam?.map((item, index) => (
+    <li key={index}>
+      {/* If item is an object, use item.note. If it's a string, use item */}
+      {typeof item === 'object' ? item.note : item}
+    </li>
+  )) || <li>NIL</li>}
+</ul>
             </div>
 
             <div className="text-[12px] pb-3">
               <h4 className="text-gray-400 font-normal mb-1">
                 Systemic Examination:
               </h4>
-              <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.systemic_exam?.map((item, index) => (
-                  <li key={index}>{item}</li>
-                )) || <li>NIL</li>}
-              </ul>
+         <ul className="list-disc list-outside pl-5 font-medium">
+  {selectedPatientDetails?.systemic_exam?.map((item, index) => (
+    <li key={index}>
+      {typeof item === 'object' ? item.note : item}
+    </li>
+  )) || <li>NIL</li>}
+</ul>
             </div>
 
             <div className="text-[12px]">
@@ -1069,18 +1121,22 @@ const PatientSOAPNotes = ({
               <h4 className="text-gray-400 font-normal mb-1">
                 Investigations Required:
               </h4>
-              <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.investigations?.map((item, index) => (
-                  <li key={index}>{item}</li>
-                )) || <li>NIL</li>}
-              </ul>
+           <ul className="list-disc list-outside pl-5 font-medium">
+  {selectedPatientDetails?.investigations?.map((item, index) => (
+    <li key={index}>
+      {typeof item === 'object' ? item.note : item}
+    </li>
+  )) || <li>NIL</li>}
+</ul>
             </div>
 
             <div className="text-[12px]">
               <h4 className="text-gray-400 font-normal mb-1">Bedside Tests:</h4>
               <ul className="list-disc list-outside pl-5 font-medium">
                 {selectedPatientDetails?.bedside_tests?.map((item, index) => (
-                  <li key={index}>{item}</li>
+              <li key={index}>
+      {typeof item === 'object' ? item.note : item}
+    </li>
                 )) || <li>NIL</li>}
               </ul>
             </div>
@@ -1111,9 +1167,12 @@ const PatientSOAPNotes = ({
                 Active Problems List:
               </h4>
               <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.problems_list?.map((item, index) => (
-                  <li key={index}>{item}</li>
-                )) || <li>NIL</li>}
+            {selectedPatientDetails?.problems_list?.map((item, index) => (
+      <li key={index}>
+        {/* ADD THE CHECK HERE TOO */}
+        {typeof item === 'object' ? item.note : item}
+      </li>
+    )) || <li>NIL</li>}
               </ul>
             </div>
 
@@ -1134,7 +1193,10 @@ const PatientSOAPNotes = ({
                 <ul className="list-disc list-outside pl-5 font-medium">
                   {selectedPatientDetails.additional_notes.map(
                     (note, index) => (
-                      <li key={index}>{note}</li>
+                     <li key={index}>
+        {/* ADD THE CHECK HERE TOO */}
+        {typeof note === 'object' ? note.note : note}
+      </li>
                     ),
                   )}
                 </ul>
@@ -1224,84 +1286,90 @@ const PatientSOAPNotes = ({
             </div>
           </div>
 
-             {/* Drug Records */}
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-          <div className=" mb-4">    <p className="font-medium text-[#1B2B40]">Medication / Drug Records</p>
-          </div>
+          {/* Drug Records */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <div className=" mb-4">    <p className="font-medium text-[#1B2B40]">Medication / Drug Records</p>
+            </div>
 
-          <div className="overflow-x-auto">
-            {selectedPatientDetails?.drug_records?.length > 0 ? (
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="text-[12px] text-gray-400 border-b">
-                    <th className="pb-2 font-normal">Drug Name</th>
-                    <th className="pb-2 font-normal">Route</th>
-                    <th className="pb-2 font-normal">Qty</th>
-                    <th className="pb-2 font-normal">Frequency</th>
-                    <th className="pb-2 font-normal">Duration</th>
-                  </tr>
-                </thead>
-                <tbody className="text-[12px]">
-                  {selectedPatientDetails.drug_records.map((drug, index) => (
-                    <tr key={index} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
-                      <td className="py-3 font-medium text-[#3E4095]">
-                        {drug.name}
-                      </td>
-                      <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
-                      <td className="py-3 text-gray-600">{drug.quantity}</td>
-                      <td className="py-3 text-gray-600">
-                        {/* Handling nested frequency object */}
-                        {typeof drug.frequency === 'object'
-                          ? `${drug.frequency.value || ''} ${drug.frequency.unit || ''}`
-                          : drug.frequency || "N/A"}
-                      </td>
-                      <td className="py-3 text-gray-600">
-                        {/* Handling nested duration object */}
-                        {typeof drug.duration === 'object'
-                          ? `${drug.duration.value || ''} ${drug.duration.unit || ''}`
-                          : drug.duration || "N/A"}
-                      </td>
+            <div className="overflow-x-auto">
+              {selectedPatientDetails?.drug_records?.length > 0 ? (
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="text-[12px] text-gray-400 border-b">
+                      <th className="pb-2 font-normal">Drug Name</th>
+                      <th className="pb-2 font-normal">Route</th>
+                      <th className="pb-2 font-normal">Qty</th>
+                      <th className="pb-2 font-normal">Frequency</th>
+                      <th className="pb-2 font-normal">Duration</th>
                     </tr>
+                  </thead>
+                  <tbody className="text-[12px]">
+                    {selectedPatientDetails.drug_records.map((drug, index) => (
+                      <tr key={index} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
+                        <td className="py-3 font-medium text-[#3E4095]">
+                          {drug.name}
+                        </td>
+                        <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
+                        <td className="py-3 text-gray-600">{drug.quantity}</td>
+                        <td className="py-3 text-gray-600">
+                          {/* Handling nested frequency object */}
+                          {typeof drug.frequency === 'object'
+                            ? `${drug.frequency.value || ''} ${drug.frequency.unit || ''}`
+                            : drug.frequency || "N/A"}
+                        </td>
+                        <td className="py-3 text-gray-600">
+                          {/* Handling nested duration object */}
+                          {typeof drug.duration === 'object'
+                            ? `${drug.duration.value || ''} ${drug.duration.unit || ''}`
+                            : drug.duration || "N/A"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="text-[12px] text-gray-500 italic">No medication records available.</p>
+              )}
+            </div>
+          </div>
+
+          {/* Care Instructions */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <p className="font-medium mb-4 text-[#1B2B40]">Care Instructions</p>
+            <div className="text-[12px] text-gray-700">
+              {selectedPatientDetails?.care_instructions?.length > 0 ? (
+                <ul className="list-disc pl-5 space-y-1">
+                  {selectedPatientDetails.care_instructions.map((instruction, index) => (
+                          <li key={index}>
+        {/* ADD THE CHECK HERE TOO */}
+        {typeof instruction === 'object' ? instruction.note : instruction}
+      </li>
                   ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className="text-[12px] text-gray-500 italic">No medication records available.</p>
-            )}
+                </ul>
+              ) : (
+                <p>NIL</p>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Care Instructions */}
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-          <p className="font-medium mb-4 text-[#1B2B40]">Care Instructions</p>
-          <div className="text-[12px] text-gray-700">
-            {selectedPatientDetails?.care_instructions?.length > 0 ? (
-              <ul className="list-disc pl-5 space-y-1">
-                {selectedPatientDetails.care_instructions.map((instruction, index) => (
-                  <li key={index}>{instruction}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>NIL</p>
-            )}
+          {/* Treatment Plan */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <p className="font-medium mb-4 text-[#1B2B40]">Treatment Plan</p>
+            <div className="text-[12px] text-gray-700">
+              {selectedPatientDetails?.treatment_plan?.length > 0 ? (
+                <ul className="list-disc pl-5 space-y-1">
+                  {selectedPatientDetails.treatment_plan.map((plan, index) => (
+                <li key={index}>
+        {/* ADD THE CHECK HERE TOO */}
+        {typeof plan === 'object' ? plan.note : plan}
+      </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>NIL</p>
+              )}
+            </div>
           </div>
-        </div>
-
-        {/* Treatment Plan */}
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-          <p className="font-medium mb-4 text-[#1B2B40]">Treatment Plan</p>
-          <div className="text-[12px] text-gray-700">
-            {selectedPatientDetails?.treatment_plan?.length > 0 ? (
-              <ul className="list-disc pl-5 space-y-1">
-                {selectedPatientDetails.treatment_plan.map((plan, index) => (
-                  <li key={index}>{plan}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>NIL</p>
-            )}
-          </div>
-        </div>
 
           {/* 7. Follow Up / Appointment */}
           <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
@@ -1443,7 +1511,7 @@ const PatientSOAPNotes = ({
                         <div
                           onClick={() => {
                             togglePopover(index);
-                            setSelectedPatientDetails(soapNote);
+                          setSelectedNoteId(soapNote.id);
                           }}
                           className={` hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer
         ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
@@ -1464,6 +1532,7 @@ const PatientSOAPNotes = ({
                             <p
                               className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
+                                setSelectedNoteId(soapNote.id);
                                 setSeePatientDetails(true);
                                 setOpenPopover(null);
                               }}
@@ -1498,7 +1567,7 @@ const PatientSOAPNotes = ({
                         <button
                           onClick={() => {
                             togglePopover(index);
-                            setSelectedPatientDetails(soapNote);
+                      setSelectedNoteId(soapNote.id);
                           }}
                           className={`h-9 w-9 flex items-center justify-center rounded-full ${openPopover === index ? "bg-slate-200" : "bg-gray-50"}`}
                         >
@@ -1519,7 +1588,9 @@ const PatientSOAPNotes = ({
                             <p
                               className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
+                          setSelectedNoteId(soapNote.id);
                                 setSeePatientDetails(true);
+                                setOpenPopover(null);
                               }}
                             >
                               See full SOAP Note
@@ -1602,33 +1673,38 @@ const PatientSOAPNotes = ({
                 </div>
               </div>
               <div>
-  <label className="block text-[12px] font-medium text-gray-600 mb-1">
-    Note Description
-  </label>
-  <textarea
-    rows="5"
-    className="w-full p-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095] resize-none transition-all placeholder:text-gray-400"
-    placeholder="Enter patient observations, medical history updates, or specific care instructions..."
-    value={noteDescription} // Ensure you have this state defined
-    onChange={(e) => setNoteDescription(e.target.value)}
-  ></textarea>
-  
-  <div className="flex justify-end mt-1">
-    <p className="text-[10px] text-gray-400">
-      {noteDescription?.length || 0} characters
-    </p>
-  </div>
+                <label className="block text-[12px] font-medium text-gray-600 mb-1">
+                  Note Description
+                </label>
+                <textarea
+                  rows="5"
+                  className="w-full p-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095] resize-none transition-all placeholder:text-gray-400"
+                  placeholder="Enter patient observations, medical history updates, or specific care instructions..."
+                  value={noteDescription} // Ensure you have this state defined
+                  onChange={(e) => setNoteDescription(e.target.value)}
+                ></textarea>
 
-  <button
-    className="w-full mt-4 bg-[#3E4095] text-white py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-colors"
-    onClick={() => {
-      toast.success("Work in Progress...");
-      setCreateAdditionalNotes(false);
-    }}
-  >
-    Save Note
-  </button>
-</div>
+                <div className="flex justify-end mt-1">
+                  <p className="text-[10px] text-gray-400">
+                    {noteDescription?.length || 0} characters
+                  </p>
+                </div>
+
+                <button
+                  className={`w-full mt-4 ${isPending ? 'border border-gray-400 bg-gray-400 text-white cursor-not-allowed' : 'bg-[#3E4095] text-white '} py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-colors`}
+                  onClick={handleCreateAdditionalNote}
+                  disabled={isPending}
+                >
+                   {isPending ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Saving Note...
+                  </div>
+                ) : (
+                  "Save Note"
+                )}
+                </button>
+              </div>
             </div>
           </div>
         </>
