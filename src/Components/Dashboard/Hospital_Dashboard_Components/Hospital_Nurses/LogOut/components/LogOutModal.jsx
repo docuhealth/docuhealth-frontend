@@ -23,7 +23,7 @@ const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selec
                 
                 <>
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-                        <div className="bg-white rounded-lg shadow-lg p-6 max-w-5xl w-full relative text-sm">
+                        <div className="bg-white rounded-lg shadow-lg p-6 max-w-5xl w-full relative text-sm max-h-3/5 overflow-scroll">
                             <div className="flex justify-between items-center border-b pb-4">
                                 <h2 className="font-medium">Choose a preferred {selected}</h2>
                                 {/* Close Button */}

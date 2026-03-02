@@ -70,7 +70,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
     });
   }, [appointments, searchQuery]);
 
-    const togglePopover = (index) => {
+  const togglePopover = (index) => {
     setOpenPopover(openPopover === index ? null : index);
   };
 
@@ -334,7 +334,14 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                     >
                       See patient's details
                     </p>
-
+                    <p
+                      className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                      onClick={()=> {
+                           setOpenPopover(null);
+                      }}
+                      >
+                      Add CASE Note
+                    </p>
                     <p
                       className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                       onClick={() => {

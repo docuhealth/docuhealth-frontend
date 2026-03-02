@@ -6,6 +6,7 @@ import UpdateVitals from '../../../Components/Dashboard/Hospital_Dashboard_Compo
 const Hospital_Nurses_Appointments_Dashboard = () => {
 
   const [updateVitals, setUpdateVitals] = useState(false)
+  
   const [selectedPatientForVitals, setSelectedPatientForVitals] = useState(null)
 
   return (

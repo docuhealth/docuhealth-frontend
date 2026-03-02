@@ -184,7 +184,7 @@ const OtherMedicalServices = ({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-3">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-3">
         {staffList.length > 0 ? (
           isStaffSelected ? (
             <>
@@ -251,7 +251,7 @@ const OtherMedicalServices = ({
             </>
           ) : (
             <>
-              <div className="bg-white rounded-lg shadow-lg p-6 max-w-5xl w-full relative text-sm">
+              <div className="bg-white rounded-lg shadow-lg p-6 max-w-5xl w-full relative text-sm max-h-3/5 overflow-scroll">
                 <div className="flex justify-between items-center border-b pb-4">
                   <h2 className="font-medium">Choose a preferred {selected}</h2>
                   {/* Close Button */}

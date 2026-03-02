@@ -68,7 +68,7 @@ useEffect(() => {
         <div className="flex items-center gap-3">
           <div>
             <p>
-              HIN : <span># {profile ? profile.hin : "loading.."}</span>
+              HIN : <span>{profile ? profile.hin : "loading.."}</span>
             </p>
           </div>
           <div className="relative">
