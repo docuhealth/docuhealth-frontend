@@ -48,6 +48,8 @@ const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInput
 const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
     const queryClient = useQueryClient();
 
+    console.log(selected)
+
     const [isRestored, setIsRestored] = useState(false);
 
         const [caseNoteData, setCaseNoteData] = useState({

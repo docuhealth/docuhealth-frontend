@@ -11,7 +11,7 @@ import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SearchBar from "../../../../SearchBar/SearchBar";
 
-const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
+const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals, setSelectedPatientForVitals, setSelectedPatientForCASE }) => {
   const {
     appointments,
     count,
@@ -338,9 +338,21 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                       className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                       onClick={()=> {
                            setOpenPopover(null);
+                           setNewCaseNote(true)
+                           setSelectedPatientForCASE(appointment)
                       }}
                       >
                       Add CASE Note
+                    </p>
+                    <p
+                      className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                      onClick={()=> {
+                           setOpenPopover(null);
+                           setCaseNoteHistory(true)
+                           setSelectedPatientForCASE(appointment)
+                      }}
+                      >
+                      CASE Note History
                     </p>
                     <p
                       className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
@@ -418,6 +430,26 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                       >
                         See patient's details
                       </button>
+                        <button
+                        className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"
+                        onClick={() => {
+                          setOpenPopover(null);
+                           setNewCaseNote(true)
+                                 setSelectedPatientForCASE(appointment)
+                        }}
+                      >
+                        Add CASE Note
+                      </button>
+                        <button
+                        className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"
+                        onClick={() => {
+                          setOpenPopover(null);
+                           setCaseNoteHistory(true)
+                                 setSelectedPatientForCASE(appointment)
+                        }}
+                      >
+                        CASE Note History
+                      </button>
                       <button
                         className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"
                         onClick={() => {
@@ -428,6 +460,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                       >
                         Update vitals
                       </button>
+                    
                       <button
                         className={`w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors     ${fetchingPersonnel ? "pointer-events-none opacity-50" : ""}`}
                         onClick={() => {
@@ -605,7 +638,7 @@ const AppointmentsList = ({ setUpdateVitals, setSelectedPatientForVitals }) => {
                   </button>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-3 my-5 gap-3 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-3 my-5 gap-3 text-sm max-h-3/5 overflow-scroll">
                 {staffList.map((staff, index) => (
                   <div key={index} className="border rounded-md p-3">
                     <div>
