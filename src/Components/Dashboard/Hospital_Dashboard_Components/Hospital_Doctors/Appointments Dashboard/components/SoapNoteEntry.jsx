@@ -1092,7 +1092,7 @@ useEffect(() => {
                     <div className="flex-1">
                       <label className="block text-[12px] pb-1">Duration</label>
                       <input
-                        type="text"
+                        type="number"
                         placeholder="duration..."
                         value={med.duration}
                         onChange={(e) =>

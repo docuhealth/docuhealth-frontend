@@ -97,7 +97,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
             <p className="pb-1">Blood pressure</p>
             <div className="relative">
               <input
-                type="text"
+                type="number"
                 id="bloodPressure"
                 className="w-full text-sm border px-3 py-2 rounded-sm pr-16 focus:outline-none" // add padding-right for the unit
                 placeholder="Enter blood pressure"
@@ -113,7 +113,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
             <p className="pb-1">Temperature</p>
             <div className="relative">
               <input
-                type="text"
+                type="number"
                 id="temperature"
                 className="w-full text-sm border px-3 py-2 rounded-sm pr-8 focus:outline-none" // add padding-right for the unit
                 placeholder="Enter temperature"
@@ -129,7 +129,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
             <p className="pb-1">Respiratory Rate</p>
             <div className="relative">
               <input
-                type="text"
+                type="number"
                 id="respRate"
                 className="w-full text-sm border px-3 py-2 rounded-sm pr-14 focus:outline-none" // add padding-right for the unit
                 placeholder="Enter respiratory rate"
@@ -145,7 +145,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
             <p className="pb-1">Height</p>
             <div className="relative">
               <input
-                type="text"
+                type="number"
                 id="height"
                 className="w-full text-sm border px-3 py-2 rounded-sm pr-10 focus:outline-none" // add padding-right for the unit
                 placeholder="Enter height"
@@ -161,7 +161,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
             <p className="pb-1">Heart Rate</p>
             <div className="relative">
               <input
-                type="text"
+                type="number"
                 id="heartRate"
                 className="w-full text-sm border px-3 py-2 rounded-sm pr-14 focus:outline-none" // add padding-right for the unit
                 placeholder="Enter heart rate"
@@ -177,7 +177,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
             <p className="pb-1">Weight</p>
             <div className="relative">
               <input
-                type="text"
+                type="number"
                 id="weight"
                 className="w-full text-sm border px-3 py-2 rounded-sm pr-10 focus:outline-none" // add padding-right for the unit
                 placeholder="Enter weight"
