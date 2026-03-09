@@ -5,11 +5,13 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { fetchSubscriptionStatus } from "../../../services/authService";
+import EmergencyModeNotice from "./Home Dashboard/Components/EmergencyModeNotice/EmergencyModeNotice";
 
 const Patient_Dashboard_Sidebar = () => {
   const { profile, toggleEmergencyStatus, newEmergencyStatus } =
     useContext(AppContext);
   const [emergencyStatus, setEmergencyStatus] = useState(false);
+  const [emergencyStatusModal, setEmergencyStatusModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -43,15 +45,20 @@ const Patient_Dashboard_Sidebar = () => {
     toast.error("Please subscribe to access feature");
     return;
   }
+    setEmergencyStatusModal(true)
+  };
 
-    try {
+  const handleEmergencyStatusModal = async() => {
+        try {
       // Optimistic UI update
       setEmergencyStatus((prev) => !prev);
       await toggleEmergencyStatus();
     } catch (err) {
       setEmergencyStatus(profile?.emergency ?? false); // revert if failed
+    }finally{
+      setEmergencyStatusModal(false)
     }
-  };
+  }
 
   const handleLogout = () => {
        sessionStorage.clear();
@@ -65,7 +72,7 @@ const Patient_Dashboard_Sidebar = () => {
 
   return (
     <>
-      <div className="pt-5 pl-5 pb-3 flex justify-between items-center  ">
+      <div className="pt-5 pl-5 pb-3 flex justify-between items-center  z-50">
         <div className="flex justify-start items-center gap-1 font-semibold text-[#3E4095]">
            <img src={docuhealth_logo} alt="Logo" className="w-6" />
                      <h1 className="text-xl">DocuHealth</h1>
@@ -424,6 +431,11 @@ const Patient_Dashboard_Sidebar = () => {
           </button>
         </div>
       </div>
+      {emergencyStatusModal && (
+        <>
+          <EmergencyModeNotice emergencyStatusModal = {emergencyStatusModal} setEmergencyStatusModal={setEmergencyStatusModal}  handleEmergencyStatusModal = {handleEmergencyStatusModal}/>
+        </>
+      )}
     </>
   );
 };

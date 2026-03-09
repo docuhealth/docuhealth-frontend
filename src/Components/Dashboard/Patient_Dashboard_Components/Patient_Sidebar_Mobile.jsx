@@ -4,6 +4,8 @@ import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { fetchSubscriptionStatus } from "../../../services/authService";
+import EmergencyModeNotice from "./Home Dashboard/Components/EmergencyModeNotice/EmergencyModeNotice";
 
 
 const Patient_Sidebar_Mobile = ({
@@ -13,6 +15,9 @@ const Patient_Sidebar_Mobile = ({
   const { profile, toggleEmergencyStatus, newEmergencyStatus } =
     useContext(AppContext);
   const [emergencyStatus, setEmergencyStatus] = useState(false);
+
+   const [emergencyStatusModal, setEmergencyStatusModal] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
 
   const location = useLocation();
@@ -36,19 +41,31 @@ const Patient_Sidebar_Mobile = ({
   }, [newEmergencyStatus]);
 
   const handleToggle = async () => {
+     const is_subscribed = fetchSubscriptionStatus()
     if (isLoading) {
       toast.error("Please wait, loading your profile...");
       return;
     }
 
-    try {
+     if (!is_subscribed) {
+    toast.error("Please subscribe to access feature");
+    return;
+  }
+  setOpenMobileSidebar(!openMobileSidebar)
+    setEmergencyStatusModal(true)
+  };
+
+   const handleEmergencyStatusModal = async() => {
+        try {
       // Optimistic UI update
       setEmergencyStatus((prev) => !prev);
       await toggleEmergencyStatus();
     } catch (err) {
       setEmergencyStatus(profile?.emergency ?? false); // revert if failed
+    }finally{
+      setEmergencyStatusModal(false)
     }
-  };
+  }
 
   const handleLogout = () => {
     setOpenMobileSidebar(false);
@@ -480,6 +497,14 @@ const Patient_Sidebar_Mobile = ({
           </div>
         </div>
       </div>
+
+      {
+        emergencyStatusModal && (
+          <>
+    <EmergencyModeNotice emergencyStatusModal = {emergencyStatusModal} setEmergencyStatusModal={setEmergencyStatusModal}  handleEmergencyStatusModal = {handleEmergencyStatusModal}/>
+          </>
+        )
+      }
     </>
   );
 };

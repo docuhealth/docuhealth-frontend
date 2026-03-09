@@ -27,7 +27,7 @@ const Patient_Dashboard_Header = () => {
   };
 
   return (
-    <div className="sticky top-0 z-30 w-full bg-white border-b border-gray-100 shadow">
+    <div className="sticky top-0 z-10 w-full bg-white border-b border-gray-100 shadow">
       {/* Header */}
       <header className="hidden lg:flex justify-between items-center py-3.5 px-6">
         <div>
