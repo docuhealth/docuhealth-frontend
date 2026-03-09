@@ -101,17 +101,17 @@ useEffect(() => {
             <button
               className="flex items-center gap-2 px-6 py-2.5 bg-[#3E4095] text-white font-medium rounded-full transition cursor-pointer"
               onClick={() => {
-                // if (profile) {
-                //   const is_subscribed = fetchSubscriptionStatus();
-                //   if (!is_subscribed) {
-                //     toast.error("Please subscribe to access feature");
-                //     return;
-                //   }
-                //   handleSelection(profile);
-                // } else {
-                //   console.log("no profile");
-                //   toast.error("We couldn't find a profile. Try again");
-                // }
+                if (profile) {
+                  const is_subscribed = fetchSubscriptionStatus();
+                  if (!is_subscribed) {
+                    toast.error("Please subscribe to access feature");
+                    return;
+                  }
+                  handleSelection(profile);
+                } else {
+                  console.log("no profile");
+                  toast.error("We couldn't find a profile. Try again");
+                }
                 handleSelection(profile);
               }}
             >
