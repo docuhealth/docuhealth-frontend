@@ -1,5 +1,5 @@
 import React, { useState, useContext, useMemo } from "react";
-import { AppointmentsContext } from "../../../../context/Patient Context/AppointmentsContext";
+import { AppointmentsContext } from "../../../../context/PatientContext/AppointmentsContext";
 import Pagination2 from "../Pagination/Pagination2";
 import { formatFullDate, formatTime } from "./Components/Date_Time_Formatter";
 import { CalendarIcon, UserIcon, Building2, MessageSquare } from "lucide-react";

@@ -1,13 +1,13 @@
 import React, { useState, useContext } from 'react'
 import {Link} from 'react-router-dom'
-import DynamicDate from '../../../Components/Dynamic Date/DynamicDate'
+import DynamicDate from '../../../Components/DynamicDate/DynamicDate'
 import template from '../../../assets/img/template.png'
-import { NursesAppContext } from '../../../context/Hospital Context/Nurses/NursesAppContext'
-import Vitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/Vitals'
-import PatientVitalsDetails from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/PatientVitalsDetails'
-import UpdateVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/UpdateVitals'
-import PatientsAssignedToMyWard from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/PatientsAssignedToMyWard'
-import ProcessVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/ProcessVitals'
+import { NursesAppContext } from '../../../context/HospitalContext/Nurses/NursesAppContext'
+import Vitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/components/Vitals'
+import PatientVitalsDetails from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/components/PatientVitalsDetails'
+import UpdateVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/components/UpdateVitals'
+import PatientsAssignedToMyWard from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/PatientsAssignedToMyWard'
+import ProcessVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/components/ProcessVitals'
 
 const Hospital_Nurses_Home_Dashboard = () => {
 

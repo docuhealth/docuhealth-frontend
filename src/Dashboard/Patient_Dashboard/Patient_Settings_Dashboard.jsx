@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-import { AppContext } from "../../context/Patient Context/AppContext";
-import DynamicDate from "../../Components/Dynamic Date/DynamicDate";
+import { AppContext } from "../../context/PatientContext/AppContext";
+import DynamicDate from "../../Components/DynamicDate/DynamicDate";
 import Settings from "../../Components/Dashboard/Patient_Dashboard_Components/Settings_Dashboard/Settings";
 
 const Patient_Settings_Dashboard = () => {

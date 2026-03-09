@@ -1,7 +1,7 @@
 import React from "react";
-import formatRecordDate from "../../Home Dashboard/Components/formatRecordDate";
-import { formatFullDateTime } from "../../Home Dashboard/Components/formatRecordDate";
-import { truncateWords } from "../../Home Dashboard/Components/formatRecordDate";
+import formatRecordDate from "../../Home_Dashboard/Components/formatRecordDate";
+import { formatFullDateTime } from "../../Home_Dashboard/Components/formatRecordDate";
+import { truncateWords } from "../../Home_Dashboard/Components/formatRecordDate";
 import Pagination2 from "../../Pagination/Pagination2";
 
 const UserSubAcctMedicalRecords = ({

@@ -2,16 +2,17 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "react-hot-toast";
+import { HelmetProvider } from "react-helmet-async";
 
 
 import Landing_Page_Layout from "./Layouts/Landing_Page_Layout/Landing_Page_Layout";
-import Home_Page from "./Pages_/Home Page/Home_Page";
-import Our_Vision_Page from "./Pages_/Our Vision/Our_Vision_Page";
-import Our_Mission_Page from "./Pages_/Our Mission/Our_Mission_Page";
-import DocuHealth_News_Page from "./Pages_/DocuHealth News Page/DocuHealth_News_Page";
-import DocuHealth_API_Page from "./Pages_/DocuHealth API Page/DocuHealth_API_Page";
-import Legal_Notice_Page from "./Pages_/Legal Notice/Legal_Notice_Page";
-import Privacy_Policy_Page from "./Pages_/Our Privacy Policy/Privacy_Policy_Page";
+import Home_Page from "./Pages/HomePage/Home_Page";
+import Our_Vision_Page from "./Pages/OurVision/Our_Vision_Page";
+import Our_Mission_Page from "./Pages/OurMission/Our_Mission_Page";
+import DocuHealth_News_Page from "./Pages/DocuHealthNewsPage/DocuHealth_News_Page";
+import DocuHealth_API_Page from "./Pages/DocuHealthAPIPage/DocuHealth_API_Page";
+import Legal_Notice_Page from "./Pages/LegalNotice/Legal_Notice_Page";
+import Privacy_Policy_Page from "./Pages/OurPrivacyPolicy/Privacy_Policy_Page";
 
 
 import Hospital_Verification_Request from "./Auth/Hospital/Hospital_Verification_Request";
@@ -25,7 +26,7 @@ import Hospital_Verify_OTP from "./Auth/Hospital/Hospital_Verify_OTP";
 import Hospital_Create_New_Password from "./Auth/Hospital/Hospital_Create_New_Password";
 
 
-import NotFound from "./Not Found/NotFound";
+import NotFound from "./NotFound/NotFound";
 
 import Verify_NIN from "./Auth/VerifyNIN/Verify_NIN";
 
@@ -134,11 +135,12 @@ function App() {
   const isHospital = hostname.startsWith("hospital.");
 
   return (
-    <Router>
+    <HelmetProvider>
+      <Router>
 
 
-      <ToastContainer
-        position="top-right"
+        <ToastContainer
+          position="top-right"
         autoClose={3000}
         hideProgressBar={false}
         closeOnClick
@@ -1039,6 +1041,7 @@ function App() {
       )}
 
     </Router>
+    </HelmetProvider>
   );
 }
 

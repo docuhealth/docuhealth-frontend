@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import DynamicDate from "../../Components/Dynamic Date/DynamicDate";
+import DynamicDate from "../../Components/DynamicDate/DynamicDate";
 import UserSubAcctNoticeDisplay from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserSubAcctNoticeDisplay";
 import UserSubAcctOverlay from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserCreateSubAcctOverlay";
 import axiosInstance from "../../utils/axiosInstance";

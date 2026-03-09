@@ -1,10 +1,10 @@
-import DoctorProfileProvider from "../../context/Hospital Context/Doctors/DoctorAppContext";
-import DoctorAppointmentsListProvider from "../../context/Hospital Context/Doctors/DoctorAppointmentsListContext";
-import DoctorsHealthPersonnelProvider from "../../context/Hospital Context/Doctors/DoctorsHealthPersonnelContext";
-import DoctorsAdmittedPatientMGTProvider from "../../context/Hospital Context/Doctors/DoctorsAdmittedPatientMGTContext";
+import DoctorProfileProvider from "../../context/HospitalContext/Doctors/DoctorAppContext";
+import DoctorAppointmentsListProvider from "../../context/HospitalContext/Doctors/DoctorAppointmentsListContext";
+import DoctorsHealthPersonnelProvider from "../../context/HospitalContext/Doctors/DoctorsHealthPersonnelContext";
+import DoctorsAdmittedPatientMGTProvider from "../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
 
-import HosStaffsProvider from "../../context/Hospital Context/HosStaffsContext";
-import HosWardProvider from "../../context/Hospital Context/HosWardContext";
+import HosStaffsProvider from "../../context/HospitalContext/HosStaffsContext";
+import HosWardProvider from "../../context/HospitalContext/HosWardContext";
 
 const HospitalDoctorProviders = ({ children }) => {
   return (

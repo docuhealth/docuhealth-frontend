@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Menu, ChevronDown, LogOut, User } from "lucide-react";
 import Hospital_Doctors_Sidebar_Mobile from "./Hospital_Doctors_Sidebar_Mobile";
-import { DoctorAppContext } from "../../../../context/Hospital Context/Doctors/DoctorAppContext";
+import { DoctorAppContext } from "../../../../context/HospitalContext/Doctors/DoctorAppContext";
 
 const Hospital_Doctors_Header = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);

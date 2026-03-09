@@ -1,7 +1,7 @@
 import React,{useContext} from "react";
-import DynamicDate from "../../../Components/Dynamic Date/DynamicDate";
-import Settings from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Settings Dashboard/Settings";
-import { NursesAppContext } from "../../../context/Hospital Context/Nurses/NursesAppContext";
+import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
+import Settings from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Settings_Dashboard/Settings";
+import { NursesAppContext } from "../../../context/HospitalContext/Nurses/NursesAppContext";
 
 
 const Hospital_Nurses_Settings_Dashboard = () => {

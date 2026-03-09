@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
-import { AppContext } from "../../context/Patient Context/AppContext";
-import { IdCardContext } from "../../context/Patient Context/IdCardContext";
+import { AppContext } from "../../context/PatientContext/AppContext";
+import { IdCardContext } from "../../context/PatientContext/IdCardContext";
 import toast from "react-hot-toast";
-import DynamicDate from "../../Components/Dynamic Date/DynamicDate";
+import DynamicDate from "../../Components/DynamicDate/DynamicDate";
 import { ChevronDown } from "lucide-react";
-import NoticeDisplay from "../../Components/Dashboard/Patient_Dashboard_Components/Home Dashboard/Components/NoticeDisplay/NoticeDisplay";
-import MedicalRecords from "../../Components/Dashboard/Patient_Dashboard_Components/Home Dashboard/MedicalRecords";
-import MedicalRecordsDetail from "../../Components/Dashboard/Patient_Dashboard_Components/Home Dashboard/MedicalRecordsDetail";
-import Id_Card from "../../Components/Dashboard/Patient_Dashboard_Components/Home Dashboard/Components/Id Card/Id_Card";
+import NoticeDisplay from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/NoticeDisplay/NoticeDisplay";
+import MedicalRecords from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/MedicalRecords";
+import MedicalRecordsDetail from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/MedicalRecordsDetail";
+import Id_Card from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/IdCard/Id_Card";
 import { fetchSubscriptionStatus } from "../../services/authService";
 
 const Patient_Home_Dashboard = () => {

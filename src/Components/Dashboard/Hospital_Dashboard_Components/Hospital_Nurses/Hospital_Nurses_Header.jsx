@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Menu, ChevronDown, LogOut, User } from "lucide-react";
 import Hospital_Nurses_Sidebar_Mobile from "./Hospital_Nurses_Sidebar_Mobile";
-import { NursesAppContext } from "../../../../context/Hospital Context/Nurses/NursesAppContext";
+import { NursesAppContext } from "../../../../context/HospitalContext/Nurses/NursesAppContext";
 
 import LogOutModal from "./LogOut/components/LogOutModal";
 import toast from "react-hot-toast";

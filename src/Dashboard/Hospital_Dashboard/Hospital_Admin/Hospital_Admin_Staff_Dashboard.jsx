@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import DynamicDate from "../../../Components/Dynamic Date/DynamicDate";
-import StaffListHospital from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Staff Mgt Dashboard/StaffListHospital";
-import OnboardNewStaff from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Staff Mgt Dashboard/components/OnboardNewStaff";
+import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
+import StaffListHospital from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Staff_Mgt_Dashboard/StaffListHospital";
+import OnboardNewStaff from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Staff_Mgt_Dashboard/components/OnboardNewStaff";
 
 
 const Hospital_Admin_Staff_Dashboard = () => {

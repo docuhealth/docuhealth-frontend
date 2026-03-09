@@ -1,11 +1,11 @@
 import React from 'react'
-import NursesProfileProvider from '../../context/Hospital Context/Nurses/NursesAppContext'
-import NursesAdmittedPatientMGTProvider from '../../context/Hospital Context/Nurses/NursesAdmittedPatientMGTContext'
-import NursesHealthPersonnelProvider from '../../context/Hospital Context/Nurses/NursesHealthPersonnelContext'
-import NursesAppointmentsListProvider from '../../context/Hospital Context/Nurses/NursesAppointmentsListContext'
-import NursesPatientsAssignedToWardProvider from '../../context/Hospital Context/Nurses/NursesPatientsAssignedToWardContext'
+import NursesProfileProvider from '../../context/HospitalContext/Nurses/NursesAppContext'
+import NursesAdmittedPatientMGTProvider from '../../context/HospitalContext/Nurses/NursesAdmittedPatientMGTContext'
+import NursesHealthPersonnelProvider from '../../context/HospitalContext/Nurses/NursesHealthPersonnelContext'
+import NursesAppointmentsListProvider from '../../context/HospitalContext/Nurses/NursesAppointmentsListContext'
+import NursesPatientsAssignedToWardProvider from '../../context/HospitalContext/Nurses/NursesPatientsAssignedToWardContext'
 
-import HosStaffsProvider from '../../context/Hospital Context/HosStaffsContext'
+import HosStaffsProvider from '../../context/HospitalContext/HosStaffsContext'
 
 const HospitalNursesProviders = ({ children }) => {
   return (

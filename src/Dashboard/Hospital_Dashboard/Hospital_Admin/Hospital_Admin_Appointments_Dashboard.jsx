@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-import DynamicDate from "../../../Components/Dynamic Date/DynamicDate";
-import AppointmentsListHospital from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Appointments Dashboard/AppointmentsListHospital";
+import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
+import AppointmentsListHospital from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Appointments_Dashboard/AppointmentsListHospital";
 
 
 const Hospital_Admin_Appointments_Dashboard = () => {

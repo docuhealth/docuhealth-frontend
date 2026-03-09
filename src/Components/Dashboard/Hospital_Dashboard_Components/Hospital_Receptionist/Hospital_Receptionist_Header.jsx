@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Menu, ChevronDown, LogOut, User } from "lucide-react";
 import Hospital_Receptionist_Sidebar_Mobile from "./Hospital_Receptionist_Sidebar_Mobile";
-import { ReceptionistAppContext } from "../../../../context/Hospital Context/Receptionist/ReceptionistAppContext";
+import { ReceptionistAppContext } from "../../../../context/HospitalContext/Receptionist/ReceptionistAppContext";
 
 
 const Hospital_Receptionist_Header = () => {

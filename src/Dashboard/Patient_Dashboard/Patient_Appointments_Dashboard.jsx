@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-import DynamicDate from "../../Components/Dynamic Date/DynamicDate";
-import { AppContext } from "../../context/Patient Context/AppContext";
+import DynamicDate from "../../Components/DynamicDate/DynamicDate";
+import { AppContext } from "../../context/PatientContext/AppContext";
 import { ChevronDown } from "lucide-react";
 import PatientAppointmentsList from "../../Components/Dashboard/Patient_Dashboard_Components/Patient_Appointments_Dashboard/PatientAppointmentsList";
 

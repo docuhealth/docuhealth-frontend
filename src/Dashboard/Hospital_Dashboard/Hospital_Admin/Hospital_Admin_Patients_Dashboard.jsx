@@ -1,7 +1,7 @@
 import React from 'react'
-import DynamicDate from '../../../Components/Dynamic Date/DynamicDate'
-import TabComponent from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Patient Mgt Dashboard/TabComponent'
-import tabs from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Patient Mgt Dashboard/TabDetails'
+import DynamicDate from '../../../Components/DynamicDate/DynamicDate'
+import TabComponent from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Patient_Mgt_Dashboard/TabComponent'
+import tabs from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Patient_Mgt_Dashboard/TabDetails'
 
 
 const Hospital_Admin_Patients_Dashboard = () => {

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Menu, ChevronDown, LogOut, User } from "lucide-react";
 import Hospital_Admin_Sidebar_Mobile from "./Hospital_Admin_Sidebar_Mobile";
-import { HosAppContext } from "../../../../context/Hospital Context/Admin/HosAppContext";
+import { HosAppContext } from "../../../../context/HospitalContext/Admin/HosAppContext";
 
 const Hospital_Admin_Header = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);

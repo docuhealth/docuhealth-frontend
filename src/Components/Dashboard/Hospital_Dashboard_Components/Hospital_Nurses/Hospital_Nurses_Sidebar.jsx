@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import LogOutModal from "./LogOut/components/LogOutModal";
-import { NursesAppContext } from "../../../../context/Hospital Context/Nurses/NursesAppContext";
+import { NursesAppContext } from "../../../../context/HospitalContext/Nurses/NursesAppContext";
 import axiosInstanceHos from "../../../../utils/axiosInstanceHos";
 import toast from 'react-hot-toast'
 

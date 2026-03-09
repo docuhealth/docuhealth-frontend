@@ -1,5 +1,5 @@
 import React from "react";
-import DynamicDate from "../../Components/Dynamic Date/DynamicDate";
+import DynamicDate from "../../Components/DynamicDate/DynamicDate";
 import Drug_Records from "../../Components/Dashboard/Patient_Dashboard_Components/Drug_Records_Dashboard/Drug_Records";
 
 const Patient_Drug_Records_Dashboard = () => {

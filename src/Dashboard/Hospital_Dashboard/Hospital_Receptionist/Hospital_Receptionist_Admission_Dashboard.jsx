@@ -1,6 +1,6 @@
 import React from 'react'
-import DynamicDate from '../../../Components/Dynamic Date/DynamicDate'
-import AdmissionRequestList from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Admission Dashboard/AdmissionRequestList'
+import DynamicDate from '../../../Components/DynamicDate/DynamicDate'
+import AdmissionRequestList from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Admission_Dashboard/AdmissionRequestList'
 
 const Hospital_Receptionist_Admission_Dashboard = () => {
   return (

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import Pagination2 from "../Pagination/Pagination2";
 import toast from "react-hot-toast";
-import { SubAccountContext } from "../../../../context/Patient Context/SubAccountContext";
+import { SubAccountContext } from "../../../../context/PatientContext/SubAccountContext";
 import UserSubAcctRecords from "./Components/UserSubAcctRecords";
 import axiosInstance from "../../../../utils/axiosInstance";
 import UserSubAcctMedicalRecords from "./Components/UserSubAcctMedicalRecords";
-import MedicalRecordsDetail from "../Home Dashboard/MedicalRecordsDetail";
+import MedicalRecordsDetail from "../Home_Dashboard/MedicalRecordsDetail";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
 const UserSubAcctList = ({ setDisplaySubAcctModal }) => {

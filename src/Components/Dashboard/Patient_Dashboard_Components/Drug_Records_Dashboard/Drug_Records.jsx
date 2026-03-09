@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { DrugRecordsContext } from "../../../../context/Patient Context/DrugRecordsContext";
+import { DrugRecordsContext } from "../../../../context/PatientContext/DrugRecordsContext";
 // import axiosInstance from '../../../../utils/axiosInstance';
 
 const Drug_Records = () => {

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import { AppContext } from "../../../context/Patient Context/AppContext";
+import { AppContext } from "../../../context/PatientContext/AppContext";
 import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { fetchSubscriptionStatus } from "../../../services/authService";
-import EmergencyModeNotice from "./Home Dashboard/Components/EmergencyModeNotice/EmergencyModeNotice";
+import EmergencyModeNotice from "./Home_Dashboard/Components/EmergencyModeNotice/EmergencyModeNotice";
 
 const Patient_Dashboard_Sidebar = () => {
   const { profile, toggleEmergencyStatus, newEmergencyStatus } =

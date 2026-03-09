@@ -1,9 +1,9 @@
 import React, { useState, useContext } from "react";
-import DynamicDate from "../../../Components/Dynamic Date/DynamicDate";
+import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import template from "../../../assets/img/template.png";
 import { Camera } from "lucide-react"; // Optional: using lucide for the icon
-import { HosAppContext } from "../../../context/Hospital Context/Admin/HosAppContext";
-import ImageCustomization from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home Dashboard/ImageCustomization";
+import { HosAppContext } from "../../../context/HospitalContext/Admin/HosAppContext";
+import ImageCustomization from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/ImageCustomization";
 
 const Hospital_Admin_Home_Dashboard = () => {
 

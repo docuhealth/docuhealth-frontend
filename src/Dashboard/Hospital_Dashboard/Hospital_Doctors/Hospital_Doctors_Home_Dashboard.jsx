@@ -1,6 +1,6 @@
 import React, {useContext} from "react";
-import DynamicDate from "../../../Components/Dynamic Date/DynamicDate";
-import { DoctorAppContext } from "../../../context/Hospital Context/Doctors/DoctorAppContext";
+import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
+import { DoctorAppContext } from "../../../context/HospitalContext/Doctors/DoctorAppContext";
 import template from "../../../assets/img/template.png";
 
 const Hospital_Doctors_Home_Dashboard = () => {

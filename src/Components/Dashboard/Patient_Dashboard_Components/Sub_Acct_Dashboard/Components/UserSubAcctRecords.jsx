@@ -1,8 +1,8 @@
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
-import { IdCardContext } from "../../../../../context/Patient Context/IdCardContext";
+import { IdCardContext } from "../../../../../context/PatientContext/IdCardContext";
 import toast from "react-hot-toast";
-import Id_Card from "../../Home Dashboard/Components/Id Card/Id_Card";
+import Id_Card from "../../Home_Dashboard/Components/IdCard/Id_Card";
 
 
 const UserSubAcctRecords = ({ subAccounts, isPending, setDisplaySubAcctModal, setViewDetailMedicalRecord, setSelectedSubAcct }) => {

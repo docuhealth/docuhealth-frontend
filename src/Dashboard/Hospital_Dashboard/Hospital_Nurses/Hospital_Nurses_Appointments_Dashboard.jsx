@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import DynamicDate from '../../../Components/Dynamic Date/DynamicDate'
-import AppointmentsList from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Appointments Dashboard/AppointmentsList'
-import UpdateVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home Dashboard/components/UpdateVitals'
-import AddNewCaseNote from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient Mgt Dashboard/AddNewCaseNote'
+import DynamicDate from '../../../Components/DynamicDate/DynamicDate'
+import AppointmentsList from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Appointments_Dashboard/AppointmentsList'
+import UpdateVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/components/UpdateVitals'
+import AddNewCaseNote from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddNewCaseNote'
 
-import CaseNote from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient Mgt Dashboard/CaseNote'
-import CaseNoteDetail from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient Mgt Dashboard/CaseNoteDetail'
+import CaseNote from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/CaseNote'
+import CaseNoteDetail from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/CaseNoteDetail'
 
 const Hospital_Nurses_Appointments_Dashboard = () => {
 

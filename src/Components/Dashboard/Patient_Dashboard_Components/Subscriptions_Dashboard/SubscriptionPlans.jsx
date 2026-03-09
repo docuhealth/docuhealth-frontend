@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
-import { SubscriptionsContext } from "../../../../context/Patient Context/SubscriptionsContext";
+import { SubscriptionsContext } from "../../../../context/PatientContext/SubscriptionsContext";
 import axiosInstance from "../../../../utils/axiosInstance";
-import DynamicDate from "../../../Dynamic Date/DynamicDate";
+import DynamicDate from "../../../DynamicDate/DynamicDate";
 import toast from "react-hot-toast";
 
 const SubscriptionPlans = () => {

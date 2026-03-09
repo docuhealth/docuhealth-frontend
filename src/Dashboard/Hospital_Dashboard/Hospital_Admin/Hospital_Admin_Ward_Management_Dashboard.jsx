@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import DynamicDate from "../../../Components/Dynamic Date/DynamicDate";
-import Wards from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Ward Mangement Dashboard/Wards";
-import { HosAppContext } from "../../../context/Hospital Context/Admin/HosAppContext";
+import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
+import Wards from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Ward_Mangement_Dashboard/Wards";
+import { HosAppContext } from "../../../context/HospitalContext/Admin/HosAppContext";
 import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 import { X } from "lucide-react";
 import toast from "react-hot-toast";

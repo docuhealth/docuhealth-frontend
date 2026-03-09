@@ -1,9 +1,9 @@
-import HosProfileProvider from "../../context/Hospital Context/Admin/HosAppContext";
-import HosAdmittedPatientMGTProvider from "../../context/Hospital Context/Admin/HosAdmittedPatientMGTContext";
-import HosStaffsProvider from "../../context/Hospital Context/HosStaffsContext";
-import HosAppointmentsProvider from "../../context/Hospital Context/Admin/HosAppointmentsContext";
-import HosSubscriptionsProvider from "../../context/Hospital Context/Admin/HosSubscriptionsContext";
-import HosWardProvider from "../../context/Hospital Context/HosWardContext";
+import HosProfileProvider from "../../context/HospitalContext/Admin/HosAppContext";
+import HosAdmittedPatientMGTProvider from "../../context/HospitalContext/Admin/HosAdmittedPatientMGTContext";
+import HosStaffsProvider from "../../context/HospitalContext/HosStaffsContext";
+import HosAppointmentsProvider from "../../context/HospitalContext/Admin/HosAppointmentsContext";
+import HosSubscriptionsProvider from "../../context/HospitalContext/Admin/HosSubscriptionsContext";
+import HosWardProvider from "../../context/HospitalContext/HosWardContext";
 
 const HospitalAdminProviders = ({ children }) => (
   <HosWardProvider>

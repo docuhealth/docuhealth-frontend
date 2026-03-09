@@ -1,15 +1,15 @@
 import React, { useState, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
-import DynamicDate from "../../../Components/Dynamic Date/DynamicDate";
+import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import template from "../../../assets/img/template.png";
-import OnboardNewPatient from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home Dashboard/components/OnboardNewPatient";
+import OnboardNewPatient from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home_Dashboard/components/OnboardNewPatient";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../utils/axiosInstanceHos";
-import BookAppointment from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home Dashboard/components/BookAppointment";
-import AppointmentsList from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Appointments Dashboard/AppointmentsList";
-import RecentPatients from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home Dashboard/components/RecentPatients";
-import { HosWardContext } from "../../../context/Hospital Context/HosWardContext";
-import { ReceptionistAppContext } from "../../../context/Hospital Context/Receptionist/ReceptionistAppContext";
+import BookAppointment from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home_Dashboard/components/BookAppointment";
+import AppointmentsList from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Appointments_Dashboard/AppointmentsList";
+import RecentPatients from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home_Dashboard/components/RecentPatients";
+import { HosWardContext } from "../../../context/HospitalContext/HosWardContext";
+import { ReceptionistAppContext } from "../../../context/HospitalContext/Receptionist/ReceptionistAppContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const Hospital_Receptionist_Home_Dashboard = () => {
