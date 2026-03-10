@@ -11,16 +11,22 @@ export const DoctorAppointmentsListContext = createContext()
 const DoctorAppointmentsListProvider = (props) => {
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [appointmentType, setAppointmentType] = useState('upcoming'); // 'upcoming' or 'history'
   const pageSize = 7;
 
   const isUserLoggedIn = !!getHospitalToken();
 
-    const { data, isPending, isFetching, isError, error } = useQuery({
-    queryKey: ["doctor-appointments", currentPage],
+  const { data, isPending, isFetching, isError, error } = useQuery({
+    queryKey: ["doctor-appointments", currentPage, appointmentType],
     queryFn: fetchAppointments,
     enabled: isUserLoggedIn,
     placeholderData: keepPreviousData,
   });
+
+  // Reset page when switching types
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [appointmentType]);
 
   useEffect(() => {
     if (isError) {
@@ -31,15 +37,25 @@ const DoctorAppointmentsListProvider = (props) => {
     }
   }, [isError, error]);
 
-   const appointments = data?.results || [];
+  const appointments = data?.results || [];
   const count = data?.count || 0;
   const totalPages = Math.ceil(count / pageSize)
 
 
 
   return (
-    <DoctorAppointmentsListContext.Provider value={{appointments, loading : isPending, count, currentPage, setCurrentPage, totalPages}}>
-        {props.children}
+    <DoctorAppointmentsListContext.Provider value={{
+      appointments,
+      loading: isPending,
+      count,
+      currentPage,
+      setCurrentPage,
+      totalPages,
+      appointmentType,
+      setAppointmentType,
+      isRefreshing: isFetching
+    }}>
+      {props.children}
     </DoctorAppointmentsListContext.Provider>
   )
 }

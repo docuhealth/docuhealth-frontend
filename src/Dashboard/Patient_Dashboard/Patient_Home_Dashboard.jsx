@@ -101,18 +101,22 @@ useEffect(() => {
             <button
               className="flex items-center gap-2 px-6 py-2.5 bg-[#3E4095] text-white font-medium rounded-full transition cursor-pointer"
               onClick={() => {
-                // if (profile) {
-                //   const is_subscribed = fetchSubscriptionStatus();
-                //   if (!is_subscribed) {
-                //     toast.error("Please subscribe to access feature");
-                //     return;
-                //   }
-                //   handleSelection(profile);
-                // } else {
-                //   console.log("no profile");
-                //   toast.error("We couldn't find a profile. Try again");
-                // }
-                handleSelection(profile);
+                if (profile) {
+                  const is_subscribed = fetchSubscriptionStatus();
+                  if (!is_subscribed) {
+                    toast.error("Please subscribe to access feature");
+                    return;
+                  }
+                  if(profile.id_card_generated){
+                      toast.error("ID Card is already generated !");
+                      toast.success('Visit the settings page to view it.')
+                      return
+                  }
+                  handleSelection(profile);
+                } else {
+                  console.log("no profile");
+                  toast.error("We couldn't find a profile. Try again");
+                }
               }}
             >
               Get Identity Card
@@ -161,12 +165,17 @@ useEffect(() => {
           <div>
             <button
               className="flex justify-center items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition w-full cursor-pointer"
-              onClick={() => {
+               onClick={() => {
                 if (profile) {
                   const is_subscribed = fetchSubscriptionStatus();
                   if (!is_subscribed) {
                     toast.error("Please subscribe to access feature");
                     return;
+                  }
+                  if(profile.id_card_generated){
+                      toast.error("ID Card is already generated !");
+                      toast.success('Visit the settings page to view it.')
+                      return
                   }
                   handleSelection(profile);
                 } else {

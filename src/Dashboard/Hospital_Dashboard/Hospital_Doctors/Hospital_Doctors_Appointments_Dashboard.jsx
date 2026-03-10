@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import AppointmentsList from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/AppointmentsList";
 import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PatientInfo";
 import SoapNoteEntry from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/SoapNoteEntry";
 import RequestAdmission from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/RequestAdmission";
 import OtherMedicalServices from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/OtherMedicalServices";
+import { DoctorAppointmentsListContext } from "../../../context/HospitalContext/Doctors/DoctorAppointmentsListContext";
 
 const Hospital_Doctors_Appointments_Dashboard = () => {
   const [seePatientDetails, setSeePatientDetails] = useState(false);
@@ -16,6 +17,8 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
 
   const [requestAdmission, setRequestAdmission] = useState(false);
 
+  const { appointmentType } = useContext(DoctorAppointmentsListContext);
+
   return (
     <>
       {seePatientDetails ? (
@@ -23,16 +26,16 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
           <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
             <DynamicDate />
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto "  onClick={()=> {
-                  setOtherMedicalServices(true)
-                }}>
+              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto " onClick={() => {
+                setOtherMedicalServices(true)
+              }}>
                 Other medical services
-               
+
               </button>
               <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto"
-              onClick={()=> {
-                setRequestAdmission(true)
-              }}
+                onClick={() => {
+                  setRequestAdmission(true)
+                }}
               >
                 Request for admission
               </button>
@@ -55,14 +58,14 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
           </div>
           {
             otherMedicalServices && (
-              <OtherMedicalServices setOtherMedicalServices={setOtherMedicalServices} 
-              selectedPatientDetails={selectedPatientDetails}
+              <OtherMedicalServices setOtherMedicalServices={setOtherMedicalServices}
+                selectedPatientDetails={selectedPatientDetails}
               />
             )
           }
           {
             requestAdmission && (
-                <RequestAdmission  setRequestAdmission ={setRequestAdmission} selectedPatientDetails={selectedPatientDetails}/>
+              <RequestAdmission setRequestAdmission={setRequestAdmission} selectedPatientDetails={selectedPatientDetails} />
             )
           }
         </>
@@ -94,9 +97,9 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
             <DynamicDate />
           </div>
           <div className="bg-white my-5  rounded-lg ">
-        <div className=" border rounded-lg p-4 lg:p-6">
-              <h2 className=" mb-4 pb-2 border-b font-medium">
-                Upcoming Appointments List
+            <div className=" border rounded-lg p-4 lg:p-6">
+              <h2 className=" mb-4 pb-2 border-b font-medium capitalize">
+                {appointmentType === 'upcoming' ? 'Upcoming' : 'Past'} Appointments List
               </h2>
               <div>
                 <AppointmentsList

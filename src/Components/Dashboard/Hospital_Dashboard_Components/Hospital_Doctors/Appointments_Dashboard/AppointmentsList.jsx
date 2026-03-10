@@ -19,37 +19,45 @@ const AppointmentsList = ({
     currentPage,
     setCurrentPage,
     totalPages,
+    appointmentType,
+    setAppointmentType,
   } = useContext(DoctorAppointmentsListContext);
 
-    const [searchQuery, setSearchQuery] = useState("");
-  
-    const processedAppointments = useMemo(() => {
-      // 1. Filter based on search query
-      let filtered = appointments.filter((app) => {
-        const searchStr = searchQuery.toLowerCase();
-        return (
-          app.patient.firstname?.toLowerCase().includes(searchStr) ||
-          app.patient.lastname?.toLowerCase().includes(searchStr) ||
-          app.staff.firstname?.toLowerCase().includes(searchStr) ||
-          app.staff.lastname?.toLowerCase().includes(searchStr) ||
-          app.note?.toLowerCase().includes(searchStr)
-        );
-      });
-  
-      // 2. Sort by proximity to current time
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const processedAppointments = useMemo(() => {
+    // 1. Filter based on search query
+    let filtered = appointments.filter((app) => {
+      const searchStr = searchQuery.toLowerCase();
+      return (
+        app.patient.firstname?.toLowerCase().includes(searchStr) ||
+        app.patient.lastname?.toLowerCase().includes(searchStr) ||
+        app.staff.firstname?.toLowerCase().includes(searchStr) ||
+        app.staff.lastname?.toLowerCase().includes(searchStr) ||
+        app.note?.toLowerCase().includes(searchStr)
+      );
+    });
+
+    // 2. Sort by proximity to current time (if upcoming)
+    if (appointmentType === 'upcoming') {
       const now = new Date().getTime();
       return [...filtered].sort((a, b) => {
         const dateA = new Date(a.scheduled_time).getTime();
         const dateB = new Date(b.scheduled_time).getTime();
         return Math.abs(dateA - now) - Math.abs(dateB - now);
       });
-    }, [appointments, searchQuery]);
+    }
 
-      const [openPopover, setOpenPopover] = useState(null);
+    // For history, sort by most recent past first
+    return [...filtered].sort((a, b) => new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime());
+
+  }, [appointments, searchQuery, appointmentType]);
+
+  const [openPopover, setOpenPopover] = useState(null);
   const togglePopover = (index) => {
     setOpenPopover(openPopover === index ? null : index);
   };
-  
+
 
   if (loading) {
     return (
@@ -60,7 +68,14 @@ const AppointmentsList = ({
   }
   if (appointments.length === 0) {
     return (
-      <div className="flex flex-col justify-center items-center text-center  h-full">
+      <div className="flex flex-col justify-center items-center text-center h-full pb-10">
+        <div className="flex justify-end w-full mb-4">
+          <button
+            onClick={() => setAppointmentType(appointmentType === 'upcoming' ? 'history' : 'upcoming')}
+            className="border border-[#3E4095] text-[#3E4095] cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto">
+            {appointmentType === 'upcoming' ? "View past appointments" : "View upcoming appointments"}
+          </button>
+        </div>
         <svg
           width="200"
           height="200"
@@ -115,12 +130,13 @@ const AppointmentsList = ({
           </defs>
         </svg>
 
-        <h2 className="font-medium pb-1">No upcoming appointment!</h2>
+        <h2 className="font-medium pb-1">{appointmentType === 'upcoming' ? "No upcoming appointment!" : "No past appointments!"}</h2>
         <div className="max-w-md text-center">
           <p className="text-[12px] text-gray-500">
             {" "}
-            You currently don’t have any upcoming appointment/follow-up meeting
-            in this hospital.
+            {appointmentType === 'upcoming'
+              ? "You currently don’t have any upcoming appointment/follow-up meeting in this hospital."
+              : "No appointment history found for this hospital."}
           </p>
         </div>
       </div>
@@ -130,217 +146,224 @@ const AppointmentsList = ({
 
   return (
     <>
-     <div className="mb-4 w-full">
+      <div className="flex md:justify-end mb-4">
+        <button
+          onClick={() => setAppointmentType(appointmentType === 'upcoming' ? 'history' : 'upcoming')}
+          className="border border-[#3E4095] text-[#3E4095] cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto">
+          {appointmentType === 'upcoming' ? "View past appointments" : "View upcoming appointments"}
+        </button>
+      </div>
+      <div className="mb-4 w-full">
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
           placeholder="Search patient's name, doctor's name, or notes..."
         />
       </div>
-    <div className="text-[12px] my-4">
-      <div className="hidden lg:block">
-        {processedAppointments.map((appointment, index) => (
-          <div
-            key={appointment.id}
-            className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10 "
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 rounded-md">
-                <CalendarIcon className="w-4 h-4 text-gray-600" />
-              </div>
-              <div>
-                <p className="text-[10px] text-gray-500 uppercase font-semibold">
-                  Date / Time
-                </p>
-                <p className="text-sm font-medium">
-                  {formatFullDate(appointment.scheduled_time)} /{" "}
-                  {formatTime(appointment.scheduled_time)}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 rounded-md">
-                <UserIcon className="w-4 h-4 text-gray-600" />
-              </div>
-              <div>
-                <p className="text-[10px] text-gray-500 uppercase font-semibold">
-                  Patient
-                </p>
-                <p className="text-sm font-medium">
-                  {appointment.patient.firstname} {appointment.patient.lastname}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 rounded-md">
-                <User className="w-4 h-4 text-gray-600" />
-              </div>
-              <div>
-                <p className="text-[10px] text-gray-500 uppercase font-semibold">
-                  Appointed Doctor
-                </p>
-                <p className="text-sm font-medium">
-                  Dr. {appointment.staff.firstname} {appointment.staff.lastname}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between relative flex-1">
+      <div className="text-[12px] my-4">
+        <div className="hidden lg:block">
+          {processedAppointments.map((appointment, index) => (
+            <div
+              key={appointment.id}
+              className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10 "
+            >
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-gray-100 rounded-md">
-                  <FileText className="w-4 h-4 text-gray-600" />
+                  <CalendarIcon className="w-4 h-4 text-gray-600" />
                 </div>
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase font-semibold">
-                    Note
+                    Date / Time
                   </p>
-                  <p className="text-sm font-medium truncate max-w-[150px]">
-                    {appointment.note || "NIL"}
+                  <p className="text-sm font-medium">
+                    {formatFullDate(appointment.scheduled_time)} /{" "}
+                    {formatTime(appointment.scheduled_time)}
                   </p>
                 </div>
               </div>
 
-              <div
-                onClick={() => {
-                  togglePopover(index);
-                  setSelectedPatientDetails(appointment);
-                }}
-                className={` hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gray-100 rounded-md">
+                  <UserIcon className="w-4 h-4 text-gray-600" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase font-semibold">
+                    Patient
+                  </p>
+                  <p className="text-sm font-medium">
+                    {appointment.patient.firstname} {appointment.patient.lastname}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gray-100 rounded-md">
+                  <User className="w-4 h-4 text-gray-600" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase font-semibold">
+                    Appointed Doctor
+                  </p>
+                  <p className="text-sm font-medium">
+                    Dr. {appointment.staff.firstname} {appointment.staff.lastname}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between relative flex-1">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gray-100 rounded-md">
+                    <FileText className="w-4 h-4 text-gray-600" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-500 uppercase font-semibold">
+                      Note
+                    </p>
+                    <p className="text-sm font-medium truncate max-w-[150px]">
+                      {appointment.note || "NIL"}
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => {
+                    togglePopover(index);
+                    setSelectedPatientDetails(appointment);
+                  }}
+                  className={` hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer
         ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
     `}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  viewBox="0 0 16 16"
                 >
-                  <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-                </svg>
-              </div>
-
-              {openPopover === index && (
-                <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
-                  <p
-                    className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
-                    onClick={() => {
-                      setSeePatientDetails(true);
-                    }}
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
                   >
-                    See patient's details
-                  </p>
+                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                  </svg>
+                </div>
 
-                  <p className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
-                    Refer Out
+                {openPopover === index && (
+                  <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
+                    <p
+                      className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                      onClick={() => {
+                        setSeePatientDetails(true);
+                      }}
+                    >
+                      See patient's details
+                    </p>
+
+                    <p className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
+                      Refer Out
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="block lg:hidden space-y-4 px-1">
+          {processedAppointments.map((appointment, index) => (
+            <div
+              key={appointment.id}
+              className="bg-white border border-gray-200 rounded-lg p-4"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                  <p className="text-[10px] text-slate-400 uppercase font-bold">
+                    Scheduled
+                  </p>
+                  <p className="text-[13px] font-semibold text-slate-700">
+                    {formatFullDate(appointment.scheduled_time)} @{" "}
+                    {formatTime(appointment.scheduled_time)}
                   </p>
                 </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      togglePopover(index);
+                      setSelectedPatientDetails(appointment);
+                    }}
 
-      <div className="block lg:hidden space-y-4 px-1">
-        {processedAppointments.map((appointment, index) => (
-          <div
-            key={appointment.id}
-            className="bg-white border border-gray-200 rounded-lg p-4"
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-                <p className="text-[10px] text-slate-400 uppercase font-bold">
-                  Scheduled
-                </p>
-                <p className="text-[13px] font-semibold text-slate-700">
-                  {formatFullDate(appointment.scheduled_time)} @{" "}
-                  {formatTime(appointment.scheduled_time)}
-                </p>
-              </div>
-               <div className="relative">
-                <button
-                   onClick={() => {
-                  togglePopover(index);
-                  setSelectedPatientDetails(appointment);
-                }}
-
-                 className={`h-9 w-9 flex items-center justify-center rounded-full ${openPopover === index ? "bg-slate-200" : "bg-gray-50"}`}
-                >
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    className={`h-9 w-9 flex items-center justify-center rounded-full ${openPopover === index ? "bg-slate-200" : "bg-gray-50"}`}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                       <path
                         d="M14 8C14 7.45 13.55 7 13 7C12.45 7 12 7.45 12 8C12 8.55 12.45 9 13 9C13.55 9 14 8.55 14 8ZM4 8C4 7.45 3.55 7 3 7C2.45 7 2 7.45 2 8C2 8.55 2.45 9 3 9C3.55 9 4 8.55 4 8ZM9 8C9 7.45 8.55 7 8 7C7.45 7 7 7.45 7 8C7 8.55 7.45 9 8 9C8.55 9 9 8.55 9 8Z"
                         fill="#1A263E"
                       />
                     </svg>
-                </button>
-                   {openPopover === index && (
-                <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
-                  <p
-                    className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
-                    onClick={() => {
-                      setSeePatientDetails(true);
-                    }}
-                  >
-                    See patient's details
-                  </p>
+                  </button>
+                  {openPopover === index && (
+                    <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
+                      <p
+                        className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                        onClick={() => {
+                          setSeePatientDetails(true);
+                        }}
+                      >
+                        See patient's details
+                      </p>
 
-                  <p className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
-                    Refer Out
-                  </p>
-                </div>
-              )}
-            </div>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs border border-indigo-100">
-                  {appointment.patient.firstname[0]}
-                  {appointment.patient.lastname[0]}
-                </div>
-                <div>
-                  <p className="text-[10px] text-slate-400 uppercase font-medium">
-                    Patient
-                  </p>
-                  <p className="text-sm font-semibold text-slate-800">
-                    {appointment.patient.firstname}{" "}
-                    {appointment.patient.lastname}
-                  </p>
+                      <p className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
+                        Refer Out
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-50">
-                <div>
-                  <p className="text-[10px] text-slate-400 uppercase font-medium">
-                    {appointment.staff.role}
-                  </p>
-                  <p className="text-[13px] text-slate-600">
-                    Dr. {appointment.staff.firstname}{" "}
-                    {appointment.staff.lastname}
-                  </p>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs border border-indigo-100">
+                    {appointment.patient.firstname[0]}
+                    {appointment.patient.lastname[0]}
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 uppercase font-medium">
+                      Patient
+                    </p>
+                    <p className="text-sm font-semibold text-slate-800">
+                      {appointment.patient.firstname}{" "}
+                      {appointment.patient.lastname}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[10px] text-slate-400 uppercase font-medium">
-                    Note
-                  </p>
-                  <p className="text-[13px] text-slate-600 truncate italic">
-                    "{appointment.note || "No notes"}"
-                  </p>
+
+                <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-50">
+                  <div>
+                    <p className="text-[10px] text-slate-400 uppercase font-medium">
+                      {appointment.staff.role}
+                    </p>
+                    <p className="text-[13px] text-slate-600">
+                      Dr. {appointment.staff.firstname}{" "}
+                      {appointment.staff.lastname}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 uppercase font-medium">
+                      Note
+                    </p>
+                    <p className="text-[13px] text-slate-600 truncate italic">
+                      "{appointment.note || "No notes"}"
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+
+        <Pagination2
+          count={count}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+        />
       </div>
-
-      <Pagination2
-        count={count}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        setCurrentPage ={setCurrentPage}
-      />
-    </div>
-        </>
+    </>
   );
 };
 

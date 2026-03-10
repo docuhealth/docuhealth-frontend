@@ -19,6 +19,8 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
     setCurrentPage,
     totalPages,
     loading,
+    appointmentType,
+    setAppointmentType,
   } = useContext(NursesAppointmentsListContext);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -61,14 +63,20 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
       );
     });
 
-    // 2. Sort by proximity to current time
-    const now = new Date().getTime();
-    return [...filtered].sort((a, b) => {
-      const dateA = new Date(a.scheduled_time).getTime();
-      const dateB = new Date(b.scheduled_time).getTime();
-      return Math.abs(dateA - now) - Math.abs(dateB - now);
-    });
-  }, [appointments, searchQuery]);
+    // 2. Sort by proximity to current time (if upcoming)
+    if (appointmentType === 'upcoming') {
+      const now = new Date().getTime();
+      return [...filtered].sort((a, b) => {
+        const dateA = new Date(a.scheduled_time).getTime();
+        const dateB = new Date(b.scheduled_time).getTime();
+        return Math.abs(dateA - now) - Math.abs(dateB - now);
+      });
+    }
+
+    // For history, sort by most recent past first
+    return [...filtered].sort((a, b) => new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime());
+
+  }, [appointments, searchQuery, appointmentType]);
 
   const togglePopover = (index) => {
     setOpenPopover(openPopover === index ? null : index);
@@ -165,7 +173,14 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
   }
   if (appointments.length === 0) {
     return (
-      <div className="flex flex-col justify-center items-center text-center  h-full">
+      <div className="flex flex-col justify-center items-center text-center  h-full pb-10">
+        <div className="flex justify-end w-full mb-4">
+          <button
+            onClick={() => setAppointmentType(appointmentType === 'upcoming' ? 'history' : 'upcoming')}
+            className="border border-[#3E4095] text-[#3E4095] cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto">
+            {appointmentType === 'upcoming' ? "View past appointments" : "View upcoming appointments"}
+          </button>
+        </div>
         <svg
           width="180"
           height="180"
@@ -220,12 +235,13 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
           </defs>
         </svg>
 
-        <h2 className="font-medium pb-1">No upcoming appointment!</h2>
+        <h2 className="font-medium pb-1">{appointmentType === 'upcoming' ? "No upcoming appointment!" : "No past appointments!"}</h2>
         <div className="max-w-md text-center">
           <p className="text-[12px] text-gray-500">
             {" "}
-            You currently don’t have any upcoming appointment/follow-up meeting
-            in this hospital.
+            {appointmentType === 'upcoming'
+              ? "You currently don’t have any upcoming appointment/follow-up meeting in this hospital."
+              : "No appointment history found for this hospital."}
           </p>
         </div>
       </div>
@@ -234,6 +250,13 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
 
   return (
     <>
+      <div className="flex md:justify-end mb-4">
+        <button
+          onClick={() => setAppointmentType(appointmentType === 'upcoming' ? 'history' : 'upcoming')}
+          className="border border-[#3E4095] text-[#3E4095] cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto">
+          {appointmentType === 'upcoming' ? "View past appointments" : "View upcoming appointments"}
+        </button>
+      </div>
       <div className="mb-4 w-full">
         <SearchBar
           value={searchQuery}
@@ -336,22 +359,22 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                     </p>
                     <p
                       className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
-                      onClick={()=> {
-                           setOpenPopover(null);
-                           setNewCaseNote(true)
-                           setSelectedPatientForCASE(appointment)
+                      onClick={() => {
+                        setOpenPopover(null);
+                        setNewCaseNote(true)
+                        setSelectedPatientForCASE(appointment)
                       }}
-                      >
+                    >
                       Add CASE Note
                     </p>
                     <p
                       className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
-                      onClick={()=> {
-                           setOpenPopover(null);
-                           setCaseNoteHistory(true)
-                           setSelectedPatientForCASE(appointment)
+                      onClick={() => {
+                        setOpenPopover(null);
+                        setCaseNoteHistory(true)
+                        setSelectedPatientForCASE(appointment)
                       }}
-                      >
+                    >
                       CASE Note History
                     </p>
                     <p
@@ -430,22 +453,22 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                       >
                         See patient's details
                       </button>
-                        <button
+                      <button
                         className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"
                         onClick={() => {
                           setOpenPopover(null);
-                           setNewCaseNote(true)
-                                 setSelectedPatientForCASE(appointment)
+                          setNewCaseNote(true)
+                          setSelectedPatientForCASE(appointment)
                         }}
                       >
                         Add CASE Note
                       </button>
-                        <button
+                      <button
                         className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"
                         onClick={() => {
                           setOpenPopover(null);
-                           setCaseNoteHistory(true)
-                                 setSelectedPatientForCASE(appointment)
+                          setCaseNoteHistory(true)
+                          setSelectedPatientForCASE(appointment)
                         }}
                       >
                         CASE Note History
@@ -460,7 +483,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                       >
                         Update vitals
                       </button>
-                    
+
                       <button
                         className={`w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors     ${fetchingPersonnel ? "pointer-events-none opacity-50" : ""}`}
                         onClick={() => {

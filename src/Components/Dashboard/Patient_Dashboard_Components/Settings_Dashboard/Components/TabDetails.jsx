@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useRef } from "react";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import axiosInstance from "../../../../../utils/axiosInstance";
 import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { AppContext } from "../../../../../context/PatientContext/AppContext";
+import html2canvas from "html2canvas";
+import IDCardUI from "../../Home_Dashboard/Components/IdCard/IDCardUI";
 
 const AccountSettingsTab = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +26,7 @@ const AccountSettingsTab = () => {
   const [isAcctDeleteConfirmed, setIsAcctDeleteConfirmed] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isAcctDeleting,setIsAcctDeleting] = useState(false)
+  const [isAcctDeleting, setIsAcctDeleting] = useState(false)
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [passwordRequirements, setPasswordRequirements] = useState({
     hasLowercase: false,
@@ -71,11 +74,11 @@ const AccountSettingsTab = () => {
 
   const updateAccountMutation = useMutation(
     {
-      mutationFn : async (payload) => {
+      mutationFn: async (payload) => {
         const res = await axiosInstance.patch("api/patients/update", payload);
         return res.data;
       },
-      onSuccess : () => {
+      onSuccess: () => {
         toast.success("Account updated successfully!");
         queryClient.invalidateQueries(["profile"]); // ✅ re-run profile query
         resetForm();
@@ -180,7 +183,7 @@ const AccountSettingsTab = () => {
   };
 
   // 🔹 Handle Account Deactivation
-  const handleAcctDeactivate = async() => {
+  const handleAcctDeactivate = async () => {
 
     if (!isAcctDeleteConfirmed) return;
 
@@ -338,11 +341,10 @@ const AccountSettingsTab = () => {
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder=""
-                    className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none pl-8 ${
-                      formData.password && !isPasswordValid
-                        ? "focus:border-red-500"
-                        : ""
-                    }`}
+                    className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none pl-8 ${formData.password && !isPasswordValid
+                      ? "focus:border-red-500"
+                      : ""
+                      }`}
                     value={formData.password}
                     onChange={(e) => {
                       handleChange(e);
@@ -381,15 +383,13 @@ const AccountSettingsTab = () => {
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            getPasswordStrength(formData.password).color
-                          }`}
+                          className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrength(formData.password).color
+                            }`}
                           style={{
-                            width: `${
-                              (getPasswordStrength(formData.password).strength /
-                                5) *
+                            width: `${(getPasswordStrength(formData.password).strength /
+                              5) *
                               100
-                            }%`,
+                              }%`,
                           }}
                         ></div>
                       </div>
@@ -400,82 +400,72 @@ const AccountSettingsTab = () => {
                     </p>
                     <div className="space-y-1">
                       <div
-                        className={`flex items-center  ${
-                          passwordRequirements.hasLowercase
-                            ? "text-green-600"
-                            : "text-red-500"
-                        }`}
+                        className={`flex items-center  ${passwordRequirements.hasLowercase
+                          ? "text-green-600"
+                          : "text-red-500"
+                          }`}
                       >
                         <span
-                          className={`w-2 h-2 rounded-full mr-2 ${
-                            passwordRequirements.hasLowercase
-                              ? "bg-green-500"
-                              : "bg-red-500"
-                          }`}
+                          className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasLowercase
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                            }`}
                         ></span>
                         Include lowercase letters (a-z)
                       </div>
                       <div
-                        className={`flex items-center  ${
-                          passwordRequirements.hasUppercase
-                            ? "text-green-600"
-                            : "text-red-500"
-                        }`}
+                        className={`flex items-center  ${passwordRequirements.hasUppercase
+                          ? "text-green-600"
+                          : "text-red-500"
+                          }`}
                       >
                         <span
-                          className={`w-2 h-2 rounded-full mr-2 ${
-                            passwordRequirements.hasUppercase
-                              ? "bg-green-500"
-                              : "bg-red-500"
-                          }`}
+                          className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasUppercase
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                            }`}
                         ></span>
                         Include uppercase letters (A-Z)
                       </div>
                       <div
-                        className={`flex items-center  ${
-                          passwordRequirements.hasNumber
-                            ? "text-green-600"
-                            : "text-red-500"
-                        }`}
+                        className={`flex items-center  ${passwordRequirements.hasNumber
+                          ? "text-green-600"
+                          : "text-red-500"
+                          }`}
                       >
                         <span
-                          className={`w-2 h-2 rounded-full mr-2 ${
-                            passwordRequirements.hasNumber
-                              ? "bg-green-500"
-                              : "bg-red-500"
-                          }`}
+                          className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasNumber
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                            }`}
                         ></span>
                         Include at least one number (0-9)
                       </div>
                       <div
-                        className={`flex items-center ${
-                          passwordRequirements.hasSymbol
-                            ? "text-green-600"
-                            : "text-red-500"
-                        }`}
+                        className={`flex items-center ${passwordRequirements.hasSymbol
+                          ? "text-green-600"
+                          : "text-red-500"
+                          }`}
                       >
                         <span
-                          className={`w-2 h-2 rounded-full mr-2 ${
-                            passwordRequirements.hasSymbol
-                              ? "bg-green-500"
-                              : "bg-red-500"
-                          }`}
+                          className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasSymbol
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                            }`}
                         ></span>
                         Include at least one symbol (!@#$%^&*)
                       </div>
                       <div
-                        className={`flex items-center  ${
-                          passwordRequirements.hasMinLength
-                            ? "text-green-600"
-                            : "text-red-500"
-                        }`}
+                        className={`flex items-center  ${passwordRequirements.hasMinLength
+                          ? "text-green-600"
+                          : "text-red-500"
+                          }`}
                       >
                         <span
-                          className={`w-2 h-2 rounded-full mr-2 ${
-                            passwordRequirements.hasMinLength
-                              ? "bg-green-500"
-                              : "bg-red-500"
-                          }`}
+                          className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasMinLength
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                            }`}
                         ></span>
                         Be at least 8 characters long
                       </div>
@@ -510,41 +500,40 @@ const AccountSettingsTab = () => {
                 <button
                   onClick={handleSubmit}
                   disabled={updateAccountMutation.isPending}
-                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium text-white rounded-full shadow-xs focus:outline-hidden transition-all cursor-pointer ${
-                    !updateAccountMutation.isPending
-                      ? "bg-[#3E4095] "
-                      : "bg-gray-300 cursor-not-allowed"
-                  }`}
+                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium text-white rounded-full shadow-xs focus:outline-hidden transition-all cursor-pointer ${!updateAccountMutation.isPending
+                    ? "bg-[#3E4095] "
+                    : "bg-gray-300 cursor-not-allowed"
+                    }`}
                 >
-                  {updateAccountMutation.isPending ? (   <span className="flex items-center justify-center gap-2">
-                            <svg
-                              className="animate-spin h-4 w-4 text-white"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              ></circle>
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                              ></path>
-                            </svg>
-                            Saving Changes...
-                          </span>) : "Save Changes"}
+                  {updateAccountMutation.isPending ? (<span className="flex items-center justify-center gap-2">
+                    <svg
+                      className="animate-spin h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      ></path>
+                    </svg>
+                    Saving Changes...
+                  </span>) : "Save Changes"}
                 </button>
                 <button
                   type="button"
-                    disabled={updateAccountMutation.isPending}
+                  disabled={updateAccountMutation.isPending}
                   onClick={handleCancel}
-                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-xs cursor-pointer ${!updateAccountMutation.isPending ? 'text-[#3E4095] bg-white border border-[#3E4095] hover:bg-gray-50': 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-hidden`}
+                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-xs cursor-pointer ${!updateAccountMutation.isPending ? 'text-[#3E4095] bg-white border border-[#3E4095] hover:bg-gray-50' : 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-hidden`}
                 >
                   Cancel Changes
                 </button>
@@ -571,36 +560,35 @@ const AccountSettingsTab = () => {
           <button
             onClick={handleAcctDeactivate}
             disabled={!isAcctDeleteConfirmed || deleteAccountMutation.isPending}
-            className={`px-8 py-2 text-sm font-medium rounded-full transition-all duration-200 w-full sm:w-auto cursor-pointer ${
-              isAcctDeleteConfirmed && !deleteAccountMutation.isPending
-                ? "bg-red-600 hover:bg-red-700 text-white"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
+            className={`px-8 py-2 text-sm font-medium rounded-full transition-all duration-200 w-full sm:w-auto cursor-pointer ${isAcctDeleteConfirmed && !deleteAccountMutation.isPending
+              ? "bg-red-600 hover:bg-red-700 text-white"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
           >
             {
-              deleteAccountMutation.isPending ? ( <span className="flex items-center justify-center gap-2">
-                            <svg
-                              className="animate-spin h-4 w-4 text-white"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              ></circle>
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                              ></path>
-                            </svg>
-                            Deactivating Account...
-                          </span>) : ("Deactivate Account")
+              deleteAccountMutation.isPending ? (<span className="flex items-center justify-center gap-2">
+                <svg
+                  className="animate-spin h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+                Deactivating Account...
+              </span>) : ("Deactivate Account")
             }
           </button>
         </div>
@@ -609,9 +597,141 @@ const AccountSettingsTab = () => {
   );
 };
 
+const IDCardTab = () => {
+  const { profile } = useContext(AppContext);
+  const cardRef = useRef(null);
+  const [downloading, setDownloading] = useState(false);
+
+  const isIdCardGenerated = profile?.id_card_generated;
+
+  const handleDownload = async () => {
+    if (!cardRef.current) return;
+
+    setDownloading(true);
+    const toastId = toast.loading("Preparing your ID card...");
+
+    try {
+      // Small delay to ensure any fonts/images are ready
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const canvas = await html2canvas(cardRef.current, {
+        scale: 2, // quality bootstrap
+        useCORS: true,
+        logging: false,
+        backgroundColor: null, // Transparent background
+        onclone: (clonedDoc) => {
+          const elements = clonedDoc.getElementsByTagName("*");
+          for (let i = 0; i < elements.length; i++) {
+            const el = elements[i];
+
+            const style = window.getComputedStyle(el);
+            ["color", "backgroundColor", "borderColor", "outlineColor"].forEach(prop => {
+              const val = style[prop];
+              if (val && (val.includes("oklch") || val.includes("var("))) {
+                // Force standard values for the capture
+                if (prop === "color") {
+                  if (el.classList.contains("text-white") || el.classList.contains("text-[white]")) {
+                    el.style.color = "#ffffff";
+                  } else {
+                    el.style.color = "#313131";
+                  }
+                }
+                if (prop === "backgroundColor") {
+                  if (el.classList.contains("bg-white")) el.style.backgroundColor = "#ffffff";
+                  else if (el.classList.contains("bg-[#F2F2F2]")) el.style.backgroundColor = "#F2F2F2";
+                  // Don't override transparent or images
+                }
+                if (prop === "borderColor") el.style.borderColor = "#dddddd";
+              }
+            });
+          }
+        }
+      });
+
+      const image = canvas.toDataURL("image/png", 1.0);
+      const link = document.createElement("a");
+      link.download = `DocuHealth_ID_Card_${profile?.firstname || "Patient"}.png`;
+      link.href = image;
+      link.click();
+
+      toast.success("ID card downloaded successfully!", { id: toastId });
+    } catch (error) {
+      console.error("ID card download failed:", error);
+      toast.error("Failed to download ID card. Please try again.", { id: toastId });
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
+        <div>
+          <h2 className="text-lg font-semibold text-[#3E4095]">My DocuHealth Identity Card</h2>
+          <p className="text-gray-500 text-sm">
+            View and download your official DocuHealth Identity Card.
+          </p>
+        </div>
+
+        {isIdCardGenerated && (
+          <button
+            disabled={downloading}
+            onClick={handleDownload}
+            className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-white text-sm font-medium transition-all shadow active:scale-95 ${downloading ? "bg-gray-400 cursor-not-allowed" : "bg-[#3E4095] "
+              }`}
+          >
+            {downloading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Downloading...
+              </>
+            ) : (
+              <>
+                <i className="bx bx-download text-lg"></i>
+                Download Card
+              </>
+            )}
+          </button>
+        )}
+      </div>
+
+      {isIdCardGenerated ? (
+        <div className="bg-gray-50 rounded-xl border p-4 sm:p-12 shadow-inner">
+          <div ref={cardRef} className="p-2 rounded-lg">
+            <IDCardUI selectedProfile={profile} idCardData={profile.id_card} />
+          </div>
+          <div className="mt-6 text-center">
+            <p className="text-xs text-gray-400 flex items-center justify-center gap-1">
+              <i className="bx bx-info-circle"></i>
+              This card contains both front and back views.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-10 text-center">
+          <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i className="bx bx-id-card text-4xl text-[#3E4095]"></i>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">ID Card Not Generated</h3>
+          <p className="text-gray-600 text-sm max-w-md mx-auto mb-8">
+            Your identity card hasn't been generated yet. It provides quick access to your medical history across our network.
+          </p>
+          <button
+            onClick={() => navigate("/")}
+            className="px-8 py-3 bg-[#3E4095] text-white rounded-full text-sm font-medium hover:bg-[#2e3075] transition-colors"
+          >
+            Go Generate Now
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 const tabs = [
-  { title: "Account Settings", content: <AccountSettingsTab /> }
+  { title: "Account Settings", content: <AccountSettingsTab /> },
+  { title: "ID Card", content: <IDCardTab /> }
 ];
 
 export default tabs;
