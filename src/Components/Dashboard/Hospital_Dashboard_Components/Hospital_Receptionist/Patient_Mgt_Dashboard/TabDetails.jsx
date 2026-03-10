@@ -496,7 +496,7 @@ const DischargedPatientsTab = () => {
                                 </svg>
 
 
-                                <p className="">{formatFullDateTime(admittedPatient.request_date)}</p>
+                                <p className="">{formatFullDateTime(admittedPatient.discharge_date) || 'Pending'}</p>
                             </div>
                             <button className="text-center mt-3 py-2 border border-[#1B2B40] w-full rounded-full cursor-pointer"
                             onClick={() => {

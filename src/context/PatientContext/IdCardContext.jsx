@@ -26,7 +26,15 @@ const IdCardProvider = (props) => {
     mutationFn: async (selectedPatient) => {
       let res;
       if ("emergency" in (selectedPatient || {})) {
-        res = await axiosInstance.patch("api/patients/id-card");
+
+        const payload = {
+          first_emergencey_number : idCardData.firstEmergency,
+          second_emergencey_number : idCardData.secondEmergency,
+          emergence_address : idCardData.emergencyAddress
+        }
+
+        console.log(payload)
+        res = await axiosInstance.post("api/patients/id-card", payload);
       } else {
         res = await axiosInstance.patch(
           `api/patients/subaccounts/id-card/${selectedPatient?.hin}`

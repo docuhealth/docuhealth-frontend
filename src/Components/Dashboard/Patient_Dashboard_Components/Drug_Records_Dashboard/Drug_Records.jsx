@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { DrugRecordsContext } from "../../../../context/PatientContext/DrugRecordsContext";
-// import axiosInstance from '../../../../utils/axiosInstance';
+import Pagination2 from "../Pagination/Pagination2";
 
 const Drug_Records = () => {
   const {
@@ -16,9 +16,11 @@ const Drug_Records = () => {
   } = useContext(DrugRecordsContext);
 
 
+
+
   return (
     <>
-        <div className="bg-white my-5 border rounded-lg py-8 px-6">
+      <div className="bg-white my-5 border rounded-lg py-8 px-6">
         {/* ===== Loading State ===== */}
         {isPending ? (
           <div className="flex justify-center items-center ">
@@ -87,16 +89,65 @@ const Drug_Records = () => {
             <div className="max-w-md text-center">
               <p className="text-[12px] text-gray-500">
                 {" "}
-                  No drug records yet, no hospital or pharmacy has dropped a <br /> drug record.
+                No drug records yet, no hospital or pharmacy has dropped a <br /> drug record.
               </p>
             </div>
           </div>
-        ) :(
-            <>
-           <h2 className=" mb-4 pb-2 border-b font-medium">
-            My Drug Records
-          </h2>
-            </>
+        ) : (
+          <>
+            <h2 className=" mb-4 pb-2 border-b font-medium">
+              My Drug Records
+            </h2>
+              <div className="overflow-x-auto">
+                   {drugRecords?.length > 0 ? (
+                     <table className="w-full text-left border-collapse">
+                       <thead>
+                         <tr className="text-[12px] text-gray-400 border-b">
+                           <th className="pb-2 font-normal">Drug Name</th>
+                           <th className="pb-2 font-normal">Route</th>
+                           <th className="pb-2 font-normal">Qty</th>
+                           <th className="pb-2 font-normal">Frequency</th>
+                           <th className="pb-2 font-normal">Duration</th>
+                         </tr>
+                       </thead>
+                       <tbody className="text-[12px]">
+                         {drugRecords.map((drug, index) => (
+                           <tr key={index} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
+                             <td className="py-3 font-medium text-[#3E4095]">
+                               {drug.name}
+                             </td>
+                             <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
+                             <td className="py-3 text-gray-600">{drug.quantity}</td>
+                             <td className="py-3 text-gray-600">
+                               {/* Handling nested frequency object */}
+                               {typeof drug.frequency === 'object'
+                                 ? `${drug.frequency.value || ''} ${drug.frequency.unit || ''}`
+                                 : drug.frequency || "N/A"}
+                             </td>
+                             <td className="py-3 text-gray-600">
+                               {/* Handling nested duration object */}
+                               {typeof drug.duration === 'object'
+                                 ? `${drug.duration.value || ''} ${drug.duration.unit || ''}`
+                                 : drug.duration || "N/A"}
+                             </td>
+                           </tr>
+                         ))}
+                       </tbody>
+                     </table>
+                   ) : (
+                     <p className="text-[12px] text-gray-500 italic">No medication records available.</p>
+                   )}
+                 </div>
+            <div>
+              <Pagination2
+                count={count}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                setCurrentPage={setCurrentPage}
+              />
+
+            </div>
+          </>
         )
         }
       </div>

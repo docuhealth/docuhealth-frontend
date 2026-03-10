@@ -126,6 +126,8 @@ const Vitals = ({ setVitals, setSelectedPatient }) => {
     );
   }
 
+  console.log(assignedVitals)
+
   return (
     <>
       <div className="bg-white rounded-xl border mt-3 p-5 text-sm">

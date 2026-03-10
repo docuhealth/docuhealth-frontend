@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import TabComponent from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/TabComponent";
 import getTabs from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/TabDetails";
@@ -7,16 +7,31 @@ import UpdateVitals from "../../../Components/Dashboard/Hospital_Dashboard_Compo
 import CaseNote from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/CaseNote";
 import AddNewCaseNote from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddNewCaseNote";
 import CaseNoteDetail from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/CaseNoteDetail";
+import VitalSignsHistory from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/VitalSignsHistory";
+import { ChevronDown } from "lucide-react";
 
 const Hospital_Nurses_Patients_Dashboard = () => {
   const [updateVitals, setUpdateVitals] = useState(false);
   const [caseNoteHistory, setCaseNoteHistory] = useState(false);
+  const [vitalSignsHistory, setVitalSignsHistory] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const [newCaseNote, setNewCaseNote] = useState(false);
   const [advanceCheckUp, setAdvanceCheckUp] = useState(false);
   const [selected, setSelected] = useState(null);
 
   const [caseNoteDetail, setCaseNoteDetail] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -27,12 +42,13 @@ const Hospital_Nurses_Patients_Dashboard = () => {
             <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
               {updateVitals ? (
                 <></>
-              ) : caseNoteHistory && !caseNoteDetail ? (
+              ) : (caseNoteHistory || vitalSignsHistory) && !caseNoteDetail ? (
                 <>
                   <button
                     className="py-2.5 px-10 w-full lg:w-60 rounded-full bg-[#3E4095] text-white cursor-pointer"
                     onClick={() => {
                       setCaseNoteHistory(false);
+                      setVitalSignsHistory(false);
                       setNewCaseNote(true);
                     }}
                   >
@@ -41,14 +57,40 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                 </>
               ) : (
                 <>
-                  <button
-                    className="py-2 px-10 w-full lg:w-60 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer"
-                    onClick={() => {
-                      setCaseNoteHistory(true);
-                    }}
-                  >
-                    Case Note History
-                  </button>
+                  <div className="relative w-full lg:w-60" ref={dropdownRef}>
+                    <button
+                      className="flex items-center justify-center py-2 px-6 w-full rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer gap-1"
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    >
+                      <span className="">Vital signs</span>
+                      <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {isDropdownOpen && (
+                      <div className="absolute top-full mt-2 left-0 w-full bg-white border border-gray-200 rounded  z-10 overflow-hidden p-2 text-sm">
+                        <button
+                          className="w-full text-left px-3  py-2.5 hover:bg-gray-100  text-gray-700 transition-colors"
+                          onClick={() => {
+                            setCaseNoteHistory(true);
+                            setVitalSignsHistory(false);
+                            setIsDropdownOpen(false);
+                          }}
+                        >
+                          Case note history
+                        </button>
+                        <button
+                          className="w-full text-left px-3  py-2.5 hover:bg-gray-100 text-gray-700 transition-colors"
+                          onClick={() => {
+                            setVitalSignsHistory(true);
+                            setCaseNoteHistory(false);
+                            setIsDropdownOpen(false);
+                          }}
+                        >
+                          Vital signs history
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
                   <button
                     className="py-2.5 px-10 w-full lg:w-60 rounded-full bg-[#3E4095] text-white cursor-pointer"
@@ -67,6 +109,11 @@ const Hospital_Nurses_Patients_Dashboard = () => {
               selectedPatient={selected}
               setUpdateVitals={setUpdateVitals}
             />
+          ) : vitalSignsHistory ? (
+            <VitalSignsHistory
+              selected={selected}
+              setVitalSignsHistory={setVitalSignsHistory}
+            />
           ) : caseNoteHistory ? (
             <CaseNote
               selected={selected}
@@ -74,7 +121,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
               setCaseNoteDetail={setCaseNoteDetail}
             />
           ) : caseNoteDetail ? (
-            <CaseNoteDetail caseNoteDetail={caseNoteDetail} setCaseNoteDetail={setCaseNoteDetail}/>
+            <CaseNoteDetail caseNoteDetail={caseNoteDetail} setCaseNoteDetail={setCaseNoteDetail} />
           ) : newCaseNote ? (
             <>
               <AddNewCaseNote

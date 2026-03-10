@@ -7,41 +7,43 @@ import { NursesAdmittedPatientMGTContext } from "../../../../../context/Hospital
 import SearchBar from "../../../../SearchBar/SearchBar";
 
 
-const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) => {
+const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected }) => {
     const {
         admittedPatients,
         loading,
         count,
         currentPage,
         totalPages,
-       setCurrentPage
+        setCurrentPage
     } = useContext(NursesAdmittedPatientMGTContext);
+
+
     const [selectedPatient, setSelectedPatient] = useState(null);
 
-  const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
 
- const processedAdmittedPatients = useMemo(() => {
-  // 1. Filter based on search query
-  const filtered = admittedPatients.filter((item) => {
-    const searchStr = searchQuery.toLowerCase();
-    
-    return (
-      item.patient.firstname?.toLowerCase().includes(searchStr) ||
-      item.patient.lastname?.toLowerCase().includes(searchStr) ||
-      item.patient.hin?.toLowerCase().includes(searchStr) ||
-      item.staff?.firstname?.toLowerCase().includes(searchStr) ||
-      item.staff?.lastname?.toLowerCase().includes(searchStr) ||
-      item.ward_info?.name?.toLowerCase().includes(searchStr)
-    );
-  });
+    const processedAdmittedPatients = useMemo(() => {
+        // 1. Filter based on search query
+        const filtered = admittedPatients.filter((item) => {
+            const searchStr = searchQuery.toLowerCase();
 
-  // 2. Sort by admission date (Most recent first)
-  return [...filtered].sort((a, b) => {
-    const dateA = new Date(a.admission_date).getTime();
-    const dateB = new Date(b.admission_date).getTime();
-    return dateB - dateA; // Use dateA - dateB for oldest first
-  });
-}, [admittedPatients, searchQuery]);
+            return (
+                item.patient.firstname?.toLowerCase().includes(searchStr) ||
+                item.patient.lastname?.toLowerCase().includes(searchStr) ||
+                item.patient.hin?.toLowerCase().includes(searchStr) ||
+                item.staff?.firstname?.toLowerCase().includes(searchStr) ||
+                item.staff?.lastname?.toLowerCase().includes(searchStr) ||
+                item.ward_info?.name?.toLowerCase().includes(searchStr)
+            );
+        });
+
+        // 2. Sort by admission date (Most recent first)
+        return [...filtered].sort((a, b) => {
+            const dateA = new Date(a.admission_date).getTime();
+            const dateB = new Date(b.admission_date).getTime();
+            return dateB - dateA; // Use dateA - dateB for oldest first
+        });
+    }, [admittedPatients, searchQuery]);
 
     if (loading) {
         return (
@@ -120,11 +122,11 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
     }
     return (
         <>
-             <SearchBar
-        value={searchQuery}
-        onChange={setSearchQuery}
-        placeholder="Search patient's name, HIN, or ward name..."
-      />
+            <SearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Search patient's name, HIN, or ward name..."
+            />
             <div className='my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
                 {
                     processedAdmittedPatients.map((admittedPatient, index) => (
@@ -295,7 +297,7 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
                                     <strong>Date of Discharge:</strong>{" "}
                                     {selectedPatient?.discharge_date
                                         ? formatFullDateTime(selectedPatient.discharge_date)
-                                        : "NIL"}
+                                        : "Pending"}
                                 </p>
 
                             </div>
@@ -308,48 +310,49 @@ const AdmittedPatientsTab = ({advanceCheckUp, setAdvanceCheckUp, setSelected}) =
             <Pagination2 count={count}
                 currentPage={currentPage}
                 totalPages={totalPages}
-                setCurrentPage = {setCurrentPage} />
+                setCurrentPage={setCurrentPage} />
         </>
     )
 }
 
+
 const DischargedPatientsTab = () => {
 
     const {
- admittedPatients,
-    loading,
-    count,
-    currentPage,
-    totalPages,
-    setCurrentPage,
+        admittedPatients,
+        loading,
+        count,
+        currentPage,
+        totalPages,
+        setCurrentPage,
     } = useContext(NursesAdmittedPatientMGTContext);
 
 
     const [selectedPatient, setSelectedPatient] = useState('')
 
-      const [searchQuery, setSearchQuery] = useState("");
-    
-     const processedAdmittedPatients = useMemo(() => {
-      // 1. Filter based on search query
-      const filtered = admittedPatients.filter((item) => {
-        const searchStr = searchQuery.toLowerCase();
-        
-        return (
-          item.patient.firstname?.toLowerCase().includes(searchStr) ||
-          item.patient.lastname?.toLowerCase().includes(searchStr) ||
-          item.patient.hin?.toLowerCase().includes(searchStr) ||
-          item.staff?.firstname?.toLowerCase().includes(searchStr) ||
-          item.staff?.lastname?.toLowerCase().includes(searchStr) ||
-          item.ward_info?.name?.toLowerCase().includes(searchStr)
-        );
-      });
-    
-      // 2. Sort by admission date (Most recent first)
-      return [...filtered].sort((a, b) => {
-        const dateA = new Date(a.admission_date).getTime();
-        const dateB = new Date(b.admission_date).getTime();
-        return dateB - dateA; // Use dateA - dateB for oldest first
-      });
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const processedAdmittedPatients = useMemo(() => {
+        // 1. Filter based on search query
+        const filtered = admittedPatients.filter((item) => {
+            const searchStr = searchQuery.toLowerCase();
+
+            return (
+                item.patient.firstname?.toLowerCase().includes(searchStr) ||
+                item.patient.lastname?.toLowerCase().includes(searchStr) ||
+                item.patient.hin?.toLowerCase().includes(searchStr) ||
+                item.staff?.firstname?.toLowerCase().includes(searchStr) ||
+                item.staff?.lastname?.toLowerCase().includes(searchStr) ||
+                item.ward_info?.name?.toLowerCase().includes(searchStr)
+            );
+        });
+
+        // 2. Sort by admission date (Most recent first)
+        return [...filtered].sort((a, b) => {
+            const dateA = new Date(a.admission_date).getTime();
+            const dateB = new Date(b.admission_date).getTime();
+            return dateB - dateA; // Use dateA - dateB for oldest first
+        });
     }, [admittedPatients, searchQuery]);
 
     if (loading) {
@@ -431,13 +434,13 @@ const DischargedPatientsTab = () => {
 
     return (
 
-<>
+        <>
 
-             <SearchBar
-        value={searchQuery}
-        onChange={setSearchQuery}
-        placeholder="Search patient's name, HIN, or ward name..."
-      />
+            <SearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Search patient's name, HIN, or ward name..."
+            />
             <div className='my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
                 {
                     processedAdmittedPatients.map((admittedPatient, index) => (
@@ -504,10 +507,10 @@ const DischargedPatientsTab = () => {
                                 </svg>
 
 
-                                <p className="">{formatFullDateTime(admittedPatient.request_date)}</p>
+                                <p className="">{formatFullDateTime(admittedPatient.discharge_date) || 'Pending'}</p>
                             </div>
                             <button className="text-center mt-3 py-2 border border-[#1B2B40] w-full rounded-full cursor-pointer"
-                                          onClick={() => setSelectedPatient(admittedPatient)}
+                                onClick={() => setSelectedPatient(admittedPatient)}
                             >
                                 View patient's details
                             </button>
@@ -515,126 +518,126 @@ const DischargedPatientsTab = () => {
                     ))
                 }
 
-                   {selectedPatient && (
-                <>
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 text-sm px-3">
-                        <div className="bg-white rounded-lg shadow-lg p-4  max-w-md w-full relative text-sm">
-                            <div className='flex justify-end'>
-                                <button
-                                    onClick={() => setSelectedPatient(null)}
-                                    className="text-gray-500 hover:text-black  "
-                                >
-                                    <i className="bx bx-x text-2xl cursor-pointer"></i>
-                                </button>
-                            </div>
-                            <div className="flex flex-col justify-center items-center">
-                                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M20.0007 36.6654C10.7959 36.6654 3.33398 29.2034 3.33398 19.9987C3.33398 10.7939 10.7959 3.33203 20.0007 3.33203C29.2053 3.33203 36.6673 10.7939 36.6673 19.9987C36.6673 29.2034 29.2053 36.6654 20.0007 36.6654ZM20.0007 33.332C27.3645 33.332 33.334 27.3625 33.334 19.9987C33.334 12.6349 27.3645 6.66536 20.0007 6.66536C12.6369 6.66536 6.66732 12.6349 6.66732 19.9987C6.66732 27.3625 12.6369 33.332 20.0007 33.332ZM21.6673 17.4987V24.9987H23.334V28.332H16.6673V24.9987H18.334V20.832H16.6673V17.4987H21.6673ZM22.5007 13.332C22.5007 14.7127 21.3813 15.832 20.0007 15.832C18.62 15.832 17.5007 14.7127 17.5007 13.332C17.5007 11.9513 18.62 10.832 20.0007 10.832C21.3813 10.832 22.5007 11.9513 22.5007 13.332Z" fill="#1B2B40" />
-                                </svg>
-                                <p className="pt-0.5 font-medium">Patient's Details</p>
+                {selectedPatient && (
+                    <>
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 text-sm px-3">
+                            <div className="bg-white rounded-lg shadow-lg p-4  max-w-md w-full relative text-sm">
+                                <div className='flex justify-end'>
+                                    <button
+                                        onClick={() => setSelectedPatient(null)}
+                                        className="text-gray-500 hover:text-black  "
+                                    >
+                                        <i className="bx bx-x text-2xl cursor-pointer"></i>
+                                    </button>
+                                </div>
+                                <div className="flex flex-col justify-center items-center">
+                                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20.0007 36.6654C10.7959 36.6654 3.33398 29.2034 3.33398 19.9987C3.33398 10.7939 10.7959 3.33203 20.0007 3.33203C29.2053 3.33203 36.6673 10.7939 36.6673 19.9987C36.6673 29.2034 29.2053 36.6654 20.0007 36.6654ZM20.0007 33.332C27.3645 33.332 33.334 27.3625 33.334 19.9987C33.334 12.6349 27.3645 6.66536 20.0007 6.66536C12.6369 6.66536 6.66732 12.6349 6.66732 19.9987C6.66732 27.3625 12.6369 33.332 20.0007 33.332ZM21.6673 17.4987V24.9987H23.334V28.332H16.6673V24.9987H18.334V20.832H16.6673V17.4987H21.6673ZM22.5007 13.332C22.5007 14.7127 21.3813 15.832 20.0007 15.832C18.62 15.832 17.5007 14.7127 17.5007 13.332C17.5007 11.9513 18.62 10.832 20.0007 10.832C21.3813 10.832 22.5007 11.9513 22.5007 13.332Z" fill="#1B2B40" />
+                                    </svg>
+                                    <p className="pt-0.5 font-medium">Patient's Details</p>
 
-                            </div>
-                            <div className="border rounded-md my-3 p-3 text-[13px] space-y-2">
+                                </div>
+                                <div className="border rounded-md my-3 p-3 text-[13px] space-y-2">
 
-                                <p>
-                                    <strong>Name of patient:</strong>{" "}
-                                    {selectedPatient?.patient?.firstname && selectedPatient?.patient?.lastname
-                                        ? `${selectedPatient.patient.firstname} ${selectedPatient.patient.lastname}`
-                                        : "NIL"}
-                                </p>
+                                    <p>
+                                        <strong>Name of patient:</strong>{" "}
+                                        {selectedPatient?.patient?.firstname && selectedPatient?.patient?.lastname
+                                            ? `${selectedPatient.patient.firstname} ${selectedPatient.patient.lastname}`
+                                            : "NIL"}
+                                    </p>
 
-                                <p>
-                                    <strong>Gender:</strong>{" "}
-                                    {selectedPatient?.patient?.gender ?? "NIL"}
-                                </p>
+                                    <p>
+                                        <strong>Gender:</strong>{" "}
+                                        {selectedPatient?.patient?.gender ?? "NIL"}
+                                    </p>
 
-                                <p>
-                                    <strong>D.O.B:</strong>{" "}
-                                    {selectedPatient?.patient?.dob
-                                        ? selectedPatient.patient.dob
-                                        : "NIL"}
-                                </p>
+                                    <p>
+                                        <strong>D.O.B:</strong>{" "}
+                                        {selectedPatient?.patient?.dob
+                                            ? selectedPatient.patient.dob
+                                            : "NIL"}
+                                    </p>
 
-                                <p>
-                                    <strong>State of Origin:</strong>{" "}
-                                    {selectedPatient?.patient?.state ?? "NIL"}
-                                </p>
+                                    <p>
+                                        <strong>State of Origin:</strong>{" "}
+                                        {selectedPatient?.patient?.state ?? "NIL"}
+                                    </p>
 
-                                <p>
-                                    <strong>Contact info:</strong>{" "}
-                                    {selectedPatient?.patient?.phone_num ?? "NIL"}
-                                </p>
+                                    <p>
+                                        <strong>Contact info:</strong>{" "}
+                                        {selectedPatient?.patient?.phone_num ?? "NIL"}
+                                    </p>
 
-                                <p>
-                                    <strong>Address:</strong>{" "}
-                                    {selectedPatient?.patient?.street ?? "NIL"}
-                                </p>
+                                    <p>
+                                        <strong>Address:</strong>{" "}
+                                        {selectedPatient?.patient?.street ?? "NIL"}
+                                    </p>
 
-                                <p>
-                                    <strong>Assigned doctor:</strong>{" "}
-                                    {selectedPatient?.staff
-                                        ? `Dr. ${selectedPatient.staff.firstname} ${selectedPatient.staff.lastname}`
-                                        : "NIL"}
-                                </p>
+                                    <p>
+                                        <strong>Assigned doctor:</strong>{" "}
+                                        {selectedPatient?.staff
+                                            ? `Dr. ${selectedPatient.staff.firstname} ${selectedPatient.staff.lastname}`
+                                            : "NIL"}
+                                    </p>
 
-                                <p>
-                                    <strong>Ward placed:</strong>{" "}
-                                    {selectedPatient?.ward_info?.name ?? "NIL"}
-                                </p>
+                                    <p>
+                                        <strong>Ward placed:</strong>{" "}
+                                        {selectedPatient?.ward_info?.name ?? "NIL"}
+                                    </p>
 
-                                <p>
-                                    <strong>Bed Assigned:</strong>{" "}
-                                    {selectedPatient?.bed_info?.bed_number
-                                        ? `Bed ${selectedPatient.bed_info.bed_number}`
-                                        : "NIL"}
-                                </p>
+                                    <p>
+                                        <strong>Bed Assigned:</strong>{" "}
+                                        {selectedPatient?.bed_info?.bed_number
+                                            ? `Bed ${selectedPatient.bed_info.bed_number}`
+                                            : "NIL"}
+                                    </p>
 
-                                <p>
-                                    <strong>Date of Admission:</strong>{" "}
-                                    {selectedPatient?.admission_date
-                                        ? formatFullDateTime(selectedPatient.admission_date)
-                                        : "NIL"}
-                                </p>
+                                    <p>
+                                        <strong>Date of Admission:</strong>{" "}
+                                        {selectedPatient?.admission_date
+                                            ? formatFullDateTime(selectedPatient.admission_date)
+                                            : "NIL"}
+                                    </p>
 
-                                <p>
-                                    <strong>Date of Discharge:</strong>{" "}
-                                    {selectedPatient?.discharge_date
-                                        ? formatFullDateTime(selectedPatient.discharge_date)
-                                        : "NIL"}
-                                </p>
+                                    <p>
+                                        <strong>Date of Discharge:</strong>{" "}
+                                        {selectedPatient?.discharge_date
+                                            ? formatFullDateTime(selectedPatient.discharge_date)
+                                            : "Pending"}
+                                    </p>
+
+                                </div>
 
                             </div>
 
                         </div>
-
-                    </div>
-                </>
-            )}
+                    </>
+                )}
             </div>
 
             <Pagination2 count={count}
                 currentPage={currentPage}
                 totalPages={totalPages}
-                setCurrentPage ={setCurrentPage} />
+                setCurrentPage={setCurrentPage} />
         </>
 
     )
 }
 
 const getTabs = (advanceCheckUp, setAdvanceCheckUp, setSelected) => [
-    { 
-      title: "Admitted Patients", 
-      status: "active", 
-      content: <AdmittedPatientsTab   advanceCheckUp={advanceCheckUp} 
-      setAdvanceCheckUp={setAdvanceCheckUp} setSelected = {setSelected} /> 
+    {
+        title: "Admitted Patients",
+        status: "active",
+        content: <AdmittedPatientsTab advanceCheckUp={advanceCheckUp}
+            setAdvanceCheckUp={setAdvanceCheckUp} setSelected={setSelected} />
     },
-  
-    { 
-      title: "Discharged Patients", 
-      status: "discharged", 
-      content: <DischargedPatientsTab   advanceCheckUp={advanceCheckUp} 
-      setAdvanceCheckUp={setAdvanceCheckUp} setSelected ={setSelected}/> 
+
+    {
+        title: "Discharged Patients",
+        status: "discharged",
+        content: <DischargedPatientsTab advanceCheckUp={advanceCheckUp}
+            setAdvanceCheckUp={setAdvanceCheckUp} setSelected={setSelected} />
     },
-  ];
-  
-  export default getTabs;
+];
+
+export default getTabs;

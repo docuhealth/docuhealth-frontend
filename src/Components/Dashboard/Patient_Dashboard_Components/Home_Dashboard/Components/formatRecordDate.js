@@ -1,5 +1,7 @@
 const formatRecordDate = (dateString) => {
+  if (!dateString) return null;
   const createdDate = new Date(dateString);
+  if (isNaN(createdDate.getTime())) return null;
   const now = new Date();
   const diffMs = now - createdDate; // difference in milliseconds
   const diffSeconds = Math.floor(diffMs / 1000);
@@ -27,7 +29,9 @@ export default formatRecordDate;
 
 
 const formatFullDateTime = (dateString) => {
+  if (!dateString) return null;
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return null;
 
   // Day with suffix
   const day = date.getDate();
@@ -35,10 +39,10 @@ const formatFullDateTime = (dateString) => {
     day % 10 === 1 && day !== 11
       ? "st"
       : day % 10 === 2 && day !== 12
-      ? "nd"
-      : day % 10 === 3 && day !== 13
-      ? "rd"
-      : "th";
+        ? "nd"
+        : day % 10 === 3 && day !== 13
+          ? "rd"
+          : "th";
 
   // Month short name
   const months = [
@@ -75,6 +79,7 @@ const getAge = (dobString) => {
   if (!dobString) return "N/A";
 
   const dob = new Date(dobString);
+  if (isNaN(dob.getTime())) return "N/A";
   const today = new Date();
 
   let age = today.getFullYear() - dob.getFullYear();
@@ -89,4 +94,4 @@ const getAge = (dobString) => {
   return age + " years old";
 };
 
-export {getAge}
+export { getAge }

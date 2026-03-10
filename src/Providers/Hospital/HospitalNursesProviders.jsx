@@ -4,24 +4,27 @@ import NursesAdmittedPatientMGTProvider from '../../context/HospitalContext/Nurs
 import NursesHealthPersonnelProvider from '../../context/HospitalContext/Nurses/NursesHealthPersonnelContext'
 import NursesAppointmentsListProvider from '../../context/HospitalContext/Nurses/NursesAppointmentsListContext'
 import NursesPatientsAssignedToWardProvider from '../../context/HospitalContext/Nurses/NursesPatientsAssignedToWardContext'
+import NursesVitalSignsProvider from '../../context/HospitalContext/Nurses/NursesVitalSignsContext'
 
 import HosStaffsProvider from '../../context/HospitalContext/HosStaffsContext'
 
 const HospitalNursesProviders = ({ children }) => {
   return (
     <>
-    <HosStaffsProvider >
-      <NursesProfileProvider>
-        <NursesAdmittedPatientMGTProvider>
-          <NursesHealthPersonnelProvider>
-            <NursesAppointmentsListProvider>
-              <NursesPatientsAssignedToWardProvider>
-                {children}
-              </NursesPatientsAssignedToWardProvider>
-            </NursesAppointmentsListProvider>
-          </NursesHealthPersonnelProvider>
-        </NursesAdmittedPatientMGTProvider>
-      </NursesProfileProvider>
+      <HosStaffsProvider >
+        <NursesProfileProvider>
+          <NursesAdmittedPatientMGTProvider>
+            <NursesHealthPersonnelProvider>
+              <NursesAppointmentsListProvider>
+                <NursesPatientsAssignedToWardProvider>
+                  <NursesVitalSignsProvider>
+                    {children}
+                  </NursesVitalSignsProvider>
+                </NursesPatientsAssignedToWardProvider>
+              </NursesAppointmentsListProvider>
+            </NursesHealthPersonnelProvider>
+          </NursesAdmittedPatientMGTProvider>
+        </NursesProfileProvider>
       </HosStaffsProvider>
     </>
   )

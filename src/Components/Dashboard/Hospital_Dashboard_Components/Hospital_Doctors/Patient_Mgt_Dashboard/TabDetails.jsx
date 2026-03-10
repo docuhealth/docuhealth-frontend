@@ -498,7 +498,7 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
               </svg>
 
               <p className="">
-                {formatFullDateTime(admittedPatient.admission_date)}
+                {formatFullDateTime(admittedPatient.discharge_date) || 'Pending'}
               </p>
             </div>
             <button

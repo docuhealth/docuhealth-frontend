@@ -563,7 +563,7 @@ const DischargedPatientsTab = () => {
               </svg>
 
               <p className="">
-                {formatFullDateTime(admittedPatient.request_date)}
+                {formatFullDateTime(admittedPatient.discharge_date) || 'Pending'}
               </p>
             </div>
             <button

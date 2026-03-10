@@ -13,7 +13,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
 
   const { wardInfo, backgroundImage, hospitalName, profile } = useContext(NursesAppContext);
   const [vitals, setVitals] = useState(false)
-  const [updateVitals, setUpdateVitals] = useState(false)
+  // const [updateVitals, setUpdateVitals] = useState(false)
 
   const [processVitals, setProcessVitals] = useState(false)
 
