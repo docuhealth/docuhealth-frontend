@@ -1,20 +1,18 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Menu, ChevronDown, LogOut, User } from "lucide-react";
+import { Bell, Menu, ChevronDown, LogOut, User, Trash2 } from "lucide-react";
 import Hospital_Admin_Sidebar_Mobile from "./Hospital_Admin_Sidebar_Mobile";
 import { HosAppContext } from "../../../../context/HospitalContext/Admin/HosAppContext";
+import RemoveBrandingModal from "./Home_Dashboard/RemoveBrandingModal";
 
 const Hospital_Admin_Header = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [openMobileSidebar, setOpenMobileSidebar] = useState(false);
-  const togglePopover = () => {
-    setIsPopoverOpen(!isPopoverOpen);
-  };
+
+  const [isDesktopPopoverOpen, setIsDesktopPopoverOpen] = useState(false);
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
 
   const { profile } = useContext(HosAppContext);
-
-  console.log("admin profile ", profile);
-
   const navigate = useNavigate();
 
   const initials = profile
@@ -24,8 +22,8 @@ const Hospital_Admin_Header = () => {
   const profileImage = profile?.theme?.profile_image;
 
   const handleLogout = () => {
-    sessionStorage.clear(); // removes ALL session-based auth data
-    navigate("/login"); // redirect to login page
+    sessionStorage.clear();
+    navigate("/login");
   };
 
   return (
@@ -50,7 +48,7 @@ const Hospital_Admin_Header = () => {
             </button>
 
             {/* Profile Section */}
-            <div className="flex items-center gap-3 pl-6 border-l border-gray-100">
+            <div className="flex items-center gap-3 pl-6 border-l border-gray-100 relative">
               <div className="text-right">
                 <p className="text-sm font-bold text-gray-900 leading-tight">
                   {profile ? `${profile.name}` : "Loading..."}
@@ -59,14 +57,18 @@ const Hospital_Admin_Header = () => {
                   Hospital Admin
                 </p>
               </div>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#3E4095] to-indigo-400 flex justify-center items-center text-white text-sm font-bold shadow-md overflow-hidden border border-gray-100">
+              <button
+                onClick={() => setIsDesktopPopoverOpen(!isDesktopPopoverOpen)}
+                className="flex items-center gap-2 group"
+              >
+                <div className="w-10 h-10 rounded-full bg-linear-to-tr from-[#3E4095] to-indigo-400 flex justify-center items-center text-white text-sm font-bold shadow-md overflow-hidden border border-gray-100 transition-transform group-hover:scale-105">
                   {profileImage ? (
                     <img
                       src={profileImage}
                       alt="Admin Profile Image"
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        e.target.style.display = 'none';
+                        e.target.style.display = "none";
                         e.target.parentElement.innerText = initials;
                       }}
                     />
@@ -74,6 +76,39 @@ const Hospital_Admin_Header = () => {
                     initials
                   )}
                 </div>
+                <ChevronDown
+                  size={16}
+                  className={`text-gray-400 transition-transform duration-200 ${isDesktopPopoverOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {/* Desktop Dropdown Popover */}
+              {isDesktopPopoverOpen && (
+                <div className="absolute right-0 top-14 w-52 bg-white border border-gray-100 shadow-xl rounded-lg p-2 animate-in fade-in zoom-in duration-200 z-50">
+                  <div className="px-3 py-2 mb-1 border-b border-gray-50">
+                    <p className="text-xs font-bold text-gray-900 truncate">
+                      {profile?.name}
+                    </p>
+                    <p className="text-[10px] text-gray-500">Hospital Admin</p>
+                  </div>
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    onClick={() => {
+                      setIsRemoveModalOpen(true);
+                      setIsDesktopPopoverOpen(false);
+                    }}
+                  >
+                    <Trash2 size={15} />
+                    Remove Profile Image
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-600 hover:bg-gray-50 rounded-lg mt-1 transition-colors"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-3.5 h-3.5" /> Logout
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>
@@ -137,9 +172,15 @@ const Hospital_Admin_Header = () => {
                     </p>
                     <p className="text-[10px] text-gray-500">Hospital Admin</p>
                   </div>
-                  {/* <button className="w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-600 hover:bg-gray-50 rounded-lg">
-                            <User className="w-3.5 h-3.5" /> Profile
-                        </button> */}
+                  <button className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-600 hover:bg-red-50 rounded-lg " 
+                       onClick={() => {
+                        setIsRemoveModalOpen(true)
+                        setIsPopoverOpen(false)
+                       }}
+                  >
+                    <Trash2 size={15} />
+                            Remove Image
+                        </button>
                   <button
                     className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-600 hover:bg-red-50 rounded-lg mt-1"
                     onClick={handleLogout}
@@ -160,6 +201,11 @@ const Hospital_Admin_Header = () => {
           />
         </div>
       </div>
+
+
+         {isRemoveModalOpen && (
+        <RemoveBrandingModal type = 'profile_image' onClose={() => setIsRemoveModalOpen(false)} />
+      )}
     </>
   );
 };

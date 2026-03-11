@@ -1,14 +1,18 @@
 import React, { useState, useContext } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import template from "../../../assets/img/template.png";
-import { Camera } from "lucide-react"; // Optional: using lucide for the icon
+import { Camera, Trash2 } from "lucide-react"; // Optional: using lucide for the icon
 import { HosAppContext } from "../../../context/HospitalContext/Admin/HosAppContext";
 import ImageCustomization from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/ImageCustomization";
+import RemoveBrandingModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/RemoveBrandingModal";
+
 
 const Hospital_Admin_Home_Dashboard = () => {
 
   const { profile } = useContext(HosAppContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+
 
   const backgroundImage = profile?.theme?.bg_image || template;
 
@@ -31,13 +35,25 @@ const Hospital_Admin_Home_Dashboard = () => {
             </p>
           </div>
 
-          {/* Change Button */}
-          <button className=" absolute bottom-4 right-4 flex items-center gap-2 bg-white px-4 py-2 rounded-md shadow-lg hover:bg-gray-100 transition-colors text-[#3E4095] font-medium text-sm"
+
+          <div className="absolute bottom-4 right-4 flex flex-col md:flex-row items-center gap-3 ">
+
+          <button className=" flex items-center gap-2 bg-white px-4 py-2 rounded-md shadow-lg hover:bg-gray-100 transition-colors text-[#3E4095] font-medium text-sm"
           onClick={() => setIsModalOpen(true)}
           >
             <Camera size={18} />
-            Change cover image
+            Change cover theme
           </button>
+          <button className=" flex items-center gap-2 bg-white px-4 py-2 rounded-md shadow-lg hover:bg-gray-100 transition-colors text-red-500 font-medium text-sm"
+          onClick={() => setIsRemoveModalOpen(true)}
+          >
+
+            <Trash2 size={18} />
+            Remove cover theme
+          </button>
+          </div>
+
+         
         </div>
 
       </div>
@@ -45,6 +61,11 @@ const Hospital_Admin_Home_Dashboard = () => {
       {isModalOpen && (
         <ImageCustomization onClose={() => setIsModalOpen(false)} />
       )}
+
+      {isRemoveModalOpen && (
+        <RemoveBrandingModal type = 'bg_image' onClose={() => setIsRemoveModalOpen(false)} />
+      )}
+
     </>
   );
 };

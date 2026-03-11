@@ -54,7 +54,7 @@ const ImageCustomization = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-white w-full max-w-lg rounded-lg shadow overflow-hidden">
         {/* Header */}
         <div className="flex justify-between items-center p-5 border-b">
@@ -114,7 +114,7 @@ const ImageCustomization = ({ onClose }) => {
              <button
               onClick={handleSubmit}
               disabled={isPending || (!payload.bg_image && !payload.profile_image)}
-              className="flex-[2] py-2.5 bg-[#3E4095] text-white rounded-full font-medium flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all "
+              className="flex-2 py-2.5 bg-[#3E4095] text-white rounded-full font-medium flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all "
             >
               {isPending ? (
                 <>
