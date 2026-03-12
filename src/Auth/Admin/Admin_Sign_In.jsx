@@ -78,7 +78,7 @@ const Admin_Sign_In = () => {
         setPassword("");
 
         setTimeout(() => {
-          window.location.href = "/admin";
+          window.location.href = "/dhadmin-home-dashboard";
         }, 1000);
         // Handle success (e.g., save token, redirect user)
       } catch (error) {

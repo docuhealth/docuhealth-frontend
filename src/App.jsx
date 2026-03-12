@@ -50,11 +50,13 @@ import Admin_Create_New_Password from "./Auth/Admin/Admin_Create_New_Password";
 
 
 import ProtectedRoute from "./Auth/ProtectedRoute/ProtectedRoute";
+import AdminProtectedRoute from "./Auth/ProtectedRoute/AdminProtectedRoute";
 import PartnerProtectedRoute from "./Auth/ProtectedRoute/PartnerProtectedRoute";
 import HospitalProtectedRoute from "./Auth/ProtectedRoute/HospitalProtectedRoute";
 
 import Admin_Dashboard_Layout from "./Layouts/Admin_Dashboard_Layout/Admin_Dashboard_Layout";
 import Admin_Home_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Home_Dashboard";
+import AdminProviders from "./Providers/Admin/AdminProviders";
 import Admin_Users_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Users_Dashboard";
 import Admin_Settings_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Settings_Dashboard";
 import Admin_Subscriptions_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Subscriptions_Dashboard";
@@ -881,85 +883,85 @@ function App() {
             {/* Dashboard Routes */}
             <Route
               path="/user-home-dashboard"
-              element={<Patient_Dashboard_Layout />}
+              element={
+                <ProtectedRoute>
+                  <Patient_Dashboard_Layout />
+                </ProtectedRoute>
+              }
             >
               <Route
                 index
-                element={
-                  <ProtectedRoute>
-                    <Patient_Home_Dashboard />
-                  </ProtectedRoute>
-                }
+                element={<Patient_Home_Dashboard />}
               />
             </Route>
 
             <Route
               path="/user-drug-records-dashboard"
-              element={<Patient_Dashboard_Layout />}
+              element={
+                <ProtectedRoute>
+                  <Patient_Dashboard_Layout />
+                </ProtectedRoute>
+              }
             >
               <Route
                 index
-                element={
-                  <ProtectedRoute>
-                    <Patient_Drug_Records_Dashboard />
-                  </ProtectedRoute>
-                }
+                element={<Patient_Drug_Records_Dashboard />}
               />
             </Route>
 
             <Route
               path="/user-subaccount-dashboard"
-              element={<Patient_Dashboard_Layout />}
+              element={
+                <ProtectedRoute>
+                  <Patient_Dashboard_Layout />
+                </ProtectedRoute>
+              }
             >
               <Route
                 index
-                element={
-                  <ProtectedRoute>
-                    <Patient_SubAccount_Dashboard />
-                  </ProtectedRoute>
-                }
+                element={<Patient_SubAccount_Dashboard />}
               />
             </Route>
 
             <Route
               path="/user-appointments-dashboard"
-              element={<Patient_Dashboard_Layout />}
+              element={
+                <ProtectedRoute>
+                  <Patient_Dashboard_Layout />
+                </ProtectedRoute>
+              }
             >
               <Route
                 index
-                element={
-                  <ProtectedRoute>
-                    <Patient_Appointments_Dashboard />
-                  </ProtectedRoute>
-                }
+                element={<Patient_Appointments_Dashboard />}
               />
             </Route>
 
             <Route
               path="/user-settings-dashboard"
-              element={<Patient_Dashboard_Layout />}
+              element={
+                <ProtectedRoute>
+                  <Patient_Dashboard_Layout />
+                </ProtectedRoute>
+              }
             >
               <Route
                 index
-                element={
-                  <ProtectedRoute>
-                    <Patient_Settings_Dashboard />
-                  </ProtectedRoute>
-                }
+                element={<Patient_Settings_Dashboard />}
               />
             </Route>
 
             <Route
               path="/user-subscriptions-dashboard"
-              element={<Patient_Dashboard_Layout />}
+              element={
+                <ProtectedRoute>
+                  <Patient_Dashboard_Layout />
+                </ProtectedRoute>
+              }
             >
               <Route
                 index
-                element={
-                  <ProtectedRoute>
-                    <Patient_Subscriptions_Dashboard />
-                  </ProtectedRoute>
-                }
+                element={<Patient_Subscriptions_Dashboard />}
               />
             </Route>
 
@@ -979,56 +981,64 @@ function App() {
             />
 
             <Route
-              path="/admin-home-dashboard"
-              element={<Admin_Dashboard_Layout />}
+              path="/dhadmin-home-dashboard"
+              element={
+                <AdminProtectedRoute>
+                  <AdminProviders>
+                    <Admin_Dashboard_Layout />
+                  </AdminProviders>
+                </AdminProtectedRoute>
+              }
             >
               <Route
                 index
-                element={
-                  // <ProtectedRoute>
-                  <Admin_Home_Dashboard />
-                  // </ProtectedRoute>
-                }
+                element={<Admin_Home_Dashboard />}
               />
             </Route>
 
             <Route
-              path="/admin-users-dashboard"
-              element={<Admin_Dashboard_Layout />}
+              path="/dhadmin-users-dashboard"
+              element={
+                <AdminProtectedRoute>
+                  <AdminProviders>
+                    <Admin_Dashboard_Layout />
+                  </AdminProviders>
+                </AdminProtectedRoute>
+              }
             >
               <Route
                 index
-                element={
-                  // <ProtectedRoute>
-                  <Admin_Users_Dashboard />
-                  // </ProtectedRoute>
-                }
+                element={<Admin_Users_Dashboard />}
               />
             </Route>
             <Route
-              path="/admin-subscriptions-dashboard"
-              element={<Admin_Dashboard_Layout />}
+              path="/dhadmin-subscriptions-dashboard"
+              element={
+                <AdminProtectedRoute>
+                  <AdminProviders>
+                    <Admin_Dashboard_Layout />
+                  </AdminProviders>
+                </AdminProtectedRoute>
+              }
             >
               <Route
                 index
-                element={
-                  // <ProtectedRoute>
-                  <Admin_Subscriptions_Dashboard />
-                  // </ProtectedRoute>
-                }
+                element={<Admin_Subscriptions_Dashboard />}
               />
             </Route>
             <Route
-              path="/admin-settings-dashboard"
-              element={<Admin_Dashboard_Layout />}
+              path="/dhadmin-settings-dashboard"
+              element={
+                <AdminProtectedRoute>
+                  <AdminProviders>
+                    <Admin_Dashboard_Layout />
+                  </AdminProviders>
+                </AdminProtectedRoute>
+              }
             >
               <Route
                 index
-                element={
-                  // <ProtectedRoute>
-                  <Admin_Settings_Dashboard />
-                  // </ProtectedRoute>
-                }
+                element={<Admin_Settings_Dashboard />}
               />
             </Route>
 

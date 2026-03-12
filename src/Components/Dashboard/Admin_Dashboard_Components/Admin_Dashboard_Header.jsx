@@ -19,7 +19,7 @@ const Admin_Dashboard_Header = () => {
 
   const handleLogout = () => {
     sessionStorage.clear();   // removes ALL session-based auth data
-    navigate("/admin-login");       // redirect to login page
+    navigate("/dhadmin-login");       // redirect to login page
   };
 
   return (
@@ -112,11 +112,12 @@ const Admin_Dashboard_Header = () => {
             </div>
           </div>
         </header>
-
+  <div className="lg:hidden">
         <Admin_Sidebar_Mobile
           openMobileSidebar={openMobileSidebar}
           setOpenMobileSidebar={setOpenMobileSidebar}
         />
+        </div>
       </div>
     </>
   )
