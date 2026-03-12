@@ -34,6 +34,7 @@ const ProfileProvider = (props) => {
 
   useEffect(() => {
   if (profile?.is_subscribed !== undefined) {
+    // console.log(profile)
     setSubscriptionStatus(profile.is_subscribed);
     setSubscriptionStatusState(profile.is_subscribed); 
   }

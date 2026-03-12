@@ -143,7 +143,7 @@ const Hospital_Admin_Header = () => {
                 onClick={() => setIsPopoverOpen(!isPopoverOpen)}
                 className="flex items-center gap-1"
               >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#3E4095] to-indigo-400 flex justify-center items-center text-white text-sm font-bold shadow-md overflow-hidden border border-gray-100">
+                <div className="w-10 h-10 rounded-full bg-linear-to-tr from-[#3E4095] to-indigo-400 flex justify-center items-center text-white text-sm font-bold shadow-md overflow-hidden border border-gray-100">
                   {profileImage ? (
                     <img
                       src={profileImage}
