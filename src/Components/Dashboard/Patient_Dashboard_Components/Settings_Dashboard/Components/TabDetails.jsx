@@ -731,7 +731,7 @@ const IDCardTab = () => {
 
 const tabs = [
   { title: "Account Settings", content: <AccountSettingsTab /> },
-  // { title: "ID Card", content: <IDCardTab /> }
+  { title: "ID Card", content: <IDCardTab /> }
 ];
 
 export default tabs;

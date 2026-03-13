@@ -10,7 +10,7 @@ function ProtectedRoute({ children }) {
     return <Navigate to="/user-login" replace />;
   }
 
-  if (role !== 'user') {
+  if (role !== 'patient') {
     return <Navigate to="/dhadmin-home-dashboard" replace />;
   }
 
