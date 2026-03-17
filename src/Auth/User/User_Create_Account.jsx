@@ -70,43 +70,43 @@ const ULP = () => {
     setCountries(allCountries);
   }, []);
 
-useEffect(() => {
-  if (country) {
-    const selectedCountry = countries.find(c => c.name === country);
-    if (selectedCountry) {
-      const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
-      setStates(countryStates);
-      
-      const stateExistsInCountry = countryStates.find(s => s.name === state);
-      if (!stateExistsInCountry && state !== "") {
-        setState("");
-        setCities([]);
-        setCity("");
+  useEffect(() => {
+    if (country) {
+      const selectedCountry = countries.find(c => c.name === country);
+      if (selectedCountry) {
+        const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
+        setStates(countryStates);
+
+        const stateExistsInCountry = countryStates.find(s => s.name === state);
+        if (!stateExistsInCountry && state !== "") {
+          setState("");
+          setCities([]);
+          setCity("");
+        }
       }
     }
-  }
-}, [country, countries]); 
+  }, [country, countries]);
 
-useEffect(() => {
-  if (country && state && states.length > 0) {
-    const selectedCountry = countries.find(c => c.name === country);
-    const selectedState = states.find(s => s.name === state);
+  useEffect(() => {
+    if (country && state && states.length > 0) {
+      const selectedCountry = countries.find(c => c.name === country);
+      const selectedState = states.find(s => s.name === state);
 
-    if (selectedCountry && selectedState) {
-      const stateCities = City.getCitiesOfState(
-        selectedCountry.isoCode,
-        selectedState.isoCode
-      );
-      setCities(stateCities || []);
+      if (selectedCountry && selectedState) {
+        const stateCities = City.getCitiesOfState(
+          selectedCountry.isoCode,
+          selectedState.isoCode
+        );
+        setCities(stateCities || []);
 
-      // FIX: Only reset city if the current city isn't in the new state's list
-      const cityExistsInState = stateCities?.find(c => c.name === city);
-      if (!cityExistsInState && city !== "") {
-        setCity("");
+        // FIX: Only reset city if the current city isn't in the new state's list
+        const cityExistsInState = stateCities?.find(c => c.name === city);
+        if (!cityExistsInState && city !== "") {
+          setCity("");
+        }
       }
     }
-  }
-}, [state, country, countries, states]);
+  }, [state, country, countries, states]);
 
   useEffect(() => {
     const savedData = sessionStorage.getItem("signup_draft");
@@ -249,7 +249,7 @@ useEffect(() => {
         phone_num,
         firstname: firstName,
         lastname: lastName,
-        middlename: middleName,
+        ...(middleName && { middlename: middleName }),
         role,
         street,
         city,
@@ -370,11 +370,10 @@ useEffect(() => {
                         <input
                           type={showPassword ? "text" : "password"}
                           placeholder=""
-                          className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${
-                            password && !isPasswordValid
+                          className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${password && !isPasswordValid
                               ? "focus:border-red-500"
                               : ""
-                          }`}
+                            }`}
                           value={password}
                           onChange={(e) => {
                             setPassword(e.target.value);
@@ -415,15 +414,13 @@ useEffect(() => {
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2">
                               <div
-                                className={`h-2 rounded-full transition-all duration-300 ${
-                                  getPasswordStrength(password).color
-                                }`}
+                                className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrength(password).color
+                                  }`}
                                 style={{
-                                  width: `${
-                                    (getPasswordStrength(password).strength /
+                                  width: `${(getPasswordStrength(password).strength /
                                       5) *
                                     100
-                                  }%`,
+                                    }%`,
                                 }}
                               ></div>
                             </div>
@@ -434,82 +431,72 @@ useEffect(() => {
                           </p>
                           <div className="space-y-1">
                             <div
-                              className={`flex items-center text-sm ${
-                                passwordRequirements.hasLowercase
+                              className={`flex items-center text-sm ${passwordRequirements.hasLowercase
                                   ? "text-green-600"
                                   : "text-red-500"
-                              }`}
+                                }`}
                             >
                               <span
-                                className={`w-2 h-2 rounded-full mr-2 ${
-                                  passwordRequirements.hasLowercase
+                                className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasLowercase
                                     ? "bg-green-500"
                                     : "bg-red-500"
-                                }`}
+                                  }`}
                               ></span>
                               Include lowercase letters (a-z)
                             </div>
                             <div
-                              className={`flex items-center text-sm ${
-                                passwordRequirements.hasUppercase
+                              className={`flex items-center text-sm ${passwordRequirements.hasUppercase
                                   ? "text-green-600"
                                   : "text-red-500"
-                              }`}
+                                }`}
                             >
                               <span
-                                className={`w-2 h-2 rounded-full mr-2 ${
-                                  passwordRequirements.hasUppercase
+                                className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasUppercase
                                     ? "bg-green-500"
                                     : "bg-red-500"
-                                }`}
+                                  }`}
                               ></span>
                               Include uppercase letters (A-Z)
                             </div>
                             <div
-                              className={`flex items-center text-sm ${
-                                passwordRequirements.hasNumber
+                              className={`flex items-center text-sm ${passwordRequirements.hasNumber
                                   ? "text-green-600"
                                   : "text-red-500"
-                              }`}
+                                }`}
                             >
                               <span
-                                className={`w-2 h-2 rounded-full mr-2 ${
-                                  passwordRequirements.hasNumber
+                                className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasNumber
                                     ? "bg-green-500"
                                     : "bg-red-500"
-                                }`}
+                                  }`}
                               ></span>
                               Include at least one number (0-9)
                             </div>
                             <div
-                              className={`flex items-center text-sm ${
-                                passwordRequirements.hasSymbol
+                              className={`flex items-center text-sm ${passwordRequirements.hasSymbol
                                   ? "text-green-600"
                                   : "text-red-500"
-                              }`}
+                                }`}
                             >
                               <span
-                                className={`w-2 h-2 rounded-full mr-2 ${
-                                  passwordRequirements.hasSymbol
+                                className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasSymbol
                                     ? "bg-green-500"
                                     : "bg-red-500"
-                                }`}
+                                  }`}
                               ></span>
                               Include at least one symbol (!@#$%^&*)
                             </div>
                             <div
-                              className={`flex items-center text-sm ${
-                                passwordRequirements.hasMinLength
+                              className={`flex items-center text-sm ${passwordRequirements.hasMinLength
                                   ? "text-green-600"
                                   : "text-red-500"
-                              }`}
+                                }`}
                             >
                               <span
-                                className={`w-2 h-2 rounded-full mr-2 ${
-                                  passwordRequirements.hasMinLength
+                                className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasMinLength
                                     ? "bg-green-500"
                                     : "bg-red-500"
-                                }`}
+                                  }`}
                               ></span>
                               Be at least 8 characters long
                             </div>
@@ -556,14 +543,13 @@ useEffect(() => {
                     <button
                       type="button"
                       onClick={handleNextStep}
-                      className={`w-full py-3  rounded-full transition-colors ${
-                        isPasswordValid &&
-                        email &&
-                        confirmPassword &&
-                        password === confirmPassword
+                      className={`w-full py-3  rounded-full transition-colors ${isPasswordValid &&
+                          email &&
+                          confirmPassword &&
+                          password === confirmPassword
                           ? "bg-[#3E4095] text-white"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      }`}
+                        }`}
                       disabled={
                         !isPasswordValid ||
                         !email ||
@@ -572,9 +558,9 @@ useEffect(() => {
                       }
                     >
                       {isPasswordValid &&
-                      email &&
-                      confirmPassword &&
-                      password === confirmPassword
+                        email &&
+                        confirmPassword &&
+                        password === confirmPassword
                         ? "Move to Step 2 / 3"
                         : "Complete all fields to continue"}
                     </button>
@@ -629,7 +615,7 @@ useEffect(() => {
                       </div>
                     </div>
                     <div className="relative pb-3">
-                      <p className="font-semibold pb-1">Middle Name :</p>
+                      <p className="font-semibold pb-1">Middle Name (Optional):</p>
                       <div className="relative">
                         <input
                           type="text"
@@ -709,15 +695,13 @@ useEffect(() => {
                     <button
                       type="button"
                       onClick={handleFinalStep}
-                      className={`w-full transition-colors py-3 rounded-full  ${
-                        firstName && lastName && middleName && DOB && gender
+                      className={`w-full transition-colors py-3 rounded-full  ${firstName && lastName && DOB && gender
                           ? "bg-[#3E4095] text-white"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      }`}
+                        }`}
                       disabled={
                         !firstName ||
                         !lastName ||
-                        !middleName ||
                         !DOB ||
                         !gender
                       }
@@ -928,16 +912,15 @@ useEffect(() => {
                     <button
                       type="button"
                       onClick={handleSubmit}
-                      className={`w-full transition-colors py-3 rounded-full ${
-                        country &&
-                        state &&
-                        city &&
-                        street &&
-                        houseNO &&
-                        !isSubmitting
+                      className={`w-full transition-colors py-3 rounded-full ${country &&
+                          state &&
+                          city &&
+                          street &&
+                          houseNO &&
+                          !isSubmitting
                           ? "bg-[#3E4095] text-white "
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      } `}
+                        } `}
                       disabled={
                         !country ||
                         !state ||
@@ -1059,11 +1042,10 @@ useEffect(() => {
                       <input
                         type={showPassword ? "text" : "password"}
                         placeholder=""
-                        className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${
-                          password && !isPasswordValid
+                        className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${password && !isPasswordValid
                             ? "focus:border-red-500"
                             : ""
-                        }`}
+                          }`}
                         value={password}
                         onChange={(e) => {
                           setPassword(e.target.value);
@@ -1104,14 +1086,12 @@ useEffect(() => {
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
-                              className={`h-2 rounded-full transition-all duration-300 ${
-                                getPasswordStrength(password).color
-                              }`}
+                              className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrength(password).color
+                                }`}
                               style={{
-                                width: `${
-                                  (getPasswordStrength(password).strength / 5) *
+                                width: `${(getPasswordStrength(password).strength / 5) *
                                   100
-                                }%`,
+                                  }%`,
                               }}
                             ></div>
                           </div>
@@ -1122,82 +1102,72 @@ useEffect(() => {
                         </p>
                         <div className="space-y-1">
                           <div
-                            className={`flex items-center text-sm ${
-                              passwordRequirements.hasLowercase
+                            className={`flex items-center text-sm ${passwordRequirements.hasLowercase
                                 ? "text-green-600"
                                 : "text-red-500"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`w-2 h-2 rounded-full mr-2 ${
-                                passwordRequirements.hasLowercase
+                              className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasLowercase
                                   ? "bg-green-500"
                                   : "bg-red-500"
-                              }`}
+                                }`}
                             ></span>
                             Include lowercase letters (a-z)
                           </div>
                           <div
-                            className={`flex items-center text-sm ${
-                              passwordRequirements.hasUppercase
+                            className={`flex items-center text-sm ${passwordRequirements.hasUppercase
                                 ? "text-green-600"
                                 : "text-red-500"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`w-2 h-2 rounded-full mr-2 ${
-                                passwordRequirements.hasUppercase
+                              className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasUppercase
                                   ? "bg-green-500"
                                   : "bg-red-500"
-                              }`}
+                                }`}
                             ></span>
                             Include uppercase letters (A-Z)
                           </div>
                           <div
-                            className={`flex items-center text-sm ${
-                              passwordRequirements.hasNumber
+                            className={`flex items-center text-sm ${passwordRequirements.hasNumber
                                 ? "text-green-600"
                                 : "text-red-500"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`w-2 h-2 rounded-full mr-2 ${
-                                passwordRequirements.hasNumber
+                              className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasNumber
                                   ? "bg-green-500"
                                   : "bg-red-500"
-                              }`}
+                                }`}
                             ></span>
                             Include at least one number (0-9)
                           </div>
                           <div
-                            className={`flex items-center text-sm ${
-                              passwordRequirements.hasSymbol
+                            className={`flex items-center text-sm ${passwordRequirements.hasSymbol
                                 ? "text-green-600"
                                 : "text-red-500"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`w-2 h-2 rounded-full mr-2 ${
-                                passwordRequirements.hasSymbol
+                              className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasSymbol
                                   ? "bg-green-500"
                                   : "bg-red-500"
-                              }`}
+                                }`}
                             ></span>
                             Include at least one symbol (!@#$%^&*)
                           </div>
                           <div
-                            className={`flex items-center text-sm ${
-                              passwordRequirements.hasMinLength
+                            className={`flex items-center text-sm ${passwordRequirements.hasMinLength
                                 ? "text-green-600"
                                 : "text-red-500"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`w-2 h-2 rounded-full mr-2 ${
-                                passwordRequirements.hasMinLength
+                              className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasMinLength
                                   ? "bg-green-500"
                                   : "bg-red-500"
-                              }`}
+                                }`}
                             ></span>
                             Be at least 8 characters long
                           </div>
@@ -1244,14 +1214,13 @@ useEffect(() => {
                   <button
                     type="button"
                     onClick={handleNextStep}
-                    className={`w-full py-3  rounded-full transition-colors ${
-                      isPasswordValid &&
-                      email &&
-                      confirmPassword &&
-                      password === confirmPassword
+                    className={`w-full py-3  rounded-full transition-colors ${isPasswordValid &&
+                        email &&
+                        confirmPassword &&
+                        password === confirmPassword
                         ? "bg-[#3E4095] text-white "
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
+                      }`}
                     disabled={
                       !isPasswordValid ||
                       !email ||
@@ -1260,9 +1229,9 @@ useEffect(() => {
                     }
                   >
                     {isPasswordValid &&
-                    email &&
-                    confirmPassword &&
-                    password === confirmPassword
+                      email &&
+                      confirmPassword &&
+                      password === confirmPassword
                       ? "Move to Step 2 / 3"
                       : "Complete all fields to continue"}
                   </button>
@@ -1320,7 +1289,7 @@ useEffect(() => {
                     </div>
                   </div>
                   <div className="relative pb-3">
-                    <p className="font-semibold pb-1">Middle Name :</p>
+                    <p className="font-semibold pb-1">Middle Name (Optional):</p>
                     <div className="relative">
                       <input
                         type="text"
@@ -1400,13 +1369,12 @@ useEffect(() => {
                   <button
                     type="button"
                     onClick={handleFinalStep}
-                    className={`w-full transition-colors py-3 rounded-full  ${
-                      firstName && lastName && middleName && DOB && gender
+                    className={`w-full transition-colors py-3 rounded-full  ${firstName && lastName && DOB && gender
                         ? "bg-[#3E4095] text-white "
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
+                      }`}
                     disabled={
-                      !firstName || !lastName || !middleName || !DOB || !gender
+                      !firstName || !lastName || !DOB || !gender
                     }
                   >
                     Move to step 3 / 3
@@ -1613,16 +1581,15 @@ useEffect(() => {
                   <button
                     type="button"
                     onClick={handleSubmit}
-                    className={`w-full transition-colors py-3 rounded-full ${
-                      country &&
-                      state &&
-                      city &&
-                      street &&
-                      houseNO &&
-                      !isSubmitting
+                    className={`w-full transition-colors py-3 rounded-full ${country &&
+                        state &&
+                        city &&
+                        street &&
+                        houseNO &&
+                        !isSubmitting
                         ? "bg-[#3E4095] text-white "
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    } `}
+                      } `}
                     disabled={
                       !country ||
                       !state ||
