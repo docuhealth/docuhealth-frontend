@@ -1,81 +1,93 @@
 # DocuHealth 🏥
 
-DocuHealth is a comprehensive, modern Healthcare Management and Electronic Health Records (EHR) system designed to streamline operations for hospitals, clinics, healthcare professionals, and patients. Built with React and Vite, the platform provides role-based access control, appointment scheduling, and patient record management.
+**Secure, lifelong access to medical records powered by HIN-NIN integration.**
 
-## 🌟 Key Features
+DocuHealth is a comprehensive, modern Healthcare Management and Electronic Health Records (EHR) system designed to streamline operations for hospitals, clinics, healthcare professionals, and patients. Built with **React 18** and **Vite**, the platform provides role-based access control, appointment scheduling, and patient record management.
 
-### 🏥 For Hospitals
-- **Multi-Role Dashboards**: Specific interfaces for Hospital Admins, Doctors, Nurses, and Receptionists.
-- **Patient Management**: Complete tracking of patient records, drug history, and admissions.
-- **Appointment System**: Efficient scheduling and management of patient appointments.
-- **Ward Management**: Real-time tracking of ward availability and patient admissions.
-- **Financial & Subscription Management**: Integrated wallet and subscription handling for hospital operations.
-- **Internal Messaging**: Secure communication system for hospital staff.
-- **Health Personnel Management**: Easy onboarding and tracking of doctors, nurses, and lab technicians.
+---
 
-### 🧑‍⚕️ For Patients
-- **Personalized Dashboard**: A dedicated space for patients to manage their health journey.
-- **Sub-Accounts**: Manage family members or dependents from a single primary account.
-- **Appointment Booking**: Easy scheduling with chosen healthcare providers.
-- **Drug Records**: Real-time access to prescriptions and medication history.
-- **Subscriptions & Settings**: Easy management of notification preferences and billing.
+## 🌟 Core Value Proposition: The HIN
+
+At the heart of DocuHealth is the **Health Identification Number (HIN)**. Linked directly with the **National Identity Number (NIN)**, the HIN ensures:
+- **Unique Patient Identity**: Eliminates duplicate or fragmented medical records.
+- **Interoperability**: Seamless data exchange between verified healthcare providers.
+- **Portability**: Patients maintain a single, lifelong health record regardless of which hospital they visit.
+
+---
+
+## ✨ Key Features
+
+### 🏥 For Hospitals & Clinics
+- **Multi-Role Dashboards**: Tailored interfaces for Admins, Doctors, Nurses, and Receptionists.
+- **Ward & Admission Tracking**: Real-time management of bed availability and patient status.
+- **Financial Management**: Integrated wallet system and subscription handling for operations.
+- **Staff Onboarding**: Automated verification and management of health personnel.
+- **Secure Messaging**: Internal communication channel for clinical collaboration.
+
+### 🧑‍⚕️ For Patients & Dependents
+- **Unified Health Profile**: Real-time access to drug history, lab results, and prescriptions.
+- **Sub-Account Management**: Manage health records for family members from a single profile.
+- **Smart Appointment Booking**: Easy scheduling with preferred doctors and clinics.
+- **Secure Data Sharing**: Control over who accesses your medical history.
 
 ### 🛠 System Administration
-- **Global Admin Dashboard**: For platform administrators to manage hospital approvals, user accounts, and system settings.
-- **Partner Dashboard**: Interfaces for integration partners.
-- **Verification System**: Built-in Hospital Verification and NIN (National Identification Number) verification.
+- **Global Governance**: Tools for hospital verification, NIN validation, and system-wide audits.
+- **Partner Portal**: Dedicated API and dashboard for integration partners.
+
+---
 
 ## 🚀 Tech Stack
 
-- **Frontend Framework**: React 18, Vite
-- **Routing**: React Router DOM (v7)
-- **Styling**: Tailwind CSS (v4) with PostCSS
-- **State Management & Data Fetching**: React Query (@tanstack/react-query), Axios
-- **Charts & Reports**: ApexCharts, Chart.js, jsPDF, html2canvas
-- **UI Components**: Heroicons, Lucide React, React Icons, Swiper
-- **Notifications**: React Hot Toast, React Toastify
-- **Code Quality**: ESLint
+- **Frontend**: React 18 (Vite)
+- **Styling**: Tailwind CSS v4, PostCSS
+- **Animations**: Framer Motion (Premium, scroll-triggered reveals)
+- **State & Data**: TanStack Query (React Query), Axios
+- **Visualization**: ApexCharts, Chart.js
+- **Utilities**: Lucide React, Swiper.js, React Hot Toast, jsPDF
+
+---
 
 ## 📦 Getting Started
 
 ### Prerequisites
-- Node.js (v18 or higher recommended)
+- Node.js (v18+)
 - npm or yarn
 
 ### Installation
 
-1. Clone the repository:
+1. **Clone the repository**
    ```bash
    git clone <repository-url>
    cd DocuHealth-
    ```
 
-2. Install dependencies:
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. Start the development server:
+3. **Run development server**
    ```bash
    npm run dev
    ```
+   The application will be available at `http://localhost:5173` (or the next available port).
 
-4. Open your browser and navigate to `http://localhost:5173`.
-
-### Building for Production
-To build the application for production, run:
+### Production Build
 ```bash
 npm run build
 ```
-The optimized files will be generated in the `dist` directory.
 
-## 🔐 Role-Based Access
+---
 
-DocuHealth provides separate secure portals and dashboard layouts depending on user authentication:
-- **Patients**
-- **Hospital Staff** (Admin, Doctor, Receptionist, Nurse)
-- **Platform Admins**
-- **Partners**
+## 🔐 Role-Based Access Control (RBAC)
+
+DocuHealth implements a robust RBAC system to ensure data privacy and security:
+- **Patients**: Personal health management and booking.
+- **Hospital Staff**: Operational tools (Admin, Doctor, Receptionist, Nurse).
+- **Platform Admins**: System-wide governance and approvals.
+- **Partners**: API-driven integration management.
+
+---
 
 ## 📄 License
-This project is proprietary. All rights reserved.
+This project is proprietary. All rights reserved. © 2026 DocuHealth Services.

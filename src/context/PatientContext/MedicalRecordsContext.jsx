@@ -38,7 +38,6 @@ const MedicalRecordsProvider = (props) => {
     }
   }, [isError, error]);
 
-  console.log(data)
 
   const medicalRecords = data?.medical_records?.results || [];
   const count = data?.medical_records?.count || 0;

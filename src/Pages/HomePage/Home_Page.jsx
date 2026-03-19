@@ -10,7 +10,7 @@ import DocuHealth_Updates_Section from "../Components/HomePage/DocuHealth_Update
 
 const Home_Page = () => {
     return (
-        <>
+        <div className="overflow-x-hidden">
             <Helmet>
                 <title>DocuHealth - Unifying Nigeria's Healthcare Ecosystem</title>
                 <meta name="description" content="Secure, lifelong access to medical records powered by the Health Identification Number (HIN) linked with the National Identity Number (NIN)." />
@@ -23,7 +23,7 @@ const Home_Page = () => {
             <Data_Privacy_Section />
             <Contact_Us_Section />
             <DocuHealth_Updates_Section />
-        </>
+        </div>
     )
 }
 export default Home_Page

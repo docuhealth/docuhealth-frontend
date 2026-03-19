@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import BackgroundTemplate from "../ui/BackgroundTemplate";
 import toast from "react-hot-toast";
 import axiosInstance from "../../../utils/axiosInstance";
+import { motion } from "framer-motion";
 
 const Contact_Us_Section = () => {
   const [activeTab, setActiveTab] = useState("individual");
@@ -54,12 +55,18 @@ const Contact_Us_Section = () => {
   return (
     <BackgroundTemplate>
       <section
-        className="py-24 px-5 lg:px-16 text-sm text-[#464646] bg-[#F6FCFE] lg:bg-white "
+        className="py-24 px-5 lg:px-16 text-sm text-[#464646] bg-[#F6FCFE] lg:bg-white overflow-hidden"
         id="contact-us"
       >
         <div className="w-full  flex flex-col lg:flex-row 6 text-sm gap-10 lg:gap-0">
           {/* Left Section */}
-          <div className="lg:w-1/2">
+          <motion.div 
+            className="lg:w-1/2"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
             <h2 className="text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-[#3E4095] mb-4">
               Contact us
             </h2>
@@ -106,7 +113,7 @@ const Contact_Us_Section = () => {
                 </div>
                 <div>
                   <p className="font-semibold 2xl:text-lg">Email us:</p>
-                  <p className="2xl:text-lg">support@docuhealthservices.com</p>
+                  <p className="2xl:text-lg">info@docuhealth.online</p>
                 </div>
               </div>
 
@@ -134,10 +141,16 @@ const Contact_Us_Section = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-   
-          <div className="lg:w-1/2 rounded-2xl p-6 lg:shadow-lg border bg-white">
+
+          <motion.div 
+            className="lg:w-1/2 rounded-2xl p-6 lg:shadow-lg border bg-white"
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
             {/* Tabs */}
             <div className="flex mb-6 bg-[#F6FCFE] rounded-full p-1">
               <button
@@ -305,7 +318,7 @@ const Contact_Us_Section = () => {
 
               </form>
             )}
-          </div>
+          </motion.div>
         </div>
       </section>
     </BackgroundTemplate>

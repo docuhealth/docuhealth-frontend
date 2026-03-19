@@ -1,35 +1,64 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import footerImgMobile from "../../../assets/img/footerImgMobilee.webp";
-import AOS from "aos";
-import "aos/dist/aos.css";
+import { motion } from "framer-motion";
 
 const HeroPG = () => {
-  useEffect(() => {
-    AOS.init({ duration: 1000 }); // Initialize AOS with a default duration
-  }, []);
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  };
+
+  const imageVariants = {
+    hidden: { opacity: 0, scale: 0.95, x: 10 },
+    visible: { opacity: 1, scale: 1, x: 0, transition: { duration: 0.8, ease: "easeOut" } },
+  };
 
   return (
     <>
       <div id="home" className=" hidden lg:block bg-cover bg-left relative px-5 lg:px-16 py-36 lg:py-20  ">
-        <div className="flex flex-col lg:flex-row items-start sm:items-center lg:items-start gap-5 ">
+        <motion.div 
+          className="flex flex-col lg:flex-row items-start sm:items-center lg:items-start gap-5 "
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           <div className="flex-1 w-full">
-            <h1 className="text-3xl lg:text-5xl 2xl:text-6xl font-bold leading-[50px] lg:leading-[60px] pb-5 text-[#212121] text-center lg:text-left">
+            <motion.h1 
+              className="text-3xl lg:text-5xl 2xl:text-6xl font-bold leading-[50px] lg:leading-[60px] pb-5 text-[#212121] text-center lg:text-left"
+              variants={itemVariants}
+            >
               Nigeria's First{" "}
               <span className="text-[#3E4095] block underline-double">
                 Centralized
               </span>{" "}
               <span className="block">Healthcare Platform</span>
-            </h1>
-            <p className="font-normal pb-10 text-[#727272] text-sm  2xl:text-xl hidden lg:block ">
+            </motion.h1>
+            <motion.p 
+              className="font-normal pb-10 text-[#727272] text-sm  2xl:text-xl hidden lg:block "
+              variants={itemVariants}
+            >
               Connecting Patients, Providers, and Payers through One <br />{" "}
               Secure Healthcare System.
-            </p>
-            <p className="font-normal pb-10 text-[#727272] text-sm text-center lg:hidden ">
+            </motion.p>
+            <motion.p 
+              className="font-normal pb-10 text-[#727272] text-sm text-center lg:hidden "
+              variants={itemVariants}
+            >
               Connecting Patients, Providers, and Payers through One Secure
               Healthcare System.
-            </p>
-            <div className="text-sm flex flex-col lg:flex-row items-center gap-3">
+            </motion.p>
+            <motion.div className="text-sm flex flex-col lg:flex-row items-center gap-3" variants={itemVariants}>
               <a href='#contact-us' className="hidden  group w-full lg:w-auto justify-center border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095] lg:flex items-center gap-1 2xl:text-xl cursor-pointer">
                 Partner with Us as A Healthcare Provider
                 <svg
@@ -63,26 +92,30 @@ const HeroPG = () => {
                   />
                 </svg>
               </Link>
-            </div>
+            </motion.div>
           </div>
-          <div className="flex-1 z-10 ">
-          <img
-  src="https://res.cloudinary.com/drhfrgahv/image/upload/f_auto,q_auto,w_800/v1762777871/hero_img_rfihkx.png"
-  alt="Health platform hero illustration"
-  width="811"
-  height="532"
-  className="rounded-lg w-full h-auto object-contain"
-/>
-
-          </div>
-        </div>
-        <svg
+          <motion.div className="flex-1 z-10 " variants={imageVariants}>
+            <img
+              src="https://res.cloudinary.com/drhfrgahv/image/upload/f_auto,q_auto,w_800/v1762777871/hero_img_rfihkx.png"
+              alt="Health platform hero illustration"
+              width="811"
+              height="532"
+              className="rounded-lg w-full h-auto object-contain"
+            />
+          </motion.div>
+        </motion.div>
+        <motion.svg
           width="177"
           height="190"
           viewBox="0 0 177 232"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="absolute right-0 top-0 -z-20"
+          animate={{ 
+            y: [0, -10, 0],
+            rotate: [0, 2, 0]
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         >
           <path
             opacity="0.05"
@@ -90,21 +123,26 @@ const HeroPG = () => {
             fill="#252E87"
             className="opacity-5"
           />
-        </svg>
-        <svg
+        </motion.svg>
+        <motion.svg
           width="90"
           height="173"
           viewBox="0 0 109 173"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="absolute left-0 bottom-10 -z-10"
+          animate={{ 
+            x: [0, 10, 0],
+            rotate: [0, -2, 0]
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         >
           <path
             d="M87.9482 90.8621L66.2976 78.3621L78.7976 56.7114L35.4963 31.7114C11.5821 17.9045 -18.9978 26.098 -32.8049 50.0127C-46.6118 73.9269 -38.4179 104.507 -14.5037 118.314L28.7976 143.314L41.2976 121.663L62.9482 134.163L44.1982 166.639C40.7464 172.618 33.1015 174.666 27.1229 171.215L-27.0037 139.965C-59.1841 121.385 -72.3869 82.5582 -59.811 48.866L-76.9436 38.963C-97.8689 26.8818 -124.626 34.0513 -136.707 54.9766C-146.065 71.1854 -143.873 90.8931 -132.683 104.569C-121.081 96.1612 -105.164 94.839 -91.9556 102.465C-74.0191 112.82 -67.874 135.754 -78.2296 153.691C-88.5853 171.627 -111.519 177.772 -129.456 167.417C-144.298 158.847 -151.067 141.663 -147.091 125.827C-168.874 104.391 -174.353 70.1808 -158.358 42.4766C-139.373 9.59363 -97.3265 -1.67263 -64.4435 17.3124L-47.3093 27.2076C-24.4202 -0.537643 15.8116 -8.52109 47.9963 10.0608L102.123 41.3108C108.102 44.7625 110.15 52.4075 106.698 58.3861L87.9482 90.8621Z"
             fill="#252E87"
             className="opacity-5"
           />
-        </svg>
+        </motion.svg>
       </div>
 
 
@@ -114,21 +152,33 @@ const HeroPG = () => {
           backgroundImage: `url(${footerImgMobile})`,
         }}
       >
-        <div className="flex flex-col lg:flex-row items-start sm:items-center lg:items-start gap-5 ">
+        <motion.div 
+          className="flex flex-col lg:flex-row items-start sm:items-center lg:items-start gap-5 "
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
           <div className="flex-1 w-full z-40">
-            <h1 className="text-4xl lg:text-5xl font-bold leading-10 lg:leading-[60px] pb-5 text-white text-center lg:text-left ">
+            <motion.h1 
+              className="text-4xl lg:text-5xl font-bold leading-10 lg:leading-[60px] pb-5 text-white text-center lg:text-left "
+              variants={itemVariants}
+            >
               Nigeria's First{" "}
               <span className="text-[#B9BBFF] block sm:inline ">Centralized</span>{" "}
               <span className="block">Healthcare Platform</span>
-            </h1>
+            </motion.h1>
             <div className="sm:max-w-sm mx-auto ">
-              <p className="font-normal pb-5 text-[#DDDDDD] text-sm text-center lg:hidden ">
+              <motion.p 
+                className="font-normal pb-5 text-[#DDDDDD] text-sm text-center lg:hidden "
+                variants={itemVariants}
+              >
                 Connecting Patients, Providers, and Payers through One Secure
                 Healthcare System.
-              </p>
+              </motion.p>
             </div>
 
-            <div className="text-sm flex flex-col lg:flex-row items-center gap-3">
+            <motion.div className="text-sm flex flex-col lg:flex-row items-center gap-3" variants={itemVariants}>
 
               <a href='#contact-us' className="w-full lg:w-auto justify-center   transition-all bg-white rounded-full py-2 px-8 text-[#3E4095] flex sm:hidden items-center gap-1 cursor-pointer">
             
@@ -174,48 +224,51 @@ const HeroPG = () => {
                 </svg>
 
               </Link>
-            </div>
+            </motion.div>
           </div>
-          <div className="flex-1 z-10 ">
-          <img
-  src="https://res.cloudinary.com/drhfrgahv/image/upload/f_auto,q_auto,w_800/v1762777871/hero_img_rfihkx.png"
-  alt="Health platform hero illustration"
-  width="811"
-  height="532"
-  className="rounded-lg w-full h-auto object-contain"
-/>
-
-          </div>
-        </div>
-        <svg
+          <motion.div className="flex-1 z-10 " variants={imageVariants}>
+            <img
+              src="https://res.cloudinary.com/drhfrgahv/image/upload/f_auto,q_auto,w_800/v1762777871/hero_img_rfihkx.png"
+              alt="Health platform hero illustration"
+              width="811"
+              height="532"
+              className="rounded-lg w-full h-auto object-contain"
+            />
+          </motion.div>
+        </motion.div>
+        <motion.svg
           width="50"
           height="100"
           viewBox="0 0 22 87"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="absolute right-0 top-14 z-20"
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 5, repeat: Infinity }}
         >
           <path
             opacity="0.05"
             d="M7.86423 71.2758L16.0937 69.0707L18.2988 77.3003L34.7579 72.8901C43.8478 70.4544 49.2424 61.1109 46.8067 52.0208C44.3711 42.9309 35.0274 37.5364 25.9375 39.972L9.47847 44.3822L11.6836 52.6117L3.45404 54.8168L0.146405 42.4725C-0.462531 40.1999 0.88612 37.8641 3.15862 37.2552L23.7324 31.7425C35.9644 28.4649 48.5024 34.6398 53.5909 45.7893L60.1058 44.0472C68.0597 41.9159 72.7798 33.7404 70.6486 25.7866C68.9977 19.6256 63.7203 15.4048 57.7282 14.8057C56.9585 19.6276 53.4414 23.782 48.421 25.1272C41.6032 26.954 34.5959 22.9083 32.7691 16.0906C30.9422 9.2728 34.988 2.26545 41.8057 0.438638C47.4474 -1.07306 53.2195 1.43682 56.0776 6.21107C66.4923 6.12742 76.0565 13.051 78.8781 23.5815C82.2272 36.0805 74.8099 48.9276 62.3109 52.2767L55.7975 54.0211C56.9677 66.2228 49.1966 77.8416 36.963 81.1196L16.3892 86.6323C14.1167 87.2412 11.7808 85.8926 11.1719 83.6201L7.86423 71.2758Z"
             fill="#FFF"
           />
-        </svg>
+        </motion.svg>
 
-        <svg
+        <motion.svg
           width="50"
           height="100"
           viewBox="0 0 109 173"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="absolute left-0 bottom-0 z-20"
+          animate={{ rotate: [0, 5, 0] }}
+          transition={{ duration: 8, repeat: Infinity }}
         >
           <path
             opacity="0.05"
             d="M87.9482 90.8621L66.2976 78.3621L78.7976 56.7114L35.4963 31.7114C11.5821 17.9045 -18.9978 26.098 -32.8049 50.0127C-46.6118 73.9269 -38.4179 104.507 -14.5037 118.314L28.7976 143.314L41.2976 121.663L62.9482 134.163L44.1982 166.639C40.7464 172.618 33.1015 174.666 27.1229 171.215L-27.0037 139.965C-59.1841 121.385 -72.3869 82.5582 -59.811 48.866L-76.9436 38.963C-97.8689 26.8818 -124.626 34.0513 -136.707 54.9766C-146.065 71.1854 -143.873 90.8931 -132.683 104.569C-121.081 96.1612 -105.164 94.839 -91.9556 102.465C-74.0191 112.82 -67.874 135.754 -78.2296 153.691C-88.5853 171.627 -111.519 177.772 -129.456 167.417C-144.298 158.847 -151.067 141.663 -147.091 125.827C-168.874 104.391 -174.353 70.1808 -158.358 42.4766C-139.373 9.59363 -97.3265 -1.67263 -64.4435 17.3124L-47.3093 27.2076C-24.4202 -0.537643 15.8116 -8.52109 47.9963 10.0608L102.123 41.3108C108.102 44.7625 110.15 52.4075 106.698 58.3861L87.9482 90.8621Z"
             fill="#FFF"
           />
-        </svg>
+        </motion.svg>
 
 
 

@@ -191,7 +191,7 @@ const Privacy_Policy_Page = () => {
           9. Agreement to Terms
         </h2>
         <p>
-          By clicking “Registering On Our Platform”, you acknowledge that you
+          By clicking <b>“Sign Up Now On Our Platform”</b>, you acknowledge that you
           have read, understood, and consent to the terms and conditions
           outlined in this Data Compliance Agreement.
         </p>

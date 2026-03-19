@@ -72,10 +72,10 @@ const Our_Mission_Page = () => {
             <h2 className='text-2xl lg:text-3xl font-semibold pb-5'>Our Mission</h2>
 
             <div className='text-[#464646] mb-10'>
-                <p className='pb-2'>Our mission is to give every Nigerian lifelong, secure access to their complete medical records — empowering individuals to take ownership of their health while enabling hospitals, doctors, and health insurers to work together in perfect harmony.</p>
-                <p className='pb-5'>We envision a connected health ecosystem where every interaction — from the first clinic visit to complex specialist care — happens through a unified digital system that makes healthcare seamless, affordable, transparent, and trustworthy</p>
+                <p className='pb-2'>Our mission is to give every Nigerian lifelong, secure access to their complete medical records empowering individuals to take ownership of their health while enabling hospitals, doctors, and health insurers to work together in perfect harmony.</p>
+                <p className='pb-5'>We envision a connected health ecosystem where every interaction from the first clinic visit to complex specialist care happens through a unified digital system that makes healthcare seamless, affordable, transparent, and trustworthy</p>
                 
-                <p>Through innovation, data-driven insight, and strong partnerships with healthcare providers and policymakers, DocuHealth is building the backbone of a smarter Nigerian healthcare system — one that ensures no medical history is ever lost, no patient is ever left behind, and no decision is made without the right information at the right time.</p>
+                <p>Through innovation, data-driven insight, and strong partnerships with healthcare providers and policymakers, DocuHealth is building the backbone of a smarter Nigerian healthcare system one that ensures no medical history is ever lost, no patient is ever left behind, and no decision is made without the right information at the right time.</p>
             </div>
           </div>
             </div>

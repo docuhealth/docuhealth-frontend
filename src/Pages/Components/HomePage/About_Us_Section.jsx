@@ -1,22 +1,33 @@
 import React from "react";
-
+import { motion } from "framer-motion";
 
 const About_Us_Section = () => {
   return (
     <>
-      <div className="relative py-20 px-5 lg:px-16 bg-[#F6FCFE]" id="about-us">
+      <div className="relative py-20 px-5 lg:px-16 bg-[#F6FCFE] overflow-hidden" id="about-us">
         <div className="flex flex-col-reverse lg:flex-row items-start gap-7 ">
-          <div className="flex-1 z-10">
-          <img
-  src="https://res.cloudinary.com/drhfrgahv/image/upload/f_auto,q_auto,w_811/v1762777850/about_img_jc2jvs.png"
-  alt="about us image"
-  width="811"
-  height="321"
-  className="object-contain w-full h-auto"
-/>
-
-          </div>
-          <div className="flex-1">
+          <motion.div 
+            className="flex-1 z-10"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
+            <img
+              src="https://res.cloudinary.com/drhfrgahv/image/upload/f_auto,q_auto,w_811/v1762777850/about_img_jc2jvs.png"
+              alt="about us image"
+              width="811"
+              height="321"
+              className="object-contain w-full h-auto"
+            />
+          </motion.div>
+          <motion.div 
+            className="flex-1"
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
             <h2 className="font-semibold pb-4 text-2xl lg:text-3xl text-[#3E4095] 2xl:text-4xl">
               About DocuHealth
             </h2>
@@ -28,15 +39,15 @@ const About_Us_Section = () => {
                 medical records.
               </p>
               <p>
-                Powered by the Health Identification Number (HIN)—securely
-                linked to the National Identification Number (NIN)—our system
+                Powered by the Health Identification Number (HIN) securely
+                linked to the National Identification Number (NIN) our system
                 allows real-time sharing of verified medical records,
                 prescriptions, and billing data, with full patient consent. We
                 are bridging the gap between providers, payers, and patients in
                 one intelligent, interoperable platform.
               </p>
             </div>
-          </div>
+          </motion.div>
         </div>
         <svg
           width="89"

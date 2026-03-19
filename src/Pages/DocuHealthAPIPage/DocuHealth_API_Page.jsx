@@ -76,7 +76,7 @@ const DocuHealth_API_Page = () => {
           <h2 className='text-2xl lg:text-3xl font-semibold pb-5'>DocuHealth services® API</h2>
 
           <div className='text-[#464646] mb-10'>
-            <p className='pb-2'>DocuHealth introduces Nigeria’s first medical record interoperability API — a powerful technology that allows hospitals, clinics, and health applications to securely connect, share, and access patient medical records in real time, regardless of the system they use.</p>
+            <p className='pb-2'>DocuHealth introduces Nigeria’s first medical record interoperability API a powerful technology that allows hospitals, clinics, and health applications to securely connect, share, and access patient medical records in real time, regardless of the system they use.</p>
             <p className='pb-5'>This means healthcare providers can now exchange patient information instantly and safely, ensuring continuity of care, reducing paperwork, and making Nigeria’s healthcare system more connected, efficient, and data-driven.</p>
 
             <p className='font-medium pb-2'>

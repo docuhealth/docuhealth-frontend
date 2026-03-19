@@ -1,6 +1,7 @@
 import React from "react";
 import BackgroundTemplate from "../ui/BackgroundTemplate";
 import { FileText, Activity, DollarSign } from "lucide-react";
+import { motion } from "framer-motion";
 
 const Core_Product_Section = () => {
   const core_products = [
@@ -39,22 +40,56 @@ const Core_Product_Section = () => {
     },
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  };
+
   return (
     <>
       <BackgroundTemplate>
         <div  className="py-24 px-5 lg:px-16 text-sm text-[#464646]" id="our-services">
-          <h2 className="font-semibold pb-4 text-2xl lg:text-3xl 2xl:text-4xl text-[#3E4095] text-center">
+          <motion.h2 
+            className="font-semibold pb-4 text-2xl lg:text-3xl 2xl:text-4xl text-[#3E4095] text-center"
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
             DocuHealth Core Product
-          </h2>
-          <p className="text-center pb-8  2xl:text-xl">
+          </motion.h2>
+          <motion.p 
+            className="text-center pb-8  2xl:text-xl"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
             Find out everything you need to know about our core products
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+          </motion.p>
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
             {core_products.map((core_product, index) => {
               const Icon = core_product.icon;
               return (
-                <div key={index} className="p-8 border rounded-2xl flex-1 ">
-
+                <motion.div 
+                  key={index} 
+                  className="p-8 border rounded-2xl flex-1 bg-white shadow-sm hover:shadow-md transition-shadow"
+                  variants={cardVariants}
+                >
                   <div className="w-16 h-16 bg-[#3E4095] rounded-full flex items-center justify-center  mb-4">
                     <Icon className="w-8 h-8 text-white" />
                   </div>
@@ -69,10 +104,10 @@ const Core_Product_Section = () => {
                       <li key={i}>{point}</li>
                     ))}
                   </ul>
-                </div>
+                </motion.div>
               )
             })}
-          </div>
+          </motion.div>
         </div>
       </BackgroundTemplate>
     </>

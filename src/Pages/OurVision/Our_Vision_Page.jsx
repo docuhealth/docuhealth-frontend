@@ -65,11 +65,11 @@ const Our_Vision_Page = () => {
     <h2 className='text-2xl lg:text-3xl font-semibold pb-5'>Our Vision</h2>
 
     <div className='text-[#464646] mb-10'>
-        <p className='pb-2'>Our vision is to build Africa’s most trusted and intelligent health data network — a secure digital backbone that connects every patient, provider, and payer into one unified ecosystem.</p>
+        <p className='pb-2'>Our vision is to build Africa’s most trusted and intelligent health data network a secure digital backbone that connects every patient, provider, and payer into one unified ecosystem.</p>
         <p className='pb-2'>We imagine a continent where every medical journey is seamlessly connected, from the smallest rural clinic to the most advanced tertiary hospital. A future where doctors have instant access to accurate patient histories, insurers process claims transparently, and citizens can trust that their health data is protected, portable, and always within their control.</p>
         <p className='pb-5'>By bridging the gaps between fragmented health systems, we aim to create a transparent, data-driven healthcare infrastructure that ensures continuity of care, accountability in spending, and equitable access for all Africans, regardless of location or income.</p>
         
-        <p>At DocuHealth, we believe that when data flows freely and securely, care becomes smarter, faster, and fairer — powering a new era of connected, affordable, and patient-centered healthcare across the African continent.</p>
+        <p>At DocuHealth, we believe that when data flows freely and securely, care becomes smarter, faster, and fairer powering a new era of connected, affordable, and patient-centered healthcare across the African continent.</p>
     </div>
   </div>
     </div>

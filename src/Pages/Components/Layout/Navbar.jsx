@@ -5,6 +5,7 @@ import { ChevronDown } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 
 import { Logo } from "../ui/Logo";
 import EmergencyModeForm from "../../../EmergencyModeFeature/EmergencyModeForm";
@@ -93,7 +94,10 @@ const Navbar = ({ showPharmacyMode }) => {
 
   return (
     <div className="text-[#0E0E31] relative z-50">
-      <div
+      <motion.div
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
         className={` ${isScrolled
           ? "fixed w-full  bg-white shadow-sm transition-transform"
           : "w-full shadow-sm"
@@ -304,7 +308,7 @@ const Navbar = ({ showPharmacyMode }) => {
             </button>
           </Link>
         </div>
-      </div>
+      </motion.div>
 
       {guestModeForm && (
         <EmergencyModeForm
@@ -405,14 +409,19 @@ const Navbar = ({ showPharmacyMode }) => {
           : "absolute top-0 w-full shadow-sm"
           }`}>
         {/* Top Navigation Bar */}
-        <div className={`lg:hidden flex justify-between items-center px-3 py-4 ${currentPath === '/' ? 'bg-none' : 'bg-white'}  `}>
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className={`lg:hidden flex justify-between items-center px-3 py-4 ${currentPath === '/' ? 'bg-none' : 'bg-white'}  `}
+        >
           <button onClick={() => setIsOpen(true)} aria-label="menu nav">
             <i className={`bx bx-menu-alt-left text-3xl ${currentPath === '/' && !isScrolled ? 'text-white' : 'text-[#3E4095]'} `}></i>
           </button>
           <div className="bg-white p-2 rounded-full">
             <img src={docuhealth_logo} alt="DocuHealth Logo" className="w-6" />
           </div>
-        </div>
+        </motion.div>
 
         <hr className="text-[#BDB5B5]" />
 
@@ -506,10 +515,10 @@ const Navbar = ({ showPharmacyMode }) => {
                                : "text-[#797979]"
                              }`}
                              onClick={() => {
-                              setIsOpen(false);
-                              toggleDropdown("");
-                            }
-                            }
+                               setIsOpen(false);
+                               toggleDropdown("");
+                             }
+                             }
                   >
                     Our Mission
                   </Link>

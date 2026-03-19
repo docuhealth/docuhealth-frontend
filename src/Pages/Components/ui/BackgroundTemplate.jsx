@@ -3,7 +3,7 @@ import React from "react";
 const BackgroundTemplate = ({ children }) => {
   return (
     <>
-      <div className="relative">
+      <div className="relative overflow-hidden">
         <svg
           width="89"
           height="103"

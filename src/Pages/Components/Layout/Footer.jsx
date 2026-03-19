@@ -1,15 +1,21 @@
 import React from 'react'
+import { motion } from 'framer-motion'
 import footerImg from '../../../assets/img/footerImg.png'
 import footerImgMobile from '../../../assets/img/footerImgMobile.png'
 import docuhealth_ndpr_audit from '../../../assets/img/docuhealth_ndpr_audit.jpg'
 import docuhealth_fhir from '../../../assets/img/docuhealth_fhir.jpg'
 import { Link } from 'react-router-dom'
-import { Instagram, Twitter, Linkedin } from "lucide-react";
+import { Instagram, Twitter, Linkedin, Youtube } from "lucide-react";
 import Newsletter from './Newsletter';
 
 const Footer = () => {
   return (
-    <div className='bg-cover bg-center bg-no-repeat '
+    <motion.div 
+      className='bg-cover bg-center bg-no-repeat '
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: true }}
       style={{
         backgroundImage: `url(${window.innerWidth < 768 ? footerImgMobile : footerImg})`,
       }}>
@@ -47,6 +53,11 @@ const Footer = () => {
                 <path d="M18.3362 18.339H15.6707V14.1622C15.6707 13.1662 15.6505 11.8845 14.2817 11.8845C12.892 11.8845 12.6797 12.9683 12.6797 14.0887V18.339H10.0142V9.75H12.5747V10.9207H12.6092C12.967 10.2457 13.837 9.53325 15.1367 9.53325C17.8375 9.53325 18.337 11.3108 18.337 13.6245L18.3362 18.339ZM7.00373 8.57475C6.14573 8.57475 5.45648 7.88025 5.45648 7.026C5.45648 6.1725 6.14648 5.47875 7.00373 5.47875C7.85873 5.47875 8.55173 6.1725 8.55173 7.026C8.55173 7.88025 7.85798 8.57475 7.00373 8.57475ZM8.34023 18.339H5.66723V9.75H8.34023V18.339ZM19.6697 3H4.32923C3.59498 3 3.00098 3.5805 3.00098 4.29675V19.7033C3.00098 20.4202 3.59498 21 4.32923 21H19.6675C20.401 21 21.001 20.4202 21.001 19.7033V4.29675C21.001 3.5805 20.401 3 19.6675 3H19.6697Z" fill="#EFEFEF" fill-opacity="0.8" />
               </svg>
 
+            </a>
+            <a href="https://www.youtube.com/@Docuhealth_ng" target="_blank" rel="noopener noreferrer" aria-label="Visit DocuHealth on YouTube">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#EFEFEF" fill-opacity="0.8" />
+              </svg>
             </a>
           </div>
           <div className="flex gap-10">
@@ -87,11 +98,6 @@ const Footer = () => {
           <h2 className="text-xl 2xl:text-2xl font-semibold mb-3">Contact us</h2>
           <ul className="space-y-2 2xl:text-lg text-sm text-[#EFEFEF] ">
             <li>+2348081988860</li>
-            <li>
-              <a href="mailto:Support@docuhealthservices.com">
-                Support@docuhealthservices.com
-              </a>
-            </li>
             <li>
               <a href="mailto:Info@docuhealth.online">
                 Info@docuhealth.online
@@ -183,6 +189,11 @@ const Footer = () => {
               </svg>
 
             </a>
+            <a href="https://www.youtube.com/@Docuhealth_ng" target="_blank" rel="noopener noreferrer" aria-label="Visit DocuHealth on YouTube">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#EFEFEF" fill-opacity="0.8" />
+              </svg>
+            </a>
           </div>
           <div className="flex flex-col  gap-4">
             <img
@@ -210,7 +221,7 @@ const Footer = () => {
           Designed and  developed by Docuhealth Tech Team.</p>
 
       </div>
-    </div>
+    </motion.div>
   )
 }
 

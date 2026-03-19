@@ -7,6 +7,8 @@ import toast from "react-hot-toast";
 const SubscriptionPlans = () => {
   const { subscriptionPlans, isPending } = useContext(SubscriptionsContext);
 
+  // console.log(subscriptionPlans)
+
 // Add this state to your component
 const [paymentUrl, setPaymentUrl] = useState(null);
 
