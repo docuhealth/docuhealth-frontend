@@ -1,11 +1,13 @@
 import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IdCardContext } from "../../../../../context/PatientContext/IdCardContext";
+import { fetchSubscriptionStatus } from "../../../../../services/authService";
 import toast from "react-hot-toast";
 import Id_Card from "../../Home_Dashboard/Components/IdCard/Id_Card";
 
 
 const UserSubAcctRecords = ({ subAccounts, isPending, setDisplaySubAcctModal, setViewDetailMedicalRecord, setSelectedSubAcct }) => {
+  const navigate = useNavigate();
   const [openPopover, setOpenPopover] = useState(null);
   const paymentStatus = true; // example placeholder
 
@@ -75,8 +77,9 @@ const UserSubAcctRecords = ({ subAccounts, isPending, setDisplaySubAcctModal, se
               </div>
               <p className=" w-full py-6 ">
                 HIN:{" "}
-                {subaccount.hin.slice(0, 4) +
-                  "*".repeat(subaccount.hin.length - 5)}
+                {subaccount.hin}
+                {/* {subaccount.hin.slice(0, 4) +
+                  "*".repeat(subaccount.hin.length - 5)} */}
               </p>
               <p className=" w-full py-6 ">DOB: {subaccount.dob}</p>
               <p className=" w-full py-6 ">Sex: {subaccount.gender}</p>
@@ -127,6 +130,14 @@ const UserSubAcctRecords = ({ subAccounts, isPending, setDisplaySubAcctModal, se
                         }`}
                       onClick={() => {
                         if (isCreatingID) return; // Prevent double clicks
+                        
+                        const is_subscribed = fetchSubscriptionStatus();
+                        if (!is_subscribed) {
+                          toast.error("Please subscribe to access feature");
+                          navigate("/user-subscriptions-dashboard");
+                          return;
+                        }
+
                         togglePopover();
                         handleSelection(subaccount);
                       }}

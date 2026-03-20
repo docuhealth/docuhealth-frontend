@@ -392,18 +392,18 @@ const MedicalRecordsDetail = ({
                       </td>
                       <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
                       <td className="py-3 text-gray-600">{drug.quantity}</td>
-                      <td className="py-3 text-gray-600">
-                        {/* Handling nested frequency object */}
-                        {typeof drug.frequency === 'object'
-                          ? `${drug.frequency.value || ''} ${drug.frequency.unit || ''}`
-                          : drug.frequency || "N/A"}
-                      </td>
-                      <td className="py-3 text-gray-600">
-                        {/* Handling nested duration object */}
-                        {typeof drug.duration === 'object'
-                          ? `${drug.duration.value || ''} ${drug.duration.unit || ''}`
-                          : drug.duration || "N/A"}
-                      </td>
+                    <td className="py-3 text-gray-600">
+                               {/* Handling nested frequency object */}
+                               {typeof drug.frequency === 'object'
+                                 ? `${drug.frequency.value || ''} ( ${drug.frequency.rate || ''} )`
+                                 : drug.frequency || "N/A"}
+                             </td>
+                             <td className="py-3 text-gray-600">
+                               {/* Handling nested duration object */}
+                               {typeof drug.duration === 'object'
+                                 ? `${drug.duration.value || ''} ( ${drug.duration.rate || ''} )`
+                                 : drug.duration || "N/A"}
+                             </td>
                     </tr>
                   ))}
                 </tbody>

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react"
+import { useNavigate } from "react-router-dom";
 import { AppContext } from "../../context/PatientContext/AppContext";
 import { IdCardContext } from "../../context/PatientContext/IdCardContext";
 import toast from "react-hot-toast";
@@ -11,6 +12,7 @@ import Id_Card from "../../Components/Dashboard/Patient_Dashboard_Components/Hom
 import { fetchSubscriptionStatus } from "../../services/authService";
 
 const Patient_Home_Dashboard = () => {
+    const navigate = useNavigate();
   const options = ["Latest", "Oldest", "A-Z", "Z-A"];
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState("Latest");
@@ -105,6 +107,7 @@ useEffect(() => {
                   const is_subscribed = fetchSubscriptionStatus();
                   if (!is_subscribed) {
                     toast.error("Please subscribe to access feature");
+                    navigate("/user-subscriptions-dashboard");
                     return;
                   }
                   if(profile.id_card_generated){
@@ -170,6 +173,7 @@ useEffect(() => {
                   const is_subscribed = fetchSubscriptionStatus();
                   if (!is_subscribed) {
                     toast.error("Please subscribe to access feature");
+                    navigate("/user-subscriptions-dashboard");
                     return;
                   }
                   if(profile.id_card_generated){

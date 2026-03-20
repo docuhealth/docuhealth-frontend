@@ -11,7 +11,7 @@ import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SearchBar from "../../../../SearchBar/SearchBar";
 
-const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals, setSelectedPatientForVitals, setSelectedPatientForCASE }) => {
+const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals, setVitalSignsHistory, setSelectedPatientForVitals, setSelectedPatientForCASE }) => {
   const {
     appointments,
     count,
@@ -380,6 +380,16 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                     <p
                       className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                       onClick={() => {
+                        setOpenPopover(null);
+                        setVitalSignsHistory(true);
+                        setSelectedPatientForVitals(appointment);
+                      }}
+                    >
+                      Vital Signs History
+                    </p>
+                    <p
+                      className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                      onClick={() => {
                         setUpdateVitals(true);
                         setSelectedPatientForVitals(appointment);
                         setOpenPopover(null);
@@ -472,6 +482,16 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                         }}
                       >
                         CASE Note History
+                      </button>
+                      <button
+                        className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"
+                        onClick={() => {
+                          setOpenPopover(null);
+                          setVitalSignsHistory(true);
+                          setSelectedPatientForVitals(appointment);
+                        }}
+                      >
+                        Vital Signs History
                       </button>
                       <button
                         className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"

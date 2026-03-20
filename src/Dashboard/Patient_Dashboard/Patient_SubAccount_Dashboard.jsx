@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import DynamicDate from "../../Components/DynamicDate/DynamicDate";
 import UserSubAcctNoticeDisplay from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserSubAcctNoticeDisplay";
 import UserSubAcctOverlay from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserCreateSubAcctOverlay";
@@ -13,6 +14,7 @@ import { fetchSubscriptionStatus } from "../../services/authService";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Patient_SubAccount_Dashboard = () => {
+    const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const [noticeDisplay, setNoticeDisplay] = useState(false);
@@ -73,7 +75,7 @@ const Patient_SubAccount_Dashboard = () => {
       subAcctUpgradeData.child_password &&
       subAcctUpgradeData.confirm_password &&
       subAcctUpgradeData.child_password ===
-        subAcctUpgradeData.confirm_password &&
+      subAcctUpgradeData.confirm_password &&
       isPasswordValid
     ) {
       setSubAcctUpgradeStep(3);
@@ -125,8 +127,13 @@ const Patient_SubAccount_Dashboard = () => {
   });
 
   const handleSubAcctUpgrade = async () => {
+
+    const is_subscribed = fetchSubscriptionStatus();
+
+
     setSubAcctUpgradeLoading(true);
-    // console.log(subAcctUpgradeData);
+
+
 
     const payload = {
       email: subAcctUpgradeData.child_email,
@@ -148,6 +155,11 @@ const Patient_SubAccount_Dashboard = () => {
       return;
     }
 
+    if (!is_subscribed) {
+      toast.error("Please subscribe to access feature");
+      navigate("/user-subscriptions-dashboard");
+      return;
+    }
     upgradeSubAcctMutation.mutate(payload);
   };
 
@@ -302,6 +314,7 @@ const Patient_SubAccount_Dashboard = () => {
 
     if (!is_subscribed) {
       toast.error("Please subscribe to access feature");
+      navigate("/user-subscriptions-dashboard");
       return;
     }
 

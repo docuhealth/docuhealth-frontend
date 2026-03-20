@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IdCardContext } from "../../../../../context/PatientContext/IdCardContext";
+import { fetchSubscriptionStatus } from "../../../../../services/authService";
 import { MoreVertical, User, Calendar, History, TrendingUp, CreditCard } from "lucide-react";
 import Id_Card from "../../Home_Dashboard/Components/IdCard/Id_Card";
 
@@ -11,6 +12,7 @@ const UserSubAcctRecordsMobile = ({
   setViewDetailMedicalRecord,
   setSelectedSubAcct
 }) => {
+  const navigate = useNavigate();
   const [openPopover, setOpenPopover] = useState(null);
 
   console.log(subAccounts)
@@ -68,7 +70,8 @@ const UserSubAcctRecordsMobile = ({
                     {subaccount.firstname} {subaccount.lastname}
                   </h3>
                   <p className="text-[11px] font-mono text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded mt-1 inline-block">
-                    HIN: {subaccount.hin.slice(0, 4)}••••
+                    {/* HIN: {subaccount.hin.slice(0, 4)}•••• */}
+                    HIN: {subaccount.hin}
                   </p>
                 </div>
               </div>
@@ -118,6 +121,14 @@ const UserSubAcctRecordsMobile = ({
                         }`}
                         onClick={() => {
                           if (isCreatingID) return;
+                          
+                          const is_subscribed = fetchSubscriptionStatus();
+                          if (!is_subscribed) {
+                            toast.error("Please subscribe to access feature");
+                            navigate("/user-subscriptions-dashboard");
+                            return;
+                          }
+
                           setOpenPopover(null);
                           handleSelection(subaccount);
                         }}

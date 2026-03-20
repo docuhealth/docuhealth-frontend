@@ -116,7 +116,7 @@ const IDCardUI = ({ selectedProfile, idCardData }) => {
                         <p style={{ color: "#313131" }} className="text-[10px] font-medium">
                             This card belongs to the registered patient. If found,
                             please return it to the nearest hospital or contact
-                            support@docuhealthservices.com
+                            info@docuhealth.online
                         </p>
                         <p style={{ color: "#313131" }} className="text-[11px] pb-2 pt-6">
                             www.docuhealthservices.net

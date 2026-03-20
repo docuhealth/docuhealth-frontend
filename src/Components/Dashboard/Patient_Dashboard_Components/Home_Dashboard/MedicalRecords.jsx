@@ -234,6 +234,7 @@ const MedicalRecords = ({
                     console.log("no profile");
                     toast.error("We couldn't find a profile. Try again");
                   }
+                 
                 }}
 
 

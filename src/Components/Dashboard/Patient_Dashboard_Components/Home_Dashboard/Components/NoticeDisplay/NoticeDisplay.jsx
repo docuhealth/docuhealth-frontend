@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AppContext } from "../../../../../../context/PatientContext/AppContext";
 import { fetchSubscriptionStatus } from "../../../../../../services/authService";
@@ -8,6 +9,7 @@ const NoticeDisplay = ({
   closeNoticeMessage,
   handleSelection,
 }) => {
+  const navigate = useNavigate();
   const { profile } = useContext(AppContext);
 
   const noticeMessage = [
@@ -55,6 +57,7 @@ const NoticeDisplay = ({
                       const is_subscribed = fetchSubscriptionStatus();
                       if (!is_subscribed) {
                         toast.error("Please subscribe to access feature");
+                        navigate("/user-subscriptions-dashboard");
                         closeNoticeMessage();
                         return;
                       }

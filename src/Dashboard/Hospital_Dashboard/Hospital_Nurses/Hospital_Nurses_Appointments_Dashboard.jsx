@@ -6,6 +6,7 @@ import AddNewCaseNote from '../../../Components/Dashboard/Hospital_Dashboard_Com
 
 import CaseNote from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/CaseNote'
 import CaseNoteDetail from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/CaseNoteDetail'
+import VitalSignsHistory from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/VitalSignsHistory'
 import { NursesAppointmentsListContext } from '../../../context/HospitalContext/Nurses/NursesAppointmentsListContext'
 
 const Hospital_Nurses_Appointments_Dashboard = () => {
@@ -13,6 +14,7 @@ const Hospital_Nurses_Appointments_Dashboard = () => {
   const [updateVitals, setUpdateVitals] = useState(false)
   const [newCaseNote, setNewCaseNote] = useState(false);
   const [caseNoteHistory, setCaseNoteHistory] = useState(false);
+  const [vitalSignsHistory, setVitalSignsHistory] = useState(false);
   const [caseNoteDetail, setCaseNoteDetail] = useState(false);
   const [selectedPatientForVitals, setSelectedPatientForVitals] = useState(null)
   const [selectedPatientForCASE, setSelectedPatientForCASE] = useState(null)
@@ -42,6 +44,11 @@ const Hospital_Nurses_Appointments_Dashboard = () => {
             setCaseNoteHistory={setCaseNoteHistory}
             setCaseNoteDetail={setCaseNoteDetail}
           />
+        ) : vitalSignsHistory ? (
+            <VitalSignsHistory
+              selected={selectedPatientForVitals}
+              setVitalSignsHistory={setVitalSignsHistory}
+            />
         ) : caseNoteDetail ? (
           <CaseNoteDetail caseNoteDetail={caseNoteDetail} setCaseNoteDetail={setCaseNoteDetail} />
         ) : (
@@ -52,7 +59,7 @@ const Hospital_Nurses_Appointments_Dashboard = () => {
                   {appointmentType === 'upcoming' ? 'Upcoming' : 'Past'} Appointments List
                 </h2>
                 <div>
-                  <AppointmentsList setNewCaseNote={setNewCaseNote} setCaseNoteHistory={setCaseNoteHistory} setUpdateVitals={setUpdateVitals} setSelectedPatientForVitals={setSelectedPatientForVitals} setSelectedPatientForCASE={setSelectedPatientForCASE} />
+                  <AppointmentsList setNewCaseNote={setNewCaseNote} setCaseNoteHistory={setCaseNoteHistory} setVitalSignsHistory={setVitalSignsHistory} setUpdateVitals={setUpdateVitals} setSelectedPatientForVitals={setSelectedPatientForVitals} setSelectedPatientForCASE={setSelectedPatientForCASE} />
                 </div>
               </div>
             </div>

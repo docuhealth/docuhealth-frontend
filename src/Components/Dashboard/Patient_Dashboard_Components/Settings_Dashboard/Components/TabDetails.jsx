@@ -602,6 +602,8 @@ const IDCardTab = () => {
   const cardRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
 
+  const navigate = useNavigate();
+  
   const isIdCardGenerated = profile?.id_card_generated;
 
   const handleDownload = async () => {
@@ -717,7 +719,7 @@ const IDCardTab = () => {
             Your identity card hasn't been generated yet. It provides quick access to your medical history across our network.
           </p>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/user-home-dashboard")}
             className="px-8 py-3 bg-[#3E4095] text-white rounded-full text-sm font-medium hover:bg-[#2e3075] transition-colors"
           >
             Go Generate Now
