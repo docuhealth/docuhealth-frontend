@@ -427,7 +427,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                         </>
                     ) : (
                         <>
-                            <div className="bg-white rounded-lg shadow-lg px-4 py-6 max-w-5xl w-full relative text-sm">
+                            <div className="bg-white rounded-lg shadow-lg p-6 max-w-5xl w-full relative text-sm max-h-3/5 overflow-scroll">
                                 <div className="flex justify-between items-center border-b pb-4">
                                     <h2 className="font-medium">Choose a preferred {selected}</h2>
                                     {/* Close Button */}
