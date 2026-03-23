@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PatientMedicalRecordDetail from "./PatientMedicalRecordDetail";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import {
@@ -390,10 +391,12 @@ const PatientMedicalRecord = ({
   currentPage,
   totalPages,
   setCurrentPage,
-  setselectedPatientDetails,
+  setSelectedMedicalRecord,
   setViewDetailMedicalRecord,
   medloading,
 }) => {
+
+  console.log(patientMedRecords)
   if (medloading) {
     return (
       <div className="flex justify-center items-center h-full text-sm pt-10">
@@ -472,14 +475,11 @@ const PatientMedicalRecord = ({
 
   return (
     <>
-      {/* {Array.isArray(patientMedRecords) && patientMedRecords.length > 0 ? (
+      {Array.isArray(patientMedRecords) && patientMedRecords.length > 0 ? (
         <>
-          <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="mt-5 -4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {patientMedRecords.map((record) => (
-              <div
-                key={record.id}
-                className="bg-[#FAFEFF] border rounded-xl p-5"
-              >
+              <div key={record.id} className="bg-[#FAFEFF] border rounded-lg p-4">
                 <div className="flex justify-between items-center ">
                   <div className="flex items-center gap-1">
                     <svg
@@ -496,9 +496,11 @@ const PatientMedicalRecord = ({
                     </svg>
                     <p className="font-medium">
                       {" "}
-                      {record?.doctor_info
-                        ? `${record.doctor_info.firstname} ${record.doctor_info.lastname}`
-                        : "NIL"}
+                      {record?.staff_info
+                        ? `Dr. ${record.staff_info.firstname} ${record.staff_info.lastname}`
+                        : record?.doctor_info
+                          ? `Dr. ${record.doctor_info.firstname} ${record.doctor_info.lastname}`
+                          : "NIL"}
                     </p>
                   </div>
                   <div className="bg-[#D2F5DB] px-2 rounded-full">
@@ -539,12 +541,9 @@ const PatientMedicalRecord = ({
                       />
                     </svg>
                   </div>
-                  <p className="">
-                    {" "}
-                    {record?.hospital_info
-                      ? `${record.hospital_info.name}`
-                      : "NIL"}
-                  </p>
+                  <p className=""> {record?.hospital_info
+                    ? `${record.hospital_info.name}`
+                    : "NIL"}</p>
                 </div>
                 <div className="flex items-center gap-1 pb-3 border-b ">
                   <div>
@@ -564,20 +563,23 @@ const PatientMedicalRecord = ({
                   <p className="">{formatFullDateTime(record.created_at)}</p>
                 </div>
                 <div className="py-5">
-                  <p>{truncateWords(record.chief_complaint, 20)}</p>
+                  <p>{truncateWords(record.chief_complaint, 100)}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3 ">
                   <button
-                    className="bg-[#1B2B40] py-2 text-white rounded-full cursor-pointer"
+                    className="bg-[#1B2B40] py-2 text-white rounded-full "
                     onClick={() => {
-                      setselectedPatientDetails(record); // ✅ single record
+                      setSelectedMedicalRecord(record);
                       setViewDetailMedicalRecord(true);
-                      console.log("Selected Medical Record:", record); // logs the record immediately
                     }}
                   >
                     <p>View details</p>
                   </button>
-                  <button className="flex justify-center items-center gap-1 py-2 border border-[#1B2B40] rounded-full cursor-pointer">
+                  <button className="flex justify-center items-center gap-1 py-2 border border-[#1B2B40] rounded-full"
+                    onClick={() => {
+                      toast.success("Coming soon !")
+                    }}
+                  >
                     <svg
                       width="12"
                       height="12"
@@ -586,29 +588,30 @@ const PatientMedicalRecord = ({
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M6.5 5H9L6 8L3 5H5.5V1.5H6.5V5ZM2 9.5H10V6H11V10C11 10.2761 10.7761 10.5 10.5 10.5H1.5C1.22386 10.5 1 10.2761 1 10V6H2V9.5Z"
+                        d="M6.5 7H5.5C3.77101 7 2.26977 7.9751 1.5162 9.40535C1.50547 9.27165 1.5 9.13645 1.5 9C1.5 6.2386 3.73857 4 6.5 4V1.25L11.75 5.5L6.5 9.75V7ZM5.5 6H7.5V7.6539L10.1607 5.5L7.5 3.34612V5H6.5C5.28975 5 4.20505 5.53745 3.47156 6.38675C4.10436 6.1357 4.79021 6 5.5 6Z"
                         fill="#1B2B40"
                       />
                     </svg>
 
-                    <p>Download</p>
+                    <p>Share</p>
                   </button>
                 </div>
               </div>
             ))}
           </div>
 
-          <Pagination2
-            count={count}
-            currentPage={currentPage}
-            totalPages={totalPages}
-          setCurrentPage={setCurrentPage}
-          />
+          <div className="mt-4">
+            <Pagination2
+              count={count}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              setCurrentPage={setCurrentPage}
+            />
+          </div>
         </>
       ) : (
         <p className="text-center">No medical records found.</p>
-      )} */}
-      <p className="text-center">Coming Soon !!!</p>
+      )}
     </>
   );
 };
@@ -1069,443 +1072,443 @@ const PatientSOAPNotes = ({
             </div>
           </div>
 
-               {/* 1. Extended Clinical History */}
-               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-                 <p className="font-medium mb-4 text-[#1B2B40]">
-                   Clinical History Details
-                 </p>
-     
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                   <div className="text-[12px] pb-2">
-                     <h4 className="text-gray-400 font-normal mb-1">
-                       History of Complaint:
-                     </h4>
-                     <p className="font-medium">
-                       {selectedPatientDetails?.history_of_complain || "NIL"}
-                     </p>
-                   </div>
-     
-                   <div className="text-[12px] pb-2">
-                     <h4 className="text-gray-400 font-normal mb-1">
-                       Past Medical History:
-                     </h4>
-                     <p className="font-medium">
-                       {selectedPatientDetails?.past_med_history || "NIL"}
-                     </p>
-                   </div>
-     
-                   <div className="text-[12px] pb-2">
-                     <h4 className="text-gray-400 font-normal mb-1">
-                       Family History:
-                     </h4>
-                     <p className="font-medium">
-                       {selectedPatientDetails?.family_history || "NIL"}
-                     </p>
-                   </div>
-     
-                   <div className="text-[12px] pb-2">
-                     <h4 className="text-gray-400 font-normal mb-1">
-                       Social History:
-                     </h4>
-                     <p className="font-medium">
-                       {selectedPatientDetails?.social_history || "NIL"}
-                     </p>
-                   </div>
-                 </div>
-     
-                 <div className="text-[12px] pt-2 border-t mt-2">
-                   <h4 className="text-gray-400 font-normal mb-1">
-                     Other Relevant History:
-                   </h4>
-                   <p className="font-medium">
-                     {selectedPatientDetails?.other_history || "NIL"}
-                   </p>
-                 </div>
-               </div>
-     
-               {/* 2. Physical Examinations & Review */}
-               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-                 <p className="font-medium mb-4">Examination Findings</p>
-     
-                 <div className="text-[12px] pb-3">
-                   <h4 className="text-gray-400 font-normal mb-1">
-                     General Examination:
-                   </h4>
+          {/* 1. Extended Clinical History */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <p className="font-medium mb-4 text-[#1B2B40]">
+              Clinical History Details
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="text-[12px] pb-2">
+                <h4 className="text-gray-400 font-normal mb-1">
+                  History of Complaint:
+                </h4>
+                <p className="font-medium">
+                  {selectedPatientDetails?.history_of_complain || "NIL"}
+                </p>
+              </div>
+
+              <div className="text-[12px] pb-2">
+                <h4 className="text-gray-400 font-normal mb-1">
+                  Past Medical History:
+                </h4>
+                <p className="font-medium">
+                  {selectedPatientDetails?.past_med_history || "NIL"}
+                </p>
+              </div>
+
+              <div className="text-[12px] pb-2">
+                <h4 className="text-gray-400 font-normal mb-1">
+                  Family History:
+                </h4>
+                <p className="font-medium">
+                  {selectedPatientDetails?.family_history || "NIL"}
+                </p>
+              </div>
+
+              <div className="text-[12px] pb-2">
+                <h4 className="text-gray-400 font-normal mb-1">
+                  Social History:
+                </h4>
+                <p className="font-medium">
+                  {selectedPatientDetails?.social_history || "NIL"}
+                </p>
+              </div>
+            </div>
+
+            <div className="text-[12px] pt-2 border-t mt-2">
+              <h4 className="text-gray-400 font-normal mb-1">
+                Other Relevant History:
+              </h4>
+              <p className="font-medium">
+                {selectedPatientDetails?.other_history || "NIL"}
+              </p>
+            </div>
+          </div>
+
+          {/* 2. Physical Examinations & Review */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <p className="font-medium mb-4">Examination Findings</p>
+
+            <div className="text-[12px] pb-3">
+              <h4 className="text-gray-400 font-normal mb-1">
+                General Examination:
+              </h4>
               <ul className="list-disc list-outside pl-5 font-medium">
-       {selectedPatientDetails?.general_exam?.map((item, index) => (
-         <li key={index}>
-           {/* If item is an object, use item.note. If it's a string, use item */}
-           {typeof item === 'object' ? item.note : item}
-         </li>
-       )) || <li>NIL</li>}
-     </ul>
-                 </div>
-     
-                 <div className="text-[12px] pb-3">
-                   <h4 className="text-gray-400 font-normal mb-1">
-                     Systemic Examination:
-                   </h4>
+                {selectedPatientDetails?.general_exam?.map((item, index) => (
+                  <li key={index}>
+                    {/* If item is an object, use item.note. If it's a string, use item */}
+                    {typeof item === 'object' ? item.note : item}
+                  </li>
+                )) || <li>NIL</li>}
+              </ul>
+            </div>
+
+            <div className="text-[12px] pb-3">
+              <h4 className="text-gray-400 font-normal mb-1">
+                Systemic Examination:
+              </h4>
               <ul className="list-disc list-outside pl-5 font-medium">
-       {selectedPatientDetails?.systemic_exam?.map((item, index) => (
-         <li key={index}>
-           {typeof item === 'object' ? item.note : item}
-         </li>
-       )) || <li>NIL</li>}
-     </ul>
-                 </div>
-     
-                 <div className="text-[12px]">
-                   <h4 className="text-gray-400 font-normal mb-1">
-                     Review of Systems:
-                   </h4>
-                   <p className="font-medium">
-                     {selectedPatientDetails?.review || "NIL"}
-                   </p>
-                 </div>
-               </div>
-     
-               {/* 3. Diagnosis & Testing */}
-               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-                 <p className="font-medium mb-4">Diagnosis & Investigations</p>
-     
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                   <div className="text-[12px]">
-                     <h4 className="text-gray-400 font-normal mb-1">
-                       Primary Diagnosis:
-                     </h4>
-                     <p className="font-medium text-[#3E4095]">
-                       {selectedPatientDetails?.primary_diagnosis || "NIL"}
-                     </p>
-                   </div>
-                   <div className="text-[12px]">
-                     <h4 className="text-gray-400 font-normal mb-1">
-                       Differential Diagnosis:
-                     </h4>
-                     <p className="font-medium">
-                       {selectedPatientDetails?.differential_diagnosis || "NIL"}
-                     </p>
-                   </div>
-                 </div>
-     
-                 <div className="text-[12px] pb-3">
-                   <h4 className="text-gray-400 font-normal mb-1">
-                     Investigations Required:
-                   </h4>
+                {selectedPatientDetails?.systemic_exam?.map((item, index) => (
+                  <li key={index}>
+                    {typeof item === 'object' ? item.note : item}
+                  </li>
+                )) || <li>NIL</li>}
+              </ul>
+            </div>
+
+            <div className="text-[12px]">
+              <h4 className="text-gray-400 font-normal mb-1">
+                Review of Systems:
+              </h4>
+              <p className="font-medium">
+                {selectedPatientDetails?.review || "NIL"}
+              </p>
+            </div>
+          </div>
+
+          {/* 3. Diagnosis & Testing */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <p className="font-medium mb-4">Diagnosis & Investigations</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="text-[12px]">
+                <h4 className="text-gray-400 font-normal mb-1">
+                  Primary Diagnosis:
+                </h4>
+                <p className="font-medium text-[#3E4095]">
+                  {selectedPatientDetails?.primary_diagnosis || "NIL"}
+                </p>
+              </div>
+              <div className="text-[12px]">
+                <h4 className="text-gray-400 font-normal mb-1">
+                  Differential Diagnosis:
+                </h4>
+                <p className="font-medium">
+                  {selectedPatientDetails?.differential_diagnosis || "NIL"}
+                </p>
+              </div>
+            </div>
+
+            <div className="text-[12px] pb-3">
+              <h4 className="text-gray-400 font-normal mb-1">
+                Investigations Required:
+              </h4>
+              <ul className="list-disc list-outside pl-5 font-medium">
+                {selectedPatientDetails?.investigations?.map((item, index) => (
+                  <li key={index}>
+                    {typeof item === 'object' ? item.note : item}
+                  </li>
+                )) || <li>NIL</li>}
+              </ul>
+            </div>
+
+            <div className="text-[12px]">
+              <h4 className="text-gray-400 font-normal mb-1">Bedside Tests:</h4>
+              <ul className="list-disc list-outside pl-5 font-medium">
+                {selectedPatientDetails?.bedside_tests?.map((item, index) => (
+                  <li key={index}>
+                    {typeof item === 'object' ? item.note : item}
+                  </li>
+                )) || <li>NIL</li>}
+              </ul>
+            </div>
+          </div>
+
+          {/* 4. Drug History & Allergies */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <p className="font-medium mb-4">Drug History / Allergies</p>
+            <div className="text-[12px]">
+              <h4 className="text-gray-400 font-normal mb-1">
+                Known Allergies & Sensitivities:
+              </h4>
+              <p className="font-medium text-red-600 italic">
+                {/* Logic to handle the character array in your payload */}
+                {Array.isArray(selectedPatientDetails?.drug_history_allergies)
+                  ? selectedPatientDetails.drug_history_allergies
+                    .join("")
+                    .replace(/['\[\]]/g, "")
+                  : "NIL"}
+              </p>
+            </div>
+          </div>
+
+          {/* 5. Patient Education & Problems List */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <div className="text-[12px] pb-3">
+              <h4 className="text-gray-400 font-normal mb-1">
+                Active Problems List:
+              </h4>
+              <ul className="list-disc list-outside pl-5 font-medium">
+                {selectedPatientDetails?.problems_list?.map((item, index) => (
+                  <li key={index}>
+                    {/* ADD THE CHECK HERE TOO */}
+                    {typeof item === 'object' ? item.note : item}
+                  </li>
+                )) || <li>NIL</li>}
+              </ul>
+            </div>
+
+            <div className="text-[12px] pt-3 border-t">
+              <h4 className="text-gray-400 font-normal mb-1">
+                Patient Education/Counselling:
+              </h4>
+              <p className="font-medium">
+                {selectedPatientDetails?.patient_education || "NIL"}
+              </p>
+            </div>
+
+            {selectedPatientDetails?.additional_notes?.length > 0 ? (
+              <div className="text-[12px] pt-3 mt-3 border-t">
+                <h4 className="text-gray-400 font-normal mb-1">
+                  Additional Notes:
+                </h4>
                 <ul className="list-disc list-outside pl-5 font-medium">
-       {selectedPatientDetails?.investigations?.map((item, index) => (
-         <li key={index}>
-           {typeof item === 'object' ? item.note : item}
-         </li>
-       )) || <li>NIL</li>}
-     </ul>
-                 </div>
-     
-                 <div className="text-[12px]">
-                   <h4 className="text-gray-400 font-normal mb-1">Bedside Tests:</h4>
-                   <ul className="list-disc list-outside pl-5 font-medium">
-                     {selectedPatientDetails?.bedside_tests?.map((item, index) => (
-                   <li key={index}>
-           {typeof item === 'object' ? item.note : item}
-         </li>
-                     )) || <li>NIL</li>}
-                   </ul>
-                 </div>
-               </div>
-     
-               {/* 4. Drug History & Allergies */}
-               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-                 <p className="font-medium mb-4">Drug History / Allergies</p>
-                 <div className="text-[12px]">
-                   <h4 className="text-gray-400 font-normal mb-1">
-                     Known Allergies & Sensitivities:
-                   </h4>
-                   <p className="font-medium text-red-600 italic">
-                     {/* Logic to handle the character array in your payload */}
-                     {Array.isArray(selectedPatientDetails?.drug_history_allergies)
-                       ? selectedPatientDetails.drug_history_allergies
-                         .join("")
-                         .replace(/['\[\]]/g, "")
-                       : "NIL"}
-                   </p>
-                 </div>
-               </div>
-     
-               {/* 5. Patient Education & Problems List */}
-               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-                 <div className="text-[12px] pb-3">
-                   <h4 className="text-gray-400 font-normal mb-1">
-                     Active Problems List:
-                   </h4>
-                   <ul className="list-disc list-outside pl-5 font-medium">
-                 {selectedPatientDetails?.problems_list?.map((item, index) => (
-           <li key={index}>
-             {/* ADD THE CHECK HERE TOO */}
-             {typeof item === 'object' ? item.note : item}
-           </li>
-         )) || <li>NIL</li>}
-                   </ul>
-                 </div>
-     
-                 <div className="text-[12px] pt-3 border-t">
-                   <h4 className="text-gray-400 font-normal mb-1">
-                     Patient Education/Counselling:
-                   </h4>
-                   <p className="font-medium">
-                     {selectedPatientDetails?.patient_education || "NIL"}
-                   </p>
-                 </div>
-     
-                 {selectedPatientDetails?.additional_notes?.length > 0 ? (
-                   <div className="text-[12px] pt-3 mt-3 border-t">
-                     <h4 className="text-gray-400 font-normal mb-1">
-                       Additional Notes:
-                     </h4>
-                     <ul className="list-disc list-outside pl-5 font-medium">
-                       {selectedPatientDetails.additional_notes.map(
-                         (note, index) => (
-                          <li key={index}>
-             {/* ADD THE CHECK HERE TOO */}
-             {typeof note === 'object' ? note.note : note}
-           </li>
-                         ),
-                       )}
-                     </ul>
-                   </div>
-                 ) : (
-                   <>
-                     <p className="text-sm pt-4 font-medium">
-                       No additional notes...
-                     </p>
-                   </>
-                 )}
-               </div>
-     
-               {/* 6. Uploaded Documents / Images */}
-               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-                 <p className="font-medium mb-4 text-[#1B2B40]">
-                   Uploaded Documents / Images
-                 </p>
-                 <div>
-                   {selectedPatientDetails?.investigation_docs?.length > 0 ? (
-                     selectedPatientDetails.investigation_docs.map(
-                       (attachment, index) => {
-                         // Correctly mapping your payload fields
-                         const fileName =
-                           attachment.filename || `Document_${index + 1}`;
-                         const fileUrl = attachment.file || attachment.url; // Supporting both common keys
-                         const fileSizeMB = attachment.size
-                           ? (attachment.size / (1024 * 1024)).toFixed(1) + " MB"
-                           : "0.5 MB"; // Fallback placeholder if size is missing
-                         const fileDate = formatFullDateTime(
-                           selectedPatientDetails.created_at,
-                         );
-     
-                         const isImage =
-                           /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName) ||
-                           attachment.file_type?.includes("image");
-                         const isPdf =
-                           /\.pdf$/i.test(fileName) ||
-                           attachment.file_type?.includes("pdf");
-                         const Icon = isImage ? Image : isPdf ? FileText : FileText;
-     
-                         return (
-                           <div
-                             key={index}
-                             className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 sm:items-center bg-white border rounded-lg px-4 py-3 mb-3 "
-                           >
-                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-[12px]">
-                               <div className="p-2 bg-[#3E4095]/10 rounded-md">
-                                 <Icon className="text-[#3E4095]" size={20} />
-                               </div>
-                               <div>
-                                 <p className="font-medium text-gray-800">
-                                   {fileName}
-                                 </p>
-                                 <p className="text-gray-500">
-                                   {fileDate} • {fileSizeMB}
-                                 </p>
-                               </div>
-                             </div>
-     
-                             <div className="flex flex-col sm:flex-row gap-3 text-[12px] w-full sm:w-auto">
-                               <a
-                                 href={fileUrl}
-                                 target="_blank"
-                                 rel="noopener noreferrer"
-                                 className="flex items-center justify-center gap-1 border border-[#3E4095] text-[#3E4095] rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28"
-                               >
-                                 <Eye className="w-3 h-3" />
-                                 View
-                               </a>
-                               <a
-                                 href={fileUrl}
-                                 download
-                                 className="flex items-center justify-center gap-1 bg-[#3E4095] text-white rounded-full font-medium hover:bg-[#2e3070] transition py-1 px-3 w-full sm:w-28"
-                               >
-                                 <ArrowDownToLine className="w-3 h-3" />
-                                 Download
-                               </a>
-                             </div>
-                           </div>
-                         );
-                       },
-                     )
-                   ) : (
-                     <p className="text-[12px] text-gray-500">NIL</p>
-                   )}
-                 </div>
-               </div>
-     
-               {/* Drug Records */}
-               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-                 <div className=" mb-4">    <p className="font-medium text-[#1B2B40]">Medication / Drug Records</p>
-                 </div>
-     
-                 <div className="overflow-x-auto">
-                   {selectedPatientDetails?.drug_records?.length > 0 ? (
-                     <table className="w-full text-left border-collapse">
-                       <thead>
-                         <tr className="text-[12px] text-gray-400 border-b">
-                           <th className="pb-2 font-normal">Drug Name</th>
-                           <th className="pb-2 font-normal">Route</th>
-                           <th className="pb-2 font-normal">Qty</th>
-                           <th className="pb-2 font-normal">Frequency</th>
-                           <th className="pb-2 font-normal">Duration</th>
-                         </tr>
-                       </thead>
-                       <tbody className="text-[12px]">
-                         {selectedPatientDetails.drug_records.map((drug, index) => (
-                           <tr key={index} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
-                             <td className="py-3 font-medium text-[#3E4095]">
-                               {drug.name}
-                             </td>
-                             <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
-                             <td className="py-3 text-gray-600">{drug.quantity}</td>
-                             <td className="py-3 text-gray-600">
-                               {/* Handling nested frequency object */}
-                               {typeof drug.frequency === 'object'
-                                 ? `${drug.frequency.value || ''} ${drug.frequency.unit || ''}`
-                                 : drug.frequency || "N/A"}
-                             </td>
-                             <td className="py-3 text-gray-600">
-                               {/* Handling nested duration object */}
-                               {typeof drug.duration === 'object'
-                                 ? `${drug.duration.value || ''} ${drug.duration.unit || ''}`
-                                 : drug.duration || "N/A"}
-                             </td>
-                           </tr>
-                         ))}
-                       </tbody>
-                     </table>
-                   ) : (
-                     <p className="text-[12px] text-gray-500 italic">No medication records available.</p>
-                   )}
-                 </div>
-               </div>
-     
-               {/* Care Instructions */}
-               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-                 <p className="font-medium mb-4 text-[#1B2B40]">Care Instructions</p>
-                 <div className="text-[12px] text-gray-700">
-                   {selectedPatientDetails?.care_instructions?.length > 0 ? (
-                     <ul className="list-disc pl-5 space-y-1">
-                       {selectedPatientDetails.care_instructions.map((instruction, index) => (
-                               <li key={index}>
-             {/* ADD THE CHECK HERE TOO */}
-             {typeof instruction === 'object' ? instruction.note : instruction}
-           </li>
-                       ))}
-                     </ul>
-                   ) : (
-                     <p>NIL</p>
-                   )}
-                 </div>
-               </div>
-     
-               {/* Treatment Plan */}
-               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-                 <p className="font-medium mb-4 text-[#1B2B40]">Treatment Plan</p>
-                 <div className="text-[12px] text-gray-700">
-                   {selectedPatientDetails?.treatment_plan?.length > 0 ? (
-                     <ul className="list-disc pl-5 space-y-1">
-                       {selectedPatientDetails.treatment_plan.map((plan, index) => (
-                     <li key={index}>
-             {/* ADD THE CHECK HERE TOO */}
-             {typeof plan === 'object' ? plan.note : plan}
-           </li>
-                       ))}
-                     </ul>
-                   ) : (
-                     <p>NIL</p>
-                   )}
-                 </div>
-               </div>
-     
-               {/* 7. Follow Up / Appointment */}
-               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-                 <p className="font-medium mb-4 text-[#1B2B40]">
-                   Follow Up / Appointment
-                 </p>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                   <p className="text-[12px] text-gray-500">
-                     Type:{" "}
-                     <span className="font-medium text-gray-900 capitalize">
-                       {selectedPatientDetails?.appointment?.type || "NIL"}
-                     </span>
-                   </p>
-                   <p className="text-[12px] text-gray-500">
-                     Scheduled:{" "}
-                     <span className="font-medium text-gray-900">
-                       {selectedPatientDetails?.appointment?.scheduled_time
-                         ? formatFullDateTime(
-                           selectedPatientDetails.appointment.scheduled_time,
-                         )
-                         : "NIL"}
-                     </span>
-                   </p>
-                   {selectedPatientDetails?.appointment?.note && (
-                     <p className="text-[12px] text-gray-500 col-span-2 mt-1">
-                       Note:{" "}
-                       <span className="font-medium text-gray-900 italic">
-                         "{selectedPatientDetails.appointment.note}"
-                       </span>
-                     </p>
-                   )}
-                 </div>
-               </div>
-     
-               {/* 8. Referral Status */}
-               <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-                 <p className="font-medium mb-4 text-[#1B2B40]">
-                   Referral Information
-                 </p>
-                 <div className="space-y-2">
-                   <div className="flex items-center gap-2">
-                     <p className="text-[12px] text-gray-500">Referral Status:</p>
-                     <span
-                       className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${selectedPatientDetails?.referred_hosp ||
-                         selectedPatientDetails?.referred_docuhealth_hosp
-                         ? "bg-green-100 text-green-700"
-                         : "bg-gray-100 text-gray-500"
-                         }`}
-                     >
-                       {selectedPatientDetails?.referred_hosp ||
-                         selectedPatientDetails?.referred_docuhealth_hosp
-                         ? "Active"
-                         : "None"}
-                     </span>
-                   </div>
-     
-                   <p className="text-[12px] text-gray-500">
-                     Referred Hospital:{" "}
-                     <span className="font-medium text-gray-900">
-                       {selectedPatientDetails?.referred_docuhealth_hosp
-                         ? `${selectedPatientDetails.referred_docuhealth_hosp} (DocuHealth Provider)`
-                         : selectedPatientDetails?.referred_hosp || "NIL"}
-                     </span>
-                   </p>
-                 </div>
-               </div>
+                  {selectedPatientDetails.additional_notes.map(
+                    (note, index) => (
+                      <li key={index}>
+                        {/* ADD THE CHECK HERE TOO */}
+                        {typeof note === 'object' ? note.note : note}
+                      </li>
+                    ),
+                  )}
+                </ul>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm pt-4 font-medium">
+                  No additional notes...
+                </p>
+              </>
+            )}
+          </div>
+
+          {/* 6. Uploaded Documents / Images */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <p className="font-medium mb-4 text-[#1B2B40]">
+              Uploaded Documents / Images
+            </p>
+            <div>
+              {selectedPatientDetails?.investigation_docs?.length > 0 ? (
+                selectedPatientDetails.investigation_docs.map(
+                  (attachment, index) => {
+                    // Correctly mapping your payload fields
+                    const fileName =
+                      attachment.filename || `Document_${index + 1}`;
+                    const fileUrl = attachment.file || attachment.url; // Supporting both common keys
+                    const fileSizeMB = attachment.size
+                      ? (attachment.size / (1024 * 1024)).toFixed(1) + " MB"
+                      : "0.5 MB"; // Fallback placeholder if size is missing
+                    const fileDate = formatFullDateTime(
+                      selectedPatientDetails.created_at,
+                    );
+
+                    const isImage =
+                      /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName) ||
+                      attachment.file_type?.includes("image");
+                    const isPdf =
+                      /\.pdf$/i.test(fileName) ||
+                      attachment.file_type?.includes("pdf");
+                    const Icon = isImage ? Image : isPdf ? FileText : FileText;
+
+                    return (
+                      <div
+                        key={index}
+                        className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 sm:items-center bg-white border rounded-lg px-4 py-3 mb-3 "
+                      >
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-[12px]">
+                          <div className="p-2 bg-[#3E4095]/10 rounded-md">
+                            <Icon className="text-[#3E4095]" size={20} />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-800">
+                              {fileName}
+                            </p>
+                            <p className="text-gray-500">
+                              {fileDate} • {fileSizeMB}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-3 text-[12px] w-full sm:w-auto">
+                          <a
+                            href={fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-1 border border-[#3E4095] text-[#3E4095] rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28"
+                          >
+                            <Eye className="w-3 h-3" />
+                            View
+                          </a>
+                          <a
+                            href={fileUrl}
+                            download
+                            className="flex items-center justify-center gap-1 bg-[#3E4095] text-white rounded-full font-medium hover:bg-[#2e3070] transition py-1 px-3 w-full sm:w-28"
+                          >
+                            <ArrowDownToLine className="w-3 h-3" />
+                            Download
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  },
+                )
+              ) : (
+                <p className="text-[12px] text-gray-500">NIL</p>
+              )}
+            </div>
+          </div>
+
+          {/* Drug Records */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <div className=" mb-4">    <p className="font-medium text-[#1B2B40]">Medication / Drug Records</p>
+            </div>
+
+            <div className="overflow-x-auto">
+              {selectedPatientDetails?.drug_records?.length > 0 ? (
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="text-[12px] text-gray-400 border-b">
+                      <th className="pb-2 font-normal">Drug Name</th>
+                      <th className="pb-2 font-normal">Route</th>
+                      <th className="pb-2 font-normal">Qty</th>
+                      <th className="pb-2 font-normal">Frequency</th>
+                      <th className="pb-2 font-normal">Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-[12px]">
+                    {selectedPatientDetails.drug_records.map((drug, index) => (
+                      <tr key={index} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
+                        <td className="py-3 font-medium text-[#3E4095]">
+                          {drug.name}
+                        </td>
+                        <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
+                        <td className="py-3 text-gray-600">{drug.quantity}</td>
+                        <td className="py-3 text-gray-600">
+                          {/* Handling nested frequency object */}
+                          {typeof drug.frequency === 'object'
+                            ? `${drug.frequency.value || ''} ( ${drug.frequency.rate || ''} )`
+                            : drug.frequency || "N/A"}
+                        </td>
+                        <td className="py-3 text-gray-600">
+                          {/* Handling nested duration object */}
+                          {typeof drug.duration === 'object'
+                            ? `${drug.duration.value || ''} ( ${drug.duration.rate || ''} )`
+                            : drug.duration || "N/A"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="text-[12px] text-gray-500 italic">No medication records available.</p>
+              )}
+            </div>
+          </div>
+
+          {/* Care Instructions */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <p className="font-medium mb-4 text-[#1B2B40]">Care Instructions</p>
+            <div className="text-[12px] text-gray-700">
+              {selectedPatientDetails?.care_instructions?.length > 0 ? (
+                <ul className="list-disc pl-5 space-y-1">
+                  {selectedPatientDetails.care_instructions.map((instruction, index) => (
+                    <li key={index}>
+                      {/* ADD THE CHECK HERE TOO */}
+                      {typeof instruction === 'object' ? instruction.note : instruction}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>NIL</p>
+              )}
+            </div>
+          </div>
+
+          {/* Treatment Plan */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <p className="font-medium mb-4 text-[#1B2B40]">Treatment Plan</p>
+            <div className="text-[12px] text-gray-700">
+              {selectedPatientDetails?.treatment_plan?.length > 0 ? (
+                <ul className="list-disc pl-5 space-y-1">
+                  {selectedPatientDetails.treatment_plan.map((plan, index) => (
+                    <li key={index}>
+                      {/* ADD THE CHECK HERE TOO */}
+                      {typeof plan === 'object' ? plan.note : plan}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>NIL</p>
+              )}
+            </div>
+          </div>
+
+          {/* 7. Follow Up / Appointment */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <p className="font-medium mb-4 text-[#1B2B40]">
+              Follow Up / Appointment
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <p className="text-[12px] text-gray-500">
+                Type:{" "}
+                <span className="font-medium text-gray-900 capitalize">
+                  {selectedPatientDetails?.appointment?.type || "NIL"}
+                </span>
+              </p>
+              <p className="text-[12px] text-gray-500">
+                Scheduled:{" "}
+                <span className="font-medium text-gray-900">
+                  {selectedPatientDetails?.appointment?.scheduled_time
+                    ? formatFullDateTime(
+                      selectedPatientDetails.appointment.scheduled_time,
+                    )
+                    : "NIL"}
+                </span>
+              </p>
+              {selectedPatientDetails?.appointment?.note && (
+                <p className="text-[12px] text-gray-500 col-span-2 mt-1">
+                  Note:{" "}
+                  <span className="font-medium text-gray-900 italic">
+                    "{selectedPatientDetails.appointment.note}"
+                  </span>
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* 8. Referral Status */}
+          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+            <p className="font-medium mb-4 text-[#1B2B40]">
+              Referral Information
+            </p>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <p className="text-[12px] text-gray-500">Referral Status:</p>
+                <span
+                  className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${selectedPatientDetails?.referred_hosp ||
+                    selectedPatientDetails?.referred_docuhealth_hosp
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-500"
+                    }`}
+                >
+                  {selectedPatientDetails?.referred_hosp ||
+                    selectedPatientDetails?.referred_docuhealth_hosp
+                    ? "Active"
+                    : "None"}
+                </span>
+              </div>
+
+              <p className="text-[12px] text-gray-500">
+                Referred Hospital:{" "}
+                <span className="font-medium text-gray-900">
+                  {selectedPatientDetails?.referred_docuhealth_hosp
+                    ? `${selectedPatientDetails.referred_docuhealth_hosp} (DocuHealth Provider)`
+                    : selectedPatientDetails?.referred_hosp || "NIL"}
+                </span>
+              </p>
+            </div>
+          </div>
         </div>
       ) : (
         <>
@@ -1809,8 +1812,10 @@ const getTabs = ({
   currentPage,
   totalPages,
   setCurrentPage, // Use the setter here
-  setselectedPatientDetails, // first
+  setSelectedMedicalRecord, // first
   setViewDetailMedicalRecord, // second
+  viewDetailMedicalRecord,
+  selectedMedicalRecord,
   patientSoapNotes,
   soapCount,
   soapCurrentPage,
@@ -1827,7 +1832,12 @@ const getTabs = ({
     },
     {
       title: "Med Records",
-      content: (
+      content: viewDetailMedicalRecord ? (
+        <PatientMedicalRecordDetail
+          selectedMedicalRecord={selectedMedicalRecord}
+          setViewDetailMedicalRecord={setViewDetailMedicalRecord}
+        />
+      ) : (
         <PatientMedicalRecord
           medloading={medloading}
           patientMedRecords={patientMedRecords}
@@ -1835,7 +1845,7 @@ const getTabs = ({
           currentPage={currentPage}
           totalPages={totalPages}
           setCurrentPage={setCurrentPage}
-          setselectedPatientDetails={setselectedPatientDetails}
+          setSelectedMedicalRecord={setSelectedMedicalRecord}
           setViewDetailMedicalRecord={setViewDetailMedicalRecord}
         />
       ),

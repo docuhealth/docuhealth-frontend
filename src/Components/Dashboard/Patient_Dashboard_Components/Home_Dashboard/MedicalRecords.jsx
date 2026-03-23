@@ -125,7 +125,7 @@ const MedicalRecords = ({
       </div>
     );
   }
-  console.log(medicalRecords)
+
 
   return (
     <div className="bg-white my-5 border rounded-lg py-5 px-5 ">

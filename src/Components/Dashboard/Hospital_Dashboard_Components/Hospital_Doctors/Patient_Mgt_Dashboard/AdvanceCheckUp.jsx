@@ -108,35 +108,27 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry, advance
           </div>
           <TabComponent2
             tabs={getTabs({
-
               medloading: medLoading,
               soapNotesLoading: soapLoading,
               patientMedRecords: medRecordsData?.results || [],
               patientSoapNotes: soapNotesData?.results || [],
               patientFullInfo,
-
               selected,
 
               count: medRecordsData?.count || 0,
               currentPage,
-              totalPages: Math.ceil(
-                (medRecordsData?.count || 0) / pageSize,
-              ),
-
+              totalPages: Math.ceil((medRecordsData?.count || 0) / pageSize),
               setCurrentPage,
-
 
               soapCount: soapNotesData?.count || 0,
               soapCurrentPage,
-              soapTotalPages: Math.ceil(
-                (soapNotesData?.count || 0) / pageSize,
-              ),
-
+              soapTotalPages: Math.ceil((soapNotesData?.count || 0) / pageSize),
               setSoapCurrentPage,
 
-
-              setSelectedMedicalRecord, // first
-              setViewDetailMedicalRecord, // second
+              setSelectedMedicalRecord,
+              setViewDetailMedicalRecord,
+              viewDetailMedicalRecord,
+              selectedMedicalRecord,
 
               setSoapNoteEntry,
               setAdvanceCheckUp,
