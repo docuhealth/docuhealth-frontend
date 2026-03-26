@@ -29,7 +29,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
     if (!searchQuery) return users;
     return users.filter(u => {
       const searchStr = searchQuery.toLowerCase();
-      const name = selectedRole === "hospital" ? u.name : `${u.firstname} ${u.lastname}`;
+      const name = selectedRole === "hospital" ? u.name : u.full_name;
       return name?.toLowerCase().includes(searchStr) || u.email?.toLowerCase().includes(searchStr);
     });
   }, [users, searchQuery, selectedRole]);
@@ -43,7 +43,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
       console.log("Deselected all users");
       setSelectedUsers([]);
     } else {
-      const allIds = displayedUsers.map((u) => (selectedRole === "hospital" ? u.hin : u.id));
+      const allIds = displayedUsers.map((u) => u.hin || u._id || u.id);
       setSelectedUsers(allIds);
     }
   };
@@ -61,7 +61,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
         console.log(`Unchecked user ID: ${id}`);
         return prev.filter((item) => item !== id);
       } else {
-        const userMember = displayedUsers.find((u) => (selectedRole === "hospital" ? u.hin : u.id) === id);
+        const userMember = displayedUsers.find((u) => (u.hin || u._id || u.id) === id);
         console.log("Checked user:", userMember);
         return [...prev, id];
       }
@@ -107,7 +107,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
 
   const handleConfirmDeactivate = () => {
     if (!userToDeactivate) return;
-    const id = selectedRole === "hospital" ? userToDeactivate.hin : userToDeactivate.id;
+    const id = userToDeactivate.hin || userToDeactivate._id || userToDeactivate.id;
     if (selectedRole === "hospital") {
       deactivateHospital([id]);
     } else {
@@ -187,7 +187,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
           <div className="flex flex-col">
             {displayedUsers.map((user, idx) => {
               const isHospital = selectedRole === "hospital";
-              const currentId = isHospital ? user.hin : user.id;
+              const currentId = user.hin || user._id || user.id;
               const isSelected = selectedUsers.includes(currentId);
 
               return (
@@ -197,21 +197,23 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
                     {isHospital && user.profile_image ? (
                        <img src={user.profile_image.url} className="w-6 h-6 rounded-full object-cover shrink-0" alt="" />
                     ) : null}
-                    <p className="truncate pr-4" title={isHospital ? user.name : `${user.firstname} ${user.lastname}`}>
-                      {isHospital ? user.name : `${user.firstname} ${user.lastname}`}
+                    <p className="truncate pr-4" title={isHospital ? user.name : `${user.full_name}`}>
+                      {isHospital ? user.name : `${user.full_name}`}
                     </p>
                   </div>
 
                   {isHospital ? (
                      <>
-                       <p className=" truncate pr-4 col-span-2" title={`${user.address || ''} ${user.city || ''} ${user.state || ''}`}>{`${user.address || ''} ${user.city || ''} ${user.state || ''}`}</p>
-                       <p className="truncate pr-4" title={user.email}>{user.email}</p>
+                       <p className=" truncate pr-4 col-span-2" title={[user.address, user.city, user.state].filter(Boolean).join(", ") || "NULL"}>
+                         {[user.address, user.city, user.state].filter(Boolean).join(", ") || "NULL"}
+                       </p>
+                       <p className="truncate pr-4" title={user.email || "NULL"}>{user.email || "NULL"}</p>
                        <p>{user.doctors || "NULL"}</p>
                        <p>{user.other_personnel || "NULL"}</p>
                      </>
                   ) : (
                      <>
-                       <p className="col-span-2 truncate pr-4" title={user.email}>{user.email}</p>
+                       <p className="col-span-2 truncate pr-4" title={user.email || "NULL"}>{user.email || "NULL"}</p>
                        <p className="truncate pr-4">{user.phone_num || user.phone_number || "NULL"}</p>
                        <p className="truncate pr-4">{user.dob || "NULL"}</p>
                        <p className="capitalize">{user.gender || user.sex || "NULL"}</p>
@@ -238,6 +240,109 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
         )}
       </div>
 
+      {/* MOBILE LIST VIEW */}
+      <div className="flex lg:hidden mb-2 justify-between items-center px-1">
+        {displayedUsers.length > 0 && (
+          <label className="flex items-center gap-2 text-sm text-gray-600 font-medium cursor-pointer">
+            <input type="checkbox" checked={allChecked} onChange={toggleSelectAll} className="w-4 h-4 accent-[#3E4095]" />
+            Select All
+          </label>
+        )}
+      </div>
+      <div className="block lg:hidden space-y-4 my-4">
+        {displayedUsers.length === 0 ? (
+          <div className="p-8 text-center text-gray-500 text-sm">No users found.</div>
+        ) : (
+          displayedUsers.map((user, idx) => {
+            const isHospital = selectedRole === "hospital";
+            const currentId = user.hin || user._id || user.id;
+            const isSelected = selectedUsers.includes(currentId);
+
+            return (
+              <div key={idx} className={`bg-white border rounded-md p-4 transition-transform relative ${isSelected ? 'border-[#3E4095] ring-1 ring-[#3E4095]' : 'border-gray-200'}`}>
+                
+                {/* Checkbox overlay top-right */}
+                <div className="absolute top-4 right-4 z-10">
+                   <input type="checkbox" checked={isSelected} onChange={() => toggleUser(currentId)} className="w-5 h-5 accent-[#3E4095] cursor-pointer" />
+                </div>
+
+                {/* Header */}
+                <div className="flex items-center gap-3 pb-3 border-b border-gray-50 mb-3 pr-8">
+                  {isHospital && user.profile_image ? (
+                     <img src={user.profile_image.url} className="w-10 h-10 rounded-full object-cover shrink-0" alt="" />
+                  ) : (
+                     <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-[14px] font-bold text-[#3E4095] shrink-0">
+                       {isHospital ? user.name?.[0]?.toUpperCase() : user.full_name?.[0]?.toUpperCase() || "U"}
+                     </div>
+                  )}
+                  <div>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                      {isHospital ? "Hospital" : "Patient"}
+                    </p>
+                    <p className="text-sm font-semibold text-gray-800">
+                      {isHospital ? user.name : user.full_name}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Body Details */}
+                <div className="space-y-2 mb-4 text-[12px]">
+                   {isHospital ? (
+                     <>
+                        <div className="flex justify-between items-start gap-3">
+                           <span className="text-gray-400 shrink-0">Email:</span>
+                           <span className="font-medium text-gray-700 text-right break-all">{user.email || "N/A"}</span>
+                        </div>
+                        <div className="flex justify-between items-start gap-3">
+                           <span className="text-gray-400 shrink-0">Address:</span>
+                           <span className="font-medium text-gray-700 text-right">{[user.address, user.city, user.state].filter(Boolean).join(", ") || "N/A"}</span>
+                        </div>
+                        <div className="flex justify-between items-start gap-3">
+                           <span className="text-gray-400 shrink-0">Doctors:</span>
+                           <span className="font-medium text-gray-700 text-right">{user.doctors || "0"}</span>
+                        </div>
+                        <div className="flex justify-between items-start gap-3">
+                           <span className="text-gray-400 shrink-0">Other personnel:</span>
+                           <span className="font-medium text-gray-700 text-right">{user.other_personnel || "0"}</span>
+                        </div>
+                     </>
+                   ) : (
+                     <>
+                        <div className="flex justify-between items-start gap-3">
+                           <span className="text-gray-400 shrink-0">Email:</span>
+                           <span className="font-medium text-gray-700 text-right break-all">{user.email || "N/A"}</span>
+                        </div>
+                        <div className="flex justify-between items-start gap-3">
+                           <span className="text-gray-400 shrink-0">Phone:</span>
+                           <span className="font-medium text-gray-700 text-right">{user.phone_num || user.phone_number || "N/A"}</span>
+                        </div>
+                        <div className="flex justify-between items-start gap-3">
+                           <span className="text-gray-400 shrink-0">D.O.B:</span>
+                           <span className="font-medium text-gray-700 text-right">{user.dob || "N/A"}</span>
+                        </div>
+                        <div className="flex justify-between items-start gap-3">
+                           <span className="text-gray-400 shrink-0">Sex:</span>
+                           <span className="font-medium text-gray-700 text-right capitalize">{user.gender || user.sex || "N/A"}</span>
+                        </div>
+                     </>
+                   )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                   <button 
+                     onClick={() => setUserToDeactivate(user)}
+                     className="w-full bg-red-50 text-red-600 border border-red-100 rounded-full py-2.5 text-[12px] font-semibold hover:bg-red-100 transition-colors"
+                   >
+                     Deactivate Account
+                   </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
 
       <div className="mt-2">
          <Pagination2 count={count} currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
@@ -249,7 +354,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
           <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-xl animate-fade-in-up">
             <h3 className="text-lg font-bold text-gray-900 mb-2">Deactivate User</h3>
             <p className="text-sm text-gray-500 mb-6">
-               Are you sure you want to deactivate <span className="font-semibold text-gray-800">{selectedRole === "hospital" ? userToDeactivate.name : `${userToDeactivate.firstname} ${userToDeactivate.lastname}`}</span>? They will no longer be able to access the platform.
+               Are you sure you want to deactivate <span className="font-semibold text-gray-800">{selectedRole === "hospital" ? userToDeactivate.name : userToDeactivate.full_name}</span>? They will no longer be able to access the platform.
             </p>
             <div className="flex gap-3">
               <button 

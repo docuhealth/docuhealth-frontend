@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Building2 } from "lucide-react";
 
 const Admin_Dashboard_Sidebar = () => {
 
@@ -88,6 +89,27 @@ const Admin_Dashboard_Sidebar = () => {
                 </svg>
               </span>
               Users
+            </li>
+          </div>
+        </Link>
+
+        <Link to="/dhadmin-hospital-requests">
+          <div className="px-4 my-4">
+            <li
+              className={`group px-4 py-2   ${currentPath === "/dhadmin-hospital-requests"
+                ? "bg-[#3E4095] text-white"
+                : "text-gray-700"
+                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+            >
+              <span>
+                <Building2
+                  className={`w-5 h-5 group-hover:text-white transition-colors ${currentPath === "/dhadmin-hospital-requests"
+                    ? "text-white"
+                    : "text-[#647284]"
+                    }`}
+                />
+              </span>
+              Hospital Requests
             </li>
           </div>
         </Link>

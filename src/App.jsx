@@ -60,6 +60,7 @@ import AdminProviders from "./Providers/Admin/AdminProviders";
 import Admin_Users_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Users_Dashboard";
 import Admin_Settings_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Settings_Dashboard";
 import Admin_Subscriptions_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Subscriptions_Dashboard";
+import Admin_Hospital_Requests_Dashboard from "./Dashboard/Admin_Dashboard/Admin_Hospital_Requests_Dashboard";
 
 import Patient_Dashboard_Layout from "./Layouts/Patient_Dashboard_Layout/Patient_Dashboard_Layout";
 import Patient_Home_Dashboard from "./Dashboard/Patient_Dashboard/Patient_Home_Dashboard";
@@ -965,10 +966,10 @@ function App() {
               />
             </Route>
 
-            <Route
+            {/* <Route
               path="/admin"
               element={<ApproveHospitals />}
-            />
+            /> */}
             <Route path="/dhadmin-login" element={<Admin_Sign_In />} />
             <Route
               path="/dhadmin-forgot-password"
@@ -1026,6 +1027,23 @@ function App() {
                 element={<Admin_Subscriptions_Dashboard />}
               />
             </Route>
+
+            <Route
+              path="/dhadmin-hospital-requests"
+              element={
+                <AdminProtectedRoute>
+                  <AdminProviders>
+                    <Admin_Dashboard_Layout />
+                  </AdminProviders>
+                </AdminProtectedRoute>
+              }
+            >
+              <Route
+                index
+                element={<Admin_Hospital_Requests_Dashboard />}
+              />
+            </Route>
+
             <Route
               path="/dhadmin-settings-dashboard"
               element={
