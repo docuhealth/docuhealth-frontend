@@ -19,7 +19,15 @@ const Admin_Home_Dashboard = () => {
     let startDate = "";
     let endDate = today.toISOString().split("T")[0]; // YYYY-MM-DD
 
-    if (selected === "Weekly") {
+    if (selected === "Daily") {
+      // Daily will be today (same start and end date)
+      startDate = today.toISOString().split("T")[0];
+    } else if (selected === "Last 24hrs") {
+      // Last 24hrs will be from yesterday to today
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      startDate = yesterday.toISOString().split("T")[0];
+    } else if (selected === "Weekly") {
       const lastWeek = new Date(today);
       lastWeek.setDate(today.getDate() - 7);
       startDate = lastWeek.toISOString().split("T")[0];

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ReactECharts from "echarts-for-react";
 import * as echarts from "echarts";
 import CustomDropdown from "./CustomDropdown";
+import { Download } from "lucide-react";
 
 
 const formatMonth = (dateString) => {
@@ -16,6 +17,23 @@ const formatMonth = (dateString) => {
 
 const RevenueChart = ({ data = [], filter = "Monthly", onFilterChange }) => {
 
+  const handleDownload = () => {
+    if (!data || data.length === 0) return;
+    const keys = Object.keys(data[0]);
+    const csvContent = [
+      keys.join(","),
+      ...data.map(row => keys.map(k => row[k]).join(","))
+    ].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `revenue_data_${filter}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // If no data, show empty state instead of mock data
   if (!data || data.length === 0) {
     return (
@@ -24,11 +42,20 @@ const RevenueChart = ({ data = [], filter = "Monthly", onFilterChange }) => {
           <h3 className="text-xs lg:text-lg lg:font-semibold text-gray-800">
             Revenue generated overview
           </h3>
-          <CustomDropdown
-            options={["Monthly", "Weekly", "Yearly"]}
-            value={filter}
-            onChange={onFilterChange}
-          />
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={handleDownload}
+              className="p-1.5 text-gray-500 hover:text-[#3E4095] bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              title="Download CSV"
+            >
+              <Download size={16} />
+            </button>
+            <CustomDropdown
+              options={["Daily", "Last 24hrs", "Weekly", "Monthly", "Yearly"]}
+              value={filter}
+              onChange={onFilterChange}
+            />
+          </div>
         </div>
         <div className="flex-1 flex justify-center items-center text-gray-400 text-sm">
           No revenue data available
@@ -90,11 +117,20 @@ const RevenueChart = ({ data = [], filter = "Monthly", onFilterChange }) => {
         <h3 className="text-xs lg:text-lg lg:font-semibold text-gray-800">
           Revenue generated overview
         </h3>
-        <CustomDropdown
-          options={["Monthly", "Weekly", "Yearly"]}
-          value={filter}
-          onChange={onFilterChange}
-        />
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={handleDownload}
+            className="p-1.5 text-gray-500 hover:text-[#3E4095] bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+            title="Download CSV"
+          >
+            <Download size={16} />
+          </button>
+          <CustomDropdown
+            options={["Daily", "Last 24hrs", "Weekly", "Monthly", "Yearly"]}
+            value={filter}
+            onChange={onFilterChange}
+          />
+        </div>
       </div>
       <ReactECharts option={option} style={{ height: "300px", width: "100%" }} />
     </div>

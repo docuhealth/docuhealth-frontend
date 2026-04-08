@@ -1,7 +1,25 @@
 import React from "react";
 import CustomDropdown from "./CustomDropdown";
+import { Download } from "lucide-react";
 
 const TopSellingStatesChart = ({ data = [], filter = "Monthly", onFilterChange }) => {
+  const handleDownload = () => {
+    if (!data || data.length === 0) return;
+    const keys = Object.keys(data[0]);
+    const csvContent = [
+      keys.join(","),
+      ...data.map(row => keys.map(k => row[k]).join(","))
+    ].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `top_selling_states_${filter}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (!data || data.length === 0) {
     return (
       <div className="bg-white p-6 rounded-md border border-gray-200 w-full h-[400px] flex flex-col mt-6">
@@ -21,11 +39,20 @@ const TopSellingStatesChart = ({ data = [], filter = "Monthly", onFilterChange }
                 State with the most registrations
               </span>
             </div>
-            <CustomDropdown
-              options={["Monthly", "Weekly", "Yearly"]}
-              value={filter}
-              onChange={onFilterChange}
-            />
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={handleDownload}
+                className="p-1.5 text-gray-500 hover:text-[#3E4095] bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+                title="Download CSV"
+              >
+                <Download size={16} />
+              </button>
+              <CustomDropdown
+                options={["Daily", "Last 24hrs", "Weekly", "Monthly", "Yearly"]}
+                value={filter}
+                onChange={onFilterChange}
+              />
+            </div>
           </div>
         </div>
         <div className="flex-1 flex justify-center items-center text-gray-400 text-sm">
@@ -58,11 +85,20 @@ const TopSellingStatesChart = ({ data = [], filter = "Monthly", onFilterChange }
               State with the most registrations
             </span>
           </div>
-          <CustomDropdown
-            options={["Monthly", "Weekly", "Yearly"]}
-            value={filter}
-            onChange={onFilterChange}
-          />
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={handleDownload}
+              className="p-1.5 text-gray-500 hover:text-[#3E4095] bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              title="Download CSV"
+            >
+              <Download size={16} />
+            </button>
+            <CustomDropdown
+              options={["Daily", "Last 24hrs", "Weekly", "Monthly", "Yearly"]}
+              value={filter}
+              onChange={onFilterChange}
+            />
+          </div>
         </div>
       </div>
       
