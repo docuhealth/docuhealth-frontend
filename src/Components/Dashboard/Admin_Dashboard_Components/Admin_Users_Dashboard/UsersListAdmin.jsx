@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Pagination2 from "../../Patient_Dashboard_Components/Pagination/Pagination2";
 import SearchBar from "../../../SearchBar/SearchBar";
 import toast from "react-hot-toast";
-import { deactivateAdminHospital, deactivateAdminPatient } from "../../../../queries/admin/users";
+import { deactivateAdminHospital, deactivateAdminPatient, activateAdminHospital, activateAdminPatient } from "../../../../queries/admin/users";
 
 const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
   const {
@@ -36,7 +36,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
 
   // --- SELECTION LOGIC ---
 
-  const selectableUsers = displayedUsers.filter(u => u.is_active !== false);
+  const selectableUsers = displayedUsers;
   const allChecked = selectableUsers.length > 0 && selectedUsers.length === selectableUsers.length;
 
   const toggleSelectAll = () => {
@@ -71,6 +71,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
 
   // ----- DEACTIVATION LOGIC -----
   const [userToDeactivate, setUserToDeactivate] = useState(null); // holds user object to confirm
+  const [userToActivate, setUserToActivate] = useState(null); // holds user object to confirm
   
   const { mutate: deactivateHospital, isPending: isDeactivatingHospital } = useMutation({
     mutationFn: (hinsList) => deactivateAdminHospital(hinsList),
@@ -116,6 +117,50 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
     }
   };
 
+  const { mutate: activateHospital, isPending: isActivatingHospital } = useMutation({
+    mutationFn: (hinsList) => activateAdminHospital(hinsList),
+    onSuccess: () => {
+      toast.success("Hospital(s) activated successfully");
+      queryClient.invalidateQueries(["admin-users", "hospital"]);
+      setUserToActivate(null);
+      setSelectedUsers([]);
+      setActiveMenu(null);
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Failed to activate hospital");
+    }
+  });
+
+  const { mutate: activatePatient, isPending: isActivatingPatient } = useMutation({
+    mutationFn: (idsList) => activateAdminPatient(idsList),
+    onSuccess: () => {
+      toast.success("User(s) activated successfully");
+      queryClient.invalidateQueries(["admin-users", "patient"]);
+      setUserToActivate(null);
+      setSelectedUsers([]);
+      setActiveMenu(null);
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Failed to activate user");
+    }
+  });
+
+  const handleBulkActivate = () => {
+    if (selectedUsers.length === 0) return toast.error("Please select users to activate");
+    if (selectedRole === "hospital") activateHospital(selectedUsers);
+    else activatePatient(selectedUsers);
+  };
+
+  const handleConfirmActivate = () => {
+    if (!userToActivate) return;
+    const id = userToActivate.hin || userToActivate._id || userToActivate.id;
+    if (selectedRole === "hospital") {
+      activateHospital([id]);
+    } else {
+      activatePatient([id]);
+    }
+  };
+
 
   if (loading) {
     return (
@@ -130,24 +175,37 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
       {selectedUsers.length > 0 && (
         <div
           className={`transition-all duration-300 mb-4 flex items-center justify-between p-3 rounded-lg ${selectedUsers.length > 0
-            ? "bg-red-50 border border-red-100 opacity-100"
+            ? "bg-[#3E4095]/10 border border-[#3E4095]/20 opacity-100"
             : "opacity-0 h-0 overflow-hidden"
             }`}
         >
-          <p className="text-sm text-red-700 font-medium">
+          <p className="text-sm text-[#3E4095] font-medium">
             {selectedUsers.length} user(s) selected
           </p>
-          <button
-            onClick={handleBulkDeactivate}
-            disabled={isDeactivatingHospital || isDeactivatingPatient}
-            className={`${(isDeactivatingHospital || isDeactivatingPatient) ? "bg-red-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"} text-white px-4 py-2 rounded-full text-xs font-bold transition-colors flex items-center gap-2`}
-          >
-            {(isDeactivatingHospital || isDeactivatingPatient) ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Deactivating...
-              </>
-            ) : "Deactivate Users"}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleBulkActivate}
+              disabled={isActivatingHospital || isActivatingPatient || isDeactivatingHospital || isDeactivatingPatient}
+              className={`${(isActivatingHospital || isActivatingPatient) ? "bg-green-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"} text-white px-4 py-2 rounded-full text-xs font-bold transition-colors flex items-center gap-2`}
+            >
+              {(isActivatingHospital || isActivatingPatient) ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Activating...
+                </>
+              ) : "Activate"}
+            </button>
+            <button
+              onClick={handleBulkDeactivate}
+              disabled={isDeactivatingHospital || isDeactivatingPatient || isActivatingHospital || isActivatingPatient}
+              className={`${(isDeactivatingHospital || isDeactivatingPatient) ? "bg-red-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"} text-white px-4 py-2 rounded-full text-xs font-bold transition-colors flex items-center gap-2`}
+            >
+              {(isDeactivatingHospital || isDeactivatingPatient) ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Deactivating...
+                </>
+              ) : "Deactivate"}
+            </button>
+          </div>
         </div>
       )}
       
@@ -196,7 +254,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
               return (
                 <div key={idx} className="grid grid-cols-9 items-center py-4 border-b border-b-gray-200 text-[12px] text-gray-700 text-left w-full hover:bg-gray-50">
                   <div className="font-semibold col-span-2 w-full pl-5 flex items-center gap-2">
-                    <input type="checkbox" disabled={!user.is_active} checked={isSelected} onChange={() => toggleUser(currentId)} className="w-4 h-4 accent-[#3E4095] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" />
+                    <input type="checkbox" checked={isSelected} onChange={() => toggleUser(currentId)} className="w-4 h-4 accent-[#3E4095] cursor-pointer" />
                     {isHospital && user.profile_image ? (
                        <img src={user.profile_image.url} className="w-6 h-6 rounded-full object-cover shrink-0" alt="" />
                     ) : null}
@@ -231,15 +289,25 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
                     </button>
                     {activeMenu === currentId && (
                       <div className="absolute right-0 top-10 w-40 bg-white border border-gray-200 rounded-md shadow z-50 p-2">
-                        <button 
-                          disabled={!user.is_active}
-                          onClick={() => {
-                            setUserToDeactivate(user)
-                          }} 
-                          className={`w-full text-left p-2 font-medium transition-colors ${user.is_active ? 'hover:bg-red-50 text-red-600' : 'text-gray-400 cursor-not-allowed'}`}
-                        >
-                          {user.is_active ? 'Deactivate Account' : 'Deactivated'}
-                        </button>
+                        {user.is_active ? (
+                          <button 
+                            onClick={() => {
+                              setUserToDeactivate(user)
+                            }} 
+                            className="w-full text-left p-2 font-medium transition-colors hover:bg-red-50 text-red-600"
+                          >
+                            Deactivate Account
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={() => {
+                              setUserToActivate(user)
+                            }} 
+                            className="w-full text-left p-2 font-medium transition-colors hover:bg-green-50 text-green-600"
+                          >
+                            Activate Account
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -273,7 +341,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
                 
                 {/* Checkbox overlay top-right */}
                 <div className="absolute top-4 right-4 z-10">
-                   <input type="checkbox" disabled={!user.is_active} checked={isSelected} onChange={() => toggleUser(currentId)} className="w-5 h-5 accent-[#3E4095] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" />
+                   <input type="checkbox" checked={isSelected} onChange={() => toggleUser(currentId)} className="w-5 h-5 accent-[#3E4095] cursor-pointer" />
                 </div>
 
                 {/* Header */}
@@ -348,13 +416,21 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
 
                  {/* Action Buttons */}
                  <div className="flex gap-2">
-                    <button 
-                      disabled={!user.is_active}
-                      onClick={() => setUserToDeactivate(user)}
-                      className={`w-full rounded-full py-2.5 text-[12px] font-semibold transition-colors ${user.is_active ? 'bg-red-50 text-red-600 border border-red-100 hover:bg-red-100' : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'}`}
-                    >
-                      {user.is_active ? 'Deactivate Account' : 'Deactivated'}
-                    </button>
+                    {user.is_active ? (
+                      <button 
+                        onClick={() => setUserToDeactivate(user)}
+                        className="w-full rounded-full py-2.5 text-[12px] font-semibold transition-colors bg-red-50 text-red-600 border border-red-100 hover:bg-red-100"
+                      >
+                        Deactivate Account
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => setUserToActivate(user)}
+                        className="w-full rounded-full py-2.5 text-[12px] font-semibold transition-colors bg-green-50 text-green-600 border border-green-100 hover:bg-green-100"
+                      >
+                        Activate Account
+                      </button>
+                    )}
                  </div>
               </div>
             );
@@ -390,6 +466,35 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
               >
                 {(isDeactivatingHospital || isDeactivatingPatient) ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : null}
                 Deactivate
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Activate Confirmation Popup */}
+      {userToActivate && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-100 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-xl animate-fade-in-up">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Activate User</h3>
+            <p className="text-sm text-gray-500 mb-6">
+               Are you sure you want to activate <span className="font-semibold text-gray-800">{selectedRole === "hospital" ? userToActivate.name : userToActivate.full_name}</span>? They will gain access to the platform.
+            </p>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setUserToActivate(null)}
+                className="flex-1 py-2.5 rounded-full border border-gray-300 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+                disabled={isActivatingHospital || isActivatingPatient}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleConfirmActivate}
+                disabled={isActivatingHospital || isActivatingPatient}
+                className="flex-1 py-2.5 rounded-full bg-green-600 text-sm font-bold text-white hover:bg-green-700 transition-colors flex justify-center items-center gap-2"
+              >
+                {(isActivatingHospital || isActivatingPatient) ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : null}
+                Activate
               </button>
             </div>
           </div>

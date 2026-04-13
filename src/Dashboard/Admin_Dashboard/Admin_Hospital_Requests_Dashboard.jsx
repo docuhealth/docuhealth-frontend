@@ -26,7 +26,7 @@ const Admin_Hospital_Requests_Dashboard = () => {
     const fetchRequests = async (page = 1) => {
         setLoading(true);
         try {
-            const res = await axiosInstance.get(`api/hospitals/verification-request?page=${page}&size=${pageSize}`);
+            const res = await axiosInstance.get(`api/admin/hospitals/verification-requests?page=${page}&size=${pageSize}`);
             setRequests(res.data.results || []);
             setCount(res.data.count || 0);
             setCurrentPage(page);
@@ -47,7 +47,7 @@ const Admin_Hospital_Requests_Dashboard = () => {
         setApproving(requestId);
         try {
             await axiosInstance.post(
-                "api/hospitals/approve-verification",
+                "api/admin/hospitals/approve-verification",
                 {
                     verification_request: requestId,
                     redirect_url: "https://docuhealthservices.net/hospital-onboarding",

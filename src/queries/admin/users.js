@@ -25,3 +25,19 @@ export const deactivateAdminPatient = async (patientIds) => {
   });
   return response.data;
 };
+
+// Activate Hospital
+export const activateAdminHospital = async (hins) => {
+  const response = await axiosInstanceAdmin.post('/api/admin/hospitals/activate', {
+    hins: hins
+  });
+  return response.data;
+};
+
+// Activate Patient
+export const activateAdminPatient = async (patientIds) => {
+  const response = await axiosInstanceAdmin.post('/api/admin/patients/activate', {
+    patient_ids: patientIds
+  });
+  return response.data;
+};
