@@ -1,5 +1,6 @@
 // services/authService.js
 import axios from "axios";
+import { normalizeEmailFields } from "../utils/normalizationUtils";
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -43,7 +44,8 @@ export function setHospitalToken(token, role) {
 
 // Login
 export async function login(userData) {
-  const response = await axios.post(`${API_BASE_URL}api/auth/login`, userData, {
+  const normalizedData = normalizeEmailFields(userData);
+  const response = await axios.post(`${API_BASE_URL}api/auth/login`, normalizedData, {
     withCredentials: true,
   });
   const data = response.data;

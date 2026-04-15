@@ -66,7 +66,10 @@ const AccountSettingsTab = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ 
+      ...formData, 
+      [name]: name === "email" ? value.toLowerCase() : value 
+    });
 
     // Trigger validation if the field being changed is the new password
     if (name === "newPassword") {

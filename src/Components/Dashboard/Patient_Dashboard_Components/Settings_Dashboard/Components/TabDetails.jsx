@@ -135,7 +135,7 @@ const AccountSettingsTab = () => {
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: name === "email" ? value.toLowerCase() : value,
     }));
 
     if (name === "password") {

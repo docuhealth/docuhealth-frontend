@@ -1,6 +1,7 @@
 // utils/axiosInstance.js
 import axios from "axios";
 import { getToken, setToken, refreshToken } from "../services/authService";
+import { normalizeEmailFields } from "./normalizationUtils";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -12,6 +13,14 @@ const axiosInstance = axios.create({
 // Attach token on requests
 axiosInstance.interceptors.request.use(
   (config) => {
+    // Normalize email fields in payload or params
+    if (config.data) {
+      config.data = normalizeEmailFields(config.data);
+    }
+    if (config.params) {
+      config.params = normalizeEmailFields(config.params);
+    }
+
     const token = getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

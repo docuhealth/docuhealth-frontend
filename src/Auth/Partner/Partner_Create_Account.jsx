@@ -187,7 +187,7 @@ const Partner_Create_Account = () => {
                                             type="email"
                                             className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                                             value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
+                                            onChange={(e) => setEmail(e.target.value.toLowerCase())}
                                             required
                                         />
                                         <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -517,7 +517,7 @@ const Partner_Create_Account = () => {
                                                 type="email"
                                                 className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
                                                 value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
+                                                onChange={(e) => setEmail(e.target.value.toLowerCase())}
                                                 required
                                             />
                                             <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />

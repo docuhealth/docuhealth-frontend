@@ -27,7 +27,8 @@ const Partner_Sign_In = () => {
       setEmail("");
     } else if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       // If the value is a valid email
-      setEmail(value);
+      const lowercasedEmail = value.toLowerCase();
+      setEmail(lowercasedEmail);
       setPhone_Num("");
     } else {
       // Reset if neither
