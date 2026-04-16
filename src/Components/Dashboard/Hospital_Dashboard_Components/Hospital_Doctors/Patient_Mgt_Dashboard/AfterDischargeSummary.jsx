@@ -217,7 +217,34 @@ const AfterDischargeSummary = ({
   };
 
   const handleSubmit = () => {
-      const drugRecords = medications.map((med) => ({
+    // Validation: Medication is compulsory
+    const isMedicationEmpty = medications.length === 0 || medications.every(med => !med.drug?.trim());
+    const hasIncompleteMedication = medications.some(
+      (med) => (med.drug?.trim() && (!med.dosage || !med.duration))
+    );
+
+    if (isMedicationEmpty) {
+      toast.error("At least one Medication on discharge is compulsory");
+      return;
+    }
+
+    if (hasIncompleteMedication) {
+      toast.error("Please fill in Dosage and Duration for all added medications");
+      return;
+    }
+
+    if (
+      !soapNoteData.chief_complaint.trim() ||
+      soapNoteData.diagnosis.length === 0 ||
+      !soapNoteData.condition_at_discharge.trim() ||
+      soapNoteData.treatment_plan.length === 0 ||
+      soapNoteData.care_instructions.length === 0
+    ) {
+      toast.error("Please fill all required fields (Chief Complaint, Diagnosis, Condition, Treatment Plan, and Care Instructions).");
+      return;
+    }
+
+    const drugRecords = medications.map((med) => ({
       name: med.drug,
       route: med.route,
       quantity: med.dosage,
@@ -231,7 +258,6 @@ const AfterDischargeSummary = ({
       },
       status: "ongoing",
       allergies: [],
-      // created_at: new Date().toISOString(),
     }));
 
     const selectedDate = new Date(
@@ -243,23 +269,6 @@ const AfterDischargeSummary = ({
       note,
       type: "consultation",
     };
-
-    const hasInvalidMedication = medications.some(
-      (med) => !med.drug?.trim() || !med.dosage?.trim() || !med.duration,
-    );
-
-    if (
-      !soapNoteData.chief_complaint.trim() ||
-      !soapNoteData.diagnosis.length === 0 ||
-      !soapNoteData.condition_at_discharge.trim() ||
-      soapNoteData.treatment_plan.length === 0 ||
-      soapNoteData.care_instructions.length === 0 ||
-      drugRecords.length === 0 ||
-      hasInvalidMedication
-    ) {
-      toast.error("fill all required fields.");
-      return;
-    }
 
     const formData = new FormData();
 
@@ -372,17 +381,17 @@ const AfterDischargeSummary = ({
             />
 
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium mb-3">
-                Medication on discharge (compulsory)
+              <p className="font-medium mb-3 text-[#1B2B40]">
+                Medication on discharge  (compulsory)
               </p>
 
               {medications.map((med, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-2 items-end mt-3"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-start mt-4 border-b pb-4 last:border-0 last:pb-0"
                 >
-                  <div>
-                    <label className="block text-[12px] pb-1">Drug</label>
+                  <div className="lg:col-span-1">
+                    <label className="block text-[12px] font-medium text-gray-700 pb-1">Drug Name</label>
                     <input
                       type="text"
                       placeholder="Drug name..."
@@ -390,95 +399,43 @@ const AfterDischargeSummary = ({
                       onChange={(e) =>
                         handleChange(index, "drug", e.target.value)
                       }
-                      className="w-full border rounded p-2 text-[12px] focus:outline-none"
+                      className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[12px] pb-1">Dosage</label>
+                    <label className="block text-[12px] font-medium text-gray-700 pb-1">Dosage (Numbers only)</label>
                     <input
                       type="number"
                       placeholder="Enter dosage..."
                       value={med.dosage}
-                      onChange={(e) =>
-                        handleChange(index, "dosage", e.target.value)
-                      }
-                      className="w-full border rounded p-2 text-[12px] focus:outline-none"
+                      onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (/^\d*$/.test(val)) {
+                          handleChange(index, "dosage", val);
+                        }
+                      }}
+                      className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
                     />
                   </div>
 
                   <div className="relative">
-                    <label className="block text-[12px] pb-1">Route</label>
-                    <select
-                      value={med.route}
-                      onChange={(e) =>
-                        handleChange(index, "route", e.target.value)
-                      }
-                      className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-6"
-                    >
-                      <option value="Oral">Oral</option>
-                      <option value="IV">IV</option>
-                      <option value="IM">IM</option>
-                    </select>
-                    {/* Custom arrow */}
-                    <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
-                      <svg
-                        className="w-3 h-3 text-gray-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <label className="block text-[12px] pb-1">
-                        Frequency
-                      </label>
-                      <input
-                        type="number"
-                        min={1}
-                        value={med.frequency}
-                        onChange={(e) =>
-                          handleChange(index, "frequency", e.target.value)
-                        }
-                        className="w-full border rounded p-2 text-[12px] focus:outline-none "
-                      />
-                    </div>
+                    <label className="block text-[12px] font-medium text-gray-700 pb-1">Route</label>
                     <div className="relative">
-                      <label className="block text-[12px] pb-1">&nbsp;</label>
                       <select
-                        value={med.frequencyUnit}
+                        value={med.route}
                         onChange={(e) =>
-                          handleChange(index, "frequencyUnit", e.target.value)
+                          handleChange(index, "route", e.target.value)
                         }
-                        className="border rounded p-2 pr-5 text-[12px] appearance-none focus:outline-none"
+                        className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none appearance-none bg-white pr-8 transition-all"
                       >
-                        <option value="Daily">Daily</option>
-                        <option value="Weekly">Weekly</option>
+                        <option value="Oral">Oral</option>
+                        <option value="IV">IV</option>
+                        <option value="IM">IM</option>
                       </select>
-                      <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
-                        <svg
-                          className="w-3 h-3 text-gray-500"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </div>
                     </div>
@@ -486,67 +443,91 @@ const AfterDischargeSummary = ({
 
                   <div className="flex gap-2">
                     <div className="flex-1">
-                      <label className="block text-[12px] pb-1">Duration</label>
+                      <label className="block text-[12px] font-medium text-gray-700 pb-1">Frequency</label>
+                      <input
+                        type="number"
+                        min={1}
+                        value={med.frequency}
+                        onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
+                        onChange={(e) => handleChange(index, "frequency", e.target.value)}
+                        className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-[12px] pb-1">&nbsp;</label>
+                      <div className="relative">
+                        <select
+                          value={med.frequencyUnit}
+                          onChange={(e) =>
+                            handleChange(index, "frequencyUnit", e.target.value)
+                          }
+                          className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-[#3E4095] outline-none transition-all bg-white"
+                        >
+                          <option value="Daily">Daily</option>
+                          <option value="Weekly">Weekly</option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 relative">
+                    <div className="flex-1">
+                      <label className="block text-[12px] font-medium text-gray-700 pb-1">Duration</label>
                       <input
                         type="number"
                         placeholder="duration..."
                         value={med.duration}
-                        onChange={(e) =>
-                          handleChange(index, "duration", e.target.value)
-                        }
-                        className="w-full border rounded p-2 text-[12px] focus:outline-none"
+                        onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
+                        onChange={(e) => handleChange(index, "duration", e.target.value)}
+                        className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
                       />
                     </div>
-                    <div className="relative">
+                    <div className="flex-1">
                       <label className="block text-[12px] pb-1">&nbsp;</label>
-                      <select
-                        value={med.durationUnit}
-                        onChange={(e) =>
-                          handleChange(index, "durationUnit", e.target.value)
-                        }
-                        className="border rounded p-2 text-[12px] appearance-none pr-5 focus:outline-none"
-                      >
-                        <option value="Month">Month (s)</option>
-                        <option value="Week">Week (s)</option>
-                        <option value="Day">Day (s)</option>
-                      </select>
-                      <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
-                        <svg
-                          className="w-3 h-3 text-gray-500"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
+                      <div className="relative">
+                        <select
+                          value={med.durationUnit}
+                          onChange={(e) =>
+                            handleChange(index, "durationUnit", e.target.value)
+                          }
+                          className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-[#3E4095] outline-none transition-all bg-white"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
+                          <option value="Month">Month (s)</option>
+                          <option value="Week">Week (s)</option>
+                          <option value="Day">Day (s)</option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                     {medications.length > 1 && (
                       <button
                         onClick={() => handleRemoveMedication(index)}
-                        className="text-red-500 text-sm font-bold mt-5 cursor-pointer"
+                        className="text-red-500 hover:text-red-700 transition-all mt-6 ml-1 p-1"
                       >
-                        <X size={11} />
+                        <X size={16} />
                       </button>
                     )}
                   </div>
-                  {/* Remove button */}
                 </div>
               ))}
 
               <button
                 onClick={handleAddMedication}
-                className="text-[#3E4095] font-medium text-sm mt-3 flex items-center gap-1"
+                className="text-[#3E4095] font-medium text-[12px] mt-4 flex items-center gap-1 hover:underline transition-all"
               >
-                <Plus size={16} /> Add more drugs
+                <Plus size={14} /> Add more drugs
               </button>
             </div>
+
 
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
               <p className="font-medium">Condition at discharge (compulsory)</p>
@@ -631,139 +612,147 @@ const AfterDischargeSummary = ({
                 Follow up / Next appointment (compulsory)
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mt-3 gap-3">
-                <div className="relative">
+                <div className="">
                   <label className="block text-[12px] pb-1">Day</label>
-                  <select
-                    value={selectedDay}
-                    onChange={(e) => setSelectedDay(e.target.value)}
-                    className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-6"
-                  >
-                    {[...Array(31)].map((_, i) => (
-                      <option key={i} value={i + 1}>
-                        {i + 1}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
-                    <svg
-                      className="w-3 h-3 text-gray-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+                  <div className="relative">
+                    <select
+                      value={selectedDay}
+                      onChange={(e) => setSelectedDay(e.target.value)}
+                      className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-8"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
+                      {[...Array(31)].map((_, i) => (
+                        <option key={i} value={i + 1}>
+                          {i + 1}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                      <svg
+                        className="w-3 h-3 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
                   </div>
                 </div>
-                <div className="relative">
+                <div className="">
                   <label className="block text-[12px] pb-1">Month</label>
-                  <select
-                    value={selectedMonth}
-                    onChange={(e) => setSelectedMonth(e.target.value)}
-                    className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-6"
-                  >
-                    <option value="January" selected>
-                      January
-                    </option>
-                    <option value="February">February</option>
-                    <option value="March">March</option>
-                    <option value="April">April</option>
-                    <option value="May">May</option>
-                    <option value="June">June</option>
-                    <option value="July">July</option>
-                    <option value="August">August</option>
-                    <option value="September">September</option>
-                    <option value="October">October</option>
-                    <option value="November">November</option>
-                    <option value="December">December</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
-                    <svg
-                      className="w-3 h-3 text-gray-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+                  <div className="relative">
+                    <select
+                      value={selectedMonth}
+                      onChange={(e) => setSelectedMonth(e.target.value)}
+                      className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-8"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
+                      <option value="January" selected>
+                        January
+                      </option>
+                      <option value="February">February</option>
+                      <option value="March">March</option>
+                      <option value="April">April</option>
+                      <option value="May">May</option>
+                      <option value="June">June</option>
+                      <option value="July">July</option>
+                      <option value="August">August</option>
+                      <option value="September">September</option>
+                      <option value="October">October</option>
+                      <option value="November">November</option>
+                      <option value="December">December</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                      <svg
+                        className="w-3 h-3 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
                   </div>
                 </div>
-                <div className="relative">
+                <div className="">
                   <label className="block text-[12px] pb-1">Year</label>
-                  <select
-                    value={selectedYear}
-                    onChange={(e) => setSelectedYear(e.target.value)}
-                    className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-6"
-                  >
-                    <option value="2025" selected>
-                      2025
-                    </option>
-                    <option value="2026">2026</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
-                    <svg
-                      className="w-3 h-3 text-gray-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+                  <div className="relative">
+                    <select
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(e.target.value)}
+                      className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-8"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
+                      <option value="2025" selected>
+                        2025
+                      </option>
+                      <option value="2026">2026</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                      <svg
+                        className="w-3 h-3 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
                   </div>
                 </div>
-                <div className="relative">
+                <div className="">
                   <label className="block text-[12px] pb-1">Select time</label>
-                  <select
-                    value={selectedTime}
-                    onChange={(e) => setSelectedTime(e.target.value)}
-                    className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-6"
-                  >
-                    <option value="08:00" selected>
-                      08:00 AM
-                    </option>
-                    <option value="09:00">09:00 AM</option>
-                    <option value="10:00">10:00 AM</option>
-                    <option value="11:00">11:00 AM</option>
-                    <option value="12:00">12:00 PM</option>
-                    <option value="13:00">01:00 PM</option>
-                    <option value="14:00">02:00 PM</option>
-                    <option value="15:00">03:00 PM</option>
-                    <option value="16:00">04:00 PM</option>
-                    <option value="17:00">05:00 PM</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
-                    <svg
-                      className="w-3 h-3 text-gray-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+                  <div className="relative">
+                    <select
+                      value={selectedTime}
+                      onChange={(e) => setSelectedTime(e.target.value)}
+                      className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-8"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
+                      <option value="08:00" selected>
+                        08:00 AM
+                      </option>
+                      <option value="09:00">09:00 AM</option>
+                      <option value="10:00">10:00 AM</option>
+                      <option value="11:00">11:00 AM</option>
+                      <option value="12:00">12:00 PM</option>
+                      <option value="13:00">01:00 PM</option>
+                      <option value="14:00">02:00 PM</option>
+                      <option value="15:00">03:00 PM</option>
+                      <option value="16:00">04:00 PM</option>
+                      <option value="17:00">05:00 PM</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                      <svg
+                        className="w-3 h-3 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
                   </div>
                 </div>
                 <div className="relative col-span-1 sm:col-span-2 lg:col-span-4">
