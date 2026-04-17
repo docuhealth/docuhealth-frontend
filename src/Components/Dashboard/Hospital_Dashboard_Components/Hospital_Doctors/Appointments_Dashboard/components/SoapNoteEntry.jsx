@@ -1046,8 +1046,10 @@ useEffect(() => {
                         className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none appearance-none bg-white pr-8 transition-all"
                       >
                         <option value="Oral">Oral</option>
-                        <option value="IV">IV</option>
-                        <option value="IM">IM</option>
+                        <option value="IV">IV = Intravenous</option>
+                        <option value="IM">IM = Intramuscular</option>
+                        <option value="SE">SE = Subcutaneous Injection</option>
+                        <option value="PV">PV = Per Vagina (Vaginal route)</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                         <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
