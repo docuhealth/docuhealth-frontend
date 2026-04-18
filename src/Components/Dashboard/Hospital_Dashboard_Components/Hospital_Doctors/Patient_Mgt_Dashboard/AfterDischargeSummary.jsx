@@ -432,7 +432,7 @@ const AfterDischargeSummary = ({
                         <option value="Oral">Oral</option>
                         <option value="IV">IV = Intravenous</option>
                         <option value="IM">IM = Intramuscular</option>
-                        <option value="SE">SE = Subcutaneous Injection</option>
+                        <option value="SC">SC = Subcutaneous Injection</option>
                         <option value="PV">PV = Per Vagina (Vaginal route)</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
