@@ -22,7 +22,6 @@ const User_Create_Account_Verify_OTP = () => {
     e.preventDefault();
 
     try {
-      // Dynamically determine which field to send (email or phone_num)
       const payload = {
         otp: otp,
         email: email,
