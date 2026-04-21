@@ -7,6 +7,8 @@ import { FaEnvelope, FaKey } from "react-icons/fa";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+
+
 const User_Create_Account_Verify_OTP = () => {
   const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
@@ -17,6 +19,7 @@ const User_Create_Account_Verify_OTP = () => {
   const navigate = useNavigate();
 
 
+  // requests 
   const handleSubmit = async (e) => {
     setIsLoading(true);
     e.preventDefault();
