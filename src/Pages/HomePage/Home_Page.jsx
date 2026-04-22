@@ -7,6 +7,7 @@ import FAQ_Section from "../Components/HomePage/FAQ_Section";
 import Data_Privacy_Section from "../Components/HomePage/Data_Privacy_Section";
 import Contact_Us_Section from "../Components/HomePage/Contact_Us_Section";
 import DocuHealth_Updates_Section from "../Components/HomePage/DocuHealth_Updates_Section";
+import Our_Locations_Section from "../Components/HomePage/Our_Locations_Section";
 
 const Home_Page = () => {
     return (
@@ -21,6 +22,7 @@ const Home_Page = () => {
             <Core_Product_Section />
             <FAQ_Section />
             <Data_Privacy_Section />
+            <Our_Locations_Section />
             <Contact_Us_Section />
             <DocuHealth_Updates_Section />
         </div>

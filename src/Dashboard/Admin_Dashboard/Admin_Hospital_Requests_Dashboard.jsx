@@ -122,9 +122,9 @@ const Admin_Hospital_Requests_Dashboard = () => {
                         <div className="p-8 text-center text-gray-500 text-sm">No verification requests found.</div>
                       ) : (
                         <div className="flex flex-col">
-                          {displayedRequests.map((req) => (
-                              <div key={req.id} className="grid grid-cols-5 items-center py-4 border-b border-b-gray-200 text-[12px] text-gray-700 text-left w-full hover:bg-gray-50">
-                                <p className="pl-5 font-semibold text-gray-800">#{req.id}</p>
+                          {displayedRequests.map((req, index) => (
+                              <div key={req.id || `req-${index}`} className="grid grid-cols-5 items-center py-4 border-b border-b-gray-200 text-[12px] text-gray-700 text-left w-full hover:bg-gray-50">
+                                <p className="pl-5 font-semibold text-gray-800">#{req.id || index}</p>
                                 <div className="pr-4">
                                   <p className="truncate font-medium">{req.official_email}</p>
                                 </div>
@@ -136,19 +136,25 @@ const Admin_Hospital_Requests_Dashboard = () => {
                                 </p>
 
                                 <div className="relative flex justify-center">
-                                  <button onClick={() => setActiveMenu(activeMenu === req.id ? null : req.id)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setActiveMenu(activeMenu === index ? null : index);
+                                    }} 
+                                    className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+                                  >
                                     <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" /></svg>
                                   </button>
-                                  {activeMenu === req.id && (
+                                  {activeMenu === index && (
                                     <div className="absolute right-0 top-10 w-40 bg-white border border-gray-200 rounded-md shadow z-50 p-2">
                                       <button 
-                                        onClick={() => { setViewDetailRequest(req); setActiveMenu(null); }} 
+                                        onClick={(e) => { e.stopPropagation(); setViewDetailRequest(req); setActiveMenu(null); }} 
                                         className="w-full text-left p-2 rounded font-medium transition-colors hover:bg-blue-50 text-[#3E4095]"
                                       >
                                         View more info
                                       </button>
                                       <button 
-                                        onClick={() => approveHospital(req.id)} 
+                                        onClick={(e) => { e.stopPropagation(); setActiveMenu(null); approveHospital(req.id); }} 
                                         disabled={approving === req.id || req.status === "approved"}
                                         className={`w-full text-left p-2 rounded-md font-medium transition-colors ${
                                             req.status === "approved" ? "text-gray-400 cursor-not-allowed" : "hover:bg-green-50 text-green-600"

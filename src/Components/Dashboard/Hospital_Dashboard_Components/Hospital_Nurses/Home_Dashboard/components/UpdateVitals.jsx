@@ -97,7 +97,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
             <p className="pb-1">Blood pressure</p>
             <div className="relative">
               <input
-                type="number"
+                type="text"
                 id="bloodPressure"
                 className="w-full text-sm border px-3 py-2 rounded-sm pr-16 focus:outline-none" // add padding-right for the unit
                 placeholder="Enter blood pressure"
