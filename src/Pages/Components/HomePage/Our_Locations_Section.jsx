@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 const Our_Locations_Section = () => {
   return (
     <section className="py-10 lg:pt-20 px-5 lg:px-16 text-sm text-[#464646] bg-white overflow-hidden" id="our-locations">
-      <div className="max-w-6xl mx-auto flex flex-col items-center">
+      <div className="max-w-7xl mx-auto flex flex-col items-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

@@ -1,8 +1,0 @@
-[31m✗[39m Build failed in 1.93s
-[31merror during build:
-[31mCould not resolve "../../../../../context/AdminContext/AdminUsersContext" from "src/Components/Dashboard/Admin_Dashboard_Components/Admin_Users_Dashboard/UsersListAdmin.jsx"[31m
-file: [36mC:/Users/USER/Documents/DocuHealth/DocuHealth-/src/Components/Dashboard/Admin_Dashboard_Components/Admin_Users_Dashboard/UsersListAdmin.jsx[31m
-    at getRollupError (file:///C:/Users/USER/Documents/DocuHealth/DocuHealth-/node_modules/rollup/dist/es/shared/parseAst.js:401:41)
-    at error (file:///C:/Users/USER/Documents/DocuHealth/DocuHealth-/node_modules/rollup/dist/es/shared/parseAst.js:397:42)
-    at ModuleLoader.handleInvalidResolvedId (file:///C:/Users/USER/Documents/DocuHealth/DocuHealth-/node_modules/rollup/dist/es/shared/node-entry.js:21590:24)
-    at file:///C:/Users/USER/Documents/DocuHealth/DocuHealth-/node_modules/rollup/dist/es/shared/node-entry.js:21550:26[39m
