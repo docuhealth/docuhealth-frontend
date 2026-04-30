@@ -107,8 +107,23 @@ const DocuHealth_API_Page = () => {
             </ul>
           </div>
         </div>
+
+        {/* API Terms CTA */}
+        <div className='mt-8 mb-16 bg-[#F6FCFE] py-6  px-5 sm:px-6 border rounded-md text-center mx-auto'>
+            <h3 className='text-lg font-bold text-[#3E4095] mb-2'>API Terms & Conditions</h3>
+            <p className='mb-4 text-sm'>
+                Before integrating, please review the rules governing access to and use of the DocuHealth After Visit Summary (AVS) API.
+            </p>
+            <Link to='/api-terms-and-conditions'>
+                <button className='bg-white text-[#3E4095] border border-[#3E4095] px-8 py-2.5 rounded-full hover:bg-[#F6FCFE] transition-colors font-medium w-full sm:w-auto'>
+                    Read API Terms
+                </button>
+            </Link>
+        </div>
+
       </div>
     </BackgroundTemplate2>
+
   )
 }
 

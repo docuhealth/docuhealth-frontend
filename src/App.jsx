@@ -13,6 +13,8 @@ import DocuHealth_News_Page from "./Pages/DocuHealthNewsPage/DocuHealth_News_Pag
 import DocuHealth_API_Page from "./Pages/DocuHealthAPIPage/DocuHealth_API_Page";
 import Legal_Notice_Page from "./Pages/LegalNotice/Legal_Notice_Page";
 import Privacy_Policy_Page from "./Pages/OurPrivacyPolicy/Privacy_Policy_Page";
+import Terms_And_Conditions_Page from "./Pages/TermsAndConditions/Terms_And_Conditions_Page";
+import API_Terms_And_Conditions_Page from "./Pages/TermsAndConditions/API_Terms_And_Conditions_Page";
 
 
 import Hospital_Verification_Request from "./Auth/Hospital/Hospital_Verification_Request";
@@ -836,6 +838,26 @@ function App() {
                 index
                 element={
                   <Privacy_Policy_Page />
+
+                }
+              />
+            </Route>
+
+            <Route path="/terms-and-conditions" element={<Landing_Page_Layout />} >
+              <Route
+                index
+                element={
+                  <Terms_And_Conditions_Page />
+
+                }
+              />
+            </Route>
+
+            <Route path="/api-terms-and-conditions" element={<Landing_Page_Layout />} >
+              <Route
+                index
+                element={
+                  <API_Terms_And_Conditions_Page />
 
                 }
               />
