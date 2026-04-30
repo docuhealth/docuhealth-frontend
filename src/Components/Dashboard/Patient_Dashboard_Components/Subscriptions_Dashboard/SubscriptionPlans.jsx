@@ -1,13 +1,12 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { SubscriptionsContext } from "../../../../context/PatientContext/SubscriptionsContext";
+import { AppContext } from "../../../../context/PatientContext/AppContext.jsx";
 import axiosInstance from "../../../../utils/axiosInstance";
-import DynamicDate from "../../../DynamicDate/DynamicDate";
 import toast from "react-hot-toast";
 
 const SubscriptionPlans = () => {
-  const { subscriptionPlans, isPending } = useContext(SubscriptionsContext);
-
-  // console.log(subscriptionPlans)
+  const { subscriptionPlans, isPending: subscriptionDataIsPending } = useContext(SubscriptionsContext);
+  const { profile, isPending: profileDataIsPending } = useContext(AppContext);
 
   // Add this state to your component
   const [paymentUrl, setPaymentUrl] = useState(null);
@@ -35,6 +34,8 @@ const SubscriptionPlans = () => {
     }
   };
 
+  const currentSubscription = profileDataIsPending === false ? profile.subscription : null;
+  const userIsSubscribed = currentSubscription?.is_subscribed ?? false;
 
   return (
     <>
@@ -45,7 +46,7 @@ const SubscriptionPlans = () => {
           </p>
         </div>
         {/* ===== Loading State ===== */}
-        {isPending ? (
+        {subscriptionDataIsPending || profileDataIsPending ? (
           <div className="flex justify-center items-center ">
             <p className="text-gray-600 text-sm animate-pulse">
               Loading subscription plans...
@@ -123,7 +124,12 @@ const SubscriptionPlans = () => {
             {/* ---------- Static Basic Plan ---------- */}
             <div className="p-4 rounded-xl bg-[#F5F8F8]">
               <div className="flex justify-between items-center">
-                <p className="text-[12px] text-gray-900 pb-2">Basic Plan</p>
+                <p className="text-[12px] text-gray-900 pb-2">
+                  Basic Plan
+                  {!userIsSubscribed && (
+                      <span className="text-xs text-green-600 font-bold"> (ACTIVE)</span>
+                  )}
+                </p>
               </div>
 
               {/* Price Section */}
@@ -170,18 +176,13 @@ const SubscriptionPlans = () => {
               </div>
 
               {/* Button */}
-              <div className="rounded-full my-4 font-semibold">
-                <div className="py-3">
-                  <p
-                    className="text-sm text-center cursor-pointer"
-                    onClick={() =>
-                      toast.success("You are already on the free plan!")
-                    }
-                  >
-                    Choose Free Plan
-                  </p>
-                </div>
-              </div>
+              <button
+                  className="py-3 rounded-full my-4 font-semibold w-full border border-gray-400 disabled:cursor-not-allowed disabled:text-gray-500"
+                  onClick={() => toast.success("You are already on the free plan!")}
+                  disabled={userIsSubscribed}
+              >
+                <p className="text-sm text-center">Choose Free Plan</p>
+              </button>
             </div>
 
             {/* ---------- Dynamic Plans from API ---------- */}
@@ -197,6 +198,9 @@ const SubscriptionPlans = () => {
                     style={{ color: "#FE9000" }}
                   >
                     {plan.name}
+                    {userIsSubscribed && currentSubscription.name === name && (
+                        <span className="text-xs text-green-600 font-bold"> (ACTIVE)</span>
+                    )}
                   </p>
                 </div>
 
@@ -226,16 +230,13 @@ const SubscriptionPlans = () => {
                 </div>
 
                 {/* Button */}
-                <div
-                  onClick={() => handlePayment(plan.paystack_plan_code)}
-                  className="rounded-full my-4 border border-[#3E4095] text-[#3E4095] font-semibold"
+                <button
+                    className="rounded-full my-4 border border-[#3E4095] text-[#3E4095] font-semibold w-full disabled:cursor-not-allowed disabled:text-gray-500"
+                    onClick={() => handlePayment(plan.paystack_plan_code)}
+                    disabled={userIsSubscribed}
                 >
-                  <div className="py-3">
-                    <p className="text-sm text-center cursor-pointer">
-                      Choose {plan.name}
-                    </p>
-                  </div>
-                </div>
+                  <p className="py-3 text-sm text-center">Choose {plan.name}</p>
+                </button>
               </div>
             ))}
           </div>
