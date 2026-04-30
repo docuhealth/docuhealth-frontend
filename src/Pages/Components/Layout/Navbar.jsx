@@ -196,6 +196,16 @@ const Navbar = ({ showPharmacyMode }) => {
                   Legal Notice
                 </Link>
                 <Link
+                  to="/terms-and-conditions"
+                  className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-[#3E4095] ${currentPath === "/terms-and-conditions"
+                      ? "text-[#3E4095] font-medium"
+                      : "text-[#797979]"
+                    }`}
+                  onClick={() => toggleDropdown("")}
+                >
+                  Terms and Conditions
+                </Link>
+                <Link
                   to="/privacy-policy"
                   className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-b-lg ${currentPath === "/our-privacy-policy"
                       ? "text-[#3E4095] font-medium"
@@ -563,6 +573,20 @@ const Navbar = ({ showPharmacyMode }) => {
                     }`}
                   >
                     Legal Notice
+                  </Link>
+                  <Link
+                    to="/terms-and-conditions"
+                    onClick={() => {
+                      setIsOpen(false);
+                      toggleDropdown("");
+                    }
+                    }
+                    className={`block  hover:bg-gray-100 hover:text-[#3E4095] ${currentPath === "/terms-and-conditions"
+                      ? "text-[#3E4095] font-medium"
+                      : "text-[#797979]"
+                    }`}
+                  >
+                    Terms and Conditions
                   </Link>
                   <Link
                     to="/privacy-policy"

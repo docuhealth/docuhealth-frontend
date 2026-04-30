@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import BackgroundTemplate from "../ui/BackgroundTemplate";
 import toast from "react-hot-toast";
 import axiosInstance from "../../../utils/axiosInstance";
@@ -248,6 +249,9 @@ const Contact_Us_Section = () => {
                 <h3 className="text-[#3E4095] font-semibold">
                   Send us a message as a Health Provider
                 </h3>
+                <p className="text-xs text-gray-500 -mt-2">
+                  By messaging us, you agree to our <Link to="/terms-and-conditions" className="text-[#3E4095] underline font-medium">Terms and Conditions</Link> for Hospitals.
+                </p>
 
                 <div>
                   <label className="block pb-2">Organization Name:</label>
