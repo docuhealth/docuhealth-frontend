@@ -14,6 +14,7 @@ const Hospital_Admin_Header = () => {
 
   const { profile } = useContext(HosAppContext);
   const navigate = useNavigate();
+  
 
   const initials = profile
     ? `${profile.name?.[0] || ""}${profile.name?.[1] || ""}`.toUpperCase()

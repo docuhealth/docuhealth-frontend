@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import template from "../../../assets/img/template.png";
-import { Camera, Trash2 } from "lucide-react"; // Optional: using lucide for the icon
+import { Camera, Trash2, Users, UserCheck, Briefcase, Bed } from "lucide-react"; 
 import { HosAppContext } from "../../../context/HospitalContext/Admin/HosAppContext";
 import ImageCustomization from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/ImageCustomization";
 import RemoveBrandingModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/RemoveBrandingModal";
@@ -9,12 +9,15 @@ import RemoveBrandingModal from "../../../Components/Dashboard/Hospital_Dashboar
 
 const Hospital_Admin_Home_Dashboard = () => {
 
-  const { profile } = useContext(HosAppContext);
+  const { profile, dashboardMetrics, dashboardMetricsLoading } = useContext(HosAppContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
 
 
   const backgroundImage = profile?.theme?.bg_image || template;
+
+
+  // console.log(dashboardMetrics)
 
   return (
     <>
@@ -38,22 +41,22 @@ const Hospital_Admin_Home_Dashboard = () => {
 
           <div className="absolute bottom-4 right-4 flex flex-col md:flex-row items-center gap-3 ">
 
-          <button className=" flex items-center gap-2 bg-white px-4 py-2 rounded-md shadow-lg hover:bg-gray-100 transition-colors text-[#3E4095] font-medium text-sm"
-          onClick={() => setIsModalOpen(true)}
-          >
-            <Camera size={18} />
-            Change cover theme
-          </button>
-          <button className=" flex items-center gap-2 bg-white px-4 py-2 rounded-md shadow-lg hover:bg-gray-100 transition-colors text-red-500 font-medium text-sm"
-          onClick={() => setIsRemoveModalOpen(true)}
-          >
+            <button className=" flex items-center gap-2 bg-white px-4 py-2 rounded-md shadow-lg hover:bg-gray-100 transition-colors text-[#3E4095] font-medium text-sm"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <Camera size={18} />
+              Change cover theme
+            </button>
+            <button className=" flex items-center gap-2 bg-white px-4 py-2 rounded-md shadow-lg hover:bg-gray-100 transition-colors text-red-500 font-medium text-sm"
+              onClick={() => setIsRemoveModalOpen(true)}
+            >
 
-            <Trash2 size={18} />
-            Remove cover theme
-          </button>
+              <Trash2 size={18} />
+              Remove cover theme
+            </button>
           </div>
 
-         
+
         </div>
 
       </div>
@@ -63,7 +66,7 @@ const Hospital_Admin_Home_Dashboard = () => {
       )}
 
       {isRemoveModalOpen && (
-        <RemoveBrandingModal type = 'bg_image' onClose={() => setIsRemoveModalOpen(false)} />
+        <RemoveBrandingModal type='bg_image' onClose={() => setIsRemoveModalOpen(false)} />
       )}
 
     </>
