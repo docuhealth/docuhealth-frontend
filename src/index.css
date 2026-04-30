@@ -34,6 +34,12 @@ layer(base);
   }
 }
 
+@layer components {
+  button {
+    cursor: pointer;
+  }
+}
+
 *{
     box-sizing: border-box;
     font-family: "Montserrat", sans-serif;
@@ -137,11 +143,6 @@ layer(base);
 .swiper-pagination-bullet-active {
   background-color: #3E4095 !important; /* DocuHealth purple */
 }
-
-button{
-  cursor: pointer;
-}
-
 
 
 
