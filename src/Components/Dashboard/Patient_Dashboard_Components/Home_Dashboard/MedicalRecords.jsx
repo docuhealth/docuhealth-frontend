@@ -224,6 +224,7 @@ const MedicalRecords = ({
                 onClick={() => {
                   if (profile) {
                     const is_subscribed = fetchSubscriptionStatus();
+                 
                     if (!is_subscribed) {
                       toast.error("Please subscribe to access feature");
                       return;

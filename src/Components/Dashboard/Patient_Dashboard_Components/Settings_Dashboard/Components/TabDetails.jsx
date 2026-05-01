@@ -698,7 +698,7 @@ const IDCardTab = () => {
       </div>
 
       {isIdCardGenerated ? (
-        <div className="bg-gray-50 rounded-xl border p-4 sm:p-12 shadow-inner">
+        <div className="bg-gray-50 rounded-xl border  sm:p-12 shadow-inner">
           <div ref={cardRef} className="p-2 rounded-lg">
             <IDCardUI selectedProfile={profile} idCardData={profile.id_card} />
           </div>

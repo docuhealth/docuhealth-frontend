@@ -8,7 +8,7 @@ const IDCardUI = ({ selectedProfile, idCardData }) => {
     if (!selectedProfile) return null;
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 place-items-center gap-2 mx-2 sm:gap-6 relative py-10 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-2 place-items-center gap-2 mx-2 sm:gap-6 relative py-2 sm:py-10 items-stretch">
             {/* First ID Card */}
             <div
                 style={{ backgroundImage: `url(${TIDF})` }}
