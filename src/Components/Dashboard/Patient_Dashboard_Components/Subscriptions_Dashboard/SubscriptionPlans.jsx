@@ -37,6 +37,8 @@ const SubscriptionPlans = () => {
   const currentSubscription = profileDataIsPending === false ? profile.subscription : null;
   const userIsSubscribed = currentSubscription?.is_subscribed ?? false;
 
+  // console.log(userIsSubscribed, currentSubscription)
+
   return (
     <>
       <div className="bg-white my-5 border rounded-lg py-8 px-6">
@@ -198,7 +200,7 @@ const SubscriptionPlans = () => {
                     style={{ color: "#FE9000" }}
                   >
                     {plan.name}
-                    {userIsSubscribed && currentSubscription.name === name && (
+                    {userIsSubscribed && currentSubscription.name === plan.name && (
                         <span className="text-xs text-green-600 font-bold"> (ACTIVE)</span>
                     )}
                   </p>
