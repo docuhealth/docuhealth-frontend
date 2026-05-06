@@ -49,11 +49,11 @@ const Patient_Home_Dashboard = () => {
     enabled: true,
   });
 
-  useEffect(() => {
-    if (vitalSigns) {
-      console.log("Vital Signs in Patient_Home_Dashboard:", vitalSigns);
-    }
-  }, [vitalSigns]);
+  // useEffect(() => {
+  //   if (vitalSigns) {
+  //     console.log("Vital Signs in Patient_Home_Dashboard:", vitalSigns);
+  //   }
+  // }, [vitalSigns]);
 
 useEffect(() => {
     // 1. Delay the initial appearance by 3 seconds (3000ms)
