@@ -60,6 +60,15 @@ const Footer = () => {
               </svg>
             </a>
           </div>
+          <div className="mb-5">
+            <img
+              src="https://res.cloudinary.com/drhfrgahv/image/upload/v1778081304/WhatsApp_Image_2026-05-04_at_08.37.36_g8lo95.jpg"
+              alt="DocuHealth New Certificate"
+              width={320}
+              height={240}
+              className="w-80 rounded-xl shadow-lg border border-white/20 object-cover"
+            />
+          </div>
           <div className="flex gap-10">
             <img
               src="https://res.cloudinary.com/drhfrgahv/image/upload/v1762777839/docuhealth_ndpr_audit_lwqlq8.jpg"
@@ -74,15 +83,6 @@ const Footer = () => {
               width={240}
               height={180}
               className="w-60 rounded-lg"
-            />
-          </div>
-          <div className="mt-5">
-            <img
-              src="https://res.cloudinary.com/drhfrgahv/image/upload/v1778081304/WhatsApp_Image_2026-05-04_at_08.37.36_g8lo95.jpg"
-              alt="DocuHealth New Certificate"
-              width={320}
-              height={240}
-              className="w-80 rounded-xl shadow-lg border border-white/20 object-cover"
             />
           </div>
 
@@ -206,6 +206,13 @@ const Footer = () => {
               </svg>
             </a>
           </div>
+          <div className="mb-4">
+            <img
+              src='https://res.cloudinary.com/drhfrgahv/image/upload/v1778081304/WhatsApp_Image_2026-05-04_at_08.37.36_g8lo95.jpg'
+              alt="docuhealth new certificate"
+              className="w-full sm:w-2/3 object-cover rounded-3xl shadow-lg border border-white/20"
+            />
+          </div>
           <div className="flex flex-col gap-4">
             <img
               src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777839/docuhealth_ndpr_audit_lwqlq8.jpg'
@@ -216,13 +223,6 @@ const Footer = () => {
               src='https://res.cloudinary.com/drhfrgahv/image/upload/v1762777826/docuhealth_fhir_zdtw2p.jpg'
               alt="docuhealth fhir image"
               className="w-full sm:w-1/2 object-cover rounded-3xl"
-            />
-          </div>
-          <div className="mt-4">
-            <img
-              src='https://res.cloudinary.com/drhfrgahv/image/upload/v1778081304/WhatsApp_Image_2026-05-04_at_08.37.36_g8lo95.jpg'
-              alt="docuhealth new certificate"
-              className="w-full sm:w-2/3 object-cover rounded-3xl shadow-lg border border-white/20"
             />
           </div>
 
