@@ -7,11 +7,13 @@ import axiosInstance from "../../../../utils/axiosInstance";
 import UserSubAcctMedicalRecords from "./Components/UserSubAcctMedicalRecords";
 import MedicalRecordsDetail from "../Home_Dashboard/MedicalRecordsDetail";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import SearchBar from "../../../../Components/SearchBar/SearchBar";
 
 const UserSubAcctList = ({ setDisplaySubAcctModal }) => {
   const {
-    subAccounts, isPending, count,
-    currentPage, setCurrentPage, totalPages
+    subAccounts, isPending, isFetching, count,
+    currentPage, setCurrentPage, totalPages,
+    searchQuery, setSearchQuery,
   } = useContext(SubAccountContext);
 
 
@@ -77,8 +79,21 @@ const UserSubAcctList = ({ setDisplaySubAcctModal }) => {
           </>
         )
       ) : (
-        <div className="hidden lg:block pt-8 px-6 border rounded-lg bg-white my-5 ">
-          <h1 className=" mb-4 font-medium">Sub-Accounts</h1>
+        <div className="hidden lg:block pt-8 px-6 border rounded-lg bg-white my-5">
+          <h1 className="mb-4 font-medium">Sub-Accounts</h1>
+          <div className="mb-3">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search by name or HIN..."
+            />
+            {isFetching && (
+              <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
+                <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+                Searching...
+              </p>
+            )}
+          </div>
           <div>
             <UserSubAcctRecords
               subAccounts={subAccounts}

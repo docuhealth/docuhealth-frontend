@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { MedicalRecordsContext } from "../../../../context/PatientContext/MedicalRecordsContext";
 import Pagination2 from "../Pagination/Pagination2";
 import formatRecordDate from "./Components/formatRecordDate";
@@ -7,6 +7,7 @@ import { truncateWords } from "./Components/formatRecordDate";
 import toast from "react-hot-toast";
 import { AppContext } from "../../../../context/PatientContext/AppContext";
 import { fetchSubscriptionStatus } from "../../../../services/authService";
+import SearchBar from "../../../../Components/SearchBar/SearchBar";
 
 const MedicalRecords = ({
   selected,
@@ -21,6 +22,7 @@ const MedicalRecords = ({
   const { currentPage } = useContext(MedicalRecordsContext);
   const { setCurrentPage } = useContext(MedicalRecordsContext);
   const { totalPages } = useContext(MedicalRecordsContext);
+  const { searchQuery, setSearchQuery } = useContext(MedicalRecordsContext);
 
   const { profile } = useContext(AppContext);
 
@@ -59,7 +61,7 @@ const MedicalRecords = ({
     );
   }
 
-  if (medicalRecords.length === 0) {
+  if (medicalRecords.length === 0 && !searchQuery) {
     return (
       <div className="flex flex-col justify-start lg:justify-center items-center text-center  h-auto lg:h-full mt-[15%] lg:mt-0">
         <svg
@@ -128,8 +130,29 @@ const MedicalRecords = ({
 
 
   return (
-    <div className="bg-white my-5 border rounded-lg py-5 px-5 ">
-      <h2 className=" mb-4 pb-2 border-b font-medium">
+    <div className="bg-white my-5 border rounded-lg py-5 px-5">
+      <div className="mb-4">
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search by doctor or hospital..."
+        />
+        {isFetching && (
+          <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
+            <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+            Searching...
+          </p>
+        )}
+      </div>
+
+      {medicalRecords.length === 0 && searchQuery ? (
+        <div className="py-12 text-center text-gray-500 text-sm">
+          <p className="font-medium">No results found.</p>
+          <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
+        </div>
+      ) : (
+      <>
+      <h2 className="mb-4 pb-2 border-b font-medium">
         My Medical Records
       </h2>
       <div className="-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -266,7 +289,6 @@ const MedicalRecords = ({
           </div>
         ))}
       </div>
-
       <div>
         <Pagination2
           count={count}
@@ -275,6 +297,8 @@ const MedicalRecords = ({
           setCurrentPage={setCurrentPage}
         />
       </div>
+      </>
+      )}
     </div>
 
   );

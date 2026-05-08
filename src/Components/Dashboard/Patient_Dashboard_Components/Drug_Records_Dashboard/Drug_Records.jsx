@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { DrugRecordsContext } from "../../../../context/PatientContext/DrugRecordsContext";
 import Pagination2 from "../Pagination/Pagination2";
+import SearchBar from "../../../../Components/SearchBar/SearchBar";
 
 const Drug_Records = () => {
   const {
@@ -13,6 +14,8 @@ const Drug_Records = () => {
     totalPages,
     currentPage,
     setCurrentPage,
+    searchQuery,
+    setSearchQuery,
   } = useContext(DrugRecordsContext);
 
 
@@ -22,12 +25,30 @@ const Drug_Records = () => {
   return (
     <>
       <div className="bg-white my-5 border rounded-lg py-8 px-6">
+        <div className="mb-4">
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search by drug name..."
+          />
+          {isFetching && (
+            <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
+              <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+              Searching...
+            </p>
+          )}
+        </div>
         {/* ===== Loading State ===== */}
         {isPending ? (
           <div className="flex justify-center items-center ">
             <p className="text-gray-600 text-sm animate-pulse">
               Loading drug records...
             </p>
+          </div>
+        ) : drugRecords.length === 0 && searchQuery ? (
+          <div className="py-12 text-center text-gray-500 text-sm">
+            <p className="font-medium">No results found.</p>
+            <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
           </div>
         ) : drugRecords.length === 0 ? (
           // ===== Empty State =====

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useMemo } from "react";
+import React, { useContext, useMemo } from "react";
 import { AppointmentsContext } from "../../../../context/PatientContext/AppointmentsContext";
 import Pagination2 from "../Pagination/Pagination2";
 import { formatFullDate, formatTime } from "./Components/Date_Time_Formatter";
@@ -15,42 +15,30 @@ const PatientAppointmentsList = ({selected}) => {
     currentPage,
     totalPages,
     setCurrentPage,
+    searchQuery,
+    setSearchQuery,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
   } = useContext(AppointmentsContext);
 
-   const [searchQuery, setSearchQuery] = useState("");
-  
-   const processedAppointments = useMemo(() => {
-    // 1. Filter by search query
-    let filtered = appointments.filter((app) => {
-      const searchStr = searchQuery.toLowerCase();
-      return (
-        app.staff?.firstname?.toLowerCase().includes(searchStr) ||
-        app.staff?.lastname?.toLowerCase().includes(searchStr) ||
-        app?.hospital_info?.name?.toLowerCase().includes(searchStr)
-      );
-    });
-
-    // 2. Sort based on the "selected" prop from parent
-    return [...filtered].sort((a, b) => {
+  // Keep client-side sort (by the `selected` prop from parent)
+  const sortedAppointments = useMemo(() => {
+    return [...appointments].sort((a, b) => {
       const dateA = new Date(a.scheduled_time).getTime();
       const dateB = new Date(b.scheduled_time).getTime();
       const nameA = `${a.staff?.firstname} ${a.staff?.lastname}`.toLowerCase();
       const nameB = `${b.staff?.firstname} ${b.staff?.lastname}`.toLowerCase();
-
       switch (selected) {
-        case "Latest":
-          return dateB - dateA; // Newest first
-        case "Oldest":
-          return dateA - dateB; // Oldest first
-        case "A-Z":
-          return nameA.localeCompare(nameB);
-        case "Z-A":
-          return nameB.localeCompare(nameA);
-        default:
-          return 0;
+        case "Latest": return dateB - dateA;
+        case "Oldest": return dateA - dateB;
+        case "A-Z": return nameA.localeCompare(nameB);
+        case "Z-A": return nameB.localeCompare(nameA);
+        default: return 0;
       }
     });
-  }, [appointments, searchQuery, selected]);
+  }, [appointments, selected]);
 
   if (isPending) {
     return (
@@ -59,7 +47,7 @@ const PatientAppointmentsList = ({selected}) => {
       </div>
     );
   }
-  if (appointments.length === 0) {
+  if (appointments.length === 0 && !searchQuery && !dateFrom && !dateTo) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
@@ -129,16 +117,57 @@ const PatientAppointmentsList = ({selected}) => {
   }
   return (
     <>
-       <div className="mb-4 w-full">
+      <div className="mb-4 w-full">
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
-     placeholder="Search by doctor or hospital..."
+          placeholder="Search by doctor or hospital..."
         />
+        <div className="flex flex-wrap gap-3 mt-2">
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-gray-500">From</label>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#3E4095]"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-gray-500">To</label>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#3E4095]"
+            />
+          </div>
+          {(dateFrom || dateTo) && (
+            <button
+              onClick={() => { setDateFrom(""); setDateTo(""); }}
+              className="text-xs text-red-400 hover:text-red-600 transition-colors"
+            >
+              Clear dates
+            </button>
+          )}
+        </div>
+        {isFetching && (
+          <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
+            <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+            Searching...
+          </p>
+        )}
       </div>
+
+      {appointments.length === 0 && (searchQuery || dateFrom || dateTo) ? (
+        <div className="py-12 text-center text-gray-500 text-sm">
+          <p className="font-medium">No results found.</p>
+          <p className="text-xs text-gray-400 mt-1">Try a different search term or date range.</p>
+        </div>
+      ) : (
    <div className="my-4">
       <div className="hidden lg:block">
-        {processedAppointments.map((apt) => (
+        {sortedAppointments.map((apt) => (
           <div key={apt.id} className="flex items-center justify-between p-4 mb-4 border border-gray-200 rounded-md transition-shadow bg-white ">
             <div className="flex items-center gap-6 flex-1">
               <InfoGroup icon={<CalendarIcon size={16}/>} label="Date / Time" value={`${formatFullDate(apt.scheduled_time)} | ${formatTime(apt.scheduled_time)}`} />
@@ -157,7 +186,7 @@ const PatientAppointmentsList = ({selected}) => {
 
       {/* --- MOBILE VIEW (Vertical Cards) --- */}
       <div className="block lg:hidden space-y-4">
-        {processedAppointments.map((apt) => (
+        {sortedAppointments.map((apt) => (
           <div key={apt.id} className="p-4 border border-gray-200 rounded-md bg-white ">
             <div className="flex justify-between items-start mb-4">
               <div>
@@ -199,6 +228,7 @@ const PatientAppointmentsList = ({selected}) => {
         setCurrentPage={setCurrentPage}
       />
     </div>
+    )}
     </>
   );
 };
