@@ -1,4 +1,4 @@
-import React, { useState, useContext, useMemo } from "react";
+import React, { useContext, useMemo } from "react";
 import { ReceptionistAppointmentsListContext } from "../../../../../context/HospitalContext/Receptionist/ReceptionistAppointmentsListContext";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import {
@@ -17,33 +17,24 @@ const AppointmentsList = () => {
     currentPage,
     totalPages,
     setCurrentPage,
+    searchQuery,
+    setSearchQuery,
+    isRefreshing,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
   } = useContext(ReceptionistAppointmentsListContext);
-  
-    const [searchQuery, setSearchQuery] = useState("");
-  
-  const processedAppointments = useMemo(() => {
-   
-    let filtered = appointments.filter((app) => {
-      const searchStr = searchQuery.toLowerCase();
-      return (
-        app.patient.firstname?.toLowerCase().includes(searchStr) ||
-        app.patient.lastname?.toLowerCase().includes(searchStr) ||
-        app.staff.firstname?.toLowerCase().includes(searchStr) ||
-        app.staff.lastname?.toLowerCase().includes(searchStr) ||
-        app.staff.role?.toLowerCase().includes(searchStr)
-      );
-    });
-  
+
+  // Keep client-side sort by proximity to now
+  const sortedAppointments = useMemo(() => {
     const now = new Date().getTime();
-  
-    return [...filtered].sort((a, b) => {
+    return [...appointments].sort((a, b) => {
       const dateA = new Date(a.scheduled_time).getTime();
       const dateB = new Date(b.scheduled_time).getTime();
-  
-  
       return Math.abs(dateA - now) - Math.abs(dateB - now);
     });
-  }, [appointments, searchQuery]);
+  }, [appointments]);
   
 
   if (loading) {
@@ -53,7 +44,7 @@ const AppointmentsList = () => {
       </div>
     );
   }
-  if (appointments.length === 0) {
+  if (appointments.length === 0 && !searchQuery && !dateFrom && !dateTo) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
@@ -124,16 +115,57 @@ const AppointmentsList = () => {
 
   return (
     <>
-        <div className="mb-4 w-full">
+      <div className="mb-4 w-full">
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
           placeholder="Search by name, role or email..."
         />
+        <div className="flex flex-wrap gap-3 mt-2">
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-gray-500">From</label>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#3E4095]"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-gray-500">To</label>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#3E4095]"
+            />
+          </div>
+          {(dateFrom || dateTo) && (
+            <button
+              onClick={() => { setDateFrom(""); setDateTo(""); }}
+              className="text-xs text-red-400 hover:text-red-600 transition-colors"
+            >
+              Clear dates
+            </button>
+          )}
+        </div>
+        {isRefreshing && (
+          <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
+            <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+            Searching...
+          </p>
+        )}
       </div>
+
+      {appointments.length === 0 && (searchQuery || dateFrom || dateTo) ? (
+        <div className="py-12 text-center text-gray-500 text-sm">
+          <p className="font-medium">No results found.</p>
+          <p className="text-xs text-gray-400 mt-1">Try a different search term or date range.</p>
+        </div>
+      ) : (
     <div className="text-[12px] my-4">
       <div className="hidden lg:block">
-        {processedAppointments.map((appointment) => (
+        {sortedAppointments.map((appointment) => (
           <div
             key={appointment.id}
             className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10 "
@@ -210,7 +242,7 @@ const AppointmentsList = () => {
         ))}
       </div>
       <div className="block lg:hidden space-y-4 my-4">
-        {processedAppointments.map((appointment) => (
+        {sortedAppointments.map((appointment) => (
           <div
             key={appointment.id}
             className="bg-white border border-gray-200 rounded-md p-4  transition-transform"
@@ -335,6 +367,7 @@ const AppointmentsList = () => {
         setCurrentPage = {setCurrentPage}
       />
     </div>
+    )}
     </>
   );
 };

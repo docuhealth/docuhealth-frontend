@@ -1,50 +1,60 @@
-import React, { useState, createContext } from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useState, useEffect, createContext } from "react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 import { getHospitalToken } from "../../../services/authService";
+import useDebounce from "../../../hooks/useDebounce";
 
 export const ReceptionistAdmittedPatientMGTContext = createContext();
 
 const ReceptionistAdmittedPatientMGTProvider = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [tab, setTab] = useState("active"); // 'active' or 'discharged'
+  const [tab, setTab] = useState("active");
+  const [searchQuery, setSearchQuery] = useState("");
   const pageSize = 6;
+
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const isUserLoggedIn = !!getHospitalToken();
 
-  const { data, isLoading: loading } = useQuery({
-    // 🔹 The Key is the secret: it tracks both status and page
-    queryKey: ["hospital-patients-receptionist", tab, currentPage],
+  const { data, isLoading: loading, isFetching } = useQuery({
+    queryKey: ["hospital-patients-receptionist", tab, currentPage, debouncedSearch],
     queryFn: async () => {
-      const res = await axiosInstanceHos.get(
-        `api/hospitals/admissions/${tab}?page=${currentPage}&size=${pageSize}`,
-      );
+      let url = `api/hospitals/admissions/${tab}?page=${currentPage}&size=${pageSize}`;
+      if (debouncedSearch) url += `&search=${debouncedSearch}`;
+      const res = await axiosInstanceHos.get(url);
       return res.data;
     },
     enabled: isUserLoggedIn,
-    placeholderData: (previousData) => previousData, // Smooth transition between pages
+    placeholderData: keepPreviousData,
   });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
 
   const admittedPatients = data?.results || [];
   const count = data?.count || 0;
   const totalPages = Math.ceil(count / pageSize);
 
-  // 🔹 Helper to switch tabs and reset page
   const handleTabChange = (newTab) => {
     setTab(newTab);
     setCurrentPage(1);
+    setSearchQuery("");
   };
 
   return (
     <ReceptionistAdmittedPatientMGTContext.Provider
       value={{
         admittedPatients,
-      loading,
-      count,
-      currentPage,
-      totalPages,
-      setCurrentPage, // Pass the setter directly for pagination
-      tab,
-      setTab: handleTabChange
+        loading,
+        isRefreshing: isFetching,
+        count,
+        currentPage,
+        totalPages,
+        setCurrentPage,
+        tab,
+        setTab: handleTabChange,
+        searchQuery,
+        setSearchQuery,
       }}
     >
       {props.children}

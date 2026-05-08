@@ -1,20 +1,23 @@
-import React, { useState, useContext } from "react";
+import { useContext } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ReceptionistAdmissionRequestContext } from "../../../../../context/HospitalContext/Receptionist/ReceptionistAdmissionRequestContext";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
-import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
+import SearchBar from "../../../../SearchBar/SearchBar";
 import toast from "react-hot-toast";
 
 const AdmissionRequestList = () => {
   const {
     admissionRequests,
     loading,
+    isRefreshing,
     count,
     currentPage,
     totalPages,
     setCurrentPage,
+    searchQuery,
+    setSearchQuery,
   } = useContext(ReceptionistAdmissionRequestContext);
 
   console.log(admissionRequests)
@@ -57,7 +60,7 @@ const AdmissionRequestList = () => {
       </div>
     );
   }
-  if (admissionRequests.length === 0) {
+  if (admissionRequests.length === 0 && !searchQuery) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
@@ -127,6 +130,27 @@ const AdmissionRequestList = () => {
 
   return (
     <>
+      <div className="mb-4 w-full">
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search patient name, HIN..."
+        />
+        {isRefreshing && (
+          <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
+            <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+            Searching...
+          </p>
+        )}
+      </div>
+
+      {admissionRequests.length === 0 && searchQuery ? (
+        <div className="py-12 text-center text-gray-500 text-sm">
+          <p className="font-medium">No results found.</p>
+          <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
+        </div>
+      ) : (
+      <>
       <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {admissionRequests.map((admissionRequest, index) => {
           const isMutatingThis =
@@ -215,6 +239,8 @@ const AdmissionRequestList = () => {
         totalPages={totalPages}
         setCurrentPage={setCurrentPage}
       />
+      </>
+      )}
     </>
   );
 };
