@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { Activity, ChevronLeft, ChevronRight } from "lucide-react";
 import { NursesVitalSignsContext } from "../../../../../context/HospitalContext/Nurses/NursesVitalSignsContext";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
+import SearchBar from "../../../../SearchBar/SearchBar";
 
 const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
     const hin = selected?.patient?.hin;
@@ -13,7 +14,10 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
         setCurrentPage,
         totalPages,
         loading,
-        setPatientHin
+        isRefreshing,
+        setPatientHin,
+        searchQuery,
+        setSearchQuery,
     } = useContext(NursesVitalSignsContext);
 
     useEffect(() => {
@@ -47,6 +51,19 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
                 <h2 className="text-sm">Vital Signs History</h2>
             </div>
 
+            <div className="my-4">
+                <SearchBar
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    placeholder="Search vitals records..."
+                />
+                {isRefreshing && (
+                    <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
+                        <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+                        Searching...
+                    </p>
+                )}
+            </div>
             <div className="my-5">
                 {loading ? (
                     <div className="flex justify-center items-center gap-3 px-2 py-3 text-gray-500">

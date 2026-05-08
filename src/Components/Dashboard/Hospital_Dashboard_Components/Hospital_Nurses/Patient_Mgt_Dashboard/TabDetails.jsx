@@ -14,36 +14,22 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
         count,
         currentPage,
         totalPages,
-        setCurrentPage
+        setCurrentPage,
+        searchQuery,
+        setSearchQuery,
+        isRefreshing
     } = useContext(NursesAdmittedPatientMGTContext);
-
 
     const [selectedPatient, setSelectedPatient] = useState(null);
 
-    const [searchQuery, setSearchQuery] = useState("");
-
-    const processedAdmittedPatients = useMemo(() => {
-        // 1. Filter based on search query
-        const filtered = admittedPatients.filter((item) => {
-            const searchStr = searchQuery.toLowerCase();
-
-            return (
-                item.patient.firstname?.toLowerCase().includes(searchStr) ||
-                item.patient.lastname?.toLowerCase().includes(searchStr) ||
-                item.patient.hin?.toLowerCase().includes(searchStr) ||
-                item.staff?.firstname?.toLowerCase().includes(searchStr) ||
-                item.staff?.lastname?.toLowerCase().includes(searchStr) ||
-                item.ward_info?.name?.toLowerCase().includes(searchStr)
-            );
-        });
-
-        // 2. Sort by admission date (Most recent first)
-        return [...filtered].sort((a, b) => {
+    const sortedAdmittedPatients = useMemo(() => {
+        // Sort by admission date (Most recent first)
+        return [...admittedPatients].sort((a, b) => {
             const dateA = new Date(a.admission_date).getTime();
             const dateB = new Date(b.admission_date).getTime();
             return dateB - dateA; // Use dateA - dateB for oldest first
         });
-    }, [admittedPatients, searchQuery]);
+    }, [admittedPatients]);
 
     if (loading) {
         return (
@@ -53,7 +39,7 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
         );
     }
 
-    if (admittedPatients.length === 0) {
+    if (admittedPatients.length === 0 && !searchQuery) {
         return (
             <div className="flex flex-col justify-center items-center text-center  h-full">
                 <svg
@@ -122,14 +108,30 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
     }
     return (
         <>
-            <SearchBar
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder="Search patient's name, HIN, or ward name..."
-            />
+            <div className="mb-4 w-full">
+                <SearchBar
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    placeholder="Search patient's name, HIN, or ward name..."
+                />
+                {isRefreshing && (
+                    <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
+                        <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+                        Searching...
+                    </p>
+                )}
+            </div>
+
+            {admittedPatients.length === 0 && searchQuery ? (
+                <div className="py-12 text-center text-gray-500 text-sm">
+                    <p className="font-medium">No results found.</p>
+                    <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
+                </div>
+            ) : (
+            <>
             <div className='my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
                 {
-                    processedAdmittedPatients.map((admittedPatient, index) => (
+                    sortedAdmittedPatients.map((admittedPatient, index) => (
                         <div key={index} className="border p-3 rounded-xl">
                             <div className='flex justify-between items-center'>
                                 <p>{admittedPatient.patient.firstname} {admittedPatient.patient.lastname} </p>
@@ -311,6 +313,8 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
                 currentPage={currentPage}
                 totalPages={totalPages}
                 setCurrentPage={setCurrentPage} />
+            </>
+            )}
         </>
     )
 }
@@ -325,35 +329,21 @@ const DischargedPatientsTab = () => {
         currentPage,
         totalPages,
         setCurrentPage,
+        searchQuery,
+        setSearchQuery,
+        isRefreshing
     } = useContext(NursesAdmittedPatientMGTContext);
-
 
     const [selectedPatient, setSelectedPatient] = useState('')
 
-    const [searchQuery, setSearchQuery] = useState("");
-
-    const processedAdmittedPatients = useMemo(() => {
-        // 1. Filter based on search query
-        const filtered = admittedPatients.filter((item) => {
-            const searchStr = searchQuery.toLowerCase();
-
-            return (
-                item.patient.firstname?.toLowerCase().includes(searchStr) ||
-                item.patient.lastname?.toLowerCase().includes(searchStr) ||
-                item.patient.hin?.toLowerCase().includes(searchStr) ||
-                item.staff?.firstname?.toLowerCase().includes(searchStr) ||
-                item.staff?.lastname?.toLowerCase().includes(searchStr) ||
-                item.ward_info?.name?.toLowerCase().includes(searchStr)
-            );
-        });
-
-        // 2. Sort by admission date (Most recent first)
-        return [...filtered].sort((a, b) => {
+    const sortedAdmittedPatients = useMemo(() => {
+        // Sort by admission date (Most recent first)
+        return [...admittedPatients].sort((a, b) => {
             const dateA = new Date(a.admission_date).getTime();
             const dateB = new Date(b.admission_date).getTime();
             return dateB - dateA; // Use dateA - dateB for oldest first
         });
-    }, [admittedPatients, searchQuery]);
+    }, [admittedPatients]);
 
     if (loading) {
         return (
@@ -363,7 +353,7 @@ const DischargedPatientsTab = () => {
         );
     }
 
-    if (admittedPatients.length === 0) {
+    if (admittedPatients.length === 0 && !searchQuery) {
         return (
             <div className="flex flex-col justify-center items-center text-center  h-full">
                 <svg
@@ -435,15 +425,30 @@ const DischargedPatientsTab = () => {
     return (
 
         <>
+            <div className="mb-4 w-full">
+                <SearchBar
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    placeholder="Search patient's name, HIN, or ward name..."
+                />
+                {isRefreshing && (
+                    <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
+                        <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+                        Searching...
+                    </p>
+                )}
+            </div>
 
-            <SearchBar
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder="Search patient's name, HIN, or ward name..."
-            />
+            {admittedPatients.length === 0 && searchQuery ? (
+                <div className="py-12 text-center text-gray-500 text-sm">
+                    <p className="font-medium">No results found.</p>
+                    <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
+                </div>
+            ) : (
+            <>
             <div className='my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
                 {
-                    processedAdmittedPatients.map((admittedPatient, index) => (
+                    sortedAdmittedPatients.map((admittedPatient, index) => (
                         <div key={index} className="border p-3 rounded-xl">
                             <div className='flex justify-between items-center'>
                                 <p>{admittedPatient.patient.firstname} {admittedPatient.patient.lastname} </p>
@@ -619,6 +624,8 @@ const DischargedPatientsTab = () => {
                 currentPage={currentPage}
                 totalPages={totalPages}
                 setCurrentPage={setCurrentPage} />
+            </>
+            )}
         </>
 
     )

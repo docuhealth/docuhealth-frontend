@@ -1,23 +1,29 @@
-import React, { useState, createContext } from "react";
+import React, { useState, createContext, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 import { getHospitalToken } from "../../../services/authService";
+import useDebounce from "../../../hooks/useDebounce";
 
 export const NursesAdmittedPatientMGTContext = createContext();
 
 const NursesAdmittedPatientMGTProvider = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [tab, setTab] = useState("active"); // 'active' or 'discharged'
+  const [searchQuery, setSearchQuery] = useState("");
   const pageSize = 6;
   const isUserLoggedIn = !!getHospitalToken();
 
-  const { data, isLoading: loading } = useQuery({
-    // 🔹 The Key is the secret: it tracks both status and page
-    queryKey: ["hospital-patients-nurse", tab, currentPage],
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
+  const { data, isLoading: loading, isFetching } = useQuery({
+    // 🔹 The Key is the secret: it tracks both status, page, and search
+    queryKey: ["hospital-patients-nurse", tab, currentPage, debouncedSearch],
     queryFn: async () => {
-      const res = await axiosInstanceHos.get(
-        `api/hospitals/admissions/${tab}?page=${currentPage}&size=${pageSize}`,
-      );
+      let url = `api/hospitals/admissions/${tab}?page=${currentPage}&size=${pageSize}`;
+      if (debouncedSearch) {
+        url += `&search=${debouncedSearch}`;
+      }
+      const res = await axiosInstanceHos.get(url);
       return res.data;
     },
     enabled: isUserLoggedIn,
@@ -34,18 +40,26 @@ const NursesAdmittedPatientMGTProvider = (props) => {
     setCurrentPage(1);
   };
 
+  // Reset page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
 
   return (
     <NursesAdmittedPatientMGTContext.Provider
     value={{
         admittedPatients,
       loading,
+      isRefreshing: isFetching,
       count,
       currentPage,
       totalPages,
       setCurrentPage, // Pass the setter directly for pagination
       tab,
-      setTab: handleTabChange
+      setTab: handleTabChange,
+      searchQuery,
+      setSearchQuery
       }}
     >
       {props.children}

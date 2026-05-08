@@ -137,7 +137,7 @@ function App() {
 
   const hostname = window.location.hostname;
 
-  const isHospital = hostname.startsWith("hospital.");
+  const isHospital = true || hostname.startsWith("hospital.");
 
   return (
     <HelmetProvider>

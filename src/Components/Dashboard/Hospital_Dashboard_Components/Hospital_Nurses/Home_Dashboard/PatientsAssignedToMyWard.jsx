@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { NursesPatientsAssignedToWardContext } from '../../../../../context/HospitalContext/Nurses/NursesPatientsAssignedToWardContext'
 import { formatFullDate, formatTime } from '../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter'
 import Pagination2 from '../../../Patient_Dashboard_Components/Pagination/Pagination2'
+import SearchBar from '../../../../SearchBar/SearchBar'
 import toast from 'react-hot-toast'
 
 const PatientsAssignedToMyWard = () => {
@@ -13,6 +14,9 @@ const PatientsAssignedToMyWard = () => {
     currentPage,
     totalPages,
     setCurrentPage,
+    searchQuery,
+    setSearchQuery,
+    isRefreshing,
   } = useContext(NursesPatientsAssignedToWardContext);
 
   console.log(assignedPatientsToWard)
@@ -25,7 +29,7 @@ const PatientsAssignedToMyWard = () => {
     );
   }
 
-  if (assignedPatientsToWard.length === 0) {
+  if (assignedPatientsToWard.length === 0 && !searchQuery) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full ">
         <svg
@@ -96,6 +100,27 @@ const PatientsAssignedToMyWard = () => {
   return (
 
     <>
+      <div className="mb-4 w-full">
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search by patient name, doctor, or email..."
+        />
+        {isRefreshing && (
+          <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
+            <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+            Searching...
+          </p>
+        )}
+      </div>
+
+      {assignedPatientsToWard.length === 0 && searchQuery ? (
+        <div className="py-12 text-center text-gray-500 text-sm">
+          <p className="font-medium">No results found.</p>
+          <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
+        </div>
+      ) : (
+      <>
       <div className='hidden lg:flex flex-col'>
         <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
 
@@ -187,6 +212,7 @@ const PatientsAssignedToMyWard = () => {
         totalPages={totalPages}
         setCurrentPage={ setCurrentPage}
       />
+      </>)}
     </>
 
   )
