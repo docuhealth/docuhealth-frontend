@@ -2,6 +2,7 @@ import React, { useEffect, useState, createContext } from "react";
 import { getHospitalToken } from "../../services/authService";
 import { fetchStaff } from "../../queries/Hospital/fetchStaff";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import useDebounce from "../../hooks/useDebounce";
 import toast from "react-hot-toast";
 
 export const HosStaffsContext = createContext();
@@ -9,9 +10,16 @@ export const HosStaffsContext = createContext();
 const HosStaffsProvider = (props) => {
 
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 7; // Example page size
+    const [searchQuery, setSearchQuery] = useState("");
+    const pageSize = 7;
+    const debouncedSearch = useDebounce(searchQuery, 300);
 
     const isUserLoggedIn = !!getHospitalToken();
+
+    // Reset to page 1 when search changes
+    useEffect(() => {
+      setCurrentPage(1);
+    }, [debouncedSearch]);
 
       const {
     data, 
@@ -20,7 +28,7 @@ const HosStaffsProvider = (props) => {
     isError,
     error
   } = useQuery ({
-    queryKey : ["hospital-staffs", currentPage],
+    queryKey : ["hospital-staffs", currentPage, debouncedSearch],
     queryFn : fetchStaff,
     enabled : isUserLoggedIn,
     placeholderData : keepPreviousData,
@@ -45,7 +53,9 @@ const HosStaffsProvider = (props) => {
     setCurrentPage,
     totalPages,
     loading: isPending,
-    isRefreshing : isFetching
+    isRefreshing : isFetching,
+    searchQuery,
+    setSearchQuery,
   }
 
 

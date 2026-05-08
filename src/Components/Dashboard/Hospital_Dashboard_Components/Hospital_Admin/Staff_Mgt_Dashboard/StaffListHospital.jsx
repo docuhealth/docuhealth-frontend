@@ -7,31 +7,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
-  const { staffs, loading, count, currentPage, totalPages, setCurrentPage } =
+  const { staffs, loading, count, currentPage, totalPages, setCurrentPage, searchQuery, setSearchQuery, isRefreshing } =
     useContext(HosStaffsContext);
 
   // console.log(staffs)
 
   const [activeMenu, setActiveMenu] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const [selectedStaffForRole, setSelectedStaffForRole] = useState(null);
   const [newRole, setNewRole] = useState("");
 
   const queryClient = useQueryClient();
 
-  const processedStaffs = useMemo(() => {
-    let result = staffs.filter((staff) => {
-      const searchStr = searchQuery.toLowerCase();
-      return (
-        staff.firstname?.toLowerCase().includes(searchStr) ||
-        staff.lastname?.toLowerCase().includes(searchStr) ||
-        staff.staff_id?.toLowerCase().includes(searchStr) ||
-        staff.email?.toLowerCase().includes(searchStr)
-      );
-    });
-
-
+  const sortedStaffs = useMemo(() => {
     const getDisplayName = (staff) => {
       const title = staff.role === 'doctor' ? 'Dr. ' : '';
       return `${title}${staff.firstname} ${staff.lastname}`.toLowerCase();
@@ -39,19 +27,19 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
 
     switch (filterType) {
       case "A-Z":
-        return [...result].sort((a, b) =>
+        return [...staffs].sort((a, b) =>
           getDisplayName(a).localeCompare(getDisplayName(b), undefined, { sensitivity: 'base' })
         );
       case "Z-A":
-        return [...result].sort((a, b) =>
+        return [...staffs].sort((a, b) =>
           getDisplayName(b).localeCompare(getDisplayName(a), undefined, { sensitivity: 'base' })
         );
       case "Oldest":
-        return [...result].sort((a, b) => a.staff_id.localeCompare(b.staff_id));
+        return [...staffs].sort((a, b) => a.staff_id.localeCompare(b.staff_id));
       default:
-        return result;
+        return staffs;
     }
-  }, [staffs, searchQuery, filterType]);
+  }, [staffs, filterType]);
 
 
   const { mutate: removeStaff, isPending: isRemoving } = useMutation({
@@ -189,7 +177,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     );
   }
 
-  if (staffs.length === 0) {
+  if (staffs.length === 0 && !searchQuery) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
@@ -215,9 +203,9 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
               width="366"
               height="366"
               filterUnits="userSpaceOnUse"
-              color-interpolation-filters="sRGB"
+              colorInterpolationFilters="sRGB"
             >
-              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+              <feFlood floodOpacity="0" result="BackgroundImageFix" />
               <feColorMatrix
                 in="SourceAlpha"
                 type="matrix"
@@ -250,7 +238,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
         <div className="max-w-md text-center">
           <p className="text-[12px] text-gray-500">
             {" "}
-            You currently don’t have any staffs in this hospital.
+            You currently don't have any staffs in this hospital.
           </p>
         </div>
       </div>
@@ -292,307 +280,323 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
           onChange={setSearchQuery}
           placeholder="Search by name, Staff ID or email..."
         />
+        {isRefreshing && (
+          <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
+            <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+            Searching...
+          </p>
+        )}
       </div>
 
-
-      <div className="hidden lg:flex lg:flex-col">
-        <div className="grid grid-cols-8 text-left text-sm bg-gray-100 py-5 rounded-md">
-          {/* Checkbox + Name of Staff */}
-          <div className="col-span-2 w-full pl-5 flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={allChecked}
-              onChange={toggleSelectAll}
-              className="w-4 h-4 accent-[#3E4095] cursor-pointer"
-            />
-            <p>Name of Staff</p>
-          </div>
-
-          <p>Staff Id</p>
-          <p>Role</p>
-          <p>Phone no</p>
-          <p>Email Address</p>
-          <p>Sex</p>
+      {staffs.length === 0 && searchQuery ? (
+        <div className="py-12 text-center text-gray-500 text-sm">
+          <p className="font-medium">No results found for "{searchQuery}"</p>
+          <p className="text-xs text-gray-400 mt-1">Try a different search term</p>
         </div>
+      ) : (
+        <>
 
-        {processedStaffs.map((staff, index) => (
-          <div key={index} className="relative">
-            <div className="grid grid-cols-8 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
-              <div className="font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-2 ">
-                {/* ADDED: Individual Checkbox */}
+
+          <div className="hidden lg:flex lg:flex-col">
+            <div className="grid grid-cols-8 text-left text-sm bg-gray-100 py-5 rounded-md">
+              {/* Checkbox + Name of Staff */}
+              <div className="col-span-2 w-full pl-5 flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={selectedStaff.includes(staff.staff_id)}
-                  onChange={() => toggleStaff(staff.staff_id)}
+                  checked={allChecked}
+                  onChange={toggleSelectAll}
                   className="w-4 h-4 accent-[#3E4095] cursor-pointer"
                 />
-
-                {/* Existing Icon and Name */}
-                <div className="flex items-center gap-1">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z"
-                      fill="#647284"
-                    />
-                  </svg>
-                  <p>
-                    {staff.role === 'doctor'
-                      ? `Dr. ${staff.firstname} ${staff.lastname}`
-                      : `${staff.firstname} ${staff.lastname}`}
-
-                  </p>
-                </div>
+                <p>Name of Staff</p>
               </div>
 
-              <p>{staff.staff_id}</p>
-              <p>{staff.role}</p>
-              <p>{staff.phone_num}</p>
-              <p className="truncate max-w-[120px] ">{staff.email}</p>
-              <p>{staff.gender}</p>
-
-              <div className="relative flex justify-center">
-                <button
-                  onClick={() =>
-                    setActiveMenu(activeMenu === staff.staff_id ? null : staff.staff_id)
-                  }
-                  className="p-2 hover:bg-gray-200 rounded-full transition-colors"
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-                  </svg>
-                </button>
-
-                {activeMenu === staff.staff_id && (
-                  <div className="absolute right-0 top-10 w-40 bg-white border border-gray-200 rounded-md shadow z-50 ">
-                    <button
-                      onClick={() => handleUpdateRole(staff)}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 hover:rounded-t-md"
-                    >
-                      Update Role
-                    </button>
-                    <button
-                      onClick={() => handleDeativate(staff)}
-                      className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 font-medium hover:rounded-b-md"
-                    >
-                      Deactivate Account
-                    </button>
-                    <button
-                      onClick={() => handleIndividualRemove(staff)}
-                      className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 font-medium hover:rounded-b-md"
-                    >
-                      Remove from Team
-                    </button>
-                  </div>
-                )}
-              </div>
+              <p>Staff Id</p>
+              <p>Role</p>
+              <p>Phone no</p>
+              <p>Email Address</p>
+              <p>Sex</p>
             </div>
-          </div>
-        ))}
-      </div>
-      <div className="lg:hidden">
-        {staffs.length > 0 && (
-          <div className="flex items-center gap-2 mb-4 px-2">
-            <input
-              type="checkbox"
-              checked={allChecked}
-              onChange={toggleSelectAll}
-              className="w-5 h-5 accent-[#3E4095] rounded"
-            />
-            <span className="text-sm font-medium text-gray-700">
-              {allChecked ? "Deselect All" : "Select All Staffs"}
-            </span>
-          </div>
-        )}
-        <div className="flex flex-col gap-4">
-          {processedStaffs.map((staff, index) => (
-            <div
-              key={index}
-              className="bg-white border border-gray-200 rounded-lg p-5   transition-all"
-            >
-              {/* 1. Header: Avatar & Primary Info */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedStaff.includes(staff.staff_id)}
-                    onChange={() => toggleStaff(staff.staff_id)}
-                    className="w-5 h-5 accent-[#3E4095] cursor-pointer"
-                  />
-                  {/* Dynamic Avatar with Initials */}
-                  <div className="h-11 w-11 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#3E4095] font-bold text-sm shadow-inner">
-                    {staff.firstname?.[0]}
-                    {staff.lastname?.[0]}
-                  </div>
 
-                  <div className="min-w-0">
-                    <h3 className="font-bold text-gray-900 text-[15px] truncate">
-                      {staff.role === 'doctor'
-                        ? `Dr. ${staff.firstname} ${staff.lastname}`
-                        : `${staff.firstname} ${staff.lastname}`}
+            {sortedStaffs.map((staff, index) => (
+              <div key={index} className="relative">
+                <div className="grid grid-cols-8 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
+                  <div className="font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-2 ">
+                    {/* ADDED: Individual Checkbox */}
+                    <input
+                      type="checkbox"
+                      checked={selectedStaff.includes(staff.staff_id)}
+                      onChange={() => toggleStaff(staff.staff_id)}
+                      className="w-4 h-4 accent-[#3E4095] cursor-pointer"
+                    />
 
-                    </h3>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] bg-[#3E4095] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                        {staff.role || "Staff"}
-                      </span>
-                      <span className="text-[10px] text-gray-400 font-mono">
-                        #{staff.staff_id || "N/A"}
-                      </span>
+                    {/* Existing Icon and Name */}
+                    <div className="flex items-center gap-1">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z"
+                          fill="#647284"
+                        />
+                      </svg>
+                      <p>
+                        {staff.role === 'doctor'
+                          ? `Dr. ${staff.firstname} ${staff.lastname}`
+                          : `${staff.firstname} ${staff.lastname}`}
+
+                      </p>
                     </div>
                   </div>
-                </div>
 
-                {/* Sex Badge */}
-                <div className="flex items-center gap-2">
-                  <div className="bg-gray-100 px-2 py-1 rounded-lg">
-                    <p className="text-[10px] text-gray-500 font-bold uppercase">
-                      {staff.gender || "—"}
-                    </p>
-                  </div>
-                  <div className="relative">
-                    <button onClick={() => setActiveMenu(activeMenu === staff.staff_id ? null : staff.staff_id)} className="p-1">
-                      <svg width="20" height="20" fill="#647284" viewBox="0 0 16 16"><path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" /></svg>
+                  <p>{staff.staff_id}</p>
+                  <p>{staff.role}</p>
+                  <p>{staff.phone_num}</p>
+                  <p className="truncate max-w-[120px] ">{staff.email}</p>
+                  <p>{staff.gender}</p>
+
+                  <div className="relative flex justify-center">
+                    <button
+                      onClick={() =>
+                        setActiveMenu(activeMenu === staff.staff_id ? null : staff.staff_id)
+                      }
+                      className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                      </svg>
                     </button>
-                    {activeMenu === staff.staff_id && (
-                      <div className="absolute right-0 top-8 w-52 bg-white border border-gray-200 rounded-lg shadow z-50 py-2">
-                        <button onClick={() => handleUpdateRole(staff)} className="w-full text-left px-4 py-3 text-sm border-b border-gray-50 hover:rounded-t-md">Update Role</button>
-                        
-                        <button onClick={() => handleDeativate(staff)} className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md">Deactivate Account</button>
 
-                        <button onClick={() => handleIndividualRemove(staff)} className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md">Remove from Team</button>
+                    {activeMenu === staff.staff_id && (
+                      <div className="absolute right-0 top-10 w-40 bg-white border border-gray-200 rounded-md shadow z-50 ">
+                        <button
+                          onClick={() => handleUpdateRole(staff)}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 hover:rounded-t-md"
+                        >
+                          Update Role
+                        </button>
+                        <button
+                          onClick={() => handleDeativate(staff)}
+                          className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 font-medium hover:rounded-b-md"
+                        >
+                          Deactivate Account
+                        </button>
+                        <button
+                          onClick={() => handleIndividualRemove(staff)}
+                          className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 font-medium hover:rounded-b-md"
+                        >
+                          Remove from Team
+                        </button>
                       </div>
                     )}
                   </div>
                 </div>
-
-
-
               </div>
-
-              {/* 2. Contact Quick-Action Box */}
-              <div className="grid grid-cols-1 gap-2 bg-gray-50 rounded-lg p-3 mb-4">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <div className="bg-white p-1.5 rounded-md shadow-sm">
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#3E4095"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                    </svg>
-                  </div>
-                  <p className="text-[12px] font-medium">
-                    {staff.phone_num || "No Phone"}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <div className="bg-white p-1.5 rounded-md shadow-sm">
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#3E4095"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                      <polyline points="22,6 12,13 2,6"></polyline>
-                    </svg>
-                  </div>
-                  <p className="text-[12px] font-medium truncate">
-                    {staff.email || "No Email"}
-                  </p>
-                </div>
+            ))}
+          </div>
+          <div className="lg:hidden">
+            {staffs.length > 0 && (
+              <div className="flex items-center gap-2 mb-4 px-2">
+                <input
+                  type="checkbox"
+                  checked={allChecked}
+                  onChange={toggleSelectAll}
+                  className="w-5 h-5 accent-[#3E4095] rounded"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  {allChecked ? "Deselect All" : "Select All Staffs"}
+                </span>
               </div>
+            )}
+            <div className="flex flex-col gap-4">
+              {sortedStaffs.map((staff, index) => (
+                <div
+                  key={index}
+                  className="bg-white border border-gray-200 rounded-lg p-5   transition-all"
+                >
+                  {/* 1. Header: Avatar & Primary Info */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedStaff.includes(staff.staff_id)}
+                        onChange={() => toggleStaff(staff.staff_id)}
+                        className="w-5 h-5 accent-[#3E4095] cursor-pointer"
+                      />
+                      {/* Dynamic Avatar with Initials */}
+                      <div className="h-11 w-11 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#3E4095] font-bold text-sm shadow-inner">
+                        {staff.firstname?.[0]}
+                        {staff.lastname?.[0]}
+                      </div>
 
-              {/* 3. Footer Action */}
-              <div className="flex gap-2">
-                {/* <a 
+                      <div className="min-w-0">
+                        <h3 className="font-bold text-gray-900 text-[15px] truncate">
+                          {staff.role === 'doctor'
+                            ? `Dr. ${staff.firstname} ${staff.lastname}`
+                            : `${staff.firstname} ${staff.lastname}`}
+
+                        </h3>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] bg-[#3E4095] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                            {staff.role || "Staff"}
+                          </span>
+                          <span className="text-[10px] text-gray-400 font-mono">
+                            #{staff.staff_id || "N/A"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Sex Badge */}
+                    <div className="flex items-center gap-2">
+                      <div className="bg-gray-100 px-2 py-1 rounded-lg">
+                        <p className="text-[10px] text-gray-500 font-bold uppercase">
+                          {staff.gender || "—"}
+                        </p>
+                      </div>
+                      <div className="relative">
+                        <button onClick={() => setActiveMenu(activeMenu === staff.staff_id ? null : staff.staff_id)} className="p-1">
+                          <svg width="20" height="20" fill="#647284" viewBox="0 0 16 16"><path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" /></svg>
+                        </button>
+                        {activeMenu === staff.staff_id && (
+                          <div className="absolute right-0 top-8 w-52 bg-white border border-gray-200 rounded-lg shadow z-50 py-2">
+                            <button onClick={() => handleUpdateRole(staff)} className="w-full text-left px-4 py-3 text-sm border-b border-gray-50 hover:rounded-t-md">Update Role</button>
+
+                            <button onClick={() => handleDeativate(staff)} className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md">Deactivate Account</button>
+
+                            <button onClick={() => handleIndividualRemove(staff)} className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md">Remove from Team</button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+
+
+                  </div>
+
+                  {/* 2. Contact Quick-Action Box */}
+                  <div className="grid grid-cols-1 gap-2 bg-gray-50 rounded-lg p-3 mb-4">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <div className="bg-white p-1.5 rounded-md shadow-sm">
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#3E4095"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                      </div>
+                      <p className="text-[12px] font-medium">
+                        {staff.phone_num || "No Phone"}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <div className="bg-white p-1.5 rounded-md shadow-sm">
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#3E4095"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                          <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                      </div>
+                      <p className="text-[12px] font-medium truncate">
+                        {staff.email || "No Email"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* 3. Footer Action */}
+                  <div className="flex gap-2">
+                    {/* <a 
                         href={`tel:${staff.phone_no}`}
                         className="flex-1 bg-white border border-gray-200 py-2.5 rounded-xl flex items-center justify-center gap-2 text-[12px] font-bold text-gray-700 active:bg-gray-100"
                     >
                         Call
                     </a> */}
-                <button className="flex-1 bg-[#3E4095] py-2.5 rounded-full flex items-center justify-center gap-2 text-[12px] font-bold text-white">
-                  Message
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {selectedStaffForRole && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-          <div className="bg-white rounded-lg p-5 w-full max-w-sm shadow-xl">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-medium text-md text-gray-800">Update Staff Role</h3>
-              <button
-                onClick={() => setSelectedStaffForRole(null)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M18 6L6 18M6 6l12 12"></path>
-                </svg>
-              </button>
-            </div>
-
-            <p className="text-xs text-gray-500 mb-6">
-              Changing role for <span className="font-semibold text-gray-700">{selectedStaffForRole.firstname} {selectedStaffForRole.lastname}</span>
-            </p>
-
-            <form onSubmit={submitRoleUpdate} className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-gray-400 uppercase mb-2">Select New Role</label>
-                <select
-                  value={newRole}
-                  onChange={(e) => setNewRole(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-[#3E4095] outline-none"
-                >
-                  <option value="doctor">Doctor</option>
-                  <option value="nurse">Nurse</option>
-                  {/* <option value="admin">Admin</option> */}
-                  <option value="receptionist">Receptionist</option>
-                  {/* <option value="pharmacist">Pharmacist</option>
-                  <option value="lab_technician">Lab Technician</option> */}
-                </select>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isUpdatingRole}
-                className="w-full bg-[#3E4095] text-white py-2.5 rounded-full font-medium text-sm hover:bg-[#2e3070] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
-              >
-                {isUpdatingRole ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Updating role
+                    <button className="flex-1 bg-[#3E4095] py-2.5 rounded-full flex items-center justify-center gap-2 text-[12px] font-bold text-white">
+                      Message
+                    </button>
                   </div>
-                ) : "Confirm Update"}
-              </button>
-            </form>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
 
+          {selectedStaffForRole && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+              <div className="bg-white rounded-lg p-5 w-full max-w-sm shadow-xl">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-medium text-md text-gray-800">Update Staff Role</h3>
+                  <button
+                    onClick={() => setSelectedStaffForRole(null)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <p className="text-xs text-gray-500 mb-6">
+                  Changing role for <span className="font-semibold text-gray-700">{selectedStaffForRole.firstname} {selectedStaffForRole.lastname}</span>
+                </p>
+
+                <form onSubmit={submitRoleUpdate} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 uppercase mb-2">Select New Role</label>
+                    <select
+                      value={newRole}
+                      onChange={(e) => setNewRole(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-[#3E4095] outline-none"
+                    >
+                      <option value="doctor">Doctor</option>
+                      <option value="nurse">Nurse</option>
+                      {/* <option value="admin">Admin</option> */}
+                      <option value="receptionist">Receptionist</option>
+                      {/* <option value="pharmacist">Pharmacist</option>
+                  <option value="lab_technician">Lab Technician</option> */}
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isUpdatingRole}
+                    className="w-full bg-[#3E4095] text-white py-2.5 rounded-full font-medium text-sm hover:bg-[#2e3070] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                  >
+                    {isUpdatingRole ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Updating role
+                      </div>
+                    ) : "Confirm Update"}
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
+
+
+        </>)}
 
       <Pagination2
         count={count}
