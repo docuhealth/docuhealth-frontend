@@ -10,6 +10,9 @@ import MedicalRecords from "../../Components/Dashboard/Patient_Dashboard_Compone
 import MedicalRecordsDetail from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/MedicalRecordsDetail";
 import Id_Card from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/IdCard/Id_Card";
 import { fetchSubscriptionStatus } from "../../services/authService";
+import { useQuery } from "@tanstack/react-query";
+import { fetchPatientVitalSigns } from "../../queries/Patient/patientVitalSigns";
+import RecentVitalSigns from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/RecentVitalSigns";
 
 const Patient_Home_Dashboard = () => {
     const navigate = useNavigate();
@@ -17,7 +20,9 @@ const Patient_Home_Dashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState("Latest");
   const [viewDetailMedicalRecord, setViewDetailMedicalRecord] = useState(false);
+  const [viewRecentVitals, setViewRecentVitals] = useState(false);
   const [selectedMedicalRecord, setSelectedMedicalRecord] = useState(null);
+  const [vitalPage, setVitalPage] = useState(1);
 
   const [noticeDisplay, setNoticeDisplay] = useState(false);
 
@@ -34,6 +39,21 @@ const Patient_Home_Dashboard = () => {
     handleSelection,
     selectedProfile,
   } = useContext(IdCardContext);
+
+  const isSubscribed = fetchSubscriptionStatus();
+
+  const { data: vitalSigns, isPending: loadingVitals } = useQuery({
+    queryKey: ["patientVitalSigns", vitalPage],
+    queryFn: () => fetchPatientVitalSigns(vitalPage),
+    // enabled: !!isSubscribed,
+    enabled: true,
+  });
+
+  // useEffect(() => {
+  //   if (vitalSigns) {
+  //     console.log("Vital Signs in Patient_Home_Dashboard:", vitalSigns);
+  //   }
+  // }, [vitalSigns]);
 
 useEffect(() => {
     // 1. Delay the initial appearance by 3 seconds (3000ms)
@@ -98,6 +118,29 @@ useEffect(() => {
                 ))}
               </div>
             )}
+          </div>
+          <div>
+            <button
+              className="flex items-center gap-2 px-6 py-2 border border-[#3E4095] text-[#3E4095]  font-medium rounded-full transition cursor-pointer"
+              onClick={() => {
+                if (profile) {
+                  const is_subscribed = fetchSubscriptionStatus();
+                  if (!is_subscribed) {
+                    toast.error("Please subscribe to access feature");
+                    navigate("/user-subscriptions-dashboard");
+                    return;
+                  }
+                  if (loadingVitals) {
+                    toast.loading("Fetching your vitals...", { id: "vitals-loading" });
+                    return;
+                  }
+                  toast.dismiss("vitals-loading");
+                  setViewRecentVitals(true);
+                }
+              }}
+            >
+              View Recent Vitals
+            </button>
           </div>
           <div>
             <button
@@ -167,6 +210,32 @@ useEffect(() => {
           </div>
           <div>
             <button
+              className="flex justify-center items-center gap-2 px-6 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full transition w-full cursor-pointer"
+               onClick={() => {
+                if (profile) {
+                  const is_subscribed = fetchSubscriptionStatus();
+                  if (!is_subscribed) {
+                    toast.error("Please subscribe to access feature");
+                    navigate("/user-subscriptions-dashboard");
+                    return;
+                  }
+                  if (loadingVitals) {
+                    toast.loading("Fetching your vitals...", { id: "vitals-loading" });
+                    return;
+                  }
+                  toast.dismiss("vitals-loading");
+                  setViewRecentVitals(true);
+                } else {
+                  console.log("no profile");
+                  toast.error("We couldn't find a profile. Try again");
+                }
+              }}
+            >
+              View Recent Vitals
+            </button>
+          </div>
+          <div>
+            <button
               className="flex justify-center items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition w-full cursor-pointer"
                onClick={() => {
                 if (profile) {
@@ -195,7 +264,14 @@ useEffect(() => {
       </div>
 
       {/* ✅ Pass loading state */}
-      {viewDetailMedicalRecord ? (
+      {viewRecentVitals ? (
+        <RecentVitalSigns
+          vitalSigns={vitalSigns}
+          setViewRecentVitals={setViewRecentVitals}
+          currentPage={vitalPage}
+          setCurrentPage={setVitalPage}
+        />
+      ) : viewDetailMedicalRecord ? (
         <MedicalRecordsDetail
           selectedMedicalRecord={selectedMedicalRecord}
           setViewDetailMedicalRecord={setViewDetailMedicalRecord}
