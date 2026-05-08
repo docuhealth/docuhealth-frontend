@@ -2,10 +2,10 @@ import axiosInstanceAdmin from "../../utils/axiosInstanceAdmin";
 
 // Fetch Users (Patients or Hospitals)
 export const fetchAdminUsers = async ({ queryKey }) => {
-  const [_key, role, page, pageSize] = queryKey;
-  const response = await axiosInstanceAdmin.get(`/api/admin/users/${role}`, {
-    params: { page, size: pageSize }
-  });
+  const [_key, role, page, pageSize, search] = queryKey;
+  const params = { page, size: pageSize };
+  if (search) params.search = search;
+  const response = await axiosInstanceAdmin.get(`/api/admin/users/${role}`, { params });
   return response.data;
 };
 
