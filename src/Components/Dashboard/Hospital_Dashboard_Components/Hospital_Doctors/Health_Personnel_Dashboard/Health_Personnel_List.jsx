@@ -11,28 +11,10 @@ const Health_Personnel_List = () => {
     currentPage,
     totalPages,
     setCurrentPage,
+    searchQuery,
+    setSearchQuery,
+    isRefreshing,
   } = useContext(HosStaffsContext);
-
-    const [searchQuery, setSearchQuery] = useState("");
-  
-    const filteredStaffs = useMemo(() => {
-      return healthPersonnelList.filter((staff) => {
-        const query = searchQuery.toLowerCase();
-        const name = `${staff.firstname} ${staff.lastname}`.toLowerCase();
-        const staffId = staff.staff_id.toLowerCase();
-        const role = staff.role.toLowerCase();
-        const phone = staff.phone_num.toLowerCase();
-        const email = staff.email.toLowerCase();
-  
-        return (
-          name.includes(query) ||
-          staffId.includes(query) ||
-          role.includes(query) ||
-          phone.includes(query) ||
-          email.includes(query)
-        );
-      });
-    }, [healthPersonnelList, searchQuery]);
   
 
   if (loading) {
@@ -43,7 +25,7 @@ const Health_Personnel_List = () => {
     );
   }
 
-  if (healthPersonnelList.length === 0) {
+  if (healthPersonnelList.length === 0 && !searchQuery) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
@@ -113,13 +95,27 @@ const Health_Personnel_List = () => {
 
   return (
     <>
-     <div className="mb-4 w-full">
-      <SearchBar 
-                    value={searchQuery} 
-                    onChange={setSearchQuery} 
-                    placeholder="Search by name, staff ID, role, phone number, or email ..." 
-                />
+      <div className="mb-4 w-full">
+        <SearchBar 
+          value={searchQuery} 
+          onChange={setSearchQuery} 
+          placeholder="Search by name, staff ID, role, phone number, or email ..." 
+        />
+        {isRefreshing && (
+          <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
+            <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+            Searching...
+          </p>
+        )}
       </div>
+
+      {healthPersonnelList.length === 0 && searchQuery ? (
+        <div className="py-12 text-center text-gray-500 text-sm">
+          <p className="font-medium">No results found.</p>
+          <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
+        </div>
+      ) : (
+      <>
       <div className="hidden lg:flex lg:flex-col">
         <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
           <div className="col-span-2 w-full pl-5 flex items-center gap-2">
@@ -132,7 +128,7 @@ const Health_Personnel_List = () => {
           <p>Email Address</p>
           <p>Sex</p>
         </div>
-        {filteredStaffs.map((staff, index) => (
+        {healthPersonnelList.map((staff, index) => (
           <div key={index} className="relative">
             <div className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
               <div className="font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-1 ">
@@ -168,7 +164,7 @@ const Health_Personnel_List = () => {
       </div>
       <div className="lg:hidden">
         <div className="flex flex-col gap-4">
-          {filteredStaffs.map((staff, index) => (
+          {healthPersonnelList.map((staff, index) => (
             <div
               key={index}
               className="bg-white border border-gray-200 rounded-lg p-5  active:bg-gray-50 transition-all"
@@ -266,6 +262,7 @@ const Health_Personnel_List = () => {
           ))}
         </div>
       </div>
+      </>)}
       <Pagination2
         count={count}
         currentPage={currentPage}

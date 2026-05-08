@@ -1,4 +1,5 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
+import useDebounce from "../../../hooks/useDebounce";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 import { getHospitalToken } from "../../../services/authService";
@@ -8,14 +9,23 @@ export const DoctorsAdmittedPatientMGTContext = createContext();
 const DoctorsAdmittedPatientMGTProvider = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [tab, setTab] = useState("active");
+  const [searchQuery, setSearchQuery] = useState("");
   const pageSize = 6;
   const isUserLoggedIn = !!getHospitalToken();
 
-  const { data, isLoading: loading, refetch } = useQuery({
-    queryKey: ["hospital-patients-doctor", tab, currentPage],
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
+  const { data, isLoading: loading, isFetching, refetch } = useQuery({
+    queryKey: ["hospital-patients-doctor", tab, currentPage, debouncedSearch],
     queryFn: async () => {
+      const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : '';
       const res = await axiosInstanceHos.get(
-        `api/hospitals/admissions/${tab}?page=${currentPage}&size=${pageSize}`
+        `api/hospitals/admissions/${tab}?page=${currentPage}&size=${pageSize}${searchParam}`
       );
       return res.data;
     },
@@ -40,6 +50,9 @@ const DoctorsAdmittedPatientMGTProvider = ({ children }) => {
         tab,
         setTab: handleTabChange,
         refetch, 
+        searchQuery,
+        setSearchQuery,
+        isRefreshing: isFetching,
       }}
     >
       {children}
