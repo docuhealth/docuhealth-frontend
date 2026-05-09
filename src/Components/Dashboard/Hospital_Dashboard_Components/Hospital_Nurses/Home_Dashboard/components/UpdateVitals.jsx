@@ -22,6 +22,8 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
     }
   }, [profile]);
 
+  // console.log(profile)
+
   const { mutate, isPending } = useMutation({
     mutationFn: (payload) =>
       axiosInstanceHos.post("api/nurses/vital-signs/update", payload),
