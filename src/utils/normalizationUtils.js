@@ -22,7 +22,7 @@ const EMAIL_KEYS = [
  * @returns {any} - The normalized data.
  */
 export const normalizeEmailFields = (data) => {
-  if (data === null || typeof data !== "object") {
+  if (data === null || typeof data !== "object" || data instanceof FormData || data instanceof Blob) {
     return data;
   }
 

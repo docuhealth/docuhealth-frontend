@@ -35,6 +35,7 @@ const HosProfileProvider = ({ children }) => {
   const profile = data?.hospital_profile
   const hospital_email = data?.email
 
+  
   return (
     <HosAppContext.Provider value={{ profile, hospital_email, loading: profileLoading, dashboardMetrics, dashboardMetricsLoading, dateRange, updateDateRange }}>
       {children}
