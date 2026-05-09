@@ -19,7 +19,7 @@ const Drug_Records = () => {
   } = useContext(DrugRecordsContext);
 
 
-  console.log(drugRecords)
+
 
 
   return (
