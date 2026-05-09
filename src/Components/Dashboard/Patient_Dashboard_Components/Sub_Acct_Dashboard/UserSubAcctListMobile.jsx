@@ -6,6 +6,7 @@ import UserSubAcctRecordsMobile from "./Components/UserSubAcctRecordsMobile";
 import axiosInstance from "../../../../utils/axiosInstance";
 import UserSubAcctMedicalRecords from "./Components/UserSubAcctMedicalRecords";
 import MedicalRecordsDetail from "../Home_Dashboard/MedicalRecordsDetail";
+import SearchBar from "../../../../Components/SearchBar/SearchBar";
 
 const UserSubAcctListMobile = ({ setDisplaySubAcctModal }) => {
   const { subAccounts } = useContext(SubAccountContext);
@@ -15,6 +16,7 @@ const UserSubAcctListMobile = ({ setDisplaySubAcctModal }) => {
   const { currentPage } = useContext(SubAccountContext);
   const { setCurrentPage } = useContext(SubAccountContext);
   const { totalPages } = useContext(SubAccountContext);
+  const { searchQuery, setSearchQuery } = useContext(SubAccountContext);
 
   const [viewDetailMedicalRecord, setViewDetailMedicalRecord] = useState(false);
   const [selectedSubAcct, setSelectedSubAcct] = useState(null);
@@ -88,8 +90,21 @@ const UserSubAcctListMobile = ({ setDisplaySubAcctModal }) => {
         )
       ) : (
         <>
-          <div className=" lg:hidden pt-8 px-6 border rounded-lg bg-white my-5 ">
-            <h1 className=" mb-4">Sub-Accounts</h1>
+          <div className="lg:hidden pt-8 px-6 border rounded-lg bg-white my-5">
+            <h1 className="mb-4">Sub-Accounts</h1>
+            <div className="mb-3">
+              <SearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Search by name or HIN..."
+              />
+              {isFetching && (
+                <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
+                  <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+                  Searching...
+                </p>
+              )}
+            </div>
             <div className="mb-5">
               <UserSubAcctRecordsMobile
                 subAccounts={subAccounts}

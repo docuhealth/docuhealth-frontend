@@ -2,29 +2,32 @@ import React, { useState, createContext, useEffect } from "react";
 import { getToken } from "../../services/authService";
 import { fetchPatientAppointments } from "../../queries/Patient/patientAppointments";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import useDebounce from "../../hooks/useDebounce";
 import toast from "react-hot-toast";
 
 export const AppointmentsContext = createContext();
 
 const AppointmentsProvider = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const pageSize = 7;
+
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const isUserLoggedIn = !!getToken();
 
-  const {
-    data,
-    isFetching,
-    isPending,
-    isError,
-    error
-  } = useQuery({
-    queryKey: ["appointments", currentPage, pageSize],
-    queryFn: fetchPatientAppointments, // Ensure params are passed
+  const { data, isFetching, isPending, isError, error } = useQuery({
+    queryKey: ["appointments", currentPage, pageSize, debouncedSearch, dateFrom, dateTo],
+    queryFn: fetchPatientAppointments,
     enabled: isUserLoggedIn,
-    placeholderData: keepPreviousData, // v5 syntax for smooth pagination
+    placeholderData: keepPreviousData,
   });
 
-  // Handle errors via useEffect since onError was removed from useQuery v5
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch, dateFrom, dateTo]);
+
   useEffect(() => {
     if (isError) {
       toast.error("Error fetching appointments");
@@ -38,7 +41,7 @@ const AppointmentsProvider = ({ children }) => {
 
   return (
     <AppointmentsContext.Provider
-      value={{ 
+      value={{
         appointments,
         isPending,
         isFetching,
@@ -47,7 +50,13 @@ const AppointmentsProvider = ({ children }) => {
         currentPage,
         totalPages,
         setCurrentPage,
-       }}
+        searchQuery,
+        setSearchQuery,
+        dateFrom,
+        setDateFrom,
+        dateTo,
+        setDateTo,
+      }}
     >
       {children}
     </AppointmentsContext.Provider>

@@ -2,17 +2,30 @@ import React, { createContext, useState, useEffect } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { fetchAdminUsers } from "../../queries/admin/users";
 import { getToken } from "../../services/authService";
+import useDebounce from "../../hooks/useDebounce";
 import toast from "react-hot-toast";
 
 export const AdminUsersContext = createContext();
 
 const AdminUsersProvider = ({ children }) => {
-  const [selectedRole, setSelectedRole] = useState("patient"); // 'patient' or 'hospital'
+  const [selectedRole, setSelectedRole] = useState("patient");
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState(""); // For future filtering
-  const pageSize = 10; // Similar to HosStaffsContext pattern
+  const [searchQuery, setSearchQuery] = useState("");
+  const pageSize = 10;
 
-  // Fetch users based on the selected role and page
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Reset page on search or role change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
+  const handleSetSelectedRole = (role) => {
+    setSelectedRole(role);
+    setCurrentPage(1);
+    setSearchQuery("");
+  };
+
   const {
     data,
     isPending,
@@ -20,7 +33,7 @@ const AdminUsersProvider = ({ children }) => {
     isError,
     error,
   } = useQuery({
-    queryKey: ["admin-users", selectedRole, currentPage, pageSize],
+    queryKey: ["admin-users", selectedRole, currentPage, pageSize, debouncedSearch],
     queryFn: fetchAdminUsers,
     enabled: !!getToken(),
     placeholderData: keepPreviousData,
@@ -40,7 +53,7 @@ const AdminUsersProvider = ({ children }) => {
 
   const value = {
     selectedRole,
-    setSelectedRole,
+    setSelectedRole: handleSetSelectedRole,
     currentPage,
     setCurrentPage,
     totalPages,

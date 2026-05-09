@@ -1,4 +1,4 @@
-import React, { useState, useContext, useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { ReceptionistRecentPatientsContext } from '../../../../../../context/HospitalContext/Receptionist/ReceptionistRecentPatientsContext'
 import Pagination2 from '../../../../Patient_Dashboard_Components/Pagination/Pagination2';
 import { formatFullDate, formatTime } from '../../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter';
@@ -9,35 +9,24 @@ const RecentPatients = () => {
     const {
         recentPatients,
         loading,
+        isRefreshing,
         count,
         currentPage,
         totalPages,
         setCurrentPage,
+        searchQuery,
+        setSearchQuery,
     } = useContext(ReceptionistRecentPatientsContext);
 
-    const [searchQuery, setSearchQuery] = useState("");
-
-    // 1. Filter by search and Rank by proximity to "Today/Now"
-    const processedPatients = useMemo(() => {
-        // A. Filter logic
-        let filtered = recentPatients.filter((item) => {
-            const searchStr = searchQuery.toLowerCase();
-            return (
-                item.patient.firstname?.toLowerCase().includes(searchStr) ||
-                item.patient.lastname?.toLowerCase().includes(searchStr) ||
-                item.patient.hin?.toLowerCase().includes(searchStr) ||
-                item.staff.firstname?.toLowerCase().includes(searchStr)
-            );
-        });
-
-        // B. Sort logic: Closest to current time ranks first
+    // Keep client-side sort: closest to current time first
+    const sortedPatients = useMemo(() => {
         const now = new Date().getTime();
-        return [...filtered].sort((a, b) => {
+        return [...recentPatients].sort((a, b) => {
             const timeA = new Date(a.created_at).getTime();
             const timeB = new Date(b.created_at).getTime();
             return Math.abs(timeA - now) - Math.abs(timeB - now);
         });
-    }, [recentPatients, searchQuery]);
+    }, [recentPatients]);
 
     if (loading) {
         return (
@@ -47,7 +36,7 @@ const RecentPatients = () => {
         );
     }
 
-    if (recentPatients.length === 0) {
+    if (recentPatients.length === 0 && !searchQuery) {
         return (
             <div className="flex flex-col justify-center items-center text-center  h-full">
                 <svg
@@ -124,7 +113,21 @@ const RecentPatients = () => {
                     onChange={setSearchQuery} 
                     placeholder="Search by name, HIN, or assigned staff..."
                 />
+                {isRefreshing && (
+                    <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
+                        <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+                        Searching...
+                    </p>
+                )}
       </div>
+
+      {recentPatients.length === 0 && searchQuery ? (
+        <div className="py-12 text-center text-gray-500 text-sm">
+          <p className="font-medium">No results found.</p>
+          <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
+        </div>
+      ) : (
+      <>
             <div className='hidden lg:flex lg:flex-col '>
                 <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
 
@@ -138,7 +141,7 @@ const RecentPatients = () => {
                     <p>Sex</p>
                 </div>
                 {
-                    processedPatients.map((patient, index) => (
+                    sortedPatients.map((patient, index) => (
                         <div key={index} className='relative'>
                             <div className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
                                 <div className='font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-1 '>
@@ -177,7 +180,7 @@ const RecentPatients = () => {
                 }
             </div>
             <div className="lg:hidden flex flex-col gap-4">
-                {processedPatients.map((patient, index) => (
+                {sortedPatients.map((patient, index) => (
                     <div
                         key={index}
                         className="bg-white border border-gray-200 rounded-md p-5  duration-200"
@@ -253,6 +256,8 @@ const RecentPatients = () => {
                 totalPages={totalPages}
                 setCurrentPage = {setCurrentPage}
             />
+        </>
+        )}
         </>
     )
 }

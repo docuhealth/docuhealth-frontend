@@ -4,32 +4,29 @@ import { getToken } from "../../services/authService";
 import toast from "react-hot-toast";
 import { fetchPatientDrugRecords } from "../../queries/Patient/patientDrugRecords";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-
+import useDebounce from "../../hooks/useDebounce";
 
 export const DrugRecordsContext = createContext();
 
 const DrugRecordsProvider = (props) => {
-
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 6; // ✅ 6 per page
+  const [searchQuery, setSearchQuery] = useState("");
+  const pageSize = 6;
 
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const isUserLoggedIn = !!getToken();
 
-  const {
-    data,
-    isPending,
-    isFetching,
-    isError,
-    error
-
-  } = useQuery({
-    queryKey : ["drugRecords", currentPage, pageSize],
+  const { data, isPending, isFetching, isError, error } = useQuery({
+    queryKey: ["drugRecords", currentPage, pageSize, debouncedSearch],
     queryFn: fetchPatientDrugRecords,
-    enabled : isUserLoggedIn,
-    placeholderData : keepPreviousData,
-  })
+    enabled: isUserLoggedIn,
+    placeholderData: keepPreviousData,
+  });
 
-   // Handle errors via useEffect since onError was removed from useQuery v5
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
   useEffect(() => {
     if (isError) {
       toast.error("Error fetching drug records");
@@ -52,7 +49,9 @@ const DrugRecordsProvider = (props) => {
         count,
         totalPages,
         currentPage,
-        setCurrentPage
+        setCurrentPage,
+        searchQuery,
+        setSearchQuery,
       }}
     >
       {props.children}

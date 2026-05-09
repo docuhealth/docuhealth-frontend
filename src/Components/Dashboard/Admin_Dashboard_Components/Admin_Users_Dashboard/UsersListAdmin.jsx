@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useContext, useState, useMemo } from "react";
+import { useContext, useState } from "react";
 import { AdminUsersContext } from "../../../../context/AdminContext/AdminUsersContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Pagination2 from "../../Patient_Dashboard_Components/Pagination/Pagination2";
@@ -17,26 +17,16 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
     users,
     count,
     totalPages,
-    loading
+    loading,
+    isRefreshing,
   } = useContext(AdminUsersContext);
 
   const queryClient = useQueryClient();
 
   const [activeMenu, setActiveMenu] = useState(null);
 
-  // Filter on frontend if the backend search isn't supported yet
-  const displayedUsers = useMemo(() => {
-    if (!searchQuery) return users;
-    return users.filter(u => {
-      const searchStr = searchQuery.toLowerCase();
-      const name = selectedRole === "hospital" ? u.name : u.full_name;
-      return name?.toLowerCase().includes(searchStr) || u.email?.toLowerCase().includes(searchStr);
-    });
-  }, [users, searchQuery, selectedRole]);
-
-  // --- SELECTION LOGIC ---
-
-  const selectableUsers = displayedUsers;
+  // Server handles filtering via debouncedSearch in context
+  const selectableUsers = users;
   const allChecked = selectableUsers.length > 0 && selectedUsers.length === selectableUsers.length;
 
   const toggleSelectAll = () => {
@@ -57,12 +47,11 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
 
     setSelectedUsers((prev) => {
       const isRemoving = prev.includes(id);
-
       if (isRemoving) {
         console.log(`Unchecked user ID: ${id}`);
         return prev.filter((item) => item !== id);
       } else {
-        const userMember = displayedUsers.find((u) => (u.hin || u._id || u.id) === id);
+        const userMember = users.find((u) => (u.hin || u._id || u.id) === id);
         console.log("Checked user:", userMember);
         return [...prev, id];
       }
@@ -215,6 +204,12 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
           onChange={setSearchQuery}
           placeholder="Search by name or email..."
         />
+        {isRefreshing && (
+          <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
+            <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+            Searching...
+          </p>
+        )}
       </div>
 
       <div className="hidden lg:flex lg:flex-col">
@@ -242,11 +237,13 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
           )}
         </div>
 
-        {displayedUsers.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 text-sm">No users found.</div>
+        {users.length === 0 ? (
+          <div className="p-8 text-center text-gray-500 text-sm">
+            {searchQuery ? "No results found for your search." : "No users found."}
+          </div>
         ) : (
           <div className="flex flex-col">
-            {displayedUsers.map((user, idx) => {
+            {users.map((user, idx) => {
               const isHospital = selectedRole === "hospital";
               const currentId = user.hin || user._id || user.id;
               const isSelected = selectedUsers.includes(currentId);
@@ -328,10 +325,12 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
         )}
       </div>
       <div className="block lg:hidden space-y-4 my-4">
-        {displayedUsers.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 text-sm">No users found.</div>
+        {users.length === 0 ? (
+          <div className="p-8 text-center text-gray-500 text-sm">
+            {searchQuery ? "No results found for your search." : "No users found."}
+          </div>
         ) : (
-          displayedUsers.map((user, idx) => {
+          users.map((user, idx) => {
             const isHospital = selectedRole === "hospital";
             const currentId = user.hin || user._id || user.id;
             const isSelected = selectedUsers.includes(currentId);
