@@ -143,10 +143,10 @@ const HospitalRequestDetail = ({
         {selectedRequest.status !== "approved" && (
           <button 
             className="bg-[#3E4095] text-white px-6 py-2 text-xs rounded-full font-medium hover:bg-[#2e3070] transition flex justify-center items-center gap-2"
-            onClick={() => approveHospital(selectedRequest.id)}
-            disabled={approving === selectedRequest.id}
+            onClick={() => approveHospital(selectedRequest.sqid)}
+            disabled={approving === selectedRequest.sqid}
           >
-            {approving === selectedRequest.id ? "Approving..." : "Approve Hospital"}
+            {approving === selectedRequest.sqid ? "Approving..." : "Approve Hospital"}
           </button>
         )}
       </div>

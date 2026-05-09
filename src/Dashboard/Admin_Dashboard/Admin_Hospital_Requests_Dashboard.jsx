@@ -44,6 +44,7 @@ const Admin_Hospital_Requests_Dashboard = () => {
     }, [currentPage]);
 
     const approveHospital = async (requestId) => {
+      console.log(requestId)
         setApproving(requestId);
         try {
             await axiosInstance.post(
@@ -55,7 +56,7 @@ const Admin_Hospital_Requests_Dashboard = () => {
             );
             toast.success("Hospital approved successfully!");
             setActiveMenu(null);
-            if (viewDetailRequest && viewDetailRequest.id === requestId) {
+            if (viewDetailRequest && viewDetailRequest.sqid === requestId) {
               setViewDetailRequest({...viewDetailRequest, status: "approved"})
             }
             fetchRequests(currentPage);
@@ -74,7 +75,7 @@ const Admin_Hospital_Requests_Dashboard = () => {
         return requests.filter(req => {
             return req.official_email?.toLowerCase().includes(searchStr) || 
                    req.status?.toLowerCase().includes(searchStr) ||
-                   req.id?.toString().includes(searchStr);
+                   req.sqid?.toString().includes(searchStr);
         });
     }, [requests, searchQuery]);
 
@@ -123,8 +124,8 @@ const Admin_Hospital_Requests_Dashboard = () => {
                       ) : (
                         <div className="flex flex-col">
                           {displayedRequests.map((req, index) => (
-                              <div key={req.id || `req-${index}`} className="grid grid-cols-5 items-center py-4 border-b border-b-gray-200 text-[12px] text-gray-700 text-left w-full hover:bg-gray-50">
-                                <p className="pl-5 font-semibold text-gray-800">#{req.id || index}</p>
+                              <div key={req.sqid || `req-${index}`} className="grid grid-cols-5 items-center py-4 border-b border-b-gray-200 text-[12px] text-gray-700 text-left w-full hover:bg-gray-50">
+                                <p className="pl-5 font-semibold text-gray-800">#{req.sqid || index}</p>
                                 <div className="pr-4">
                                   <p className="truncate font-medium">{req.official_email}</p>
                                 </div>
@@ -154,13 +155,13 @@ const Admin_Hospital_Requests_Dashboard = () => {
                                         View more info
                                       </button>
                                       <button 
-                                        onClick={(e) => { e.stopPropagation(); setActiveMenu(null); approveHospital(req.id); }} 
-                                        disabled={approving === req.id || req.status === "approved"}
+                                        onClick={(e) => { e.stopPropagation(); setActiveMenu(null); approveHospital(req.sqid); }} 
+                                        disabled={approving === req.sqid || req.status === "approved"}
                                         className={`w-full text-left p-2 rounded-md font-medium transition-colors ${
                                             req.status === "approved" ? "text-gray-400 cursor-not-allowed" : "hover:bg-green-50 text-green-600"
                                         }`}
                                       >
-                                        {approving === req.id ? "Approving..." : req.status === "approved" ? "Already Approved" : "Approve Hospital"}
+                                        {approving === req.sqid ? "Approving..." : req.status === "approved" ? "Already Approved" : "Approve Hospital"}
                                       </button>
                                     </div>
                                   )}
@@ -180,7 +181,7 @@ const Admin_Hospital_Requests_Dashboard = () => {
                       ) : (
                         displayedRequests.map((req) => (
                           <div
-                            key={req.id}
+                            key={req.sqid}
                             className="bg-white border border-gray-200 rounded-md p-4 transition-transform"
                           >
                             {/* Header: ID and Status */}
@@ -192,7 +193,7 @@ const Admin_Hospital_Requests_Dashboard = () => {
                               </div>
                               <div>
                                 <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">
-                                  Hospital ID: #{req.id}
+                                  Hospital ID: #{req.sqid}
                                 </p>
                                 <p className={`text-sm font-semibold capitalize ${req.status === "approved" ? "text-green-600" : req.status === "rejected" ? "text-red-600" : "text-yellow-600"}`}>
                                   {req.status}
@@ -234,10 +235,10 @@ const Admin_Hospital_Requests_Dashboard = () => {
                               {req.status !== "approved" && (
                                 <button
                                   className="bg-[#3E4095] border border-[#3E4095] text-white rounded-full py-2 text-[12px] font-semibold flex items-center justify-center flex-1 hover:bg-[#2e3070] transition-colors"
-                                  onClick={() => approveHospital(req.id)}
-                                  disabled={approving === req.id}
+                                  onClick={() => approveHospital(req.sqid)}
+                                  disabled={approving === req.sqid}
                                 >
-                                  {approving === req.id ? "Approving..." : "Approve"}
+                                  {approving === req.sqid ? "Approving..." : "Approve"}
                                 </button>
                               )}
                             </div>
