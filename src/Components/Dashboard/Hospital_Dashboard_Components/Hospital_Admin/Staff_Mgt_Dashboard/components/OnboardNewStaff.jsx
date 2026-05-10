@@ -38,6 +38,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
   const doctorSpecializations = [
     "Surgeon",
+    "General Dentist",
     "Gynecologist",
     "Obstetrician",
     "Pediatrician",
