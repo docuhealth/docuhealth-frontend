@@ -24,7 +24,7 @@ const DoctorsHealthPersonnelProvider = (props) => {
                 `api/hospitals/team-members?page=${page}&size=${pageSize}`
             );
 
-            console.log(res.data)
+            // console.log(res.data)
             setHealthPersonnelList(res.data.results || [])
             setCount(res.data.count || 0);
             setCurrentPage(page);

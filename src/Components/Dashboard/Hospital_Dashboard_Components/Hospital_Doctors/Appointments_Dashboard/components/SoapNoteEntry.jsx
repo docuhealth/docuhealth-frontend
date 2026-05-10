@@ -139,9 +139,13 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
   };
 
   const today = new Date();
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
 
   const [selectedDay, setSelectedDay] = useState(String(today.getDate()));
-  const [selectedMonth, setSelectedMonth] = useState("January");
+  const [selectedMonth, setSelectedMonth] = useState(monthNames[today.getMonth()]);
   const [selectedYear, setSelectedYear] = useState(String(today.getFullYear()));
   const [selectedTime, setSelectedTime] = useState("08:00");
 
@@ -363,7 +367,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
     const payload = {
       staff: profile?.staff_id || "",
       patient: selectedPatientDetails.patient.hin || "",
-      vital_signs: selectedPatientFetchedInfo?.latest_vitals.id,
+      ...(selectedPatientFetchedInfo?.latest_vitals?.id && { vital_signs: selectedPatientFetchedInfo.latest_vitals.id }),
       referred_docuhealth_hosp: soapNoteData.referred_docuhealth_hosp,
       referred_hosp: soapNoteData.referred_hosp,
       drug_records: drugRecords,
@@ -1187,7 +1191,7 @@ useEffect(() => {
                       onChange={(e) => setSelectedMonth(e.target.value)}
                       className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-8"
                     >
-                      <option value="January" selected>
+                      <option value="January">
                         January
                       </option>
                       <option value="February">February</option>
@@ -1228,10 +1232,10 @@ useEffect(() => {
                       onChange={(e) => setSelectedYear(e.target.value)}
                       className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-8"
                     >
-                      <option value="2025" selected>
-                        2025
-                      </option>
+                      <option value="2024">2024</option>
+                      <option value="2025">2025</option>
                       <option value="2026">2026</option>
+                      <option value="2027">2027</option>
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                       <svg
@@ -1259,7 +1263,7 @@ useEffect(() => {
                       onChange={(e) => setSelectedTime(e.target.value)}
                       className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-8"
                     >
-                      <option value="08:00" selected>
+                      <option value="08:00">
                         08:00 AM
                       </option>
                       <option value="09:00">09:00 AM</option>
@@ -1393,9 +1397,27 @@ useEffect(() => {
                 Previous
               </button>
               <button
-                disabled={isPending}
+                disabled={
+                  isPending ||
+                  medications.length === 0 ||
+                  medications.every((med) => !med.drug?.trim()) ||
+                  medications.some(
+                    (med) =>
+                      med.drug?.trim() && (!med.dosage || !med.duration)
+                  ) ||
+                  soapNoteData.care_instructions.length === 0 ||
+                  soapNoteData.treatment_plan.length === 0
+                }
                 className={`py-2.5  rounded-full text-sm px-20 sm:mt-5 text-white lg:w-auto w-full ${
-                  isPending
+                  isPending ||
+                  medications.length === 0 ||
+                  medications.every((med) => !med.drug?.trim()) ||
+                  medications.some(
+                    (med) =>
+                      med.drug?.trim() && (!med.dosage || !med.duration)
+                  ) ||
+                  soapNoteData.care_instructions.length === 0 ||
+                  soapNoteData.treatment_plan.length === 0
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-[#3E4095] cursor-pointer"
                 }`}
