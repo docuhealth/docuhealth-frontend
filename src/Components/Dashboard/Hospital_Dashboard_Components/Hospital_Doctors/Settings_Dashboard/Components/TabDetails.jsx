@@ -12,6 +12,7 @@ const AccountSettingsTab = () => {
     email: "",
     oldPassword: "",
     newPassword: "",
+    confirmPassword: "",
     otp: "",
   });
 
@@ -164,7 +165,7 @@ const AccountSettingsTab = () => {
     onSuccess: () => {
       toast.success("Password changed successfully!");
       // Reset password fields and validation state
-      setFormData((prev) => ({ ...prev, oldPassword: "", newPassword: "" }));
+      setFormData((prev) => ({ ...prev, oldPassword: "", newPassword: "", confirmPassword: "" }));
       setIsPasswordValid(false);
       setPasswordRequirements({
         hasLowercase: false,
@@ -188,6 +189,10 @@ const AccountSettingsTab = () => {
 
     if (!isPasswordValid) {
       return toast.error("Please meet all password security requirements.");
+    }
+
+    if (formData.newPassword !== formData.confirmPassword) {
+      return toast.error("Passwords do not match");
     }
 
     updatePasswordMutation.mutate({
@@ -491,13 +496,56 @@ const AccountSettingsTab = () => {
                   )}
                 </div>
 
+                <div className="mt-4">
+                  <p className="block text-[12px] font-medium text-gray-700 mb-0.5">
+                    Confirm Password :
+                  </p>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      placeholder=""
+                      className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none pl-8 ${
+                        formData.confirmPassword && formData.newPassword !== formData.confirmPassword
+                          ? "focus:border-red-500"
+                          : ""
+                      }`}
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                    />
+                    <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                    >
+                      {showPassword ? (
+                        <FaEyeSlash className="h-3 w-3 text-gray-400" />
+                      ) : (
+                        <FaEye className="h-3 w-3 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
+                  {formData.confirmPassword && formData.newPassword !== formData.confirmPassword && (
+                    <p className="text-red-500 text-[10px] mt-1">Passwords do not match</p>
+                  )}
+                </div>
+
                 <button
                   onClick={handleUpdatePassword}
                   disabled={
-                    updatePasswordMutation.isPending || !isPasswordValid || !formData.oldPassword
+                    updatePasswordMutation.isPending || 
+                    !isPasswordValid || 
+                    !formData.oldPassword || 
+                    formData.newPassword !== formData.confirmPassword ||
+                    !formData.confirmPassword
                   }
                   className={`mt-4 text-[12px] w-full lg:w-[50%] py-2 rounded-full text-white transition-all flex items-center justify-center gap-2 ${
-                    !isPasswordValid || updatePasswordMutation.isPending || !formData.oldPassword
+                    !isPasswordValid || 
+                    updatePasswordMutation.isPending || 
+                    !formData.oldPassword || 
+                    formData.newPassword !== formData.confirmPassword ||
+                    !formData.confirmPassword
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-[#3E4095]"
                   }`}
