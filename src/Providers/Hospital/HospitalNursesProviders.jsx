@@ -5,6 +5,7 @@ import NursesHealthPersonnelProvider from '../../context/HospitalContext/Nurses/
 import NursesAppointmentsListProvider from '../../context/HospitalContext/Nurses/NursesAppointmentsListContext'
 import NursesPatientsAssignedToWardProvider from '../../context/HospitalContext/Nurses/NursesPatientsAssignedToWardContext'
 import NursesVitalSignsProvider from '../../context/HospitalContext/Nurses/NursesVitalSignsContext'
+import NursesCaseNotesProvider from '../../context/HospitalContext/Nurses/NursesCaseNotesContext'
 
 import HosStaffsProvider from '../../context/HospitalContext/HosStaffsContext'
 
@@ -18,7 +19,9 @@ const HospitalNursesProviders = ({ children }) => {
               <NursesAppointmentsListProvider>
                 <NursesPatientsAssignedToWardProvider>
                   <NursesVitalSignsProvider>
-                    {children}
+                    <NursesCaseNotesProvider>
+                      {children}
+                    </NursesCaseNotesProvider>
                   </NursesVitalSignsProvider>
                 </NursesPatientsAssignedToWardProvider>
               </NursesAppointmentsListProvider>

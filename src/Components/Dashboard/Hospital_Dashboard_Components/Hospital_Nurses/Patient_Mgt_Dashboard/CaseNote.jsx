@@ -1,29 +1,40 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarIcon, ClockIcon, UserIcon, MoreVertical } from "lucide-react";
+import { NursesCaseNotesContext } from "../../../../../context/HospitalContext/Nurses/NursesCaseNotesContext";
+import SearchBar from "../../../../SearchBar/SearchBar";
+import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 
 const CaseNote = ({ selected, setCaseNoteHistory, setCaseNoteDetail }) => {
-const [openMenuId, setOpenMenuId] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
   const menuRef = useRef(null);
   const hin = selected?.patient?.hin;
 
+  const {
+    caseNotes,
+    count,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    loading,
+    isRefreshing,
+    setPatientHin,
+    searchQuery,
+    setSearchQuery,
+  } = useContext(NursesCaseNotesContext);
 
-  const { data: caseNotes, isLoading } = useQuery({
-    queryKey: ["patient-case-notes", hin],
-    queryFn: async () => {
-      const res = await axiosInstanceHos.get(`api/nurses/case-notes/patient/${hin}`);
-      return res.data.results;
-    },
-    enabled: !!hin,
-    onError: (err) => {
-      console.error("Error fetching patient's case notes:", err);
-      toast.error("Failed to load patient's case notes");
+  useEffect(() => {
+    if (hin) {
+      setPatientHin(hin);
     }
-  });
+    return () => {
+      setPatientHin(null);
+      setCurrentPage(1);
+    };
+  }, [hin, setPatientHin, setCurrentPage]);
 
- 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -55,9 +66,23 @@ const [openMenuId, setOpenMenuId] = useState(null);
 
         <h2 className=" text-sm">Case Note History</h2>
       </div>
-      <div className=" my-5">
 
-        {isLoading ? (
+      <div className="my-4">
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search case notes..."
+        />
+        {isRefreshing && (
+          <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
+            <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+            Searching...
+          </p>
+        )}
+      </div>
+
+      <div className=" my-5">
+        {loading ? (
           <>
             <div className="flex justify-center items-center gap-3 px-2 py-3">
               <p className="text-sm text-gray-500 pt-3">
@@ -65,7 +90,7 @@ const [openMenuId, setOpenMenuId] = useState(null);
               </p>
             </div>
           </>
-        ) : caseNotes?.length === 0 && !isLoading ? (
+        ) : caseNotes?.length === 0 && !loading ? (
           <>
             <div className="flex flex-col justify-center items-center text-center  my-2">
               <svg
@@ -195,12 +220,12 @@ const [openMenuId, setOpenMenuId] = useState(null);
                   </div>
 
                   {/* Actions Menu */}
-                  <div className="relative flex justify-end  lg:mt-0">
+                  <div className="relative flex justify-end  lg:mt-0" ref={menuRef}>
                     <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenMenuId(openMenuId === note.id ? null : note.id);
-                    }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(openMenuId === note.id ? null : note.id);
+                      }}
                       className="p-2 hover:bg-gray-200 rounded-full transition-all"
                     >
                       <svg
@@ -214,22 +239,30 @@ const [openMenuId, setOpenMenuId] = useState(null);
                     </button>
 
                     {openMenuId === note.id && (
-                    <div className="absolute right-0 top-10 z-10 w-40 bg-white rounded-md shadow text-sm border border-gray-100  animate-in fade-in zoom-in duration-200">
-                      <button
-                        onClick={() => {
-                          setCaseNoteDetail(note);
-                          setCaseNoteHistory(false);
-                          setOpenMenuId(null);
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:rounded-md transition-colors"
-                      >
-                        View note details
-                      </button>
-                    </div>
-                  )}
+                      <div className="absolute right-0 top-10 z-10 w-40 bg-white rounded-md shadow text-sm border border-gray-100  animate-in fade-in zoom-in duration-200">
+                        <button
+                          onClick={() => {
+                            setCaseNoteDetail(note);
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:rounded-md transition-colors"
+                        >
+                          View note details
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-6">
+              <Pagination2
+                count={count}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                setCurrentPage={setCurrentPage}
+              />
             </div>
           </>
         )}

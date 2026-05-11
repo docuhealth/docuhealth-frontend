@@ -114,14 +114,14 @@ const Hospital_Nurses_Patients_Dashboard = () => {
               selected={selected}
               setVitalSignsHistory={setVitalSignsHistory}
             />
+          ) : caseNoteDetail ? (
+            <CaseNoteDetail caseNoteDetail={caseNoteDetail} setCaseNoteDetail={setCaseNoteDetail} />
           ) : caseNoteHistory ? (
             <CaseNote
               selected={selected}
               setCaseNoteHistory={setCaseNoteHistory}
               setCaseNoteDetail={setCaseNoteDetail}
             />
-          ) : caseNoteDetail ? (
-            <CaseNoteDetail caseNoteDetail={caseNoteDetail} setCaseNoteDetail={setCaseNoteDetail} />
           ) : newCaseNote ? (
             <>
               <AddNewCaseNote
