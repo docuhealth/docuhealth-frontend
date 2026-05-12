@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // React Icons
 import dashb from "../../assets/img/dashb.png";
+import AuthRightSide from "../AuthRightSide";
 import { Link } from "react-router-dom";
 import { authAPI } from "../../utils/authAPI";
 import { useNavigate } from "react-router-dom";
@@ -463,29 +464,7 @@ const Partner_Create_Account = () => {
                         </div>
                     </div>
                 </div>
-                <div
-                    className="w-1/2 h-screen flex flex-col justify-center items-center p-4 flex-1"
-                    style={{
-                        background: "linear-gradient(to bottom, #3E4095, #718FCC)",
-                    }}
-                >
-                    <div className="">
-                        <p className="text-white font-semibold text-xl sm:text-2xl pb-1">
-                            The simplest way to manage <br /> medical records
-                        </p>
-                        <p className="text-white font-light text-sm">
-                            No better way to attend to, and keep records of medical records
-                        </p>
-                    </div>
-
-                    <div className="max-h-[420px] flex justify-center items-center pt-2">
-                        <img
-                            src={dashb}
-                            alt="Dashboard"
-                            className="object-contain w-full h-full"
-                        />
-                    </div>
-                </div>
+                <AuthRightSide />
             </div>
 
             <div className="h-screen sm:hidden">

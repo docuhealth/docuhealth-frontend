@@ -87,7 +87,7 @@ const Core_Product_Section = () => {
               return (
                 <motion.div 
                   key={index} 
-                  className="p-8 border rounded-2xl flex-1 bg-white shadow-sm hover:shadow-md transition-shadow"
+                  className="p-8 border rounded-lg flex-1 bg-white  hover:shadow-md transition-shadow"
                   variants={cardVariants}
                 >
                   <div className="w-16 h-16 bg-[#3E4095] rounded-full flex items-center justify-center  mb-4">

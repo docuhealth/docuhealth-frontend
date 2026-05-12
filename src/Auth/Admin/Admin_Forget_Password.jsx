@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 import { FaEnvelope } from "react-icons/fa";
 import dashb from "../../assets/img/dashb.png";
+import AuthRightSide from "../AuthRightSide";
 import { Link, useNavigate } from "react-router-dom";
 import { authAPI } from "../../utils/authAPI";
 import toast from "react-hot-toast";
@@ -120,30 +121,7 @@ const AFP = () => {
           </div>
         </div>
 
-        {/* Right Side */}
-        <div
-          className="flex-1 h-screen flex flex-col justify-center items-center p-4"
-          style={{
-            background: "linear-gradient(to bottom, #3E4095, #718FCC)",
-          }}
-        >
-          <div className="">
-            <p className="text-white font-semibold text-2xl pb-1">
-              The simplest way to manage <br /> medical records
-            </p>
-            <p className="text-white font-light text-sm">
-              No better way to attend to, and keep records of medical records
-            </p>
-          </div>
-
-          <div className="max-h-[420px] flex justify-center items-center pt-2">
-            <img
-              src={dashb}
-              alt="Dashboard"
-              className="object-contain w-full h-full"
-            />
-          </div>
-        </div>
+        <AuthRightSide />
       </div>
 
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
