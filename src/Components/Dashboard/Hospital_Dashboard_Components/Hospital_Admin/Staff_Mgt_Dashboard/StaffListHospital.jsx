@@ -7,8 +7,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
-  const { staffs, loading, count, currentPage, totalPages, setCurrentPage, searchQuery, setSearchQuery, isRefreshing } =
+  const { staffs, loading, count, currentPage, totalPages, setCurrentPage, searchQuery, setSearchQuery, isRefreshing, selectedRole, setSelectedRole } =
     useContext(HosStaffsContext);
+
+  const ROLE_TABS = [
+    { label: "All", value: "" },
+    { label: "Doctors", value: "doctor" },
+    { label: "Nurses", value: "nurse" },
+    { label: "Receptionists", value: "receptionist" },
+  ];
 
   // console.log(staffs)
 
@@ -286,6 +293,21 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
             Searching...
           </p>
         )}
+        <div className="flex gap-2 mt-3 flex-wrap">
+          {ROLE_TABS.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setSelectedRole(tab.value)}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+                selectedRole === tab.value
+                  ? "bg-[#3E4095] text-white border-[#3E4095]"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-[#3E4095] hover:text-[#3E4095]"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {staffs.length === 0 && searchQuery ? (

@@ -14,7 +14,16 @@ const Health_Personnel_List = () => {
     setCurrentPage,
     searchQuery,
     setSearchQuery,
+    selectedRole,
+    setSelectedRole,
   } = useContext(HosStaffsContext);
+
+  const ROLE_TABS = [
+    { label: "All", value: "" },
+    { label: "Doctors", value: "doctor" },
+    { label: "Nurses", value: "nurse" },
+    { label: "Receptionists", value: "receptionist" },
+  ];
 
   if (loading) {
     return (
@@ -24,7 +33,7 @@ const Health_Personnel_List = () => {
     );
   }
 
-  if (healthPersonnelList.length === 0 && !searchQuery) {
+  if (healthPersonnelList.length === 0 && !searchQuery && !selectedRole) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
@@ -106,9 +115,24 @@ const Health_Personnel_List = () => {
           Searching...
         </p>
       )}
+      <div className="flex gap-2 mt-3 flex-wrap">
+        {ROLE_TABS.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => setSelectedRole(tab.value)}
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+              selectedRole === tab.value
+                ? "bg-[#3E4095] text-white border-[#3E4095]"
+                : "bg-white text-gray-600 border-gray-200 hover:border-[#3E4095] hover:text-[#3E4095]"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
     </div>
 
-    {healthPersonnelList.length === 0 && searchQuery ? (
+    {healthPersonnelList.length === 0 && (searchQuery || selectedRole) ? (
       <div className="py-12 text-center text-gray-500 text-sm">
         <p className="font-medium">No results found.</p>
         <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
