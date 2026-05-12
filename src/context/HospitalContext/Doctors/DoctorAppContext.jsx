@@ -56,7 +56,11 @@ const DoctorProfileProvider = ({ children }) => {
       hospitals: hospitals || [],
       isLoading: !profile && isUserLoggedIn,
       backgroundImage,
-      hospitalName
+      hospitalName,
+      dashboardMetrics,
+      dashboardMetricsLoading,
+      dateRange,
+      updateDateRange,
     }}>
       {children}
     </DoctorAppContext.Provider>
