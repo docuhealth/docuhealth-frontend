@@ -131,7 +131,7 @@ const MedicalRecords = ({
 
   return (
     <div className="bg-white my-5 border rounded-lg py-5 px-5">
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
@@ -143,7 +143,7 @@ const MedicalRecords = ({
             Searching...
           </p>
         )}
-      </div>
+      </div> */}
 
       {medicalRecords.length === 0 && searchQuery ? (
         <div className="py-12 text-center text-gray-500 text-sm">
