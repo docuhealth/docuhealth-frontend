@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { login, setHospitalToken } from "../../services/authService";
 import toast from "react-hot-toast";
 import dashb from "../../assets/img/dashb.png";
+import AuthRightSide from "../AuthRightSide";
 import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 
 const Hospital_Sign_In = () => {
@@ -204,30 +205,7 @@ const Hospital_Sign_In = () => {
           </div>
         </div>
 
-        {/* Right Side */}
-        <div
-          className="flex-1 h-screen flex flex-col justify-center items-center p-4"
-          style={{
-            background: "linear-gradient(to bottom, #3E4095, #718FCC)",
-          }}
-        >
-          <div className="">
-            <p className="text-white font-semibold text-xl pb-1 sm:text-2xl">
-              The simplest way to manage <br /> medical records
-            </p>
-            <p className="text-white font-light text-sm">
-              No better way to attend to, and keep records of medical records
-            </p>
-          </div>
-
-          <div className="max-h-[420px] flex justify-center items-center pt-2">
-            <img
-              src={dashb}
-              alt="Dashboard"
-              className="object-contain w-full h-full"
-            />
-          </div>
-        </div>
+        <AuthRightSide />
       </div>
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
         <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
