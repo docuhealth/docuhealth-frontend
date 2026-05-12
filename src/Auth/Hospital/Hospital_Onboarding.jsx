@@ -263,7 +263,7 @@ const Hospital_Onboarding = () => {
                             <>
                                 <div className="w-full px-10 " id="temp">
                                     <h2 className="text-xl font-semibold pb-1">
-                                        Onboard Your Hospital
+                                        Create My DocuCore Account
                                     </h2>
                                     <p className="text-gray-600  mb-6 text-sm">
                                         Create your account with your correct credentials to get
@@ -518,10 +518,10 @@ const Hospital_Onboarding = () => {
                             <>
                                 <div className="w-full px-10 " id="temp">
                                     <h2 className="text-xl font-semibold pb-1 ">
-                                        Create Your Account
+                                        Create My DocuCore Account
                                     </h2>
                                     <p className="text-gray-600  mb-6 text-sm">
-                                        Create your account with your correct credentials to get
+                                        Create my DocuCore account with your correct credentials to get
                                         started
                                     </p>
                                     <form className="text-sm">
@@ -714,7 +714,7 @@ const Hospital_Onboarding = () => {
                         <>
                             <div className="w-full px-5 flex  flex-col justify-center min-h-screen " id="temp">
                                 <h2 className="text-xl font-semibold pb-1">
-                                    Onboard Your Hospital
+                                    Create My DocuCore Account
                                 </h2>
                                 <p className="text-gray-600  mb-6 text-sm">
                                     Create your account with your correct credentials to get

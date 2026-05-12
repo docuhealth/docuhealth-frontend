@@ -117,7 +117,7 @@ const Hospital_Verification_Request = () => {
 
                         <div className="w-full  px-10">
                             <h2 className="text-xl font-semibold pb-1">
-                                Get Verified as a Provider!
+                                Get Verified as a DocuCore Provider!
                             </h2>
                             <p className="text-gray-600 mb-6 text-sm">
                                 Input your official email and supporting documents.

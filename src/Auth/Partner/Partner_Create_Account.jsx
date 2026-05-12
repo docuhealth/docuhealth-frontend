@@ -173,10 +173,10 @@ const Partner_Create_Account = () => {
 
                         <div className="w-full px-10 " id="temp">
                             <h2 className="text-xl font-semibold pb-1">
-                                Create Your Account
+                                Create My DocuHealth Partner Account
                             </h2>
                             <p className="text-gray-600  mb-6 text-sm">
-                                Create your account with your correct credentials to get
+                                Create my DocuHealth partner account with your correct credentials to get
                                 started
                             </p>
 
@@ -417,6 +417,13 @@ const Partner_Create_Account = () => {
                                         className="text-[#3E4095] hover:underline"
                                     >
                                         Privacy Policy
+                                    </Link>{" "}
+                                    and{" "}
+                                    <Link
+                                        to="/api-terms-and-conditions"
+                                        className="text-[#3E4095] hover:underline"
+                                    >
+                                        API Terms and Conditions
                                     </Link>
                                     .
                                 </p>
@@ -752,6 +759,13 @@ const Partner_Create_Account = () => {
                                             className="text-[#3E4095] hover:underline"
                                         >
                                             Privacy Policy
+                                        </Link>{" "}
+                                        and{" "}
+                                        <Link
+                                            to="/api-terms-and-conditions"
+                                            className="text-[#3E4095] hover:underline"
+                                        >
+                                            API Terms and Conditions
                                         </Link>
                                         .
                                     </p>

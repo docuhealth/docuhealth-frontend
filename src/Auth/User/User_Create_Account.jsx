@@ -326,10 +326,10 @@ const ULP = () => {
               <>
                 <div className="w-full px-10 " id="temp">
                   <h2 className="text-xl font-semibold pb-1">
-                    Create Your Account
+                    Create My DocuHealth Account
                   </h2>
                   <p className="text-gray-600  mb-6 text-sm">
-                    Create your account with your correct credentials to get
+                    Create my DocuHealth account with your correct credentials to get
                     started
                   </p>
 
@@ -583,10 +583,10 @@ const ULP = () => {
               <>
                 <div className="w-full px-10 " id="temp">
                   <h2 className="text-xl font-semibold pb-1 ">
-                    Create Your Account
+                    Create My DocuHealth Account
                   </h2>
                   <p className="text-gray-600  mb-6 text-sm">
-                    Create your account with your correct credentials to get
+                    Create my DocuHealth account with your correct credentials to get
                     started
                   </p>
 
@@ -731,10 +731,10 @@ const ULP = () => {
                   style={{ display: step === 3 ? "block" : "none" }}
                 >
                   <h2 className="text-xl font-semibold pb-1 ">
-                    Create Your Account
+                    Create My DocuHealth Account
                   </h2>
                   <p className="text-gray-600  mb-6 text-sm">
-                    Create your account with your correct credentials to get
+                    Create my DocuHealth account with your correct credentials to get
                     started
                   </p>
 

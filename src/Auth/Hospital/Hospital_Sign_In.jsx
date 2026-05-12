@@ -112,10 +112,10 @@ const Hospital_Sign_In = () => {
             <div className="w-full ">
               <div className="px-10 w-full">
                 <h2 className="text-xl font-semibold pb-1">
-                  Sign Into Your Provider's Account
+                  Sign Into My DocuCore Account
                 </h2>
                 <p className="text-gray-600 mb-6 text-sm">
-                  Input your correct log-in credentials to get access into your
+                  Input your correct log-in credentials to get access into your DocuCore
                   dashboard
                 </p>
 
@@ -215,10 +215,10 @@ const Hospital_Sign_In = () => {
 
         <div className="px-5 w-full">
           <h2 className="text-xl font-semibold pb-1">
-            Sign Into Your Provider's Account
+            Sign Into My DocuCore Account
           </h2>
           <p className="text-gray-600 mb-6 text-sm">
-            Input your correct log-in credentials to get access into your
+            Input your correct log-in credentials to get access into your DocuCore
             dashboard
           </p>
 
