@@ -48,11 +48,28 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const today = new Date();
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
 
     const [selectedDay, setSelectedDay] = useState(String(today.getDate()));
-    const [selectedMonth, setSelectedMonth] = useState("January");
+    const [selectedMonth, setSelectedMonth] = useState(months[today.getMonth()]);
     const [selectedYear, setSelectedYear] = useState(String(today.getFullYear()));
     const [selectedTime, setSelectedTime] = useState("08:00");
+    const [useTodayDate, setUseTodayDate] = useState(false);
+
+    const isToday = selectedDay === String(today.getDate()) &&
+        selectedMonth === months[today.getMonth()] &&
+        selectedYear === String(today.getFullYear());
+
+    useEffect(() => {
+        if (useTodayDate) {
+            setSelectedDay(String(today.getDate()));
+            setSelectedMonth(months[today.getMonth()]);
+            setSelectedYear(String(today.getFullYear()));
+        }
+    }, [useTodayDate]);
 
     const [formData, setFormData] = useState({
         staff: "",
@@ -250,13 +267,34 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                                         </svg>
                                     </div>
                                 </div>
+
+                                <div className="mb-4">
+                                    <label className="flex items-center cursor-pointer group">
+                                        <div className="relative">
+                                            <input
+                                                type="checkbox"
+                                                className="sr-only"
+                                                checked={useTodayDate}
+                                                disabled={!isToday && !useTodayDate}
+                                                onChange={() => setUseTodayDate(!useTodayDate)}
+                                            />
+                                            <div className={`block w-8 h-4 rounded-full transition ${useTodayDate ? 'bg-[#3E4095]' : 'bg-gray-300'} ${(!isToday && !useTodayDate) ? 'opacity-50 cursor-not-allowed' : ''}`}></div>
+                                            <div className={`dot absolute left-1 top-0.5 bg-white w-3 h-3 rounded-full transition-transform ${useTodayDate ? 'translate-x-3' : ''}`}></div>
+                                        </div>
+                                        <div className={`ml-2 font-medium text-[12px] ${(!isToday && !useTodayDate) ? 'text-gray-400' : 'text-gray-700'}`}>
+                                            Use today's date
+                                        </div>
+                                    </label>
+                                </div>
+
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[12px]">
                                     <div className="relative">
                                         <label className="block  pb-1">Day</label>
                                         <select
                                             value={selectedDay}
+                                            disabled={useTodayDate}
                                             onChange={(e) => setSelectedDay(e.target.value)}
-                                            className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-[12px] "
+                                            className={`w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer text-[12px] ${useTodayDate ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                                         >
                                             {[...Array(31)].map((_, i) => (
                                                 <option key={i} value={i + 1}>{i + 1}</option>
@@ -283,8 +321,9 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                                         <label className="block  pb-1">Month</label>
                                         <select
                                             value={selectedMonth}
+                                            disabled={useTodayDate}
                                             onChange={(e) => setSelectedMonth(e.target.value)}
-                                            className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-[12px] "
+                                            className={`w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer text-[12px] ${useTodayDate ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                                         >
                                             <option value="January" selected>
                                                 January
@@ -322,8 +361,9 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                                         <label className="block text-[12px] pb-1">Year</label>
                                         <select
                                             value={selectedYear}
+                                            disabled={useTodayDate}
                                             onChange={(e) => setSelectedYear(e.target.value)}
-                                            className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-[12px] "
+                                            className={`w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer text-[12px] ${useTodayDate ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                                         >
                                             <option value="2025" selected>
                                                 2025
