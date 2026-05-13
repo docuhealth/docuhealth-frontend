@@ -13,6 +13,7 @@ const AccountSettingsTab = () => {
     firstname: "",
     lastname: "",
     password: "",
+    confirmPassword: "",
     middlename: "",
     email: "",
     phone_num: "",
@@ -25,6 +26,7 @@ const AccountSettingsTab = () => {
 
   const [isAcctDeleteConfirmed, setIsAcctDeleteConfirmed] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isAcctDeleting, setIsAcctDeleting] = useState(false)
   const [isPasswordValid, setIsPasswordValid] = useState(false);
@@ -113,6 +115,7 @@ const AccountSettingsTab = () => {
       middlename: "",
       email: "",
       password: "",
+      confirmPassword: "",
       phone_num: "",
       gender: "",
       DOB: "",
@@ -126,6 +129,7 @@ const AccountSettingsTab = () => {
     });
     setIsPasswordValid(false);
     setShowPassword(false);
+    setShowConfirmPassword(false);
   }
 
 
@@ -148,7 +152,7 @@ const AccountSettingsTab = () => {
     e.preventDefault();
 
     // Separate password/email (root fields) from others (profile fields)
-    const { email, password, ...profileFields } = formData;
+    const { email, password, confirmPassword, ...profileFields } = formData;
 
     // Include only non-empty fields in profile
     const filledProfile = Object.fromEntries(
@@ -174,12 +178,18 @@ const AccountSettingsTab = () => {
       return;
     }
 
+    if (password && password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
     updateAccountMutation.mutate(payload);
   };
 
   // 🔹 Handle Cancel Changes (reset to empty or previous data)
   const handleCancel = () => {
-    if (window.confirm("Cancel all changes?")) resetForm();
+    resetForm();
+    toast.success("Changes cancelled successfully.");
   };
 
   // 🔹 Handle Account Deactivation
@@ -478,6 +488,38 @@ const AccountSettingsTab = () => {
                       </div>
                     )}
                   </div>
+                )}
+              </div>
+
+              <div className="relative text-sm">
+                <p className="font-medium mb-1 text-gray-700">Confirm New Password :</p>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    placeholder=""
+                    className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none pl-8 ${formData.confirmPassword && formData.password !== formData.confirmPassword
+                      ? "focus:border-red-500"
+                      : ""
+                      }`}
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                  />
+                  <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                  >
+                    {showConfirmPassword ? (
+                      <FaEyeSlash className="h-3 w-3 text-gray-400" />
+                    ) : (
+                      <FaEye className="h-3 w-3 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                  <p className="text-red-500 text-[10px] mt-1">Passwords do not match</p>
                 )}
               </div>
 

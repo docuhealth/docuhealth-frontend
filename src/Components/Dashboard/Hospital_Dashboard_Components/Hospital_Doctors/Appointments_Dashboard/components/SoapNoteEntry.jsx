@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import ICD11DiagnosisSearch from "./ICD11DiagnosisSearch";
 
 const NoteSection = ({
   title,
@@ -274,6 +275,9 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       });
       queryClient.invalidateQueries({
         queryKey: ["patient-soap-notes", hin],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["doctor-appointments"],
       });
 
       setStep(1);
@@ -904,14 +908,17 @@ useEffect(() => {
             </div>
 
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5">
-              <p className="font-medium">Primary diagnosis (compulsory)</p>
-              <textarea
-                name="primary_diagnosis"
+              <p className="font-medium text-[#1B2B40]">Primary diagnosis (compulsory)</p>
+              <ICD11DiagnosisSearch
                 value={soapNoteData.primary_diagnosis}
-                onChange={handleTextChange}
-                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
-                placeholder="Enter primary diagnosis..."
-              ></textarea>
+                onChange={(val) => 
+                  setSoapNoteData((prev) => ({
+                    ...prev,
+                    primary_diagnosis: val,
+                  }))
+                }
+                placeholder="Search ICD-11 for primary diagnosis..."
+              />
             </div>
 
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
@@ -1018,23 +1025,12 @@ useEffect(() => {
                     />
                   </div>
                   <div>
-                    <label className="block text-[12px] font-medium text-gray-700 pb-1">Dosage (Numbers only)</label>
+                    <label className="block text-[12px] font-medium text-gray-700 pb-1">Dosage</label>
                     <input
-                      type="number"
-                      placeholder="Enter dosage..."
+                      type="text"
+                      placeholder="Enter dosage (e.g. 400/10)..."
                       value={med.dosage}
-                      onKeyDown={(e) => {
-                        // Prevent symbols like e, +, -, .
-                        if (["e", "E", "+", "-", "."].includes(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (/^\d*$/.test(val)) {
-                          handleChange(index, "dosage", val);
-                        }
-                      }}
+                      onChange={(e) => handleChange(index, "dosage", e.target.value)}
                       className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
                     />
                   </div>
@@ -1054,6 +1050,10 @@ useEffect(() => {
                         <option value="IM">IM = Intramuscular</option>
                         <option value="SC">SC = Subcutaneous Injection</option>
                         <option value="PV">PV = Per Vagina (Vaginal route)</option>
+                        <option value="IT">IT = Intrathecal</option>
+                        <option value="PR">PR = Per rectal</option>
+                        <option value="SL">SL = Sublingual</option>
+                        <option value="Topical">Topical</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                         <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
