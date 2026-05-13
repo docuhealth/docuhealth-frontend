@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import ICD11DiagnosisSearch from "./ICD11DiagnosisSearch";
+
 
 const NoteSection = ({
   title,
@@ -909,16 +909,13 @@ useEffect(() => {
 
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5">
               <p className="font-medium text-[#1B2B40]">Primary diagnosis (compulsory)</p>
-              <ICD11DiagnosisSearch
+              <textarea
+                name="primary_diagnosis"
                 value={soapNoteData.primary_diagnosis}
-                onChange={(val) => 
-                  setSoapNoteData((prev) => ({
-                    ...prev,
-                    primary_diagnosis: val,
-                  }))
-                }
-                placeholder="Search ICD-11 for primary diagnosis..."
-              />
+                onChange={handleTextChange}
+                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
+                placeholder="Enter primary diagnosis..."
+              ></textarea>
             </div>
 
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
