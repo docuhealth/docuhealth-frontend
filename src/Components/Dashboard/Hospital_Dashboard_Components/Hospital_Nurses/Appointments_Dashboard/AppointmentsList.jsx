@@ -11,7 +11,7 @@ import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SearchBar from "../../../../SearchBar/SearchBar";
 
-const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals, setVitalSignsHistory, setSelectedPatientForVitals, setSelectedPatientForCASE }) => {
+const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals, setVitalSignsHistory, setSelectedPatientForVitals, setSelectedPatientForCASE, setSharedSoapNoteHistory, setSelectedPatientForSharedSoap }) => {
   const {
     appointments,
     count,
@@ -416,6 +416,16 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                       className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                       onClick={() => {
                         setOpenPopover(null);
+                        setSharedSoapNoteHistory(true);
+                        setSelectedPatientForSharedSoap(appointment);
+                      }}
+                    >
+                      View Shared SOAP Notes
+                    </p>
+                    <p
+                      className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                      onClick={() => {
+                        setOpenPopover(null);
                         setVitalSignsHistory(true);
                         setSelectedPatientForVitals(appointment);
                       }}
@@ -517,6 +527,16 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                         }}
                       >
                         CASE Note History
+                      </button>
+                      <button
+                        className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"
+                        onClick={() => {
+                          setOpenPopover(null);
+                          setSharedSoapNoteHistory(true);
+                          setSelectedPatientForSharedSoap(appointment);
+                        }}
+                      >
+                        View Shared SOAP Notes
                       </button>
                       <button
                         className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"
