@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { ArrowLeft, X, Plus, UploadCloud, FileText } from "lucide-react";
+import { ArrowLeft, X, Plus, UploadCloud, FileText, AlertTriangle } from "lucide-react";
 import { truncateWords } from "../../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import toast from "react-hot-toast";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
@@ -153,6 +153,8 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
   const [note, setNote] = useState("Nil");
 
   const [confirmationModal, setConfirmationModal] = useState(false);
+  const [shareModal, setShareModal] = useState(false);
+  const [isShared, setIsShared] = useState(false);
 
   const [soapNoteData, setSoapNoteData] = useState({
     chief_complaint: "",
@@ -457,6 +459,10 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       formData.append("investigation_docs", fileObj.file);
     });
 
+    if (isShared) {
+      formData.append("is_shared", "true");
+    }
+
     mutate(formData);
   };
 
@@ -475,7 +481,8 @@ useEffect(() => {
     selectedYear,
     selectedTime,
     note,
-    inputs // Saving current input field text too
+    inputs, // Saving current input field text too
+    isShared
   };
   
   if (selectedPatientDetails?.patient?.hin) {
@@ -484,7 +491,7 @@ useEffect(() => {
       JSON.stringify(soapDraft)
     );
   }
-}, [isRestored,step, medications, soapNoteData, selectedDay, selectedMonth, selectedYear, selectedTime, note, inputs, selectedPatientDetails.patient.hin]);
+}, [isRestored,step, medications, soapNoteData, selectedDay, selectedMonth, selectedYear, selectedTime, note, inputs, isShared, selectedPatientDetails.patient.hin]);
 
 
 useEffect(() => {
@@ -503,6 +510,7 @@ useEffect(() => {
       if (data.selectedTime) setSelectedTime(data.selectedTime);
       if (data.note) setNote(data.note);
       if (data.inputs) setInputs(data.inputs);
+      if (data.isShared !== undefined) setIsShared(data.isShared);
     }
     setIsRestored(true);
   }
@@ -1379,6 +1387,28 @@ useEffect(() => {
               ></textarea>
             </div>
 
+            <div className="flex items-center justify-between border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
+              <div>
+                <p className="font-medium text-[#1B2B40]">Share SOAP Note (Optional)</p>
+                <p className="text-[12px] text-gray-500 mt-1">Allow other healthcare personnel (e.g. NURSES) in this hospital to access this SOAP Note.</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  className="sr-only peer" 
+                  checked={isShared} 
+                  onChange={() => {
+                    if (!isShared) {
+                      setShareModal(true);
+                    } else {
+                      setIsShared(false);
+                    }
+                  }} 
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#3E4095]"></div>
+              </label>
+            </div>
+
             <div className="flex flex-col sm:flex-row items-center lg:justify-end cursor-pointer gap-4 mt-5 sm:mt-0">
               <button
                 className={`py-2 ${
@@ -1506,6 +1536,41 @@ useEffect(() => {
           </>
         )
       }
+
+      {shareModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-3 ">
+          <div className="bg-white w-full max-w-[500px] rounded-md p-5 lg:p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200 ">
+            <div className="flex flex-col items-center mb-6">
+              <div className="bg-amber-100 p-3 rounded-full mb-3">
+                <AlertTriangle className="w-6 h-6 text-[#d97706]" />
+              </div>
+              <h2 className="font-medium text-gray-800 text-lg">Share SOAP Note</h2>
+            </div>
+            <div className="bg-gray-50 border border-gray-100 rounded-md p-6 mb-6">
+              <p className="text-gray-600 text-center text-[13px] leading-relaxed">
+                Other healthcare personnel ( NURSES ) in this hospital would have access to some part of the SOAP note of this patient.
+              </p>
+            </div>
+            <button
+              className="w-full py-3 rounded-full transition-all shadow active:scale-95 flex items-center justify-center gap-2 bg-[#3E4095] text-white cursor-pointer text-[12px] font-medium"
+              onClick={() => {
+                setIsShared(true);
+                setShareModal(false);
+              }}
+            >
+              Continue
+            </button>
+            <button
+              className="w-full mt-3 py-3 text-gray-500 text-[12px] hover:text-red-500 hover:bg-red-50 rounded-full transition-colors cursor-pointer font-medium"
+              onClick={() => {
+                setShareModal(false);
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };
