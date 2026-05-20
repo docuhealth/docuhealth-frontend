@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selected, handleFinalRequest,processingId, isFetching }) => {
-    // Internal state for the checkboxes
+ 
 
     
     const [handoverOptions, setHandoverOptions] = useState({
@@ -9,7 +9,7 @@ const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selec
         myAppointments: true,
     });
 
-    // If the parent hasn't triggered the modal, return null
+
     if (!isOpen) return null;
 
     const isAnyOptionSelected = Object.values(handoverOptions).some(value => value === true);
