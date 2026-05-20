@@ -8,6 +8,8 @@ import CaseNote from "../../../Components/Dashboard/Hospital_Dashboard_Component
 import AddNewCaseNote from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddNewCaseNote";
 import CaseNoteDetail from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/CaseNoteDetail";
 import VitalSignsHistory from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/VitalSignsHistory";
+import SharedSoapNotes from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SharedSoapNotes";
+import SharedSoapNoteDetail from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SharedSoapNoteDetail";
 import { ChevronDown } from "lucide-react";
 
 const Hospital_Nurses_Patients_Dashboard = () => {
@@ -22,6 +24,8 @@ const Hospital_Nurses_Patients_Dashboard = () => {
   const [selected, setSelected] = useState(null);
 
   const [caseNoteDetail, setCaseNoteDetail] = useState(false);
+  const [sharedSoapNoteHistory, setSharedSoapNoteHistory] = useState(false);
+  const [sharedSoapNoteDetail, setSharedSoapNoteDetail] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -32,6 +36,18 @@ const Hospital_Nurses_Patients_Dashboard = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!advanceCheckUp) {
+      setCaseNoteHistory(false);
+      setVitalSignsHistory(false);
+      setSharedSoapNoteHistory(false);
+      setSharedSoapNoteDetail(false);
+      setCaseNoteDetail(false);
+      setNewCaseNote(false);
+      setUpdateVitals(false);
+    }
+  }, [advanceCheckUp]);
 
   return (
     <>
@@ -49,6 +65,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                     onClick={() => {
                       setCaseNoteHistory(false);
                       setVitalSignsHistory(false);
+                      setSharedSoapNoteHistory(false);
                       setNewCaseNote(true);
                     }}
                   >
@@ -73,6 +90,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                           onClick={() => {
                             setCaseNoteHistory(true);
                             setVitalSignsHistory(false);
+                            setSharedSoapNoteHistory(false);
                             setIsDropdownOpen(false);
                           }}
                         >
@@ -83,10 +101,22 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                           onClick={() => {
                             setVitalSignsHistory(true);
                             setCaseNoteHistory(false);
+                            setSharedSoapNoteHistory(false);
                             setIsDropdownOpen(false);
                           }}
                         >
                           Vital signs history
+                        </button>
+                        <button
+                          className="w-full text-left px-3  py-2.5 hover:bg-gray-100 text-gray-700 transition-colors"
+                          onClick={() => {
+                            setSharedSoapNoteHistory(true);
+                            setVitalSignsHistory(false);
+                            setCaseNoteHistory(false);
+                            setIsDropdownOpen(false);
+                          }}
+                        >
+                          View Shared SOAP Notes
                         </button>
                       </div>
                     )}
@@ -113,6 +143,17 @@ const Hospital_Nurses_Patients_Dashboard = () => {
             <VitalSignsHistory
               selected={selected}
               setVitalSignsHistory={setVitalSignsHistory}
+            />
+          ) : sharedSoapNoteDetail ? (
+            <SharedSoapNoteDetail
+              sharedSoapNoteDetail={sharedSoapNoteDetail}
+              setSharedSoapNoteDetail={setSharedSoapNoteDetail}
+            />
+          ) : sharedSoapNoteHistory ? (
+            <SharedSoapNotes
+              selected={selected}
+              setSharedSoapNoteHistory={setSharedSoapNoteHistory}
+              setSharedSoapNoteDetail={setSharedSoapNoteDetail}
             />
           ) : caseNoteDetail ? (
             <CaseNoteDetail caseNoteDetail={caseNoteDetail} setCaseNoteDetail={setCaseNoteDetail} />
