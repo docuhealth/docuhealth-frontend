@@ -7,6 +7,8 @@ import AddNewCaseNote from '../../../Components/Dashboard/Hospital_Dashboard_Com
 import CaseNote from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/CaseNote'
 import CaseNoteDetail from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/CaseNoteDetail'
 import VitalSignsHistory from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/VitalSignsHistory'
+import SharedSoapNotes from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SharedSoapNotes'
+import SharedSoapNoteDetail from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SharedSoapNoteDetail'
 import { NursesAppointmentsListContext } from '../../../context/HospitalContext/Nurses/NursesAppointmentsListContext'
 
 const Hospital_Nurses_Appointments_Dashboard = () => {
@@ -18,6 +20,9 @@ const Hospital_Nurses_Appointments_Dashboard = () => {
   const [caseNoteDetail, setCaseNoteDetail] = useState(false);
   const [selectedPatientForVitals, setSelectedPatientForVitals] = useState(null)
   const [selectedPatientForCASE, setSelectedPatientForCASE] = useState(null)
+  const [sharedSoapNoteHistory, setSharedSoapNoteHistory] = useState(false);
+  const [sharedSoapNoteDetail, setSharedSoapNoteDetail] = useState(false);
+  const [selectedPatientForSharedSoap, setSelectedPatientForSharedSoap] = useState(null);
 
   const { appointmentType } = useContext(NursesAppointmentsListContext);
 
@@ -38,6 +43,8 @@ const Hospital_Nurses_Appointments_Dashboard = () => {
               setNewCaseNote={setNewCaseNote}
             />
           </>
+        ) : caseNoteDetail ? (
+          <CaseNoteDetail caseNoteDetail={caseNoteDetail} setCaseNoteDetail={setCaseNoteDetail} />
         ) : caseNoteHistory ? (
           <CaseNote
             selected={selectedPatientForCASE}
@@ -49,8 +56,17 @@ const Hospital_Nurses_Appointments_Dashboard = () => {
               selected={selectedPatientForVitals}
               setVitalSignsHistory={setVitalSignsHistory}
             />
-        ) : caseNoteDetail ? (
-          <CaseNoteDetail caseNoteDetail={caseNoteDetail} setCaseNoteDetail={setCaseNoteDetail} />
+        ) : sharedSoapNoteDetail ? (
+          <SharedSoapNoteDetail
+            sharedSoapNoteDetail={sharedSoapNoteDetail}
+            setSharedSoapNoteDetail={setSharedSoapNoteDetail}
+          />
+        ) : sharedSoapNoteHistory ? (
+          <SharedSoapNotes
+            selected={selectedPatientForSharedSoap}
+            setSharedSoapNoteHistory={setSharedSoapNoteHistory}
+            setSharedSoapNoteDetail={setSharedSoapNoteDetail}
+          />
         ) : (
           <>
             <div className="bg-white my-5  rounded-lg ">
@@ -59,7 +75,7 @@ const Hospital_Nurses_Appointments_Dashboard = () => {
                   {appointmentType === 'upcoming' ? 'Upcoming' : 'Past'} Appointments List
                 </h2>
                 <div>
-                  <AppointmentsList setNewCaseNote={setNewCaseNote} setCaseNoteHistory={setCaseNoteHistory} setVitalSignsHistory={setVitalSignsHistory} setUpdateVitals={setUpdateVitals} setSelectedPatientForVitals={setSelectedPatientForVitals} setSelectedPatientForCASE={setSelectedPatientForCASE} />
+                  <AppointmentsList setNewCaseNote={setNewCaseNote} setCaseNoteHistory={setCaseNoteHistory} setVitalSignsHistory={setVitalSignsHistory} setUpdateVitals={setUpdateVitals} setSelectedPatientForVitals={setSelectedPatientForVitals} setSelectedPatientForCASE={setSelectedPatientForCASE} setSharedSoapNoteHistory={setSharedSoapNoteHistory} setSelectedPatientForSharedSoap={setSelectedPatientForSharedSoap} />
                 </div>
               </div>
             </div>
