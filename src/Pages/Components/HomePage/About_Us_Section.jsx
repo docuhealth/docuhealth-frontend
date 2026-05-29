@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 const About_Us_Section = () => {
   return (
     <>
-      <div className="relative py-20 px-5 lg:px-16 bg-[#F6FCFE] overflow-hidden" id="about-us">
+      <div className="relative py-20 bg-[#F6FCFE] overflow-hidden" id="about-us">
+      <div className="max-w-[1440px] 2xl:max-w-[1600px] mx-auto w-full px-8 xl:px-16">
         <div className="flex flex-col-reverse lg:flex-row items-start gap-7 ">
           <motion.div 
             className="flex-1 z-10"
@@ -77,6 +78,7 @@ const About_Us_Section = () => {
             className="opacity-5"
           />
         </svg>
+        </div>
       </div>
     </>
   );

@@ -102,9 +102,10 @@ const Navbar = ({ showPharmacyMode }) => {
           ? "fixed w-full  bg-white shadow-sm transition-transform"
           : "w-full shadow-sm"
           } ${isVisible ? "translate-y-0" : "-translate-y-full"}
-      hidden lg:flex justify-between px-16 items-center py-4 `}
+      hidden lg:block `}
         style={{ transition: "transform 0.3s ease-in-out" }}
       >
+       <div className="max-w-[1440px] 2xl:max-w-[1600px] mx-auto flex justify-between items-center px-8 xl:px-16 py-4">
         <Link to="/">
           <Logo />
         </Link>
@@ -317,6 +318,7 @@ const Navbar = ({ showPharmacyMode }) => {
               Sign In
             </button>
           </Link>
+        </div>
         </div>
       </motion.div>
 
