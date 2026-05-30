@@ -26,7 +26,10 @@ const HeroPG = () => {
 
   return (
     <>
-      <div id="home" className=" hidden lg:block bg-cover bg-left relative px-5 lg:px-16 py-36 lg:py-20  ">
+      <div id="home" className="hidden lg:block bg-cover bg-left relative py-36 lg:py-20">
+      
+      {/* PERFECTLY MATCHED NAVBAR CONTAINER */}
+      <div className="max-w-[1440px] 2xl:max-w-[1600px] mx-auto w-full px-8 xl:px-16">
         <motion.div 
           className="flex flex-col lg:flex-row items-start sm:items-center lg:items-start gap-5 "
           variants={containerVariants}
@@ -143,6 +146,7 @@ const HeroPG = () => {
             className="opacity-5"
           />
         </motion.svg>
+        </div>
       </div>
 
 
