@@ -34,7 +34,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({ strength: 0 });
 
-  const personnelOptions = ["doctor", "nurse", "receptionist"];
+  const personnelOptions = ["doctor", "nurse", "receptionist", "laboratory scientist"];
 
   const doctorSpecializations = [
     "Surgeon",
@@ -72,12 +72,25 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     "Hospice / Palliative Care Nurse",
   ];
 
+  const labScientistSpecializations = [
+    "N/A",
+    "Hematology and Blood Transfusion",
+    "Chemical Pathology",
+    "Medical Microbiology",
+    "Immunology and Immunochemistry",
+    "Histopathology and Cytopathology",
+    "Molecular Diagnostics",
+    "Forensic Laboratory Science",
+  ];
+
   const specializationOptions =
     form.personnel === "doctor"
       ? doctorSpecializations
       : form.personnel === "nurse"
         ? nurseSpecializations
-        : [];
+        : form.personnel === "laboratory scientist"
+          ? labScientistSpecializations
+          : [];
 
 
   const gender = ["male", "female"];
