@@ -119,7 +119,7 @@ const Navbar = ({ showPharmacyMode }) => {
               }`}
             onClick={() => toggleDropdown("")}
           >
-            Home
+            HHome
           </Link>
 
           {/* Our Company Dropdown */}
