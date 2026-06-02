@@ -298,11 +298,10 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
             <button
               key={tab.value}
               onClick={() => setSelectedRole(tab.value)}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
-                selectedRole === tab.value
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-colors ${selectedRole === tab.value
                   ? "bg-[#3E4095] text-white border-[#3E4095]"
                   : "bg-white text-gray-600 border-gray-200 hover:border-[#3E4095] hover:text-[#3E4095]"
-              }`}
+                }`}
             >
               {tab.label}
             </button>
@@ -595,8 +594,8 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                       <option value="nurse">Nurse</option>
                       {/* <option value="admin">Admin</option> */}
                       <option value="receptionist">Receptionist</option>
-                      {/* <option value="pharmacist">Pharmacist</option>
-                  <option value="lab_technician">Lab Technician</option> */}
+                      {/* <option value="pharmacist">Pharmacist</option>*/}
+                      <option value="lab_scientist">Lab Scientist</option>
                     </select>
                   </div>
 

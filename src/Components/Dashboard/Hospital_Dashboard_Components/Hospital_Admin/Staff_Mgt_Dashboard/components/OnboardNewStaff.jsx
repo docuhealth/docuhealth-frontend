@@ -34,7 +34,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({ strength: 0 });
 
-  const personnelOptions = ["doctor", "nurse", "receptionist", "laboratory scientist"];
+  const personnelOptions = ["doctor", "nurse", "receptionist", "lab_scientist"];
 
   const doctorSpecializations = [
     "Surgeon",
@@ -88,7 +88,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
       ? doctorSpecializations
       : form.personnel === "nurse"
         ? nurseSpecializations
-        : form.personnel === "laboratory scientist"
+        : form.personnel === "lab_scientist"
           ? labScientistSpecializations
           : [];
 
