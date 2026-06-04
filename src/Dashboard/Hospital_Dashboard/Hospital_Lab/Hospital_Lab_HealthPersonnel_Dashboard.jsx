@@ -8,7 +8,7 @@ const allStaff = [
     id: 1,
     firstname: "Amara",
     lastname: "Okafor",
-    ward: "Emergency ward",
+    staffId: "FUTU-NR001",
     phone: "09060406069",
     gender: "Female",
     role: "nurse",
@@ -18,7 +18,7 @@ const allStaff = [
     id: 2,
     firstname: "Emeka",
     lastname: "Nwosu",
-    ward: "General ward",
+    staffId: "FUTU-DR002",
     phone: "08034512678",
     gender: "Male",
     role: "doctor",
@@ -28,7 +28,7 @@ const allStaff = [
     id: 3,
     firstname: "Fatima",
     lastname: "Bello",
-    ward: "ICU",
+    staffId: "FUTU-NR003",
     phone: "07055234901",
     gender: "Female",
     role: "nurse",
@@ -38,7 +38,7 @@ const allStaff = [
     id: 4,
     firstname: "Chidi",
     lastname: "Eze",
-    ward: "Pediatric ward",
+    staffId: "FUTU-DR004",
     phone: "09012345678",
     gender: "Male",
     role: "doctor",
@@ -48,7 +48,7 @@ const allStaff = [
     id: 5,
     firstname: "Ngozi",
     lastname: "Adeyemi",
-    ward: "Emergency ward",
+    staffId: "FUTU-NR005",
     phone: "08123456789",
     gender: "Female",
     role: "nurse",
@@ -58,7 +58,7 @@ const allStaff = [
     id: 6,
     firstname: "Yusuf",
     lastname: "Lawal",
-    ward: "Surgical ward",
+    staffId: "FUTU-DR006",
     phone: "07098765432",
     gender: "Male",
     role: "doctor",
@@ -68,7 +68,7 @@ const allStaff = [
     id: 7,
     firstname: "Blessing",
     lastname: "Obi",
-    ward: "General ward",
+    staffId: "FUTU-RC001",
     phone: "09060406069",
     gender: "Female",
     role: "receptionist",
@@ -78,7 +78,7 @@ const allStaff = [
     id: 8,
     firstname: "Kelechi",
     lastname: "Nnadi",
-    ward: "Lab",
+    staffId: "FUTU-LB008",
     phone: "08056781234",
     gender: "Male",
     role: "lab scientist",
@@ -88,7 +88,7 @@ const allStaff = [
     id: 9,
     firstname: "Halima",
     lastname: "Usman",
-    ward: "Emergency ward",
+    staffId: "FUTU-NR009",
     phone: "09060406069",
     gender: "Female",
     role: "nurse",
@@ -98,7 +98,7 @@ const allStaff = [
     id: 10,
     firstname: "Tunde",
     lastname: "Afolabi",
-    ward: "Surgical ward",
+    staffId: "FUTU-DR010",
     phone: "07011223344",
     gender: "Male",
     role: "doctor",
@@ -108,7 +108,7 @@ const allStaff = [
     id: 11,
     firstname: "Chinwe",
     lastname: "Okonkwo",
-    ward: "Pediatric ward",
+    staffId: "FUTU-NR011",
     phone: "09060406069",
     gender: "Female",
     role: "nurse",
@@ -118,7 +118,7 @@ const allStaff = [
     id: 12,
     firstname: "Musa",
     lastname: "Garba",
-    ward: "Lab",
+    staffId: "FUTU-LB012",
     phone: "08099887766",
     gender: "Male",
     role: "lab scientist",
@@ -128,7 +128,7 @@ const allStaff = [
     id: 13,
     firstname: "Aisha",
     lastname: "Muhammed",
-    ward: "General ward",
+    staffId: "FUTU-RC013",
     phone: "09060406069",
     gender: "Female",
     role: "receptionist",
@@ -138,7 +138,7 @@ const allStaff = [
     id: 14,
     firstname: "Seun",
     lastname: "Adeola",
-    ward: "ICU",
+    staffId: "FUTU-DR014",
     phone: "07055112233",
     gender: "Male",
     role: "doctor",
@@ -148,7 +148,7 @@ const allStaff = [
     id: 15,
     firstname: "Ifeoma",
     lastname: "Okeke",
-    ward: "Emergency ward",
+    staffId: "FUTU-NR015",
     phone: "09060406069",
     gender: "Female",
     role: "nurse",
@@ -158,7 +158,7 @@ const allStaff = [
     id: 16,
     firstname: "Bayo",
     lastname: "Adekoya",
-    ward: "Surgical ward",
+    staffId: "FUTU-PH016",
     phone: "08134445566",
     gender: "Male",
     role: "pharmacist",
@@ -168,7 +168,7 @@ const allStaff = [
     id: 17,
     firstname: "Zainab",
     lastname: "Sule",
-    ward: "General ward",
+    staffId: "FUTU-NR017",
     phone: "09060406069",
     gender: "Female",
     role: "nurse",
@@ -178,7 +178,7 @@ const allStaff = [
     id: 18,
     firstname: "Obinna",
     lastname: "Dike",
-    ward: "Lab",
+    staffId: "FUTU-LB018",
     phone: "07099001122",
     gender: "Male",
     role: "lab scientist",
@@ -188,7 +188,7 @@ const allStaff = [
     id: 19,
     firstname: "Adaeze",
     lastname: "Eze",
-    ward: "Pediatric ward",
+    staffId: "FUTU-NR019",
     phone: "09060406069",
     gender: "Female",
     role: "nurse",
@@ -198,7 +198,7 @@ const allStaff = [
     id: 20,
     firstname: "Ibrahim",
     lastname: "Salisu",
-    ward: "Emergency ward",
+    staffId: "FUTU-DR020",
     phone: "08022334455",
     gender: "Male",
     role: "doctor",
@@ -229,7 +229,7 @@ const Hospital_Lab_HealthPersonnel_Dashboard = () => {
         fullName.includes(searchQuery.toLowerCase()) ||
         s.phone.includes(searchQuery) ||
         s.role.includes(searchQuery.toLowerCase()) ||
-        s.ward.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.staffId.toLowerCase().includes(searchQuery.toLowerCase()) ||
         s.email.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesRole = !selectedRole || s.role === selectedRole;
       return matchesSearch && matchesRole;
@@ -274,7 +274,7 @@ const Hospital_Lab_HealthPersonnel_Dashboard = () => {
             <SearchBar
               value={searchQuery}
               onChange={handleSearch}
-              placeholder="Search by name, role, ward, or phone number..."
+              placeholder="Search by name, role, staff ID, or phone number..."
             />
             <div className="flex gap-2 mt-3 flex-wrap">
               {ROLE_TABS.map((tab) => (
@@ -306,7 +306,7 @@ const Hospital_Lab_HealthPersonnel_Dashboard = () => {
               <div className="hidden lg:flex lg:flex-col">
                 <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
                   <div className="col-span-2 pl-5">Name of Staff</div>
-                  <p>Ward</p>
+                  <p>Staff Id</p>
                   <p>Role</p>
                   <p>Phone no.</p>
                   <p>Email Address</p>
@@ -333,7 +333,7 @@ const Hospital_Lab_HealthPersonnel_Dashboard = () => {
                       </svg>
                       <p>{displayName(staff)}</p>
                     </div>
-                    <p>{staff.ward}</p>
+                    <p>{staff.staffId}</p>
                     <p className="capitalize">{staff.role}</p>
                     <p>{staff.phone}</p>
                     <p className="truncate max-w-[120px]">{staff.email}</p>
@@ -365,7 +365,7 @@ const Hospital_Lab_HealthPersonnel_Dashboard = () => {
                               {staff.role}
                             </span>
                             <span className="text-[10px] text-gray-400">
-                              {staff.ward}
+                              {staff.staffId}
                             </span>
                           </div>
                         </div>

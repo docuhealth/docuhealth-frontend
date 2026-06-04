@@ -474,7 +474,7 @@ const Hospital_Lab_Requests_Dashboard = () => {
                   onClick={() =>
                     navigate("/hospital-lab-test-detail", { state: { order } })
                   }
-                  className="mt-1 w-full border border-gray-300 text-xs text-gray-700 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="mt-1 w-full border border-gray-300 text-xs text-gray-700 py-2 rounded-full hover:bg-gray-50 transition-colors"
                 >
                   View details
                 </button>

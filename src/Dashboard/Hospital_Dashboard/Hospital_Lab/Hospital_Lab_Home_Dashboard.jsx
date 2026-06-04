@@ -33,26 +33,26 @@ const statCards = [
 ];
 
 const recentPatients = [
-  { name: "Amara Okafor",    date: "30/05/2026", time: "9:45 AM",  hin: "12*********85", sex: "Female" },
-  { name: "Emeka Nwosu",     date: "30/05/2026", time: "10:20 AM", hin: "34*********62", sex: "Male"   },
-  { name: "Fatima Bello",    date: "29/05/2026", time: "8:30 AM",  hin: "56*********41", sex: "Female" },
-  { name: "Chidi Eze",       date: "29/05/2026", time: "11:15 AM", hin: "78*********29", sex: "Male"   },
-  { name: "Ngozi Adeyemi",   date: "28/05/2026", time: "2:00 PM",  hin: "90*********73", sex: "Female" },
-  { name: "Yusuf Lawal",     date: "28/05/2026", time: "3:30 PM",  hin: "12*********58", sex: "Male"   },
-  { name: "Blessing Obi",    date: "27/05/2026", time: "9:00 AM",  hin: "34*********94", sex: "Female" },
-  { name: "Kelechi Nnadi",   date: "27/05/2026", time: "4:45 PM",  hin: "56*********37", sex: "Male"   },
-  { name: "Halima Usman",    date: "26/05/2026", time: "10:00 AM", hin: "78*********15", sex: "Female" },
-  { name: "Tunde Afolabi",   date: "26/05/2026", time: "1:30 PM",  hin: "90*********82", sex: "Male"   },
-  { name: "Chinwe Okonkwo",  date: "25/05/2026", time: "8:00 AM",  hin: "11*********66", sex: "Female" },
-  { name: "Musa Garba",      date: "25/05/2026", time: "12:00 PM", hin: "23*********49", sex: "Male"   },
-  { name: "Aisha Muhammed",  date: "24/05/2026", time: "3:00 PM",  hin: "45*********31", sex: "Female" },
-  { name: "Seun Adeola",     date: "24/05/2026", time: "11:45 AM", hin: "67*********78", sex: "Male"   },
-  { name: "Ifeoma Okeke",    date: "23/05/2026", time: "9:30 AM",  hin: "89*********52", sex: "Female" },
-  { name: "Bayo Adekoya",    date: "23/05/2026", time: "2:15 PM",  hin: "13*********96", sex: "Male"   },
-  { name: "Zainab Sule",     date: "22/05/2026", time: "10:45 AM", hin: "35*********07", sex: "Female" },
-  { name: "Obinna Dike",     date: "22/05/2026", time: "4:00 PM",  hin: "57*********43", sex: "Male"   },
-  { name: "Adaeze Eze",      date: "21/05/2026", time: "8:15 AM",  hin: "79*********88", sex: "Female" },
-  { name: "Ibrahim Salisu",  date: "21/05/2026", time: "1:00 PM",  hin: "91*********24", sex: "Male"   },
+  { name: "Amara Okafor",    date: "30/05/2026", time: "9:45 AM",  hin: "12*********85", sex: "Female", staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Emeka Nwosu",     date: "30/05/2026", time: "10:20 AM", hin: "34*********62", sex: "Male",   staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Fatima Bello",    date: "29/05/2026", time: "8:30 AM",  hin: "56*********41", sex: "Female", staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Chidi Eze",       date: "29/05/2026", time: "11:15 AM", hin: "78*********29", sex: "Male",   staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Ngozi Adeyemi",   date: "28/05/2026", time: "2:00 PM",  hin: "90*********73", sex: "Female", staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Yusuf Lawal",     date: "28/05/2026", time: "3:30 PM",  hin: "12*********58", sex: "Male",   staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Blessing Obi",    date: "27/05/2026", time: "9:00 AM",  hin: "34*********94", sex: "Female", staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Kelechi Nnadi",   date: "27/05/2026", time: "4:45 PM",  hin: "56*********37", sex: "Male",   staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Halima Usman",    date: "26/05/2026", time: "10:00 AM", hin: "78*********15", sex: "Female", staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Tunde Afolabi",   date: "26/05/2026", time: "1:30 PM",  hin: "90*********82", sex: "Male",   staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Chinwe Okonkwo",  date: "25/05/2026", time: "8:00 AM",  hin: "11*********66", sex: "Female", staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Musa Garba",      date: "25/05/2026", time: "12:00 PM", hin: "23*********49", sex: "Male",   staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Aisha Muhammed",  date: "24/05/2026", time: "3:00 PM",  hin: "45*********31", sex: "Female", staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Seun Adeola",     date: "24/05/2026", time: "11:45 AM", hin: "67*********78", sex: "Male",   staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Ifeoma Okeke",    date: "23/05/2026", time: "9:30 AM",  hin: "89*********52", sex: "Female", staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Bayo Adekoya",    date: "23/05/2026", time: "2:15 PM",  hin: "13*********96", sex: "Male",   staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Zainab Sule",     date: "22/05/2026", time: "10:45 AM", hin: "35*********07", sex: "Female", staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Obinna Dike",     date: "22/05/2026", time: "4:00 PM",  hin: "57*********43", sex: "Male",   staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Adaeze Eze",      date: "21/05/2026", time: "8:15 AM",  hin: "79*********88", sex: "Female", staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
+  { name: "Ibrahim Salisu",  date: "21/05/2026", time: "1:00 PM",  hin: "91*********24", sex: "Male",   staff: { firstname: "Heritech", lastname: "Rioch", role: "doctor" } },
 ];
 
 const PAGE_SIZE = 8;
@@ -115,26 +115,44 @@ const Hospital_Lab_Home_Dashboard = () => {
           <h2 className="mb-4 pb-2 border-b font-medium">Recent Patients attended to</h2>
 
           {/* Desktop grid */}
-          <div className="hidden lg:flex lg:flex-col">
+          <div className='hidden lg:flex lg:flex-col '>
             <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
-              <div className="col-span-2 pl-5">Patient&apos;s Name</div>
-              <p className="col-span-2">Date / Time</p>
-              <p className="col-span-2">HIN</p>
+              <div className="col-span-2 w-full pl-5 flex items-center gap-2">
+                <p>Patient's Name</p>
+              </div>
+              <p className='col-span-2'>Date / Time</p>
+              <p>HIN</p>
+              <p>Staff</p>
               <p>Sex</p>
             </div>
-            {paginated.map((p, i) => (
-              <div key={i} className="grid grid-cols-7 items-center text-[12px] text-gray-700 border-b border-b-gray-200">
-                <div className="font-semibold col-span-2 py-6 pl-5 flex items-center gap-1">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" />
-                  </svg>
-                  <p>{p.name}</p>
+            {
+              paginated.map((patient, index) => (
+                <div key={index} className='relative'>
+                  <div className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full border-b border-b-gray-200">
+                    <div className='font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-1 '>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" />
+                      </svg>
+                      <p>{patient.name}</p>
+                    </div>
+                    <p className='col-span-2'>{patient.date} / {patient.time}</p>
+                    <p>{patient.hin}</p>
+
+                    <div className='font-semibold w-full py-6 flex items-center gap-1 '>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" />
+                      </svg>
+                      <p>
+                        {patient.staff.role === 'doctor'
+                          ? `Dr. ${patient.staff.firstname} ${patient.staff.lastname}`
+                          : `${patient.staff.firstname} ${patient.staff.lastname}`}
+                      </p>
+                    </div>
+                    <p>{patient.sex}</p>
+                  </div>
                 </div>
-                <p className="col-span-2">{p.date} / {p.time}</p>
-                <p className="col-span-2">{p.hin}</p>
-                <p>{p.sex}</p>
-              </div>
-            ))}
+              ))
+            }
           </div>
 
           {/* Mobile cards */}
@@ -166,8 +184,16 @@ const Hospital_Lab_Home_Dashboard = () => {
                     <p className="text-[10px] text-gray-500 mt-1 pl-5">at {p.time}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Sex</p>
-                    <p className="text-[11.5px] font-medium text-gray-700">{p.sex}</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Assigned Staff</p>
+                    <div className="flex items-center gap-1.5 text-gray-700">
+                      <i className='bx bx-shield-quarter text-[#3E4095] text-[14px]'></i>
+                      <p className="text-[11.5px] font-medium leading-none">
+                        {p.staff.role === "doctor"
+                          ? `Dr. ${p.staff.firstname} ${p.staff.lastname}`
+                          : `${p.staff.firstname} ${p.staff.lastname}`}
+                      </p>
+                    </div>
+                    <p className="text-[10px] text-gray-500 mt-1 pl-5">Healthcare Provider</p>
                   </div>
                 </div>
 
