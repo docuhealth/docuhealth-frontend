@@ -2,7 +2,8 @@ import { useState, useContext } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import template from "../../../assets/img/template.png";
 import { LabAppContext } from "../../../context/HospitalContext/Lab/LabAppContext";
-import { FlaskConical, ClipboardList, CheckCircle, ArrowUpRight, ArrowDownRight, User, ChevronLeft, ChevronRight } from "lucide-react";
+import { FlaskConical, ClipboardList, CheckCircle, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 
 const statCards = [
   {
@@ -63,10 +64,6 @@ const Hospital_Lab_Home_Dashboard = () => {
   const totalPages = Math.ceil(recentPatients.length / PAGE_SIZE);
   const paginated = recentPatients.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
-  const goTo = (page) => {
-    if (page >= 1 && page <= totalPages) setCurrentPage(page);
-  };
-
   return (
     <>
       <div className="py-2">
@@ -112,78 +109,82 @@ const Hospital_Lab_Home_Dashboard = () => {
         ))}
       </div>
 
-      {/* Recent Patients Table */}
-      <div className="mt-8 bg-white border border-gray-200 rounded-xl p-4 sm:p-6">
-        <h3 className="text-xs sm:text-sm font-semibold text-[#1B2B40] mb-5">Recent patients attended to</h3>
+      {/* Recent Patients */}
+      <div className="bg-white rounded-lg my-5">
+        <div className="border rounded-lg p-4 lg:p-6">
+          <h2 className="mb-4 pb-2 border-b font-medium">Recent Patients attended to</h2>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left min-w-[480px]">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="px-3 sm:px-4 py-3 text-xs font-semibold text-gray-500 min-w-[140px]">Patient&apos;s name</th>
-                <th className="px-3 sm:px-4 py-3 text-xs font-semibold text-gray-500 min-w-[100px]">Date</th>
-                <th className="px-3 sm:px-4 py-3 text-xs font-semibold text-gray-500 min-w-[90px]">Time</th>
-                <th className="px-3 sm:px-4 py-3 text-xs font-semibold text-gray-500 min-w-[120px]">HIN</th>
-                <th className="px-3 sm:px-4 py-3 text-xs font-semibold text-gray-500 min-w-[60px]">Sex</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginated.map((p, i) => (
-                <tr key={i} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
-                  <td className="px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 flex items-center gap-2">
-                    <User size={15} className="text-gray-400 shrink-0" />
-                    <span className="truncate">{p.name}</span>
-                  </td>
-                  <td className="px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 whitespace-nowrap">{p.date}</td>
-                  <td className="px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 whitespace-nowrap">{p.time}</td>
-                  <td className="px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-600">{p.hin}</td>
-                  <td className="px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-600">{p.sex}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-5">
-          <p className="text-xs text-gray-400">
-            Showing page {currentPage} to {Math.min(currentPage * PAGE_SIZE, recentPatients.length)} of {recentPatients.length} entries
-          </p>
-
-          <div className="flex items-center gap-1 flex-wrap">
-            {/* Prev */}
-            <button
-              onClick={() => goTo(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronLeft size={15} />
-            </button>
-
-            {/* Page numbers */}
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => goTo(page)}
-                className={`w-8 h-8 flex items-center justify-center rounded-full text-xs font-semibold transition-colors ${
-                  page === currentPage
-                    ? "bg-[#3E4095] text-white"
-                    : "text-gray-500 hover:bg-gray-100"
-                }`}
-              >
-                {page}
-              </button>
+          {/* Desktop grid */}
+          <div className="hidden lg:flex lg:flex-col">
+            <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
+              <div className="col-span-2 pl-5">Patient&apos;s Name</div>
+              <p className="col-span-2">Date / Time</p>
+              <p className="col-span-2">HIN</p>
+              <p>Sex</p>
+            </div>
+            {paginated.map((p, i) => (
+              <div key={i} className="grid grid-cols-7 items-center text-[12px] text-gray-700 border-b border-b-gray-200">
+                <div className="font-semibold col-span-2 py-6 pl-5 flex items-center gap-1">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" />
+                  </svg>
+                  <p>{p.name}</p>
+                </div>
+                <p className="col-span-2">{p.date} / {p.time}</p>
+                <p className="col-span-2">{p.hin}</p>
+                <p>{p.sex}</p>
+              </div>
             ))}
-
-            {/* Next */}
-            <button
-              onClick={() => goTo(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronRight size={15} />
-            </button>
           </div>
+
+          {/* Mobile cards */}
+          <div className="lg:hidden flex flex-col gap-4">
+            {paginated.map((p, i) => (
+              <div key={i} className="bg-white border border-gray-200 rounded-md p-5 duration-200">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-blue-50 text-[#3E4095] flex items-center justify-center font-bold text-sm border border-blue-100 uppercase">
+                      {p.name.split(" ")[0]?.[0]}{p.name.split(" ")[1]?.[0]}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-[14px] leading-tight">{p.name}</h3>
+                      <p className="text-[11px] text-gray-500 font-medium">{p.sex}</p>
+                    </div>
+                  </div>
+                  <span className="bg-gray-50 text-gray-600 text-[10px] px-2 py-1 rounded-md border border-gray-100 font-medium uppercase tracking-wider">
+                    {p.hin?.slice(-4) || "N/A"}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-y-4 pt-3 border-t border-gray-50">
+                  <div>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Date</p>
+                    <div className="flex items-center gap-1.5 text-gray-700">
+                      <i className="bx bx-calendar text-[#3E4095] text-[14px]"></i>
+                      <p className="text-[11.5px] font-medium leading-none">{p.date}</p>
+                    </div>
+                    <p className="text-[10px] text-gray-500 mt-1 pl-5">at {p.time}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Sex</p>
+                    <p className="text-[11.5px] font-medium text-gray-700">{p.sex}</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 bg-[#F8F9FF] rounded-lg p-2.5 flex justify-between items-center">
+                  <span className="text-[10px] font-semibold text-[#3E4095] uppercase">HIN Number</span>
+                  <span className="text-[12px] font-mono font-bold text-gray-600 tracking-widest">{p.hin}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Pagination2
+            count={recentPatients.length}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
+          />
         </div>
       </div>
     </>
