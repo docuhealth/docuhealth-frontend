@@ -32,11 +32,11 @@ const Hospital_Lab_Sidebar = () => {
       </div>
 
       {/* Main nav links */}
-      <nav className="flex-1 mt-4 text-sm overflow-y-auto">
+      <nav className="mt-4 text-sm">
         <ul>
           {/* Overview */}
           <Link to="/hospital-lab-home-dashboard">
-            <div className="px-4 my-1">
+            <div className="px-4 my-4">
               <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-home-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                 <span>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -50,7 +50,7 @@ const Hospital_Lab_Sidebar = () => {
 
           {/* Test Orders */}
           <Link to="/hospital-lab-requests-dashboard">
-            <div className="px-4 my-1">
+            <div className="px-4 my-4">
               <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-requests-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                 <span>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -64,7 +64,7 @@ const Hospital_Lab_Sidebar = () => {
 
           {/* Appointments */}
           <Link to="/hospital-lab-appointments-dashboard">
-            <div className="px-4 my-1">
+            <div className="px-4 my-4">
               <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-appointments-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                 <span>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -78,7 +78,7 @@ const Hospital_Lab_Sidebar = () => {
 
           {/* Messages */}
           <Link to="/hospital-lab-messages-dashboard">
-            <div className="px-4 my-1">
+            <div className="px-4 my-4">
               <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-messages-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                 <span>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -92,7 +92,7 @@ const Hospital_Lab_Sidebar = () => {
 
           {/* Health Personnel */}
           <Link to="/hospital-lab-healthpersonnel-dashboard">
-            <div className="px-4 my-1">
+            <div className="px-4 my-4">
               <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-healthpersonnel-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                 <span>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -103,33 +103,32 @@ const Hospital_Lab_Sidebar = () => {
               </li>
             </div>
           </Link>
-        </ul>
-      </nav>
 
-      {/* Bottom section — Settings + Logout */}
-      <div className="shrink-0 border-t border-gray-100 pt-2 pb-4 text-sm">
-        <Link to="/hospital-lab-settings-dashboard">
-          <div className="px-4 my-1">
-            <li className={`group px-4 py-2 list-none ${currentPath === "/hospital-lab-settings-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
-              <span>
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M7.2386 3.33324L9.4108 1.16107C9.73621 0.835632 10.2639 0.835632 10.5893 1.16107L12.7615 3.33324H15.8334C16.2936 3.33324 16.6667 3.70634 16.6667 4.16657V7.23848L18.8389 9.41067C19.1643 9.73609 19.1643 10.2638 18.8389 10.5892L16.6667 12.7613V15.8333C16.6667 16.2935 16.2936 16.6666 15.8334 16.6666H12.7615L10.5893 18.8388C10.2639 19.1642 9.73621 19.1642 9.4108 18.8388L7.2386 16.6666H4.1667C3.70646 16.6666 3.33336 16.2935 3.33336 15.8333V12.7613L1.1612 10.5892C0.835754 10.2638 0.835754 9.73609 1.1612 9.41067L3.33336 7.23848V4.16657C3.33336 3.70634 3.70646 3.33324 4.1667 3.33324H7.2386ZM5.00003 4.99991V7.92884L2.92896 9.99992L5.00003 12.071V14.9999H7.92896L10 17.071L12.0711 14.9999H15V12.071L17.0711 9.99992L15 7.92884V4.99991H12.0711L10 2.92884L7.92896 4.99991H5.00003ZM10 13.3333C8.15908 13.3333 6.6667 11.8408 6.6667 9.99992C6.6667 8.15896 8.15908 6.66657 10 6.66657C11.841 6.66657 13.3334 8.15896 13.3334 9.99992C13.3334 11.8408 11.841 13.3333 10 13.3333ZM10 11.6666C10.9205 11.6666 11.6667 10.9204 11.6667 9.99992C11.6667 9.07942 10.9205 8.33326 10 8.33326C9.07955 8.33326 8.33338 9.07942 8.33338 9.99992C8.33338 10.9204 9.07955 11.6666 10 11.6666Z" className={`group-hover:fill-white ${currentPath === "/hospital-lab-settings-dashboard" ? "fill-white" : "fill-[#647284]"}`} />
-                </svg>
-              </span>
-              Settings
+          {/* Settings */}
+          <Link to="/hospital-lab-settings-dashboard">
+            <div className="px-4 my-4">
+              <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-settings-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
+                <span>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.2386 3.33324L9.4108 1.16107C9.73621 0.835632 10.2639 0.835632 10.5893 1.16107L12.7615 3.33324H15.8334C16.2936 3.33324 16.6667 3.70634 16.6667 4.16657V7.23848L18.8389 9.41067C19.1643 9.73609 19.1643 10.2638 18.8389 10.5892L16.6667 12.7613V15.8333C16.6667 16.2935 16.2936 16.6666 15.8334 16.6666H12.7615L10.5893 18.8388C10.2639 19.1642 9.73621 19.1642 9.4108 18.8388L7.2386 16.6666H4.1667C3.70646 16.6666 3.33336 16.2935 3.33336 15.8333V12.7613L1.1612 10.5892C0.835754 10.2638 0.835754 9.73609 1.1612 9.41067L3.33336 7.23848V4.16657C3.33336 3.70634 3.70646 3.33324 4.1667 3.33324H7.2386ZM5.00003 4.99991V7.92884L2.92896 9.99992L5.00003 12.071V14.9999H7.92896L10 17.071L12.0711 14.9999H15V12.071L17.0711 9.99992L15 7.92884V4.99991H12.0711L10 2.92884L7.92896 4.99991H5.00003ZM10 13.3333C8.15908 13.3333 6.6667 11.8408 6.6667 9.99992C6.6667 8.15896 8.15908 6.66657 10 6.66657C11.841 6.66657 13.3334 8.15896 13.3334 9.99992C13.3334 11.8408 11.841 13.3333 10 13.3333ZM10 11.6666C10.9205 11.6666 11.6667 10.9204 11.6667 9.99992C11.6667 9.07942 10.9205 8.33326 10 8.33326C9.07955 8.33326 8.33338 9.07942 8.33338 9.99992C8.33338 10.9204 9.07955 11.6666 10 11.6666Z" className={`group-hover:fill-white ${currentPath === "/hospital-lab-settings-dashboard" ? "fill-white" : "fill-[#647284]"}`} />
+                  </svg>
+                </span>
+                Settings
+              </li>
+            </div>
+          </Link>
+
+          {/* Logout */}
+          <div className="px-4 my-4" onClick={handleLogout}>
+            <li className="group px-4 py-2 text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3.33329 12.4998H4.99996V16.6665H15V3.33317H4.99996V7.49984H3.33329V2.49984C3.33329 2.0396 3.70639 1.6665 4.16663 1.6665H15.8333C16.2935 1.6665 16.6666 2.0396 16.6666 2.49984V17.4998C16.6666 17.9601 16.2935 18.3332 15.8333 18.3332H4.16663C3.70639 18.3332 3.33329 17.9601 3.33329 17.4998V12.4998ZM8.33329 9.1665V6.6665L12.5 9.99984L8.33329 13.3332V10.8332H1.66663V9.1665H8.33329Z" className="group-hover:fill-white fill-[#647284]" />
+              </svg>
+              Log-out
             </li>
           </div>
-        </Link>
-
-        <div className="px-4 my-1 cursor-pointer" onClick={handleLogout}>
-          <li className="group px-4 py-2 list-none text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3.33329 12.4998H4.99996V16.6665H15V3.33317H4.99996V7.49984H3.33329V2.49984C3.33329 2.0396 3.70639 1.6665 4.16663 1.6665H15.8333C16.2935 1.6665 16.6666 2.0396 16.6666 2.49984V17.4998C16.6666 17.9601 16.2935 18.3332 15.8333 18.3332H4.16663C3.70639 18.3332 3.33329 17.9601 3.33329 17.4998V12.4998ZM8.33329 9.1665V6.6665L12.5 9.99984L8.33329 13.3332V10.8332H1.66663V9.1665H8.33329Z" className="group-hover:fill-white fill-[#647284]" />
-            </svg>
-            Log-out
-          </li>
-        </div>
-      </div>
+        </ul>
+      </nav>
     </div>
   );
 };
