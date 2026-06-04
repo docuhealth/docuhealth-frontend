@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
+import template from "../../../assets/img/template.png";
+import { LabAppContext } from "../../../context/HospitalContext/Lab/LabAppContext";
 import { FlaskConical, ClipboardList, CheckCircle, ArrowUpRight, ArrowDownRight, User, ChevronLeft, ChevronRight } from "lucide-react";
 
 const statCards = [
@@ -55,6 +57,7 @@ const recentPatients = [
 const PAGE_SIZE = 8;
 
 const Hospital_Lab_Home_Dashboard = () => {
+  const { backgroundImage, hospitalName } = useContext(LabAppContext);
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalPages = Math.ceil(recentPatients.length / PAGE_SIZE);
@@ -70,30 +73,34 @@ const Hospital_Lab_Home_Dashboard = () => {
         <DynamicDate />
 
         {/* Cover Banner */}
-        <div className="relative mt-4 w-full h-[200px] sm:h-[250px] lg:h-[300px] rounded-xl bg-linear-to-br from-[#3E4095] to-indigo-400 flex flex-col items-center justify-center border border-gray-300">
-          <div className="text-white text-center mb-4 px-4">
-            <p className="text-base sm:text-xl font-semibold opacity-90 uppercase tracking-widest">
-              Hospital Laboratory
+        <div
+          className="relative mt-4 w-full h-[300px] rounded-xl bg-cover bg-center flex flex-col items-center justify-center border border-gray-300"
+          style={{
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${backgroundImage || template})`
+          }}
+        >
+          <div className="text-white text-center mb-4">
+            <p className="text-xl font-semibold opacity-90 uppercase tracking-widest">
+              {hospitalName || "NIL"} Hospital Laboratory
             </p>
-            <p className="text-xs sm:text-sm opacity-75 mt-1">Lab Scientist Dashboard</p>
           </div>
         </div>
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
         {statCards.map((stat, index) => (
           <div
             key={index}
-            className="bg-white border border-gray-200 rounded-md p-4 sm:p-5 flex flex-col justify-between"
+            className="bg-white border border-gray-200 rounded-md p-5 flex flex-col justify-between"
           >
             <div className="flex items-center gap-3 mb-4">
               <div className={`w-10 h-10 rounded-sm flex items-center justify-center border ${stat.bgClass}`}>
                 {stat.icon}
               </div>
-              <p className="text-xs sm:text-sm font-semibold text-[#1B2B40]">{stat.title}</p>
+              <p className="text-sm font-semibold text-[#1B2B40]">{stat.title}</p>
             </div>
-            <p className="text-2xl sm:text-3xl font-semibold text-[#647284] mb-3">{stat.value}</p>
+            <p className="text-3xl font-semibold text-[#647284] mb-3">{stat.value}</p>
             <p className="text-xs text-gray-500 font-medium flex items-center gap-1 flex-wrap">
               <span className={`flex items-center gap-0.5 ${stat.trend >= 0 ? "text-green-500" : "text-red-500"}`}>
                 {stat.trend >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
