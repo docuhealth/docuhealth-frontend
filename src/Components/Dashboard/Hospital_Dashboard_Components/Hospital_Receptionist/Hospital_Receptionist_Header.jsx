@@ -16,7 +16,6 @@ const Hospital_Receptionist_Header = () => {
   
       const {profile} = useContext(ReceptionistAppContext);
 
-      console.log(profile)
 
       const navigate = useNavigate()
 
