@@ -5,24 +5,24 @@ import Hospital_Nurses_Sidebar from "../../../Components/Dashboard/Hospital_Dash
 
 const Hospital_Nurses_Layout = () => {
   return (
-    <div className="flex h-screen">
-    {/* Sidebar */} 
-    <aside className=" w-64 shadow-sm border z-20 min-h-screen hidden lg:block">
-      <Hospital_Nurses_Sidebar />
-    </aside>
-    {/* Main content */}
-    <div className="flex-1 flex flex-col">
-      {/* Header */}
-      <header>
-        <Hospital_Nurses_Header />
-      </header>
-      {/* Page content */}
-      <main className="flex-1 p-4 lg:p-6  overflow-y-auto bg-[#F5F5F5]">
-        <Outlet />
-      </main>
+    <div className="flex h-screen overflow-hidden">
+      {/* Sidebar */}
+      <aside className=" w-64 shadow-sm border z-20 min-h-screen hidden lg:block">
+        <Hospital_Nurses_Sidebar />
+      </aside>
+      {/* Main content */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header>
+          <Hospital_Nurses_Header />
+        </header>
+        {/* Page content */}
+        <main className="flex-1 p-4 lg:p-6  overflow-y-auto bg-[#F5F5F5]">
+          <Outlet />
+        </main>
+      </div>
     </div>
-  </div>
-  )
-}
+  );
+};
 
-export default Hospital_Nurses_Layout
+export default Hospital_Nurses_Layout;

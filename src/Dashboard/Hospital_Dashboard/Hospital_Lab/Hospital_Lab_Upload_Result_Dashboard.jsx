@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import RichTextEditor from "../../../Components/RichTextEditor/RichTextEditor";
 import { ArrowLeft, Save, Plus, X, Info, Check } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { uploadLabResult } from "../../../queries/Hospital/lab/results";
+import toast from "react-hot-toast";
 
 const days   = Array.from({ length: 31 }, (_, i) => i + 1);
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -18,6 +21,9 @@ const emptyTable = () => ({ id: Date.now() + Math.random(), title: "", rows: [em
 
 const Hospital_Lab_Upload_Result_Dashboard = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const order = state?.order;
+  const queryClient = useQueryClient();
 
   const [tables, setTables]                 = useState([]);
   const [interpretNotes, setInterpretNotes] = useState([]);
@@ -26,6 +32,35 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
   const [extraComment, setExtraComment]     = useState("");
   const [showConfirm, setShowConfirm]       = useState(false);
   const [showSuccess, setShowSuccess]       = useState(false);
+
+  const uploadMutation = useMutation({
+    mutationFn: (payload) => uploadLabResult(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lab-test-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-results"] });
+      setShowConfirm(false);
+      setShowSuccess(true);
+    },
+    onError: (err) => {
+      setShowConfirm(false);
+      toast.error(err?.response?.data?.message || "Failed to upload result");
+    },
+  });
+
+  const handleConfirmUpload = () => {
+    const payload = {
+      request_id:           order?.id,
+      result_tables:        tables.map((t) => ({ title: t.title, rows: t.rows })),
+      interpretation:       interpretNotes.map((n) => n.text).filter(Boolean),
+      clinical_correlation: clinicalNotes.map((n) => n.text).filter(Boolean),
+      collection_date: collectionDate.day
+        ? `${collectionDate.year}-${String(months.indexOf(collectionDate.month) + 1).padStart(2, "0")}-${String(collectionDate.day).padStart(2, "0")}`
+        : undefined,
+      collection_time: collectionDate.time || undefined,
+      extra_comment:   extraComment || undefined,
+    };
+    uploadMutation.mutate(payload);
+  };
 
   /* ── Table helpers ── */
   const addTable = () => setTables((prev) => [...prev, emptyTable()]);
@@ -352,13 +387,13 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
             </p>
 
             <button
-              onClick={() => {
-                setShowConfirm(false);
-                setShowSuccess(true);
-              }}
-              className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3 rounded-full hover:bg-indigo-700 transition-colors"
+              onClick={handleConfirmUpload}
+              disabled={uploadMutation.isPending}
+              className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3 rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              Confirm upload
+              {uploadMutation.isPending ? (
+                <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Uploading...</>
+              ) : "Confirm upload"}
             </button>
           </div>
         </div>
