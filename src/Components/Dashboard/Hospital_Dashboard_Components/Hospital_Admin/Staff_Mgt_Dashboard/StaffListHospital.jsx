@@ -26,7 +26,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     { label: "Doctors", value: "doctor" },
     { label: "Nurses", value: "nurse" },
     { label: "Receptionists", value: "receptionist" },
-    { label: "Lab Scientist", value: "lab_scientist" },
+    { label: "Lab Scientists", value: "lab_scientist" },
   ];
 
   // console.log(staffs)

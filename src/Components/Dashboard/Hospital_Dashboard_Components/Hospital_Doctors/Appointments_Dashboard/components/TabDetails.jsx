@@ -175,7 +175,7 @@ const PatientInfo = ({ patientFullInfo }) => {
               Temperature
             </p>
             <p className="font-medium">
-              {patientFullInfo?.latest_vitals?.temp} °F
+              {patientFullInfo?.latest_vitals?.temp} °C
             </p>
           </div>
           <div className=" bg-white border rounded-md p-3">
@@ -913,7 +913,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                   Temperature
                 </p>
                 <p className="font-medium">
-                  {selectedPatientDetails?.vital_signs_info?.temp} °F
+                  {selectedPatientDetails?.vital_signs_info?.temp} °C
                 </p>
               </div>
               <div className=" bg-white border rounded-md p-3">
