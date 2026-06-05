@@ -108,7 +108,7 @@ const hin = selected?.patient?.hin;
                     Temperature
                   </p>
                   <p className="font-medium">
-                    {patientFullInfo?.latest_vitals?.temp} °F
+                    {patientFullInfo?.latest_vitals?.temp} °C
                   </p>
                 </div>
                 <div className=" bg-white border rounded-md p-3">
