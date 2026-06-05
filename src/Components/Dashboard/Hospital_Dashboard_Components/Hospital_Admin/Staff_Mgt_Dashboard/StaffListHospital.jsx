@@ -7,8 +7,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
-  const { staffs, loading, count, currentPage, totalPages, setCurrentPage, searchQuery, setSearchQuery, isRefreshing, selectedRole, setSelectedRole } =
-    useContext(HosStaffsContext);
+  const {
+    staffs,
+    loading,
+    count,
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    searchQuery,
+    setSearchQuery,
+    isRefreshing,
+    selectedRole,
+    setSelectedRole,
+  } = useContext(HosStaffsContext);
 
   const ROLE_TABS = [
     { label: "All", value: "" },
@@ -29,18 +40,22 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
 
   const sortedStaffs = useMemo(() => {
     const getDisplayName = (staff) => {
-      const title = staff.role === 'doctor' ? 'Dr. ' : '';
+      const title = staff.role === "doctor" ? "Dr. " : "";
       return `${title}${staff.firstname} ${staff.lastname}`.toLowerCase();
     };
 
     switch (filterType) {
       case "A-Z":
         return [...staffs].sort((a, b) =>
-          getDisplayName(a).localeCompare(getDisplayName(b), undefined, { sensitivity: 'base' })
+          getDisplayName(a).localeCompare(getDisplayName(b), undefined, {
+            sensitivity: "base",
+          }),
         );
       case "Z-A":
         return [...staffs].sort((a, b) =>
-          getDisplayName(b).localeCompare(getDisplayName(a), undefined, { sensitivity: 'base' })
+          getDisplayName(b).localeCompare(getDisplayName(a), undefined, {
+            sensitivity: "base",
+          }),
         );
       case "Oldest":
         return [...staffs].sort((a, b) => a.staff_id.localeCompare(b.staff_id));
@@ -49,11 +64,10 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     }
   }, [staffs, filterType]);
 
-
   const { mutate: removeStaff, isPending: isRemoving } = useMutation({
     mutationFn: (ids) =>
       axiosInstanceHos.post("/api/hospitals/team-members/remove", {
-        staff_ids: ids // The API expects an object with a staff_ids array
+        staff_ids: ids, // The API expects an object with a staff_ids array
       }),
     onSuccess: () => {
       toast.success("Staff member(s) removed successfully");
@@ -63,12 +77,12 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     },
     onError: (err) => {
       toast.error(err.response?.data?.message || "Failed to remove staff");
-    }
+    },
   });
   const { mutate: deactivateStaff, isPending: isDeactivating } = useMutation({
     mutationFn: (ids) =>
       axiosInstanceHos.post("/api/hospitals/team-members/deactivate", {
-        staff_ids: ids // The API expects an object with a staff_ids array
+        staff_ids: ids, // The API expects an object with a staff_ids array
       }),
     onSuccess: () => {
       toast.success("Staff member account deactivated successfully");
@@ -78,9 +92,8 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     },
     onError: (err) => {
       toast.error(err.response?.data?.message || "Failed to deactivate staff");
-    }
+    },
   });
-
 
   // const staffObjectsToRemove = staffs.filter((staff) =>
   //   selectedStaff.includes(staff.staff_id)
@@ -88,9 +101,9 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
 
   // console.log("Bulk Removing Staff Details:", staffObjectsToRemove);
 
-
   const handleBulkRemove = () => {
-    if (selectedStaff.length === 0) return toast.error("Please select staff to remove");
+    if (selectedStaff.length === 0)
+      return toast.error("Please select staff to remove");
 
     removeStaff(selectedStaff);
   };
@@ -103,14 +116,17 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
   const handleDeativate = (staff) => {
     deactivateStaff([staff.staff_id]);
     setActiveMenu(null);
-  }
+  };
 
   const { mutate: updateRole, isPending: isUpdatingRole } = useMutation({
     mutationFn: ({ staff_id, role }) =>
       // The staff_id goes in the URL path, not the body
-      axiosInstanceHos.patch(`/api/hospitals/team-member/${staff_id}/update-role`, {
-        role: role, // Body only contains the role
-      }),
+      axiosInstanceHos.patch(
+        `/api/hospitals/team-member/${staff_id}/update-role`,
+        {
+          role: role, // Body only contains the role
+        },
+      ),
     onSuccess: () => {
       toast.success("Role updated successfully");
       queryClient.invalidateQueries(["hospital-staffs", currentPage]);
@@ -135,13 +151,14 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
 
     updateRole({
       staff_id: selectedStaffForRole.staff_id,
-      role: newRole
+      role: newRole,
     });
   };
 
   // --- SELECTION LOGIC ---
 
-  const allChecked = staffs.length > 0 && selectedStaff.length === staffs.length;
+  const allChecked =
+    staffs.length > 0 && selectedStaff.length === staffs.length;
 
   const toggleSelectAll = () => {
     if (allChecked) {
@@ -174,8 +191,6 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       }
     });
   };
-
-
 
   if (loading) {
     return (
@@ -253,15 +268,15 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     );
   }
 
-
   return (
     <>
       {selectedStaff.length > 0 && (
         <div
-          className={`transition-all duration-300 mb-4 flex items-center justify-between p-3 rounded-lg ${selectedStaff.length > 0
-            ? "bg-red-50 border border-red-100 opacity-100"
-            : "opacity-0 h-0 overflow-hidden"
-            }`}
+          className={`transition-all duration-300 mb-4 flex items-center justify-between p-3 rounded-lg ${
+            selectedStaff.length > 0
+              ? "bg-red-50 border border-red-100 opacity-100"
+              : "opacity-0 h-0 overflow-hidden"
+          }`}
         >
           <p className="text-sm text-red-700 font-medium">
             {selectedStaff.length} staff member(s) selected
@@ -269,12 +284,16 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
           <button
             onClick={handleBulkRemove}
             disabled={isRemoving} // Prevent clicks while loading
-            className={`${isRemoving ? "bg-red-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
-              } text-white px-4 py-2 rounded-full text-xs font-bold transition-colors flex items-center gap-2`}
+            className={`${
+              isRemoving
+                ? "bg-red-400 cursor-not-allowed"
+                : "bg-red-600 hover:bg-red-700"
+            } text-white px-4 py-2 rounded-full text-xs font-bold transition-colors flex items-center gap-2`}
           >
             {isRemoving ? (
               <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Removing...
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>{" "}
+                Removing...
               </>
             ) : (
               "Remove from Team"
@@ -299,10 +318,11 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
             <button
               key={tab.value}
               onClick={() => setSelectedRole(tab.value)}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-colors ${selectedRole === tab.value
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+                selectedRole === tab.value
                   ? "bg-[#3E4095] text-white border-[#3E4095]"
                   : "bg-white text-gray-600 border-gray-200 hover:border-[#3E4095] hover:text-[#3E4095]"
-                }`}
+              }`}
             >
               {tab.label}
             </button>
@@ -313,12 +333,12 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       {staffs.length === 0 && searchQuery ? (
         <div className="py-12 text-center text-gray-500 text-sm">
           <p className="font-medium">No results found for "{searchQuery}"</p>
-          <p className="text-xs text-gray-400 mt-1">Try a different search term</p>
+          <p className="text-xs text-gray-400 mt-1">
+            Try a different search term
+          </p>
         </div>
       ) : (
         <>
-
-
           <div className="hidden lg:flex lg:flex-col">
             <div className="grid grid-cols-8 text-left text-sm bg-gray-100 py-5 rounded-md">
               {/* Checkbox + Name of Staff */}
@@ -366,10 +386,9 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                         />
                       </svg>
                       <p>
-                        {staff.role === 'doctor'
+                        {staff.role === "doctor"
                           ? `Dr. ${staff.firstname} ${staff.lastname}`
                           : `${staff.firstname} ${staff.lastname}`}
-
                       </p>
                     </div>
                   </div>
@@ -383,7 +402,9 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                   <div className="relative flex justify-center">
                     <button
                       onClick={() =>
-                        setActiveMenu(activeMenu === staff.staff_id ? null : staff.staff_id)
+                        setActiveMenu(
+                          activeMenu === staff.staff_id ? null : staff.staff_id,
+                        )
                       }
                       className="p-2 hover:bg-gray-200 rounded-full transition-colors"
                     >
@@ -461,10 +482,9 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
 
                       <div className="min-w-0">
                         <h3 className="font-bold text-gray-900 text-[15px] truncate">
-                          {staff.role === 'doctor'
+                          {staff.role === "doctor"
                             ? `Dr. ${staff.firstname} ${staff.lastname}`
                             : `${staff.firstname} ${staff.lastname}`}
-
                         </h3>
                         <div className="flex items-center gap-1.5">
                           <span className="text-[10px] bg-[#3E4095] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
@@ -485,23 +505,51 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                         </p>
                       </div>
                       <div className="relative">
-                        <button onClick={() => setActiveMenu(activeMenu === staff.staff_id ? null : staff.staff_id)} className="p-1">
-                          <svg width="20" height="20" fill="#647284" viewBox="0 0 16 16"><path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" /></svg>
+                        <button
+                          onClick={() =>
+                            setActiveMenu(
+                              activeMenu === staff.staff_id
+                                ? null
+                                : staff.staff_id,
+                            )
+                          }
+                          className="p-1"
+                        >
+                          <svg
+                            width="20"
+                            height="20"
+                            fill="#647284"
+                            viewBox="0 0 16 16"
+                          >
+                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                          </svg>
                         </button>
                         {activeMenu === staff.staff_id && (
                           <div className="absolute right-0 top-8 w-52 bg-white border border-gray-200 rounded-lg shadow z-50 py-2">
-                            <button onClick={() => handleUpdateRole(staff)} className="w-full text-left px-4 py-3 text-sm border-b border-gray-50 hover:rounded-t-md">Update Role</button>
+                            <button
+                              onClick={() => handleUpdateRole(staff)}
+                              className="w-full text-left px-4 py-3 text-sm border-b border-gray-50 hover:rounded-t-md"
+                            >
+                              Update Role
+                            </button>
 
-                            <button onClick={() => handleDeativate(staff)} className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md">Deactivate Account</button>
+                            <button
+                              onClick={() => handleDeativate(staff)}
+                              className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md"
+                            >
+                              Deactivate Account
+                            </button>
 
-                            <button onClick={() => handleIndividualRemove(staff)} className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md">Remove from Team</button>
+                            <button
+                              onClick={() => handleIndividualRemove(staff)}
+                              className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md"
+                            >
+                              Remove from Team
+                            </button>
                           </div>
                         )}
                       </div>
                     </div>
-
-
-
                   </div>
 
                   {/* 2. Contact Quick-Action Box */}
@@ -568,24 +616,39 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
               <div className="bg-white rounded-lg p-5 w-full max-w-sm shadow-xl">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-medium text-md text-gray-800">Update Staff Role</h3>
+                  <h3 className="font-medium text-md text-gray-800">
+                    Update Staff Role
+                  </h3>
                   <button
                     onClick={() => setSelectedStaffForRole(null)}
                     className="text-gray-400 hover:text-gray-600"
                   >
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <svg
+                      width="18"
+                      height="18"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                    >
                       <path d="M18 6L6 18M6 6l12 12"></path>
                     </svg>
                   </button>
                 </div>
 
                 <p className="text-xs text-gray-500 mb-6">
-                  Changing role for <span className="font-semibold text-gray-700">{selectedStaffForRole.firstname} {selectedStaffForRole.lastname}</span>
+                  Changing role for{" "}
+                  <span className="font-semibold text-gray-700">
+                    {selectedStaffForRole.firstname}{" "}
+                    {selectedStaffForRole.lastname}
+                  </span>
                 </p>
 
                 <form onSubmit={submitRoleUpdate} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-400 uppercase mb-2">Select New Role</label>
+                    <label className="block text-xs font-medium text-gray-400 uppercase mb-2">
+                      Select New Role
+                    </label>
                     <select
                       value={newRole}
                       onChange={(e) => setNewRole(e.target.value)}
@@ -610,15 +673,16 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                         Updating role
                       </div>
-                    ) : "Confirm Update"}
+                    ) : (
+                      "Confirm Update"
+                    )}
                   </button>
                 </form>
               </div>
             </div>
           )}
-
-
-        </>)}
+        </>
+      )}
 
       <Pagination2
         count={count}
@@ -626,8 +690,6 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
         totalPages={totalPages}
         setCurrentPage={setCurrentPage}
       />
-
-
     </>
   );
 };
