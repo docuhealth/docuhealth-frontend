@@ -2,16 +2,6 @@ import React from "react";
 import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-const navItem = (path, currentPath, icon, label) => (
-  <Link to={path}>
-    <div className="px-4 my-1">
-      <li className={`group px-4 py-2 ${currentPath === path ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
-        <span>{icon(currentPath === path)}</span>
-        {label}
-      </li>
-    </div>
-  </Link>
-);
 
 const Hospital_Lab_Sidebar = () => {
   const navigate = useNavigate();
@@ -32,7 +22,7 @@ const Hospital_Lab_Sidebar = () => {
       </div>
 
       {/* Main nav links */}
-      <nav className="flex-1 mt-4 text-sm overflow-y-auto">
+      <nav className="flex-1  text-sm overflow-y-auto">
         <ul>
           {/* Overview */}
           <Link to="/hospital-lab-home-dashboard">

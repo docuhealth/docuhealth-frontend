@@ -39,7 +39,7 @@ const Hospital_Lab_Sidebar_Mobile = ({ openMobileSidebar, setOpenMobileSidebar }
           </div>
         </div>
 
-        <nav className="flex-1 mt-4 text-sm overflow-y-auto">
+        <nav className="flex-1  text-sm overflow-y-auto">
           <ul>
             {/* Overview */}
             <Link to="/hospital-lab-home-dashboard" onClick={() => setOpenMobileSidebar(false)}>
