@@ -678,7 +678,7 @@ useEffect(() => {
                     Temperature
                   </p>
                   <p className="font-medium">
-                    {selectedPatientFetchedInfo?.latest_vitals?.temp} °F
+                    {selectedPatientFetchedInfo?.latest_vitals?.temp} °C
                   </p>
                 </div>
                 <div className=" bg-white border rounded-md p-3">

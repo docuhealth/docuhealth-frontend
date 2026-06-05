@@ -190,7 +190,7 @@ const MedicalRecordsDetail = ({
                 Temperature
               </p>
               <p className="font-medium">
-                {selectedMedicalRecord?.vital_signs_info?.temp} °F
+                {selectedMedicalRecord?.vital_signs_info?.temp} °C
               </p>
             </div>
             <div className=" bg-white border rounded-md p-3">
