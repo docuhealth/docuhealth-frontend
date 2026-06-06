@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { DoctorAppContext } from "../../../../context/HospitalContext/Doctors/DoctorAppContext";
 
 const Hospital_Doctors_Sidebar_Mobile = ({
   openMobileSidebar,
@@ -9,6 +10,8 @@ const Hospital_Doctors_Sidebar_Mobile = ({
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
+
+  const { hospitalLogo, hospitalName } = useContext(DoctorAppContext);
 
   const handleLogout = (event) => {
     event.preventDefault();
@@ -33,8 +36,8 @@ const Hospital_Doctors_Sidebar_Mobile = ({
       >
        <div className="p-4 flex justify-between items-center    ">
           <div className="flex justify-start items-center gap-1 font-semibold text-[#3E4095]">
-            <img src={docuhealth_logo} alt="Logo" className="w-6" />
-            <h1 className="text-xl">DocuHealth</h1>
+            <img src={hospitalLogo || docuhealth_logo} alt="Logo" className="w-6 h-6 aspect-square object-cover" />
+            <h1 className="text-xl">{hospitalName || "DocuHealth"}</h1>
           </div>
           <div
             className=" lg:hidden "

@@ -3,6 +3,7 @@ import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import LogOutModal from "./LogOut/components/LogOutModal";
 import { fetchStaff } from "../../../../queries/Hospital/fetchStaff";
+import { NursesAppContext } from "../../../../context/HospitalContext/Nurses/NursesAppContext";
 
 const Hospital_Nurses_Sidebar_Mobile = ({ openMobileSidebar,
   setOpenMobileSidebar, setIsModalOpen
@@ -11,6 +12,8 @@ const Hospital_Nurses_Sidebar_Mobile = ({ openMobileSidebar,
   const location = useLocation();
   const currentPath = location.pathname;
   const navigate = useNavigate();
+
+  const { hospitalLogo, hospitalName } = useContext(NursesAppContext);
 
 
   return (
@@ -29,8 +32,8 @@ const Hospital_Nurses_Sidebar_Mobile = ({ openMobileSidebar,
       >
         <div className="p-4 flex justify-between items-center    ">
           <div className="flex justify-start items-center gap-1 font-semibold text-[#3E4095]">
-            <img src={docuhealth_logo} alt="Logo" className="w-6" />
-            <h1 className="text-xl">DocuHealth</h1>
+            <img src={hospitalLogo || docuhealth_logo} alt="Logo" className="w-6 h-6 aspect-square object-cover" />
+            <h1 className="text-xl">{hospitalName || "DocuHealth"}</h1>
           </div>
           <div
             className=" lg:hidden "

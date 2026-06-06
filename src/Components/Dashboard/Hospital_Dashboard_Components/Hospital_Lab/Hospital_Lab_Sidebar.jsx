@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { LabAppContext } from "../../../../context/HospitalContext/Lab/LabAppContext";
 
 const navItem = (path, currentPath, icon, label) => (
   <Link to={path}>
@@ -18,6 +19,8 @@ const Hospital_Lab_Sidebar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
 
+  const { hospitalLogo, hospitalName } = useContext(LabAppContext);
+
   const handleLogout = () => {
     sessionStorage.clear();
     navigate("/login");
@@ -27,8 +30,8 @@ const Hospital_Lab_Sidebar = () => {
     <div className="flex flex-col h-screen">
       {/* Logo */}
       <div className="pt-5 pl-5 pb-3 flex items-center gap-1 font-semibold text-[#3E4095] shrink-0">
-        <img src={docuhealth_logo} alt="Logo" className="w-6" />
-        <h1 className="text-xl">DocuHealth</h1>
+        <img src={hospitalLogo || docuhealth_logo} alt="Logo" className="w-6 h-6 aspect-square object-cover" />
+        <h1 className="text-xl">{hospitalName || "DocuHealth"}</h1>
       </div>
 
       {/* Main nav links */}
