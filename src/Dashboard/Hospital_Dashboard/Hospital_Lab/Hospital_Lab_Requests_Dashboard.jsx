@@ -1,38 +1,40 @@
 import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import {
   Search,
   ChevronDown,
   FlaskConical,
-  Building2,
-  CalendarClock,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { LabRequestsContext } from "../../../context/HospitalContext/Lab/LabRequestsContext";
+import LabOrderCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabOrderCard";
 
 const tabs = ["Pending Test", "In-progress", "Completed test", "Rejected test"];
 
 const getBadgeStyle = (status) => {
   switch (status) {
-    case "pending":   return { label: "New",       cls: "bg-green-100 text-green-600" };
-    case "in_progress": return { label: "In Progress", cls: "bg-amber-100 text-amber-600" };
-    case "completed": return { label: "Completed",  cls: "bg-green-100 text-green-600" };
-    case "rejected":  return { label: "Rejected",   cls: "bg-red-100 text-red-500" };
-    default:          return { label: status || "—", cls: "bg-indigo-100 text-indigo-500" };
+    case "pending":
+      return { label: "New", cls: "bg-green-100 text-green-600" };
+    case "in_progress":
+      return { label: "In Progress", cls: "bg-amber-100 text-amber-600" };
+    case "completed":
+      return { label: "Completed", cls: "bg-green-100 text-green-600" };
+    case "rejected":
+      return { label: "Rejected", cls: "bg-red-100 text-red-500" };
+    default:
+      return { label: status || "—", cls: "bg-indigo-100 text-indigo-500" };
   }
 };
 
 const TAB_STATUS_MAP = {
-  "Pending Test":   "pending",
-  "In-progress":    "in_progress",
+  "Pending Test": "pending",
+  "In-progress": "in_progress",
   "Completed test": "completed",
-  "Rejected test":  "rejected",
+  "Rejected test": "rejected",
 };
 
 const Hospital_Lab_Requests_Dashboard = () => {
-  const navigate = useNavigate();
   const {
     requests,
     activeTab,
@@ -43,29 +45,10 @@ const Hospital_Lab_Requests_Dashboard = () => {
     loading,
     searchQuery,
     setSearchQuery,
+    categories,
+    selectedCategory,
+    setSelectedCategory,
   } = useContext(LabRequestsContext);
-
-  const getPatientName = (order) =>
-    order.patient_name ||
-    (order.patient ? `${order.patient.firstname || ""} ${order.patient.lastname || ""}`.trim() : "") ||
-    order.name ||
-    "Unknown";
-
-  const getHIN = (order) => order.patient_hin || order.patient?.hin || order.hin || "—";
-
-  const getTestName = (order) => order.test_name || order.test || "—";
-
-  const getHospital = (order) => order.hospital_name || order.hospital || "—";
-
-  const getDatetime = (order) => {
-    if (order.datetime) return order.datetime;
-    const raw = order.scheduled_at || order.created_at;
-    if (!raw) return "—";
-    return new Date(raw).toLocaleString("en-US", {
-      day: "numeric", month: "short", year: "numeric",
-      hour: "2-digit", minute: "2-digit",
-    });
-  };
 
   const goTo = (page) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
@@ -78,13 +61,29 @@ const Hospital_Lab_Requests_Dashboard = () => {
       </div>
 
       <div className="mt-4 bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
-        {/* Tabs */}
-        <div className="flex items-center gap-4 sm:gap-6 border-b border-gray-100 mb-5 overflow-x-auto pb-px">
+        {/* Tabs — mobile: 2×2 pill grid; sm+: underline row */}
+        <div className="sm:hidden grid grid-cols-2 gap-2 mb-5">
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-3 text-xs sm:text-sm font-medium whitespace-nowrap transition-colors shrink-0 ${
+              className={`py-2 px-3 text-xs font-medium rounded-lg text-center transition-colors ${
+                activeTab === tab
+                  ? "bg-[#3E4095] text-white"
+                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        <div className="hidden sm:flex items-center gap-6 border-b border-gray-100 mb-5 overflow-x-auto pb-px hide-scrollbar">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`pb-3 text-sm font-medium whitespace-nowrap transition-colors shrink-0 ${
                 activeTab === tab
                   ? "text-[#3E4095] border-b-2 border-[#3E4095]"
                   : "text-gray-400 hover:text-gray-600"
@@ -95,18 +94,34 @@ const Hospital_Lab_Requests_Dashboard = () => {
           ))}
         </div>
 
-        {/* Search + Sort row */}
-        <div className="flex items-center justify-end gap-2 sm:gap-3 mb-6 flex-wrap">
-          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
+        {/* Search + Category + Sort row */}
+        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 mb-6">
+          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 w-full sm:w-auto">
             <Search size={14} className="text-gray-400 shrink-0" />
             <input
               type="text"
               placeholder="Search patient or test..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="text-xs text-gray-600 bg-transparent outline-none w-40 sm:w-48"
+              className="text-xs text-gray-600 bg-transparent outline-none flex-1 sm:w-48"
             />
           </div>
+
+          {categories.length > 0 && (
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 bg-gray-50 outline-none focus:border-[#3E4095] appearance-none cursor-pointer"
+            >
+              <option value="">All categories</option>
+              {categories.map((cat) => (
+                <option key={cat.sqid} value={cat.sqid}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          )}
+
           <button className="flex items-center gap-1.5 border border-[#3E4095] text-[#3E4095] text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-indigo-50 transition-colors whitespace-nowrap">
             Sort by: Latest <ChevronDown size={14} />
           </button>
@@ -125,69 +140,14 @@ const Hospital_Lab_Requests_Dashboard = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {requests.map((order) => {
-              const badge = getBadgeStyle(order.status || TAB_STATUS_MAP[activeTab]);
-              return (
-                <div
-                  key={order.id}
-                  className="border border-gray-200 rounded-xl p-4 flex flex-col gap-3"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-bold text-[#1B2B40] truncate">
-                      {getPatientName(order)}
-                    </p>
-                    <span className={`text-[10px] font-semibold px-2 py-1 rounded-full whitespace-nowrap shrink-0 ${badge.cls}`}>
-                      {badge.label}
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-gray-400">HIN:{getHIN(order)}</p>
-
-                  <hr className="border-gray-100" />
-
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <FlaskConical size={14} className="text-gray-400 shrink-0" />
-                      <span className="truncate">{getTestName(order)}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <Building2 size={14} className="text-gray-400 shrink-0" />
-                      <span className="truncate">{getHospital(order)}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <CalendarClock size={14} className="text-gray-400 shrink-0" />
-                      <span>{getDatetime(order)}</span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() =>
-                      navigate("/hospital-lab-test-detail", {
-                        state: {
-                          order: {
-                            id:       order.sqid || order.id,
-                            name:     getPatientName(order),
-                            hin:      getHIN(order),
-                            test:     getTestName(order),
-                            hospital: getHospital(order),
-                            datetime: getDatetime(order),
-                            tab:      activeTab,
-                            requestedBy: order.requested_by ||
-                              (order.doctor ? `Dr. ${order.doctor.firstname || ""} ${order.doctor.lastname || ""}`.trim() : undefined),
-                            age:    order.patient?.age,
-                            gender: order.patient?.sex || order.patient?.gender,
-                            email:  order.hospital_email || order.email,
-                          },
-                        },
-                      })
-                    }
-                    className="mt-1 w-full border border-gray-300 text-xs text-gray-700 py-2 rounded-full hover:bg-gray-50 transition-colors"
-                  >
-                    View details
-                  </button>
-                </div>
-              );
-            })}
+            {requests.map((order) => (
+              <LabOrderCard
+                key={order.sqid}
+                order={order}
+                badge={getBadgeStyle(order.status || TAB_STATUS_MAP[activeTab])}
+                activeTab={activeTab}
+              />
+            ))}
           </div>
         )}
 
