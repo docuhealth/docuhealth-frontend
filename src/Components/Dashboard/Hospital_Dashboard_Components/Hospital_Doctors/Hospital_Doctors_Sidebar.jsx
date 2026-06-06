@@ -18,13 +18,14 @@ const Hospital_Doctors_Sidebar = () => {
 
   return (
     <>
+     <div className="flex flex-col h-screen">
        <div className="pt-5 pl-5 pb-3 flex justify-between items-center  ">
         <div className="flex justify-start items-center gap-1 font-semibold text-[#3E4095]">
           <img src={hospitalLogo || docuhealth_logo} alt="Logo" className="w-6 h-6 aspect-square object-cover" />
           <h1 className="text-xl">{hospitalName || "DocuHealth"}</h1>
         </div>
       </div>
-      <nav className="mt-4 text-sm">
+    <nav className="flex-1  text-sm overflow-y-auto">
         <ul>
           <Link to="/hospital-doctors-home-dashboard">
             <div className="px-4 my-4">
@@ -251,6 +252,11 @@ const Hospital_Doctors_Sidebar = () => {
               </li>
             </div>
           </Link>
+       
+        </ul>
+      </nav>
+         <div className="text-sm border-t border-gray-100 pb-4 pt-2 shrink-0">
+        <ul>
           <Link to="/hospital-doctors-settings-dashboard">
             <div className="px-4 my-4">
               <li
@@ -288,32 +294,20 @@ const Hospital_Doctors_Sidebar = () => {
             </div>
           </Link>
 
-          <div
-            className="px-4 my-4"
-               onClick={handleLogout}
-          >
-            <li
-              className={`group px-4 py-2  text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className={`group-hover:fill-white 
-                            fill-[#647284]`}
-              >
+           <div className="px-4 my-2" onClick={handleLogout}>
+            <li className="group px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg flex items-center gap-2 justify-start cursor-pointer transition-colors duration-150">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M3.33329 12.4998H4.99996V16.6665H15V3.33317H4.99996V7.49984H3.33329V2.49984C3.33329 2.0396 3.70639 1.6665 4.16663 1.6665H15.8333C16.2935 1.6665 16.6666 2.0396 16.6666 2.49984V17.4998C16.6666 17.9601 16.2935 18.3332 15.8333 18.3332H4.16663C3.70639 18.3332 3.33329 17.9601 3.33329 17.4998V12.4998ZM8.33329 9.1665V6.6665L12.5 9.99984L8.33329 13.3332V10.8332H1.66663V9.1665H8.33329Z"
-                  className={`group-hover:fill-white fill-[#647284]`}
+                  className="fill-red-500 group-hover:fill-white"
                 />
               </svg>
               Log-out
             </li>
           </div>
-        </ul>
-      </nav>
+          </ul>
+          </div>
+      </div>
     </>
   );
 };

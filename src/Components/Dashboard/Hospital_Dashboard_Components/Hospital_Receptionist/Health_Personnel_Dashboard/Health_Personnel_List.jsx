@@ -23,6 +23,7 @@ const Health_Personnel_List = () => {
     { label: "Doctors", value: "doctor" },
     { label: "Nurses", value: "nurse" },
     { label: "Receptionists", value: "receptionist" },
+    { label: "Lab Scientists", value: "lab_scientist" },
   ];
 
   if (loading) {

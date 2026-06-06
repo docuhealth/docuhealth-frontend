@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
-import { ArrowLeft, Printer, Download } from "lucide-react";
+import { ArrowLeft, Printer, Download, X } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { acceptLabRequest, rejectLabRequest } from "../../../queries/Hospital/lab/requests";
+import toast from "react-hot-toast";
 
 const statusStyles = {
   "Pending Test":   { label: "Pending",     color: "text-amber-500" },
@@ -110,6 +114,10 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
     tab:      "Pending Test",
   };
 
+  const queryClient = useQueryClient();
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+
   const status       = statusStyles[order.tab] ?? statusStyles["Pending Test"];
   const specimen     = specimenMap[order.test]  ?? "Blood";
   const isPending    = order.tab === "Pending Test";
@@ -118,6 +126,27 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
   const isRejected   = order.tab === "Rejected test";
 
   const headerLabel = isCompleted || isRejected ? "Lab result" : "Test";
+
+  const acceptMutation = useMutation({
+    mutationFn: () => acceptLabRequest(order.id),
+    onSuccess: () => {
+      toast.success("Request accepted — moved to In-progress");
+      queryClient.invalidateQueries({ queryKey: ["lab-test-orders"] });
+      navigate(-1);
+    },
+    onError: (err) => toast.error(err?.response?.data?.message || "Failed to accept request"),
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: () => rejectLabRequest({ sqid: order.id, reason: rejectReason }),
+    onSuccess: () => {
+      toast.success("Request rejected");
+      queryClient.invalidateQueries({ queryKey: ["lab-test-orders"] });
+      setShowRejectModal(false);
+      navigate(-1);
+    },
+    onError: (err) => toast.error(err?.response?.data?.message || "Failed to reject request"),
+  });
 
   return (
     <>
@@ -144,11 +173,21 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
           {/* Pending */}
           {isPending && (
             <>
-              <button className="border border-red-400 text-red-500 text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-red-50 transition-colors">
+              <button
+                onClick={() => setShowRejectModal(true)}
+                disabled={acceptMutation.isPending}
+                className="border border-red-400 text-red-500 text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-red-50 transition-colors disabled:opacity-50"
+              >
                 Reject request
               </button>
-              <button className="border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-indigo-50 transition-colors">
-                Accept request
+              <button
+                onClick={() => acceptMutation.mutate()}
+                disabled={acceptMutation.isPending}
+                className="border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50 flex items-center gap-1"
+              >
+                {acceptMutation.isPending ? (
+                  <><div className="w-3 h-3 border-2 border-[#3E4095] border-t-transparent rounded-full animate-spin" /> Accepting...</>
+                ) : "Accept request"}
               </button>
             </>
           )}
@@ -271,7 +310,52 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
       {isRejected && (
         <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
           <p className="text-xs sm:text-sm font-semibold text-red-500 mb-2">Reason for rejection (note):</p>
-          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{rejectionReason}</p>
+          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{order.rejection_reason || rejectionReason}</p>
+        </div>
+      )}
+
+      {/* ── Reject Modal ── */}
+      {showRejectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-auto p-6 relative flex flex-col gap-4">
+            <button
+              onClick={() => setShowRejectModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X size={16} />
+            </button>
+
+            <h3 className="text-base font-semibold text-gray-800">Reject Request</h3>
+            <p className="text-xs text-gray-500">
+              Please provide a reason for rejecting this lab request. This will be visible to the requesting doctor.
+            </p>
+
+            <textarea
+              rows={4}
+              placeholder="Enter reason for rejection..."
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-red-400 resize-none transition-colors"
+            />
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowRejectModal(false)}
+                className="flex-1 border border-gray-300 text-gray-600 text-sm font-medium py-2.5 rounded-full hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => rejectMutation.mutate()}
+                disabled={rejectMutation.isPending || !rejectReason.trim()}
+                className="flex-1 bg-red-500 text-white text-sm font-semibold py-2.5 rounded-full hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
+              >
+                {rejectMutation.isPending ? (
+                  <><div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" /> Rejecting...</>
+                ) : "Confirm Rejection"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </>

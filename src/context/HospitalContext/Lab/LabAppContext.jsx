@@ -19,15 +19,20 @@ const LabProfileProvider = ({ children }) => {
   const backgroundImage = data?.theme?.bg_image;
   const hospitalName = data?.theme?.name;
   const hospitalLogo = data?.theme?.profile_image;
+  const stats = data?.stats || null;
+  const recentPatients = data?.recent_patients || [];
 
-  return (
+
+    return (
     <LabAppContext.Provider
       value={{
-        profile,
+        profile: profile || null,
         isLoading: profileLoading,
         backgroundImage,
         hospitalName,
         hospitalLogo,
+        stats,
+        recentPatients,
       }}
     >
       {children}
