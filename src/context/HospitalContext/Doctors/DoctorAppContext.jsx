@@ -46,6 +46,7 @@ const DoctorProfileProvider = ({ children }) => {
   const profile = data?.doctor;
   const backgroundImage = data?.theme?.bg_image;
   const hospitalName = data?.theme?.name;
+  const hospitalLogo = data?.theme?.profile_image;
 
 
 
@@ -57,6 +58,7 @@ const DoctorProfileProvider = ({ children }) => {
       isLoading: !profile && isUserLoggedIn,
       backgroundImage,
       hospitalName,
+      hospitalLogo,
       dashboardMetrics,
       dashboardMetricsLoading,
       dateRange,

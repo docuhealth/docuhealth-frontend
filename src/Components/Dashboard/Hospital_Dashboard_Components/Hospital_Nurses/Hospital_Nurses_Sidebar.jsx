@@ -18,7 +18,7 @@ const Hospital_Nurses_Sidebar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const { profile } = useContext(NursesAppContext);
+  const {profile, hospitalLogo, hospitalName} = useContext(NursesAppContext);
 
   const handleLogoutLogic = async (handoverSelection) => {
     // If user clicked "Just Logout" (handoverSelection is null)
@@ -86,8 +86,8 @@ const Hospital_Nurses_Sidebar = () => {
       {/* Top Brand Header */}
       <div className="pt-5 pl-5 pb-3 flex justify-between items-center shrink-0">
         <div className="flex justify-start items-center gap-1 font-semibold text-[#3E4095]">
-          <img src={docuhealth_logo} alt="Logo" className="w-6" />
-          <h1 className="text-xl">DocuHealth</h1>
+          <img src={hospitalLogo || docuhealth_logo} alt="Logo" className="w-6 h-6 aspect-square object-cover" />
+          <h1 className="text-xl">{hospitalName || "DocuHealth"}</h1>
         </div>
       </div>
 

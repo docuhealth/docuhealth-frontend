@@ -14,7 +14,7 @@ const Hospital_Receptionist_Header = () => {
       setIsPopoverOpen(!isPopoverOpen);
       };
   
-      const {profile} = useContext(ReceptionistAppContext);
+      const {profile, hospitalLogo} = useContext(ReceptionistAppContext);
 
 
       const navigate = useNavigate()
@@ -59,9 +59,13 @@ const Hospital_Receptionist_Header = () => {
                 Hospital Receptionist
               </p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#3E4095] to-indigo-400 flex justify-center items-center text-white text-sm font-bold shadow-md">
-              {initials}
-            </div>
+            {hospitalLogo ? (
+              <img src={hospitalLogo} alt="Hospital Logo" className="w-10 h-10 rounded-full object-cover shadow-md" />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#3E4095] to-indigo-400 flex justify-center items-center text-white text-sm font-bold shadow-md">
+                {initials}
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -94,9 +98,13 @@ const Hospital_Receptionist_Header = () => {
                     onClick={() => setIsPopoverOpen(!isPopoverOpen)}
                     className="flex items-center gap-1"
                 >
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#3E4095] to-indigo-400  flex items-center justify-center text-white text-xs font-bold ring-2 ring-indigo-50">
-                        {initials}
-                    </div>
+                    {hospitalLogo ? (
+                      <img src={hospitalLogo} alt="Hospital Logo" className="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-50" />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#3E4095] to-indigo-400  flex items-center justify-center text-white text-xs font-bold ring-2 ring-indigo-50">
+                          {initials}
+                      </div>
+                    )}
                     <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isPopoverOpen ? 'rotate-180' : ''}`} />
                 </button>
 

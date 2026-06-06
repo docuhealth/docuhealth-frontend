@@ -2,11 +2,14 @@ import React, { useState, useEffect, useContext } from "react";
 import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { DoctorAppContext } from "../../../../context/HospitalContext/Doctors/DoctorAppContext";
 
 const Hospital_Doctors_Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
+
+  const { hospitalLogo, hospitalName } = useContext(DoctorAppContext);
 
   const handleLogout = () => {
     sessionStorage.clear();   // removes ALL session-based auth data
@@ -18,8 +21,8 @@ const Hospital_Doctors_Sidebar = () => {
      <div className="flex flex-col h-screen">
        <div className="pt-5 pl-5 pb-3 flex justify-between items-center  ">
         <div className="flex justify-start items-center gap-1 font-semibold text-[#3E4095]">
-          <img src={docuhealth_logo} alt="Logo" className="w-6" />
-          <h1 className="text-xl">DocuHealth</h1>
+          <img src={hospitalLogo || docuhealth_logo} alt="Logo" className="w-6 h-6 aspect-square object-cover" />
+          <h1 className="text-xl">{hospitalName || "DocuHealth"}</h1>
         </div>
       </div>
     <nav className="flex-1  text-sm overflow-y-auto">

@@ -18,14 +18,15 @@ const NursesProfileProvider = (props) => {
         staleTime: 1000 * 60 * 30, 
       });
 
-      const profile = data?.nurse ;
-      const wardInfo = data?.ward_info
-      const backgroundImage = data?.theme?.bg_image
-        const hospitalName = data?.theme?.name;
+      const profile = data?.nurse;
+      const wardInfo = data?.ward_info;
+      const backgroundImage = data?.theme?.bg_image;
+      const hospitalName = data?.theme?.name;
+      const hospitalLogo = data?.theme?.profile_image;
 
 
   return (
-    <NursesAppContext.Provider value={{ profile, wardInfo, backgroundImage, hospitalName }}>
+    <NursesAppContext.Provider value={{ profile, wardInfo, backgroundImage, hospitalName, hospitalLogo }}>
         {props.children}
     </NursesAppContext.Provider>
   )

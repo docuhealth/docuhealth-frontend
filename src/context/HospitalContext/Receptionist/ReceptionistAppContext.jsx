@@ -18,10 +18,11 @@ const ReceptionistProfileProvider = (props) => {
   const profile = data?.receptionist;
   const backgroundImage = data?.theme?.bg_image;
   const hospitalName = data?.theme?.name;
+  const hospitalLogo = data?.theme?.profile_image;
  
 
       return(
-        <ReceptionistAppContext.Provider value={{ profile, backgroundImage, hospitalName, loading: profileLoading }}>{props.children}</ReceptionistAppContext.Provider>
+        <ReceptionistAppContext.Provider value={{ profile, backgroundImage, hospitalName, hospitalLogo, loading: profileLoading }}>{props.children}</ReceptionistAppContext.Provider>
       )
 }
 
