@@ -1,6 +1,6 @@
 import React, { useEffect, useState, createContext } from "react";
 import { getHospitalToken } from "../../../services/authService";
-import { fetchLabRequests } from "../../../queries/Hospital/lab/requests";
+import { fetchLabRequests, fetchTestCategories } from "../../../queries/Hospital/lab/requests";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import useDebounce from "../../../hooks/useDebounce";
 import toast from "react-hot-toast";
@@ -18,6 +18,7 @@ const LabRequestsProvider = (props) => {
   const [activeTab, setActiveTab] = useState("Pending Test");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const pageSize = 6;
 
   const debouncedSearch = useDebounce(searchQuery, 300);
@@ -26,15 +27,22 @@ const LabRequestsProvider = (props) => {
   const status = TAB_STATUS_MAP[activeTab];
 
   const { data, isPending, isFetching, isError, error } = useQuery({
-    queryKey: ["lab-test-orders", status, currentPage, debouncedSearch],
+    queryKey: ["lab-test-orders", status, currentPage, debouncedSearch, selectedCategory],
     queryFn: fetchLabRequests,
     enabled: isUserLoggedIn,
     placeholderData: keepPreviousData,
   });
 
+  const { data: categoriesData } = useQuery({
+    queryKey: ["lab-test-categories"],
+    queryFn: fetchTestCategories,
+    enabled: isUserLoggedIn,
+    staleTime: 10 * 60 * 1000,
+  });
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab, debouncedSearch]);
+  }, [activeTab, debouncedSearch, selectedCategory]);
 
   useEffect(() => {
     if (isError) {
@@ -45,6 +53,7 @@ const LabRequestsProvider = (props) => {
   const requests = data?.results || [];
   const count = data?.count || 0;
   const totalPages = Math.max(1, Math.ceil(count / pageSize));
+  const categories = categoriesData?.results || [];
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -64,6 +73,9 @@ const LabRequestsProvider = (props) => {
       isRefreshing: isFetching,
       searchQuery,
       setSearchQuery,
+      categories,
+      selectedCategory,
+      setSelectedCategory,
     }}>
       {props.children}
     </LabRequestsContext.Provider>

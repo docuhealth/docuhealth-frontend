@@ -121,6 +121,7 @@ import Hospital_Lab_Appointments_Dashboard from "./Dashboard/Hospital_Dashboard/
 import Hospital_Lab_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Messages_Dashboard";
 import Hospital_Lab_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_HealthPersonnel_Dashboard";
 import Hospital_Lab_Upload_Result_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Upload_Result_Dashboard";
+import Hospital_Lab_Results_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Results_Dashboard";
 import HospitalLabProviders from "./Providers/Hospital/HospitalLabProviders";
 
 import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
@@ -627,6 +628,25 @@ function App() {
                   <HospitalProtectedRoute>
                     <HospitalLabProviders>
                       <Hospital_Lab_Upload_Result_Dashboard />
+                    </HospitalLabProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-lab-results-dashboard"
+              element={
+                <HospitalLabProviders>
+                  <Hospital_Lab_Layout />
+                </HospitalLabProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalLabProviders>
+                      <Hospital_Lab_Results_Dashboard />
                     </HospitalLabProviders>
                   </HospitalProtectedRoute>
                 }

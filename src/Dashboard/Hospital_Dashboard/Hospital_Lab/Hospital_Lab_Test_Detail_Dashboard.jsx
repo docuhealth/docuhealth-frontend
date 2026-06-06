@@ -1,103 +1,33 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
-import { ArrowLeft, Printer, Download, X } from "lucide-react";
+import { ArrowLeft, Printer, Download } from "lucide-react";
+import PatientInfoCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/PatientInfoCard";
+import RejectModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/RejectModal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { acceptLabRequest, rejectLabRequest } from "../../../queries/Hospital/lab/requests";
 import toast from "react-hot-toast";
 
-const statusStyles = {
-  "Pending Test":   { label: "Pending",     color: "text-amber-500" },
-  "In-progress":    { label: "In-progress",  color: "text-amber-500" },
-  "Completed test": { label: "Completed",    color: "text-green-600" },
-  "Rejected test":  { label: "Rejected",     color: "text-red-500"   },
+const STATUS_STYLES = {
+  pending:     { label: "Pending",     color: "text-amber-500" },
+  in_progress: { label: "In Progress", color: "text-amber-500" },
+  completed:   { label: "Completed",   color: "text-green-600" },
+  rejected:    { label: "Rejected",    color: "text-red-500"   },
 };
 
-const specimenMap = {
-  "Malaria/Typhoid Test":  "Urine",
-  "Full Blood Count":      "Blood (EDTA)",
-  "Liver Function Test":   "Blood (Plain)",
-  "Blood Glucose":         "Blood (Fluoride)",
-  "Thyroid Function Test": "Blood (Plain)",
-  "Widal Test":            "Blood (Plain)",
-  "Hepatitis B Screen":    "Blood (Plain)",
-  "Electrolytes & Urea":   "Blood (Plain)",
-  "Urinalysis":            "Urine",
-  "Malaria RDT":           "Blood",
-  "HIV Screening":         "Blood",
-  "Kidney Function Test":  "Blood (Plain)",
-  "Blood Culture":         "Blood",
-  "Sputum Culture":        "Sputum",
+const getRefRange = (p) => {
+  if (p.ref_text) return p.ref_text;
+  if (p.ref_low != null && p.ref_high != null) return `${p.ref_low} – ${p.ref_high}`;
+  return "—";
 };
 
-const noteText =
-  "Axial CT images of the chest were obtained without intravenous contrast, from the lung apices through the diaphragm, using a 64-slice multidetector CT scanner. Images were reconstructed in 1.25 mm and 5 mm slices in the axial, coronal, and sagittal planes.";
-
-const dummyResultGroups = [
-  {
-    title: "Typhoid Fever (Widal Test)",
-    rows: [
-      { test: "Salmonella Typhi O",  result: "1:80", reference: "<1:160", status: "Negative" },
-      { test: "Salmonella Typhi H",  result: "1:80", reference: "<1:160", status: "Negative" },
-      { test: "Salmonella Paratyphi A", result: "1:160", reference: "<1:160", status: "Positive" },
-      { test: "Salmonella Paratyphi B", result: "1:80", reference: "<1:160", status: "Negative" },
-    ],
-  },
-  {
-    title: "Malaria Parasite Test",
-    rows: [
-      { test: "Malaria Microscopy", result: "No parasites seen", reference: "No parasites seen", status: "Negative" },
-      { test: "Malaria RDT",        result: "No parasites seen", reference: "No parasites seen", status: "Negative" },
-    ],
-  },
-];
-
-const interpretationPoints = [
-  "Typhoid Fever (Widal Test): All antibody titers (Salmonella Typhi and Paratyphi) are below the significant threshold of 1:160, indicating no serologic evidence of active typhoid fever.",
-  "Malaria Parasite Test: Both microscopy and RDT are negative, showing no evidence of malaria parasitemia.",
-];
-
-const clinicalCorrelationPoints = [
-  "Negative results for typhoid and malaria suggest that the patient's symptoms (e.g., fever, malaise) may be due to another etiology. Consider further diagnostic evaluation for other infectious or non-infectious causes.",
-  "Widal test results should be interpreted cautiously, as low titers may occur in endemic areas without active infection. Clinical history and repeat testing may be warranted if symptoms persist.",
-];
-
-const rejectionReason =
-  "Typhoid Fever (Widal Test): All antibody titers (Salmonella Typhi and Paratyphi) are below the significant threshold of 1:160, indicating no serologic evidence of active typhoid fever.";
-
-/* ─── helpers ─── */
-const PatientInfoCard = ({ order, isCompleted, isRejected }) => {
-  const requestedBy = order.requestedBy ?? "Dr. Lois David";
-  const email       = order.email       ?? "lab@hospital.com";
-  const age         = order.age         ?? "30 years";
-  const gender      = order.gender      ?? "Male";
-  const dateLabel   = isCompleted || isRejected ? "Date/Time uploaded" : "Date/Time requested:";
-
-  return (
-    <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <div className="flex flex-col gap-1">
-          <p className="text-sm font-bold text-[#1B2B40]">{order.name}</p>
-          <p className="text-xs text-gray-500">Patient HIN: {order.hin}</p>
-          <p className="text-xs text-gray-500">Age: {age}</p>
-          <p className="text-xs text-gray-500">Gender: {gender}</p>
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="text-xs text-gray-400">Requested by:</p>
-          <p className="text-sm font-bold text-[#1B2B40]">{requestedBy}</p>
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="text-xs text-gray-400">Provider information:</p>
-          <p className="text-sm font-bold text-[#1B2B40]">{order.hospital}</p>
-          <p className="text-xs text-gray-500">Email: {email}</p>
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="text-xs text-gray-400">{dateLabel}</p>
-          <p className="text-sm font-semibold text-[#1B2B40]">{order.datetime}</p>
-        </div>
-      </div>
-    </div>
-  );
+const getParamStatus = (value, p) => {
+  const num = parseFloat(value);
+  if (isNaN(num)) return null;
+  if (p.ref_low != null && p.ref_high != null) {
+    return num >= p.ref_low && num <= p.ref_high ? "Normal" : "Abnormal";
+  }
+  return null;
 };
 
 /* ─── main component ─── */
@@ -111,19 +41,26 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
     test:     "Malaria/Typhoid Test",
     hospital: "Lagos General Hospital",
     datetime: "30th, May., 2026/ 9:45 AM",
-    tab:      "Pending Test",
+    status:   "pending",
   };
 
   const queryClient = useQueryClient();
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
 
-  const status       = statusStyles[order.tab] ?? statusStyles["Pending Test"];
-  const specimen     = specimenMap[order.test]  ?? "Blood";
-  const isPending    = order.tab === "Pending Test";
-  const isInProgress = order.tab === "In-progress";
-  const isCompleted  = order.tab === "Completed test";
-  const isRejected   = order.tab === "Rejected test";
+  const statusStyle  = STATUS_STYLES[order.status] ?? STATUS_STYLES.pending;
+  const isPending    = order.status === "pending";
+  const isInProgress = order.status === "in_progress";
+  const isCompleted  = order.status === "completed";
+  const isRejected   = order.status === "rejected";
+
+  const specimens    = order.test_info?.specimens ?? [];
+  const preferredSpecimen = specimens.find((s) => s.is_preferred) ?? specimens[0];
+  const specimenLabel = preferredSpecimen
+    ? `${preferredSpecimen.name}${preferredSpecimen.container ? ` (${preferredSpecimen.container})` : ""}`
+    : "—";
+
+  const resultParams = order.result_info?.parameters ?? [];
 
   const headerLabel = isCompleted || isRejected ? "Lab result" : "Test";
 
@@ -167,7 +104,7 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <p className="text-xs sm:text-sm font-medium text-gray-700">
             Status:{" "}
-            <span className={`font-semibold ${status.color}`}>{status.label}</span>
+            <span className={`font-semibold ${statusStyle.color}`}>{statusStyle.label}</span>
           </p>
 
           {/* Pending */}
@@ -228,80 +165,112 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
           </div>
           <div>
             <p className="text-xs text-gray-500 mb-1">Specimen needed:</p>
-            <p className="text-sm font-semibold text-[#3E4095]">{specimen}</p>
+            <p className="text-sm font-semibold text-[#3E4095]">{specimenLabel}</p>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Note:</p>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{noteText}</p>
-          </div>
+          {order.test_info?.special_instructions && (
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Special instructions:</p>
+              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{order.test_info.special_instructions}</p>
+            </div>
+          )}
+          {order.note && (
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Note:</p>
+              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{order.note}</p>
+            </div>
+          )}
         </div>
       )}
 
-      {/* ── IN-PROGRESS: test details (no specimen) ── */}
+      {/* ── IN-PROGRESS: test details ── */}
       {isInProgress && (
         <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5 flex flex-col gap-4">
           <div>
             <p className="text-xs text-gray-500 mb-1">Test requested</p>
             <p className="text-sm font-semibold text-teal-600">{order.test}</p>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Note:</p>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{noteText}</p>
-          </div>
+          {order.specimen_collected_at && (
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Specimen collected:</p>
+              <p className="text-sm font-semibold text-[#1B2B40]">{order.specimen_collected_at}</p>
+            </div>
+          )}
+          {order.note && (
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Note:</p>
+              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{order.note}</p>
+            </div>
+          )}
         </div>
       )}
 
       {/* ── COMPLETED: result tables + interpretation ── */}
       {isCompleted && (
         <>
-          {dummyResultGroups.map((group, gi) => (
-            <div key={gi} className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
-              <p className="text-xs sm:text-sm font-semibold text-[#1B2B40] mb-4">{group.title}</p>
+          {resultParams.length > 0 && (
+            <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
+              <p className="text-xs sm:text-sm font-semibold text-[#1B2B40] mb-4">{order.test}</p>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left min-w-[420px]">
                   <thead>
                     <tr className="border-b border-gray-100 text-gray-500">
-                      <th className="pb-3 pr-4 font-medium text-xs sm:text-sm">Test</th>
+                      <th className="pb-3 pr-4 font-medium text-xs sm:text-sm">Parameter</th>
                       <th className="pb-3 pr-4 font-medium text-xs sm:text-sm">Result</th>
+                      <th className="pb-3 pr-4 font-medium text-xs sm:text-sm">Unit</th>
                       <th className="pb-3 pr-4 font-medium text-xs sm:text-sm">Reference range</th>
                       <th className="pb-3 font-medium text-xs sm:text-sm">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
-                    {group.rows.map((row, ri) => (
-                      <tr key={ri}>
-                        <td className="py-3 pr-4 text-xs sm:text-sm text-gray-600">{row.test}</td>
-                        <td className="py-3 pr-4 text-xs sm:text-sm text-gray-600">{row.result}</td>
-                        <td className="py-3 pr-4 text-xs sm:text-sm text-gray-500">{row.reference}</td>
-                        <td className={`py-3 text-xs sm:text-sm font-medium ${row.status === "Positive" ? "text-green-600" : "text-red-500"}`}>
-                          {row.status}
-                        </td>
-                      </tr>
-                    ))}
+                    {resultParams.map((p, i) => {
+                      const info = p.parameter_info;
+                      const paramStatus = getParamStatus(p.value, info);
+                      return (
+                        <tr key={i}>
+                          <td className="py-3 pr-4 text-xs sm:text-sm text-gray-600">{info.name}</td>
+                          <td className="py-3 pr-4 text-xs sm:text-sm text-gray-600">{p.value ?? "—"}</td>
+                          <td className="py-3 pr-4 text-xs sm:text-sm text-gray-500">{info.unit || "—"}</td>
+                          <td className="py-3 pr-4 text-xs sm:text-sm text-gray-500">{getRefRange(info)}</td>
+                          <td className={`py-3 text-xs sm:text-sm font-medium ${
+                            paramStatus === "Normal" ? "text-green-600"
+                            : paramStatus === "Abnormal" ? "text-red-500"
+                            : "text-gray-500"
+                          }`}>
+                            {paramStatus ?? "—"}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
             </div>
-          ))}
+          )}
 
-          {/* Interpretation + Clinical correlation */}
+          {/* Interpretation + Clinical correlation + Comments */}
           <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5 flex flex-col gap-5">
-            <div>
-              <p className="text-xs text-gray-500 mb-2">Interpretation:</p>
-              <ol className="list-decimal list-inside flex flex-col gap-2">
-                {interpretationPoints.map((pt, i) => (
-                  <li key={i} className="text-xs sm:text-sm text-gray-600 leading-relaxed">{pt}</li>
-                ))}
-              </ol>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 mb-2">Clinical correlation:</p>
-              <ol className="list-decimal list-inside flex flex-col gap-2">
-                {clinicalCorrelationPoints.map((pt, i) => (
-                  <li key={i} className="text-xs sm:text-sm text-gray-600 leading-relaxed">{pt}</li>
-                ))}
-              </ol>
-            </div>
+            {order.result_info?.interpretation && (
+              <div>
+                <p className="text-xs text-gray-500 mb-2">Interpretation:</p>
+                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                  {order.result_info.interpretation}
+                </p>
+              </div>
+            )}
+            {order.result_info?.clinical_correlation && (
+              <div>
+                <p className="text-xs text-gray-500 mb-2">Clinical correlation:</p>
+                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                  {order.result_info.clinical_correlation}
+                </p>
+              </div>
+            )}
+            {order.result_info?.comments && (
+              <div>
+                <p className="text-xs text-gray-500 mb-2">Comments:</p>
+                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{order.result_info.comments}</p>
+              </div>
+            )}
           </div>
         </>
       )}
@@ -310,54 +279,18 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
       {isRejected && (
         <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
           <p className="text-xs sm:text-sm font-semibold text-red-500 mb-2">Reason for rejection (note):</p>
-          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{order.rejection_reason || rejectionReason}</p>
+          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{order.rejection_reason || "No reason provided."}</p>
         </div>
       )}
 
-      {/* ── Reject Modal ── */}
-      {showRejectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-auto p-6 relative flex flex-col gap-4">
-            <button
-              onClick={() => setShowRejectModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X size={16} />
-            </button>
-
-            <h3 className="text-base font-semibold text-gray-800">Reject Request</h3>
-            <p className="text-xs text-gray-500">
-              Please provide a reason for rejecting this lab request. This will be visible to the requesting doctor.
-            </p>
-
-            <textarea
-              rows={4}
-              placeholder="Enter reason for rejection..."
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-red-400 resize-none transition-colors"
-            />
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowRejectModal(false)}
-                className="flex-1 border border-gray-300 text-gray-600 text-sm font-medium py-2.5 rounded-full hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => rejectMutation.mutate()}
-                disabled={rejectMutation.isPending || !rejectReason.trim()}
-                className="flex-1 bg-red-500 text-white text-sm font-semibold py-2.5 rounded-full hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
-              >
-                {rejectMutation.isPending ? (
-                  <><div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" /> Rejecting...</>
-                ) : "Confirm Rejection"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <RejectModal
+        isOpen={showRejectModal}
+        onClose={() => setShowRejectModal(false)}
+        onConfirm={() => rejectMutation.mutate()}
+        isPending={rejectMutation.isPending}
+        value={rejectReason}
+        onChange={setRejectReason}
+      />
     </>
   );
 };
