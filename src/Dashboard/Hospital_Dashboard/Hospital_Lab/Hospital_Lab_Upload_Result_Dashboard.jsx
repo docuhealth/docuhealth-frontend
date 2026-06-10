@@ -8,15 +8,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uploadLabResult } from "../../../queries/Hospital/lab/results";
 import toast from "react-hot-toast";
 
-const days   = Array.from({ length: 31 }, (_, i) => i + 1);
-const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const years  = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
-const times  = Array.from({ length: 24 }, (_, i) => {
-  const h    = i % 12 === 0 ? 12 : i % 12;
-  const ampm = i < 12 ? "AM" : "PM";
-  return `${String(h).padStart(2, "0")}:00 ${ampm}`;
-});
-
 const getRefRange = (p) => {
   if (p.ref_text) return p.ref_text;
   if (p.ref_low != null && p.ref_high != null) return `${p.ref_low} – ${p.ref_high}`;
@@ -34,14 +25,12 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
     [order]
   );
 
-  // { [sqid]: value }
-  const [paramValues, setParamValues]         = useState({});
-  const [interpretation, setInterpretation]   = useState("");
-  const [clinicalCorrelation, setClinical]    = useState("");
-  const [comments, setComments]               = useState("");
-  const [collectionDate, setCollectionDate]   = useState({ day: "", month: "", year: "", time: "" });
-  const [showConfirm, setShowConfirm]         = useState(false);
-  const [showSuccess, setShowSuccess]         = useState(false);
+  const [paramValues, setParamValues]       = useState({});
+  const [interpretation, setInterpretation] = useState("");
+  const [clinicalCorrelation, setClinical]  = useState("");
+  const [comments, setComments]             = useState("");
+  const [showConfirm, setShowConfirm]       = useState(false);
+  const [showSuccess, setShowSuccess]       = useState(false);
 
   const uploadMutation = useMutation({
     mutationFn: (payload) => uploadLabResult(payload),
@@ -58,17 +47,12 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
   });
 
   const handleConfirmUpload = () => {
-    const collDate = collectionDate.day && collectionDate.month && collectionDate.year
-      ? `${collectionDate.year}-${String(months.indexOf(collectionDate.month) + 1).padStart(2, "0")}-${String(collectionDate.day).padStart(2, "0")}`
-      : undefined;
-
     const payload = {
       order:                order?.id,
       parameters:           parameters.map((p) => ({ parameter: p.sqid, value: paramValues[p.sqid] ?? "" })),
       interpretation:       interpretation || undefined,
       clinical_correlation: clinicalCorrelation || undefined,
       comments:             comments || undefined,
-      specimen_collected_at: collDate,
     };
     uploadMutation.mutate(payload);
   };
@@ -182,59 +166,6 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
             onChange={(e) => setComments(e.target.value)}
             className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none focus:border-[#3E4095] resize-none transition-colors"
           />
-        </div>
-
-        {/* ── Collection date ── */}
-        <div className="border border-gray-200 rounded-xl p-4 sm:p-5 flex flex-col gap-4">
-          <p className="text-sm font-medium text-gray-700">Specimen collection date</p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-gray-500">Day</label>
-              <select
-                value={collectionDate.day}
-                onChange={(e) => setCollectionDate((p) => ({ ...p, day: e.target.value }))}
-                className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-[#3E4095] bg-white appearance-none"
-              >
-                <option value="">Select day</option>
-                {days.map((d) => <option key={d} value={d}>{d}</option>)}
-              </select>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-gray-500">Month</label>
-              <select
-                value={collectionDate.month}
-                onChange={(e) => setCollectionDate((p) => ({ ...p, month: e.target.value }))}
-                className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-[#3E4095] bg-white appearance-none"
-              >
-                <option value="">Select month</option>
-                {months.map((m) => <option key={m} value={m}>{m}</option>)}
-              </select>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-gray-500">Year</label>
-              <select
-                value={collectionDate.year}
-                onChange={(e) => setCollectionDate((p) => ({ ...p, year: e.target.value }))}
-                className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-[#3E4095] bg-white appearance-none"
-              >
-                <option value="">Select year</option>
-                {years.map((y) => <option key={y} value={y}>{y}</option>)}
-              </select>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1 w-full sm:max-w-xs">
-            <label className="text-xs text-gray-500">Time</label>
-            <select
-              value={collectionDate.time}
-              onChange={(e) => setCollectionDate((p) => ({ ...p, time: e.target.value }))}
-              className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-[#3E4095] bg-white appearance-none"
-            >
-              <option value="">Select time</option>
-              {times.map((t) => <option key={t} value={t}>{t}</option>)}
-            </select>
-          </div>
         </div>
 
         {/* ── Actions ── */}
