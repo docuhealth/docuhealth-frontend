@@ -156,10 +156,10 @@ const Partner_Home_Dashboard = () => {
             </div>
           </div>
           <a
-            href="mailto:info@docuhealth.online"
+            href="mailto:admin@docuhealthservices.net"
             className="bg-white border border-[#3E4095] text-[#3E4095] px-6 py-2 rounded-full font-semibold hover:bg-[#3E4095] hover:text-white transition-all duration-300 text-sm text-center w-full md:w-auto"
           >
-            info@docuhealth.online
+            admin@docuhealthservices.net
           </a>
         </div>
       </main>

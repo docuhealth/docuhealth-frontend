@@ -98,8 +98,8 @@ const Footer = () => {
             <ul className="space-y-2 2xl:text-lg text-sm text-[#EFEFEF] opacity-90">
               <li>+2348081988860</li>
               <li>
-                <a href="mailto:Info@docuhealth.online" className="hover:underline">
-                  Info@docuhealth.online
+                <a href="mailto:support@docuhealthservices.net" className="hover:underline">
+                  support@docuhealthservices.net
                 </a>
               </li>
             </ul>
@@ -126,13 +126,13 @@ const Footer = () => {
             <ul className="space-y-2 text-sm text-[#EFEFEF] opacity-90">
               <li>+2348081988860</li>
               <li>
-                <a href="mailto:Support@docuhealthservices.com">
-                  Support@docuhealthservices.com
+                <a href="mailto:support@docuhealthservices.net">
+                  support@docuhealthservices.net
                 </a>
               </li>
               <li>
-                <a href="mailto:Info@docuhealth.online">
-                  Info@docuhealth.online
+                <a href="mailto:support@docuhealthservices.net">
+                  support@docuhealthservices.net
                 </a>
               </li>
             </ul>
