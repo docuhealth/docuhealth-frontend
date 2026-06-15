@@ -35,8 +35,66 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
 
   const [selectedStaffForRole, setSelectedStaffForRole] = useState(null);
   const [newRole, setNewRole] = useState("");
+  const [newSpecialization, setNewSpecialization] = useState("");
 
   const queryClient = useQueryClient();
+
+  const doctorSpecializations = [
+    "Surgeon",
+    "General Dentist",
+    "Gynecologist",
+    "Obstetrician",
+    "Pediatrician",
+    "Cardiologist",
+    "Endocrinologist",
+    "General Practitioner",
+    "Neurologist",
+    "Dermatologist",
+    "Orthopedic",
+    "Radiologist",
+    "Anesthesiologist"
+  ];
+
+  const nurseSpecializations = [
+    "General Nurse / Registered Nurse (RN)",
+    "Pediatric Nurse",
+    "Geriatric Nurse",
+    "Neonatal Nurse",
+    "Obstetric / Midwife Nurse",
+    "Mental Health / Psychiatric Nurse",
+    "Oncology Nurse",
+    "Cardiac / Critical Care Nurse",
+    "Emergency / Trauma Nurse",
+    "Community Health Nurse",
+    "Home Health Nurse",
+    "Surgical / Operating Room (OR) Nurse",
+    "Nurse Anesthetist",
+    "Nurse Educator",
+    "Nurse Researcher",
+    "Infection Control Nurse",
+    "Hospice / Palliative Care Nurse",
+  ];
+
+  const labScientistSpecializations = [
+    "N/A",
+    "Hematology and Blood Transfusion",
+    "Chemical Pathology",
+    "Medical Microbiology",
+    "Immunology and Immunochemistry",
+    "Histopathology and Cytopathology",
+    "Molecular Diagnostics",
+    "Forensic Laboratory Science",
+  ];
+
+  const specializationOptions =
+    newRole === "doctor"
+      ? doctorSpecializations
+      : newRole === "nurse"
+        ? nurseSpecializations
+        : newRole === "lab_scientist"
+          ? labScientistSpecializations
+          : [];
+
 
   const sortedStaffs = useMemo(() => {
     const getDisplayName = (staff) => {
@@ -119,12 +177,13 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
   };
 
   const { mutate: updateRole, isPending: isUpdatingRole } = useMutation({
-    mutationFn: ({ staff_id, role }) =>
+    mutationFn: ({ staff_id, role, specialization }) =>
       // The staff_id goes in the URL path, not the body
       axiosInstanceHos.patch(
-        `/api/hospitals/team-member/${staff_id}/update-role`,
+        `/api/hospitals/team-member/${staff_id}/update`,
         {
           role: role, // Body only contains the role
+          ...(specialization && { specialization: specialization })
         },
       ),
     onSuccess: () => {
@@ -140,6 +199,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
   const handleUpdateRole = (staff) => {
     setSelectedStaffForRole(staff);
     setNewRole(staff.role); // Pre-fill with current role
+    setNewSpecialization(staff.specialization || ""); // Pre-fill with current specialization if any
 
     // console.log(staff)
     setActiveMenu(null);
@@ -152,6 +212,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     updateRole({
       staff_id: selectedStaffForRole.staff_id,
       role: newRole,
+      specialization: newSpecialization
     });
   };
 
@@ -617,7 +678,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
               <div className="bg-white rounded-lg p-5 w-full max-w-sm shadow-xl">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="font-medium text-md text-gray-800">
-                    Update Staff Role
+                    Update Staff Role & Specialization
                   </h3>
                   <button
                     onClick={() => setSelectedStaffForRole(null)}
@@ -637,7 +698,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                 </div>
 
                 <p className="text-xs text-gray-500 mb-6">
-                  Changing role for{" "}
+                  Updating info for{" "}
                   <span className="font-semibold text-gray-700">
                     {selectedStaffForRole.firstname}{" "}
                     {selectedStaffForRole.lastname}
@@ -651,7 +712,10 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                     </label>
                     <select
                       value={newRole}
-                      onChange={(e) => setNewRole(e.target.value)}
+                      onChange={(e) => {
+                        setNewRole(e.target.value);
+                        setNewSpecialization("");
+                      }}
                       className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-[#3E4095] outline-none"
                     >
                       <option value="doctor">Doctor</option>
@@ -662,6 +726,26 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                       <option value="lab_scientist">Lab Scientist</option>
                     </select>
                   </div>
+
+                  {newRole !== "receptionist" && newRole && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 uppercase mb-2">
+                        Select Specialization
+                      </label>
+                      <select
+                        value={newSpecialization}
+                        onChange={(e) => setNewSpecialization(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-[#3E4095] outline-none"
+                      >
+                        <option value="">Select Specialization (Optional)</option>
+                        {specializationOptions.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
 
                   <button
                     type="submit"
