@@ -72,7 +72,7 @@ const Hospital_Nurses_Appointments_Dashboard = () => {
             <div className="bg-white my-5  rounded-lg ">
               <div className=" border rounded-lg p-4 lg:p-6">
                 <h2 className=" mb-4 pb-2 border-b font-medium capitalize">
-                  {appointmentType === 'upcoming' ? 'Upcoming' : 'Past'} Appointments List
+                  {appointmentType === 'upcoming' ? 'Upcoming' : appointmentType === 'today' ? "Today's" : 'Past'} Appointments List
                 </h2>
                 <div>
                   <AppointmentsList setNewCaseNote={setNewCaseNote} setCaseNoteHistory={setCaseNoteHistory} setVitalSignsHistory={setVitalSignsHistory} setUpdateVitals={setUpdateVitals} setSelectedPatientForVitals={setSelectedPatientForVitals} setSelectedPatientForCASE={setSelectedPatientForCASE} setSharedSoapNoteHistory={setSharedSoapNoteHistory} setSelectedPatientForSharedSoap={setSelectedPatientForSharedSoap} />

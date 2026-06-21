@@ -60,6 +60,31 @@ const Nurse_Icon = () => (
   </svg>
 );
 
+const labCategories = [
+  "Hematology",
+  "Clinical Chemistry / Biochemistry",
+  "Microbiology & Parasitology",
+  "Endocrinology / Hormones",
+  "Tumor Markers",
+  "Molecular / PCR Tests",
+  "Histopathology / Cytology",
+  "Urinalysis & Body Fluids"
+];
+
+const labTestTypes = {
+  "Microbiology & Parasitology": [
+    "Malaria Rapid Diagnostic Test (RDT)",
+    "Malaria Microscopy (Blood Smear)",
+    "Widal Test (Typhoid)",
+    "Stool Microscopy / Ova & Parasite (O&P)",
+    "Urine Microscopy / Culture & Sensitivity",
+    "Sputum Microscopy / AFB (for TB)",
+    "Blood Culture",
+    "Throat Swab Culture",
+    "Wound Swab Culture"
+  ]
+};
+
 const OtherMedicalServices = ({
   setOtherMedicalServices,
   selectedPatientDetails,
@@ -69,11 +94,16 @@ const OtherMedicalServices = ({
   const [requestLoading, setRequestLoading] = useState(false);
   const [staffList, setStaffList] = useState([]);
   const [isStaffSelected, setIsStaffSelected] = useState(false);
+  const [isStaffSelectedRole, setIsStaffSelectedRole] = useState(null);
+  const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     staff_id: "",
     patient_hin: "",
     note: "",
+    category: "",
+    test_type: [],
+    specimen: "",
   });
 
   const medicalServices = [
@@ -88,7 +118,7 @@ const OtherMedicalServices = ({
       id: 2,
       title: "Order lab test",
       subtitle: "Request for lab test",
-      role: "lab_personnel",
+      role: "lab_scientist",
       icon: <Lab_Personnel_Icon />, // replace with your SVG
     },
     {
@@ -111,9 +141,6 @@ const OtherMedicalServices = ({
     setFormData((prev) => ({
       ...prev,
       staff_id: staffId,
-    }));
-    setFormData((prev) => ({
-      ...prev,
       patient_hin: selectedPatientDetails.patient.hin,
     }));
   };
@@ -121,7 +148,7 @@ const OtherMedicalServices = ({
   const handleSubmit = async () => {
     setLoading(true);
 
-    if (selected != "nurse") {
+    if (selected != "nurse" && selected != "lab_scientist") {
       toast.error("Feature coming soon");
       setLoading(false);
       return;
@@ -144,7 +171,7 @@ const OtherMedicalServices = ({
 
       // Store the data
       setStaffList(data);
-      // setIsStaffSelectedRole(selected.toLowerCase());
+      setIsStaffSelectedRole(selected);
       toast.success(`${selected} fetched successfully.`);
     } catch (err) {
       console.error("Error fetching medical personnel:", err);
@@ -182,6 +209,36 @@ const OtherMedicalServices = ({
      mutate(formData)
   };
 
+  const { mutate: labMutate, isPending: isLabPending } = useMutation({
+    mutationFn: (payload) => {
+      return axiosInstanceHos.post("api/doctors/lab/request", payload);
+    },
+    onSuccess: () => {
+      toast.success(
+        "You have successfully assigned patient to a lab scientist for a test",
+      );
+      setOtherMedicalServices(false);
+      setRequestLoading(false);
+    },
+    onError: (err) => {
+      console.error(
+        "Error assigning patient to lab scientist:",
+        err,
+      );
+      toast.error(
+        err.response?.data?.message || "Lab test request failed.",
+      );
+    },
+  });
+
+  const handleLabRequest = async () => {
+    if (!formData.category || formData.test_type.length === 0 || !formData.specimen || !formData.note) {
+      toast.error("Please fill in all lab test fields.");
+      return;
+    }
+    labMutate(formData);
+  };
+
   return (
     <>
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-3">
@@ -189,64 +246,209 @@ const OtherMedicalServices = ({
           isStaffSelected ? (
             <>
               <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => setOtherMedicalServices(false)}
-                    className="text-gray-500 hover:text-black"
-                  >
-                    <i className="bx bx-x text-2xl cursor-pointer"></i>
-                  </button>
-                </div>
-                <h2 className="text-center font-semibold text-lg text-gray-800">
-                  Request for Vitals
-                </h2>
-                <p className="text-center text-gray-500 mb-4 text-sm">
-                  Assign to a nurse for vitals checkup
-                </p>
-                <div className="mb-2 text-[12px]">
-                  <p className="mb-1 text-gray-700 font-medium">Add note :</p>
-                  <textarea
-                    className="border rounded-lg w-full  h-[100px] p-3 text-[12px] outline-none focus:border-[#3E4095]"
-                    value={formData.note}
-                    onChange={(e) =>
-                      setFormData({ ...formData, note: e.target.value })
-                    }
-                    placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
-                  ></textarea>
-                </div>
-                <button
-                  disabled={isPending || !formData.note}
-                  className={`mt-6 w-full cursor-pointer bg-[#3E4095] text-white py-2 rounded-full disabled:bg-[#3E4095]/60 ${isPending ? "bg-[#3E4095]/60 cursor-not-allowed" : ""}} text-sm `}
-                  onClick={handleRequest}
-                >
-                  {isPending ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg
-                        className="animate-spin h-4 w-4 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
+                {isStaffSelectedRole === "nurse" && (
+                  <>
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => setOtherMedicalServices(false)}
+                        className="text-gray-500 hover:text-black"
                       >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                        ></path>
-                      </svg>
-                      Processing Request
-                    </span>
-                  ) : (
-                    "Proceed"
-                  )}{" "}
-                </button>
+                        <i className="bx bx-x text-2xl cursor-pointer"></i>
+                      </button>
+                    </div>
+                    <h2 className="text-center font-semibold text-lg text-gray-800">
+                      Request for Vitals
+                    </h2>
+                    <p className="text-center text-gray-500 mb-4 text-sm">
+                      Assign to a nurse for vitals checkup
+                    </p>
+                    <div className="mb-2 text-[12px]">
+                      <p className="mb-1 text-gray-700 font-medium">Add note :</p>
+                      <textarea
+                        className="border rounded-lg w-full  h-[100px] p-3 text-[12px] outline-none focus:border-[#3E4095]"
+                        value={formData.note}
+                        onChange={(e) =>
+                          setFormData({ ...formData, note: e.target.value })
+                        }
+                        placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
+                      ></textarea>
+                    </div>
+                    <button
+                      disabled={isPending || !formData.note}
+                      className={`mt-6 w-full cursor-pointer bg-[#3E4095] text-white py-2 rounded-full disabled:bg-[#3E4095]/60 ${isPending ? "bg-[#3E4095]/60 cursor-not-allowed" : ""}} text-sm `}
+                      onClick={handleRequest}
+                    >
+                      {isPending ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg
+                            className="animate-spin h-4 w-4 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                            ></path>
+                          </svg>
+                          Processing Request
+                        </span>
+                      ) : (
+                        "Proceed"
+                      )}
+                    </button>
+                  </>
+                )}
+
+                {isStaffSelectedRole === "lab_scientist" && (
+                  <>
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => setOtherMedicalServices(false)}
+                        className="text-gray-500 hover:text-black"
+                      >
+                        <i className="bx bx-x text-2xl cursor-pointer"></i>
+                      </button>
+                    </div>
+                    <h2 className="text-center font-semibold text-lg text-gray-800">
+                      Order Lab test
+                    </h2>
+                    <p className="text-center text-gray-500 mb-4 text-sm">
+                      Kindly order a lab test
+                    </p>
+
+                    <div className="mb-4 text-[12px]">
+                      <p className="block font-medium text-gray-700 mb-1">Category</p>
+                      <div className="relative">
+                        <select 
+                          className="border rounded-lg w-full p-2.5 text-[12px] outline-none focus:border-[#3E4095] appearance-none"
+                          value={formData.category}
+                          onChange={(e) => {
+                             setFormData({ ...formData, category: e.target.value, test_type: [] });
+                          }}
+                        >
+                          <option value="" disabled>Select category</option>
+                          {labCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+                          <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mb-4 relative text-[12px]">
+                      <p className="block font-medium text-gray-700 mb-1">Test type</p>
+                      <div 
+                        className="border rounded-lg w-full p-2.5 outline-none focus:border-[#3E4095] flex justify-between items-center cursor-pointer bg-white"
+                        onClick={() => setIsTestTypeDropdownOpen(!isTestTypeDropdownOpen)}
+                      >
+                        <span className="truncate pr-2">
+                          {formData.test_type.length > 0 ? formData.test_type.join(", ") : "Select test type"}
+                        </span>
+                        <svg className="fill-current h-4 w-4 text-gray-700 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                      </div>
+                      
+                      {isTestTypeDropdownOpen && (
+                        <div className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                          {(labTestTypes[formData.category] || labTestTypes["Microbiology & Parasitology"]).map(test => (
+                            <label key={test} className="flex items-center p-2.5 hover:bg-gray-50 cursor-pointer border-b last:border-b-0">
+                              <input 
+                                type="checkbox" 
+                                className="mr-3 w-4 h-4 text-[#3E4095] rounded border-gray-300 focus:ring-[#3E4095]"
+                                checked={formData.test_type.includes(test)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setFormData({ ...formData, test_type: [...formData.test_type, test] });
+                                  } else {
+                                    setFormData({ ...formData, test_type: formData.test_type.filter(t => t !== test) });
+                                  }
+                                }}
+                              />
+                              <span className="text-[12px] text-gray-700">{test}</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mb-4 text-[12px]">
+                      <p className="block font-medium text-gray-700 mb-1">Specimen needed</p>
+                      <div className="relative">
+                        <select 
+                          className="border rounded-lg w-full p-2.5 text-[12px] outline-none focus:border-[#3E4095] appearance-none"
+                          value={formData.specimen}
+                          onChange={(e) => setFormData({ ...formData, specimen: e.target.value })}
+                        >
+                          <option value="" disabled>Select specimen needed</option>
+                          <option value="Suggestions: Blood (Serum/Plasma), Urine">Suggestions: Blood (Serum/Plasma), Urine</option>
+                          <option value="Blood (Serum/Plasma)">Blood (Serum/Plasma)</option>
+                          <option value="Urine">Urine</option>
+                          <option value="Stool">Stool</option>
+                          <option value="Sputum">Sputum</option>
+                          <option value="Swab">Swab</option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+                          <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mb-2 text-[12px]">
+                      <p className="mb-1 text-gray-700 font-medium">Add note:</p>
+                      <textarea
+                        className="border rounded-lg w-full h-[100px] p-3 text-[12px] outline-none focus:border-[#3E4095]"
+                        value={formData.note}
+                        onChange={(e) =>
+                          setFormData({ ...formData, note: e.target.value })
+                        }
+                        placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
+                      ></textarea>
+                    </div>
+
+                    <button
+                      disabled={isLabPending || !formData.note || !formData.category || formData.test_type.length === 0 || !formData.specimen}
+                      className={`mt-6 w-full cursor-pointer bg-[#3E4095] text-white py-2 rounded-full disabled:bg-[#3E4095]/60 ${isLabPending ? "bg-[#3E4095]/60 cursor-not-allowed" : ""}} text-sm `}
+                      onClick={handleLabRequest}
+                    >
+                      {isLabPending ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg
+                            className="animate-spin h-4 w-4 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                            ></path>
+                          </svg>
+                          Processing Request
+                        </span>
+                      ) : (
+                        "Proceed"
+                      )}
+                    </button>
+                  </>
+                )}
               </div>
             </>
           ) : (

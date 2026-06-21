@@ -4,12 +4,10 @@ export const fetchAppointments = async ({ queryKey }) => {
   const [_key, page, type, search, dateFrom, dateTo] = queryKey;
   const pageSize = 7;
 
-  // map 'history' to 'appointments/history' and 'upcoming' to 'appointments/upcoming'
-  const endpoint = type === 'history' ? 'appointments/history' : 'appointments/upcoming';
-
   const params = new URLSearchParams({
     page: page,
     size: pageSize,
+    timeframe: type,
   });
 
   if (search) params.append("search", search);
@@ -17,7 +15,7 @@ export const fetchAppointments = async ({ queryKey }) => {
   if (dateTo) params.append("scheduled_time_lte", dateTo);
 
   const res = await axiosInstanceHos.get(
-    `api/nurses/${endpoint}?${params.toString()}`,
+    `api/appointments/staff?${params.toString()}`,
   );
 
   return res.data;

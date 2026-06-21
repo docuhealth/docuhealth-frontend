@@ -132,13 +132,13 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
         }
         setLoading(true)
         try {
-            const res = await axiosInstanceHos.get(`api/receptionists/staff/${selected.toLowerCase()}`);
+            const res = await axiosInstanceHos.get(`api/receptionists/staff/${selected === 'Lab personnel' ? 'lab_scientist' : selected.toLowerCase()}`);
             if (!res.data || res.data.length === 0) {
                 toast.error(`No ${selected} currently available.`);
                 return;
             }
             setStaffList(res.data);
-            setIsStaffSelectedRole(selected.toLowerCase());
+            setIsStaffSelectedRole(selected === 'Lab personnel' ? 'lab_scientist' : selected.toLowerCase());
             toast.success(`${selected} fetched successfully.`);
             setLoading(false)
         } catch (err) {
@@ -238,6 +238,9 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                                         {/* If role is nurse: show only Vital checkup */}
                                         {isStaffSelectedRole === "nurse" && (
                                             <option value="vital">Vital checkup / other nursing services</option>
+                                        )}
+                                        {isStaffSelectedRole === "lab_scientist" && (
+                                            <option value="lab_test">Lab test</option>
                                         )}
                                         {/* <option value="male">Consultation</option>
                                         <option value="female">Vital checkup/other nursing services</option>

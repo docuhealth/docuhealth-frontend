@@ -62,12 +62,28 @@ const AppointmentsList = ({
   if (appointments.length === 0 && !searchQuery && !dateFrom && !dateTo) {
     return (
       <div className="flex flex-col justify-center items-center text-center h-full pb-10">
-        <div className="flex justify-end w-full mb-4">
-          <button
-            onClick={() => setAppointmentType(appointmentType === 'upcoming' ? 'history' : 'upcoming')}
-            className="border border-[#3E4095] text-[#3E4095] cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto">
-            {appointmentType === 'upcoming' ? "View past appointments" : "View upcoming appointments"}
-          </button>
+        <div className="flex flex-col sm:flex-row md:justify-end mb-8 gap-3 w-full">
+          {appointmentType !== 'history' && (
+            <button
+              onClick={() => setAppointmentType('history')}
+              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+              View past appointments
+            </button>
+          )}
+          {appointmentType !== 'today' && (
+            <button
+              onClick={() => setAppointmentType('today')}
+              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+              View today's appointments
+            </button>
+          )}
+          {appointmentType !== 'upcoming' && (
+            <button
+              onClick={() => setAppointmentType('upcoming')}
+              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+              View upcoming appointments
+            </button>
+          )}
         </div>
         <svg
           width="200"
@@ -123,12 +139,16 @@ const AppointmentsList = ({
           </defs>
         </svg>
 
-        <h2 className="font-medium pb-1">{appointmentType === 'upcoming' ? "No upcoming appointment!" : "No past appointments!"}</h2>
+        <h2 className="font-medium pb-1">
+          {appointmentType === 'upcoming' ? "No upcoming appointment!" : appointmentType === 'today' ? "No appointments today!" : "No past appointments!"}
+        </h2>
         <div className="max-w-md text-center">
           <p className="text-[12px] text-gray-500">
             {" "}
             {appointmentType === 'upcoming'
               ? "You currently don’t have any upcoming appointment/follow-up meeting in this hospital."
+              : appointmentType === 'today'
+              ? "You currently don’t have any appointment/follow-up meeting today."
               : "No appointment history found for this hospital."}
           </p>
         </div>
@@ -139,12 +159,28 @@ const AppointmentsList = ({
 
   return (
     <>
-      <div className="flex md:justify-end mb-4">
-        <button
-          onClick={() => setAppointmentType(appointmentType === 'upcoming' ? 'history' : 'upcoming')}
-          className="border border-[#3E4095] text-[#3E4095] cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto">
-          {appointmentType === 'upcoming' ? "View past appointments" : "View upcoming appointments"}
-        </button>
+      <div className="flex flex-col sm:flex-row md:justify-end mb-8 gap-3 w-full">
+        {appointmentType !== 'history' && (
+          <button
+            onClick={() => setAppointmentType('history')}
+            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+            View past appointments
+          </button>
+        )}
+        {appointmentType !== 'today' && (
+          <button
+            onClick={() => setAppointmentType('today')}
+            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+            View today's appointments
+          </button>
+        )}
+        {appointmentType !== 'upcoming' && (
+          <button
+            onClick={() => setAppointmentType('upcoming')}
+            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+            View upcoming appointments
+          </button>
+        )}
       </div>
 
       <div className="mb-4 w-full space-y-3">

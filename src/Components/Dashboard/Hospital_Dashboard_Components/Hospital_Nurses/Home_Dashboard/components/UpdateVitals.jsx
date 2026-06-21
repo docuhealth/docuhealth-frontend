@@ -52,7 +52,6 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
     !bloodPressure ||
     !temperature ||
     !respRate ||
-    !height ||
     !weight ||
     !heartRate;
 
@@ -143,7 +142,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
             </div>
           </div>
           <div className="relative">
-            <p className="pb-1">Height</p>
+            <p className="pb-1">Height (optional)</p>
             <div className="relative">
               <input
                 type="number"
