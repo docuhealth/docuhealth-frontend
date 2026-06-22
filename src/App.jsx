@@ -126,8 +126,6 @@ import HospitalLabProviders from "./Providers/Hospital/HospitalLabProviders";
 
 import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
 
-
-
 // import Snowfall from 'react-snowfall'
 // import Confetti from 'react-confetti'
 

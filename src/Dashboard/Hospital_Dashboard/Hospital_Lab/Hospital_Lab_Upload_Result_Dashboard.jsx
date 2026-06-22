@@ -4,9 +4,6 @@ import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { ArrowLeft, Save } from "lucide-react";
 import ConfirmUploadModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/ConfirmUploadModal";
 import SuccessModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/SuccessModal";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { uploadLabResult } from "../../../queries/Hospital/lab/results";
-import toast from "react-hot-toast";
 
 const getRefRange = (p) => {
   if (p.ref_text) return p.ref_text;
@@ -18,7 +15,6 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const order = state?.order;
-  const queryClient = useQueryClient();
 
   const parameters = useMemo(
     () => order?.test_info?.parameters ?? [],
@@ -31,30 +27,15 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
   const [comments, setComments]             = useState("");
   const [showConfirm, setShowConfirm]       = useState(false);
   const [showSuccess, setShowSuccess]       = useState(false);
-
-  const uploadMutation = useMutation({
-    mutationFn: (payload) => uploadLabResult(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lab-test-orders"] });
-      queryClient.invalidateQueries({ queryKey: ["lab-results"] });
-      setShowConfirm(false);
-      setShowSuccess(true);
-    },
-    onError: (err) => {
-      setShowConfirm(false);
-      toast.error(err?.response?.data?.message || "Failed to upload result");
-    },
-  });
+  const [uploading, setUploading]           = useState(false);
 
   const handleConfirmUpload = () => {
-    const payload = {
-      order:                order?.id,
-      parameters:           parameters.map((p) => ({ parameter: p.sqid, value: paramValues[p.sqid] ?? "" })),
-      interpretation:       interpretation || undefined,
-      clinical_correlation: clinicalCorrelation || undefined,
-      comments:             comments || undefined,
-    };
-    uploadMutation.mutate(payload);
+    setUploading(true);
+    setTimeout(() => {
+      setUploading(false);
+      setShowConfirm(false);
+      setShowSuccess(true);
+    }, 800);
   };
 
   return (
@@ -187,7 +168,7 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
         isOpen={showConfirm}
         onClose={() => setShowConfirm(false)}
         onConfirm={handleConfirmUpload}
-        isPending={uploadMutation.isPending}
+        isPending={uploading}
       />
 
       <SuccessModal

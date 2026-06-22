@@ -1,3 +1,5 @@
+import { Pencil } from "lucide-react";
+
 const calcAge = (dob) => {
   if (!dob) return null;
   const diff = Date.now() - new Date(dob).getTime();
@@ -5,21 +7,32 @@ const calcAge = (dob) => {
   return isNaN(years) ? null : `${years} years`;
 };
 
-const PatientInfoCard = ({ order, isCompleted, isRejected }) => {
+const PatientInfoCard = ({ order, isCompleted, isRejected, isInProgress, onEditSample }) => {
   const requestedBy = order.requestedBy ?? "—";
   const email       = order.email       ?? "—";
   const ageDisplay  = calcAge(order.dob) ?? "—";
   const gender      = order.gender      ?? "—";
-  const dateLabel   = isCompleted || isRejected ? "Date/Time uploaded" : "Date/Time requested:";
+  const dateLabel   = isCompleted || isRejected ? "Date/Time uploaded:" : "Date/Time of test request:";
+
+  const showSampleCol = isInProgress || isCompleted;
+  const gridCols = showSampleCol
+    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-5"
+    : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4";
 
   return (
     <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className={`grid ${gridCols} gap-4 sm:gap-6`}>
         <div className="flex flex-col gap-1">
           <p className="text-sm font-bold text-[#1B2B40]">{order.name}</p>
           <p className="text-xs text-gray-500">Patient HIN: {order.hin}</p>
           <p className="text-xs text-gray-500">Age: {ageDisplay}</p>
           <p className="text-xs text-gray-500">Gender: {gender}</p>
+          {order.payment_category && (
+            <p className="text-xs text-gray-500">
+              Payment category:{" "}
+              <span className="text-teal-600 font-medium">{order.payment_category}</span>
+            </p>
+          )}
         </div>
         <div className="flex flex-col gap-1">
           <p className="text-xs text-gray-400">Requested by:</p>
@@ -32,8 +45,27 @@ const PatientInfoCard = ({ order, isCompleted, isRejected }) => {
         </div>
         <div className="flex flex-col gap-1">
           <p className="text-xs text-gray-400">{dateLabel}</p>
-          <p className="text-sm font-semibold text-[#1B2B40]">{order.datetime}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold text-[#1B2B40]">{order.datetime}</p>
+            {isInProgress && onEditSample && (
+              <button
+                onClick={onEditSample}
+                className="text-gray-400 hover:text-[#3E4095] transition-colors"
+                title="Edit sample collection info"
+              >
+                <Pencil size={13} />
+              </button>
+            )}
+          </div>
         </div>
+        {showSampleCol && (
+          <div className="flex flex-col gap-1">
+            <p className="text-xs text-gray-400">Sample collection date:</p>
+            <p className="text-sm font-semibold text-[#1B2B40]">
+              {order.specimen_collected_at ?? (isCompleted ? order.datetime : "—")}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
