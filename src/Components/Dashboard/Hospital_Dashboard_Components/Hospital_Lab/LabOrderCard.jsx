@@ -32,32 +32,47 @@ const LabOrderCard = ({ order, badge, activeTab }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="border border-gray-200 rounded-xl p-4 flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-sm font-bold text-[#1B2B40] truncate">
-          {getPatientName(order)}
-        </p>
+    <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-4">
+      <div className="flex justify-between items-start">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs border border-indigo-100 uppercase">
+            {getPatientName(order).charAt(0)}
+          </div>
+          <div>
+             <p className="text-[10px] text-slate-400 uppercase font-bold">
+                Patient
+             </p>
+             <p className="text-sm font-semibold text-slate-800">
+                {getPatientName(order)}
+             </p>
+          </div>
+        </div>
         <span className={`text-[10px] font-semibold px-2 py-1 rounded-full whitespace-nowrap shrink-0 ${badge.cls}`}>
           {badge.label}
         </span>
       </div>
 
-      <p className="text-xs text-gray-400">HIN: {getHIN(order)}</p>
-
-      <hr className="border-gray-100" />
-
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-xs text-gray-500">
-          <FlaskConical size={14} className="text-gray-400 shrink-0" />
-          <span className="truncate">{getTestName(order)}</span>
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-50">
+          <div>
+            <p className="text-[10px] text-slate-400 uppercase font-medium">HIN</p>
+            <p className="text-[13px] text-slate-600">{getHIN(order)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-slate-400 uppercase font-medium">Date / Time</p>
+            <p className="text-[13px] text-slate-600">{getDatetime(order)}</p>
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-500">
-          <Building2 size={14} className="text-gray-400 shrink-0" />
-          <span className="truncate">{getHospital(order)}</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-gray-500">
-          <CalendarClock size={14} className="text-gray-400 shrink-0" />
-          <span>{getDatetime(order)}</span>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-[10px] text-slate-400 uppercase font-medium">Test</p>
+            <p className="text-[13px] text-slate-600 truncate" title={getTestName(order)}>{getTestName(order)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-slate-400 uppercase font-medium">Hospital</p>
+            <p className="text-[13px] text-slate-600 truncate" title={getHospital(order)}>{getHospital(order)}</p>
+          </div>
         </div>
       </div>
 
@@ -88,7 +103,7 @@ const LabOrderCard = ({ order, badge, activeTab }) => {
             },
           })
         }
-        className="mt-1 w-full border border-gray-300 text-xs text-gray-700 py-2 rounded-full hover:bg-gray-50 transition-colors"
+        className="mt-2 w-full border border-[#3E4095] text-[#3E4095] text-xs font-medium py-2 rounded-full hover:bg-indigo-50 transition-colors"
       >
         View details
       </button>

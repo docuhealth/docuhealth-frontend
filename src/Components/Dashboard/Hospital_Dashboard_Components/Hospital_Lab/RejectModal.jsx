@@ -5,7 +5,7 @@ const RejectModal = ({ isOpen, onClose, onConfirm, isPending, value, onChange })
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-auto p-6 relative flex flex-col gap-4">
+      <div className="bg-white rounded-md shadow-xl w-full max-w-md mx-auto p-6 relative flex flex-col gap-4">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
@@ -23,20 +23,20 @@ const RejectModal = ({ isOpen, onClose, onConfirm, isPending, value, onChange })
           placeholder="Enter reason for rejection..."
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-red-400 resize-none transition-colors"
+          className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-700 outline-none focus:border-red-400 resize-none transition-colors"
         />
 
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 border border-gray-300 text-gray-600 text-sm font-medium py-2.5 rounded-full hover:bg-gray-50 transition-colors"
+            className="flex-1 border border-gray-300 text-gray-600 text-sm font-medium py-2 rounded-full hover:bg-gray-50 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={isPending || !value.trim()}
-            className="flex-1 bg-red-500 text-white text-sm font-semibold py-2.5 rounded-full hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
+            className="flex-1 bg-red-500 text-white text-sm font-semibold py-2 rounded-full border border-transparent hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
           >
             {isPending ? (
               <><div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" /> Rejecting...</>

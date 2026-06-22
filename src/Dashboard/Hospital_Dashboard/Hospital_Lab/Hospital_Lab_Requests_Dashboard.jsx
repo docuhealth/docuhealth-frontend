@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { LabRequestsContext } from "../../../context/HospitalContext/Lab/LabRequestsContext";
 import LabOrderCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabOrderCard";
+import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 
 const tabs = ["Pending Test", "In-progress", "Completed test", "Rejected test"];
 
@@ -48,6 +49,7 @@ const Hospital_Lab_Requests_Dashboard = () => {
     categories,
     selectedCategory,
     setSelectedCategory,
+    count,
   } = useContext(LabRequestsContext);
 
   const goTo = (page) => {
@@ -61,32 +63,16 @@ const Hospital_Lab_Requests_Dashboard = () => {
       </div>
 
       <div className="mt-4 bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
-        {/* Tabs — mobile: 2×2 pill grid; sm+: underline row */}
-        <div className="sm:hidden grid grid-cols-2 gap-2 mb-5">
+        {/* Tabs */}
+        <div className="flex border-b border-gray-200 mb-5 overflow-x-auto hide-scrollbar">
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`py-2 px-3 text-xs font-medium rounded-lg text-center transition-colors ${
+              className={`text-sm px-2 sm:px-4 py-2 font-medium transition-colors duration-200 cursor-pointer whitespace-nowrap shrink-0 ${
                 activeTab === tab
-                  ? "bg-[#3E4095] text-white"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        <div className="hidden sm:flex items-center gap-6 border-b border-gray-100 mb-5 overflow-x-auto pb-px hide-scrollbar">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-3 text-sm font-medium whitespace-nowrap transition-colors shrink-0 ${
-                activeTab === tab
-                  ? "text-[#3E4095] border-b-2 border-[#3E4095]"
-                  : "text-gray-400 hover:text-gray-600"
+                  ? "text-[#3E4095] border-b-2 border-[#3E4095] font-semibold"
+                  : "text-gray-600 hover:text-gray-800"
               }`}
             >
               {tab}
@@ -152,40 +138,12 @@ const Hospital_Lab_Requests_Dashboard = () => {
         )}
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-6">
-          <p className="text-xs text-gray-400">
-            Page {currentPage} of {totalPages}
-          </p>
-          <div className="flex items-center gap-1 flex-wrap">
-            <button
-              onClick={() => goTo(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronLeft size={15} />
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => goTo(page)}
-                className={`w-8 h-8 flex items-center justify-center rounded-full text-xs font-semibold transition-colors ${
-                  page === currentPage
-                    ? "bg-[#3E4095] text-white"
-                    : "text-gray-500 hover:bg-gray-100"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-            <button
-              onClick={() => goTo(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronRight size={15} />
-            </button>
-          </div>
-        </div>
+        <Pagination2
+          count={count}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+        />
       </div>
     </>
   );

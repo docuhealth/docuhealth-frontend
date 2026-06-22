@@ -28,6 +28,12 @@ const getParamStatus = (value, p) => {
   return null;
 };
 
+const ParamIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" />
+  </svg>
+);
+
 /* ─── main component ─── */
 const Hospital_Lab_Test_Detail_Dashboard = () => {
   const navigate  = useNavigate();
@@ -232,38 +238,37 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
             <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
               <p className="text-xs sm:text-sm font-semibold text-[#1B2B40] mb-4">{order.test}</p>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left min-w-[420px]">
-                  <thead>
-                    <tr className="border-b border-gray-100 text-gray-500">
-                      <th className="pb-3 pr-4 font-medium text-xs sm:text-sm">Parameter</th>
-                      <th className="pb-3 pr-4 font-medium text-xs sm:text-sm">Result</th>
-                      <th className="pb-3 pr-4 font-medium text-xs sm:text-sm">Unit</th>
-                      <th className="pb-3 pr-4 font-medium text-xs sm:text-sm">Reference range</th>
-                      <th className="pb-3 font-medium text-xs sm:text-sm">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {resultParams.map((p, i) => {
-                      const info = p.parameter_info;
-                      const paramStatus = getParamStatus(p.value, info);
-                      return (
-                        <tr key={i}>
-                          <td className="py-3 pr-4 text-xs sm:text-sm text-gray-600">{info.name}</td>
-                          <td className="py-3 pr-4 text-xs sm:text-sm text-gray-600">{p.value ?? "—"}</td>
-                          <td className="py-3 pr-4 text-xs sm:text-sm text-gray-500">{info.unit || "—"}</td>
-                          <td className="py-3 pr-4 text-xs sm:text-sm text-gray-500">{getRefRange(info)}</td>
-                          <td className={`py-3 text-xs sm:text-sm font-medium ${
-                            paramStatus === "Normal" ? "text-green-600"
-                            : paramStatus === "Abnormal" ? "text-red-500"
-                            : "text-gray-500"
-                          }`}>
-                            {paramStatus ?? "—"}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                <div className="min-w-[600px] flex flex-col mt-2">
+                  <div className="grid grid-cols-6 text-left text-sm bg-gray-100 py-5 rounded-md">
+                    <div className="col-span-2 pl-5">Parameter</div>
+                    <p>Result</p>
+                    <p>Unit</p>
+                    <p>Reference range</p>
+                    <p>Status</p>
+                  </div>
+                  {resultParams.map((p, i) => {
+                    const info = p.parameter_info;
+                    const paramStatus = getParamStatus(p.value, info);
+                    return (
+                      <div key={i} className="grid grid-cols-6 items-center text-[12px] text-gray-700 border-b border-b-gray-200">
+                        <div className="font-semibold col-span-2 py-6 pl-5 flex items-center gap-1.5 text-gray-600">
+                          <ParamIcon />
+                          <p>{info.name}</p>
+                        </div>
+                        <p>{p.value ?? "—"}</p>
+                        <p>{info.unit || "—"}</p>
+                        <p>{getRefRange(info)}</p>
+                        <p className={`capitalize font-medium ${
+                          paramStatus === "Normal" ? "text-green-600"
+                          : paramStatus === "Abnormal" ? "text-red-500"
+                          : "text-gray-500"
+                        }`}>
+                          {paramStatus ?? "—"}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}
@@ -307,7 +312,7 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
       {/* ── Accept confirmation modal ── */}
       {showAcceptModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 flex flex-col items-center gap-4">
+          <div className="bg-white rounded-md shadow-xl w-full max-w-md p-6 flex flex-col items-center gap-4">
             <button
               onClick={() => setShowAcceptModal(false)}
               className="self-end -mt-2 -mr-2 text-gray-400 hover:text-gray-600"
@@ -322,12 +327,12 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               </svg>
             </div>
             <h3 className="text-base font-semibold text-gray-800 text-center">Confirm Test Acceptance</h3>
-            <p className="text-sm text-gray-600 text-center leading-relaxed border border-gray-200 rounded-lg px-4 py-3">
+            <p className="text-sm text-gray-600 text-center leading-relaxed border border-gray-200 rounded-md px-4 py-3">
               By proceeding you confirm that you are ready and capable of proceeding with the test requested. Kindly note that sample collection can be logged in now or later!
             </p>
             <button
               onClick={() => { setShowAcceptModal(false); setShowSampleModal(true); }}
-              className="w-full bg-[#3E4095] text-white text-sm font-medium py-3 rounded-full hover:bg-indigo-700 transition-colors"
+              className="w-full bg-[#3E4095] text-white text-sm font-medium py-3 rounded-full border border-transparent transition-colors"
             >
               Accept &amp; Log sample collection now
             </button>
@@ -345,11 +350,11 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
       {/* ── Sample Collection Info modal ── */}
       {showSampleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 flex flex-col gap-5">
+          <div className="bg-white rounded-md shadow-xl w-full max-w-md p-6 flex flex-col gap-5">
             {/* Header */}
             <div className="relative flex items-start justify-center">
               <div className="text-center">
-                <h3 className="text-lg font-bold text-gray-900">Edit Sample Collection Info</h3>
+                <h3 className="text-base font-semibold text-gray-900">Edit Sample Collection Info</h3>
                 <p className="text-sm text-gray-500 mt-1">Kindly fill up to proceed!</p>
               </div>
               <button
@@ -386,27 +391,21 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
             <div className="flex gap-3">
               <div className="flex flex-col gap-1.5 flex-1">
                 <label className="text-sm text-gray-500">New sample collection date</label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={sampleDate}
-                    onChange={(e) => setSampleDate(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white outline-none w-full pr-9 focus:border-[#3E4095] transition-colors"
-                  />
-                  <Calendar size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#3E4095] pointer-events-none" />
-                </div>
+                <input
+                  type="date"
+                  value={sampleDate}
+                  onChange={(e) => setSampleDate(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white outline-none w-full focus:border-[#3E4095] transition-colors"
+                />
               </div>
               <div className="flex flex-col gap-1.5 flex-1">
                 <label className="text-sm text-gray-500">New sample Collection Time</label>
-                <div className="relative">
-                  <input
-                    type="time"
-                    value={sampleTime}
-                    onChange={(e) => setSampleTime(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white outline-none w-full pr-9 focus:border-[#3E4095] transition-colors"
-                  />
-                  <Clock size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#3E4095] pointer-events-none" />
-                </div>
+                <input
+                  type="time"
+                  value={sampleTime}
+                  onChange={(e) => setSampleTime(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white outline-none w-full focus:border-[#3E4095] transition-colors"
+                />
               </div>
             </div>
 
@@ -417,7 +416,7 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
                 acceptMutation.mutate();
               }}
               disabled={!sampleDate || !sampleTime || acceptMutation.isPending}
-              className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3.5 rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-50"
+              className="w-full bg-[#3E4095] text-white text-sm font-semibold py-2.5 rounded-full transition-colors disabled:opacity-50"
             >
               {acceptMutation.isPending ? (
                 <span className="flex items-center justify-center gap-2">
