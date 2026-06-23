@@ -8,6 +8,14 @@ import LabAppointmentMobileCard from "../../../Components/Dashboard/Hospital_Das
 
 const filterOptions = ["All", "Today", "This week", "This month"];
 
+const getPatientName = (appt) =>
+  appt.patient_name ||
+  (appt.patient ? `${appt.patient.firstname || ""} ${appt.patient.lastname || ""}`.trim() : "") ||
+  appt.name ||
+  "Unknown";
+
+const getTestName = (appt) => appt.test_name || appt.test || "Test request";
+
 const Hospital_Lab_Appointments_Dashboard = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
@@ -18,19 +26,19 @@ const Hospital_Lab_Appointments_Dashboard = () => {
   const handleOpen = (appt) => {
     navigate("/hospital-lab-appointment-detail", {
       state: {
-        order: {
-          id:       appt.id,
-          name:     getPatientName(appt),
-          hin:      appt.patient_hin || appt.patient?.hin || appt.hin || "—",
-          test:     getTestName(appt),
-          hospital: appt.hospital_name || appt.hospital || "—",
-          datetime: appt.scheduled_at || appt.datetime || "—",
-          tab:      "Pending Test",
-          requestedBy: appt.requested_by || appt.doctor?.firstname
-            ? `Dr. ${appt.doctor?.firstname || ""} ${appt.doctor?.lastname || ""}`.trim()
-            : undefined,
+        appt: {
+          id:          appt.id,
+          name:        getPatientName(appt),
+          hin:         appt.patient_hin || appt.patient?.hin || appt.hin || "—",
+          test:        getTestName(appt),
+          hospital:    appt.hospital_name || appt.hospital || "—",
+          scheduledAt: appt.scheduled_at || appt.datetime || null,
+          requestedBy: appt.requested_by ||
+            (appt.doctor ? `Dr. ${appt.doctor.firstname || ""} ${appt.doctor.lastname || ""}`.trim() : undefined),
           age:    appt.patient?.age,
           gender: appt.patient?.sex || appt.patient?.gender,
+          status: appt.status || "upcoming",
+          note:   appt.note || appt.doctor_note || appt.description,
         },
       },
     });

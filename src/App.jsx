@@ -122,6 +122,7 @@ import Hospital_Lab_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/Hosp
 import Hospital_Lab_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_HealthPersonnel_Dashboard";
 import Hospital_Lab_Upload_Result_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Upload_Result_Dashboard";
 import Hospital_Lab_Results_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Results_Dashboard";
+import Hospital_Lab_Appointment_Detail_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Appointment_Detail_Dashboard";
 import HospitalLabProviders from "./Providers/Hospital/HospitalLabProviders";
 
 import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
@@ -138,8 +139,8 @@ function App() {
   const hostname = window.location.hostname;
 
   //Adjust the condition to remove the true value when deploying to production. This is just for testing purposes to always render the hospital routes.
+  const isHospital = hostname.startsWith("hospital.");
   // const isHospital = true || hostname.startsWith("hospital.");
-  const isHospital = true || hostname.startsWith("hospital.");
 
   return (
     <HelmetProvider>
@@ -663,7 +664,7 @@ function App() {
                 element={
                   <HospitalProtectedRoute>
                     <HospitalLabProviders>
-                      <Hospital_Lab_Test_Detail_Dashboard />
+                      <Hospital_Lab_Appointment_Detail_Dashboard />
                     </HospitalLabProviders>
                   </HospitalProtectedRoute>
                 }
