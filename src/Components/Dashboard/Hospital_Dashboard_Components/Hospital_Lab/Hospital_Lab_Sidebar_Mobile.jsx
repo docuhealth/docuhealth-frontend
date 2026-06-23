@@ -3,6 +3,12 @@ import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { LabAppContext } from "../../../../context/HospitalContext/Lab/LabAppContext";
 
+const TEST_ORDERS_ROUTES = [
+  "/hospital-lab-requests-dashboard",
+  "/hospital-lab-test-detail",
+  "/hospital-lab-upload-result",
+];
+
 const Hospital_Lab_Sidebar_Mobile = ({ openMobileSidebar, setOpenMobileSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -61,10 +67,10 @@ const Hospital_Lab_Sidebar_Mobile = ({ openMobileSidebar, setOpenMobileSidebar }
             {/* Lab Requests */}
             <Link to="/hospital-lab-requests-dashboard" onClick={() => setOpenMobileSidebar(false)}>
               <div className="px-4 my-4">
-                <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-requests-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
+                <li className={`group px-4 py-2 ${TEST_ORDERS_ROUTES.includes(currentPath) ? "bg-[#3E4095] text-white" : "text-gray-700"} text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                   <span>
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10.9968 1.8883L13.7052 6.57927C13.9352 6.97785 13.7987 7.4875 13.4001 7.71762L12.3172 8.3419L13.1509 9.78599L11.7075 10.6193L10.8737 9.17524L9.79167 9.80099C9.39308 10.0311 8.88342 9.89449 8.65333 9.49591L7.12183 6.84387C5.41152 7.36279 4.16667 8.95182 4.16667 10.8317C4.16667 11.3528 4.26233 11.8516 4.43706 12.3114C5.08267 11.9017 5.84702 11.665 6.66667 11.665C8.07007 11.665 9.31142 12.3588 10.0664 13.4222L16.4734 9.72365L17.3068 11.1671L10.7415 14.9575C10.8017 15.2394 10.8333 15.5318 10.8333 15.8317C10.8333 16.1172 10.8046 16.3962 10.7499 16.6656L17.5 16.665V18.3317L3.33378 18.3327C2.81025 17.6362 2.5 16.7702 2.5 15.8317C2.5 14.9923 2.74818 14.2109 3.17517 13.5569C2.74397 12.744 2.5 11.8163 2.5 10.8317C2.5 8.33557 4.06776 6.20566 6.27231 5.37289L5.94497 4.80496C5.48474 4.00781 5.75787 2.9885 6.55503 2.52825L8.72008 1.27825C9.51725 0.81802 10.5366 1.09115 10.9968 1.8883ZM6.66667 13.3317C5.28596 13.3317 4.16667 14.451 4.16667 15.8317C4.16667 16.1238 4.21678 16.4043 4.30889 16.6649H9.02442C9.11658 16.4043 9.16667 16.1238 9.16667 15.8317C9.16667 14.451 8.04737 13.3317 6.66667 13.3317ZM9.55342 2.72163L7.38835 3.97163L9.68 7.94091L11.8451 6.69091L9.55342 2.72163Z" className={`group-hover:fill-white ${currentPath === "/hospital-lab-requests-dashboard" ? "fill-white" : "fill-[#647284]"}`} />
+                      <path d="M10.9968 1.8883L13.7052 6.57927C13.9352 6.97785 13.7987 7.4875 13.4001 7.71762L12.3172 8.3419L13.1509 9.78599L11.7075 10.6193L10.8737 9.17524L9.79167 9.80099C9.39308 10.0311 8.88342 9.89449 8.65333 9.49591L7.12183 6.84387C5.41152 7.36279 4.16667 8.95182 4.16667 10.8317C4.16667 11.3528 4.26233 11.8516 4.43706 12.3114C5.08267 11.9017 5.84702 11.665 6.66667 11.665C8.07007 11.665 9.31142 12.3588 10.0664 13.4222L16.4734 9.72365L17.3068 11.1671L10.7415 14.9575C10.8017 15.2394 10.8333 15.5318 10.8333 15.8317C10.8333 16.1172 10.8046 16.3962 10.7499 16.6656L17.5 16.665V18.3317L3.33378 18.3327C2.81025 17.6362 2.5 16.7702 2.5 15.8317C2.5 14.9923 2.74818 14.2109 3.17517 13.5569C2.74397 12.744 2.5 11.8163 2.5 10.8317C2.5 8.33557 4.06776 6.20566 6.27231 5.37289L5.94497 4.80496C5.48474 4.00781 5.75787 2.9885 6.55503 2.52825L8.72008 1.27825C9.51725 0.81802 10.5366 1.09115 10.9968 1.8883ZM6.66667 13.3317C5.28596 13.3317 4.16667 14.451 4.16667 15.8317C4.16667 16.1238 4.21678 16.4043 4.30889 16.6649H9.02442C9.11658 16.4043 9.16667 16.1238 9.16667 15.8317C9.16667 14.451 8.04737 13.3317 6.66667 13.3317ZM9.55342 2.72163L7.38835 3.97163L9.68 7.94091L11.8451 6.69091L9.55342 2.72163Z" className={`group-hover:fill-white ${TEST_ORDERS_ROUTES.includes(currentPath) ? "fill-white" : "fill-[#647284]"}`} />
                     </svg>
                   </span>
                   Test Orders
@@ -89,10 +95,10 @@ const Hospital_Lab_Sidebar_Mobile = ({ openMobileSidebar, setOpenMobileSidebar }
             {/* Appointments */}
             <Link to="/hospital-lab-appointments-dashboard" onClick={() => setOpenMobileSidebar(false)}>
               <div className="px-4 my-4">
-                <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-appointments-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
+                <li className={`group px-4 py-2 ${["/hospital-lab-appointments-dashboard", "/hospital-lab-appointment-detail"].includes(currentPath) ? "bg-[#3E4095] text-white" : "text-gray-700"} text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                   <span>
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5.83464 2.49992V0.833252H7.5013V2.49992H12.5013V0.833252H14.168V2.49992H17.5013C17.9616 2.49992 18.3346 2.87302 18.3346 3.33325V7.49992H16.668V4.16659H14.168V5.83325H12.5013V4.16659H7.5013V5.83325H5.83464V4.16659H3.33464V15.8333H8.33464V17.4999H2.5013C2.04107 17.4999 1.66797 17.1268 1.66797 16.6666V3.33325C1.66797 2.87302 2.04107 2.49992 2.5013 2.49992H5.83464ZM14.168 9.99992C12.3271 9.99992 10.8346 11.4923 10.8346 13.3333C10.8346 15.1742 12.3271 16.6666 14.168 16.6666C16.0089 16.6666 17.5013 15.1742 17.5013 13.3333C17.5013 11.4923 16.0089 9.99992 14.168 9.99992ZM9.16797 13.3333C9.16797 10.5718 11.4066 8.33325 14.168 8.33325C16.9294 8.33325 19.168 10.5718 19.168 13.3333C19.168 16.0947 16.9294 18.3333 14.168 18.3333C11.4066 18.3333 9.16797 16.0947 9.16797 13.3333ZM13.3346 10.8333V13.6784L15.2454 15.5892L16.4239 14.4107L15.0013 12.9881V10.8333H13.3346Z" className={`group-hover:fill-white ${currentPath === "/hospital-lab-appointments-dashboard" ? "fill-white" : "fill-[#647284]"}`} />
+                      <path d="M5.83464 2.49992V0.833252H7.5013V2.49992H12.5013V0.833252H14.168V2.49992H17.5013C17.9616 2.49992 18.3346 2.87302 18.3346 3.33325V7.49992H16.668V4.16659H14.168V5.83325H12.5013V4.16659H7.5013V5.83325H5.83464V4.16659H3.33464V15.8333H8.33464V17.4999H2.5013C2.04107 17.4999 1.66797 17.1268 1.66797 16.6666V3.33325C1.66797 2.87302 2.04107 2.49992 2.5013 2.49992H5.83464ZM14.168 9.99992C12.3271 9.99992 10.8346 11.4923 10.8346 13.3333C10.8346 15.1742 12.3271 16.6666 14.168 16.6666C16.0089 16.6666 17.5013 15.1742 17.5013 13.3333C17.5013 11.4923 16.0089 9.99992 14.168 9.99992ZM9.16797 13.3333C9.16797 10.5718 11.4066 8.33325 14.168 8.33325C16.9294 8.33325 19.168 10.5718 19.168 13.3333C19.168 16.0947 16.9294 18.3333 14.168 18.3333C11.4066 18.3333 9.16797 16.0947 9.16797 13.3333ZM13.3346 10.8333V13.6784L15.2454 15.5892L16.4239 14.4107L15.0013 12.9881V10.8333H13.3346Z" className={`group-hover:fill-white ${["/hospital-lab-appointments-dashboard", "/hospital-lab-appointment-detail"].includes(currentPath) ? "fill-white" : "fill-[#647284]"}`} />
                     </svg>
                   </span>
                   Appointments
