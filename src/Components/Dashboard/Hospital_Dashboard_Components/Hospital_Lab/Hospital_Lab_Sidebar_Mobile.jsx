@@ -78,19 +78,6 @@ const Hospital_Lab_Sidebar_Mobile = ({ openMobileSidebar, setOpenMobileSidebar }
               </div>
             </Link>
 
-            {/* Results */}
-            <Link to="/hospital-lab-results-dashboard" onClick={() => setOpenMobileSidebar(false)}>
-              <div className="px-4 my-4">
-                <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-results-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
-                  <span>
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5 2.5C4.08 2.5 3.33333 3.24667 3.33333 4.16667V15.8333C3.33333 16.7533 4.08 17.5 5 17.5H15C15.92 17.5 16.6667 16.7533 16.6667 15.8333V7.5L11.6667 2.5H5ZM5 4.16667H10.8333V8.33333H15V15.8333H5V4.16667ZM6.66667 10V11.6667H13.3333V10H6.66667ZM6.66667 13.3333V15H10.8333V13.3333H6.66667Z" className={`group-hover:fill-white ${currentPath === "/hospital-lab-results-dashboard" ? "fill-white" : "fill-[#647284]"}`} />
-                    </svg>
-                  </span>
-                  Results
-                </li>
-              </div>
-            </Link>
 
             {/* Appointments */}
             <Link to="/hospital-lab-appointments-dashboard" onClick={() => setOpenMobileSidebar(false)}>
