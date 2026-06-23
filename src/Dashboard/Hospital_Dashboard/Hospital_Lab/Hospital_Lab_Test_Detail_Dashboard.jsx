@@ -1,10 +1,16 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { ArrowLeft, Printer, Download, Calendar, Clock, X } from "lucide-react";
 import PatientInfoCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/PatientInfoCard";
 import RejectModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/RejectModal";
 import toast from "react-hot-toast";
+import {
+  acceptLabRequest,
+  rejectLabRequest,
+  logSpecimenCollectionTime,
+} from "../../../queries/Hospital/lab/requests";
 
 const STATUS_STYLES = {
   pending:     { label: "Pending",     color: "text-amber-500" },
@@ -51,12 +57,11 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [showSampleModal, setShowSampleModal] = useState(false);
+  const [fromAccept, setFromAccept] = useState(false);
   const [sampleLogged, setSampleLogged] = useState(!!order.specimen_collected_at);
   const [sampleDate, setSampleDate] = useState("");
   const [sampleTime, setSampleTime] = useState("");
   const [rejectReason, setRejectReason] = useState("");
-  const [accepting, setAccepting] = useState(false);
-  const [rejecting, setRejecting] = useState(false);
 
   const statusStyle  = STATUS_STYLES[order.status] ?? STATUS_STYLES.pending;
   const isPending    = order.status === "pending";
@@ -74,29 +79,47 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
 
   const headerLabel = isCompleted || isRejected ? "Lab result" : "Test";
 
-  const acceptMutation = {
-    mutate: () => {
-      setAccepting(true);
-      setTimeout(() => {
-        setAccepting(false);
-        toast.success("Request accepted — moved to In-progress");
-        navigate(-1);
-      }, 800);
-    },
-    isPending: accepting,
+  const acceptMutation = useMutation({ mutationFn: () => acceptLabRequest(order.id) });
+  const rejectMutation = useMutation({ mutationFn: ({ reason }) => rejectLabRequest({ sqid: order.id, reason }) });
+  const specimenMutation = useMutation({ mutationFn: (data) => logSpecimenCollectionTime(data) });
+
+  const handleAcceptLater = async () => {
+    try {
+      await acceptMutation.mutateAsync();
+      toast.success("Request accepted — moved to In-progress");
+      setShowAcceptModal(false);
+      navigate(-1);
+    } catch {
+      toast.error("Failed to accept request. Please try again.");
+    }
   };
 
-  const rejectMutation = {
-    mutate: () => {
-      setRejecting(true);
-      setTimeout(() => {
-        setRejecting(false);
-        toast.success("Request rejected");
-        setShowRejectModal(false);
-        navigate(-1);
-      }, 800);
-    },
-    isPending: rejecting,
+  const handleReject = async () => {
+    try {
+      await rejectMutation.mutateAsync({ reason: rejectReason });
+      toast.success("Request rejected");
+      setShowRejectModal(false);
+      navigate(-1);
+    } catch {
+      toast.error("Failed to reject request. Please try again.");
+    }
+  };
+
+  const handleSampleSubmit = async () => {
+    const specimen_collected_at = `${sampleDate}T${sampleTime}:00`;
+    try {
+      if (fromAccept) {
+        await acceptMutation.mutateAsync();
+        toast.success("Request accepted");
+      }
+      await specimenMutation.mutateAsync({ sqid: order.id, specimen_collected_at });
+      toast.success(fromAccept ? "Sample collection logged" : "Sample collection updated");
+      setShowSampleModal(false);
+      setSampleLogged(true);
+      if (fromAccept) navigate(-1);
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -126,19 +149,17 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
             <>
               <button
                 onClick={() => setShowRejectModal(true)}
-                disabled={acceptMutation.isPending}
+                disabled={acceptMutation.isPending || rejectMutation.isPending}
                 className="border border-red-400 text-red-500 text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-red-50 transition-colors disabled:opacity-50"
               >
                 Reject request
               </button>
               <button
                 onClick={() => setShowAcceptModal(true)}
-                disabled={acceptMutation.isPending}
+                disabled={acceptMutation.isPending || rejectMutation.isPending}
                 className="border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50 flex items-center gap-1"
               >
-                {acceptMutation.isPending ? (
-                  <><div className="w-3 h-3 border-2 border-[#3E4095] border-t-transparent rounded-full animate-spin" /> Accepting...</>
-                ) : "Accept request"}
+                Accept request
               </button>
             </>
           )}
@@ -331,17 +352,19 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               By proceeding you confirm that you are ready and capable of proceeding with the test requested. Kindly note that sample collection can be logged in now or later!
             </p>
             <button
-              onClick={() => { setShowAcceptModal(false); setShowSampleModal(true); }}
+              onClick={() => { setFromAccept(true); setShowAcceptModal(false); setShowSampleModal(true); }}
               className="w-full bg-[#3E4095] text-white text-sm font-medium py-3 rounded-full border border-transparent transition-colors"
             >
               Accept &amp; Log sample collection now
             </button>
             <button
-              onClick={() => { setShowAcceptModal(false); acceptMutation.mutate(); }}
+              onClick={handleAcceptLater}
               disabled={acceptMutation.isPending}
-              className="w-full border border-[#3E4095] text-[#3E4095] text-sm font-medium py-3 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50"
+              className="w-full border border-[#3E4095] text-[#3E4095] text-sm font-medium py-3 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              Accept &amp; Log sample collection Later
+              {acceptMutation.isPending ? (
+                <><div className="w-3 h-3 border-2 border-[#3E4095] border-t-transparent rounded-full animate-spin" /> Accepting...</>
+              ) : "Accept & Log sample collection Later"}
             </button>
           </div>
         </div>
@@ -410,17 +433,13 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
             </div>
 
             <button
-              onClick={() => {
-                setShowSampleModal(false);
-                setSampleLogged(true);
-                acceptMutation.mutate();
-              }}
-              disabled={!sampleDate || !sampleTime || acceptMutation.isPending}
+              onClick={handleSampleSubmit}
+              disabled={!sampleDate || !sampleTime || specimenMutation.isPending || acceptMutation.isPending}
               className="w-full bg-[#3E4095] text-white text-sm font-semibold py-2.5 rounded-full transition-colors disabled:opacity-50"
             >
-              {acceptMutation.isPending ? (
+              {(specimenMutation.isPending || acceptMutation.isPending) ? (
                 <span className="flex items-center justify-center gap-2">
-                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" /> Updating...
+                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" /> Saving...
                 </span>
               ) : "Update entry!"}
             </button>
@@ -431,7 +450,7 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
       <RejectModal
         isOpen={showRejectModal}
         onClose={() => setShowRejectModal(false)}
-        onConfirm={() => rejectMutation.mutate()}
+        onConfirm={handleReject}
         isPending={rejectMutation.isPending}
         value={rejectReason}
         onChange={setRejectReason}

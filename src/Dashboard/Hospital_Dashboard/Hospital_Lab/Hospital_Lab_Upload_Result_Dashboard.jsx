@@ -1,9 +1,12 @@
 import { useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { ArrowLeft, Save } from "lucide-react";
 import ConfirmUploadModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/ConfirmUploadModal";
 import SuccessModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/SuccessModal";
+import toast from "react-hot-toast";
+import { submitTestResult } from "../../../queries/Hospital/lab/requests";
 
 const getRefRange = (p) => {
   if (p.ref_text) return p.ref_text;
@@ -25,17 +28,30 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
   const [interpretation, setInterpretation] = useState("");
   const [clinicalCorrelation, setClinical]  = useState("");
   const [comments, setComments]             = useState("");
-  const [showConfirm, setShowConfirm]       = useState(false);
-  const [showSuccess, setShowSuccess]       = useState(false);
-  const [uploading, setUploading]           = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleConfirmUpload = () => {
-    setUploading(true);
-    setTimeout(() => {
-      setUploading(false);
+  const submitMutation = useMutation({ mutationFn: submitTestResult });
+
+  const handleConfirmUpload = async () => {
+    const payload = {
+      order: order?.id,
+      parameters: parameters.map((p) => ({
+        parameter: p.sqid,
+        value: paramValues[p.sqid] ?? "",
+      })),
+      interpretation,
+      clinical_correlation: clinicalCorrelation,
+      comments,
+    };
+    try {
+      await submitMutation.mutateAsync(payload);
       setShowConfirm(false);
       setShowSuccess(true);
-    }, 800);
+    } catch {
+      toast.error("Failed to upload result. Please try again.");
+      setShowConfirm(false);
+    }
   };
 
   return (
@@ -168,7 +184,7 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
         isOpen={showConfirm}
         onClose={() => setShowConfirm(false)}
         onConfirm={handleConfirmUpload}
-        isPending={uploading}
+        isPending={submitMutation.isPending}
       />
 
       <SuccessModal

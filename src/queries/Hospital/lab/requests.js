@@ -25,3 +25,13 @@ export const rejectLabRequest = async ({ sqid, reason }) => {
   const res = await axiosInstanceHos.patch(`api/lab/test-orders/${sqid}/reject`, { reason });
   return res.data;
 };
+
+export const logSpecimenCollectionTime = async ({ sqid, specimen_collected_at }) => {
+  const res = await axiosInstanceHos.patch(`api/lab/test-orders/${sqid}/specimen-collection-time`, { specimen_collected_at });
+  return res.data;
+};
+
+export const submitTestResult = async (payload) => {
+  const res = await axiosInstanceHos.post("api/lab/test-orders/submit-result", payload);
+  return res.data;
+};
