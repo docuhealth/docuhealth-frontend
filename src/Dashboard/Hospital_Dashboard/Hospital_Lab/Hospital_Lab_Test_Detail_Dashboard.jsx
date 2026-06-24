@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { ArrowLeft, Printer, Download, Calendar, Clock, X } from "lucide-react";
 import PatientInfoCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/PatientInfoCard";
 import RejectModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/RejectModal";
 import toast from "react-hot-toast";
 import {
+  fetchLabOrderDetail,
   acceptLabRequest,
   rejectLabRequest,
   logSpecimenCollectionTime,
@@ -40,19 +41,46 @@ const ParamIcon = () => (
   </svg>
 );
 
+const normalizeOrder = (raw, tab) => ({
+  id:                    raw.sqid,
+  name:                  [raw.patient_info?.firstname, raw.patient_info?.lastname].filter(Boolean).join(" ") || "Unknown",
+  hin:                   raw.patient_info?.hin || "—",
+  test:                  raw.test_info?.name || "—",
+  hospital:              raw.hospital_info?.name || "—",
+  datetime:              raw.created_at
+    ? new Date(raw.created_at).toLocaleString("en-US", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    : "—",
+  tab,
+  requestedBy:           raw.ordered_by
+    ? `${raw.ordered_by.role === "doctor" ? "Dr. " : ""}${raw.ordered_by.firstname || ""} ${raw.ordered_by.lastname || ""}`.trim()
+    : undefined,
+  gender:                raw.patient_info?.gender,
+  dob:                   raw.patient_info?.dob,
+  payment_category:      raw.patient_info?.payment_category,
+  email:                 raw.hospital_info?.email,
+  status:                raw.status,
+  note:                  raw.note,
+  test_info:             raw.test_info,
+  result_info:           raw.result_info,
+  rejection_reason:      raw.rejection_reason,
+  specimen_collected_at: raw.specimen_collected_at,
+});
+
 /* ─── main component ─── */
 const Hospital_Lab_Test_Detail_Dashboard = () => {
-  const navigate  = useNavigate();
-  const { state } = useLocation();
+  const navigate      = useNavigate();
+  const queryClient   = useQueryClient();
+  const { state }     = useLocation();
+  const sqid          = state?.order?.id;
+  const activeTab     = state?.order?.tab;
 
-  const order = state?.order ?? {
-    name:     "Amara Okafor",
-    hin:      "12456********",
-    test:     "Malaria/Typhoid Test",
-    hospital: "Lagos General Hospital",
-    datetime: "30th, May., 2026/ 9:45 AM",
-    status:   "pending",
-  };
+  const { data: rawOrder, isLoading: orderLoading } = useQuery({
+    queryKey: ["lab-order", sqid],
+    queryFn:  () => fetchLabOrderDetail(sqid),
+    enabled:  !!sqid,
+  });
+
+  const order = rawOrder ? normalizeOrder(rawOrder, activeTab) : (state?.order ?? {});
 
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
@@ -116,11 +144,24 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
       toast.success(fromAccept ? "Sample collection logged" : "Sample collection updated");
       setShowSampleModal(false);
       setSampleLogged(true);
-      if (fromAccept) navigate(-1);
+      if (fromAccept) {
+        navigate(-1);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["lab-order", sqid] });
+      }
     } catch {
       toast.error("Something went wrong. Please try again.");
     }
   };
+
+  if (orderLoading) {
+    return (
+      <div className="flex items-center justify-center py-24 text-gray-400 text-sm">
+        <div className="w-5 h-5 border-2 border-[#3E4095] border-t-transparent rounded-full animate-spin mr-3" />
+        Loading order...
+      </div>
+    );
+  }
 
   return (
     <>
