@@ -25,13 +25,18 @@ export const fetchLabTests = async ({ queryKey }) => {
   return res.data;
 };
 
+export const fetchLabOrderDetail = async (sqid) => {
+  const res = await axiosInstanceHos.get(`api/lab/test-orders/${sqid}`);
+  return res.data;
+};
+
 export const acceptLabRequest = async (sqid) => {
   const res = await axiosInstanceHos.patch(`api/lab/test-orders/${sqid}/accept`);
   return res.data;
 };
 
 export const rejectLabRequest = async ({ sqid, reason }) => {
-  const res = await axiosInstanceHos.patch(`api/lab/test-orders/${sqid}/reject`, { reason });
+  const res = await axiosInstanceHos.patch(`api/lab/test-orders/${sqid}/reject`, { rejection_reason: reason });
   return res.data;
 };
 
