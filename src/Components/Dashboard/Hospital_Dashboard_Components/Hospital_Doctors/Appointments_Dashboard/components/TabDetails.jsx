@@ -1734,34 +1734,6 @@ const getTabs = ({
       title: "Patient Info",
       content: <PatientInfo patientFullInfo={patientFullInfo} />,
     },
-    {
-      title: "Med Records",
-      content: (
-        <PatientMedicalRecord
-          medloading={medloading}
-          patientMedRecords={patientMedRecords}
-          count={count}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          setCurrentPage={setCurrentPage}
-          setSelectedMedicalRecord={setSelectedMedicalRecord}
-          setViewDetailMedicalRecord={setViewDetailMedicalRecord}
-        />
-      ),
-    },
-    {
-      title: "SOAP Notes",
-      content: (
-        <PatientSOAPNotes
-          soapNotesLoading={soapNotesLoading}
-          patientSoapNotes={patientSoapNotes}
-          soapCount={soapCount}
-          soapCurrentPage={soapCurrentPage}
-          soapTotalPages={soapTotalPages}
-          setSoapCurrentPage={setSoapCurrentPage}
-        />
-      ),
-    },
   ];
 
 export default getTabs;
