@@ -5,6 +5,8 @@ import { FlaskConical, ChevronDown } from "lucide-react";
 import { LabAppointmentsListContext } from "../../../context/HospitalContext/Lab/LabAppointmentsListContext";
 import LabAppointmentRow from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabAppointmentRow";
 import LabAppointmentMobileCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabAppointmentMobileCard";
+import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PatientInfo";
+import CreateOrderModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/CreateOrderModal";
 
 const filterOptions = ["All", "Today", "This week", "This month"];
 
@@ -20,6 +22,10 @@ const Hospital_Lab_Appointments_Dashboard = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
   const [showFilter, setShowFilter] = useState(false);
+  const [seePatientDetails, setSeePatientDetails] = useState(false);
+  const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [orderPatientHin, setOrderPatientHin] = useState(null);
 
   const { appointments, loading } = useContext(LabAppointmentsListContext);
 
@@ -43,6 +49,34 @@ const Hospital_Lab_Appointments_Dashboard = () => {
       },
     });
   };
+
+  const handleSeeDetails = (appt) => {
+    const normalized = {
+      ...appt,
+      patient: appt.patient || { hin: appt.patient_hin || appt.hin },
+    };
+    setSelectedPatientDetails(normalized);
+    setSeePatientDetails(true);
+  };
+
+  const handleCreateOrder = (appt) => {
+    setOrderPatientHin(appt.patient_hin || appt.patient?.hin || appt.hin || null);
+    setShowOrderModal(true);
+  };
+
+  if (seePatientDetails) {
+    return (
+      <>
+        <div className="py-2">
+          <DynamicDate />
+        </div>
+        <PatientInfo
+          selectedPatientDetails={selectedPatientDetails}
+          setSeePatientDetails={setSeePatientDetails}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -93,14 +127,14 @@ const Hospital_Lab_Appointments_Dashboard = () => {
                 {/* Desktop rows */}
                 <div className="hidden lg:block">
                   {appointments.map((appt) => (
-                    <LabAppointmentRow key={appt.id} appt={appt} onOpen={handleOpen} />
+                    <LabAppointmentRow key={appt.id} appt={appt} onOpen={handleOpen} onSeeDetails={handleSeeDetails} onCreateOrder={handleCreateOrder} />
                   ))}
                 </div>
 
                 {/* Mobile cards */}
                 <div className="block lg:hidden space-y-4 my-4">
                   {appointments.map((appt) => (
-                    <LabAppointmentMobileCard key={appt.id} appt={appt} onOpen={handleOpen} />
+                    <LabAppointmentMobileCard key={appt.id} appt={appt} onOpen={handleOpen} onSeeDetails={handleSeeDetails} onCreateOrder={handleCreateOrder} />
                   ))}
                 </div>
               </>
@@ -108,6 +142,11 @@ const Hospital_Lab_Appointments_Dashboard = () => {
           </div>
         </div>
       </div>
+      <CreateOrderModal
+        isOpen={showOrderModal}
+        onClose={() => setShowOrderModal(false)}
+        patientHin={orderPatientHin}
+      />
     </>
   );
 };
