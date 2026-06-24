@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { fetchTestCategories, fetchLabTests } from "../../../../../../queries/Hospital/lab/requests";
 
 const Pharmacist_Icon = () => (
   <svg
@@ -60,30 +61,7 @@ const Nurse_Icon = () => (
   </svg>
 );
 
-const labCategories = [
-  "Hematology",
-  "Clinical Chemistry / Biochemistry",
-  "Microbiology & Parasitology",
-  "Endocrinology / Hormones",
-  "Tumor Markers",
-  "Molecular / PCR Tests",
-  "Histopathology / Cytology",
-  "Urinalysis & Body Fluids"
-];
 
-const labTestTypes = {
-  "Microbiology & Parasitology": [
-    "Malaria Rapid Diagnostic Test (RDT)",
-    "Malaria Microscopy (Blood Smear)",
-    "Widal Test (Typhoid)",
-    "Stool Microscopy / Ova & Parasite (O&P)",
-    "Urine Microscopy / Culture & Sensitivity",
-    "Sputum Microscopy / AFB (for TB)",
-    "Blood Culture",
-    "Throat Swab Culture",
-    "Wound Swab Culture"
-  ]
-};
 
 const OtherMedicalServices = ({
   setOtherMedicalServices,
@@ -103,8 +81,29 @@ const OtherMedicalServices = ({
     note: "",
     category: "",
     test_type: [],
-    specimen: "",
+    // specimen: "",
   });
+
+  const { data: categoriesData } = useQuery({
+    queryKey: ["lab-test-categories"],
+    queryFn:  fetchTestCategories,
+    staleTime: Infinity,
+  });
+
+  const categories = Array.isArray(categoriesData)
+    ? categoriesData
+    : (categoriesData?.results ?? []);
+
+  const { data: testTypesData, isLoading: isTestTypesLoading } = useQuery({
+    queryKey: ["lab-tests", formData.category],
+    queryFn: fetchLabTests,
+    enabled: !!formData.category,
+    staleTime: Infinity,
+  });
+
+  const fetchedTestTypes = Array.isArray(testTypesData) 
+    ? testTypesData 
+    : (testTypesData?.results ?? []);
 
   const medicalServices = [
     {
@@ -210,8 +209,15 @@ const OtherMedicalServices = ({
   };
 
   const { mutate: labMutate, isPending: isLabPending } = useMutation({
-    mutationFn: (payload) => {
-      return axiosInstanceHos.post("api/doctors/lab/request", payload);
+    mutationFn: async (payload) => {
+      const promises = payload.test_type.map(testSqid => {
+        return axiosInstanceHos.post("api/lab/test-orders/create", {
+          test: testSqid,
+          patient: payload.patient_hin,
+          note: payload.note
+        });
+      });
+      return await Promise.all(promises);
     },
     onSuccess: () => {
       toast.success(
@@ -232,8 +238,8 @@ const OtherMedicalServices = ({
   });
 
   const handleLabRequest = async () => {
-    if (!formData.category || formData.test_type.length === 0 || !formData.specimen || !formData.note) {
-      toast.error("Please fill in all lab test fields.");
+    if (!formData.category || formData.test_type.length === 0 || !formData.note) {
+      toast.error("Please fill in all required lab test fields.");
       return;
     }
     labMutate(formData);
@@ -337,7 +343,9 @@ const OtherMedicalServices = ({
                           }}
                         >
                           <option value="" disabled>Select category</option>
-                          {labCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                          {categories.map((cat) => (
+                            <option key={cat.sqid} value={cat.sqid}>{cat.name}</option>
+                          ))}
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
                           <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
@@ -348,38 +356,47 @@ const OtherMedicalServices = ({
                     <div className="mb-4 relative text-[12px]">
                       <p className="block font-medium text-gray-700 mb-1">Test type</p>
                       <div 
-                        className="border rounded-lg w-full p-2.5 outline-none focus:border-[#3E4095] flex justify-between items-center cursor-pointer bg-white"
-                        onClick={() => setIsTestTypeDropdownOpen(!isTestTypeDropdownOpen)}
+                        className={`border rounded-lg w-full p-2.5 outline-none focus:border-[#3E4095] flex justify-between items-center bg-white ${
+                          !formData.category ? "opacity-50 cursor-not-allowed bg-gray-50" : "cursor-pointer"
+                        }`}
+                        onClick={() => {
+                          if (formData.category) setIsTestTypeDropdownOpen(!isTestTypeDropdownOpen);
+                        }}
                       >
                         <span className="truncate pr-2">
-                          {formData.test_type.length > 0 ? formData.test_type.join(", ") : "Select test type"}
+                          {isTestTypesLoading 
+                            ? "Loading tests..." 
+                            : formData.test_type.length > 0 
+                              ? formData.test_type.map(id => fetchedTestTypes.find(t => (t.sqid || t.name) === id)?.name || id).join(", ") 
+                              : "Select test type"}
                         </span>
                         <svg className="fill-current h-4 w-4 text-gray-700 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                       </div>
                       
                       {isTestTypeDropdownOpen && (
                         <div className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                          {(labTestTypes[formData.category] || labTestTypes["Microbiology & Parasitology"]).map(test => (
-                            <label key={test} className="flex items-center p-2.5 hover:bg-gray-50 cursor-pointer border-b last:border-b-0">
+                          {fetchedTestTypes.map(test => (
+                            <label key={test.sqid || test.name} className="flex items-center p-2.5 hover:bg-gray-50 cursor-pointer border-b last:border-b-0">
                               <input 
                                 type="checkbox" 
                                 className="mr-3 w-4 h-4 text-[#3E4095] rounded border-gray-300 focus:ring-[#3E4095]"
-                                checked={formData.test_type.includes(test)}
+                                checked={formData.test_type.includes(test.sqid || test.name)}
                                 onChange={(e) => {
                                   if (e.target.checked) {
-                                    setFormData({ ...formData, test_type: [...formData.test_type, test] });
+                                    setFormData({ ...formData, test_type: [...formData.test_type, test.sqid || test.name] });
                                   } else {
-                                    setFormData({ ...formData, test_type: formData.test_type.filter(t => t !== test) });
+                                    setFormData({ ...formData, test_type: formData.test_type.filter(t => t !== (test.sqid || test.name)) });
                                   }
                                 }}
                               />
-                              <span className="text-[12px] text-gray-700">{test}</span>
+                              <span className="text-[12px] text-gray-700">{test.name}</span>
                             </label>
                           ))}
                         </div>
                       )}
                     </div>
 
+                    {/*
                     <div className="mb-4 text-[12px]">
                       <p className="block font-medium text-gray-700 mb-1">Specimen needed</p>
                       <div className="relative">
@@ -401,6 +418,7 @@ const OtherMedicalServices = ({
                         </div>
                       </div>
                     </div>
+                    */}
 
                     <div className="mb-2 text-[12px]">
                       <p className="mb-1 text-gray-700 font-medium">Add note:</p>
@@ -415,7 +433,7 @@ const OtherMedicalServices = ({
                     </div>
 
                     <button
-                      disabled={isLabPending || !formData.note || !formData.category || formData.test_type.length === 0 || !formData.specimen}
+                      disabled={isLabPending || !formData.note || !formData.category || formData.test_type.length === 0}
                       className={`mt-6 w-full cursor-pointer bg-[#3E4095] text-white py-2 rounded-full disabled:bg-[#3E4095]/60 ${isLabPending ? "bg-[#3E4095]/60 cursor-not-allowed" : ""}} text-sm `}
                       onClick={handleLabRequest}
                     >

@@ -17,15 +17,16 @@ const LabRequestsProvider = (props) => {
   const [currentPage, setCurrentPage]       = useState(1);
   const [searchQuery, setSearchQuery]       = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [ordering, setOrdering] = useState("-created_at");
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab, searchQuery, selectedCategory]);
+  }, [activeTab, searchQuery, selectedCategory, ordering]);
 
   const statusFilter = TAB_STATUS_MAP[activeTab];
 
   const { data, isLoading } = useQuery({
-    queryKey: ["lab-requests", statusFilter, currentPage, searchQuery, selectedCategory],
+    queryKey: ["lab-requests", statusFilter, currentPage, searchQuery, selectedCategory, ordering],
     queryFn:  fetchLabRequests,
     placeholderData: keepPreviousData,
   });
@@ -63,6 +64,8 @@ const LabRequestsProvider = (props) => {
       categories,
       selectedCategory,
       setSelectedCategory,
+      ordering,
+      setOrdering,
     }}>
       {props.children}
     </LabRequestsContext.Provider>

@@ -5,6 +5,8 @@ import { ArrowLeft, Printer, Download, X, ChevronDown } from "lucide-react";
 import PatientInfoCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/PatientInfoCard";
 import RejectModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/RejectModal";
 import { LabRequestsContext } from "../../../context/HospitalContext/Lab/LabRequestsContext";
+import { useQuery } from "@tanstack/react-query";
+import { fetchLabTests } from "../../../queries/Hospital/lab/requests";
 import toast from "react-hot-toast";
 
 const STATUS_STYLES = {
@@ -14,34 +16,7 @@ const STATUS_STYLES = {
   rejected:    { label: "Rejected",    color: "text-red-500"   },
 };
 
-const TEST_TYPES = {
-  "cat-1": [
-    { sqid: "tt-1-1", name: "Complete Blood Count (CBC)" },
-    { sqid: "tt-1-2", name: "ESR (Erythrocyte Sedimentation Rate)" },
-    { sqid: "tt-1-3", name: "Blood Film / Peripheral Smear" },
-    { sqid: "tt-1-4", name: "Malaria Blood Smear" },
-  ],
-  "cat-2": [
-    { sqid: "tt-2-1", name: "Fasting Blood Glucose (FBG)" },
-    { sqid: "tt-2-2", name: "Liver Function Tests (LFTs)" },
-    { sqid: "tt-2-3", name: "Kidney Function Tests (KFTs)" },
-    { sqid: "tt-2-4", name: "Lipid Panel" },
-    { sqid: "tt-2-5", name: "Thyroid Function Tests (TFTs)" },
-  ],
-  "cat-3": [
-    { sqid: "tt-3-1", name: "Widal Test (Typhoid), Blood Culture, Stool Microscopy" },
-    { sqid: "tt-3-2", name: "Urinalysis & Microscopy Culture Sensitivity" },
-    { sqid: "tt-3-3", name: "Sputum Culture & Sensitivity" },
-    { sqid: "tt-3-4", name: "Throat Swab Culture" },
-    { sqid: "tt-3-5", name: "Wound Swab Culture" },
-  ],
-  "cat-4": [
-    { sqid: "tt-4-1", name: "HIV Screening (ELISA)" },
-    { sqid: "tt-4-2", name: "Hepatitis B Surface Antigen (HBsAg)" },
-    { sqid: "tt-4-3", name: "Malaria Rapid Test" },
-    { sqid: "tt-4-4", name: "Syphilis (VDRL)" },
-  ],
-};
+
 
 const getRefRange = (p) => {
   if (p.ref_text) return p.ref_text;
@@ -99,7 +74,16 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
   const [requestDate,      setRequestDate]      = useState("");
   const [requestTime,      setRequestTime]      = useState("");
 
-  const testTypes = TEST_TYPES[selectedCategory] ?? [];
+  const { data: testTypesData, isLoading: isTestTypesLoading } = useQuery({
+    queryKey: ["lab-tests", selectedCategory],
+    queryFn: fetchLabTests,
+    enabled: !!selectedCategory,
+    staleTime: Infinity,
+  });
+
+  const testTypes = Array.isArray(testTypesData) 
+    ? testTypesData 
+    : (testTypesData?.results ?? []);
 
   const statusStyle  = STATUS_STYLES[order.status] ?? STATUS_STYLES.pending;
   const isPending    = order.status === "pending";
@@ -407,7 +391,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
       {/* ── Patient's Lab test Request modal ── */}
       {showSampleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 flex flex-col gap-5">
+          <div className="bg-white border rounded-lg shadow-xl w-full max-w-md p-6 flex flex-col gap-5">
 
             {/* Header */}
             <div className="flex items-start justify-between">
@@ -451,7 +435,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
                   disabled={!selectedCategory}
                   className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none appearance-none focus:border-[#3E4095] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <option value="">Select test type</option>
+                  <option value="">{isTestTypesLoading ? "Loading tests..." : "Select test type"}</option>
                   {testTypes.map((t) => (
                     <option key={t.sqid} value={t.sqid}>{t.name}</option>
                   ))}

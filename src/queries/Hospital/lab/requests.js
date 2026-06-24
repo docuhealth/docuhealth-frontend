@@ -2,17 +2,26 @@ import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 
 // status: "pending" | "in_progress" | "completed" | "rejected"
 export const fetchLabRequests = async ({ queryKey }) => {
-  const [_key, status, page, search, category] = queryKey;
+  const [_key, status, page, search, category, ordering] = queryKey;
   const pageSize = 6;
   let url = `api/lab/test-orders?status=${status}&page=${page}&size=${pageSize}`;
   if (search)   url += `&search=${search}`;
   if (category) url += `&category=${category}`;
+  if (ordering) url += `&ordering=${ordering}`;
   const res = await axiosInstanceHos.get(url);
   return res.data;
 };
 
 export const fetchTestCategories = async () => {
   const res = await axiosInstanceHos.get("api/lab/test-categories");
+  return res.data;
+};
+
+export const fetchLabTests = async ({ queryKey }) => {
+  const [_key, category] = queryKey;
+  let url = "api/lab/lab-tests";
+  if (category) url += `?category=${category}`;
+  const res = await axiosInstanceHos.get(url);
   return res.data;
 };
 

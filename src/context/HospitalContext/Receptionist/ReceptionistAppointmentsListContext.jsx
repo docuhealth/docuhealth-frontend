@@ -9,6 +9,7 @@ export const ReceptionistAppointmentsListContext = createContext();
 
 const ReceptionistAppointmentsListProvider = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [appointmentType, setAppointmentType] = useState('today'); // 'today', 'upcoming' or 'history'
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -18,7 +19,7 @@ const ReceptionistAppointmentsListProvider = (props) => {
   const isUserLoggedIn = !!getHospitalToken();
 
   const { data, isPending, isFetching, isError, error } = useQuery({
-    queryKey: ["receptionist-appointments", currentPage, debouncedSearch, dateFrom, dateTo],
+    queryKey: ["receptionist-appointments", currentPage, appointmentType, debouncedSearch, dateFrom, dateTo],
     queryFn: fetchAppointments,
     enabled: isUserLoggedIn,
     placeholderData: keepPreviousData,
@@ -26,7 +27,7 @@ const ReceptionistAppointmentsListProvider = (props) => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearch, dateFrom, dateTo]);
+  }, [appointmentType, debouncedSearch, dateFrom, dateTo]);
 
   useEffect(() => {
     if (isError) {
@@ -47,6 +48,8 @@ const ReceptionistAppointmentsListProvider = (props) => {
     currentPage,
     setCurrentPage,
     totalPages,
+    appointmentType,
+    setAppointmentType,
     loading: isPending,
     isRefreshing: isFetching,
     searchQuery,

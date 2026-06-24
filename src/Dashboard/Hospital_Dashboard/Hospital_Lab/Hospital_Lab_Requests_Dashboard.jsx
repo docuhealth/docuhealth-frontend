@@ -49,6 +49,8 @@ const Hospital_Lab_Requests_Dashboard = () => {
     categories,
     selectedCategory,
     setSelectedCategory,
+    ordering,
+    setOrdering,
     count,
   } = useContext(LabRequestsContext);
 
@@ -108,9 +110,17 @@ const Hospital_Lab_Requests_Dashboard = () => {
             </select>
           )}
 
-          <button className="flex items-center gap-1.5 border border-[#3E4095] text-[#3E4095] text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-indigo-50 transition-colors whitespace-nowrap">
-            Sort by: Latest <ChevronDown size={14} />
-          </button>
+          <div className="relative inline-block">
+            <select
+              value={ordering}
+              onChange={(e) => setOrdering(e.target.value)}
+              className="flex items-center border border-[#3E4095] text-[#3E4095] text-xs font-medium pl-4 pr-10 py-2 rounded-full hover:bg-indigo-50 transition-colors whitespace-nowrap appearance-none outline-none cursor-pointer bg-transparent"
+            >
+              <option value="-created_at">Sort by: Latest</option>
+              <option value="created_at">Sort by: Oldest</option>
+            </select>
+            <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#3E4095] pointer-events-none" />
+          </div>
         </div>
 
         {/* Cards Grid */}

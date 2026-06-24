@@ -24,17 +24,23 @@ const AppointmentsList = () => {
     setDateFrom,
     dateTo,
     setDateTo,
+    appointmentType,
+    setAppointmentType,
   } = useContext(ReceptionistAppointmentsListContext);
 
   // Keep client-side sort by proximity to now
   const sortedAppointments = useMemo(() => {
-    const now = new Date().getTime();
-    return [...appointments].sort((a, b) => {
-      const dateA = new Date(a.scheduled_time).getTime();
-      const dateB = new Date(b.scheduled_time).getTime();
-      return Math.abs(dateA - now) - Math.abs(dateB - now);
-    });
-  }, [appointments]);
+    if (appointmentType === 'upcoming') {
+      const now = new Date().getTime();
+      return [...appointments].sort((a, b) => {
+        const dateA = new Date(a.scheduled_time).getTime();
+        const dateB = new Date(b.scheduled_time).getTime();
+        return Math.abs(dateA - now) - Math.abs(dateB - now);
+      });
+    }
+
+    return [...appointments].sort((a, b) => new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime());
+  }, [appointments, appointmentType]);
   
 
   if (loading) {
@@ -46,7 +52,30 @@ const AppointmentsList = () => {
   }
   if (appointments.length === 0 && !searchQuery && !dateFrom && !dateTo) {
     return (
-      <div className="flex flex-col justify-center items-center text-center  h-full">
+      <div className="flex flex-col justify-center items-center text-center  h-full pb-10">
+        <div className="flex flex-col sm:flex-row md:justify-end mb-8 gap-3 w-full">
+          {appointmentType !== 'history' && (
+            <button
+              onClick={() => setAppointmentType('history')}
+              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+              View past appointments
+            </button>
+          )}
+          {appointmentType !== 'today' && (
+            <button
+              onClick={() => setAppointmentType('today')}
+              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+              View today's appointments
+            </button>
+          )}
+          {appointmentType !== 'upcoming' && (
+            <button
+              onClick={() => setAppointmentType('upcoming')}
+              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+              View upcoming appointments
+            </button>
+          )}
+        </div>
         <svg
           width="180"
           height="180"
@@ -101,12 +130,17 @@ const AppointmentsList = () => {
           </defs>
         </svg>
 
-        <h2 className="font-medium pb-1">No upcoming appointment!</h2>
+        <h2 className="font-medium pb-1">
+          {appointmentType === 'upcoming' ? "No upcoming appointment!" : appointmentType === 'today' ? "No appointments today!" : "No past appointments!"}
+        </h2>
         <div className="max-w-md text-center">
           <p className="text-[12px] text-gray-500">
             {" "}
-            You currently don’t have any upcoming appointment/follow-up meeting
-            in this hospital.
+            {appointmentType === 'upcoming'
+              ? "You currently don’t have any upcoming appointment/follow-up meeting in this hospital."
+              : appointmentType === 'today'
+              ? "You currently don’t have any appointment/follow-up meeting today."
+              : "No appointment history found for this hospital."}
           </p>
         </div>
       </div>
@@ -115,6 +149,30 @@ const AppointmentsList = () => {
 
   return (
     <>
+      <div className="flex flex-col sm:flex-row md:justify-end mb-8 gap-3 w-full">
+        {appointmentType !== 'history' && (
+          <button
+            onClick={() => setAppointmentType('history')}
+            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+            View past appointments
+          </button>
+        )}
+        {appointmentType !== 'today' && (
+          <button
+            onClick={() => setAppointmentType('today')}
+            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+            View today's appointments
+          </button>
+        )}
+        {appointmentType !== 'upcoming' && (
+          <button
+            onClick={() => setAppointmentType('upcoming')}
+            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+            View upcoming appointments
+          </button>
+        )}
+      </div>
+
       <div className="mb-4 w-full">
         <SearchBar
           value={searchQuery}

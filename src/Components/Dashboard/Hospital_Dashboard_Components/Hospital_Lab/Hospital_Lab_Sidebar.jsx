@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LabAppContext } from "../../../../context/HospitalContext/Lab/LabAppContext";
+import toast from "react-hot-toast";
 
 
 const TEST_ORDERS_ROUTES = [
@@ -77,7 +78,7 @@ const Hospital_Lab_Sidebar = () => {
           </Link>
 
           {/* Messages */}
-          <Link to="/hospital-lab-messages-dashboard">
+          <div className="cursor-pointer" onClick={() => toast.success("Coming Soon !")}>
             <div className="px-4 my-4">
               <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-messages-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                 <span>
@@ -88,7 +89,7 @@ const Hospital_Lab_Sidebar = () => {
                 Messages
               </li>
             </div>
-          </Link>
+          </div>
 
           {/* Health Personnel */}
           <Link to="/hospital-lab-healthpersonnel-dashboard">

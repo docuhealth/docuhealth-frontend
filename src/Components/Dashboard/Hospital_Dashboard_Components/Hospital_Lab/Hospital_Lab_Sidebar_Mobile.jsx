@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { LabAppContext } from "../../../../context/HospitalContext/Lab/LabAppContext";
+import toast from "react-hot-toast";
 
 const TEST_ORDERS_ROUTES = [
   "/hospital-lab-requests-dashboard",
@@ -94,7 +95,7 @@ const Hospital_Lab_Sidebar_Mobile = ({ openMobileSidebar, setOpenMobileSidebar }
             </Link>
 
             {/* Messages */}
-            <Link to="/hospital-lab-messages-dashboard" onClick={() => setOpenMobileSidebar(false)}>
+            <div className="cursor-pointer" onClick={() => { setOpenMobileSidebar(false); toast.success("Coming Soon !"); }}>
               <div className="px-4 my-4">
                 <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-messages-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                   <span>
@@ -105,7 +106,7 @@ const Hospital_Lab_Sidebar_Mobile = ({ openMobileSidebar, setOpenMobileSidebar }
                   Messages
                 </li>
               </div>
-            </Link>
+            </div>
 
             {/* Health Personnel */}
             <Link to="/hospital-lab-healthpersonnel-dashboard" onClick={() => setOpenMobileSidebar(false)}>
