@@ -418,7 +418,7 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
             {/* Header */}
             <div className="relative flex items-start justify-center">
               <div className="text-center">
-                <h3 className="text-base font-semibold text-gray-900">Edit Sample Collection Info</h3>
+                <h3 className="text-base font-semibold text-gray-900">{fromAccept ? "Sample Collection Info" : "Edit Sample Collection Info"}</h3>
                 <p className="text-sm text-gray-500 mt-1">Kindly fill up to proceed!</p>
               </div>
               <button
