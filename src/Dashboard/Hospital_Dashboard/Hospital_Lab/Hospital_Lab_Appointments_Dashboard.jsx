@@ -20,14 +20,13 @@ const getTestName = (appt) => appt.test_name || appt.test || "Test request";
 
 const Hospital_Lab_Appointments_Dashboard = () => {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState("All");
   const [showFilter, setShowFilter] = useState(false);
   const [seePatientDetails, setSeePatientDetails] = useState(false);
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [orderPatientHin, setOrderPatientHin] = useState(null);
 
-  const { appointments, loading } = useContext(LabAppointmentsListContext);
+  const { appointments, loading, activeFilter, setActiveFilter } = useContext(LabAppointmentsListContext);
 
   const handleOpen = (appt) => {
     navigate("/hospital-lab-appointment-detail", {
@@ -38,7 +37,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
           hin:         appt.patient_hin || appt.patient?.hin || appt.hin || "—",
           test:        getTestName(appt),
           hospital:    appt.hospital_name || appt.hospital || "—",
-          scheduledAt: appt.scheduled_at || appt.datetime || null,
+          scheduledAt: appt.scheduled_time || appt.scheduled_at || appt.datetime || null,
           requestedBy: appt.requested_by ||
             (appt.doctor ? `Dr. ${appt.doctor.firstname || ""} ${appt.doctor.lastname || ""}`.trim() : undefined),
           age:    appt.patient?.age,

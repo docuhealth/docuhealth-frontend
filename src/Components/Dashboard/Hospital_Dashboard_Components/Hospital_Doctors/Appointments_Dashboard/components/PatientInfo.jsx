@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { ArrowLeft, X } from "lucide-react";
 import TabComponent from "./TabComponent";
 import getTabs from "./TabDetails";
@@ -25,28 +26,6 @@ const DUMMY_PATIENT_INFO = {
     country: "Nigeria",
     plan_type: "HMO",
   },
-  latest_vitals: {
-    blood_pressure: "120/80",
-    temp: "36.6",
-    weight: "72",
-    resp_rate: "16",
-    heart_rate: "74",
-    height: "1.75",
-  },
-  ongoing_drugs: [
-    {
-      name: "Amoxicillin",
-      quantity: "500",
-      frequency: { value: "3", rate: "times/day" },
-      duration: { value: "7", rate: "days" },
-    },
-    {
-      name: "Ibuprofen",
-      quantity: "400",
-      frequency: { value: "2", rate: "times/day" },
-      duration: { value: "5", rate: "days" },
-    },
-  ],
 };
 
 const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
@@ -60,7 +39,21 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
   const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
   const [orderForm, setOrderForm] = useState({ category: "", test_type: [], date: "", time: "" });
 
-  const patientFullInfo = DUMMY_PATIENT_INFO;
+  const p = selectedPatientDetails?.patient ?? {};
+  const patientFullInfo = {
+    patient_info: {
+      ...DUMMY_PATIENT_INFO.patient_info,
+      firstname: p.firstname  ?? DUMMY_PATIENT_INFO.patient_info.firstname,
+      lastname:  p.lastname   ?? DUMMY_PATIENT_INFO.patient_info.lastname,
+      dob:       p.dob        ?? DUMMY_PATIENT_INFO.patient_info.dob,
+      email:     p.email      ?? DUMMY_PATIENT_INFO.patient_info.email,
+      phone_num: p.phone_num  ?? DUMMY_PATIENT_INFO.patient_info.phone_num,
+      street:    p.street     ?? DUMMY_PATIENT_INFO.patient_info.street,
+      city:      p.city       ?? DUMMY_PATIENT_INFO.patient_info.city,
+      state:     p.state      ?? DUMMY_PATIENT_INFO.patient_info.state,
+      country:   p.country    ?? DUMMY_PATIENT_INFO.patient_info.country,
+    },
+  };
   const pageSize = 6;
   const medLoading = false;
   const soapLoading = false;
@@ -825,6 +818,26 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
       )}
     </>
   );
+};
+
+PatientInfo.propTypes = {
+  selectedPatientDetails: PropTypes.shape({
+    status:  PropTypes.string,
+    patient: PropTypes.shape({
+      hin:       PropTypes.string,
+      firstname: PropTypes.string,
+      lastname:  PropTypes.string,
+      dob:       PropTypes.string,
+      email:     PropTypes.string,
+      phone_num: PropTypes.string,
+      street:    PropTypes.string,
+      city:      PropTypes.string,
+      state:     PropTypes.string,
+      country:   PropTypes.string,
+      gender:    PropTypes.string,
+    }),
+  }),
+  setSeePatientDetails: PropTypes.func,
 };
 
 export default PatientInfo;
