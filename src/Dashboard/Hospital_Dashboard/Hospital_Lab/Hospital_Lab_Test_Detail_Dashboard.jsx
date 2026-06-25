@@ -299,7 +299,8 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
           {resultParams.length > 0 && (
             <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
               <p className="text-xs sm:text-sm font-semibold text-[#1B2B40] mb-4">{order.test}</p>
-              <div className="overflow-x-auto">
+              {/* Desktop Table */}
+              <div className="hidden lg:block overflow-x-auto">
                 <div className="min-w-[600px] flex flex-col mt-2">
                   <div className="grid grid-cols-6 text-left text-sm bg-gray-100 py-5 rounded-md">
                     <div className="col-span-2 pl-5">Parameter</div>
@@ -331,6 +332,46 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
                     );
                   })}
                 </div>
+              </div>
+
+              {/* Mobile View */}
+              <div className="lg:hidden flex flex-col gap-4 mt-2">
+                {resultParams.map((p, i) => {
+                  const info = p.parameter_info;
+                  const paramStatus = getParamStatus(p.value, info);
+                  return (
+                    <div key={i} className="bg-white border border-gray-200 rounded-md p-4 duration-200">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-2 text-gray-900 font-bold text-[14px]">
+                          <ParamIcon />
+                          <span>{info.name}</span>
+                        </div>
+                        <span className={`text-[10px] px-2 py-1 rounded-md border font-medium uppercase tracking-wider ${
+                          paramStatus === "Normal" ? "bg-green-50 text-green-600 border-green-100"
+                          : paramStatus === "Abnormal" ? "bg-red-50 text-red-500 border-red-100"
+                          : "bg-gray-50 text-gray-500 border-gray-100"
+                        }`}>
+                          {paramStatus ?? "—"}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-y-4 pt-3 border-t border-gray-50">
+                        <div>
+                          <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Result</p>
+                          <p className="text-[11.5px] font-medium text-gray-700 leading-none mt-1">
+                            {p.value ?? "—"} {info.unit || ""}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Reference Range</p>
+                          <p className="text-[11.5px] font-medium text-gray-700 leading-none mt-1">
+                            {getRefRange(info)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
