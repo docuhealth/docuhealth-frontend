@@ -617,20 +617,20 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
             </div>
 
             <div className="py-5 border-b">
-              <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-semibold text-gray-600 shrink-0">
+              <div className="flex items-center">
+                <div className="w-14 h-14 rounded-full bg-[#DCE2EA] flex items-center justify-center text-xl text-black shrink-0">
                   {`${patientFullInfo?.patient_info?.firstname?.[0] ?? ""}${patientFullInfo?.patient_info?.lastname?.[0] ?? ""}`.toUpperCase()}
                 </div>
 
-                <div className="flex flex-col">
-                  <p className="text-2xl font-semibold text-[#1B2B40]">
+                <div className="flex flex-col items-start ml-3">
+                  <p className="text-[16px] font-medium text-[#1B2B40]">
                     {patientFullInfo?.patient_info?.firstname}{" "}
                     {patientFullInfo?.patient_info?.lastname}
                   </p>
-                  <p className="text-sm font-medium text-green-700">
+                  <p className="text-[14px] text-gray-500">
                     {patientFullInfo?.patient_info?.plan_type
-                      ? `${patientFullInfo.patient_info.plan_type} Patient`
-                      : "Patient"}
+                      ? `${patientFullInfo.patient_info.plan_type} patient`
+                      : "patient"}
                   </p>
                 </div>
               </div>
