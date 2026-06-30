@@ -88,37 +88,74 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
               No parameters defined for this test
             </p>
           ) : (
-            <div className="border border-gray-200 rounded-xl overflow-x-auto">
-              <table className="w-full text-xs min-w-[520px]">
-                <thead>
-                  <tr className="border-b border-gray-100 bg-gray-50 text-gray-400 uppercase tracking-wider">
-                    <th className="py-3 px-4 font-semibold text-left">Parameter</th>
-                    <th className="py-3 px-4 font-semibold text-left">Unit</th>
-                    <th className="py-3 px-4 font-semibold text-left">Reference range</th>
-                    <th className="py-3 px-4 font-semibold text-left min-w-[140px]">Result value</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {parameters.map((p) => (
-                    <tr key={p.sqid}>
-                      <td className="py-3 px-4 text-gray-700 font-medium">{p.name}</td>
-                      <td className="py-3 px-4 text-gray-500">{p.unit || "—"}</td>
-                      <td className="py-3 px-4 text-gray-500">{getRefRange(p)}</td>
-                      <td className="py-3 px-4">
-                        <input
-                          type="text"
-                          placeholder="Enter value"
-                          value={paramValues[p.sqid] ?? ""}
-                          onChange={(e) =>
-                            setParamValues((prev) => ({ ...prev, [p.sqid]: e.target.value }))
-                          }
-                          className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-700 outline-none focus:border-[#3E4095] transition-colors"
-                        />
-                      </td>
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              {/* Desktop Table */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-xs min-w-[520px]">
+                  <thead>
+                    <tr className="border-b border-gray-100 bg-gray-50 text-gray-400 uppercase tracking-wider">
+                      <th className="py-3 px-4 font-semibold text-left">Parameter</th>
+                      <th className="py-3 px-4 font-semibold text-left">Unit</th>
+                      <th className="py-3 px-4 font-semibold text-left">Reference range</th>
+                      <th className="py-3 px-4 font-semibold text-left min-w-[140px]">Result value</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {parameters.map((p) => (
+                      <tr key={p.sqid}>
+                        <td className="py-3 px-4 text-gray-700 font-medium">{p.name}</td>
+                        <td className="py-3 px-4 text-gray-500">{p.unit || "—"}</td>
+                        <td className="py-3 px-4 text-gray-500">{getRefRange(p)}</td>
+                        <td className="py-3 px-4">
+                          <input
+                            type="text"
+                            placeholder="Enter value"
+                            value={paramValues[p.sqid] ?? ""}
+                            onChange={(e) =>
+                              setParamValues((prev) => ({ ...prev, [p.sqid]: e.target.value }))
+                            }
+                            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-700 outline-none focus:border-[#3E4095] transition-colors"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile View */}
+              <div className="block sm:hidden divide-y divide-gray-100">
+                {parameters.map((p) => (
+                  <div key={p.sqid} className="p-4 flex flex-col gap-3">
+                    <div>
+                      <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Parameter</p>
+                      <p className="text-sm text-gray-700 font-medium">{p.name}</p>
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex-1">
+                        <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Unit</p>
+                        <p className="text-sm text-gray-500">{p.unit || "—"}</p>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Ref Range</p>
+                        <p className="text-sm text-gray-500">{getRefRange(p)}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Result value</p>
+                      <input
+                        type="text"
+                        placeholder="Enter value"
+                        value={paramValues[p.sqid] ?? ""}
+                        onChange={(e) =>
+                          setParamValues((prev) => ({ ...prev, [p.sqid]: e.target.value }))
+                        }
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-[#3E4095] transition-colors"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

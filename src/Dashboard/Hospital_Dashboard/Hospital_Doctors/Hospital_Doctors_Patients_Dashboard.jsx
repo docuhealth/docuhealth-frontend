@@ -73,6 +73,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
             <OtherMedicalServices
               setOtherMedicalServices={setOtherMedicalServices}
               selectedPatientDetails={selected}
+              isFromPatientMgt={true}
             />
           )}
 

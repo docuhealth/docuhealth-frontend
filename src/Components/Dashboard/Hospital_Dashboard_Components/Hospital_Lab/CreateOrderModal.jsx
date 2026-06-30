@@ -34,9 +34,6 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
           patient: patientHin,
           note: payload.note,
         };
-        if (appointmentSqid) {
-          requestPayload.appointment = appointmentSqid;
-        }
         return axiosInstanceHos.post("api/lab/test-orders/create", requestPayload);
       });
       return Promise.all(promises);

@@ -5,7 +5,7 @@ import { FlaskConical, ChevronDown } from "lucide-react";
 import { LabAppointmentsListContext } from "../../../context/HospitalContext/Lab/LabAppointmentsListContext";
 import LabAppointmentRow from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabAppointmentRow";
 import LabAppointmentMobileCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabAppointmentMobileCard";
-import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PatientInfo";
+import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/PatientInfoComponents/LabPatientInfo";
 import CreateOrderModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/CreateOrderModal";
 import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 import SearchBar from "../../../Components/SearchBar/SearchBar";

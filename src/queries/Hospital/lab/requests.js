@@ -46,6 +46,6 @@ export const logSpecimenCollectionTime = async ({ sqid, specimen_collected_at })
 };
 
 export const submitTestResult = async (payload) => {
-  const res = await axiosInstanceHos.post("api/lab/test-orders/submit-result", payload);
+  const res = await axiosInstanceHos.post("api/lab/test-orders/results/submit", payload);
   return res.data;
 };

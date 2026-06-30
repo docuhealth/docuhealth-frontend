@@ -19,7 +19,7 @@ const ConfirmUploadModal = ({ isOpen, onClose, onConfirm, isPending }) => {
 
         <h3 className="text-base font-semibold text-gray-800 mb-3">Confirm Upload</h3>
 
-        <p className="text-sm text-gray-500 leading-relaxed mb-6">
+        <p className="text-sm text-gray-500 leading-relaxed mb-6 text-justify">
           By proceeding you confirm that you have carried out the requested test and you are certain of the results/finding. Once uploaded, result will be shared to both doctor and patient!
         </p>
 

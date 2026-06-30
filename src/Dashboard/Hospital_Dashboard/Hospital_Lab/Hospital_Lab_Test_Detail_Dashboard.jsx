@@ -179,8 +179,8 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
           {headerLabel}
         </button>
 
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-          <p className="text-xs sm:text-sm font-medium text-gray-700">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+          <p className="text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-0">
             Status:{" "}
             <span className={`font-semibold ${statusStyle.color}`}>{statusStyle.label}</span>
           </p>
@@ -191,14 +191,14 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               <button
                 onClick={() => setShowRejectModal(true)}
                 disabled={acceptMutation.isPending || rejectMutation.isPending}
-                className="border border-red-400 text-red-500 text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-red-50 transition-colors disabled:opacity-50"
+                className="w-full sm:w-auto border border-red-400 text-red-500 text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-red-50 transition-colors disabled:opacity-50"
               >
                 Reject request
               </button>
               <button
                 onClick={() => setShowAcceptModal(true)}
                 disabled={acceptMutation.isPending || rejectMutation.isPending}
-                className="border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50 flex items-center gap-1"
+                className="w-full sm:w-auto border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
               >
                 Accept request
               </button>
@@ -210,14 +210,14 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
             <>
               <button
                 onClick={() => setShowSampleModal(true)}
-                className="border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-indigo-50 transition-colors"
+                className="w-full sm:w-auto border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-indigo-50 transition-colors"
               >
                 {sampleLogged ? "Edit sample collection info" : "Log sample collection"}
               </button>
               <button
                 onClick={() => navigate("/hospital-lab-upload-result", { state: { order } })}
                 disabled={!sampleLogged}
-                className="bg-[#3E4095] text-white text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto bg-[#3E4095] text-white text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Upload test result
               </button>
@@ -227,10 +227,10 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
           {/* Completed / Rejected */}
           {(isCompleted || isRejected) && (
             <>
-              <button className="flex items-center gap-2 border border-gray-300 text-gray-600 text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 border border-gray-300 text-gray-600 text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
                 <Printer size={13} /> Print out
               </button>
-              <button className="flex items-center gap-2 border border-gray-300 text-gray-600 text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 border border-gray-300 text-gray-600 text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
                 <Download size={13} /> Download
               </button>
             </>
