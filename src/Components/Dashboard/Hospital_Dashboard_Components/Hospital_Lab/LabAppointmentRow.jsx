@@ -11,7 +11,7 @@ const getTestName = (appt) => appt.test_name || appt.test || "Test request";
 
 const getNote = (appt) => appt.note || appt.doctor_note || appt.description || "—";
 
-const LabAppointmentRow = ({ appt, onOpen, onSeeDetails, onCreateOrder }) => {
+const LabAppointmentRow = ({ appt, onOpen, onSeeDetails, onCreateOrder, hideCreateOrder }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -66,12 +66,14 @@ const LabAppointmentRow = ({ appt, onOpen, onSeeDetails, onCreateOrder }) => {
             >
               See patient's details
             </p>
-            <p
-              className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
-              onClick={() => { setOpen(false); onCreateOrder(appt); }}
-            >
-              Create an order
-            </p>
+            {!hideCreateOrder && (
+              <p
+                className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                onClick={() => { setOpen(false); onCreateOrder(appt); }}
+              >
+                Create an order
+              </p>
+            )}
             <p className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
               Mark as done
             </p>

@@ -99,6 +99,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
         <PatientInfo
           selectedPatientDetails={selectedPatientDetails}
           setSeePatientDetails={setSeePatientDetails}
+          hideCreateOrder={appointmentType === 'history'}
         />
       </>
     );
@@ -194,13 +195,13 @@ const Hospital_Lab_Appointments_Dashboard = () => {
               <>
                 <div className="hidden lg:block">
                   {sortedAppointments.map((appt) => (
-                    <LabAppointmentRow key={appt.id} appt={appt} onOpen={handleOpen} onSeeDetails={handleSeeDetails} onCreateOrder={handleCreateOrder} />
+                    <LabAppointmentRow key={appt.id} appt={appt} onOpen={handleOpen} onSeeDetails={handleSeeDetails} onCreateOrder={handleCreateOrder} hideCreateOrder={appointmentType === 'history'} />
                   ))}
                 </div>
 
                 <div className="block lg:hidden space-y-4 my-4">
                   {sortedAppointments.map((appt) => (
-                    <LabAppointmentMobileCard key={appt.id} appt={appt} onOpen={handleOpen} onSeeDetails={handleSeeDetails} onCreateOrder={handleCreateOrder} />
+                    <LabAppointmentMobileCard key={appt.id} appt={appt} onOpen={handleOpen} onSeeDetails={handleSeeDetails} onCreateOrder={handleCreateOrder} hideCreateOrder={appointmentType === 'history'} />
                   ))}
                 </div>
                 

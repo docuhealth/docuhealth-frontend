@@ -28,7 +28,7 @@ const DUMMY_PATIENT_INFO = {
   },
 };
 
-const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
+const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateOrder }) => {
   const [viewDetailMedicalRecord, setViewDetailMedicalRecord] = useState(false);
   const [selectedMedicalRecord, setSelectedMedicalRecord] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,7 +37,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
-  const [orderForm, setOrderForm] = useState({ category: "", test_type: [], date: "", time: "" });
+  const [orderForm, setOrderForm] = useState({ category: "", test_type: [], note: "" });
 
   const p = selectedPatientDetails?.patient ?? {};
   const patientFullInfo = {
@@ -78,18 +78,22 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
 
   const { mutate: createOrder, isPending: isOrderPending } = useMutation({
     mutationFn: (payload) => {
-      const promises = payload.test_type.map((testSqid) =>
-        axiosInstanceHos.post("api/lab/test-orders/create", {
+      const promises = payload.test_type.map((testSqid) => {
+        const requestPayload = {
           test: testSqid,
           patient: selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin,
-          note: `Scheduled: ${payload.date} ${payload.time}`,
-        })
-      );
+          note: payload.note,
+        };
+        if (selectedPatientDetails?.sqid) {
+          requestPayload.appointment = selectedPatientDetails.sqid;
+        }
+        return axiosInstanceHos.post("api/lab/test-orders/create", requestPayload);
+      });
       return Promise.all(promises);
     },
     onSuccess: () => {
       setShowOrderModal(false);
-      setOrderForm({ category: "", test_type: [], date: "", time: "" });
+      setOrderForm({ category: "", test_type: [], note: "" });
       setShowSuccessModal(true);
     },
     onError: (err) => {
@@ -98,8 +102,8 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
   });
 
   const handleCreateOrder = () => {
-    if (!orderForm.category || orderForm.test_type.length === 0 || !orderForm.date || !orderForm.time) {
-      toast.error("Please fill in all fields.");
+    if (!orderForm.category || orderForm.test_type.length === 0) {
+      toast.error("Please select a category and at least one test type.");
       return;
     }
     createOrder(orderForm);
@@ -591,7 +595,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
       ) : (
         <>
           <div className="bg-white rounded-xl border mt-3 p-5 text-sm">
-            <div className="flex items-center justify-between border-b pb-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-3 gap-4 sm:gap-0">
               <div
                 className="flex items-center gap-1 cursor-pointer"
                 onClick={() => setSeePatientDetails(false)}
@@ -600,19 +604,21 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
                 <p>Patient details</p>
               </div>
 
-              <div className="flex items-center gap-3">
-                <p className="text-sm font-medium text-gray-800">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+                {/* <p className="text-sm font-medium text-gray-800">
                   Status:{" "}
                   <span className="text-amber-500 capitalize">
                     {selectedPatientDetails?.status || "Pending"}
                   </span>
-                </p>
-                <button
-                  onClick={() => setShowOrderModal(true)}
-                  className="border border-[#3E4095] text-[#3E4095] text-sm rounded-full px-5 py-1.5 hover:bg-blue-50 transition-colors cursor-pointer"
-                >
-                  Create an order
-                </button>
+                </p> */}
+                {!hideCreateOrder && (
+                  <button
+                    onClick={() => setShowOrderModal(true)}
+                    className="w-full sm:w-auto border border-[#3E4095] text-[#3E4095] text-sm rounded-full px-5 py-1.5 hover:bg-blue-50 transition-colors cursor-pointer"
+                  >
+                    Create an order
+                  </button>
+                )}
               </div>
             </div>
 
@@ -673,46 +679,51 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
       {/* ── Create an Order Modal ── */}
       {showOrderModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 flex flex-col gap-5">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 flex flex-col gap-6">
 
             {/* Header */}
             <div className="relative flex items-start justify-center">
               <div className="text-center">
-                <h3 className="text-base font-semibold text-[#1B2B40]">Patient&apos;s Lab test Request</h3>
-                <p className="text-sm text-gray-400 mt-1">Kindly fill up to proceed!</p>
+                <h3 className="text-[20px] font-semibold text-[#1B2B40]">Order Lab test</h3>
+                <p className="text-sm text-gray-500 mt-1">Kindly order a lab test</p>
               </div>
               <button
-                onClick={() => { setShowOrderModal(false); setOrderForm({ category: "", test_type: [], date: "", time: "" }); }}
-                className="absolute right-0 top-0 text-gray-400 hover:text-gray-600 transition-colors"
+                onClick={() => { setShowOrderModal(false); setOrderForm({ category: "", test_type: [], note: "" }); setIsTestTypeDropdownOpen(false); }}
+                className="absolute right-0 top-0 text-gray-800 hover:text-black transition-colors"
               >
-                <X size={18} />
+                <X size={20} strokeWidth={2.5} />
               </button>
             </div>
 
             {/* Category */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm text-gray-600">Category</label>
-              <select
-                value={orderForm.category}
-                onChange={(e) => setOrderForm({ ...orderForm, category: e.target.value, test_type: [] })}
-                className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-[#3E4095] transition-colors appearance-none"
-              >
-                <option value="" disabled>Select category</option>
-                {categories.map((cat) => (
-                  <option key={cat.sqid || cat.id} value={cat.sqid || cat.id}>{cat.name}</option>
-                ))}
-              </select>
+              <label className="text-sm text-[#1B2B40] font-medium">Category</label>
+              <div className="relative">
+                <select
+                  value={orderForm.category}
+                  onChange={(e) => setOrderForm({ ...orderForm, category: e.target.value, test_type: [] })}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-[#3E4095] transition-colors appearance-none"
+                >
+                  <option value="" disabled>Select category</option>
+                  {categories.map((cat) => (
+                    <option key={cat.sqid || cat.id} value={cat.sqid || cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
             </div>
 
-            {/* Test Type multi-select */}
+            {/* Test Type */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm text-gray-600">Test type</label>
+              <label className="text-sm text-[#1B2B40] font-medium">Test type</label>
               <div className="relative">
                 <button
                   type="button"
                   disabled={!orderForm.category}
                   onClick={() => setIsTestTypeDropdownOpen((v) => !v)}
-                  className={`w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-left flex justify-between items-center transition-colors ${!orderForm.category ? "opacity-50 cursor-not-allowed bg-gray-50" : "bg-white focus:border-[#3E4095]"}`}
+                  className={`w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-left flex justify-between items-center transition-colors ${!orderForm.category ? "opacity-60 cursor-not-allowed bg-gray-50" : "bg-white focus:border-[#3E4095]"}`}
                 >
                   <span className="truncate text-gray-700">
                     {isTestTypesLoading
@@ -724,12 +735,12 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
                   <svg className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${isTestTypeDropdownOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {isTestTypeDropdownOpen && fetchedTestTypes.length > 0 && (
-                  <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto">
-                    {fetchedTestTypes.map((test) => {
+                  <div className="absolute top-full mt-2 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto overflow-x-hidden">
+                    {fetchedTestTypes.map((test, index) => {
                       const id = test.sqid || test.name;
                       const checked = orderForm.test_type.includes(id);
                       return (
-                        <label key={id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer text-sm text-gray-700">
+                        <label key={id} className={`flex items-center gap-4 px-4 py-3 hover:bg-gray-50 cursor-pointer text-sm text-[#1B2B40] ${index !== fetchedTestTypes.length - 1 ? 'border-b border-gray-100' : ''}`}>
                           <input
                             type="checkbox"
                             checked={checked}
@@ -741,7 +752,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
                                   : [...prev.test_type, id],
                               }));
                             }}
-                            className="accent-[#3E4095]"
+                            className="w-4 h-4 accent-blue-600 rounded border-gray-300"
                           />
                           {test.name}
                         </label>
@@ -752,40 +763,29 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
               </div>
             </div>
 
-            {/* Date + Time */}
-            <div className="flex gap-3">
-              <div className="flex flex-col gap-1.5 flex-1">
-                <label className="text-sm text-gray-600">Request date</label>
-                <input
-                  type="date"
-                  value={orderForm.date}
-                  onChange={(e) => setOrderForm({ ...orderForm, date: e.target.value })}
-                  className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-[#3E4095] transition-colors w-full"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5 flex-1">
-                <label className="text-sm text-gray-600">Request Time</label>
-                <input
-                  type="time"
-                  value={orderForm.time}
-                  onChange={(e) => setOrderForm({ ...orderForm, time: e.target.value })}
-                  className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-[#3E4095] transition-colors w-full"
-                />
-              </div>
+            {/* Add note */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm text-[#1B2B40] font-medium">Add note:</label>
+              <textarea
+                value={orderForm.note}
+                onChange={(e) => setOrderForm({ ...orderForm, note: e.target.value })}
+                placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
+                className="border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-500 bg-white outline-none focus:border-[#3E4095] transition-colors resize-none h-28"
+              />
             </div>
 
             {/* Submit */}
             <button
               onClick={handleCreateOrder}
               disabled={isOrderPending}
-              className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3.5 rounded-full transition-colors disabled:opacity-50 hover:bg-[#2e307a]"
+              className="w-full bg-[#3E4095] text-white text-sm font-medium py-2.5 rounded-full transition-colors disabled:opacity-50 hover:bg-[#2e307a]"
             >
               {isOrderPending ? (
                 <span className="flex items-center justify-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Creating...
                 </span>
-              ) : "Create test order"}
+              ) : "Proceed"}
             </button>
           </div>
         </div>
@@ -794,22 +794,20 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
       {/* ── Success Modal ── */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8 flex flex-col items-center gap-5">
-            <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-auto p-8 flex flex-col items-center text-center">
+            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
               <div className="w-14 h-14 rounded-full bg-green-700 flex items-center justify-center">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                   <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
             </div>
-
-            <p className="text-center text-sm font-medium text-gray-800 leading-relaxed">
+            <p className="text-base font-semibold text-gray-800 mb-6 leading-snug">
               You have successfully created/<br />accepted a patient&apos;s test request!
             </p>
-
             <button
               onClick={() => setShowSuccessModal(false)}
-              className="w-full bg-green-700 text-white text-sm font-semibold py-3 rounded-full hover:bg-green-800 transition-colors"
+              className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3 rounded-full hover:opacity-90 transition-colors"
             >
               Done
             </button>
