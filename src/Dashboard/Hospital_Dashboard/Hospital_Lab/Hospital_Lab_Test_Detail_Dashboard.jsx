@@ -11,13 +11,18 @@ import {
   acceptLabRequest,
   rejectLabRequest,
   logSpecimenCollectionTime,
+  approveLabTestResult,
+  rejectLabTestResult,
 } from "../../../queries/Hospital/lab/requests";
+import DoctorReviewModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/DoctorReviewModal";
 
 const STATUS_STYLES = {
   pending:     { label: "Pending",     color: "text-amber-500" },
   in_progress: { label: "In Progress", color: "text-amber-500" },
   completed:   { label: "Completed",   color: "text-green-600" },
   rejected:    { label: "Rejected",    color: "text-red-500"   },
+  approved:    { label: "Approved",    color: "text-green-600" },
+  accepted:    { label: "Accepted",    color: "text-green-600" },
 };
 
 const getRefRange = (p) => {
@@ -67,22 +72,30 @@ const normalizeOrder = (raw, tab) => ({
 });
 
 /* ─── main component ─── */
-const Hospital_Lab_Test_Detail_Dashboard = () => {
+const Hospital_Lab_Test_Detail_Dashboard = ({ 
+  orderIdProp, 
+  onBackProp, 
+  isDoctorView 
+} = {}) => {
   const navigate      = useNavigate();
   const queryClient   = useQueryClient();
-  const { state }     = useLocation();
-  const sqid          = state?.order?.id;
-  const activeTab     = state?.order?.tab;
+  const { state }     = useLocation() || {};
+  const isDirectOrder = typeof orderIdProp === "object" && orderIdProp !== null;
+  const sqid          = isDirectOrder ? orderIdProp.sqid : (orderIdProp || state?.sqid);
 
-  const { data: rawOrder, isLoading: orderLoading } = useQuery({
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [isDoctorReviewModalOpen, setIsDoctorReviewModalOpen] = useState(false);
+  const [doctorReviewType, setDoctorReviewType] = useState("approve");
+
+  const { data: fetchedOrder, isLoading: orderLoading } = useQuery({
     queryKey: ["lab-order", sqid],
     queryFn:  () => fetchLabOrderDetail(sqid),
-    enabled:  !!sqid,
+    enabled:  !!sqid && !isDirectOrder,
   });
 
-  const order = rawOrder ? normalizeOrder(rawOrder, activeTab) : (state?.order ?? {});
+  const rawOrder = isDirectOrder ? orderIdProp : fetchedOrder;
+  const order = rawOrder ? normalizeOrder(rawOrder, state?.order?.tab) : (state?.order ?? {});
 
-  const [showRejectModal, setShowRejectModal] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [showSampleModal, setShowSampleModal] = useState(false);
   const [fromAccept, setFromAccept] = useState(false);
@@ -91,7 +104,8 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
   const [sampleTime, setSampleTime] = useState("");
   const [rejectReason, setRejectReason] = useState("");
 
-  const statusStyle  = STATUS_STYLES[order.status] ?? STATUS_STYLES.pending;
+  const displayStatus = isDoctorView && order?.result_info?.status ? order.result_info.status : order.status;
+  const statusStyle  = STATUS_STYLES[displayStatus] ?? STATUS_STYLES.pending;
   const isPending    = order.status === "pending";
   const isInProgress = order.status === "in_progress";
   const isCompleted  = order.status === "completed";
@@ -111,31 +125,60 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
 
   const headerLabel = isCompleted || isRejected ? "Lab result" : "Test";
 
-  const acceptMutation = useMutation({ mutationFn: () => acceptLabRequest(order.id) });
-  const rejectMutation = useMutation({ mutationFn: ({ reason }) => rejectLabRequest({ sqid: order.id, reason }) });
-  const specimenMutation = useMutation({ mutationFn: (data) => logSpecimenCollectionTime(data) });
-
-  const handleAcceptLater = async () => {
-    try {
-      await acceptMutation.mutateAsync();
+  const acceptMutation = useMutation({ 
+    mutationFn: () => acceptLabRequest(order.id),
+    onSuccess: () => {
       toast.success("Request accepted — moved to In-progress");
       setShowAcceptModal(false);
-      navigate(-1);
-    } catch {
-      toast.error("Failed to accept request. Please try again.");
-    }
-  };
+      queryClient.invalidateQueries(["labRequests"]);
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || "Failed to accept request");
+    },
+  });
 
-  const handleReject = async () => {
-    try {
-      await rejectMutation.mutateAsync({ reason: rejectReason });
-      toast.success("Request rejected");
-      setShowRejectModal(false);
-      navigate(-1);
-    } catch {
-      toast.error("Failed to reject request. Please try again.");
-    }
-  };
+  const rejectMutation = useMutation({
+    mutationFn: rejectLabRequest,
+    onSuccess: () => {
+      toast.success("Request rejected successfully!");
+      setIsRejectModalOpen(false);
+      queryClient.invalidateQueries(["labOrderDetail", sqid]);
+      queryClient.invalidateQueries(["labRequests"]);
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || "Failed to reject request");
+    },
+  });
+
+  const specimenMutation = useMutation({ mutationFn: (data) => logSpecimenCollectionTime(data) });
+
+  const approveMutation = useMutation({
+    mutationFn: approveLabTestResult,
+    onSuccess: () => {
+      toast.success("Result approved successfully!");
+      setIsDoctorReviewModalOpen(false);
+      queryClient.invalidateQueries(["patient-lab-records"]);
+      queryClient.invalidateQueries(["labOrderDetail", sqid]);
+      queryClient.invalidateQueries(["labRequests"]);
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || "Failed to approve result");
+    },
+  });
+
+  const rejectDoctorMutation = useMutation({
+    mutationFn: rejectLabTestResult,
+    onSuccess: () => {
+      toast.success("Result rejected successfully!");
+      setIsDoctorReviewModalOpen(false);
+      queryClient.invalidateQueries(["patient-lab-records"]);
+      queryClient.invalidateQueries(["labOrderDetail", sqid]);
+      queryClient.invalidateQueries(["labRequests"]);
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || "Failed to reject result");
+    },
+  });
 
   const handleSampleSubmit = async () => {
     const specimen_collected_at = `${sampleDate}T${sampleTime}:00`;
@@ -158,7 +201,7 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
     }
   };
 
-  if (orderLoading) {
+  if (orderLoading && !isDirectOrder) {
     return (
       <div className="flex items-center justify-center py-24 text-gray-400 text-sm">
         <div className="w-5 h-5 border-2 border-[#3E4095] border-t-transparent rounded-full animate-spin mr-3" />
@@ -173,10 +216,9 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         <DynamicDate />
       </div>
 
-      {/* ── Top bar ── */}
       <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => onBackProp ? onBackProp() : navigate(-1)}
           className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#3E4095] transition-colors w-fit"
         >
           <ArrowLeft size={16} />
@@ -189,11 +231,10 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
             <span className={`font-semibold ${statusStyle.color}`}>{statusStyle.label}</span>
           </p>
 
-          {/* Pending */}
-          {isPending && (
+          {isPending && !isDoctorView && (
             <>
               <button
-                onClick={() => setShowRejectModal(true)}
+                onClick={() => setIsRejectModalOpen(true)}
                 disabled={acceptMutation.isPending || rejectMutation.isPending}
                 className="w-full sm:w-auto border border-red-400 text-red-500 text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-red-50 transition-colors disabled:opacity-50"
               >
@@ -209,8 +250,7 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
             </>
           )}
 
-          {/* In-progress */}
-          {isInProgress && (
+          {isInProgress && !isDoctorView && (
             <>
               <button
                 onClick={() => setShowSampleModal(true)}
@@ -221,28 +261,38 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               <button
                 onClick={() => navigate("/hospital-lab-upload-result", { state: { order } })}
                 disabled={!sampleLogged}
-                className="w-full sm:w-auto bg-[#3E4095] text-white text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto bg-[#3E4095] text-white text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-[#2e3070] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Upload test result
               </button>
             </>
           )}
 
-          {/* Completed / Rejected */}
-          {(isCompleted || isRejected) && (
+          {isCompleted && isDoctorView && (
             <>
-              <button className="w-full sm:w-auto flex items-center justify-center gap-2 border border-gray-300 text-gray-600 text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
-                <Printer size={13} /> Print out
+              <button
+                onClick={() => {
+                  setDoctorReviewType("reject");
+                  setIsDoctorReviewModalOpen(true);
+                }}
+                className="w-full sm:w-44 border border-red-500 text-red-500 text-xs font-medium px-4 sm:px-6 py-2.5 rounded-full hover:bg-red-50 transition-colors flex items-center justify-center"
+              >
+                Reject result
               </button>
-              <button className="w-full sm:w-auto flex items-center justify-center gap-2 border border-gray-300 text-gray-600 text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
-                <Download size={13} /> Download
+              <button
+                onClick={() => {
+                  setDoctorReviewType("approve");
+                  setIsDoctorReviewModalOpen(true);
+                }}
+                className="w-full sm:w-44 bg-[#3E4095] text-white text-xs font-medium px-4 sm:px-6 py-2.5 rounded-full hover:bg-[#2e3070] transition-colors flex items-center justify-center"
+              >
+                Accept result
               </button>
             </>
           )}
         </div>
       </div>
 
-      {/* ── Patient info card (all tabs) ── */}
       <PatientInfoCard
         order={order}
         isCompleted={isCompleted}
@@ -251,7 +301,6 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         onEditSample={() => setShowSampleModal(true)}
       />
 
-      {/* ── PENDING: test details ── */}
       {isPending && (
         <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5 flex flex-col gap-4">
           <div>
@@ -277,7 +326,6 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         </div>
       )}
 
-      {/* ── IN-PROGRESS: test details ── */}
       {isInProgress && (
         <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5 flex flex-col gap-4">
           <div>
@@ -297,16 +345,14 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         </div>
       )}
 
-      {/* ── COMPLETED: result tables + interpretation ── */}
       {isCompleted && (
         <>
           {resultParams.length > 0 && (
-            <div className="mt-4 bg-[#F8F9FA] rounded-2xl px-4 sm:px-6 py-5 sm:py-6">
+            <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
               <p className="text-sm font-bold text-gray-800 mb-4 sm:mb-6">{order.test}</p>
-              {/* Desktop Table */}
               <div className="hidden lg:block overflow-x-auto">
                 <div className="min-w-[600px] flex flex-col">
-                  <div className="grid grid-cols-4 text-left text-sm font-semibold text-gray-700 bg-white py-4 px-6 rounded-full mb-2 shadow-sm">
+                  <div className="grid grid-cols-4 text-left text-sm font-semibold text-gray-700 bg-[#F8F9FA] py-4 px-6 rounded-full mb-2 border border-gray-200">
                     <p>Test</p>
                     <p>Result</p>
                     <p>Reference range</p>
@@ -335,7 +381,6 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
                 </div>
               </div>
 
-              {/* Mobile View */}
               <div className="lg:hidden flex flex-col gap-4 mt-2">
                 {resultParams.map((p, i) => {
                   const info = p.parameter_info;
@@ -346,7 +391,7 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
                   const isGreen = statusLower === "positive" || statusLower === "normal";
 
                   return (
-                    <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                    <div key={i} className="bg-white border border-gray-200 rounded-md p-4">
                       <div className="flex justify-between items-start mb-4">
                         <div className="text-gray-800 font-bold text-sm">
                           {info.name}
@@ -381,8 +426,7 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
             </div>
           )}
 
-          {/* Interpretation + Clinical correlation + Comments */}
-          <div className="mt-4 bg-[#F8F9FA] rounded-2xl px-4 sm:px-6 py-5 sm:py-6 flex flex-col gap-5">
+          <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5 flex flex-col gap-5">
             {order.result_info?.interpretation && (
               <div>
                 <p className="text-xs sm:text-sm text-gray-500 mb-2">Interpretation:</p>
@@ -406,10 +450,29 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               </div>
             )}
           </div>
+
+          {order.specimen_collected_at && (
+            <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
+              <p className="text-sm font-semibold text-[#1B2B40] mb-4">Date collected</p>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Date:</p>
+                  <p className="text-sm font-medium text-[#1B2B40]">
+                    {new Date(order.specimen_collected_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Time:</p>
+                  <p className="text-sm font-medium text-[#1B2B40]">
+                    {new Date(order.specimen_collected_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
 
-      {/* ── REJECTED: reason card ── */}
       {isRejected && (
         <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
           <p className="text-xs sm:text-sm font-semibold text-red-500 mb-2">Reason for rejection (note):</p>
@@ -417,7 +480,6 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         </div>
       )}
 
-      {/* ── Accept confirmation modal ── */}
       {showAcceptModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
           <div className="bg-white rounded-md shadow-xl w-full max-w-md p-6 flex flex-col items-center gap-4">
@@ -445,7 +507,7 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               Accept &amp; Log sample collection now
             </button>
             <button
-              onClick={handleAcceptLater}
+              onClick={() => acceptMutation.mutate()}
               disabled={acceptMutation.isPending}
               className="w-full border border-[#3E4095] text-[#3E4095] text-sm font-medium py-3 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
@@ -457,11 +519,9 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         </div>
       )}
 
-      {/* ── Sample Collection Info modal ── */}
       {showSampleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
           <div className="bg-white rounded-md shadow-xl w-full max-w-md p-6 flex flex-col gap-5">
-            {/* Header */}
             <div className="relative flex items-start justify-center">
               <div className="text-center">
                 <h3 className="text-base font-semibold text-gray-900">Edit Sample Collection Info</h3>
@@ -475,7 +535,6 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               </button>
             </div>
 
-            {/* Patient Name */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm text-gray-500">Patient Name</label>
               <input
@@ -486,7 +545,6 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               />
             </div>
 
-            {/* Test Requested */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm text-gray-500">Test Requested</label>
               <input
@@ -497,7 +555,6 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               />
             </div>
 
-            {/* Date + Time */}
             <div className="flex gap-3">
               <div className="flex flex-col gap-1.5 flex-1">
                 <label className="text-sm text-gray-500">New sample collection date</label>
@@ -534,13 +591,27 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         </div>
       )}
 
+      {/* Reject modal for lab requests */}
       <RejectModal
-        isOpen={showRejectModal}
-        onClose={() => setShowRejectModal(false)}
-        onConfirm={handleReject}
-        isPending={rejectMutation.isPending}
-        value={rejectReason}
-        onChange={setRejectReason}
+        isOpen={isRejectModalOpen}
+        onClose={() => setIsRejectModalOpen(false)}
+        onSubmit={(reason) => rejectMutation.mutate({ sqid, reason })}
+        isSubmitting={rejectMutation.isPending}
+      />
+
+      {/* Approve/Reject modal for doctors */}
+      <DoctorReviewModal
+        isOpen={isDoctorReviewModalOpen}
+        onClose={() => setIsDoctorReviewModalOpen(false)}
+        type={doctorReviewType}
+        isPending={approveMutation.isPending || rejectDoctorMutation.isPending}
+        onConfirm={() => {
+          if (doctorReviewType === "approve") {
+            approveMutation.mutate(sqid);
+          } else {
+            rejectDoctorMutation.mutate(sqid);
+          }
+        }}
       />
     </>
   );

@@ -26,7 +26,7 @@ const ConfirmUploadModal = ({ isOpen, onClose, onConfirm, isPending }) => {
         <button
           onClick={onConfirm}
           disabled={isPending}
-          className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3 rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+          className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3 rounded-full hover:bg-[#2e3070] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
         >
           {isPending ? (
             <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Uploading...</>

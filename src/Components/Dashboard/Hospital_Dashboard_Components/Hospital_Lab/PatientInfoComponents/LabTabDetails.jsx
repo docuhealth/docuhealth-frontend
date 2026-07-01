@@ -1500,7 +1500,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                 </div>
 
                 <button
-                  className={`w-full mt-4 ${isPending ? 'border border-gray-400 bg-gray-400 text-white cursor-not-allowed' : 'bg-[#3E4095] text-white '} py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-colors`}
+                  className={`w-full mt-4 ${isPending ? 'border border-gray-400 bg-gray-400 text-white cursor-not-allowed' : 'bg-[#3E4095] text-white hover:bg-[#2e3070] '} py-2 rounded-full text-sm font-medium transition-colors`}
                   onClick={handleCreateAdditionalNote}
                   disabled={isPending}
                 >

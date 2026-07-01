@@ -49,3 +49,13 @@ export const submitTestResult = async (payload) => {
   const res = await axiosInstanceHos.post("api/lab/test-orders/results/submit", payload);
   return res.data;
 };
+
+export const approveLabTestResult = async (sqid) => {
+  const res = await axiosInstanceHos.patch(`api/lab/test-orders/results/${sqid}/approve`);
+  return res.data;
+};
+
+export const rejectLabTestResult = async (sqid) => {
+  const res = await axiosInstanceHos.patch(`api/lab/test-orders/results/${sqid}/reject`);
+  return res.data;
+};

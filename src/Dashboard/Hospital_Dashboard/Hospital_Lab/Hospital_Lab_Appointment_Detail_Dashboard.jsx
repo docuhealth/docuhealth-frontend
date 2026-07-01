@@ -195,7 +195,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
               <button
                 onClick={() => navigate("/hospital-lab-upload-result", { state: { order } })}
                 disabled={!sampleLogged}
-                className="bg-[#3E4095] text-white text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="bg-[#3E4095] text-white text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-[#2e3070] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Upload test result
               </button>
@@ -205,12 +205,12 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
           {/* Completed / Rejected */}
           {(isCompleted || isRejected) && (
             <>
-              <button className="flex items-center gap-2 border border-gray-300 text-gray-600 text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
+              {/* <button className="flex items-center gap-2 border border-gray-300 text-gray-600 text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
                 <Printer size={13} /> Print out
               </button>
               <button className="flex items-center gap-2 border border-gray-300 text-gray-600 text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
                 <Download size={13} /> Download
-              </button>
+              </button> */}
             </>
           )}
         </div>

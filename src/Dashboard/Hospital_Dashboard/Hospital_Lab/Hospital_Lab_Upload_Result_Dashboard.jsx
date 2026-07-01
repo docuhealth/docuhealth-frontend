@@ -209,7 +209,7 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
           </button>
           <button
             onClick={() => setShowConfirm(true)}
-            className="bg-[#3E4095] text-white text-sm font-medium px-8 py-2.5 rounded-full hover:bg-indigo-700 transition-colors text-center"
+            className="bg-[#3E4095] text-white text-sm font-medium px-8 py-2.5 rounded-full hover:bg-[#2e3070] transition-colors text-center"
           >
             Upload result
           </button>

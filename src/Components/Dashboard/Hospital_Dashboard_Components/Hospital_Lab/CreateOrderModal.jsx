@@ -80,7 +80,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
           </p>
           <button
             onClick={handleClose}
-            className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3 rounded-full hover:opacity-90 transition-colors"
+            className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3 rounded-full hover:bg-[#2e3070] transition-colors"
           >
             Done
           </button>
@@ -190,7 +190,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
         <button
           onClick={handleSubmit}
           disabled={isPending}
-          className="w-full bg-[#3E4095] text-white text-sm font-medium py-2.5 rounded-full transition-colors disabled:opacity-50 hover:bg-[#2e307a]"
+          className="w-full bg-[#3E4095] text-white text-sm font-medium py-2.5 rounded-full transition-colors disabled:opacity-50 hover:bg-[#2e3070]"
         >
           {isPending ? (
             <span className="flex items-center justify-center gap-2">

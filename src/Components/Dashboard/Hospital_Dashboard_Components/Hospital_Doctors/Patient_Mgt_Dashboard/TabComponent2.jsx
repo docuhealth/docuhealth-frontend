@@ -8,17 +8,16 @@ const TabComponent2 = ({ tabs }) => {
   return (
     <div className="w-full py-3 mx-auto">
       {/* Tab Headers */}
-      <div className="flex border-b border-gray-200">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2 border-b-0 sm:border-b border-gray-200 pb-4 sm:pb-0 sm:mb-5">
         {tabs.map((tab, index) => (
           <button
             key={index}
             onClick={() => setActiveTab(index)}
-            className={`text-sm px-2 sm:px-4  py-2 sm:text-sm font-medium transition-colors duration-200 cursor-pointer
-              ${
-                activeTab === index
-                  ? "text-[#3E4095]  border-b-2 border-[#3E4095] font-semibold"
-                  : "text-gray-600 hover:text-gray-800"
-              }`}
+            className={`text-[13px] px-2 sm:px-6 py-2 sm:py-3 font-medium transition-colors duration-200 cursor-pointer text-center sm:whitespace-nowrap sm:shrink-0 rounded-lg sm:rounded-none ${
+              activeTab === index
+                ? "bg-[#3E4095] text-white sm:bg-transparent sm:text-[#3E4095] sm:border-b-2 sm:border-[#3E4095] font-semibold"
+                : "text-gray-600 hover:bg-gray-100 hover:text-gray-800 sm:hover:bg-transparent sm:border-b-2 sm:border-transparent"
+            }`}
           >
             {tab.title}
           </button>
