@@ -55,7 +55,7 @@ const LabAppointmentMobileCard = ({ appt, onOpen, onSeeDetails, onCreateOrder, h
                   className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                   onClick={() => { setOpen(false); onCreateOrder(appt); }}
                 >
-                  Create an order
+                  Create a test order
                 </p>
               )}
               <p className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">

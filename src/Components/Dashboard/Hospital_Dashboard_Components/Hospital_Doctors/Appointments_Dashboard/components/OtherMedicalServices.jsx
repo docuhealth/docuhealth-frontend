@@ -227,7 +227,8 @@ const OtherMedicalServices = ({
         return axiosInstanceHos.post("api/lab/test-orders/create", {
           test: testSqid,
           patient: payload.patient_hin,
-          note: payload.note
+          note: payload.note,
+          order_source: "staff_admission_order"
         });
       });
       return await Promise.all(promises);

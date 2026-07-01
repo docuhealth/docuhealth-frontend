@@ -83,6 +83,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
           test: testSqid,
           patient: selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin,
           note: payload.note,
+          order_source: "staff_appointment_order",
         };
         if (selectedPatientDetails?.sqid) {
           requestPayload.appointment = selectedPatientDetails.sqid;
@@ -616,7 +617,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     onClick={() => setShowOrderModal(true)}
                     className="w-full sm:w-auto border border-[#3E4095] text-[#3E4095] text-sm rounded-full px-5 py-1.5 hover:bg-blue-50 transition-colors cursor-pointer"
                   >
-                    Create an order
+                    Create a test order
                   </button>
                 )}
               </div>

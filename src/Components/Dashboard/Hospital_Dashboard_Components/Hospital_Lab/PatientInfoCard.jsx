@@ -7,6 +7,25 @@ const calcAge = (dob) => {
   return isNaN(years) ? null : `${years} years`;
 };
 
+const formatFullDateTime = (dateString) => {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return null;
+
+  const day = date.getDate();
+  const suffix = day % 10 === 1 && day !== 11 ? "st" : day % 10 === 2 && day !== 12 ? "nd" : day % 10 === 3 && day !== 13 ? "rd" : "th";
+  const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May.", "Jun.", "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12 || 12;
+
+  return `${day}${suffix}, ${month} ${year} / ${hours}:${minutes} ${ampm}`;
+};
+
 const PatientInfoCard = ({ order, isCompleted, isRejected, isInProgress, onEditSample, dateLabel: dateLabelProp, hideRequestedBy }) => {
   const requestedBy = order.requestedBy ?? "—";
   const email       = order.email       ?? "—";
@@ -65,7 +84,7 @@ const PatientInfoCard = ({ order, isCompleted, isRejected, isInProgress, onEditS
           <div className="flex flex-col gap-1">
             <p className="text-xs text-gray-400">Sample collection date:</p>
             <p className="text-sm font-semibold text-[#1B2B40]">
-              {order.specimen_collected_at ?? (isCompleted ? order.datetime : "—")}
+              {order.specimen_collected_at ? formatFullDateTime(order.specimen_collected_at) : (isCompleted ? order.datetime : "—")}
             </p>
           </div>
         )}

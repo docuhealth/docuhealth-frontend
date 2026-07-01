@@ -103,7 +103,11 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
     ? `${preferredSpecimen.name}${preferredSpecimen.container ? ` (${preferredSpecimen.container})` : ""}`
     : "—";
 
-  const resultParams = order.result_info?.parameters ?? [];
+  const resultParams = order.result_info?.parameters ?? (order.test_info?.parameters || []).map(p => ({
+    parameter_info: p,
+    value: null,
+    status: null
+  }));
 
   const headerLabel = isCompleted || isRejected ? "Lab result" : "Test";
 
@@ -297,36 +301,33 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
       {isCompleted && (
         <>
           {resultParams.length > 0 && (
-            <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
-              <p className="text-xs sm:text-sm font-semibold text-[#1B2B40] mb-4">{order.test}</p>
+            <div className="mt-4 bg-[#F8F9FA] rounded-2xl px-4 sm:px-6 py-5 sm:py-6">
+              <p className="text-sm font-bold text-gray-800 mb-4 sm:mb-6">{order.test}</p>
               {/* Desktop Table */}
               <div className="hidden lg:block overflow-x-auto">
-                <div className="min-w-[600px] flex flex-col mt-2">
-                  <div className="grid grid-cols-6 text-left text-sm bg-gray-100 py-5 rounded-md">
-                    <div className="col-span-2 pl-5">Parameter</div>
+                <div className="min-w-[600px] flex flex-col">
+                  <div className="grid grid-cols-4 text-left text-sm font-semibold text-gray-700 bg-white py-4 px-6 rounded-full mb-2 shadow-sm">
+                    <p>Test</p>
                     <p>Result</p>
-                    <p>Unit</p>
                     <p>Reference range</p>
                     <p>Status</p>
                   </div>
                   {resultParams.map((p, i) => {
                     const info = p.parameter_info;
-                    const paramStatus = getParamStatus(p.value, info);
+                    const paramStatus = p.status ?? getParamStatus(p.value, info);
+                    const isLast = i === resultParams.length - 1;
+                    const statusText = paramStatus ?? "—";
+                    const statusLower = statusText.toLowerCase();
+                    const isRed = statusLower === "negative" || statusLower === "abnormal";
+                    const isGreen = statusLower === "positive" || statusLower === "normal";
+                    
                     return (
-                      <div key={i} className="grid grid-cols-6 items-center text-[12px] text-gray-700 border-b border-b-gray-200">
-                        <div className="font-semibold col-span-2 py-6 pl-5 flex items-center gap-1.5 text-gray-600">
-                          <ParamIcon />
-                          <p>{info.name}</p>
-                        </div>
-                        <p>{p.value ?? "—"}</p>
-                        <p>{info.unit || "—"}</p>
+                      <div key={i} className={`grid grid-cols-4 items-center text-sm text-gray-600 py-4 px-6 ${isLast ? "" : "border-b border-gray-200"}`}>
+                        <p>{info.name}</p>
+                        <p>{p.value ?? "—"} {info.unit || ""}</p>
                         <p>{getRefRange(info)}</p>
-                        <p className={`capitalize font-medium ${
-                          paramStatus === "Normal" ? "text-green-600"
-                          : paramStatus === "Abnormal" ? "text-red-500"
-                          : "text-gray-500"
-                        }`}>
-                          {paramStatus ?? "—"}
+                        <p className={`capitalize font-medium ${isRed ? "text-red-500" : isGreen ? "text-green-600" : "text-gray-500"}`}>
+                          {statusText}
                         </p>
                       </div>
                     );
@@ -338,33 +339,37 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               <div className="lg:hidden flex flex-col gap-4 mt-2">
                 {resultParams.map((p, i) => {
                   const info = p.parameter_info;
-                  const paramStatus = getParamStatus(p.value, info);
+                  const paramStatus = p.status ?? getParamStatus(p.value, info);
+                  const statusText = paramStatus ?? "—";
+                  const statusLower = statusText.toLowerCase();
+                  const isRed = statusLower === "negative" || statusLower === "abnormal";
+                  const isGreen = statusLower === "positive" || statusLower === "normal";
+
                   return (
-                    <div key={i} className="bg-white border border-gray-200 rounded-md p-4 duration-200">
+                    <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
                       <div className="flex justify-between items-start mb-4">
-                        <div className="flex items-center gap-2 text-gray-900 font-bold text-[14px]">
-                          <ParamIcon />
-                          <span>{info.name}</span>
+                        <div className="text-gray-800 font-bold text-sm">
+                          {info.name}
                         </div>
                         <span className={`text-[10px] px-2 py-1 rounded-md border font-medium uppercase tracking-wider ${
-                          paramStatus === "Normal" ? "bg-green-50 text-green-600 border-green-100"
-                          : paramStatus === "Abnormal" ? "bg-red-50 text-red-500 border-red-100"
+                          isGreen ? "bg-green-50 text-green-600 border-green-100"
+                          : isRed ? "bg-red-50 text-red-500 border-red-100"
                           : "bg-gray-50 text-gray-500 border-gray-100"
                         }`}>
-                          {paramStatus ?? "—"}
+                          {statusText}
                         </span>
                       </div>
 
                       <div className="grid grid-cols-2 gap-y-4 pt-3 border-t border-gray-50">
                         <div>
-                          <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Result</p>
-                          <p className="text-[11.5px] font-medium text-gray-700 leading-none mt-1">
+                          <p className="text-[10px] text-gray-400 uppercase font-medium mb-1">Result</p>
+                          <p className="text-sm font-medium text-gray-700">
                             {p.value ?? "—"} {info.unit || ""}
                           </p>
                         </div>
                         <div>
-                          <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Reference Range</p>
-                          <p className="text-[11.5px] font-medium text-gray-700 leading-none mt-1">
+                          <p className="text-[10px] text-gray-400 uppercase font-medium mb-1">Reference Range</p>
+                          <p className="text-sm font-medium text-gray-700">
                             {getRefRange(info)}
                           </p>
                         </div>
@@ -377,27 +382,27 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
           )}
 
           {/* Interpretation + Clinical correlation + Comments */}
-          <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5 flex flex-col gap-5">
+          <div className="mt-4 bg-[#F8F9FA] rounded-2xl px-4 sm:px-6 py-5 sm:py-6 flex flex-col gap-5">
             {order.result_info?.interpretation && (
               <div>
-                <p className="text-xs text-gray-500 mb-2">Interpretation:</p>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                <p className="text-xs sm:text-sm text-gray-500 mb-2">Interpretation:</p>
+                <p className="text-sm font-medium text-gray-800 leading-relaxed whitespace-pre-line">
                   {order.result_info.interpretation}
                 </p>
               </div>
             )}
             {order.result_info?.clinical_correlation && (
               <div>
-                <p className="text-xs text-gray-500 mb-2">Clinical correlation:</p>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                <p className="text-xs sm:text-sm text-gray-500 mb-2">Clinical correlation:</p>
+                <p className="text-sm font-medium text-gray-800 leading-relaxed whitespace-pre-line">
                   {order.result_info.clinical_correlation}
                 </p>
               </div>
             )}
             {order.result_info?.comments && (
               <div>
-                <p className="text-xs text-gray-500 mb-2">Comments:</p>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{order.result_info.comments}</p>
+                <p className="text-xs sm:text-sm text-gray-500 mb-2">Comments:</p>
+                <p className="text-sm font-medium text-gray-800 leading-relaxed">{order.result_info.comments}</p>
               </div>
             )}
           </div>
