@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import { FaTimes } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { HosAppContext } from "../../../../../../context/HospitalContext/Admin/HosAppContext";
 
 const AccountSettingsTab = () => {
+  const { profile, hospital_email } = useContext(HosAppContext);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,6 +16,16 @@ const AccountSettingsTab = () => {
     confirmPassword: "",
     otp: "",
   });
+
+  useEffect(() => {
+    if (profile || hospital_email) {
+      setFormData((prev) => ({
+        ...prev,
+        name: profile?.name || "",
+        email: hospital_email || "",
+      }));
+    }
+  }, [profile, hospital_email]);
 
   const queryClient = useQueryClient();
 
@@ -197,7 +209,7 @@ const handleRequestEmailOTP = (e) => {
   return (
     <>
       <div className="space-y-4">
-        <div className="w-full  mx-auto ">
+        <div className="w-full max-w-lg">
           <form className="my-3">
             <div className="">
               <div className="border-b text-xs uppercase text-gray-600 pb-1">
