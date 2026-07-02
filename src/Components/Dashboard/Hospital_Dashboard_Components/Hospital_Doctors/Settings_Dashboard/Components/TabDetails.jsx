@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import { FaTimes } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 
 const AccountSettingsTab = () => {
+  const { profile } = useContext(DoctorAppContext);
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -15,6 +17,17 @@ const AccountSettingsTab = () => {
     confirmPassword: "",
     otp: "",
   });
+
+  useEffect(() => {
+    if (profile) {
+      setFormData((prev) => ({
+        ...prev,
+        firstname: profile.firstname || "",
+        lastname: profile.lastname || "",
+        email: profile.email || "",
+      }));
+    }
+  }, [profile]);
 
   const queryClient = useQueryClient();
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -204,7 +217,7 @@ const AccountSettingsTab = () => {
   return (
     <>
       <div className="space-y-4">
-        <div className="w-full  mx-auto ">
+        <div className="w-full max-w-lg">
           <form className="my-3">
             <div className="">
               <div className="border-b text-xs uppercase text-gray-600 pb-1">
