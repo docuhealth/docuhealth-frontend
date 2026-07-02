@@ -33,7 +33,7 @@ const PatientInfo = ({ patientFullInfo, selected }) => {
 
   return (
     <>
-      <div className="my-5 bg-[#FAFAFA] rounded-lg border p-4">
+      <div className="mb-5 bg-[#FAFAFA] rounded-lg border p-4">
         <h2 className="font-medium">General Information</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -478,7 +478,7 @@ const PatientMedicalRecord = ({
     <>
       {Array.isArray(patientMedRecords) && patientMedRecords.length > 0 ? (
         <>
-          <div className="mt-5 -4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className=" -4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {patientMedRecords.map((record) => (
               <div key={record.id} className="bg-[#FAFEFF] border rounded-lg p-4">
                 <div className="flex justify-between items-center ">
@@ -1905,7 +1905,7 @@ const PatientLabRecords = ({
     <>
       {Array.isArray(patientLabRecords) && patientLabRecords.length > 0 ? (
         <>
-          <div className="mt-5 -4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className=" text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {patientLabRecords.map((record) => (
               <div key={record.sqid || record.id} className="bg-white border rounded-xl p-4">
                 <div className="flex justify-between items-center mb-1">
@@ -2050,20 +2050,20 @@ const getTabs = ({
           selected={selected}
         />
       ),
-    },
-    {
-      title: "Lab Results",
-      content: (
-        <PatientLabRecords
-          labloading={labloading}
-          patientLabRecords={patientLabRecords}
-          count={labCount}
-          currentPage={labCurrentPage}
-          totalPages={labTotalPages}
-          setCurrentPage={setLabCurrentPage}
-        />
-      ),
-    },
+    }
+    // {
+    //   title: "Lab Results",
+    //   content: (
+    //     <PatientLabRecords
+    //       labloading={labloading}
+    //       patientLabRecords={patientLabRecords}
+    //       count={labCount}
+    //       currentPage={labCurrentPage}
+    //       totalPages={labTotalPages}
+    //       setCurrentPage={setLabCurrentPage}
+    //     />
+    //   ),
+    // },
   ];
 
 export default getTabs;

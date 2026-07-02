@@ -275,7 +275,12 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
                   setDoctorReviewType("reject");
                   setIsDoctorReviewModalOpen(true);
                 }}
-                className="w-full sm:w-44 border border-red-500 text-red-500 text-xs font-medium px-4 sm:px-6 py-2.5 rounded-full hover:bg-red-50 transition-colors flex items-center justify-center"
+                disabled={displayStatus === "rejected"}
+                className={`w-full sm:w-44 border text-xs font-medium px-4 sm:px-6 py-2.5 rounded-full flex items-center justify-center transition-colors ${
+                  displayStatus === "rejected"
+                    ? "border-red-200 text-red-300 cursor-not-allowed"
+                    : "border-red-500 text-red-500 hover:bg-red-50"
+                }`}
               >
                 Reject result
               </button>
@@ -284,7 +289,12 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
                   setDoctorReviewType("approve");
                   setIsDoctorReviewModalOpen(true);
                 }}
-                className="w-full sm:w-44 bg-[#3E4095] text-white text-xs font-medium px-4 sm:px-6 py-2.5 rounded-full hover:bg-[#2e3070] transition-colors flex items-center justify-center"
+                disabled={displayStatus === "accepted" || displayStatus === "approved"}
+                className={`w-full sm:w-44 text-xs font-medium px-4 sm:px-6 py-2.5 rounded-full flex items-center justify-center transition-colors ${
+                  displayStatus === "accepted" || displayStatus === "approved"
+                    ? "bg-[#b1b2d4] text-white cursor-not-allowed"
+                    : "bg-[#3E4095] text-white hover:bg-[#2e3070]"
+                }`}
               >
                 Accept result
               </button>

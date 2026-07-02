@@ -100,6 +100,42 @@ const Hospital_Doctors_Sidebar = () => {
               </li>
             </div>
           </Link>
+          <Link to="/hospital-doctors-lab-dashboard">
+            <div className="px-4 my-4">
+              <li
+                className={`group px-4 py-2   ${
+                  currentPath === "/hospital-doctors-lab-dashboard"
+                    ? "bg-[#3E4095] text-white"
+                    : "text-gray-700"
+                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+              >
+                <span>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`group-hover:fill-white ${
+                      currentPath === "/hospital-doctors-lab-dashboard"
+                        ? "fill-white"
+                        : "fill-[#647284]"
+                    }`}
+                  >
+                    <path
+                      d="M10.9968 1.8883L13.7052 6.57927C13.9352 6.97785 13.7987 7.4875 13.4001 7.71762L12.3172 8.3419L13.1509 9.78599L11.7075 10.6193L10.8737 9.17524L9.79167 9.80099C9.39308 10.0311 8.88342 9.89449 8.65333 9.49591L7.12183 6.84387C5.41152 7.36279 4.16667 8.95182 4.16667 10.8317C4.16667 11.3528 4.26233 11.8516 4.43706 12.3114C5.08267 11.9017 5.84702 11.665 6.66667 11.665C8.07007 11.665 9.31142 12.3588 10.0664 13.4222L16.4734 9.72365L17.3068 11.1671L10.7415 14.9575C10.8017 15.2394 10.8333 15.5318 10.8333 15.8317C10.8333 16.1172 10.8046 16.3962 10.7499 16.6656L17.5 16.665V18.3317L3.33378 18.3327C2.81025 17.6362 2.5 16.7702 2.5 15.8317C2.5 14.9923 2.74818 14.2109 3.17517 13.5569C2.74397 12.744 2.5 11.8163 2.5 10.8317C2.5 8.33557 4.06776 6.20566 6.27231 5.37289L5.94497 4.80496C5.48474 4.00781 5.75787 2.9885 6.55503 2.52825L8.72008 1.27825C9.51725 0.81802 10.5366 1.09115 10.9968 1.8883ZM6.66667 13.3317C5.28596 13.3317 4.16667 14.451 4.16667 15.8317C4.16667 16.1238 4.21678 16.4043 4.30889 16.6649H9.02442C9.11658 16.4043 9.16667 16.1238 9.16667 15.8317C9.16667 14.451 8.04737 13.3317 6.66667 13.3317ZM9.55342 2.72163L7.38835 3.97163L9.68 7.94091L11.8451 6.69091L9.55342 2.72163Z"
+                      className={`group-hover:fill-white ${
+                        currentPath === "/hospital-doctors-lab-dashboard"
+                          ? "fill-white"
+                          : "fill-[#647284]"
+                      }`}
+                    />
+                  </svg>
+                </span>
+                Lab Results
+              </li>
+            </div>
+          </Link>
           <Link to="/hospital-doctors-patients-dashboard">
             <div className="px-4 my-4">
               <li
@@ -136,47 +172,8 @@ const Hospital_Doctors_Sidebar = () => {
               </li>
             </div>
           </Link>
-          {/* <Link to="">
-            <div className="px-4 my-4"
-            onClick={()=> {
-              toast.success('feature coming soon !')
-            }}
-            >
-              <li
-                className={`group px-4 py-2   ${
-                  currentPath === "/hospital-doctors-lab-dashboard"
-                    ? "bg-[#3E4095] text-white"
-                    : "text-gray-700"
-                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
-              >
-                <span>
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`group-hover:fill-white ${
-                      currentPath === "/hospital-doctors-lab-dashboard"
-                        ? "fill-white"
-                        : "fill-[#647284]"
-                    }`}
-                  >
-                    <path
-                      d="M10.9968 1.8883L13.7052 6.57927C13.9352 6.97785 13.7987 7.4875 13.4001 7.71762L12.3172 8.3419L13.1509 9.78599L11.7075 10.6193L10.8737 9.17524L9.79167 9.80099C9.39308 10.0311 8.88342 9.89449 8.65333 9.49591L7.12183 6.84387C5.41152 7.36279 4.16667 8.95182 4.16667 10.8317C4.16667 11.3528 4.26233 11.8516 4.43706 12.3114C5.08267 11.9017 5.84702 11.665 6.66667 11.665C8.07007 11.665 9.31142 12.3588 10.0664 13.4222L16.4734 9.72365L17.3068 11.1671L10.7415 14.9575C10.8017 15.2394 10.8333 15.5318 10.8333 15.8317C10.8333 16.1172 10.8046 16.3962 10.7499 16.6656L17.5 16.665V18.3317L3.33378 18.3327C2.81025 17.6362 2.5 16.7702 2.5 15.8317C2.5 14.9923 2.74818 14.2109 3.17517 13.5569C2.74397 12.744 2.5 11.8163 2.5 10.8317C2.5 8.33557 4.06776 6.20566 6.27231 5.37289L5.94497 4.80496C5.48474 4.00781 5.75787 2.9885 6.55503 2.52825L8.72008 1.27825C9.51725 0.81802 10.5366 1.09115 10.9968 1.8883ZM6.66667 13.3317C5.28596 13.3317 4.16667 14.451 4.16667 15.8317C4.16667 16.1238 4.21678 16.4043 4.30889 16.6649H9.02442C9.11658 16.4043 9.16667 16.1238 9.16667 15.8317C9.16667 14.451 8.04737 13.3317 6.66667 13.3317ZM9.55342 2.72163L7.38835 3.97163L9.68 7.94091L11.8451 6.69091L9.55342 2.72163Z"
-                      className={`group-hover:fill-white ${
-                        currentPath === "/hospital-doctors-lab-dashboard"
-                          ? "fill-white"
-                          : "fill-[#647284]"
-                      }`}
-                    />
-                  </svg>
-                </span>
-                Scan/Lab Results
-              </li>
-            </div>
-          </Link>
-          <Link to="">
+
+          <Link to="/hospital-doctors-messages-dashboard">
             <div className="px-4 my-4"
                 onClick={()=> {
                   toast.success('feature coming soon !')
@@ -215,7 +212,7 @@ const Hospital_Doctors_Sidebar = () => {
                 Messages
               </li>
             </div>
-          </Link> */}
+          </Link>
 
           <Link to="/hospital-doctors-healthpersonnel-dashboard">
             <div className="px-4 my-4">

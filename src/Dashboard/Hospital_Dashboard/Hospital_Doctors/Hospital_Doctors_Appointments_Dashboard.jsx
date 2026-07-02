@@ -88,6 +88,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
             <SoapNoteEntry
               setSoapNoteEntry={setSoapNoteEntry}
               selectedPatientDetails={selectedPatientDetails}
+              source="appointments"
             />
           </div>
         </>
