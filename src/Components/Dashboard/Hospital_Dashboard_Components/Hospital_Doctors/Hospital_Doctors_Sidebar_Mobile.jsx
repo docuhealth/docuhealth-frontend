@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { DoctorAppContext } from "../../../../context/HospitalContext/Doctors/DoctorAppContext";
 
 const Hospital_Doctors_Sidebar_Mobile = ({
   openMobileSidebar,
@@ -9,6 +10,8 @@ const Hospital_Doctors_Sidebar_Mobile = ({
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
+
+  const { hospitalLogo, hospitalName } = useContext(DoctorAppContext);
 
   const handleLogout = (event) => {
     event.preventDefault();
@@ -28,13 +31,13 @@ const Hospital_Doctors_Sidebar_Mobile = ({
         onClick={() => setOpenMobileSidebar(false)}
       />
       <div
-        className={`w-64 min-h-screen absolute top-0 left-0 z-50 bg-white transform transition-transform duration-300 ease-in-out
+        className={`w-64 h-screen flex flex-col fixed top-0 left-0 z-50 bg-white transform transition-transform duration-300 ease-in-out
               ${openMobileSidebar ? "translate-x-0" : "-translate-x-full"}`}
       >
        <div className="p-4 flex justify-between items-center    ">
           <div className="flex justify-start items-center gap-1 font-semibold text-[#3E4095]">
-            <img src={docuhealth_logo} alt="Logo" className="w-6" />
-            <h1 className="text-xl">DocuHealth</h1>
+            <img src={hospitalLogo || docuhealth_logo} alt="Logo" className="w-6 h-6 aspect-square object-cover" />
+            <h1 className="text-xl">{hospitalName || "DocuHealth"}</h1>
           </div>
           <div
             className=" lg:hidden "
@@ -62,7 +65,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
             </svg>
           </div>
         </div>
-        <nav className="mt-4 text-sm">
+        <nav className="flex-1 text-sm overflow-y-auto">
           <ul>
                   <Link to="/hospital-doctors-home-dashboard"
                         onClick={() => setOpenMobileSidebar(false)}>
@@ -139,6 +142,43 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       </li>
                     </div>
                   </Link>
+                  <Link to="/hospital-doctors-lab-dashboard"
+                        onClick={() => setOpenMobileSidebar(false)}>
+                    <div className="px-4 my-4">
+                      <li
+                        className={`group px-4 py-2   ${
+                          currentPath === "/hospital-doctors-lab-dashboard"
+                            ? "bg-[#3E4095] text-white"
+                            : "text-gray-700"
+                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                      >
+                        <span>
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            className={`group-hover:fill-white ${
+                              currentPath === "/hospital-doctors-lab-dashboard"
+                                ? "fill-white"
+                                : "fill-[#647284]"
+                            }`}
+                          >
+                            <path
+                              d="M10.9968 1.8883L13.7052 6.57927C13.9352 6.97785 13.7987 7.4875 13.4001 7.71762L12.3172 8.3419L13.1509 9.78599L11.7075 10.6193L10.8737 9.17524L9.79167 9.80099C9.39308 10.0311 8.88342 9.89449 8.65333 9.49591L7.12183 6.84387C5.41152 7.36279 4.16667 8.95182 4.16667 10.8317C4.16667 11.3528 4.26233 11.8516 4.43706 12.3114C5.08267 11.9017 5.84702 11.665 6.66667 11.665C8.07007 11.665 9.31142 12.3588 10.0664 13.4222L16.4734 9.72365L17.3068 11.1671L10.7415 14.9575C10.8017 15.2394 10.8333 15.5318 10.8333 15.8317C10.8333 16.1172 10.8046 16.3962 10.7499 16.6656L17.5 16.665V18.3317L3.33378 18.3327C2.81025 17.6362 2.5 16.7702 2.5 15.8317C2.5 14.9923 2.74818 14.2109 3.17517 13.5569C2.74397 12.744 2.5 11.8163 2.5 10.8317C2.5 8.33557 4.06776 6.20566 6.27231 5.37289L5.94497 4.80496C5.48474 4.00781 5.75787 2.9885 6.55503 2.52825L8.72008 1.27825C9.51725 0.81802 10.5366 1.09115 10.9968 1.8883ZM6.66667 13.3317C5.28596 13.3317 4.16667 14.451 4.16667 15.8317C4.16667 16.1238 4.21678 16.4043 4.30889 16.6649H9.02442C9.11658 16.4043 9.16667 16.1238 9.16667 15.8317C9.16667 14.451 8.04737 13.3317 6.66667 13.3317ZM9.55342 2.72163L7.38835 3.97163L9.68 7.94091L11.8451 6.69091L9.55342 2.72163Z"
+                              className={`group-hover:fill-white ${
+                                currentPath === "/hospital-doctors-lab-dashboard"
+                                  ? "fill-white"
+                                  : "fill-[#647284]"
+                              }`}
+                            />
+                          </svg>
+                        </span>
+                        Lab Results
+                      </li>
+                    </div>
+                  </Link>
                   <Link to="/hospital-doctors-patients-dashboard"
                         onClick={() => setOpenMobileSidebar(false)}>
                     <div className="px-4 my-4">
@@ -176,43 +216,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       </li>
                     </div>
                   </Link>
-                  {/* <Link to="/hospital-doctors-lab-dashboard"
-                        onClick={() => setOpenMobileSidebar(false)}>
-                    <div className="px-4 my-4">
-                      <li
-                        className={`group px-4 py-2   ${
-                          currentPath === "/hospital-doctors-lab-dashboard"
-                            ? "bg-[#3E4095] text-white"
-                            : "text-gray-700"
-                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
-                      >
-                        <span>
-                          <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            className={`group-hover:fill-white ${
-                              currentPath === "/hospital-doctors-lab-dashboard"
-                                ? "fill-white"
-                                : "fill-[#647284]"
-                            }`}
-                          >
-                            <path
-                              d="M10.9968 1.8883L13.7052 6.57927C13.9352 6.97785 13.7987 7.4875 13.4001 7.71762L12.3172 8.3419L13.1509 9.78599L11.7075 10.6193L10.8737 9.17524L9.79167 9.80099C9.39308 10.0311 8.88342 9.89449 8.65333 9.49591L7.12183 6.84387C5.41152 7.36279 4.16667 8.95182 4.16667 10.8317C4.16667 11.3528 4.26233 11.8516 4.43706 12.3114C5.08267 11.9017 5.84702 11.665 6.66667 11.665C8.07007 11.665 9.31142 12.3588 10.0664 13.4222L16.4734 9.72365L17.3068 11.1671L10.7415 14.9575C10.8017 15.2394 10.8333 15.5318 10.8333 15.8317C10.8333 16.1172 10.8046 16.3962 10.7499 16.6656L17.5 16.665V18.3317L3.33378 18.3327C2.81025 17.6362 2.5 16.7702 2.5 15.8317C2.5 14.9923 2.74818 14.2109 3.17517 13.5569C2.74397 12.744 2.5 11.8163 2.5 10.8317C2.5 8.33557 4.06776 6.20566 6.27231 5.37289L5.94497 4.80496C5.48474 4.00781 5.75787 2.9885 6.55503 2.52825L8.72008 1.27825C9.51725 0.81802 10.5366 1.09115 10.9968 1.8883ZM6.66667 13.3317C5.28596 13.3317 4.16667 14.451 4.16667 15.8317C4.16667 16.1238 4.21678 16.4043 4.30889 16.6649H9.02442C9.11658 16.4043 9.16667 16.1238 9.16667 15.8317C9.16667 14.451 8.04737 13.3317 6.66667 13.3317ZM9.55342 2.72163L7.38835 3.97163L9.68 7.94091L11.8451 6.69091L9.55342 2.72163Z"
-                              className={`group-hover:fill-white ${
-                                currentPath === "/hospital-doctors-lab-dashboard"
-                                  ? "fill-white"
-                                  : "fill-[#647284]"
-                              }`}
-                            />
-                          </svg>
-                        </span>
-                        Scan/Lab Results
-                      </li>
-                    </div>
-                  </Link>
+
                   <Link to="/hospital-doctors-messages-dashboard"
                         onClick={() => setOpenMobileSidebar(false)}>
                     <div className="px-4 my-4">
@@ -249,7 +253,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                         Messages
                       </li>
                     </div>
-                  </Link> */}
+                  </Link>
         
                   <Link to="/hospital-doctors-healthpersonnel-dashboard"
                         onClick={() => setOpenMobileSidebar(false)}>
@@ -287,70 +291,67 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       </li>
                     </div>
                   </Link>
-                  <Link to="/hospital-doctors-settings-dashboard"
-                        onClick={() => setOpenMobileSidebar(false)}>
-                    <div className="px-4 my-4">
-                      <li
-                        className={`group px-4 py-2   ${
-                          currentPath === "/hospital-doctors-settings-dashboard"
-                            ? "bg-[#3E4095] text-white"
-                            : "text-gray-700"
-                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
-                      >
-                        <span>
-                          <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            className={`group-hover:fill-white ${
-                              currentPath === "/hospital-doctors-settings-dashboard"
-                                ? "fill-white"
-                                : "fill-[#647284]"
-                            }`}
-                          >
-                            <path
-                              d="M7.2386 3.33324L9.4108 1.16107C9.73621 0.835632 10.2639 0.835632 10.5893 1.16107L12.7615 3.33324H15.8334C16.2936 3.33324 16.6667 3.70634 16.6667 4.16657V7.23848L18.8389 9.41067C19.1643 9.73609 19.1643 10.2638 18.8389 10.5892L16.6667 12.7613V15.8333C16.6667 16.2935 16.2936 16.6666 15.8334 16.6666H12.7615L10.5893 18.8388C10.2639 19.1642 9.73621 19.1642 9.4108 18.8388L7.2386 16.6666H4.1667C3.70646 16.6666 3.33336 16.2935 3.33336 15.8333V12.7613L1.1612 10.5892C0.835754 10.2638 0.835754 9.73609 1.1612 9.41067L3.33336 7.23848V4.16657C3.33336 3.70634 3.70646 3.33324 4.1667 3.33324H7.2386ZM5.00003 4.99991V7.92884L2.92896 9.99992L5.00003 12.071V14.9999H7.92896L10 17.071L12.0711 14.9999H15V12.071L17.0711 9.99992L15 7.92884V4.99991H12.0711L10 2.92884L7.92896 4.99991H5.00003ZM10 13.3333C8.15908 13.3333 6.6667 11.8408 6.6667 9.99992C6.6667 8.15896 8.15908 6.66657 10 6.66657C11.841 6.66657 13.3334 8.15896 13.3334 9.99992C13.3334 11.8408 11.841 13.3333 10 13.3333ZM10 11.6666C10.9205 11.6666 11.6667 10.9204 11.6667 9.99992C11.6667 9.07942 10.9205 8.33326 10 8.33326C9.07955 8.33326 8.33338 9.07942 8.33338 9.99992C8.33338 10.9204 9.07955 11.6666 10 11.6666Z"
-                              className={`group-hover:fill-white ${
-                                currentPath === "/hospital-doctors-settings-dashboard"
-                                  ? "fill-white"
-                                  : "fill-[#647284]"
-                              }`}
-                            />
-                          </svg>
-                        </span>
-                        Settings
-                      </li>
-                    </div>
-                  </Link>
-        
-                  <div
-                    className="px-4 my-4"
-                       onClick={handleLogout}
-                  >
-                    <li
-                      className={`group px-4 py-2  text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
-                    >
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 20 20"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className={`group-hover:fill-white 
-                                    fill-[#647284]`}
-                      >
-                        <path
-                          d="M3.33329 12.4998H4.99996V16.6665H15V3.33317H4.99996V7.49984H3.33329V2.49984C3.33329 2.0396 3.70639 1.6665 4.16663 1.6665H15.8333C16.2935 1.6665 16.6666 2.0396 16.6666 2.49984V17.4998C16.6666 17.9601 16.2935 18.3332 15.8333 18.3332H4.16663C3.70639 18.3332 3.33329 17.9601 3.33329 17.4998V12.4998ZM8.33329 9.1665V6.6665L12.5 9.99984L8.33329 13.3332V10.8332H1.66663V9.1665H8.33329Z"
-                          className={`group-hover:fill-white fill-[#647284]`}
-                        />
-                      </svg>
-                      Log-out
-                    </li>
-                  </div>
                 </ul>
         </nav>
+        <div className="text-sm border-t border-gray-100 pb-4 pt-2 shrink-0">
+          <ul>
+            <Link to="/hospital-doctors-settings-dashboard"
+                  onClick={() => setOpenMobileSidebar(false)}>
+              <div className="px-4 my-2">
+                <li
+                  className={`group px-4 py-2   ${
+                    currentPath === "/hospital-doctors-settings-dashboard"
+                      ? "bg-[#3E4095] text-white"
+                      : "text-gray-700"
+                  } hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start transition-colors duration-150`}
+                >
+                  <span>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M7.2386 3.33324L9.4108 1.16107C9.73621 0.835632 10.2639 0.835632 10.5893 1.16107L12.7615 3.33324H15.8334C16.2936 3.33324 16.6667 3.70634 16.6667 4.16657V7.23848L18.8389 9.41067C19.1643 9.73609 19.1643 10.2638 18.8389 10.5892L16.6667 12.7613V15.8333C16.6667 16.2935 16.2936 16.6666 15.8334 16.6666H12.7615L10.5893 18.8388C10.2639 19.1642 9.73621 19.1642 9.4108 18.8388L7.2386 16.6666H4.1667C3.70646 16.6666 3.33336 16.2935 3.33336 15.8333V12.7613L1.1612 10.5892C0.835754 10.2638 0.835754 9.73609 1.1612 9.41067L3.33336 7.23848V4.16657C3.33336 3.70634 3.70646 3.33324 4.1667 3.33324H7.2386ZM5.00003 4.99991V7.92884L2.92896 9.99992L5.00003 12.071V14.9999H7.92896L10 17.071L12.0711 14.9999H15V12.071L17.0711 9.99992L15 7.92884V4.99991H12.0711L10 2.92884L7.92896 4.99991H5.00003ZM10 13.3333C8.15908 13.3333 6.6667 11.8408 6.6667 9.99992C6.6667 8.15896 8.15908 6.66657 10 6.66657C11.841 6.66657 13.3334 8.15896 13.3334 9.99992C13.3334 11.8408 11.841 13.3333 10 13.3333ZM10 11.6666C10.9205 11.6666 11.6667 10.9204 11.6667 9.99992C11.6667 9.07942 10.9205 8.33326 10 8.33326C9.07955 8.33326 8.33338 9.07942 8.33338 9.99992C8.33338 10.9204 9.07955 11.6666 10 11.6666Z"
+                        className={`group-hover:fill-white ${
+                          currentPath === "/hospital-doctors-settings-dashboard"
+                            ? "fill-white"
+                            : "fill-[#647284]"
+                        }`}
+                      />
+                    </svg>
+                  </span>
+                  Settings
+                </li>
+              </div>
+            </Link>
+  
+            <div
+              className="px-4 my-2"
+                 onClick={handleLogout}
+            >
+              <li
+                className="group px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg flex items-center gap-2 justify-start cursor-pointer transition-colors duration-150"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3.33329 12.4998H4.99996V16.6665H15V3.33317H4.99996V7.49984H3.33329V2.49984C3.33329 2.0396 3.70639 1.6665 4.16663 1.6665H15.8333C16.2935 1.6665 16.6666 2.0396 16.6666 2.49984V17.4998C16.6666 17.9601 16.2935 18.3332 15.8333 18.3332H4.16663C3.70639 18.3332 3.33329 17.9601 3.33329 17.4998V12.4998ZM8.33329 9.1665V6.6665L12.5 9.99984L8.33329 13.3332V10.8332H1.66663V9.1665H8.33329Z"
+                    className="fill-red-500 group-hover:fill-white"
+                  />
+                </svg>
+                Log-out
+              </li>
+            </div>
+          </ul>
+        </div>
       </div>
 
       <div

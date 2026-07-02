@@ -77,50 +77,12 @@ const NoteSection = ({
   </div>
 );
 
-const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
+const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => {
   const { profile, hospitals } = useContext(DoctorAppContext);
 
   const queryClient = useQueryClient();
 
   const [step, setStep] = useState(1);
-
-  const [medications, setMedications] = useState([
-    {
-      drug: "",
-      dosage: "",
-      route: "Oral",
-      frequency: 1,
-      frequencyUnit: "Daily",
-      duration: "",
-      durationUnit: "Month",
-    },
-  ]);
-
-  const handleAddMedication = () => {
-    setMedications([
-      ...medications,
-      {
-        drug: "",
-        dosage: "",
-        route: "Oral",
-        frequency: 1,
-        frequencyUnit: "Daily",
-        duration: "",
-        durationUnit: "Month",
-      },
-    ]);
-  };
-
-  const handleRemoveMedication = (index) => {
-    const updated = medications.filter((_, i) => i !== index);
-    setMedications(updated);
-  };
-
-  const handleChange = (index, field, value) => {
-    const updated = [...medications];
-    updated[index][field] = value;
-    setMedications(updated);
-  };
 
   const [attachments, setAttachments] = useState([]);
 
@@ -326,22 +288,6 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
   });
 
   const handleSubmit = async () => {
-    // Validation: Medication is compulsory
-    const isMedicationEmpty = medications.length === 0 || medications.every(med => !med.drug?.trim());
-    const hasIncompleteMedication = medications.some(
-      (med) => (med.drug?.trim() && (!med.dosage || !med.duration))
-    );
-
-    if (isMedicationEmpty) {
-      toast.error("At least one Medication is compulsory");
-      return;
-    }
-
-    if (hasIncompleteMedication) {
-      toast.error("Please fill in Dosage and Duration for all added medications");
-      return;
-    }
-
     if (
       soapNoteData.care_instructions.length === 0 ||
       soapNoteData.treatment_plan.length === 0
@@ -349,22 +295,11 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       toast.error("Care Instructions and Treatment Plan is required");
       return;
     }
-    const drugRecords = medications.map((med) => ({
-      name: med.drug,
-      route: med.route,
-      quantity: med.dosage,
-      frequency: {
-        value: med.frequency,
-        rate: med.frequencyUnit,
-      },
-      duration: {
-        value: med.duration,
-        rate: med.durationUnit,
-      },
-      status: "ongoing",
-      allergies: [],
-      // created_at: new Date().toISOString(),
-    }));
+
+    if (!note?.trim()) {
+      toast.error("Follow up / Next appointment note is compulsory");
+      return;
+    }
 
     const selectedDate = new Date(
       `${selectedDay} ${selectedMonth} ${selectedYear} ${selectedTime}`,
@@ -376,7 +311,6 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       ...(selectedPatientFetchedInfo?.latest_vitals?.id && { vital_signs: selectedPatientFetchedInfo.latest_vitals.id }),
       referred_docuhealth_hosp: soapNoteData.referred_docuhealth_hosp,
       referred_hosp: soapNoteData.referred_hosp,
-      drug_records: drugRecords,
       investigations: soapNoteData.investigations,
       problems_list: soapNoteData.problems_list,
       care_instructions: soapNoteData.care_instructions,
@@ -452,8 +386,11 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       formData.append(key, JSON.stringify(soapNoteData[key] || []));
     });
 
-    formData.append("drug_records", JSON.stringify(drugRecords));
-    formData.append("appointment", JSON.stringify(appointment));
+    formData.append("next_appointment", JSON.stringify(appointment));
+
+    if (source === "appointments" && selectedPatientDetails?.sqid) {
+      formData.append("appointment", selectedPatientDetails.sqid);
+    }
 
     attachments.forEach((fileObj) => {
       formData.append("investigation_docs", fileObj.file);
@@ -474,7 +411,6 @@ useEffect(() => {
 
   const soapDraft = {
     step,
-    medications,
     soapNoteData,
     selectedDay,
     selectedMonth,
@@ -491,7 +427,7 @@ useEffect(() => {
       JSON.stringify(soapDraft)
     );
   }
-}, [isRestored,step, medications, soapNoteData, selectedDay, selectedMonth, selectedYear, selectedTime, note, inputs, isShared, selectedPatientDetails.patient.hin]);
+}, [isRestored,step, soapNoteData, selectedDay, selectedMonth, selectedYear, selectedTime, note, inputs, isShared, selectedPatientDetails.patient.hin]);
 
 
 useEffect(() => {
@@ -502,7 +438,6 @@ useEffect(() => {
       const data = JSON.parse(savedDraft);
       
       if (data.step) setStep(data.step);
-      if (data.medications) setMedications(data.medications);
       if (data.soapNoteData) setSoapNoteData(data.soapNoteData);
       if (data.selectedDay) setSelectedDay(data.selectedDay);
       if (data.selectedMonth) setSelectedMonth(data.selectedMonth);
@@ -678,7 +613,7 @@ useEffect(() => {
                     Temperature
                   </p>
                   <p className="font-medium">
-                    {selectedPatientFetchedInfo?.latest_vitals?.temp} °F
+                    {selectedPatientFetchedInfo?.latest_vitals?.temp} °C
                   </p>
                 </div>
                 <div className=" bg-white border rounded-md p-3">
@@ -804,7 +739,7 @@ useEffect(() => {
             />
 
             <NoteSection
-              title="Investigations (Test / Scan results interpretation)"
+              title="Investigations (Scan and Test result images / documents)"
               field="investigations"
               placeholder="e.g. Patient reports mild headache"
               soapNoteData={soapNoteData}
@@ -1010,151 +945,7 @@ useEffect(() => {
             />
 
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium mb-3 text-[#1B2B40]">Medication (compulsory)</p>
-
-              {medications.map((med, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-start mt-4 border-b pb-4 last:border-0 last:pb-0"
-                >
-                  <div className="lg:col-span-1">
-                    <label className="block text-[12px] font-medium text-gray-700 pb-1">Drug Name</label>
-                    <input
-                      type="text"
-                      placeholder="Drug name..."
-                      value={med.drug}
-                      onChange={(e) =>
-                        handleChange(index, "drug", e.target.value)
-                      }
-                      className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] font-medium text-gray-700 pb-1">Dosage</label>
-                    <input
-                      type="text"
-                      placeholder="Enter dosage (e.g. 400/10)..."
-                      value={med.dosage}
-                      onChange={(e) => handleChange(index, "dosage", e.target.value)}
-                      className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
-                    />
-                  </div>
-
-                  <div className="relative">
-                    <label className="block text-[12px] font-medium text-gray-700 pb-1">Route</label>
-                    <div className="relative">
-                      <select
-                        value={med.route}
-                        onChange={(e) =>
-                          handleChange(index, "route", e.target.value)
-                        }
-                        className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none appearance-none bg-white pr-8 transition-all"
-                      >
-                        <option value="Oral">Oral</option>
-                        <option value="IV">IV = Intravenous</option>
-                        <option value="IM">IM = Intramuscular</option>
-                        <option value="SC">SC = Subcutaneous Injection</option>
-                        <option value="PV">PV = Per Vagina (Vaginal route)</option>
-                        <option value="IT">IT = Intrathecal</option>
-                        <option value="PR">PR = Per rectal</option>
-                        <option value="SL">SL = Sublingual</option>
-                        <option value="Topical">Topical</option>
-                      </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <label className="block text-[12px] font-medium text-gray-700 pb-1">Frequency</label>
-                      <input
-                        type="number"
-                        min={1}
-                        value={med.frequency}
-                        onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
-                        onChange={(e) => handleChange(index, "frequency", e.target.value)}
-                        className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <label className="block text-[12px] pb-1">&nbsp;</label>
-                      <div className="relative">
-                        <select
-                          value={med.frequencyUnit}
-                          onChange={(e) => handleChange(index, "frequencyUnit", e.target.value)}
-                          className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-[#3E4095] outline-none transition-all bg-white"
-                        >
-                          <option value="Daily">Daily</option>
-                          <option value="Weekly">Weekly</option>
-                        </select>
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 relative">
-                    <div className="flex-1">
-                      <label className="block text-[12px] font-medium text-gray-700 pb-1">Duration</label>
-                      <input
-                        type="number"
-                        placeholder="duration..."
-                        value={med.duration}
-                        onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
-                        onChange={(e) => handleChange(index, "duration", e.target.value)}
-                        className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <label className="block text-[12px] pb-1">&nbsp;</label>
-                      <div className="relative">
-                        <select
-                          value={med.durationUnit}
-                          onChange={(e) => handleChange(index, "durationUnit", e.target.value)}
-                          className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-[#3E4095] outline-none transition-all bg-white"
-                        >
-                          <option value="Month">Month (s)</option>
-                          <option value="Week">Week (s)</option>
-                          <option value="Day">Day (s)</option>
-                        </select>
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                    {medications.length > 1 && (
-                      <button
-                        onClick={() => handleRemoveMedication(index)}
-                        className="text-red-500 hover:text-red-700 transition-colors mt-6 ml-1 p-1"
-                        title="Remove medication"
-                      >
-                        <X size={16} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-
-              <button
-                onClick={handleAddMedication}
-                className="text-[#3E4095] font-medium text-[12px] mt-4 flex items-center gap-1 hover:underline transition-all"
-              >
-                <Plus size={14} /> Add more drugs
-              </button>
-            </div>
-
-
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium">Follow up / Next appointment</p>
+              <p className="font-medium text-[#1B2B40]">Follow up / Next appointment (compulsory)</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mt-3 gap-3">
                 <div className="">
                   <label className="block text-[12px] pb-1">Day</label>
@@ -1426,23 +1217,11 @@ useEffect(() => {
               <button
                 disabled={
                   isPending ||
-                  medications.length === 0 ||
-                  medications.every((med) => !med.drug?.trim()) ||
-                  medications.some(
-                    (med) =>
-                      med.drug?.trim() && (!med.dosage || !med.duration)
-                  ) ||
                   soapNoteData.care_instructions.length === 0 ||
                   soapNoteData.treatment_plan.length === 0
                 }
                 className={`py-2.5  rounded-full text-sm px-20 sm:mt-5 text-white lg:w-auto w-full ${
                   isPending ||
-                  medications.length === 0 ||
-                  medications.every((med) => !med.drug?.trim()) ||
-                  medications.some(
-                    (med) =>
-                      med.drug?.trim() && (!med.dosage || !med.duration)
-                  ) ||
                   soapNoteData.care_instructions.length === 0 ||
                   soapNoteData.treatment_plan.length === 0
                     ? "bg-gray-400 cursor-not-allowed"
@@ -1540,6 +1319,12 @@ useEffect(() => {
       {shareModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-3 ">
           <div className="bg-white w-full max-w-[500px] rounded-md p-5 lg:p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200 ">
+            <button
+              onClick={() => setShareModal(false)}
+              className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
             <div className="flex flex-col items-center mb-6">
               <div className="bg-amber-100 p-3 rounded-full mb-3">
                 <AlertTriangle className="w-6 h-6 text-[#d97706]" />
@@ -1561,7 +1346,7 @@ useEffect(() => {
               Continue
             </button>
             <button
-              className="w-full mt-3 py-3 text-gray-500 text-[12px] hover:text-red-500 hover:bg-red-50 rounded-full transition-colors cursor-pointer font-medium"
+              className="w-full mt-3 py-3 text-red-500 bg-red-50 text-[12px] hover:bg-red-100 rounded-full transition-colors cursor-pointer font-medium"
               onClick={() => {
                 setShareModal(false);
               }}

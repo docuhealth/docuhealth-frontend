@@ -96,7 +96,7 @@ const DocuHealth_API_Page = () => {
 
           <div className='text-[#464646] mb-10'>
              <p className='font-medium pb-2'>
-             Send an email to info@docuhealth.online with:
+             Send an email to admin@docuhealthservices.net with:
             </p>
             <ul class="list-decimal pl-6 space-y-1">
               <li>Company/EMR Name</li>

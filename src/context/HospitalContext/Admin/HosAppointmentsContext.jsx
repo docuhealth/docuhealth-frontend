@@ -10,6 +10,7 @@ export const HosAppointmentsContext = createContext();
 const HosAppointmentsProvider = (props) => {
 
     const [currentPage, setCurrentPage] = useState(1);
+    const [appointmentType, setAppointmentType] = useState('today'); // 'today', 'upcoming' or 'history'
     const [searchQuery, setSearchQuery] = useState("");
     const [dateFrom, setDateFrom] = useState("");
     const [dateTo, setDateTo] = useState("");
@@ -21,7 +22,7 @@ const HosAppointmentsProvider = (props) => {
   // Reset to page 1 when search or date filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearch, dateFrom, dateTo]);
+  }, [appointmentType, debouncedSearch, dateFrom, dateTo]);
 
   const {
     data, 
@@ -30,7 +31,7 @@ const HosAppointmentsProvider = (props) => {
     isError,
     error
   } = useQuery ({
-    queryKey : ["hospital-appointments", currentPage, debouncedSearch, dateFrom, dateTo],
+    queryKey : ["hospital-appointments", currentPage, appointmentType, debouncedSearch, dateFrom, dateTo],
     queryFn : fetchAppointments,
     enabled : isUserLoggedIn,
     placeholderData : keepPreviousData,
@@ -53,6 +54,8 @@ const HosAppointmentsProvider = (props) => {
     currentPage,
     setCurrentPage,
     totalPages,
+    appointmentType,
+    setAppointmentType,
     loading: isPending,    // Initial load spinner
     isRefreshing: isFetching, // Background refresh indicator
     searchQuery,

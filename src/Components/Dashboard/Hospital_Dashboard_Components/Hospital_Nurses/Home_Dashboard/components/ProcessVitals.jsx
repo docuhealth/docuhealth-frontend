@@ -41,7 +41,6 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
     !bloodPressure ||
     !temperature ||
     !respRate ||
-    !height ||
     !weight ||
     !heartRate;
 
@@ -51,9 +50,9 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
       blood_pressure: bloodPressure,
       temp: temperature,
       resp_rate: respRate,
-      height: height,
       weight: weight,
       heart_rate: heartRate,
+      ...(height && { height }),
     };
 
     mutate(payload);
@@ -132,7 +131,7 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
             </div>
           </div>
           <div className="relative">
-            <p className="pb-1">Height</p>
+            <p className="pb-1">Height (optional)</p>
             <div className="relative">
               <input
                 type="number"

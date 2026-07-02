@@ -1,22 +1,22 @@
-import React from "react";
+import React, { useContext } from "react";
 import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { LabAppContext } from "../../../../context/HospitalContext/Lab/LabAppContext";
+import toast from "react-hot-toast";
 
-const navItem = (path, currentPath, icon, label) => (
-  <Link to={path}>
-    <div className="px-4 my-1">
-      <li className={`group px-4 py-2 ${currentPath === path ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
-        <span>{icon(currentPath === path)}</span>
-        {label}
-      </li>
-    </div>
-  </Link>
-);
+
+const TEST_ORDERS_ROUTES = [
+  "/hospital-lab-requests-dashboard",
+  "/hospital-lab-test-detail",
+  "/hospital-lab-upload-result",
+];
 
 const Hospital_Lab_Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
+
+  const { hospitalLogo, hospitalName } = useContext(LabAppContext);
 
   const handleLogout = () => {
     sessionStorage.clear();
@@ -27,16 +27,16 @@ const Hospital_Lab_Sidebar = () => {
     <div className="flex flex-col h-screen">
       {/* Logo */}
       <div className="pt-5 pl-5 pb-3 flex items-center gap-1 font-semibold text-[#3E4095] shrink-0">
-        <img src={docuhealth_logo} alt="Logo" className="w-6" />
-        <h1 className="text-xl">DocuHealth</h1>
+        <img src={hospitalLogo || docuhealth_logo} alt="Logo" className="w-6 h-6 aspect-square object-cover" />
+        <h1 className="text-xl">{hospitalName || "DocuHealth"}</h1>
       </div>
 
       {/* Main nav links */}
-      <nav className="flex-1 mt-4 text-sm overflow-y-auto">
+      <nav className="flex-1  text-sm overflow-y-auto">
         <ul>
           {/* Overview */}
           <Link to="/hospital-lab-home-dashboard">
-            <div className="px-4 my-1">
+            <div className="px-4 my-4">
               <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-home-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                 <span>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -50,11 +50,11 @@ const Hospital_Lab_Sidebar = () => {
 
           {/* Test Orders */}
           <Link to="/hospital-lab-requests-dashboard">
-            <div className="px-4 my-1">
-              <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-requests-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
+            <div className="px-4 my-4">
+              <li className={`group px-4 py-2 ${TEST_ORDERS_ROUTES.includes(currentPath) ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                 <span>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10.9968 1.8883L13.7052 6.57927C13.9352 6.97785 13.7987 7.4875 13.4001 7.71762L12.3172 8.3419L13.1509 9.78599L11.7075 10.6193L10.8737 9.17524L9.79167 9.80099C9.39308 10.0311 8.88342 9.89449 8.65333 9.49591L7.12183 6.84387C5.41152 7.36279 4.16667 8.95182 4.16667 10.8317C4.16667 11.3528 4.26233 11.8516 4.43706 12.3114C5.08267 11.9017 5.84702 11.665 6.66667 11.665C8.07007 11.665 9.31142 12.3588 10.0664 13.4222L16.4734 9.72365L17.3068 11.1671L10.7415 14.9575C10.8017 15.2394 10.8333 15.5318 10.8333 15.8317C10.8333 16.1172 10.8046 16.3962 10.7499 16.6656L17.5 16.665V18.3317L3.33378 18.3327C2.81025 17.6362 2.5 16.7702 2.5 15.8317C2.5 14.9923 2.74818 14.2109 3.17517 13.5569C2.74397 12.744 2.5 11.8163 2.5 10.8317C2.5 8.33557 4.06776 6.20566 6.27231 5.37289L5.94497 4.80496C5.48474 4.00781 5.75787 2.9885 6.55503 2.52825L8.72008 1.27825C9.51725 0.81802 10.5366 1.09115 10.9968 1.8883ZM6.66667 13.3317C5.28596 13.3317 4.16667 14.451 4.16667 15.8317C4.16667 16.1238 4.21678 16.4043 4.30889 16.6649H9.02442C9.11658 16.4043 9.16667 16.1238 9.16667 15.8317C9.16667 14.451 8.04737 13.3317 6.66667 13.3317ZM9.55342 2.72163L7.38835 3.97163L9.68 7.94091L11.8451 6.69091L9.55342 2.72163Z" className={`group-hover:fill-white ${currentPath === "/hospital-lab-requests-dashboard" ? "fill-white" : "fill-[#647284]"}`} />
+                    <path d="M10.9968 1.8883L13.7052 6.57927C13.9352 6.97785 13.7987 7.4875 13.4001 7.71762L12.3172 8.3419L13.1509 9.78599L11.7075 10.6193L10.8737 9.17524L9.79167 9.80099C9.39308 10.0311 8.88342 9.89449 8.65333 9.49591L7.12183 6.84387C5.41152 7.36279 4.16667 8.95182 4.16667 10.8317C4.16667 11.3528 4.26233 11.8516 4.43706 12.3114C5.08267 11.9017 5.84702 11.665 6.66667 11.665C8.07007 11.665 9.31142 12.3588 10.0664 13.4222L16.4734 9.72365L17.3068 11.1671L10.7415 14.9575C10.8017 15.2394 10.8333 15.5318 10.8333 15.8317C10.8333 16.1172 10.8046 16.3962 10.7499 16.6656L17.5 16.665V18.3317L3.33378 18.3327C2.81025 17.6362 2.5 16.7702 2.5 15.8317C2.5 14.9923 2.74818 14.2109 3.17517 13.5569C2.74397 12.744 2.5 11.8163 2.5 10.8317C2.5 8.33557 4.06776 6.20566 6.27231 5.37289L5.94497 4.80496C5.48474 4.00781 5.75787 2.9885 6.55503 2.52825L8.72008 1.27825C9.51725 0.81802 10.5366 1.09115 10.9968 1.8883ZM6.66667 13.3317C5.28596 13.3317 4.16667 14.451 4.16667 15.8317C4.16667 16.1238 4.21678 16.4043 4.30889 16.6649H9.02442C9.11658 16.4043 9.16667 16.1238 9.16667 15.8317C9.16667 14.451 8.04737 13.3317 6.66667 13.3317ZM9.55342 2.72163L7.38835 3.97163L9.68 7.94091L11.8451 6.69091L9.55342 2.72163Z" className={`group-hover:fill-white ${TEST_ORDERS_ROUTES.includes(currentPath) ? "fill-white" : "fill-[#647284]"}`} />
                   </svg>
                 </span>
                 Test Orders
@@ -62,13 +62,14 @@ const Hospital_Lab_Sidebar = () => {
             </div>
           </Link>
 
+
           {/* Appointments */}
           <Link to="/hospital-lab-appointments-dashboard">
-            <div className="px-4 my-1">
-              <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-appointments-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
+            <div className="px-4 my-4">
+              <li className={`group px-4 py-2 ${["/hospital-lab-appointments-dashboard", "/hospital-lab-appointment-detail"].includes(currentPath) ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                 <span>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5.83464 2.49992V0.833252H7.5013V2.49992H12.5013V0.833252H14.168V2.49992H17.5013C17.9616 2.49992 18.3346 2.87302 18.3346 3.33325V7.49992H16.668V4.16659H14.168V5.83325H12.5013V4.16659H7.5013V5.83325H5.83464V4.16659H3.33464V15.8333H8.33464V17.4999H2.5013C2.04107 17.4999 1.66797 17.1268 1.66797 16.6666V3.33325C1.66797 2.87302 2.04107 2.49992 2.5013 2.49992H5.83464ZM14.168 9.99992C12.3271 9.99992 10.8346 11.4923 10.8346 13.3333C10.8346 15.1742 12.3271 16.6666 14.168 16.6666C16.0089 16.6666 17.5013 15.1742 17.5013 13.3333C17.5013 11.4923 16.0089 9.99992 14.168 9.99992ZM9.16797 13.3333C9.16797 10.5718 11.4066 8.33325 14.168 8.33325C16.9294 8.33325 19.168 10.5718 19.168 13.3333C19.168 16.0947 16.9294 18.3333 14.168 18.3333C11.4066 18.3333 9.16797 16.0947 9.16797 13.3333ZM13.3346 10.8333V13.6784L15.2454 15.5892L16.4239 14.4107L15.0013 12.9881V10.8333H13.3346Z" className={`group-hover:fill-white ${currentPath === "/hospital-lab-appointments-dashboard" ? "fill-white" : "fill-[#647284]"}`} />
+                    <path d="M5.83464 2.49992V0.833252H7.5013V2.49992H12.5013V0.833252H14.168V2.49992H17.5013C17.9616 2.49992 18.3346 2.87302 18.3346 3.33325V7.49992H16.668V4.16659H14.168V5.83325H12.5013V4.16659H7.5013V5.83325H5.83464V4.16659H3.33464V15.8333H8.33464V17.4999H2.5013C2.04107 17.4999 1.66797 17.1268 1.66797 16.6666V3.33325C1.66797 2.87302 2.04107 2.49992 2.5013 2.49992H5.83464ZM14.168 9.99992C12.3271 9.99992 10.8346 11.4923 10.8346 13.3333C10.8346 15.1742 12.3271 16.6666 14.168 16.6666C16.0089 16.6666 17.5013 15.1742 17.5013 13.3333C17.5013 11.4923 16.0089 9.99992 14.168 9.99992ZM9.16797 13.3333C9.16797 10.5718 11.4066 8.33325 14.168 8.33325C16.9294 8.33325 19.168 10.5718 19.168 13.3333C19.168 16.0947 16.9294 18.3333 14.168 18.3333C11.4066 18.3333 9.16797 16.0947 9.16797 13.3333ZM13.3346 10.8333V13.6784L15.2454 15.5892L16.4239 14.4107L15.0013 12.9881V10.8333H13.3346Z" className={`group-hover:fill-white ${["/hospital-lab-appointments-dashboard", "/hospital-lab-appointment-detail"].includes(currentPath) ? "fill-white" : "fill-[#647284]"}`} />
                   </svg>
                 </span>
                 Appointments
@@ -77,8 +78,8 @@ const Hospital_Lab_Sidebar = () => {
           </Link>
 
           {/* Messages */}
-          <Link to="/hospital-lab-messages-dashboard">
-            <div className="px-4 my-1">
+          <div className="cursor-pointer" onClick={() => toast.success("Coming Soon !")}>
+            <div className="px-4 my-4">
               <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-messages-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                 <span>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -88,11 +89,11 @@ const Hospital_Lab_Sidebar = () => {
                 Messages
               </li>
             </div>
-          </Link>
+          </div>
 
           {/* Health Personnel */}
           <Link to="/hospital-lab-healthpersonnel-dashboard">
-            <div className="px-4 my-1">
+            <div className="px-4 my-4">
               <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-healthpersonnel-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
                 <span>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -106,29 +107,33 @@ const Hospital_Lab_Sidebar = () => {
         </ul>
       </nav>
 
-      {/* Bottom section — Settings + Logout */}
-      <div className="shrink-0 border-t border-gray-100 pt-2 pb-4 text-sm">
-        <Link to="/hospital-lab-settings-dashboard">
-          <div className="px-4 my-1">
-            <li className={`group px-4 py-2 list-none ${currentPath === "/hospital-lab-settings-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
-              <span>
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M7.2386 3.33324L9.4108 1.16107C9.73621 0.835632 10.2639 0.835632 10.5893 1.16107L12.7615 3.33324H15.8334C16.2936 3.33324 16.6667 3.70634 16.6667 4.16657V7.23848L18.8389 9.41067C19.1643 9.73609 19.1643 10.2638 18.8389 10.5892L16.6667 12.7613V15.8333C16.6667 16.2935 16.2936 16.6666 15.8334 16.6666H12.7615L10.5893 18.8388C10.2639 19.1642 9.73621 19.1642 9.4108 18.8388L7.2386 16.6666H4.1667C3.70646 16.6666 3.33336 16.2935 3.33336 15.8333V12.7613L1.1612 10.5892C0.835754 10.2638 0.835754 9.73609 1.1612 9.41067L3.33336 7.23848V4.16657C3.33336 3.70634 3.70646 3.33324 4.1667 3.33324H7.2386ZM5.00003 4.99991V7.92884L2.92896 9.99992L5.00003 12.071V14.9999H7.92896L10 17.071L12.0711 14.9999H15V12.071L17.0711 9.99992L15 7.92884V4.99991H12.0711L10 2.92884L7.92896 4.99991H5.00003ZM10 13.3333C8.15908 13.3333 6.6667 11.8408 6.6667 9.99992C6.6667 8.15896 8.15908 6.66657 10 6.66657C11.841 6.66657 13.3334 8.15896 13.3334 9.99992C13.3334 11.8408 11.841 13.3333 10 13.3333ZM10 11.6666C10.9205 11.6666 11.6667 10.9204 11.6667 9.99992C11.6667 9.07942 10.9205 8.33326 10 8.33326C9.07955 8.33326 8.33338 9.07942 8.33338 9.99992C8.33338 10.9204 9.07955 11.6666 10 11.6666Z" className={`group-hover:fill-white ${currentPath === "/hospital-lab-settings-dashboard" ? "fill-white" : "fill-[#647284]"}`} />
-                </svg>
-              </span>
-              Settings
+      {/* Bottom: Settings & Logout */}
+      <div className="text-sm border-t border-gray-100 pb-4 pt-2 shrink-0">
+        <ul>
+          {/* Settings */}
+          <Link to="/hospital-lab-settings-dashboard">
+            <div className="px-4 my-2">
+              <li className={`group px-4 py-2 ${currentPath === "/hospital-lab-settings-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}>
+                <span>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.2386 3.33324L9.4108 1.16107C9.73621 0.835632 10.2639 0.835632 10.5893 1.16107L12.7615 3.33324H15.8334C16.2936 3.33324 16.6667 3.70634 16.6667 4.16657V7.23848L18.8389 9.41067C19.1643 9.73609 19.1643 10.2638 18.8389 10.5892L16.6667 12.7613V15.8333C16.6667 16.2935 16.2936 16.6666 15.8334 16.6666H12.7615L10.5893 18.8388C10.2639 19.1642 9.73621 19.1642 9.4108 18.8388L7.2386 16.6666H4.1667C3.70646 16.6666 3.33336 16.2935 3.33336 15.8333V12.7613L1.1612 10.5892C0.835754 10.2638 0.835754 9.73609 1.1612 9.41067L3.33336 7.23848V4.16657C3.33336 3.70634 3.70646 3.33324 4.1667 3.33324H7.2386ZM5.00003 4.99991V7.92884L2.92896 9.99992L5.00003 12.071V14.9999H7.92896L10 17.071L12.0711 14.9999H15V12.071L17.0711 9.99992L15 7.92884V4.99991H12.0711L10 2.92884L7.92896 4.99991H5.00003ZM10 13.3333C8.15908 13.3333 6.6667 11.8408 6.6667 9.99992C6.6667 8.15896 8.15908 6.66657 10 6.66657C11.841 6.66657 13.3334 8.15896 13.3334 9.99992C13.3334 11.8408 11.841 13.3333 10 13.3333ZM10 11.6666C10.9205 11.6666 11.6667 10.9204 11.6667 9.99992C11.6667 9.07942 10.9205 8.33326 10 8.33326C9.07955 8.33326 8.33338 9.07942 8.33338 9.99992C8.33338 10.9204 9.07955 11.6666 10 11.6666Z" className={`group-hover:fill-white ${currentPath === "/hospital-lab-settings-dashboard" ? "fill-white" : "fill-[#647284]"}`} />
+                  </svg>
+                </span>
+                Settings
+              </li>
+            </div>
+          </Link>
+
+          {/* Logout */}
+          <div className="px-4 my-2" onClick={handleLogout}>
+            <li className="group px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg flex items-center gap-2 justify-start cursor-pointer transition-colors duration-150">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3.33329 12.4998H4.99996V16.6665H15V3.33317H4.99996V7.49984H3.33329V2.49984C3.33329 2.0396 3.70639 1.6665 4.16663 1.6665H15.8333C16.2935 1.6665 16.6666 2.0396 16.6666 2.49984V17.4998C16.6666 17.9601 16.2935 18.3332 15.8333 18.3332H4.16663C3.70639 18.3332 3.33329 17.9601 3.33329 17.4998V12.4998ZM8.33329 9.1665V6.6665L12.5 9.99984L8.33329 13.3332V10.8332H1.66663V9.1665H8.33329Z" className="fill-red-500 group-hover:fill-white" />
+              </svg>
+              Log-out
             </li>
           </div>
-        </Link>
-
-        <div className="px-4 my-1 cursor-pointer" onClick={handleLogout}>
-          <li className="group px-4 py-2 list-none text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3.33329 12.4998H4.99996V16.6665H15V3.33317H4.99996V7.49984H3.33329V2.49984C3.33329 2.0396 3.70639 1.6665 4.16663 1.6665H15.8333C16.2935 1.6665 16.6666 2.0396 16.6666 2.49984V17.4998C16.6666 17.9601 16.2935 18.3332 15.8333 18.3332H4.16663C3.70639 18.3332 3.33329 17.9601 3.33329 17.4998V12.4998ZM8.33329 9.1665V6.6665L12.5 9.99984L8.33329 13.3332V10.8332H1.66663V9.1665H8.33329Z" className="group-hover:fill-white fill-[#647284]" />
-            </svg>
-            Log-out
-          </li>
-        </div>
+        </ul>
       </div>
     </div>
   );

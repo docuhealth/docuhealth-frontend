@@ -102,7 +102,7 @@ const Contact_Us_Section = () => {
                   </div>
                   <div>
                     <p className="font-semibold 2xl:text-lg">Email us:</p>
-                    <p className="2xl:text-lg">info@docuhealth.online</p>
+                    <p className="2xl:text-lg">support@docuhealthservices.net</p>
                   </div>
                 </div>
 
@@ -115,7 +115,7 @@ const Contact_Us_Section = () => {
                   </div>
                   <div>
                     <p className="font-semibold 2xl:text-lg">For Partnerships and Collaborations</p>
-                    <p className="2xl:text-lg">info@docuhealth.online</p>
+                    <p className="2xl:text-lg">admin@docuhealthservices.net</p>
                   </div>
                 </div>
               </div>

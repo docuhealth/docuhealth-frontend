@@ -9,7 +9,7 @@ export const NursesAppointmentsListContext = createContext();
 
 const NursesAppointmentsListProvider = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [appointmentType, setAppointmentType] = useState('upcoming'); // 'upcoming' or 'history'
+  const [appointmentType, setAppointmentType] = useState('today'); // 'today', 'upcoming' or 'history'
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");

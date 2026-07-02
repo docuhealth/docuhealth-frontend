@@ -5,7 +5,7 @@ import Hospital_Lab_Sidebar from "../../../Components/Dashboard/Hospital_Dashboa
 
 const Hospital_Lab_Layout = () => {
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
       <aside className="w-64 shadow-sm border z-20 min-h-screen hidden lg:block">
         <Hospital_Lab_Sidebar />

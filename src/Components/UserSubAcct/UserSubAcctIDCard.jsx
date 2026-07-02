@@ -240,10 +240,10 @@ const UserSubAcctIDCard = ({generateIDCard, setGenerateIDCard, selectedUser, for
                         <p className="text-[#313131] text-[10px]">
                           This card belongs to the registered patient. If found,
                           please return it to the nearest hospital or contact
-                          support@docuhealthServices.com.
+                          support@docuhealthservices.net.
                         </p>
                         <p className="text-[#313131] text-[10px] py-2">
-                          www.docuhealthservices.com
+                          www.docuhealthservices.net
                         </p>
                       </div>
                     </div>

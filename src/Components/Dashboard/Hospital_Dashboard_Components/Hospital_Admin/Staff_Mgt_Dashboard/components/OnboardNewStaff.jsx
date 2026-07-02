@@ -2,11 +2,10 @@ import React, { useState, useEffect, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HosAppContext } from "../../../../../../context/HospitalContext/Admin/HosAppContext";
-import { HosWardContext } from "../../../../../../context/HospitalContext/HosWardContext"
+import { HosWardContext } from "../../../../../../context/HospitalContext/HosWardContext";
 
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import toast from "react-hot-toast";
-
 
 const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const [step, setStep] = useState(1);
@@ -28,7 +27,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const { profile } = useContext(HosAppContext);
   const { wards } = useContext(HosWardContext);
 
-  console.log(wards)
+  console.log(wards);
 
   const [passwordRequirements, setPasswordRequirements] = useState({});
   const [isPasswordValid, setIsPasswordValid] = useState(false);
@@ -49,7 +48,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     "Dermatologist",
     "Orthopedic",
     "Radiologist",
-    "Anesthesiologist"
+    "Anesthesiologist",
   ];
 
   const nurseSpecializations = [
@@ -91,7 +90,6 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
         : form.personnel === "lab_scientist"
           ? labScientistSpecializations
           : [];
-
 
   const gender = ["male", "female"];
 
@@ -162,7 +160,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     setForm((prev) => ({
       ...prev,
       [field]: value,
-      ...(field === "personnel" && { specialization: "", ward: "" })
+      ...(field === "personnel" && { specialization: "", ward: "" }),
     }));
   };
 
@@ -216,18 +214,24 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
       // Reset and Close
       setForm({
-        firstname: "", lastname: "", phone: "", gender: "",
-        role: "", personnel: "", specialization: "", ward: "",
-        email: "", password: "",
+        firstname: "",
+        lastname: "",
+        phone: "",
+        gender: "",
+        role: "",
+        personnel: "",
+        specialization: "",
+        ward: "",
+        email: "",
+        password: "",
       });
       setStep(1);
       setCreateNewStaff(false);
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Something went wrong.");
-    }
+    },
   });
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -276,7 +280,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                 onClick={() => {
                   setCreateNewStaff(false);
                 }}
-                class="bx bx-x text-xl cursor-pointer bg-gray-100 rounded-full"
+                className="bx bx-x text-xl cursor-pointer bg-gray-100 rounded-full"
               ></i>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -295,7 +299,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
               <input
                 placeholder="Phone number"
-                type='number'
+                type="number"
                 value={form.phone}
                 onChange={(e) => handleChange("phone", e.target.value)}
                 className="border p-2 rounded-lg outline-none text-sm focus:border-[#3E4095]"
@@ -323,7 +327,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                 <option value="">Healthcare personnel</option>
                 {personnelOptions.map((p) => (
                   <option key={p} value={p}>
-                    {p}
+                    {p.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
                   </option>
                 ))}
               </select>
@@ -333,8 +337,9 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                 disabled={form.personnel === "receptionist" || !form.personnel}
                 value={form.specialization}
                 onChange={(e) => handleChange("specialization", e.target.value)}
-                className={`border p-2 rounded-lg outline-none text-sm col-span-2 ${form.personnel === "receptionist" ? "bg-gray-100" : ""
-                  }`}
+                className={`border p-2 rounded-lg outline-none text-sm col-span-2 ${
+                  form.personnel === "receptionist" ? "bg-gray-100" : ""
+                }`}
               >
                 <option value="">Area of specialization</option>
                 {specializationOptions.map((s) => (
@@ -349,8 +354,9 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                 disabled={form.personnel === "receptionist"}
                 value={form.ward}
                 onChange={(e) => handleChange("ward", e.target.value)}
-                className={`border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-[#3E4095] ${form.personnel === "receptionist" ? "bg-gray-100" : ""
-                  }`}
+                className={`border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-[#3E4095] ${
+                  form.personnel === "receptionist" ? "bg-gray-100" : ""
+                }`}
               >
                 <option value="">Assign to ward</option>
                 {wardOptions.map((w) => (

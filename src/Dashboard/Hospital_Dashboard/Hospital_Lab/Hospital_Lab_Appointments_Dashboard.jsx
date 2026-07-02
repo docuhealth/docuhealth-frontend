@@ -1,44 +1,109 @@
-import { useState } from "react";
+import { useState, useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
-import { User, FlaskConical, FileText, ChevronDown, MoreHorizontal } from "lucide-react";
+import { FlaskConical, ChevronDown } from "lucide-react";
+import { LabAppointmentsListContext } from "../../../context/HospitalContext/Lab/LabAppointmentsListContext";
+import LabAppointmentRow from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabAppointmentRow";
+import LabAppointmentMobileCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabAppointmentMobileCard";
+import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/PatientInfoComponents/LabPatientInfo";
+import CreateOrderModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/CreateOrderModal";
+import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
+import SearchBar from "../../../Components/SearchBar/SearchBar";
 
-const appointments = [
-  { id: 1,  patient: "Amara Okafor",   test: "Test request", note: "Patient is complaining of severe cough and cold" },
-  { id: 2,  patient: "Emeka Nwosu",    test: "Test request", note: "Patient presents with persistent fever for 3 days" },
-  { id: 3,  patient: "Fatima Bello",   test: "Test request", note: "Routine check — doctor requested full blood panel" },
-  { id: 4,  patient: "Chidi Eze",      test: "Test request", note: "Patient is complaining of severe cough and cold" },
-  { id: 5,  patient: "Ngozi Adeyemi",  test: "Test request", note: "Patient reports abdominal pain and loss of appetite" },
-  { id: 6,  patient: "Yusuf Lawal",    test: "Test request", note: "Follow-up malaria test after initial treatment" },
-  { id: 7,  patient: "Blessing Obi",   test: "Test request", note: "Patient is complaining of severe cough and cold" },
-  { id: 8,  patient: "Kelechi Nnadi",  test: "Test request", note: "Thyroid check requested by endocrinologist" },
-  { id: 9,  patient: "Halima Usman",   test: "Test request", note: "Patient is complaining of severe cough and cold" },
-  { id: 10, patient: "Tunde Afolabi",  test: "Test request", note: "Annual wellness lab screen" },
-];
+const getPatientName = (appt) =>
+  appt.patient_name ||
+  (appt.patient ? `${appt.patient.firstname || ""} ${appt.patient.lastname || ""}`.trim() : "") ||
+  appt.name ||
+  "Unknown";
 
-const filterOptions = ["All", "Today", "This week", "This month"];
+const getTestName = (appt) => appt.test_name || appt.test || "Test request";
 
 const Hospital_Lab_Appointments_Dashboard = () => {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState("All");
-  const [showFilter, setShowFilter]     = useState(false);
-  const [openMenu, setOpenMenu]         = useState(null);
+  const [seePatientDetails, setSeePatientDetails] = useState(false);
+  const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [orderPatientHin, setOrderPatientHin] = useState(null);
+
+  const {
+    appointments,
+    loading,
+    count,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    appointmentType,
+    setAppointmentType,
+    searchQuery,
+    setSearchQuery,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
+    isRefreshing,
+  } = useContext(LabAppointmentsListContext);
+
+  const sortedAppointments = useMemo(() => {
+    if (appointmentType === 'upcoming') {
+      const now = new Date().getTime();
+      return [...appointments].sort((a, b) => {
+        const dateA = new Date(a.scheduled_time || a.scheduled_at || a.datetime).getTime();
+        const dateB = new Date(b.scheduled_time || b.scheduled_at || b.datetime).getTime();
+        return Math.abs(dateA - now) - Math.abs(dateB - now);
+      });
+    }
+    return [...appointments].sort((a, b) => new Date(b.scheduled_time || b.scheduled_at || b.datetime).getTime() - new Date(a.scheduled_time || a.scheduled_at || a.datetime).getTime());
+  }, [appointments, appointmentType]);
 
   const handleOpen = (appt) => {
-    setOpenMenu(null);
     navigate("/hospital-lab-appointment-detail", {
       state: {
-        order: {
-          name:     appt.patient,
-          hin:      "12456********",
-          test:     appt.test === "Test request" ? "Malaria/Typhoid Test" : appt.test,
-          hospital: "Lagos General Hospital",
-          datetime: "30th, May., 2026/ 9:45 AM",
-          tab:      "Pending Test",
+        appt: {
+          id:          appt.id,
+          name:        getPatientName(appt),
+          hin:         appt.patient_hin || appt.patient?.hin || appt.hin || "—",
+          test:        getTestName(appt),
+          hospital:    appt.hospital_name || appt.hospital || "—",
+          scheduledAt: appt.scheduled_time || appt.scheduled_at || appt.datetime || null,
+          requestedBy: appt.requested_by ||
+            (appt.doctor ? `Dr. ${appt.doctor.firstname || ""} ${appt.doctor.lastname || ""}`.trim() : undefined),
+          age:    appt.patient?.age,
+          gender: appt.patient?.sex || appt.patient?.gender,
+          status: appt.status || "upcoming",
+          note:   appt.note || appt.doctor_note || appt.description,
         },
       },
     });
   };
+
+  const handleSeeDetails = (appt) => {
+    const normalized = {
+      ...appt,
+      patient: appt.patient || { hin: appt.patient_hin || appt.hin },
+    };
+    setSelectedPatientDetails(normalized);
+    setSeePatientDetails(true);
+  };
+
+  const handleCreateOrder = (appt) => {
+    setOrderPatientHin(appt.patient_hin || appt.patient?.hin || appt.hin || null);
+    setShowOrderModal(true);
+  };
+
+  if (seePatientDetails) {
+    return (
+      <>
+        <div className="py-2">
+          <DynamicDate />
+        </div>
+        <PatientInfo
+          selectedPatientDetails={selectedPatientDetails}
+          setSeePatientDetails={setSeePatientDetails}
+          hideCreateOrder={appointmentType === 'history'}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -46,139 +111,118 @@ const Hospital_Lab_Appointments_Dashboard = () => {
         <DynamicDate />
       </div>
 
-      <div className="mt-4 bg-white border border-gray-200 rounded-xl p-4 sm:p-6">
+      <div className="bg-white my-5 rounded-lg">
+        <div className="border rounded-lg p-4 lg:p-6">
+          <h2 className="mb-4 pb-2 border-b font-medium capitalize">
+            {appointmentType === 'upcoming' ? 'Upcoming' : appointmentType === 'today' ? "Today's" : 'Past'} Appointments List
+          </h2>
 
-        {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-xs sm:text-sm font-semibold text-[#1B2B40]">Upcoming appointment</h3>
+          <div className="flex flex-col sm:flex-row md:justify-end mb-8 gap-3 w-full">
+            {appointmentType !== 'history' && (
+              <button
+                onClick={() => setAppointmentType('history')}
+                className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+                View past appointments
+              </button>
+            )}
+            {appointmentType !== 'today' && (
+              <button
+                onClick={() => setAppointmentType('today')}
+                className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+                View today's appointments
+              </button>
+            )}
+            {appointmentType !== 'upcoming' && (
+              <button
+                onClick={() => setAppointmentType('upcoming')}
+                className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+                View upcoming appointments
+              </button>
+            )}
+          </div>
 
-          {/* Filter dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setShowFilter(!showFilter)}
-              className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              Filter <ChevronDown size={15} className={`transition-transform ${showFilter ? "rotate-180" : ""}`} />
-            </button>
-            {showFilter && (
-              <div className="absolute right-0 top-8 w-36 bg-white border border-gray-100 shadow-lg rounded-lg py-1 z-10">
-                {filterOptions.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => { setActiveFilter(opt); setShowFilter(false); }}
-                    className={`w-full text-left text-xs px-4 py-2 hover:bg-gray-50 transition-colors ${
-                      activeFilter === opt ? "text-[#3E4095] font-semibold" : "text-gray-600"
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
+          <div className="mb-4 w-full space-y-3">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search patient's name, doctor's name, or notes..."
+            />
+            <div className="flex flex-wrap gap-3">
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-500 whitespace-nowrap">From:</label>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095]"
+                />
               </div>
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-500 whitespace-nowrap">To:</label>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095]"
+                />
+              </div>
+              {(dateFrom || dateTo) && (
+                <button
+                  onClick={() => { setDateFrom(""); setDateTo(""); }}
+                  className="text-xs text-red-500 hover:text-red-700 underline cursor-pointer"
+                >
+                  Clear dates
+                </button>
+              )}
+              {isRefreshing && (
+                <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
+                  <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+                  Searching...
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="text-[12px] my-4">
+            {loading ? (
+              <div className="py-12 text-center text-gray-400 text-sm">Loading appointments...</div>
+            ) : appointments.length === 0 ? (
+              <div className="py-12 text-center text-gray-400 text-sm">
+                <p className="font-medium">No results found.</p>
+                <p className="text-xs text-gray-400 mt-1">Try a different search term or date range, or check another tab.</p>
+              </div>
+            ) : (
+              <>
+                <div className="hidden lg:block">
+                  {sortedAppointments.map((appt) => (
+                    <LabAppointmentRow key={appt.id} appt={appt} onOpen={handleOpen} onSeeDetails={handleSeeDetails} onCreateOrder={handleCreateOrder} hideCreateOrder={appointmentType === 'history'} />
+                  ))}
+                </div>
+
+                <div className="block lg:hidden space-y-4 my-4">
+                  {sortedAppointments.map((appt) => (
+                    <LabAppointmentMobileCard key={appt.id} appt={appt} onOpen={handleOpen} onSeeDetails={handleSeeDetails} onCreateOrder={handleCreateOrder} hideCreateOrder={appointmentType === 'history'} />
+                  ))}
+                </div>
+                
+                {totalPages > 1 && (
+                  <Pagination2
+                    count={count}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    setCurrentPage={setCurrentPage}
+                  />
+                )}
+              </>
             )}
           </div>
         </div>
-
-        {/* Appointment rows */}
-        <div className="flex flex-col gap-3">
-          {appointments.map((appt) => (
-            <div
-              key={appt.id}
-              className="border border-gray-200 rounded-xl"
-            >
-              {/* Mobile: stacked layout */}
-              <div className="flex flex-col sm:hidden px-4 py-3 gap-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <User size={16} className="text-gray-400 shrink-0" />
-                    <span>Patient: <span className="font-medium">{appt.patient}</span></span>
-                  </div>
-                  {/* Three-dot menu */}
-                  <div className="relative">
-                    <button
-                      onClick={() => setOpenMenu(openMenu === appt.id ? null : appt.id)}
-                      className="p-1 rounded-full hover:bg-gray-100 transition-colors text-gray-400"
-                    >
-                      <MoreHorizontal size={18} />
-                    </button>
-                    {openMenu === appt.id && (
-                      <div className="absolute right-0 top-8 w-40 bg-white border border-gray-100 shadow-lg rounded-lg py-1 z-10">
-                        <button
-                          onClick={() => handleOpen(appt)}
-                          className="w-full text-left text-xs px-4 py-2 text-gray-600 hover:bg-gray-50 transition-colors"
-                        >
-                          Open
-                        </button>
-                        <button className="w-full text-left text-xs px-4 py-2 text-green-600 hover:bg-green-50 transition-colors">
-                          Accept request
-                        </button>
-                        <button className="w-full text-left text-xs px-4 py-2 text-red-500 hover:bg-red-50 transition-colors">
-                          Reject request
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <FlaskConical size={14} className="text-gray-400 shrink-0" />
-                  <span>{appt.test}</span>
-                </div>
-                <div className="flex items-start gap-2 text-xs text-gray-500">
-                  <FileText size={14} className="text-gray-400 shrink-0 mt-0.5" />
-                  <span>Note: {appt.note}</span>
-                </div>
-              </div>
-
-              {/* Tablet/Desktop: horizontal row */}
-              <div className="hidden sm:flex items-stretch">
-                {/* Patient */}
-                <div className="flex items-center gap-2.5 px-4 py-4 border-r border-gray-200 min-w-[180px] lg:min-w-[200px]">
-                  <User size={18} className="text-gray-400 shrink-0" />
-                  <span className="text-sm text-gray-700">Patient: <span className="font-medium">{appt.patient}</span></span>
-                </div>
-
-                {/* Test request */}
-                <div className="flex items-center gap-2.5 px-4 py-4 border-r border-gray-200 min-w-[130px] lg:min-w-[150px]">
-                  <FlaskConical size={18} className="text-gray-400 shrink-0" />
-                  <span className="text-sm text-gray-700">{appt.test}</span>
-                </div>
-
-                {/* Note */}
-                <div className="flex items-center gap-2.5 px-4 py-4 flex-1">
-                  <FileText size={18} className="text-gray-400 shrink-0" />
-                  <span className="text-xs sm:text-sm text-gray-600">Note: {appt.note}</span>
-                </div>
-
-                {/* Three-dot menu */}
-                <div className="relative flex items-center px-4">
-                  <button
-                    onClick={() => setOpenMenu(openMenu === appt.id ? null : appt.id)}
-                    className="p-1 rounded-full hover:bg-gray-100 transition-colors text-gray-400"
-                  >
-                    <MoreHorizontal size={18} />
-                  </button>
-                  {openMenu === appt.id && (
-                    <div className="absolute right-6 top-10 w-40 bg-white border border-gray-100 shadow-lg rounded-lg py-1 z-10">
-                      <button
-                        onClick={() => handleOpen(appt)}
-                        className="w-full text-left text-xs px-4 py-2 text-gray-600 hover:bg-gray-50 transition-colors"
-                      >
-                        Open
-                      </button>
-                      <button className="w-full text-left text-xs px-4 py-2 text-green-600 hover:bg-green-50 transition-colors">
-                        Accept request
-                      </button>
-                      <button className="w-full text-left text-xs px-4 py-2 text-red-500 hover:bg-red-50 transition-colors">
-                        Reject request
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
       </div>
+      <CreateOrderModal
+        isOpen={showOrderModal}
+        onClose={() => setShowOrderModal(false)}
+        patientHin={orderPatientHin}
+      />
     </>
   );
 };
