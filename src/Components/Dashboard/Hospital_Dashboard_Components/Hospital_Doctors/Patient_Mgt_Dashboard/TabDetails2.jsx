@@ -16,6 +16,7 @@ import {
   Eye,
   ArrowDownToLine,
 } from "lucide-react";
+import { renderListOrString, renderLabTests } from "../../../../../utils/soapNoteHelpers";
 import {
   formatFullDate,
   formatTime,
@@ -1135,27 +1136,14 @@ const PatientSOAPNotes = ({
               <h4 className="text-gray-400 font-normal mb-1">
                 General Examination:
               </h4>
-              <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.general_exam?.map((item, index) => (
-                  <li key={index}>
-                    {/* If item is an object, use item.note. If it's a string, use item */}
-                    {typeof item === 'object' ? item.note : item}
-                  </li>
-                )) || <li>NIL</li>}
-              </ul>
+              {renderListOrString(selectedPatientDetails?.general_exam)}
             </div>
 
             <div className="text-[12px] pb-3">
               <h4 className="text-gray-400 font-normal mb-1">
                 Systemic Examination:
               </h4>
-              <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.systemic_exam?.map((item, index) => (
-                  <li key={index}>
-                    {typeof item === 'object' ? item.note : item}
-                  </li>
-                )) || <li>NIL</li>}
-              </ul>
+              {renderListOrString(selectedPatientDetails?.systemic_exam)}
             </div>
 
             <div className="text-[12px]">
@@ -1195,24 +1183,12 @@ const PatientSOAPNotes = ({
               <h4 className="text-gray-400 font-normal mb-1">
                 Investigations Required:
               </h4>
-              <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.investigations?.map((item, index) => (
-                  <li key={index}>
-                    {typeof item === 'object' ? item.note : item}
-                  </li>
-                )) || <li>NIL</li>}
-              </ul>
+              {renderListOrString(selectedPatientDetails?.investigations)}
             </div>
 
             <div className="text-[12px]">
               <h4 className="text-gray-400 font-normal mb-1">Bedside Tests:</h4>
-              <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.bedside_tests?.map((item, index) => (
-                  <li key={index}>
-                    {typeof item === 'object' ? item.note : item}
-                  </li>
-                )) || <li>NIL</li>}
-              </ul>
+              {renderListOrString(selectedPatientDetails?.bedside_tests)}
             </div>
           </div>
 
@@ -1223,14 +1199,9 @@ const PatientSOAPNotes = ({
               <h4 className="text-gray-400 font-normal mb-1">
                 Known Allergies & Sensitivities:
               </h4>
-              <p className="font-medium text-red-600 italic">
-                {/* Logic to handle the character array in your payload */}
-                {Array.isArray(selectedPatientDetails?.drug_history_allergies)
-                  ? selectedPatientDetails.drug_history_allergies
-                    .join("")
-                    .replace(/['\[\]]/g, "")
-                  : "NIL"}
-              </p>
+              <div className="font-medium text-red-600 italic">
+                {renderListOrString(selectedPatientDetails?.drug_history_allergies)}
+              </div>
             </div>
           </div>
 
@@ -1240,14 +1211,7 @@ const PatientSOAPNotes = ({
               <h4 className="text-gray-400 font-normal mb-1">
                 Active Problems List:
               </h4>
-              <ul className="list-disc list-outside pl-5 font-medium">
-                {selectedPatientDetails?.problems_list?.map((item, index) => (
-                  <li key={index}>
-                    {/* ADD THE CHECK HERE TOO */}
-                    {typeof item === 'object' ? item.note : item}
-                  </li>
-                )) || <li>NIL</li>}
-              </ul>
+              {renderListOrString(selectedPatientDetails?.problems_list)}
             </div>
 
             <div className="text-[12px] pt-3 border-t">
@@ -1411,18 +1375,7 @@ const PatientSOAPNotes = ({
           <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
             <p className="font-medium mb-4 text-[#1B2B40]">Care Instructions</p>
             <div className="text-[12px] text-gray-700">
-              {selectedPatientDetails?.care_instructions?.length > 0 ? (
-                <ul className="list-disc pl-5 space-y-1">
-                  {selectedPatientDetails.care_instructions.map((instruction, index) => (
-                    <li key={index}>
-                      {/* ADD THE CHECK HERE TOO */}
-                      {typeof instruction === 'object' ? instruction.note : instruction}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>NIL</p>
-              )}
+              {renderListOrString(selectedPatientDetails?.care_instructions)}
             </div>
           </div>
 
@@ -1430,20 +1383,11 @@ const PatientSOAPNotes = ({
           <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
             <p className="font-medium mb-4 text-[#1B2B40]">Treatment Plan</p>
             <div className="text-[12px] text-gray-700">
-              {selectedPatientDetails?.treatment_plan?.length > 0 ? (
-                <ul className="list-disc pl-5 space-y-1">
-                  {selectedPatientDetails.treatment_plan.map((plan, index) => (
-                    <li key={index}>
-                      {/* ADD THE CHECK HERE TOO */}
-                      {typeof plan === 'object' ? plan.note : plan}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>NIL</p>
-              )}
+              {renderListOrString(selectedPatientDetails?.treatment_plan)}
             </div>
           </div>
+
+          {renderLabTests(selectedPatientDetails?.lab_tests_info)}
 
           {/* 7. Follow Up / Appointment */}
           <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
@@ -1454,15 +1398,15 @@ const PatientSOAPNotes = ({
               <p className="text-[12px] text-gray-500">
                 Type:{" "}
                 <span className="font-medium text-gray-900 capitalize">
-                  {selectedPatientDetails?.appointment?.type || "NIL"}
+                  {selectedPatientDetails?.appointment_info?.type || "NIL"}
                 </span>
               </p>
               <p className="text-[12px] text-gray-500">
                 Scheduled:{" "}
                 <span className="font-medium text-gray-900">
-                  {selectedPatientDetails?.appointment?.scheduled_time
+                  {selectedPatientDetails?.appointment_info?.scheduled_time
                     ? formatFullDateTime(
-                      selectedPatientDetails.appointment.scheduled_time,
+                      selectedPatientDetails.appointment_info.scheduled_time,
                     )
                     : "NIL"}
                 </span>
