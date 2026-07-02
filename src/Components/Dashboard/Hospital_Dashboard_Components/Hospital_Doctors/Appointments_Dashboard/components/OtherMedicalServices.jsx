@@ -66,6 +66,7 @@ const Nurse_Icon = () => (
 const OtherMedicalServices = ({
   setOtherMedicalServices,
   selectedPatientDetails,
+  isFromPatientMgt = false,
 }) => {
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -113,13 +114,13 @@ const OtherMedicalServices = ({
       role: "nurse",
       icon: <Nurse_Icon />,
     },
-    {
+    ...(isFromPatientMgt ? [{
       id: 2,
       title: "Order lab test",
       subtitle: "Request for lab test",
       role: "lab_scientist",
       icon: <Lab_Personnel_Icon />, // replace with your SVG
-    },
+    }] : []),
     {
       id: 3,
       title: "Prescribe drugs",
@@ -149,6 +150,18 @@ const OtherMedicalServices = ({
 
     if (selected != "nurse" && selected != "lab_scientist") {
       toast.error("Feature coming soon");
+      setLoading(false);
+      return;
+    }
+
+    if (selected === "lab_scientist") {
+      setStaffList([{ dummy: true }]); // Pass the length check
+      setIsStaffSelectedRole(selected);
+      setIsStaffSelected(true);
+      setFormData((prev) => ({
+        ...prev,
+        patient_hin: selectedPatientDetails.patient.hin,
+      }));
       setLoading(false);
       return;
     }
@@ -214,7 +227,8 @@ const OtherMedicalServices = ({
         return axiosInstanceHos.post("api/lab/test-orders/create", {
           test: testSqid,
           patient: payload.patient_hin,
-          note: payload.note
+          note: payload.note,
+          order_source: "staff_admission_order"
         });
       });
       return await Promise.all(promises);

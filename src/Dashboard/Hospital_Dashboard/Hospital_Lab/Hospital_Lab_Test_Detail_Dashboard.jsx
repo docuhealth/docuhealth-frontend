@@ -11,13 +11,18 @@ import {
   acceptLabRequest,
   rejectLabRequest,
   logSpecimenCollectionTime,
+  approveLabTestResult,
+  rejectLabTestResult,
 } from "../../../queries/Hospital/lab/requests";
+import DoctorReviewModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/DoctorReviewModal";
 
 const STATUS_STYLES = {
   pending:     { label: "Pending",     color: "text-amber-500" },
   in_progress: { label: "In Progress", color: "text-amber-500" },
   completed:   { label: "Completed",   color: "text-green-600" },
   rejected:    { label: "Rejected",    color: "text-red-500"   },
+  approved:    { label: "Approved",    color: "text-green-600" },
+  accepted:    { label: "Accepted",    color: "text-green-600" },
 };
 
 const getRefRange = (p) => {
@@ -67,22 +72,30 @@ const normalizeOrder = (raw, tab) => ({
 });
 
 /* ─── main component ─── */
-const Hospital_Lab_Test_Detail_Dashboard = () => {
+const Hospital_Lab_Test_Detail_Dashboard = ({ 
+  orderIdProp, 
+  onBackProp, 
+  isDoctorView 
+} = {}) => {
   const navigate      = useNavigate();
   const queryClient   = useQueryClient();
-  const { state }     = useLocation();
-  const sqid          = state?.order?.id;
-  const activeTab     = state?.order?.tab;
+  const { state }     = useLocation() || {};
+  const isDirectOrder = typeof orderIdProp === "object" && orderIdProp !== null;
+  const sqid          = isDirectOrder ? orderIdProp.sqid : (orderIdProp || state?.sqid);
 
-  const { data: rawOrder, isLoading: orderLoading } = useQuery({
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [isDoctorReviewModalOpen, setIsDoctorReviewModalOpen] = useState(false);
+  const [doctorReviewType, setDoctorReviewType] = useState("approve");
+
+  const { data: fetchedOrder, isLoading: orderLoading } = useQuery({
     queryKey: ["lab-order", sqid],
     queryFn:  () => fetchLabOrderDetail(sqid),
-    enabled:  !!sqid,
+    enabled:  !!sqid && !isDirectOrder,
   });
 
-  const order = rawOrder ? normalizeOrder(rawOrder, activeTab) : (state?.order ?? {});
+  const rawOrder = isDirectOrder ? orderIdProp : fetchedOrder;
+  const order = rawOrder ? normalizeOrder(rawOrder, state?.order?.tab) : (state?.order ?? {});
 
-  const [showRejectModal, setShowRejectModal] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [showSampleModal, setShowSampleModal] = useState(false);
   const [fromAccept, setFromAccept] = useState(false);
@@ -91,7 +104,8 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
   const [sampleTime, setSampleTime] = useState("");
   const [rejectReason, setRejectReason] = useState("");
 
-  const statusStyle  = STATUS_STYLES[order.status] ?? STATUS_STYLES.pending;
+  const displayStatus = isDoctorView && order?.result_info?.status ? order.result_info.status : order.status;
+  const statusStyle  = STATUS_STYLES[displayStatus] ?? STATUS_STYLES.pending;
   const isPending    = order.status === "pending";
   const isInProgress = order.status === "in_progress";
   const isCompleted  = order.status === "completed";
@@ -103,35 +117,68 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
     ? `${preferredSpecimen.name}${preferredSpecimen.container ? ` (${preferredSpecimen.container})` : ""}`
     : "—";
 
-  const resultParams = order.result_info?.parameters ?? [];
+  const resultParams = order.result_info?.parameters ?? (order.test_info?.parameters || []).map(p => ({
+    parameter_info: p,
+    value: null,
+    status: null
+  }));
 
   const headerLabel = isCompleted || isRejected ? "Lab result" : "Test";
 
-  const acceptMutation = useMutation({ mutationFn: () => acceptLabRequest(order.id) });
-  const rejectMutation = useMutation({ mutationFn: ({ reason }) => rejectLabRequest({ sqid: order.id, reason }) });
-  const specimenMutation = useMutation({ mutationFn: (data) => logSpecimenCollectionTime(data) });
-
-  const handleAcceptLater = async () => {
-    try {
-      await acceptMutation.mutateAsync();
+  const acceptMutation = useMutation({ 
+    mutationFn: () => acceptLabRequest(order.id),
+    onSuccess: () => {
       toast.success("Request accepted — moved to In-progress");
       setShowAcceptModal(false);
-      navigate(-1);
-    } catch {
-      toast.error("Failed to accept request. Please try again.");
-    }
-  };
+      queryClient.invalidateQueries(["labRequests"]);
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || "Failed to accept request");
+    },
+  });
 
-  const handleReject = async () => {
-    try {
-      await rejectMutation.mutateAsync({ reason: rejectReason });
-      toast.success("Request rejected");
-      setShowRejectModal(false);
-      navigate(-1);
-    } catch {
-      toast.error("Failed to reject request. Please try again.");
-    }
-  };
+  const rejectMutation = useMutation({
+    mutationFn: rejectLabRequest,
+    onSuccess: () => {
+      toast.success("Request rejected successfully!");
+      setIsRejectModalOpen(false);
+      queryClient.invalidateQueries(["labOrderDetail", sqid]);
+      queryClient.invalidateQueries(["labRequests"]);
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || "Failed to reject request");
+    },
+  });
+
+  const specimenMutation = useMutation({ mutationFn: (data) => logSpecimenCollectionTime(data) });
+
+  const approveMutation = useMutation({
+    mutationFn: approveLabTestResult,
+    onSuccess: () => {
+      toast.success("Result approved successfully!");
+      setIsDoctorReviewModalOpen(false);
+      queryClient.invalidateQueries(["patient-lab-records"]);
+      queryClient.invalidateQueries(["labOrderDetail", sqid]);
+      queryClient.invalidateQueries(["labRequests"]);
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || "Failed to approve result");
+    },
+  });
+
+  const rejectDoctorMutation = useMutation({
+    mutationFn: rejectLabTestResult,
+    onSuccess: () => {
+      toast.success("Result rejected successfully!");
+      setIsDoctorReviewModalOpen(false);
+      queryClient.invalidateQueries(["patient-lab-records"]);
+      queryClient.invalidateQueries(["labOrderDetail", sqid]);
+      queryClient.invalidateQueries(["labRequests"]);
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || "Failed to reject result");
+    },
+  });
 
   const handleSampleSubmit = async () => {
     const specimen_collected_at = `${sampleDate}T${sampleTime}:00`;
@@ -154,7 +201,7 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
     }
   };
 
-  if (orderLoading) {
+  if (orderLoading && !isDirectOrder) {
     return (
       <div className="flex items-center justify-center py-24 text-gray-400 text-sm">
         <div className="w-5 h-5 border-2 border-[#3E4095] border-t-transparent rounded-full animate-spin mr-3" />
@@ -169,76 +216,93 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         <DynamicDate />
       </div>
 
-      {/* ── Top bar ── */}
       <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => onBackProp ? onBackProp() : navigate(-1)}
           className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#3E4095] transition-colors w-fit"
         >
           <ArrowLeft size={16} />
           {headerLabel}
         </button>
 
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-          <p className="text-xs sm:text-sm font-medium text-gray-700">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+          <p className="text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-0">
             Status:{" "}
             <span className={`font-semibold ${statusStyle.color}`}>{statusStyle.label}</span>
           </p>
 
-          {/* Pending */}
-          {isPending && (
+          {isPending && !isDoctorView && (
             <>
               <button
-                onClick={() => setShowRejectModal(true)}
+                onClick={() => setIsRejectModalOpen(true)}
                 disabled={acceptMutation.isPending || rejectMutation.isPending}
-                className="border border-red-400 text-red-500 text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-red-50 transition-colors disabled:opacity-50"
+                className="w-full sm:w-auto border border-red-400 text-red-500 text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-red-50 transition-colors disabled:opacity-50"
               >
                 Reject request
               </button>
               <button
                 onClick={() => setShowAcceptModal(true)}
                 disabled={acceptMutation.isPending || rejectMutation.isPending}
-                className="border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50 flex items-center gap-1"
+                className="w-full sm:w-auto border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
               >
                 Accept request
               </button>
             </>
           )}
 
-          {/* In-progress */}
-          {isInProgress && (
+          {isInProgress && !isDoctorView && (
             <>
               <button
                 onClick={() => setShowSampleModal(true)}
-                className="border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-indigo-50 transition-colors"
+                className="w-full sm:w-auto border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-indigo-50 transition-colors"
               >
                 {sampleLogged ? "Edit sample collection info" : "Log sample collection"}
               </button>
               <button
                 onClick={() => navigate("/hospital-lab-upload-result", { state: { order } })}
                 disabled={!sampleLogged}
-                className="bg-[#3E4095] text-white text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto bg-[#3E4095] text-white text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-[#2e3070] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Upload test result
               </button>
             </>
           )}
 
-          {/* Completed / Rejected */}
-          {(isCompleted || isRejected) && (
+          {isCompleted && isDoctorView && (
             <>
-              <button className="flex items-center gap-2 border border-gray-300 text-gray-600 text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
-                <Printer size={13} /> Print out
+              <button
+                onClick={() => {
+                  setDoctorReviewType("reject");
+                  setIsDoctorReviewModalOpen(true);
+                }}
+                disabled={displayStatus === "rejected"}
+                className={`w-full sm:w-44 border text-xs font-medium px-4 sm:px-6 py-2.5 rounded-full flex items-center justify-center transition-colors ${
+                  displayStatus === "rejected"
+                    ? "border-red-200 text-red-300 cursor-not-allowed"
+                    : "border-red-500 text-red-500 hover:bg-red-50"
+                }`}
+              >
+                Reject result
               </button>
-              <button className="flex items-center gap-2 border border-gray-300 text-gray-600 text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
-                <Download size={13} /> Download
+              <button
+                onClick={() => {
+                  setDoctorReviewType("approve");
+                  setIsDoctorReviewModalOpen(true);
+                }}
+                disabled={displayStatus === "accepted" || displayStatus === "approved"}
+                className={`w-full sm:w-44 text-xs font-medium px-4 sm:px-6 py-2.5 rounded-full flex items-center justify-center transition-colors ${
+                  displayStatus === "accepted" || displayStatus === "approved"
+                    ? "bg-[#b1b2d4] text-white cursor-not-allowed"
+                    : "bg-[#3E4095] text-white hover:bg-[#2e3070]"
+                }`}
+              >
+                Accept result
               </button>
             </>
           )}
         </div>
       </div>
 
-      {/* ── Patient info card (all tabs) ── */}
       <PatientInfoCard
         order={order}
         isCompleted={isCompleted}
@@ -247,7 +311,6 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         onEditSample={() => setShowSampleModal(true)}
       />
 
-      {/* ── PENDING: test details ── */}
       {isPending && (
         <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5 flex flex-col gap-4">
           <div>
@@ -273,7 +336,6 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         </div>
       )}
 
-      {/* ── IN-PROGRESS: test details ── */}
       {isInProgress && (
         <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5 flex flex-col gap-4">
           <div>
@@ -293,77 +355,134 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         </div>
       )}
 
-      {/* ── COMPLETED: result tables + interpretation ── */}
       {isCompleted && (
         <>
           {resultParams.length > 0 && (
             <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
-              <p className="text-xs sm:text-sm font-semibold text-[#1B2B40] mb-4">{order.test}</p>
-              <div className="overflow-x-auto">
-                <div className="min-w-[600px] flex flex-col mt-2">
-                  <div className="grid grid-cols-6 text-left text-sm bg-gray-100 py-5 rounded-md">
-                    <div className="col-span-2 pl-5">Parameter</div>
+              <p className="text-sm font-bold text-gray-800 mb-4 sm:mb-6">{order.test}</p>
+              <div className="hidden lg:block overflow-x-auto">
+                <div className="min-w-[600px] flex flex-col">
+                  <div className="grid grid-cols-4 text-left text-sm font-semibold text-gray-700 bg-[#F8F9FA] py-4 px-6 rounded-full mb-2 border border-gray-200">
+                    <p>Test</p>
                     <p>Result</p>
-                    <p>Unit</p>
                     <p>Reference range</p>
                     <p>Status</p>
                   </div>
                   {resultParams.map((p, i) => {
                     const info = p.parameter_info;
-                    const paramStatus = getParamStatus(p.value, info);
+                    const paramStatus = p.status ?? getParamStatus(p.value, info);
+                    const isLast = i === resultParams.length - 1;
+                    const statusText = paramStatus ?? "—";
+                    const statusLower = statusText.toLowerCase();
+                    const isRed = statusLower === "negative" || statusLower === "abnormal";
+                    const isGreen = statusLower === "positive" || statusLower === "normal";
+                    
                     return (
-                      <div key={i} className="grid grid-cols-6 items-center text-[12px] text-gray-700 border-b border-b-gray-200">
-                        <div className="font-semibold col-span-2 py-6 pl-5 flex items-center gap-1.5 text-gray-600">
-                          <ParamIcon />
-                          <p>{info.name}</p>
-                        </div>
-                        <p>{p.value ?? "—"}</p>
-                        <p>{info.unit || "—"}</p>
+                      <div key={i} className={`grid grid-cols-4 items-center text-sm text-gray-600 py-4 px-6 ${isLast ? "" : "border-b border-gray-200"}`}>
+                        <p>{info.name}</p>
+                        <p>{p.value ?? "—"} {info.unit || ""}</p>
                         <p>{getRefRange(info)}</p>
-                        <p className={`capitalize font-medium ${
-                          paramStatus === "Normal" ? "text-green-600"
-                          : paramStatus === "Abnormal" ? "text-red-500"
-                          : "text-gray-500"
-                        }`}>
-                          {paramStatus ?? "—"}
+                        <p className={`capitalize font-medium ${isRed ? "text-red-500" : isGreen ? "text-green-600" : "text-gray-500"}`}>
+                          {statusText}
                         </p>
                       </div>
                     );
                   })}
                 </div>
               </div>
+
+              <div className="lg:hidden flex flex-col gap-4 mt-2">
+                {resultParams.map((p, i) => {
+                  const info = p.parameter_info;
+                  const paramStatus = p.status ?? getParamStatus(p.value, info);
+                  const statusText = paramStatus ?? "—";
+                  const statusLower = statusText.toLowerCase();
+                  const isRed = statusLower === "negative" || statusLower === "abnormal";
+                  const isGreen = statusLower === "positive" || statusLower === "normal";
+
+                  return (
+                    <div key={i} className="bg-white border border-gray-200 rounded-md p-4">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="text-gray-800 font-bold text-sm">
+                          {info.name}
+                        </div>
+                        <span className={`text-[10px] px-2 py-1 rounded-md border font-medium uppercase tracking-wider ${
+                          isGreen ? "bg-green-50 text-green-600 border-green-100"
+                          : isRed ? "bg-red-50 text-red-500 border-red-100"
+                          : "bg-gray-50 text-gray-500 border-gray-100"
+                        }`}>
+                          {statusText}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-y-4 pt-3 border-t border-gray-50">
+                        <div>
+                          <p className="text-[10px] text-gray-400 uppercase font-medium mb-1">Result</p>
+                          <p className="text-sm font-medium text-gray-700">
+                            {p.value ?? "—"} {info.unit || ""}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 uppercase font-medium mb-1">Reference Range</p>
+                          <p className="text-sm font-medium text-gray-700">
+                            {getRefRange(info)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
-          {/* Interpretation + Clinical correlation + Comments */}
           <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5 flex flex-col gap-5">
             {order.result_info?.interpretation && (
               <div>
-                <p className="text-xs text-gray-500 mb-2">Interpretation:</p>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                <p className="text-xs sm:text-sm text-gray-500 mb-2">Interpretation:</p>
+                <p className="text-sm font-medium text-gray-800 leading-relaxed whitespace-pre-line">
                   {order.result_info.interpretation}
                 </p>
               </div>
             )}
             {order.result_info?.clinical_correlation && (
               <div>
-                <p className="text-xs text-gray-500 mb-2">Clinical correlation:</p>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                <p className="text-xs sm:text-sm text-gray-500 mb-2">Clinical correlation:</p>
+                <p className="text-sm font-medium text-gray-800 leading-relaxed whitespace-pre-line">
                   {order.result_info.clinical_correlation}
                 </p>
               </div>
             )}
             {order.result_info?.comments && (
               <div>
-                <p className="text-xs text-gray-500 mb-2">Comments:</p>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{order.result_info.comments}</p>
+                <p className="text-xs sm:text-sm text-gray-500 mb-2">Comments:</p>
+                <p className="text-sm font-medium text-gray-800 leading-relaxed">{order.result_info.comments}</p>
               </div>
             )}
           </div>
+
+          {order.specimen_collected_at && (
+            <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
+              <p className="text-sm font-semibold text-[#1B2B40] mb-4">Date collected</p>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Date:</p>
+                  <p className="text-sm font-medium text-[#1B2B40]">
+                    {new Date(order.specimen_collected_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Time:</p>
+                  <p className="text-sm font-medium text-[#1B2B40]">
+                    {new Date(order.specimen_collected_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
 
-      {/* ── REJECTED: reason card ── */}
       {isRejected && (
         <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
           <p className="text-xs sm:text-sm font-semibold text-red-500 mb-2">Reason for rejection (note):</p>
@@ -371,7 +490,6 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         </div>
       )}
 
-      {/* ── Accept confirmation modal ── */}
       {showAcceptModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
           <div className="bg-white rounded-md shadow-xl w-full max-w-md p-6 flex flex-col items-center gap-4">
@@ -399,7 +517,7 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               Accept &amp; Log sample collection now
             </button>
             <button
-              onClick={handleAcceptLater}
+              onClick={() => acceptMutation.mutate()}
               disabled={acceptMutation.isPending}
               className="w-full border border-[#3E4095] text-[#3E4095] text-sm font-medium py-3 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
@@ -411,11 +529,9 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         </div>
       )}
 
-      {/* ── Sample Collection Info modal ── */}
       {showSampleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
           <div className="bg-white rounded-md shadow-xl w-full max-w-md p-6 flex flex-col gap-5">
-            {/* Header */}
             <div className="relative flex items-start justify-center">
               <div className="text-center">
                 <h3 className="text-base font-semibold text-gray-900">{fromAccept ? "Sample Collection Info" : "Edit Sample Collection Info"}</h3>
@@ -429,7 +545,6 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               </button>
             </div>
 
-            {/* Patient Name */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm text-gray-500">Patient Name</label>
               <input
@@ -440,7 +555,6 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               />
             </div>
 
-            {/* Test Requested */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm text-gray-500">Test Requested</label>
               <input
@@ -451,7 +565,6 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
               />
             </div>
 
-            {/* Date + Time */}
             <div className="flex gap-3">
               <div className="flex flex-col gap-1.5 flex-1">
                 <label className="text-sm text-gray-500">New sample collection date</label>
@@ -488,13 +601,27 @@ const Hospital_Lab_Test_Detail_Dashboard = () => {
         </div>
       )}
 
+      {/* Reject modal for lab requests */}
       <RejectModal
-        isOpen={showRejectModal}
-        onClose={() => setShowRejectModal(false)}
-        onConfirm={handleReject}
-        isPending={rejectMutation.isPending}
-        value={rejectReason}
-        onChange={setRejectReason}
+        isOpen={isRejectModalOpen}
+        onClose={() => setIsRejectModalOpen(false)}
+        onSubmit={(reason) => rejectMutation.mutate({ sqid, reason })}
+        isSubmitting={rejectMutation.isPending}
+      />
+
+      {/* Approve/Reject modal for doctors */}
+      <DoctorReviewModal
+        isOpen={isDoctorReviewModalOpen}
+        onClose={() => setIsDoctorReviewModalOpen(false)}
+        type={doctorReviewType}
+        isPending={approveMutation.isPending || rejectDoctorMutation.isPending}
+        onConfirm={() => {
+          if (doctorReviewType === "approve") {
+            approveMutation.mutate(sqid);
+          } else {
+            rejectDoctorMutation.mutate(sqid);
+          }
+        }}
       />
     </>
   );

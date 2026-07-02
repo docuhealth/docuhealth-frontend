@@ -16,6 +16,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry, advance
 
   const [currentPage, setCurrentPage] = useState(1);
   const [soapCurrentPage, setSoapCurrentPage] = useState(1);
+  const [labCurrentPage, setLabCurrentPage] = useState(1);
 
   const [viewDetailMedicalRecord, setViewDetailMedicalRecord] = useState(false);
   const [selectedMedicalRecord, setSelectedMedicalRecord] = useState(null);
@@ -57,6 +58,17 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry, advance
     enabled: !!hin,
   });
 
+  const { data: labRecordsData, isLoading: labLoading } = useQuery({
+    queryKey: ["patient-lab-records", hin, labCurrentPage],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get(
+        `api/lab/test-orders/patient/${hin}?page=${labCurrentPage}&size=${pageSize}`,
+      );
+      return res.data;
+    },
+    enabled: !!hin,
+    keepPreviousData: true,
+  });
 
   return (
     <>
@@ -124,6 +136,13 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry, advance
               soapCurrentPage,
               soapTotalPages: Math.ceil((soapNotesData?.count || 0) / pageSize),
               setSoapCurrentPage,
+
+              labloading: labLoading,
+              patientLabRecords: labRecordsData?.results || [],
+              labCount: labRecordsData?.count || 0,
+              labCurrentPage,
+              labTotalPages: Math.ceil((labRecordsData?.count || 0) / pageSize),
+              setLabCurrentPage,
 
               setSelectedMedicalRecord,
               setViewDetailMedicalRecord,

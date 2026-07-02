@@ -1,14 +1,14 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { FlaskConical, ChevronDown } from "lucide-react";
 import { LabAppointmentsListContext } from "../../../context/HospitalContext/Lab/LabAppointmentsListContext";
 import LabAppointmentRow from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabAppointmentRow";
 import LabAppointmentMobileCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabAppointmentMobileCard";
-import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PatientInfo";
+import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/PatientInfoComponents/LabPatientInfo";
 import CreateOrderModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/CreateOrderModal";
-
-const filterOptions = ["All", "Today", "This week", "This month"];
+import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
+import SearchBar from "../../../Components/SearchBar/SearchBar";
 
 const getPatientName = (appt) =>
   appt.patient_name ||
@@ -20,13 +20,40 @@ const getTestName = (appt) => appt.test_name || appt.test || "Test request";
 
 const Hospital_Lab_Appointments_Dashboard = () => {
   const navigate = useNavigate();
-  const [showFilter, setShowFilter] = useState(false);
   const [seePatientDetails, setSeePatientDetails] = useState(false);
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [orderPatientHin, setOrderPatientHin] = useState(null);
 
-  const { appointments, loading, activeFilter, setActiveFilter } = useContext(LabAppointmentsListContext);
+  const {
+    appointments,
+    loading,
+    count,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    appointmentType,
+    setAppointmentType,
+    searchQuery,
+    setSearchQuery,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
+    isRefreshing,
+  } = useContext(LabAppointmentsListContext);
+
+  const sortedAppointments = useMemo(() => {
+    if (appointmentType === 'upcoming') {
+      const now = new Date().getTime();
+      return [...appointments].sort((a, b) => {
+        const dateA = new Date(a.scheduled_time || a.scheduled_at || a.datetime).getTime();
+        const dateB = new Date(b.scheduled_time || b.scheduled_at || b.datetime).getTime();
+        return Math.abs(dateA - now) - Math.abs(dateB - now);
+      });
+    }
+    return [...appointments].sort((a, b) => new Date(b.scheduled_time || b.scheduled_at || b.datetime).getTime() - new Date(a.scheduled_time || a.scheduled_at || a.datetime).getTime());
+  }, [appointments, appointmentType]);
 
   const handleOpen = (appt) => {
     navigate("/hospital-lab-appointment-detail", {
@@ -72,6 +99,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
         <PatientInfo
           selectedPatientDetails={selectedPatientDetails}
           setSeePatientDetails={setSeePatientDetails}
+          hideCreateOrder={appointmentType === 'history'}
         />
       </>
     );
@@ -85,33 +113,72 @@ const Hospital_Lab_Appointments_Dashboard = () => {
 
       <div className="bg-white my-5 rounded-lg">
         <div className="border rounded-lg p-4 lg:p-6">
+          <h2 className="mb-4 pb-2 border-b font-medium capitalize">
+            {appointmentType === 'upcoming' ? 'Upcoming' : appointmentType === 'today' ? "Today's" : 'Past'} Appointments List
+          </h2>
 
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4 pb-2 border-b">
-            <h2 className="font-medium">Upcoming appointment</h2>
-
-            {/* Filter dropdown */}
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row md:justify-end mb-8 gap-3 w-full">
+            {appointmentType !== 'history' && (
               <button
-                onClick={() => setShowFilter(!showFilter)}
-                className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-gray-800 transition-colors"
-              >
-                Filter <ChevronDown size={14} className={`transition-transform ${showFilter ? "rotate-180" : ""}`} />
+                onClick={() => setAppointmentType('history')}
+                className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+                View past appointments
               </button>
-              {showFilter && (
-                <div className="absolute right-0 top-8 w-36 bg-white border border-gray-100 shadow-lg rounded-lg py-1 z-10">
-                  {filterOptions.map((opt) => (
-                    <button
-                      key={opt}
-                      onClick={() => { setActiveFilter(opt); setShowFilter(false); }}
-                      className={`w-full text-left text-xs px-4 py-2 hover:bg-gray-50 transition-colors ${
-                        activeFilter === opt ? "text-[#3E4095] font-semibold" : "text-gray-600"
-                      }`}
-                    >
-                      {opt}
-                    </button>
-                  ))}
-                </div>
+            )}
+            {appointmentType !== 'today' && (
+              <button
+                onClick={() => setAppointmentType('today')}
+                className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+                View today's appointments
+              </button>
+            )}
+            {appointmentType !== 'upcoming' && (
+              <button
+                onClick={() => setAppointmentType('upcoming')}
+                className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+                View upcoming appointments
+              </button>
+            )}
+          </div>
+
+          <div className="mb-4 w-full space-y-3">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search patient's name, doctor's name, or notes..."
+            />
+            <div className="flex flex-wrap gap-3">
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-500 whitespace-nowrap">From:</label>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095]"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-500 whitespace-nowrap">To:</label>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095]"
+                />
+              </div>
+              {(dateFrom || dateTo) && (
+                <button
+                  onClick={() => { setDateFrom(""); setDateTo(""); }}
+                  className="text-xs text-red-500 hover:text-red-700 underline cursor-pointer"
+                >
+                  Clear dates
+                </button>
+              )}
+              {isRefreshing && (
+                <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
+                  <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+                  Searching...
+                </p>
               )}
             </div>
           </div>
@@ -120,22 +187,32 @@ const Hospital_Lab_Appointments_Dashboard = () => {
             {loading ? (
               <div className="py-12 text-center text-gray-400 text-sm">Loading appointments...</div>
             ) : appointments.length === 0 ? (
-              <div className="py-12 text-center text-gray-400 text-sm">No upcoming appointments</div>
+              <div className="py-12 text-center text-gray-400 text-sm">
+                <p className="font-medium">No results found.</p>
+                <p className="text-xs text-gray-400 mt-1">Try a different search term or date range, or check another tab.</p>
+              </div>
             ) : (
               <>
-                {/* Desktop rows */}
                 <div className="hidden lg:block">
-                  {appointments.map((appt) => (
-                    <LabAppointmentRow key={appt.id} appt={appt} onOpen={handleOpen} onSeeDetails={handleSeeDetails} onCreateOrder={handleCreateOrder} />
+                  {sortedAppointments.map((appt) => (
+                    <LabAppointmentRow key={appt.id} appt={appt} onOpen={handleOpen} onSeeDetails={handleSeeDetails} onCreateOrder={handleCreateOrder} hideCreateOrder={appointmentType === 'history'} />
                   ))}
                 </div>
 
-                {/* Mobile cards */}
                 <div className="block lg:hidden space-y-4 my-4">
-                  {appointments.map((appt) => (
-                    <LabAppointmentMobileCard key={appt.id} appt={appt} onOpen={handleOpen} onSeeDetails={handleSeeDetails} onCreateOrder={handleCreateOrder} />
+                  {sortedAppointments.map((appt) => (
+                    <LabAppointmentMobileCard key={appt.id} appt={appt} onOpen={handleOpen} onSeeDetails={handleSeeDetails} onCreateOrder={handleCreateOrder} hideCreateOrder={appointmentType === 'history'} />
                   ))}
                 </div>
+                
+                {totalPages > 1 && (
+                  <Pagination2
+                    count={count}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    setCurrentPage={setCurrentPage}
+                  />
+                )}
               </>
             )}
           </div>

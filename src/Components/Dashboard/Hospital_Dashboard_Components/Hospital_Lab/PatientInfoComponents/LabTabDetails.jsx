@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import PatientMedicalRecordDetail from "./PatientMedicalRecordDetail";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import {
@@ -16,25 +15,20 @@ import {
   Eye,
   ArrowDownToLine,
 } from "lucide-react";
-import { renderListOrString, renderLabTests } from "../../../../../utils/soapNoteHelpers";
 import {
   formatFullDate,
   formatTime,
 } from "../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
 import toast from "react-hot-toast";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
 import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
-import Hospital_Lab_Test_Detail_Dashboard from "../../../../../Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Test_Detail_Dashboard";
+import {useMutation, useQueryClient } from "@tanstack/react-query";
 
 
-const PatientInfo = ({ patientFullInfo, selected }) => {
-  console.log(selected);
-
-
-
+const PatientInfo = ({ patientFullInfo }) => {
+  console.log(patientFullInfo);
   return (
     <>
-      <div className="mb-5 bg-[#FAFAFA] rounded-lg border p-4">
+      <div className="my-5 bg-[#FAFAFA] rounded-lg border p-4">
         <h2 className="font-medium">General Information</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -118,271 +112,29 @@ const PatientInfo = ({ patientFullInfo, selected }) => {
 
           <div>
             <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Admission Date / Time
+              Assigned doctor
             </p>
             <input
               type="text"
               readOnly
               className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={formatFullDateTime(selected?.admission_date)}
+              value="NIL"
             />
           </div>
+
           <div>
             <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Discharge Date / Time
+              Date of last visit
             </p>
             <input
               type="text"
               readOnly
               className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={selected?.discharge_date ? formatFullDateTime(selected.discharge_date) : 'Still Admitted'}
-            />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Ward Placed
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={selected?.ward_info?.name + ' ward'}
-            />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Assigned Bed
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={"Bed " + selected?.bed_info?.bed_number}
-            />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Doctor in charge
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={
-                "Dr. " +
-                selected?.staff?.firstname +
-                " " +
-                selected?.staff?.lastname
-              }
-            />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">Gender</p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={patientFullInfo?.patient_info?.gender}
+              value="NIL"
             />
           </div>
         </div>
       </div>
-      <div className="my-5 bg-[#FAFAFA] rounded-lg border p-4">
-        <h2 className="font-medium">
-          Latest vital signs (Created :{" "}
-          {formatFullDateTime(patientFullInfo?.latest_vitals?.created_at)} )
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[12px] mt-5">
-          <div className=" bg-white border rounded-md p-3">
-            <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M13.1874 2.81468C13.7081 3.33538 13.7081 4.1796 13.1874 4.7003L11.3018 6.58591L9.41615 4.7003L11.3018 2.81468C11.8225 2.29398 12.6667 2.29398 13.1874 2.81468ZM14.1302 1.87187C13.0888 0.83047 11.4004 0.83047 10.359 1.87187L8.47335 3.75748L8.23762 3.52201C7.97728 3.26166 7.55522 3.26166 7.29482 3.52201C7.03448 3.78236 7.03448 4.20446 7.29482 4.46482L7.53055 4.70054L3.38742 8.84364C3.01516 9.21591 2.76141 9.69004 2.65816 10.2063L2.42427 11.3758C2.37265 11.6338 2.24578 11.8709 2.05964 12.057L1.40229 12.7144C1.14194 12.9748 1.14194 13.3969 1.40229 13.6572L2.3451 14.6C2.60545 14.8604 3.02756 14.8604 3.28791 14.6L3.94526 13.9427C4.13139 13.7566 4.36846 13.6297 4.62658 13.578L5.79602 13.3442C6.31226 13.2409 6.78642 12.9872 7.15868 12.6149L11.3018 8.47178L11.5375 8.70744C11.7978 8.96778 12.22 8.96778 12.4803 8.70744C12.7406 8.44711 12.7406 8.02498 12.4803 7.76464L12.2446 7.52898L14.1302 5.6431C15.1716 4.6017 15.1716 2.91326 14.1302 1.87187ZM8.47335 5.64335L10.359 7.52898L6.21585 11.6721C6.02972 11.8582 5.79265 11.9851 5.53453 12.0367L4.36509 12.2706C3.84885 12.3738 3.37472 12.6276 3.00245 12.9999C3.37472 12.6276 3.62846 12.1535 3.73171 11.6372L3.9656 10.4678C4.01722 10.2097 4.1441 9.97264 4.33023 9.78651L8.47335 5.64335Z"
-                  fill="#3E4095"
-                />
-              </svg>
-              Blood Pressure
-            </p>
-            <p className="font-medium">
-              {patientFullInfo?.latest_vitals?.blood_pressure} mmHG
-            </p>
-          </div>
-          <div className=" bg-white border rounded-md p-3">
-            <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5.33203 3.33317C5.33203 1.86041 6.52594 0.666504 7.9987 0.666504C9.47143 0.666504 10.6654 1.86041 10.6654 3.33317V6.8363C11.8744 7.67957 12.6654 9.0807 12.6654 10.6665C12.6654 13.2438 10.576 15.3332 7.9987 15.3332C5.42137 15.3332 3.33203 13.2438 3.33203 10.6665C3.33203 9.0807 4.12304 7.67957 5.33203 6.8363V3.33317ZM6.09483 7.9299C5.20498 8.55057 4.66536 9.56197 4.66536 10.6665C4.66536 12.5074 6.15775 13.9998 7.9987 13.9998C9.83963 13.9998 11.332 12.5074 11.332 10.6665C11.332 9.56197 10.7924 8.55057 9.90256 7.9299L9.33203 7.5319V3.33317C9.33203 2.59679 8.7351 1.99984 7.9987 1.99984C7.2623 1.99984 6.66536 2.59679 6.66536 3.33317V7.5319L6.09483 7.9299ZM5.33203 10.6665H10.6654C10.6654 12.1392 9.47143 13.3332 7.9987 13.3332C6.52594 13.3332 5.33203 12.1392 5.33203 10.6665Z"
-                  fill="#3E4095"
-                />
-              </svg>
-              Temperature
-            </p>
-            <p className="font-medium">
-              {patientFullInfo?.latest_vitals?.temp} °C
-            </p>
-          </div>
-          <div className=" bg-white border rounded-md p-3">
-            <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M11.0013 2C13.0264 2 14.668 3.66667 14.668 6C14.668 10.6667 9.66797 13.3333 8.0013 14.3333C6.68304 13.5423 3.2793 11.7087 1.91393 8.66733L0.667969 8.66667V7.33333L1.47494 7.33393C1.38414 6.90887 1.33464 6.46434 1.33464 6C1.33464 3.66667 3.0013 2 5.0013 2C6.24128 2 7.33464 2.66667 8.0013 3.33333C8.66797 2.66667 9.7613 2 11.0013 2ZM11.0013 3.33333C10.284 3.33333 9.5075 3.71274 8.9441 4.27614L8.0013 5.21895L7.0585 4.27614C6.49509 3.71274 5.71857 3.33333 5.0013 3.33333C3.70734 3.33333 2.66797 4.43767 2.66797 6C2.66797 6.45695 2.7282 6.90107 2.84569 7.3336L4.29051 7.33333L5.66797 5.03757L7.66797 8.37087L8.2905 7.33333H11.3346V8.66667H9.04544L7.66797 10.9625L5.66797 7.62913L5.04543 8.66667L3.40656 8.66707C3.93282 9.58247 4.73 10.4454 5.76473 11.2686C6.26131 11.6637 6.79097 12.0323 7.3787 12.4025C7.5777 12.5279 7.77537 12.6486 8.0013 12.7835C8.22724 12.6486 8.4249 12.5279 8.6239 12.4025C9.21164 12.0323 9.7413 11.6637 10.2379 11.2686C12.2238 9.68867 13.3346 7.96233 13.3346 6C13.3346 4.42717 12.31 3.33333 11.0013 3.33333Z"
-                  fill="#3E4095"
-                />
-              </svg>
-              Weight
-            </p>
-            <p className="font-medium">
-              {patientFullInfo?.latest_vitals?.weight} Kg
-            </p>
-          </div>
-          <div className=" bg-white border rounded-md p-3">
-            <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M13.4938 3.17157C15.0022 4.68315 15.054 7.09133 13.6511 8.662L7.99863 14.3233L2.34628 8.662C0.943397 7.09133 0.995837 4.67934 2.5036 3.17157C4.01308 1.6621 6.42882 1.61125 7.99936 3.01902C9.56536 1.61333 11.9854 1.66 13.4938 3.17157ZM3.44641 4.11438C2.45325 5.10754 2.40339 6.6982 3.31865 7.7488L7.99863 12.4362L12.6788 7.7488C13.5944 6.6978 13.5447 5.11017 12.55 4.1134C11.5585 3.11986 9.96256 3.07204 8.9149 3.98917L6.11308 6.79127L5.17027 5.84843L7.05336 3.964L6.99883 3.91801C5.949 3.07465 4.41418 3.14662 3.44641 4.11438Z"
-                  fill="#3E4095"
-                />
-              </svg>
-              Respiratory rate
-            </p>
-            <p className="font-medium">
-              {patientFullInfo?.latest_vitals?.resp_rate} / min
-            </p>
-          </div>
-          <div className=" bg-white border rounded-md p-3">
-            <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M11.0013 2C13.0264 2 14.668 3.66667 14.668 6C14.668 10.6667 9.66797 13.3333 8.0013 14.3333C6.68304 13.5423 3.2793 11.7087 1.91393 8.66733L0.667969 8.66667V7.33333L1.47494 7.33393C1.38414 6.90887 1.33464 6.46434 1.33464 6C1.33464 3.66667 3.0013 2 5.0013 2C6.24128 2 7.33464 2.66667 8.0013 3.33333C8.66797 2.66667 9.7613 2 11.0013 2ZM11.0013 3.33333C10.284 3.33333 9.5075 3.71274 8.9441 4.27614L8.0013 5.21895L7.0585 4.27614C6.49509 3.71274 5.71857 3.33333 5.0013 3.33333C3.70734 3.33333 2.66797 4.43767 2.66797 6C2.66797 6.45695 2.7282 6.90107 2.84569 7.3336L4.29051 7.33333L5.66797 5.03757L7.66797 8.37087L8.2905 7.33333H11.3346V8.66667H9.04544L7.66797 10.9625L5.66797 7.62913L5.04543 8.66667L3.40656 8.66707C3.93282 9.58247 4.73 10.4454 5.76473 11.2686C6.26131 11.6637 6.79097 12.0323 7.3787 12.4025C7.5777 12.5279 7.77537 12.6486 8.0013 12.7835C8.22724 12.6486 8.4249 12.5279 8.6239 12.4025C9.21164 12.0323 9.7413 11.6637 10.2379 11.2686C12.2238 9.68867 13.3346 7.96233 13.3346 6C13.3346 4.42717 12.31 3.33333 11.0013 3.33333Z"
-                  fill="#3E4095"
-                />
-              </svg>
-              Heart rate
-            </p>
-            <p className="font-medium">
-              {patientFullInfo?.latest_vitals?.heart_rate} bpm
-            </p>
-          </div>
-          <div className=" bg-white border rounded-md p-3">
-            <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M11.3333 12.6667H12.6667V9.33333H6.66667V3.33333H3.33333V4.66667H4.66667V6H3.33333V7.33333H5.33333V8.66667H3.33333V10H4.66667V11.3333H3.33333V12.6667H4.66667V11.3333H6V12.6667H7.33333V10.6667H8.66667V12.6667H10V11.3333H11.3333V12.6667ZM8 8H13.3333C13.7015 8 14 8.29847 14 8.66667V13.3333C14 13.7015 13.7015 14 13.3333 14H2.66667C2.29848 14 2 13.7015 2 13.3333V2.66667C2 2.29848 2.29848 2 2.66667 2H7.33333C7.70153 2 8 2.29848 8 2.66667V8Z"
-                  fill="#3E4095"
-                />
-              </svg>
-              Height
-            </p>
-            <p className="font-medium">
-              {patientFullInfo?.latest_vitals?.height} m
-            </p>
-          </div>
-        </div>
-      </div>
-      <div className="my-5 bg-[#FAFAFA] rounded-lg border p-4">
-        <h2 className="font-medium">
-          Ongoing Medication ({patientFullInfo?.ongoing_drugs?.length})
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[12px] mt-5">
-          {patientFullInfo?.ongoing_drugs?.map((drug, index) => (
-            <div key={index} className="border p-4 rounded-md bg-white">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-1">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M13.1861 2.81611C14.7481 4.3782 14.7481 6.91088 13.1861 8.47295L11.7713 9.88668L8.47199 13.187C6.90986 14.7491 4.37722 14.7491 2.81512 13.187C1.25303 11.6249 1.25303 9.09228 2.81512 7.53015L7.52919 2.81611C9.09126 1.25401 11.6239 1.25401 13.1861 2.81611ZM9.88619 9.88715L6.11496 6.11593L3.75794 8.47295C2.71654 9.51435 2.71654 11.2028 3.75794 12.2442C4.79933 13.2856 6.48777 13.2856 7.52919 12.2442L9.88619 9.88715Z"
-                      fill="#EE1414"
-                    />
-                  </svg>
-                  <p className="font-medium">{drug.name}</p>
-                </div>
-
-                <span className="bg-blue-100/50 text-[#3E4095] px-3 py-1 rounded-full text-[12px]">
-                  Ongoing
-                </span>
-              </div>
-
-              <div className="flex justify-between mt-2">
-                <p>Dosage:</p>
-                <p className="text-right font-medium">
-                  {drug.quantity ? `${drug.quantity} mg` : "NIL"}
-                </p>
-              </div>
-
-              <div className="flex justify-between mt-2">
-                <p>Frequency:</p>
-                <p className="text-right font-medium">
-                  {drug.frequency
-                    ? `${drug.frequency.value}× ${drug.frequency.rate}`
-                    : "NIL"}
-                </p>
-              </div>
-
-              <div className="flex justify-between mt-2">
-                <p>Duration:</p>
-                <p className="text-right font-medium">
-                  {drug.duration
-                    ? `${drug.duration.value} ${drug.duration.rate}`
-                    : "NIL"}
-                </p>
-              </div>
-
-              <div className="flex justify-between mt-2">
-                <p>Prescribed by:</p>
-                <p className="text-right font-medium">
-                  {patientFullInfo?.latest_vitals?.staff_info
-                    ? `Dr. ${patientFullInfo.latest_vitals.staff_info.firstname} ${patientFullInfo.latest_vitals.staff_info.lastname}`
-                    : "NIL"}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-
     </>
   );
 };
@@ -397,8 +149,6 @@ const PatientMedicalRecord = ({
   setViewDetailMedicalRecord,
   medloading,
 }) => {
-
-  console.log(patientMedRecords)
   if (medloading) {
     return (
       <div className="flex justify-center items-center h-full text-sm pt-10">
@@ -407,7 +157,7 @@ const PatientMedicalRecord = ({
     );
   }
 
-  if (!patientMedRecords || patientMedRecords.length === 0) {
+  if (patientMedRecords.length === 0) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
@@ -477,11 +227,14 @@ const PatientMedicalRecord = ({
 
   return (
     <>
-      {Array.isArray(patientMedRecords) && patientMedRecords.length > 0 ? (
+      {/* {Array.isArray(patientMedRecords) && patientMedRecords.length > 0 ? (
         <>
-          <div className=" -4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {patientMedRecords.map((record) => (
-              <div key={record.id} className="bg-[#FAFEFF] border rounded-lg p-4">
+              <div
+                key={record.id}
+                className="bg-[#FAFEFF] border rounded-xl p-5"
+              >
                 <div className="flex justify-between items-center ">
                   <div className="flex items-center gap-1">
                     <svg
@@ -498,11 +251,9 @@ const PatientMedicalRecord = ({
                     </svg>
                     <p className="font-medium">
                       {" "}
-                      {record?.staff_info
-                        ? `Dr. ${record.staff_info.firstname} ${record.staff_info.lastname}`
-                        : record?.doctor_info
-                          ? `Dr. ${record.doctor_info.firstname} ${record.doctor_info.lastname}`
-                          : "NIL"}
+                      {record?.doctor_info
+                        ? `${record.doctor_info.firstname} ${record.doctor_info.lastname}`
+                        : "NIL"}
                     </p>
                   </div>
                   <div className="bg-[#D2F5DB] px-2 rounded-full">
@@ -543,9 +294,12 @@ const PatientMedicalRecord = ({
                       />
                     </svg>
                   </div>
-                  <p className=""> {record?.hospital_info
-                    ? `${record.hospital_info.name}`
-                    : "NIL"}</p>
+                  <p className="">
+                    {" "}
+                    {record?.hospital_info
+                      ? `${record.hospital_info.name}`
+                      : "NIL"}
+                  </p>
                 </div>
                 <div className="flex items-center gap-1 pb-3 border-b ">
                   <div>
@@ -565,23 +319,20 @@ const PatientMedicalRecord = ({
                   <p className="">{formatFullDateTime(record.created_at)}</p>
                 </div>
                 <div className="py-5">
-                  <p>{truncateWords(record.chief_complaint, 100)}</p>
+                  <p>{truncateWords(record.chief_complaint, 20)}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3 ">
                   <button
-                    className="bg-[#1B2B40] py-2 text-white rounded-full "
+                    className="bg-[#1B2B40] py-2 text-white rounded-full cursor-pointer"
                     onClick={() => {
-                      setSelectedMedicalRecord(record);
+                      setSelectedMedicalRecord(record); // ✅ single record
                       setViewDetailMedicalRecord(true);
+                      console.log("Selected Medical Record:", record); // logs the record immediately
                     }}
                   >
                     <p>View details</p>
                   </button>
-                  <button className="flex justify-center items-center gap-1 py-2 border border-[#1B2B40] rounded-full"
-                    onClick={() => {
-                      toast.success("Coming soon !")
-                    }}
-                  >
+                  <button className="flex justify-center items-center gap-1 py-2 border border-[#1B2B40] rounded-full cursor-pointer">
                     <svg
                       width="12"
                       height="12"
@@ -590,45 +341,43 @@ const PatientMedicalRecord = ({
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M6.5 7H5.5C3.77101 7 2.26977 7.9751 1.5162 9.40535C1.50547 9.27165 1.5 9.13645 1.5 9C1.5 6.2386 3.73857 4 6.5 4V1.25L11.75 5.5L6.5 9.75V7ZM5.5 6H7.5V7.6539L10.1607 5.5L7.5 3.34612V5H6.5C5.28975 5 4.20505 5.53745 3.47156 6.38675C4.10436 6.1357 4.79021 6 5.5 6Z"
+                        d="M6.5 5H9L6 8L3 5H5.5V1.5H6.5V5ZM2 9.5H10V6H11V10C11 10.2761 10.7761 10.5 10.5 10.5H1.5C1.22386 10.5 1 10.2761 1 10V6H2V9.5Z"
                         fill="#1B2B40"
                       />
                     </svg>
 
-                    <p>Share</p>
+                    <p>Download</p>
                   </button>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-4">
-            <Pagination2
-              count={count}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              setCurrentPage={setCurrentPage}
-            />
-          </div>
+          <Pagination2
+            count={count}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
+          />
         </>
       ) : (
         <p className="text-center">No medical records found.</p>
-      )}
+      )} */}
+      <p className="text-center text-sm">Coming Soon !!!</p>
     </>
   );
 };
 
 const PatientSOAPNotes = ({
-  setSoapNoteEntry,
   soapNotesLoading,
   patientSoapNotes,
   soapCount,
   soapCurrentPage,
   soapTotalPages,
-  setSoapCurrentPage,
-  setAdvanceCheckUp,
-  selected
+  setSoapCurrentPage
 }) => {
+  console.log(patientSoapNotes);
+
   if (soapNotesLoading) {
     return (
       <div className="flex justify-center items-center h-full text-sm pt-10">
@@ -639,90 +388,74 @@ const PatientSOAPNotes = ({
 
   if (patientSoapNotes.length === 0) {
     return (
-      <>
-        {
-          !selected.discharge_date && (
-            <div className="flex justify-end my-5">
-              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto"
-                onClick={() => {
-                  setSoapNoteEntry(true)
-                  setAdvanceCheckUp(false)
-                }}
-              >
-                Create new SOAP Note
-              </button>
-            </div>
-          )
-        }
-        <div className="flex flex-col justify-center items-center text-center  h-full">
-          <svg
-            width="200"
-            height="200"
-            viewBox="0 0 366 366"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g filter="url(#filter0_d_1501_46523)">
-              <circle cx="183" cy="171" r="159" fill="#DBDBDB" />
-            </g>
-            <circle cx="183" cy="171" r="132" fill="#F6F6F6" />
-            <path
-              d="M183 233.5C148.482 233.5 120.5 205.518 120.5 171C120.5 136.482 148.482 108.5 183 108.5C217.518 108.5 245.5 136.482 245.5 171C245.5 205.518 217.518 233.5 183 233.5ZM183 221C210.614 221 233 198.614 233 171C233 143.386 210.614 121 183 121C155.386 121 133 143.386 133 171C133 198.614 155.386 221 183 221ZM176.75 139.75H189.25V152.25H176.75V139.75ZM176.75 164.75H189.25V202.25H176.75V164.75Z"
-              fill="#929AA3"
-            />
-            <defs>
-              <filter
-                id="filter0_d_1501_46523"
-                x="0"
-                y="0"
-                width="366"
-                height="366"
-                filterUnits="userSpaceOnUse"
-                color-interpolation-filters="sRGB"
-              >
-                <feFlood flood-opacity="0" result="BackgroundImageFix" />
-                <feColorMatrix
-                  in="SourceAlpha"
-                  type="matrix"
-                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                  result="hardAlpha"
-                />
-                <feOffset dy="12" />
-                <feGaussianBlur stdDeviation="12" />
-                <feComposite in2="hardAlpha" operator="out" />
-                <feColorMatrix
-                  type="matrix"
-                  values="0 0 0 0 0.927885 0 0 0 0 0.927885 0 0 0 0 0.927885 0 0 0 0.15 0"
-                />
-                <feBlend
-                  mode="normal"
-                  in2="BackgroundImageFix"
-                  result="effect1_dropShadow_1501_46523"
-                />
-                <feBlend
-                  mode="normal"
-                  in="SourceGraphic"
-                  in2="effect1_dropShadow_1501_46523"
-                  result="shape"
-                />
-              </filter>
-            </defs>
-          </svg>
+      <div className="flex flex-col justify-center items-center text-center  h-full">
+        <svg
+          width="200"
+          height="200"
+          viewBox="0 0 366 366"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g filter="url(#filter0_d_1501_46523)">
+            <circle cx="183" cy="171" r="159" fill="#DBDBDB" />
+          </g>
+          <circle cx="183" cy="171" r="132" fill="#F6F6F6" />
+          <path
+            d="M183 233.5C148.482 233.5 120.5 205.518 120.5 171C120.5 136.482 148.482 108.5 183 108.5C217.518 108.5 245.5 136.482 245.5 171C245.5 205.518 217.518 233.5 183 233.5ZM183 221C210.614 221 233 198.614 233 171C233 143.386 210.614 121 183 121C155.386 121 133 143.386 133 171C133 198.614 155.386 221 183 221ZM176.75 139.75H189.25V152.25H176.75V139.75ZM176.75 164.75H189.25V202.25H176.75V164.75Z"
+            fill="#929AA3"
+          />
+          <defs>
+            <filter
+              id="filter0_d_1501_46523"
+              x="0"
+              y="0"
+              width="366"
+              height="366"
+              filterUnits="userSpaceOnUse"
+              color-interpolation-filters="sRGB"
+            >
+              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+              <feColorMatrix
+                in="SourceAlpha"
+                type="matrix"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy="12" />
+              <feGaussianBlur stdDeviation="12" />
+              <feComposite in2="hardAlpha" operator="out" />
+              <feColorMatrix
+                type="matrix"
+                values="0 0 0 0 0.927885 0 0 0 0 0.927885 0 0 0 0 0.927885 0 0 0 0.15 0"
+              />
+              <feBlend
+                mode="normal"
+                in2="BackgroundImageFix"
+                result="effect1_dropShadow_1501_46523"
+              />
+              <feBlend
+                mode="normal"
+                in="SourceGraphic"
+                in2="effect1_dropShadow_1501_46523"
+                result="shape"
+              />
+            </filter>
+          </defs>
+        </svg>
 
-          <h2 className="font-medium pb-1">No soap notes!</h2>
-          <div className="max-w-md text-center">
-            <p className="text-[12px] text-gray-500">
-              {" "}
-              This patient does not have any soap notes
-            </p>
-          </div>
+        <h2 className="font-medium pb-1">No soap notes!</h2>
+        <div className="max-w-md text-center">
+          <p className="text-[12px] text-gray-500">
+            {" "}
+            This patient does not have any soap notes
+          </p>
         </div>
-      </>
+      </div>
     );
   }
 
-  const [seePatientDetails, setSeePatientDetails] = useState(false);
-  const [selectedNoteId, setSelectedNoteId] = useState(null);
+const [seePatientDetails, setSeePatientDetails] = useState(false);
+const [selectedNoteId, setSelectedNoteId] = useState(null);
 
   const [createAdditionalNotes, setCreateAdditionalNotes] = useState(false);
   const [noteDescription, setNoteDescription] = useState("");
@@ -737,45 +470,46 @@ const PatientSOAPNotes = ({
 
 
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: (payload) =>
-      axiosInstanceHos.post("api/medical-records/soap-note/additional-notes", payload),
-    onSuccess: () => {
-      toast.success("Additional Note created successfully !");
+    const { mutate, isPending } = useMutation({
+      mutationFn: (payload) =>
+        axiosInstanceHos.post("api/medical-records/soap-note/additional-notes", payload),
+      onSuccess: () => {
+        toast.success("Additional Note created successfully !");
 
-      setCreateAdditionalNotes(false);
-      setNoteDescription('')
+        setCreateAdditionalNotes(false);
+        setNoteDescription ('')
 
-      const hin = selectedPatientDetails.patient_info.hin
+        const hin  = selectedPatientDetails.patient_info.hin
 
-      queryClient.invalidateQueries({
-        queryKey: ["patient-med-records", hin],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["patient-soap-notes", hin],
-      });
+        queryClient.invalidateQueries({
+          queryKey: ["patient-med-records", hin],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["patient-soap-notes", hin],
+        });
 
-    },
-    onError: (error) => {
-      console.error("Upload error:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to create additional note",
-      );
-    },
-  });
+      },
+      onError: (error) => {
+        console.error("Upload error:", error);
+        toast.error(
+          error.response?.data?.message || "Failed to create additional note",
+        );
+      },
+    });
 
   const handleCreateAdditionalNote = () => {
-    if (!noteDescription) {
+    if(!noteDescription) {
       toast.error('Please enter a note.')
     }
 
     const payload = {
-      soap_note: selectedPatientDetails.id,
-      note: noteDescription
+      soap_note : selectedPatientDetails.id, 
+      note : noteDescription
     }
-
+    
     mutate(payload)
   }
+
 
   return (
     <div>
@@ -1136,14 +870,27 @@ const PatientSOAPNotes = ({
               <h4 className="text-gray-400 font-normal mb-1">
                 General Examination:
               </h4>
-              {renderListOrString(selectedPatientDetails?.general_exam)}
+         <ul className="list-disc list-outside pl-5 font-medium">
+  {selectedPatientDetails?.general_exam?.map((item, index) => (
+    <li key={index}>
+      {/* If item is an object, use item.note. If it's a string, use item */}
+      {typeof item === 'object' ? item.note : item}
+    </li>
+  )) || <li>NIL</li>}
+</ul>
             </div>
 
             <div className="text-[12px] pb-3">
               <h4 className="text-gray-400 font-normal mb-1">
                 Systemic Examination:
               </h4>
-              {renderListOrString(selectedPatientDetails?.systemic_exam)}
+         <ul className="list-disc list-outside pl-5 font-medium">
+  {selectedPatientDetails?.systemic_exam?.map((item, index) => (
+    <li key={index}>
+      {typeof item === 'object' ? item.note : item}
+    </li>
+  )) || <li>NIL</li>}
+</ul>
             </div>
 
             <div className="text-[12px]">
@@ -1183,12 +930,24 @@ const PatientSOAPNotes = ({
               <h4 className="text-gray-400 font-normal mb-1">
                 Investigations Required:
               </h4>
-              {renderListOrString(selectedPatientDetails?.investigations)}
+           <ul className="list-disc list-outside pl-5 font-medium">
+  {selectedPatientDetails?.investigations?.map((item, index) => (
+    <li key={index}>
+      {typeof item === 'object' ? item.note : item}
+    </li>
+  )) || <li>NIL</li>}
+</ul>
             </div>
 
             <div className="text-[12px]">
               <h4 className="text-gray-400 font-normal mb-1">Bedside Tests:</h4>
-              {renderListOrString(selectedPatientDetails?.bedside_tests)}
+              <ul className="list-disc list-outside pl-5 font-medium">
+                {selectedPatientDetails?.bedside_tests?.map((item, index) => (
+              <li key={index}>
+      {typeof item === 'object' ? item.note : item}
+    </li>
+                )) || <li>NIL</li>}
+              </ul>
             </div>
           </div>
 
@@ -1199,9 +958,14 @@ const PatientSOAPNotes = ({
               <h4 className="text-gray-400 font-normal mb-1">
                 Known Allergies & Sensitivities:
               </h4>
-              <div className="font-medium text-red-600 italic">
-                {renderListOrString(selectedPatientDetails?.drug_history_allergies)}
-              </div>
+              <p className="font-medium text-red-600 italic">
+                {/* Logic to handle the character array in your payload */}
+                {Array.isArray(selectedPatientDetails?.drug_history_allergies)
+                  ? selectedPatientDetails.drug_history_allergies
+                    .join("")
+                    .replace(/['\[\]]/g, "")
+                  : "NIL"}
+              </p>
             </div>
           </div>
 
@@ -1211,7 +975,14 @@ const PatientSOAPNotes = ({
               <h4 className="text-gray-400 font-normal mb-1">
                 Active Problems List:
               </h4>
-              {renderListOrString(selectedPatientDetails?.problems_list)}
+              <ul className="list-disc list-outside pl-5 font-medium">
+            {selectedPatientDetails?.problems_list?.map((item, index) => (
+      <li key={index}>
+        {/* ADD THE CHECK HERE TOO */}
+        {typeof item === 'object' ? item.note : item}
+      </li>
+    )) || <li>NIL</li>}
+              </ul>
             </div>
 
             <div className="text-[12px] pt-3 border-t">
@@ -1231,10 +1002,10 @@ const PatientSOAPNotes = ({
                 <ul className="list-disc list-outside pl-5 font-medium">
                   {selectedPatientDetails.additional_notes.map(
                     (note, index) => (
-                      <li key={index}>
-                        {/* ADD THE CHECK HERE TOO */}
-                        {typeof note === 'object' ? note.note : note}
-                      </li>
+                     <li key={index}>
+        {/* ADD THE CHECK HERE TOO */}
+        {typeof note === 'object' ? note.note : note}
+      </li>
                     ),
                   )}
                 </ul>
@@ -1352,13 +1123,13 @@ const PatientSOAPNotes = ({
                         <td className="py-3 text-gray-600">
                           {/* Handling nested frequency object */}
                           {typeof drug.frequency === 'object'
-                            ? `${drug.frequency.value || ''} ( ${drug.frequency.rate || ''} )`
+                            ? `${drug.frequency.value || ''} ${drug.frequency.unit || ''}`
                             : drug.frequency || "N/A"}
                         </td>
                         <td className="py-3 text-gray-600">
                           {/* Handling nested duration object */}
                           {typeof drug.duration === 'object'
-                            ? `${drug.duration.value || ''} ( ${drug.duration.rate || ''} )`
+                            ? `${drug.duration.value || ''} ${drug.duration.unit || ''}`
                             : drug.duration || "N/A"}
                         </td>
                       </tr>
@@ -1375,7 +1146,18 @@ const PatientSOAPNotes = ({
           <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
             <p className="font-medium mb-4 text-[#1B2B40]">Care Instructions</p>
             <div className="text-[12px] text-gray-700">
-              {renderListOrString(selectedPatientDetails?.care_instructions)}
+              {selectedPatientDetails?.care_instructions?.length > 0 ? (
+                <ul className="list-disc pl-5 space-y-1">
+                  {selectedPatientDetails.care_instructions.map((instruction, index) => (
+                          <li key={index}>
+        {/* ADD THE CHECK HERE TOO */}
+        {typeof instruction === 'object' ? instruction.note : instruction}
+      </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>NIL</p>
+              )}
             </div>
           </div>
 
@@ -1383,11 +1165,20 @@ const PatientSOAPNotes = ({
           <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
             <p className="font-medium mb-4 text-[#1B2B40]">Treatment Plan</p>
             <div className="text-[12px] text-gray-700">
-              {renderListOrString(selectedPatientDetails?.treatment_plan)}
+              {selectedPatientDetails?.treatment_plan?.length > 0 ? (
+                <ul className="list-disc pl-5 space-y-1">
+                  {selectedPatientDetails.treatment_plan.map((plan, index) => (
+                <li key={index}>
+        {/* ADD THE CHECK HERE TOO */}
+        {typeof plan === 'object' ? plan.note : plan}
+      </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>NIL</p>
+              )}
             </div>
           </div>
-
-          {renderLabTests(selectedPatientDetails?.lab_tests_info)}
 
           {/* 7. Follow Up / Appointment */}
           <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
@@ -1398,15 +1189,15 @@ const PatientSOAPNotes = ({
               <p className="text-[12px] text-gray-500">
                 Type:{" "}
                 <span className="font-medium text-gray-900 capitalize">
-                  {selectedPatientDetails?.appointment_info?.type || "NIL"}
+                  {selectedPatientDetails?.appointment?.type || "NIL"}
                 </span>
               </p>
               <p className="text-[12px] text-gray-500">
                 Scheduled:{" "}
                 <span className="font-medium text-gray-900">
-                  {selectedPatientDetails?.appointment_info?.scheduled_time
+                  {selectedPatientDetails?.appointment?.scheduled_time
                     ? formatFullDateTime(
-                      selectedPatientDetails.appointment_info.scheduled_time,
+                      selectedPatientDetails.appointment.scheduled_time,
                     )
                     : "NIL"}
                 </span>
@@ -1457,22 +1248,6 @@ const PatientSOAPNotes = ({
         </div>
       ) : (
         <>
-          {
-            !selected.discharge_date && (
-              <div className="flex justify-end">
-                <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto"
-                  onClick={() => {
-                    setSoapNoteEntry(true)
-                    setAdvanceCheckUp(false)
-                  }}
-                >
-                  Create new SOAP Note
-                </button>
-              </div>
-            )
-          }
-
-
           {Array.isArray(patientSoapNotes) && patientSoapNotes.length > 0 ? (
             <>
               <div className="text-[12px] my-4">
@@ -1545,7 +1320,7 @@ const PatientSOAPNotes = ({
                         <div
                           onClick={() => {
                             togglePopover(index);
-                            setSelectedNoteId(soapNote.id);
+                          setSelectedNoteId(soapNote.id);
                           }}
                           className={` hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer
         ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
@@ -1601,7 +1376,7 @@ const PatientSOAPNotes = ({
                         <button
                           onClick={() => {
                             togglePopover(index);
-                            setSelectedNoteId(soapNote.id);
+                      setSelectedNoteId(soapNote.id);
                           }}
                           className={`h-9 w-9 flex items-center justify-center rounded-full ${openPopover === index ? "bg-slate-200" : "bg-gray-50"}`}
                         >
@@ -1622,7 +1397,7 @@ const PatientSOAPNotes = ({
                             <p
                               className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
-                                setSelectedNoteId(soapNote.id);
+                          setSelectedNoteId(soapNote.id);
                                 setSeePatientDetails(true);
                                 setOpenPopover(null);
                               }}
@@ -1725,18 +1500,18 @@ const PatientSOAPNotes = ({
                 </div>
 
                 <button
-                  className={`w-full mt-4 ${isPending ? 'border border-gray-400 bg-gray-400 text-white cursor-not-allowed' : 'bg-[#3E4095] text-white '} py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-colors`}
+                  className={`w-full mt-4 ${isPending ? 'border border-gray-400 bg-gray-400 text-white cursor-not-allowed' : 'bg-[#3E4095] text-white hover:bg-[#2e3070] '} py-2 rounded-full text-sm font-medium transition-colors`}
                   onClick={handleCreateAdditionalNote}
                   disabled={isPending}
                 >
-                  {isPending ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Saving Note...
-                    </div>
-                  ) : (
-                    "Save Note"
-                  )}
+                   {isPending ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Saving Note...
+                  </div>
+                ) : (
+                  "Save Note"
+                )}
                 </button>
               </div>
             </div>
@@ -1747,267 +1522,27 @@ const PatientSOAPNotes = ({
   );
 };
 
-const PatientLabRecords = ({
-  patientLabRecords,
-  count,
-  currentPage,
-  totalPages,
-  setCurrentPage,
-  labloading,
-}) => {
-  const [selectedRecord, setSelectedRecord] = useState(null);
-
-  if (labloading) {
-    return (
-      <div className="flex justify-center items-center h-full text-sm pt-10">
-        Loading...
-      </div>
-    );
-  }
-
-  if (selectedRecord) {
-    return (
-      <div className="">
-        <Hospital_Lab_Test_Detail_Dashboard 
-          orderIdProp={selectedRecord} 
-          onBackProp={() => setSelectedRecord(null)} 
-          isDoctorView={true} 
-        />
-      </div>
-    );
-  }
-
-  if (!patientLabRecords || patientLabRecords.length === 0) {
-    return (
-      <div className="flex flex-col justify-center items-center text-center  h-full">
-        <svg
-          width="200"
-          height="200"
-          viewBox="0 0 366 366"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <g filter="url(#filter0_d_1501_46523)">
-            <circle cx="183" cy="171" r="159" fill="#DBDBDB" />
-          </g>
-          <circle cx="183" cy="171" r="132" fill="#F6F6F6" />
-          <path
-            d="M183 233.5C148.482 233.5 120.5 205.518 120.5 171C120.5 136.482 148.482 108.5 183 108.5C217.518 108.5 245.5 136.482 245.5 171C245.5 205.518 217.518 233.5 183 233.5ZM183 221C210.614 221 233 198.614 233 171C233 143.386 210.614 121 183 121C155.386 121 133 143.386 133 171C133 198.614 155.386 221 183 221ZM176.75 139.75H189.25V152.25H176.75V139.75ZM176.75 164.75H189.25V202.25H176.75V164.75Z"
-            fill="#929AA3"
-          />
-          <defs>
-            <filter
-              id="filter0_d_1501_46523"
-              x="0"
-              y="0"
-              width="366"
-              height="366"
-              filterUnits="userSpaceOnUse"
-              color-interpolation-filters="sRGB"
-            >
-              <feFlood flood-opacity="0" result="BackgroundImageFix" />
-              <feColorMatrix
-                in="SourceAlpha"
-                type="matrix"
-                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                result="hardAlpha"
-              />
-              <feOffset dy="12" />
-              <feGaussianBlur stdDeviation="12" />
-              <feComposite in2="hardAlpha" operator="out" />
-              <feColorMatrix
-                type="matrix"
-                values="0 0 0 0 0.927885 0 0 0 0 0.927885 0 0 0 0 0.927885 0 0 0 0.15 0"
-              />
-              <feBlend
-                mode="normal"
-                in2="BackgroundImageFix"
-                result="effect1_dropShadow_1501_46523"
-              />
-              <feBlend
-                mode="normal"
-                in="SourceGraphic"
-                in2="effect1_dropShadow_1501_46523"
-                result="shape"
-              />
-            </filter>
-          </defs>
-        </svg>
-
-        <h2 className="font-medium pb-1">No lab results!</h2>
-        <div className="max-w-md text-center">
-          <p className="text-[12px] text-gray-500">
-            {" "}
-            This patient does not have any lab results
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      {Array.isArray(patientLabRecords) && patientLabRecords.length > 0 ? (
-        <>
-          <div className=" text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {patientLabRecords.map((record) => (
-              <div key={record.sqid || record.id} className="bg-white border rounded-xl p-4">
-                <div className="flex justify-between items-center mb-1">
-                  <p className="font-bold text-[#1B2B40] text-[15px]">
-                    {record?.patient_info?.firstname} {record?.patient_info?.lastname}
-                  </p>
-                  <div className="bg-[#e6e6f5] px-3 py-1 rounded-full">
-                    <p className="text-[#3E4095] text-[11px] font-medium">
-                      Lab result
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5 mb-3">
-                  <div className="flex items-center gap-1">
-                    <p className="text-gray-400 text-xs">Test Order Status: </p>
-                    <p className="text-[#08A913] text-xs font-semibold capitalize">{record?.status || "Ready"}</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <p className="text-gray-400 text-xs">Approval Status: </p>
-                    <p className={`text-xs font-semibold capitalize ${
-                      record?.result_info?.status === 'approved' || record?.result_info?.status === 'accepted' ? 'text-[#08A913]' : 
-                      record?.result_info?.status === 'rejected' ? 'text-red-500' : 
-                      record?.result_info?.status === 'pending' ? 'text-amber-500' : 'text-gray-500'
-                    }`}>
-                      {record?.result_info?.status || "N/A"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="border-t border-gray-100 my-3"></div>
-
-                <div className="flex items-center gap-2 mb-3">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                  <p className="text-gray-500 text-[12px]">
-                    {record?.ordered_by ? `Dr. ${record.ordered_by.firstname} ${record.ordered_by.lastname}` : "Dr. Raphael Jonnas"}
-                  </p>
-                </div>
-
-                <div className="flex items-start gap-2">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500 mt-0.5"><path d="M3 21h18"></path><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path><path d="M10 9h4"></path><path d="M12 7v4"></path></svg>
-                  <p className="text-gray-500 text-[12px] leading-snug">
-                    {record?.hospital_info?.name} Hospital
-                  </p>
-                </div>
-
-                <div className="border-t border-gray-100 my-3"></div>
-
-                <button 
-                  onClick={() => setSelectedRecord(record)}
-                  className="w-full bg-[#3E4095] hover:bg-[#2e3070] text-white text-[12px] font-medium py-2 rounded-full transition-colors cursor-pointer"
-                >
-                  Open
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4">
-            <Pagination2
-              count={count}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              setCurrentPage={setCurrentPage}
-            />
-          </div>
-        </>
-      ) : (
-        <p className="text-center">No lab records found.</p>
-      )}
-    </>
-  );
-};
-
-
 const getTabs = ({
   medloading,
   soapNotesLoading,
   patientMedRecords,
   patientFullInfo,
-  selected,
   count,
   currentPage,
   totalPages,
   setCurrentPage, // Use the setter here
-  setSelectedMedicalRecord, // first
-  setViewDetailMedicalRecord, // second
-  viewDetailMedicalRecord,
-  selectedMedicalRecord,
+  setSelectedMedicalRecord,
+  setViewDetailMedicalRecord,
   patientSoapNotes,
   soapCount,
   soapCurrentPage,
   soapTotalPages,
   setSoapCurrentPage,
-  setSoapNoteEntry,
-  setAdvanceCheckUp,
-  labloading,
-  patientLabRecords,
-  labCount,
-  labCurrentPage,
-  labTotalPages,
-  setLabCurrentPage,
 }) => [
     {
       title: "Patient Info",
-      content: (
-        <PatientInfo patientFullInfo={patientFullInfo} selected={selected} />
-      ),
+      content: <PatientInfo patientFullInfo={patientFullInfo} />,
     },
-    {
-      title: "Med Records",
-      content: viewDetailMedicalRecord ? (
-        <PatientMedicalRecordDetail
-          selectedMedicalRecord={selectedMedicalRecord}
-          setViewDetailMedicalRecord={setViewDetailMedicalRecord}
-        />
-      ) : (
-        <PatientMedicalRecord
-          medloading={medloading}
-          patientMedRecords={patientMedRecords}
-          count={count}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          setCurrentPage={setCurrentPage}
-          setSelectedMedicalRecord={setSelectedMedicalRecord}
-          setViewDetailMedicalRecord={setViewDetailMedicalRecord}
-        />
-      ),
-    },
-    {
-      title: "SOAP Notes",
-      content: (
-        <PatientSOAPNotes
-          setSoapNoteEntry={setSoapNoteEntry}
-          soapNotesLoading={soapNotesLoading}
-          patientSoapNotes={patientSoapNotes}
-          soapCount={soapCount}
-          soapCurrentPage={soapCurrentPage}
-          soapTotalPages={soapTotalPages}
-          setSoapCurrentPage={setSoapCurrentPage}
-          setAdvanceCheckUp={setAdvanceCheckUp}
-          selected={selected}
-        />
-      ),
-    }
-    // {
-    //   title: "Lab Results",
-    //   content: (
-    //     <PatientLabRecords
-    //       labloading={labloading}
-    //       patientLabRecords={patientLabRecords}
-    //       count={labCount}
-    //       currentPage={labCurrentPage}
-    //       totalPages={labTotalPages}
-    //       setCurrentPage={setLabCurrentPage}
-    //     />
-    //   ),
-    // },
   ];
 
 export default getTabs;

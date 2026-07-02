@@ -19,14 +19,14 @@ const ConfirmUploadModal = ({ isOpen, onClose, onConfirm, isPending }) => {
 
         <h3 className="text-base font-semibold text-gray-800 mb-3">Confirm Upload</h3>
 
-        <p className="text-sm text-gray-500 leading-relaxed mb-6">
+        <p className="text-sm text-gray-500 leading-relaxed mb-6 text-justify">
           By proceeding you confirm that you have carried out the requested test and you are certain of the results/finding. Once uploaded, result will be shared to both doctor and patient!
         </p>
 
         <button
           onClick={onConfirm}
           disabled={isPending}
-          className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3 rounded-full hover:bg-indigo-700 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+          className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3 rounded-full hover:bg-[#2e3070] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
         >
           {isPending ? (
             <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Uploading...</>

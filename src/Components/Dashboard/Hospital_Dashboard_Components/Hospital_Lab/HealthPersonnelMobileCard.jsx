@@ -46,7 +46,7 @@ const HealthPersonnelMobileCard = ({ staff, displayName }) => (
       </div>
     </div>
 
-    <button className="flex-1 w-full bg-[#3E4095] py-2.5 rounded-full flex items-center justify-center gap-2 text-[12px] font-bold text-white">
+    <button className="flex-1 w-full bg-[#3E4095] py-2.5 rounded-full flex items-center justify-center gap-2 text-[12px] font-bold text-white hover:bg-[#2e3070] transition-colors">
       Message
     </button>
   </div>

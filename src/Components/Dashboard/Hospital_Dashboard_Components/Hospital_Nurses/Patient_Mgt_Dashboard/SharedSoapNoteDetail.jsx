@@ -5,22 +5,9 @@ import {
 } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { FileText, Eye, ArrowDownToLine, Image, ArrowLeft } from "lucide-react";
+import { renderListOrString, renderLabTests } from "../../../../../utils/soapNoteHelpers";
 
 const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail }) => {
-  const renderListOrString = (content) => {
-    if (!content) return <p>NIL</p>;
-    if (typeof content === 'string') return <p>{content}</p>;
-    if (Array.isArray(content) && content.length > 0) {
-      return (
-        <ul className="list-disc pl-5 space-y-1">
-          {content.map((item, index) => (
-            <li key={index}>{typeof item === 'object' ? item.note : item}</li>
-          ))}
-        </ul>
-      );
-    }
-    return <p>NIL</p>;
-  };
 
   const docsArray = typeof sharedSoapNoteDetail?.investigation_docs === 'string'
     ? [sharedSoapNoteDetail.investigation_docs]
@@ -345,6 +332,8 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
         </div>
       </div>
 
+      {renderLabTests(sharedSoapNoteDetail?.lab_tests_info)}
+
       {/* Follow Up / Appointment */}
       <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
         <p className="font-medium mb-4 text-[#1B2B40]">
@@ -354,15 +343,15 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
           <p className="text-[12px] text-gray-500">
             Type:{" "}
             <span className="font-medium text-gray-900 capitalize">
-              {sharedSoapNoteDetail?.appointment?.type || "NIL"}
+              {sharedSoapNoteDetail?.appointment_info?.type || "NIL"}
             </span>
           </p>
           <p className="text-[12px] text-gray-500">
             Scheduled:{" "}
             <span className="font-medium text-gray-900">
-              {sharedSoapNoteDetail?.appointment?.scheduled_time
+              {sharedSoapNoteDetail?.appointment_info?.scheduled_time
                 ? formatFullDateTime(
-                  sharedSoapNoteDetail.appointment.scheduled_time,
+                  sharedSoapNoteDetail.appointment_info.scheduled_time,
                 )
                 : "NIL"}
             </span>

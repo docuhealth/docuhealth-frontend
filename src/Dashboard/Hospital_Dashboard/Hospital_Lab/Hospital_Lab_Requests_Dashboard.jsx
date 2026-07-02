@@ -66,15 +66,15 @@ const Hospital_Lab_Requests_Dashboard = () => {
 
       <div className="mt-4 bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
         {/* Tabs */}
-        <div className="flex border-b border-gray-200 mb-5 overflow-x-auto hide-scrollbar">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-0 border-b-0 sm:border-b border-gray-200 mb-5">
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`text-sm px-2 sm:px-4 py-2 font-medium transition-colors duration-200 cursor-pointer whitespace-nowrap shrink-0 ${
+              className={`text-sm px-2 sm:px-4 py-2 font-medium transition-colors duration-200 cursor-pointer text-center sm:whitespace-nowrap sm:shrink-0 rounded-lg sm:rounded-none ${
                 activeTab === tab
-                  ? "text-[#3E4095] border-b-2 border-[#3E4095] font-semibold"
-                  : "text-gray-600 hover:text-gray-800"
+                  ? "bg-[#3E4095] text-white sm:bg-transparent sm:text-[#3E4095] sm:border-b-2 sm:border-[#3E4095] font-semibold"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-800 sm:hover:bg-transparent sm:border-b-2 sm:border-transparent"
               }`}
             >
               {tab}

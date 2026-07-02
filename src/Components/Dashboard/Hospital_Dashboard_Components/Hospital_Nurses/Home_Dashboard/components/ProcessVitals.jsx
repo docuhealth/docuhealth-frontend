@@ -50,9 +50,9 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
       blood_pressure: bloodPressure,
       temp: temperature,
       resp_rate: respRate,
-      height: height,
       weight: weight,
       heart_rate: heartRate,
+      ...(height && { height }),
     };
 
     mutate(payload);

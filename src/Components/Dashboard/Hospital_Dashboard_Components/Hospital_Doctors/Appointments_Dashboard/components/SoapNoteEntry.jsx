@@ -77,7 +77,7 @@ const NoteSection = ({
   </div>
 );
 
-const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
+const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => {
   const { profile, hospitals } = useContext(DoctorAppContext);
 
   const queryClient = useQueryClient();
@@ -386,7 +386,11 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails }) => {
       formData.append(key, JSON.stringify(soapNoteData[key] || []));
     });
 
-    formData.append("appointment", JSON.stringify(appointment));
+    formData.append("next_appointment", JSON.stringify(appointment));
+
+    if (source === "appointments" && selectedPatientDetails?.sqid) {
+      formData.append("appointment", selectedPatientDetails.sqid);
+    }
 
     attachments.forEach((fileObj) => {
       formData.append("investigation_docs", fileObj.file);
