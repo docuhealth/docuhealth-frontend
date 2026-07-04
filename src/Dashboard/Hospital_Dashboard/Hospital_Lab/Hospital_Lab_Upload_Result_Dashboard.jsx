@@ -30,6 +30,7 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
   const [comments, setComments]             = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [attempted, setAttempted] = useState(false);
 
   const submitMutation = useMutation({ mutationFn: submitTestResult });
 
@@ -168,8 +169,11 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
             placeholder="Enter interpretation..."
             value={interpretation}
             onChange={(e) => setInterpretation(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none focus:border-[#3E4095] resize-none transition-colors"
+            className={`w-full border rounded-lg px-4 py-3 text-sm text-gray-700 outline-none resize-none transition-colors ${attempted && !interpretation.trim() ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-[#3E4095]"}`}
           />
+          {attempted && !interpretation.trim() && (
+            <p className="text-xs text-red-500">Interpretation is required.</p>
+          )}
         </div>
 
         {/* ── Clinical correlation ── */}
@@ -208,8 +212,8 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
             <Save size={14} /> Save as draft
           </button>
           <button
-            onClick={() => setShowConfirm(true)}
-            className="bg-[#3E4095] text-white text-sm font-medium px-8 py-2.5 rounded-full hover:bg-[#2e3070] transition-colors text-center"
+            onClick={() => { setAttempted(true); if (interpretation.trim()) setShowConfirm(true); }}
+            className="bg-[#3E4095] text-white text-sm font-medium px-8 py-2.5 rounded-full hover:bg-indigo-700 transition-colors text-center"
           >
             Upload result
           </button>
