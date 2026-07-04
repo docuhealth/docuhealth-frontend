@@ -39,26 +39,41 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
   const [orderForm, setOrderForm] = useState({ category: "", test_type: [], note: "" });
 
-  const p = selectedPatientDetails?.patient ?? {};
-  const patientFullInfo = {
-    patient_info: {
-      ...DUMMY_PATIENT_INFO.patient_info,
-      firstname: p.firstname  ?? DUMMY_PATIENT_INFO.patient_info.firstname,
-      lastname:  p.lastname   ?? DUMMY_PATIENT_INFO.patient_info.lastname,
-      dob:       p.dob        ?? DUMMY_PATIENT_INFO.patient_info.dob,
-      email:     p.email      ?? DUMMY_PATIENT_INFO.patient_info.email,
-      phone_num: p.phone_num  ?? DUMMY_PATIENT_INFO.patient_info.phone_num,
-      street:    p.street     ?? DUMMY_PATIENT_INFO.patient_info.street,
-      city:      p.city       ?? DUMMY_PATIENT_INFO.patient_info.city,
-      state:     p.state      ?? DUMMY_PATIENT_INFO.patient_info.state,
-      country:   p.country    ?? DUMMY_PATIENT_INFO.patient_info.country,
-    },
-  };
+  const hin = selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin;
   const pageSize = 6;
-  const medLoading = false;
-  const soapLoading = false;
-  const medRecordsData = { results: [], count: 0 };
-  const soapNotesData = { results: [], count: 0 };
+
+  const { data: patientFullInfo, isLoading: loadingInfo } = useQuery({
+    queryKey: ["patient-info", hin],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get(`api/doctors/patient/info/${hin}`);
+      return res.data;
+    },
+    enabled: !!hin,
+    onError: () => toast.error("Error fetching patient's details"),
+  });
+
+  const { data: medRecordsData, isLoading: medLoading } = useQuery({
+    queryKey: ["patient-med-records", hin, currentPage],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get(
+        `api/doctors/patient/records/${hin}?page=${currentPage}&size=${pageSize}`
+      );
+      return res.data;
+    },
+    enabled: !!hin,
+    keepPreviousData: true,
+  });
+
+  const { data: soapNotesData, isLoading: soapLoading } = useQuery({
+    queryKey: ["patient-soap-notes", hin, soapCurrentPage],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get(
+        `api/medical-records/soap-note/${hin}?page=${soapCurrentPage}&size=${pageSize}`
+      );
+      return res.data;
+    },
+    enabled: !!hin,
+  });
 
   const { data: categoriesData } = useQuery({
     queryKey: ["lab-test-categories"],
@@ -217,8 +232,11 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     Patient's Doctor :{" "}
                     <span className="font-medium ">
                       {" "}
-                      {selectedMedicalRecord?.doctor_info.firstname}{" "}
-                      {selectedMedicalRecord?.doctor_info.lastname}
+                      {selectedMedicalRecord?.staff_info 
+                        ? `Dr. ${selectedMedicalRecord.staff_info.firstname} ${selectedMedicalRecord.staff_info.lastname}`
+                        : selectedMedicalRecord?.doctor_info
+                          ? `Dr. ${selectedMedicalRecord.doctor_info.firstname} ${selectedMedicalRecord.doctor_info.lastname}`
+                          : "NIL"}
                     </span>
                   </p>
                   <p className="text-[12px]">
@@ -226,8 +244,9 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     Specialisation :{" "}
                     <span className="font-medium">
                       {" "}
-                      {selectedMedicalRecord?.doctor_info?.specialization ||
-                        "surgeon"}
+                      {selectedMedicalRecord?.staff_info?.specialization ||
+                        selectedMedicalRecord?.doctor_info?.specialization ||
+                        "NIL"}
                     </span>
                   </p>
                 </div>
@@ -292,7 +311,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     Blood Pressure
                   </p>
                   <p className="font-medium">
-                    {selectedMedicalRecord.vital_signs.blood_pressure} mmHg
+                    {(selectedMedicalRecord?.vital_signs?.blood_pressure || selectedMedicalRecord?.vital_signs_info?.blood_pressure || 'NIL')} mmHg
                   </p>
                 </div>
                 <div className=" bg-white border rounded-md p-3">
@@ -312,7 +331,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     Temperature
                   </p>
                   <p className="font-medium">
-                    {selectedMedicalRecord.vital_signs.temp} °C
+                    {(selectedMedicalRecord?.vital_signs?.temp || selectedMedicalRecord?.vital_signs_info?.temp || 'NIL')} °C
                   </p>
                 </div>
                 <div className=" bg-white border rounded-md p-3">
@@ -332,7 +351,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     Weight
                   </p>
                   <p className="font-medium">
-                    {selectedMedicalRecord.vital_signs.weight} Kg
+                    {(selectedMedicalRecord?.vital_signs?.weight || selectedMedicalRecord?.vital_signs_info?.weight || 'NIL')} Kg
                   </p>
                 </div>
                 <div className=" bg-white border rounded-md p-3">
@@ -352,7 +371,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     Respiratory rate
                   </p>
                   <p className="font-medium">
-                    {selectedMedicalRecord.vital_signs.resp_rate} / min
+                    {(selectedMedicalRecord?.vital_signs?.resp_rate || selectedMedicalRecord?.vital_signs_info?.resp_rate || 'NIL')} / min
                   </p>
                 </div>
                 <div className=" bg-white border rounded-md p-3">
@@ -372,7 +391,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     Heart rate
                   </p>
                   <p className="font-medium">
-                    {selectedMedicalRecord.vital_signs.heart_rate} bpm
+                    {(selectedMedicalRecord?.vital_signs?.heart_rate || selectedMedicalRecord?.vital_signs_info?.heart_rate || 'NIL')} bpm
                   </p>
                 </div>
                 <div className=" bg-white border rounded-md p-3">
@@ -392,7 +411,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     Height
                   </p>
                   <p className="font-medium">
-                    {selectedMedicalRecord.vital_signs.height} m
+                    {(selectedMedicalRecord?.vital_signs?.height || selectedMedicalRecord?.vital_signs_info?.height || 'NIL')} m
                   </p>
                 </div>
               </div>
@@ -412,7 +431,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
               <div className="text-[12px] pb-1">
                 <p>History summary :</p>
                 <ul className="list-disc list-outside pl-5 font-medium">
-                  {selectedMedicalRecord.history.map((item, index) => (
+                  {(selectedMedicalRecord?.history || []).map((item, index) => (
                     <li key={index}>{item}</li>
                   ))}
                 </ul>
@@ -420,7 +439,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
               <div className="text-[12px] pb-1">
                 <p>Diagnosis:</p>
                 <ul className="list-disc list-outside pl-5 font-medium">
-                  {selectedMedicalRecord.diagnosis.map((item, index) => (
+                  {(selectedMedicalRecord?.diagnosis || []).map((item, index) => (
                     <li key={index}>{item}</li>
                   ))}
                 </ul>
@@ -428,7 +447,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
               <div className="text-[12px] pb-1">
                 <p>Treatment plan:</p>
                 <ul className="list-disc list-outside pl-5 font-medium">
-                  {selectedMedicalRecord.treatment_plan.map((item, index) => (
+                  {(selectedMedicalRecord?.treatment_plan || []).map((item, index) => (
                     <li key={index}>{item}</li>
                   ))}
                 </ul>
@@ -436,7 +455,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
               <div className="text-[12px] pb-1">
                 <p>Care instructions:</p>
                 <ul className="list-disc list-outside pl-5 font-medium">
-                  {selectedMedicalRecord.care_instructions.map(
+                  {(selectedMedicalRecord?.care_instructions || []).map(
                     (item, index) => (
                       <li key={index}>{item}</li>
                     ),
@@ -446,7 +465,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
               <div className="text-[12px] pb-1">
                 <p>Physical examinations:</p>
                 <ul className="list-disc list-outside pl-5 font-medium">
-                  {selectedMedicalRecord.physical_exam.map((item, index) => (
+                  {(selectedMedicalRecord?.physical_exam || []).map((item, index) => (
                     <li key={index}>{item}</li>
                   ))}
                 </ul>
@@ -454,7 +473,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
               <div className="text-[12px] ">
                 <p>Medication:</p>
                 <ul className="list-disc list-outside pl-5 font-medium">
-                  {selectedMedicalRecord.drug_records.map((drug, index) => (
+                  {(selectedMedicalRecord?.drug_records || []).map((drug, index) => (
                     <li key={index}>
                       {" "}
                       <span className="font-normal">Name of drug :</span>{" "}
@@ -463,9 +482,9 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                       {drug.quantity}mg /{" "}
                       <span className="font-normal">Route :</span> {drug.route}{" "}
                       / <span className="font-normal">Frequency :</span>{" "}
-                      {drug.frequency.value} {drug.frequency.rate} /{" "}
+                      {(drug?.frequency?.value || 'NIL')} {(drug?.frequency?.rate || 'NIL')} /{" "}
                       <span className="font-normal">Duration :</span>{" "}
-                      {drug.duration.value} {drug.duration.rate}
+                      {(drug?.duration?.value || 'NIL')} {(drug?.duration?.rate || 'NIL')}
                     </li>
                   ))}
                 </ul>
@@ -623,25 +642,31 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
               </div>
             </div>
 
-            <div className="py-5 border-b">
-              <div className="flex items-center">
-                <div className="w-14 h-14 rounded-full bg-[#DCE2EA] flex items-center justify-center text-xl text-black shrink-0">
-                  {`${patientFullInfo?.patient_info?.firstname?.[0] ?? ""}${patientFullInfo?.patient_info?.lastname?.[0] ?? ""}`.toUpperCase()}
-                </div>
-
-                <div className="flex flex-col items-start ml-3">
-                  <p className="text-[16px] font-medium text-[#1B2B40]">
-                    {patientFullInfo?.patient_info?.firstname}{" "}
-                    {patientFullInfo?.patient_info?.lastname}
-                  </p>
-                  <p className="text-[14px] text-gray-500">
-                    {patientFullInfo?.patient_info?.plan_type
-                      ? `${patientFullInfo.patient_info.plan_type} patient`
-                      : "patient"}
-                  </p>
-                </div>
+            {loadingInfo ? (
+              <div className="flex justify-center items-center gap-3 px-2 py-3">
+                <p className="text-sm text-gray-500 pt-2">Loading patient data...</p>
               </div>
-            </div>
+            ) : (
+              <>
+                <div className="py-5 border-b">
+                  <div className="flex items-center">
+                    <div className="w-14 h-14 rounded-full bg-[#DCE2EA] flex items-center justify-center text-xl text-black shrink-0">
+                      {`${patientFullInfo?.patient_info?.firstname?.[0] ?? ""}${patientFullInfo?.patient_info?.lastname?.[0] ?? ""}`.toUpperCase()}
+                    </div>
+
+                    <div className="flex flex-col items-start ml-3">
+                      <p className="text-[16px] font-medium text-[#1B2B40]">
+                        {patientFullInfo?.patient_info?.firstname}{" "}
+                        {patientFullInfo?.patient_info?.lastname}
+                      </p>
+                      <p className="text-[14px] text-gray-500">
+                        {patientFullInfo?.patient_info?.plan_type
+                          ? `${patientFullInfo.patient_info.plan_type} patient`
+                          : "patient"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
             <div>
               <TabComponent
@@ -673,6 +698,8 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                 })}
               />
             </div>
+            </>
+            )}
           </div>
         </>
       )}
