@@ -163,6 +163,20 @@ const Hospital_Admin_Sidebar_Mobile = ({ openMobileSidebar, setOpenMobileSidebar
                 </li>
               </div>
             </Link>
+
+            {/* Subscriptions */}
+            <Link to="/hospital-admin-subscriptions-dashboard" onClick={() => setOpenMobileSidebar(false)}>
+              <div className="px-4 my-4">
+                <li className={`group px-4 py-2 ${currentPath === "/hospital-admin-subscriptions-dashboard" ? "bg-[#3E4095] text-white" : "text-gray-700"} hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start transition-colors duration-150`}>
+                  <span>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2.50411 2.50244H17.5041C17.9644 2.50244 18.3375 2.87553 18.3375 3.33577V16.6691C18.3375 17.1293 17.9644 17.5024 17.5041 17.5024H2.50411C2.04388 17.5024 1.67078 17.1293 1.67078 16.6691V3.33577C1.67078 2.87553 2.04388 2.50244 2.50411 2.50244ZM3.33744 4.16911V15.8335H16.6708V4.16911H3.33744ZM7.08744 11.6691H11.6708C11.9009 11.6691 12.0875 11.4826 12.0875 11.2524C12.0875 11.0223 11.9009 10.8357 11.6708 10.8357H8.33746C7.18685 10.8357 6.25411 9.90307 6.25411 8.7524C6.25411 7.60184 7.18685 6.66911 8.33746 6.66911H9.17079V5.00244H10.8375V6.66911H12.9208V8.33573H8.33746C8.10733 8.33573 7.92078 8.52232 7.92078 8.7524C7.92078 8.98257 8.10733 9.16907 8.33746 9.16907H11.6708C12.8214 9.16907 13.7541 10.1018 13.7541 11.2524C13.7541 12.4031 12.8214 13.3357 11.6708 13.3357H10.8375V15.0024H9.17079V13.3357H7.08744V11.6691Z" className={`group-hover:fill-white ${currentPath === "/hospital-admin-subscriptions-dashboard" ? "fill-white" : "fill-[#647284]"}`} />
+                    </svg>
+                  </span>
+                  Subscriptions
+                </li>
+              </div>
+            </Link>
           </ul>
         </nav>
 

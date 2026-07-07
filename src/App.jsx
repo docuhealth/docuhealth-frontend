@@ -138,7 +138,7 @@ function App() {
   const hostname = window.location.hostname;
 
   //Adjust the condition to remove the true value when deploying to production. This is just for testing purposes to always render the hospital routes.
-  const isHospital = hostname.startsWith("hospital.");
+  const isHospital = true || hostname.startsWith("hospital.");
   // const isHospital = true || hostname.startsWith("hospital.");
 
   return (
