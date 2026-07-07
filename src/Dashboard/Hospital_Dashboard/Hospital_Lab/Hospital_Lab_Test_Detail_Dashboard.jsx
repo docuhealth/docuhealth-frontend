@@ -81,7 +81,7 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
   const queryClient   = useQueryClient();
   const { state }     = useLocation() || {};
   const isDirectOrder = typeof orderIdProp === "object" && orderIdProp !== null;
-  const sqid          = isDirectOrder ? orderIdProp.sqid : (orderIdProp || state?.sqid);
+  const sqid          = isDirectOrder ? orderIdProp.sqid : (orderIdProp || state?.sqid || state?.order?.id);
 
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [isDoctorReviewModalOpen, setIsDoctorReviewModalOpen] = useState(false);
@@ -605,8 +605,10 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
       <RejectModal
         isOpen={isRejectModalOpen}
         onClose={() => setIsRejectModalOpen(false)}
-        onSubmit={(reason) => rejectMutation.mutate({ sqid, reason })}
-        isSubmitting={rejectMutation.isPending}
+        onConfirm={() => rejectMutation.mutate({ sqid, reason: rejectReason })}
+        isPending={rejectMutation.isPending}
+        value={rejectReason}
+        onChange={setRejectReason}
       />
 
       {/* Approve/Reject modal for doctors */}
