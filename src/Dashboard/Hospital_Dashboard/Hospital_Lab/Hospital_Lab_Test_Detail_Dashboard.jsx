@@ -275,9 +275,9 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
                   setDoctorReviewType("reject");
                   setIsDoctorReviewModalOpen(true);
                 }}
-                disabled={displayStatus === "rejected"}
+                disabled={displayStatus === "rejected" || displayStatus === "accepted" || displayStatus === "approved"}
                 className={`w-full sm:w-44 border text-xs font-medium px-4 sm:px-6 py-2.5 rounded-full flex items-center justify-center transition-colors ${
-                  displayStatus === "rejected"
+                  displayStatus === "rejected" || displayStatus === "accepted" || displayStatus === "approved"
                     ? "border-red-200 text-red-300 cursor-not-allowed"
                     : "border-red-500 text-red-500 hover:bg-red-50"
                 }`}
@@ -289,9 +289,9 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
                   setDoctorReviewType("approve");
                   setIsDoctorReviewModalOpen(true);
                 }}
-                disabled={displayStatus === "accepted" || displayStatus === "approved"}
+                disabled={displayStatus === "rejected" || displayStatus === "accepted" || displayStatus === "approved"}
                 className={`w-full sm:w-44 text-xs font-medium px-4 sm:px-6 py-2.5 rounded-full flex items-center justify-center transition-colors ${
-                  displayStatus === "accepted" || displayStatus === "approved"
+                  displayStatus === "rejected" || displayStatus === "accepted" || displayStatus === "approved"
                     ? "bg-[#b1b2d4] text-white cursor-not-allowed"
                     : "bg-[#3E4095] text-white hover:bg-[#2e3070]"
                 }`}
