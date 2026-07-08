@@ -7,6 +7,24 @@ import { HosWardContext } from "../../../../../../context/HospitalContext/HosWar
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import toast from "react-hot-toast";
 
+// Backend error responses show up in a few different shapes:
+// - { detail: "..." } (FastAPI)
+// - { message: "..." } (some newer endpoints)
+// - { field_name: ["..."] } (DRF-style field validation errors)
+const getErrorMessage = (error) => {
+  const data = error.response?.data;
+  if (!data) return "Something went wrong.";
+  if (typeof data.detail === "string") return data.detail;
+  if (typeof data.message === "string") return data.message;
+
+  const firstFieldError = Object.values(data).find(
+    (value) => Array.isArray(value) && typeof value[0] === "string",
+  );
+  if (firstFieldError) return firstFieldError[0];
+
+  return "Something went wrong.";
+};
+
 const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const [step, setStep] = useState(1);
   const queryClient = useQueryClient();
@@ -34,6 +52,10 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const [passwordStrength, setPasswordStrength] = useState({ strength: 0 });
 
   const personnelOptions = ["doctor", "nurse", "receptionist", "lab_scientist"];
+
+  // Personnel types that are not assigned to a ward during staff creation.
+  // Add "pharmacist" here once it's introduced as a personnel option.
+  const noWardRoles = ["receptionist", "lab_scientist"];
 
   const doctorSpecializations = [
     "Surgeon",
@@ -186,18 +208,18 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     }
 
     const isReceptionist = form.personnel.toLowerCase() === "receptionist";
+    const isNoWardRole = noWardRoles.includes(form.personnel.toLowerCase());
 
-    // Specialization & ward required ONLY if not receptionist
-    if (!isReceptionist) {
-      if (!form.specialization.trim()) {
-        toast.error("Please select an area of specialization.");
-        return;
-      }
+    // Specialization required for anyone with a specialization list (i.e. not receptionist)
+    if (!isReceptionist && !form.specialization.trim()) {
+      toast.error("Please select an area of specialization.");
+      return;
+    }
 
-      if (!form.ward.trim()) {
-        toast.error("Please assign a ward.");
-        return;
-      }
+    // Ward required only for roles that are assigned to a ward
+    if (!isNoWardRole && !form.ward.trim()) {
+      toast.error("Please assign a ward.");
+      return;
     }
 
     setStep(2);
@@ -229,7 +251,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
       setCreateNewStaff(false);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Something went wrong.");
+      toast.error(getErrorMessage(error));
     },
   });
 
@@ -351,11 +373,11 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
               {/* Ward dropdown */}
               <select
-                disabled={form.personnel === "receptionist"}
+                disabled={noWardRoles.includes(form.personnel)}
                 value={form.ward}
                 onChange={(e) => handleChange("ward", e.target.value)}
                 className={`border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-[#3E4095] ${
-                  form.personnel === "receptionist" ? "bg-gray-100" : ""
+                  noWardRoles.includes(form.personnel) ? "bg-gray-100" : ""
                 }`}
               >
                 <option value="">Assign to ward</option>
