@@ -25,7 +25,9 @@ const HosProfileProvider = ({ children }) => {
     queryKey: ["hospital-dashboard-metrics", dateRange],
     queryFn: fetchHospitalDashboardMetrics,
     enabled: isUserLoggedIn,
-    staleTime: 1000 * 60 * 30, 
+    staleTime: 1000 * 5, 
+    refetchInterval: 15000,
+    refetchOnWindowFocus: true,
   });
 
   const updateDateRange = (newRange) => {

@@ -26,7 +26,9 @@ const AdminDashboardProvider = ({ children }) => {
     queryKey: ["admin-dashboard", dateRange],
     queryFn: fetchAdminDashboardData,
     enabled: isEnabled,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 5,
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
   });
 
   const updateDateRange = (newRange) => {

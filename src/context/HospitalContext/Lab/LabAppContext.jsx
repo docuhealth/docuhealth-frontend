@@ -9,7 +9,9 @@ const LabProfileProvider = (props) => {
   const { data, isLoading } = useQuery({
     queryKey: ["lab-dashboard"],
     queryFn:  fetchLabProfile,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 1000 * 5,
+    refetchInterval: 15000,
+    refetchOnWindowFocus: true,
   });
 
   return (
