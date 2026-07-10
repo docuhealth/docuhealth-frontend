@@ -27,7 +27,7 @@ const AdminDashboardProvider = ({ children }) => {
     queryFn: fetchAdminDashboardData,
     enabled: isEnabled,
     staleTime: 1000 * 5,
-    refetchInterval: 30000,
+    refetchInterval: 15000,
     refetchOnWindowFocus: true,
   });
 
