@@ -186,7 +186,7 @@ const AccountSettingsTab = () => {
               </div>
               <div className="mt-3">
                 <label htmlFor="firstname" className="block text-[12px] font-medium text-gray-700 mb-0.5">
-                  FirstName
+                  First Name
                 </label>
                 <input
                   id="firstname"
@@ -199,7 +199,7 @@ const AccountSettingsTab = () => {
               </div>
               <div className="mt-3">
                 <label htmlFor="lastname" className="block text-[12px] font-medium text-gray-700 mb-0.5">
-                  LastName
+                  Last Name
                 </label>
                 <input
                   id="lastname"

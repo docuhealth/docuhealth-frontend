@@ -37,7 +37,8 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
-  const [orderForm, setOrderForm] = useState({ category: "", test_type: [], note: "" });
+  const [orderForm, setOrderForm] = useState({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });
+  const [duplicateWarning, setDuplicateWarning] = useState(null);
 
   const hin = selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin;
   const pageSize = 6;
@@ -93,27 +94,34 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
 
   const { mutate: createOrder, isPending: isOrderPending } = useMutation({
     mutationFn: (payload) => {
-      const promises = payload.test_type.map((testSqid) => {
-        const requestPayload = {
+      const requestPayload = {
+        patient: selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin,
+        order_source: "staff_appointment_order",
+        items_data: payload.test_type.map((testSqid) => ({
           test: testSqid,
-          patient: selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin,
           note: payload.note,
-          order_source: "staff_appointment_order",
-        };
-        if (selectedPatientDetails?.sqid) {
-          requestPayload.appointment = selectedPatientDetails.sqid;
-        }
-        return axiosInstanceHos.post("api/lab/test-orders/create", requestPayload);
-      });
-      return Promise.all(promises);
+        })),
+      };
+      if (selectedPatientDetails?.sqid) {
+        requestPayload.appointment = selectedPatientDetails.sqid;
+      }
+      if (payload.ignore_duplicate_warning) {
+        requestPayload.ignore_duplicate_warning = true;
+      }
+      return axiosInstanceHos.post("api/lab/test-orders/create", requestPayload);
     },
     onSuccess: () => {
       setShowOrderModal(false);
-      setOrderForm({ category: "", test_type: [], note: "" });
+      setOrderForm({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });
+      setDuplicateWarning(null);
       setShowSuccessModal(true);
     },
     onError: (err) => {
-      toast.error(err.response?.data?.message || "Failed to create order.");
+      if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {
+        setDuplicateWarning(err.response.data.duplicate_warning);
+      } else {
+        toast.error(err.response?.data?.message || "Failed to create order.");
+      }
     },
   });
 
@@ -122,7 +130,11 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
       toast.error("Please select a category and at least one test type.");
       return;
     }
-    createOrder(orderForm);
+    createOrder({ ...orderForm, ignore_duplicate_warning: false });
+  };
+
+  const handleOverrideSubmit = () => {
+    createOrder({ ...orderForm, ignore_duplicate_warning: true });
   };
 
   return (
@@ -716,7 +728,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                 <p className="text-sm text-gray-500 mt-1">Kindly order a lab test</p>
               </div>
               <button
-                onClick={() => { setShowOrderModal(false); setOrderForm({ category: "", test_type: [], note: "" }); setIsTestTypeDropdownOpen(false); }}
+                onClick={() => { setShowOrderModal(false); setOrderForm({ category: "", test_type: [], note: "", ignore_duplicate_warning: false }); setIsTestTypeDropdownOpen(false); setDuplicateWarning(null); }}
                 className="absolute right-0 top-0 text-gray-800 hover:text-black transition-colors"
               >
                 <X size={20} strokeWidth={2.5} />
@@ -815,6 +827,41 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                 </span>
               ) : "Proceed"}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Duplicate Warning Modal ── */}
+      {duplicateWarning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 flex flex-col gap-6">
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Duplicate Order Detected</h3>
+              <p className="text-sm text-gray-600 mb-4 whitespace-pre-wrap text-left bg-orange-50 p-3 rounded-md">
+                {duplicateWarning}
+              </p>
+              <p className="text-sm text-gray-600 font-medium">Are you sure you want to proceed?</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDuplicateWarning(null)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleOverrideSubmit}
+                disabled={isOrderPending}
+                className="flex-1 px-4 py-2 bg-[#3E4095] text-white rounded-lg hover:bg-[#2e3070] transition-colors disabled:opacity-50"
+              >
+                {isOrderPending ? "Proceeding..." : "Proceed Anyway"}
+              </button>
+            </div>
           </div>
         </div>
       )}

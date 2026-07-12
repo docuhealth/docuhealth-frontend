@@ -28,14 +28,26 @@ const SubscriptionPlans = () => {
         toast.error("Initialization failed. No payment link received.", { id: loadingToast });
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || "Payment initialization failed.";
+      let errorMsg = "Payment initialization failed.";
+      if (err.response?.data) {
+        if (typeof err.response.data === 'string') {
+          errorMsg = err.response.data;
+        } else {
+          errorMsg = err.response.data.error || err.response.data.message || err.response.data.detail || errorMsg;
+        }
+      }
+      
+      if (errorMsg.toLowerCase().includes("already subscribed")) {
+        errorMsg = "You are already subscribed to this plan.";
+      }
+
       toast.error(errorMsg, { id: loadingToast });
       console.error("Payment Error:", err);
     }
   };
 
   const currentSubscription = profileDataIsPending === false ? profile.subscription : null;
-  const userIsSubscribed = currentSubscription?.is_subscribed ?? false;
+  const userIsSubscribed = currentSubscription !== null;
 
   // console.log(userIsSubscribed, currentSubscription)
 
@@ -199,9 +211,11 @@ const SubscriptionPlans = () => {
                     className="text-[12px] text-gray-600 pb-2"
                     style={{ color: "#FE9000" }}
                   >
-                    {plan.name}
-                    {userIsSubscribed && currentSubscription.name === plan.name && (
-                        <span className="text-xs text-green-600 font-bold"> (ACTIVE)</span>
+                    {plan.name + " "}
+                    {userIsSubscribed && currentSubscription.plan_name === plan.name && (
+                        <span className={`text-xs font-bold ${currentSubscription.status === 'past_due' ? 'text-red-500' : 'text-green-600'}`}>
+                          ({currentSubscription.status === 'past_due' ? 'PAST DUE' : 'ACTIVE'})
+                        </span>
                     )}
                   </p>
                 </div>
@@ -231,11 +245,9 @@ const SubscriptionPlans = () => {
                   ))}
                 </div>
 
-                {/* Button */}
                 <button
                     className="rounded-full my-4 border border-[#3E4095] text-[#3E4095] font-semibold w-full disabled:cursor-not-allowed disabled:text-gray-500"
                     onClick={() => handlePayment(plan.paystack_plan_code)}
-                    disabled={userIsSubscribed}
                 >
                   <p className="py-3 text-sm text-center">Choose {plan.name}</p>
                 </button>

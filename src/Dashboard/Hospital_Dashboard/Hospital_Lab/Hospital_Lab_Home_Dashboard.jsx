@@ -14,7 +14,7 @@ const Hospital_Lab_Home_Dashboard = () => {
 
   const statCards = [
     {
-      title: "Total Lab Requests",
+      title: "Total Lab Tests",
       value: stats?.total_requests ?? 0,
       trend: stats?.total_requests_trend ?? 0,
       trendText: "change from last month",

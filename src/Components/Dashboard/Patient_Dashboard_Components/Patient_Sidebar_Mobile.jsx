@@ -41,17 +41,17 @@ const Patient_Sidebar_Mobile = ({
   }, [newEmergencyStatus]);
 
   const handleToggle = async () => {
-     const is_subscribed = fetchSubscriptionStatus()
+    const hasSubscription = fetchSubscriptionStatus()
     if (isLoading) {
       toast.error("Please wait, loading your profile...");
       return;
     }
 
-     if (!is_subscribed) {
-    toast.error("Please subscribe to access feature");
-    return;
-  }
-  setOpenMobileSidebar(!openMobileSidebar)
+    if (!hasSubscription) {
+      toast.error("Please subscribe to access feature");
+      return;
+    }
+    setOpenMobileSidebar(!openMobileSidebar)
     setEmergencyStatusModal(true)
   };
 

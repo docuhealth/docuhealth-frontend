@@ -18,10 +18,11 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const order = state?.order;
+  const item = state?.item;
 
   const parameters = useMemo(
-    () => order?.test_info?.parameters ?? [],
-    [order]
+    () => item?.test_info?.parameters ?? [],
+    [item]
   );
 
   const [paramValues, setParamValues]       = useState({});
@@ -46,7 +47,7 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
       comments,
     };
     try {
-      await submitMutation.mutateAsync(payload);
+      await submitMutation.mutateAsync({ order_sqid: order?.id, item_sqid: item?.sqid, payload });
       setShowConfirm(false);
       setShowSuccess(true);
     } catch {
@@ -79,8 +80,8 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
         <div className="flex flex-col gap-3">
           <p className="text-sm font-medium text-gray-700">
             Test parameters
-            {order?.test && (
-              <span className="ml-2 text-xs font-normal text-teal-600">({order.test})</span>
+            {item?.test_info?.name && (
+              <span className="ml-2 text-xs font-normal text-teal-600">({item.test_info.name})</span>
             )}
           </p>
 

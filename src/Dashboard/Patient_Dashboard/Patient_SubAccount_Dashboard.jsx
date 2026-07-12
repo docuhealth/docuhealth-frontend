@@ -128,7 +128,7 @@ const Patient_SubAccount_Dashboard = () => {
 
   const handleSubAcctUpgrade = async () => {
 
-    const is_subscribed = fetchSubscriptionStatus();
+    const hasSubscription = fetchSubscriptionStatus();
 
 
     setSubAcctUpgradeLoading(true);
@@ -155,7 +155,7 @@ const Patient_SubAccount_Dashboard = () => {
       return;
     }
 
-    if (!is_subscribed) {
+    if (!hasSubscription) {
       toast.error("Please subscribe to access feature");
       navigate("/user-subscriptions-dashboard");
       return;
@@ -305,14 +305,14 @@ const Patient_SubAccount_Dashboard = () => {
   const handleSubAcctCreation = async (e) => {
     e.preventDefault();
 
-    const is_subscribed = fetchSubscriptionStatus();
+    const hasSubscription = fetchSubscriptionStatus();
 
     if (!isFormValid) {
       toast.error("Please fill all required fields correctly.");
       return;
     }
 
-    if (!is_subscribed) {
+    if (!hasSubscription) {
       toast.error("Please subscribe to access feature");
       navigate("/user-subscriptions-dashboard");
       return;

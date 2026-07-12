@@ -246,9 +246,9 @@ const MedicalRecords = ({
                 className="bg-[#1B2B40] py-2 text-white rounded-full "
                 onClick={() => {
                   if (profile) {
-                    const is_subscribed = fetchSubscriptionStatus();
-                 
-                    if (!is_subscribed) {
+                    const hasSubscription = fetchSubscriptionStatus();
+                    
+                    if (!hasSubscription) {
                       toast.error("Please subscribe to access feature");
                       return;
                     }

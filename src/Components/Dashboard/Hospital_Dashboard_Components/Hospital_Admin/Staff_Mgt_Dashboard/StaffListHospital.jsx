@@ -192,7 +192,18 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       setSelectedStaffForRole(null);
     },
     onError: (err) => {
-      toast.error(err.response?.data?.message || "Failed to update role");
+      let errorMsg = "Failed to update role";
+      if (err.response?.data) {
+        const data = err.response.data;
+        if (typeof data === 'string') {
+          errorMsg = data;
+        } else if (data.role && Array.isArray(data.role)) {
+          errorMsg = data.role[0];
+        } else {
+          errorMsg = data.error || data.message || data.detail || errorMsg;
+        }
+      }
+      toast.error(errorMsg);
     },
   });
 

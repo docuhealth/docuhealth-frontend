@@ -35,13 +35,23 @@ export const renderListOrString = (content) => {
 
 export const renderLabTests = (labTests) => {
   if (!labTests || labTests.length === 0) return null;
+  
+  const flatItems = labTests.reduce((acc, orderOrItem) => {
+    if (orderOrItem.items && Array.isArray(orderOrItem.items)) {
+      return acc.concat(orderOrItem.items);
+    }
+    return acc.concat([orderOrItem]);
+  }, []);
+
+  if (flatItems.length === 0) return null;
+
   return (
     <div className="my-8 flex flex-col gap-8">
-      {labTests.map((labTest, idx) => {
+      {flatItems.map((labTest, idx) => {
         const testInfo = labTest.test_info;
         const resultInfo = labTest.result_info;
         const resultParams = resultInfo?.parameters || [];
-        const isCompleted = labTest.status === "completed" || labTest.status === "accepted";
+        const isCompleted = labTest.status === "completed" || labTest.status === "accepted" || labTest.status === "result_ready" || labTest.status === "approved";
         const hasResults = resultParams.length > 0;
         
         return (
@@ -49,11 +59,12 @@ export const renderLabTests = (labTests) => {
             <div className="flex justify-between items-center mb-4">
               <p className="text-[16px] font-bold text-[#1B2B40]">{testInfo?.name}</p>
               <span className={`text-[10px] px-3 py-1.5 rounded-md border font-bold uppercase tracking-wider ${
-                labTest.status === 'completed' || labTest.status === 'accepted' ? 'bg-green-50 text-green-600 border-green-100' :
+                isCompleted ? 'bg-green-50 text-green-600 border-green-100' :
                 labTest.status === 'rejected' ? 'bg-red-50 text-red-500 border-red-100' :
+                labTest.status === 'sample_collected' ? 'bg-blue-50 text-blue-600 border-blue-100' :
                 'bg-yellow-50 text-yellow-600 border-yellow-100'
               }`}>
-                {labTest.status}
+                {labTest.status?.replace(/_/g, ' ')}
               </span>
             </div>
             

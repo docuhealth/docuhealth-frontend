@@ -21,12 +21,12 @@ const LabProfileProvider = (props) => {
         hospitalName:    data?.theme?.name ?? null,
         hospitalLogo:    data?.theme?.profile_image ?? null,
         stats: data?.summary ? {
-          total_requests:       data.summary.total_orders,
-          total_requests_trend: data.summary.total_orders_change,
-          pending_tests:        data.summary.pending_orders,
-          pending_tests_trend:  data.summary.pending_orders_change,
-          completed_tests:      data.summary.completed_orders,
-          completed_tests_trend: data.summary.completed_orders_change,
+          total_requests:       data.summary.total_items ?? data.summary.total_orders,
+          total_requests_trend: data.summary.total_items_change ?? data.summary.total_orders_change,
+          pending_tests:        data.summary.pending_items ?? data.summary.pending_orders,
+          pending_tests_trend:  data.summary.pending_items_change ?? data.summary.pending_orders_change,
+          completed_tests:      data.summary.completed_items ?? data.summary.completed_orders,
+          completed_tests_trend: data.summary.completed_items_change ?? data.summary.completed_orders_change,
         } : null,
         recentPatients:  [],
       }}

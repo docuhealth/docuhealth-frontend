@@ -131,8 +131,8 @@ const UserSubAcctRecords = ({ subAccounts, isPending, setDisplaySubAcctModal, se
                       onClick={() => {
                         if (isCreatingID) return; // Prevent double clicks
                         
-                        const is_subscribed = fetchSubscriptionStatus();
-                        if (!is_subscribed) {
+                        const hasSubscription = fetchSubscriptionStatus();
+                        if (!hasSubscription) {
                           toast.error("Please subscribe to access feature");
                           navigate("/user-subscriptions-dashboard");
                           return;

@@ -82,8 +82,10 @@ const OtherMedicalServices = ({
     note: "",
     category: "",
     test_type: [],
+    ignore_duplicate_warning: false,
     // specimen: "",
   });
+  const [duplicateWarning, setDuplicateWarning] = useState(null);
 
   const { data: categoriesData } = useQuery({
     queryKey: ["lab-test-categories"],
@@ -223,31 +225,39 @@ const OtherMedicalServices = ({
 
   const { mutate: labMutate, isPending: isLabPending } = useMutation({
     mutationFn: async (payload) => {
-      const promises = payload.test_type.map(testSqid => {
-        return axiosInstanceHos.post("api/lab/test-orders/create", {
+      const requestPayload = {
+        patient: payload.patient_hin,
+        order_source: "staff_admission_order",
+        items_data: payload.test_type.map(testSqid => ({
           test: testSqid,
-          patient: payload.patient_hin,
           note: payload.note,
-          order_source: "staff_admission_order"
-        });
-      });
-      return await Promise.all(promises);
+        }))
+      };
+      if (payload.ignore_duplicate_warning) {
+        requestPayload.ignore_duplicate_warning = true;
+      }
+      return await axiosInstanceHos.post("api/lab/test-orders/create", requestPayload);
     },
     onSuccess: () => {
       toast.success(
         "You have successfully assigned patient to a lab scientist for a test",
       );
+      setDuplicateWarning(null);
       setOtherMedicalServices(false);
       setRequestLoading(false);
     },
     onError: (err) => {
-      console.error(
-        "Error assigning patient to lab scientist:",
-        err,
-      );
-      toast.error(
-        err.response?.data?.message || "Lab test request failed.",
-      );
+      if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {
+        setDuplicateWarning(err.response.data.duplicate_warning);
+      } else {
+        console.error(
+          "Error assigning patient to lab scientist:",
+          err,
+        );
+        toast.error(
+          err.response?.data?.message || "Lab test request failed.",
+        );
+      }
     },
   });
 
@@ -256,7 +266,11 @@ const OtherMedicalServices = ({
       toast.error("Please fill in all required lab test fields.");
       return;
     }
-    labMutate(formData);
+    labMutate({ ...formData, ignore_duplicate_warning: false });
+  };
+
+  const handleOverrideSubmit = () => {
+    labMutate({ ...formData, ignore_duplicate_warning: true });
   };
 
   return (
@@ -331,14 +345,46 @@ const OtherMedicalServices = ({
 
                 {isStaffSelectedRole === "lab_scientist" && (
                   <>
-                    <div className="flex justify-end">
-                      <button
-                        onClick={() => setOtherMedicalServices(false)}
-                        className="text-gray-500 hover:text-black"
-                      >
-                        <i className="bx bx-x text-2xl cursor-pointer"></i>
-                      </button>
-                    </div>
+                    {duplicateWarning ? (
+                      <>
+                        <div className="text-center mt-2">
+                          <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
+                            <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                          </div>
+                          <h3 className="text-xl font-semibold text-gray-900 mb-2">Duplicate Order Detected</h3>
+                          <p className="text-sm text-gray-600 mb-4 whitespace-pre-wrap text-left bg-orange-50 p-3 rounded-md">
+                            {duplicateWarning}
+                          </p>
+                          <p className="text-sm text-gray-600 font-medium">Are you sure you want to proceed?</p>
+                        </div>
+                        <div className="flex gap-3 mt-6">
+                          <button
+                            onClick={() => setDuplicateWarning(null)}
+                            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={handleOverrideSubmit}
+                            disabled={isLabPending}
+                            className="flex-1 px-4 py-2 bg-[#3E4095] text-white rounded-lg hover:bg-[#2e3070] transition-colors disabled:opacity-50"
+                          >
+                            {isLabPending ? "Proceeding..." : "Proceed Anyway"}
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => setOtherMedicalServices(false)}
+                            className="text-gray-500 hover:text-black"
+                          >
+                            <i className="bx bx-x text-2xl cursor-pointer"></i>
+                          </button>
+                        </div>
                     <h2 className="text-center font-semibold text-lg text-gray-800">
                       Order Lab test
                     </h2>
@@ -481,7 +527,9 @@ const OtherMedicalServices = ({
                     </button>
                   </>
                 )}
-              </div>
+              </>
+            )}
+          </div>
             </>
           ) : (
             <>

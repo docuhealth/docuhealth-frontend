@@ -122,8 +122,8 @@ const UserSubAcctRecordsMobile = ({
                         onClick={() => {
                           if (isCreatingID) return;
                           
-                          const is_subscribed = fetchSubscriptionStatus();
-                          if (!is_subscribed) {
+                          const hasSubscription = fetchSubscriptionStatus();
+                          if (!hasSubscription) {
                             toast.error("Please subscribe to access feature");
                             navigate("/user-subscriptions-dashboard");
                             return;

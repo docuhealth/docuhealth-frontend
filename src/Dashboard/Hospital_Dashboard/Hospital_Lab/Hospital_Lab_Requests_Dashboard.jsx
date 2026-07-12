@@ -11,27 +11,34 @@ import { LabRequestsContext } from "../../../context/HospitalContext/Lab/LabRequ
 import LabOrderCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabOrderCard";
 import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 
-const tabs = ["Pending Test", "In-progress", "Completed test", "Rejected test"];
+const tabs = ["Pending Test", "Sample Collected", "In-progress", "Result Ready", "Rejected test"];
 
 const getBadgeStyle = (status) => {
   switch (status) {
     case "pending":
+    case "partially_pending":
       return { label: "New", cls: "bg-green-100 text-green-600" };
+    case "sample_collected":
+      return { label: "Sample Collected", cls: "bg-blue-100 text-blue-600" };
     case "in_progress":
+    case "partially_in_progress":
       return { label: "In Progress", cls: "bg-amber-100 text-amber-600" };
-    case "completed":
-      return { label: "Completed", cls: "bg-green-100 text-green-600" };
+    case "result_ready":
+    case "partially_result_ready":
+      return { label: "Result Ready", cls: "bg-green-100 text-green-600" };
     case "rejected":
+    case "partially_rejected":
       return { label: "Rejected", cls: "bg-red-100 text-red-500" };
     default:
-      return { label: status || "—", cls: "bg-indigo-100 text-indigo-500" };
+      return { label: status?.replace(/_/g, ' ') || "—", cls: "bg-indigo-100 text-indigo-500 capitalize" };
   }
 };
 
 const TAB_STATUS_MAP = {
   "Pending Test": "pending",
+  "Sample Collected": "sample_collected",
   "In-progress": "in_progress",
-  "Completed test": "completed",
+  "Result Ready": "result_ready",
   "Rejected test": "rejected",
 };
 
@@ -140,7 +147,7 @@ const Hospital_Lab_Requests_Dashboard = () => {
               <LabOrderCard
                 key={order.sqid}
                 order={order}
-                badge={getBadgeStyle(order.status || TAB_STATUS_MAP[activeTab])}
+                badge={getBadgeStyle(order.aggregate_status || order.status || TAB_STATUS_MAP[activeTab])}
                 activeTab={activeTab}
               />
             ))}

@@ -52,13 +52,27 @@ export async function login(userData) {
   return data;
 }
 
-export function setSubscriptionStatus(subscriptionStatus){
-  sessionStorage.setItem("is_subscribed", String(subscriptionStatus))
+export function setSubscriptionStatus(subscription){
+  if (subscription) {
+    sessionStorage.setItem("subscription", JSON.stringify(subscription));
+  } else {
+    sessionStorage.removeItem("subscription");
+  }
 }
 
 export function fetchSubscriptionStatus(){
-  const is_subscribed = sessionStorage.getItem("is_subscribed");
-  return is_subscribed === "true"; // convert back to boolean
+  const subscription = sessionStorage.getItem("subscription");
+  return subscription !== null && subscription !== "undefined" && subscription !== "null";
+}
+
+export function getSubscriptionDetails(){
+  const subscriptionStr = sessionStorage.getItem("subscription");
+  if (!subscriptionStr || subscriptionStr === "null" || subscriptionStr === "undefined") return null;
+  try {
+    return JSON.parse(subscriptionStr);
+  } catch (e) {
+    return null;
+  }
 }
 // Refresh
 export async function refreshToken() {

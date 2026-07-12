@@ -106,12 +106,14 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
             title: "Radiologist",
             subtitle: "Medical personnel",
             icon: <Radiologist_Icon />,
+            disabled: true,
         },
         {
             id: 5,
             title: "Pharmacist",
             subtitle: "Medical personnel",
             icon: <Pharmacist_Icon />,
+            disabled: true,
         },
     ];
 
@@ -135,6 +137,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
             const res = await axiosInstanceHos.get(`api/receptionists/staff/${selected === 'Lab personnel' ? 'lab_scientist' : selected.toLowerCase()}`);
             if (!res.data || res.data.length === 0) {
                 toast.error(`No ${selected} currently available.`);
+                setLoading(false);
                 return;
             }
             setStaffList(res.data);
@@ -542,8 +545,9 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                             {personnelTypes.map((item) => (
                                 <button
                                     key={item.id}
+                                    disabled={item.disabled}
                                     onClick={() => setSelected(item.title)}
-                                    className={`border rounded-lg p-3 flex flex-col gap-2 text-left transition cursor-pointer 
+                                    className={`border rounded-lg p-3 flex flex-col gap-2 text-left transition ${item.disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'cursor-pointer'} 
 ${selected === item.title ? "border-[#3E4095] bg-blue-50" : "border-gray-200"}`}
                                 >
                                     <div className="flex justify-between items-center gap-2">
