@@ -1,48 +1,83 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useMemo } from "react";
 import DynamicDate from "../../Components/DynamicDate/DynamicDate";
 import { AdminDashboardContext } from "../../context/AdminContext/AdminDashboardContext";
-import { FileText, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { FileText, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import RevenueChart from "../../Components/Dashboard/Admin_Dashboard_Components/Home_Dashboard/RevenueChart";
 import RegisteredUsersChart from "../../Components/Dashboard/Admin_Dashboard_Components/Home_Dashboard/RegisteredUsersChart";
 import SubscribedUsersChart from "../../Components/Dashboard/Admin_Dashboard_Components/Home_Dashboard/SubscribedUsersChart";
 import SubAccountChart from "../../Components/Dashboard/Admin_Dashboard_Components/Home_Dashboard/SubAccountChart";
 import TopSellingStatesChart from "../../Components/Dashboard/Admin_Dashboard_Components/Home_Dashboard/TopSellingStatesChart";
+import { useQuery } from "@tanstack/react-query";
+import { getToken, getRole } from "../../services/authService";
+import { fetchAdminDashboardData } from "../../queries/admin/dashboard";
+import { getDatesForFilter } from "../../utils/dateFilterHelper";
 
+const ChartLoadingPlaceholder = ({ title }) => (
+  <div className="bg-white p-6 rounded-md border border-gray-200 w-full h-95 flex flex-col justify-between animate-pulse">
+    <div className="flex justify-between items-center mb-6">
+      <h3 className="text-xs lg:text-lg lg:font-semibold text-gray-800">
+        {title}
+      </h3>
+      <div className="h-8 w-24 bg-gray-200 rounded"></div>
+    </div>
+    <div className="flex-1 flex justify-center items-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3E4095]"></div>
+    </div>
+  </div>
+);
 
 const Admin_Home_Dashboard = () => {
-  const { dashboardData, loading, updateDateRange } = useContext(AdminDashboardContext);
-  const [globalFilter, setGlobalFilter] = useState("Monthly");
+  const { dashboardData, loading } = useContext(AdminDashboardContext);
 
-  const handleFilterChange = (selected) => {
-    setGlobalFilter(selected);
-    const today = new Date();
-    let startDate = "";
-    let endDate = today.toISOString().split("T")[0]; // YYYY-MM-DD
+  const token = getToken();
+  const role = getRole();
+  const isEnabled = !!token && role === "dhadmin";
 
-    if (selected === "Daily") {
-      // Daily will be today (same start and end date)
-      startDate = today.toISOString().split("T")[0];
-    } else if (selected === "Last 24hrs") {
-      // Last 24hrs will be from yesterday to today
-      const yesterday = new Date(today);
-      yesterday.setDate(today.getDate() - 1);
-      startDate = yesterday.toISOString().split("T")[0];
-    } else if (selected === "Weekly") {
-      const lastWeek = new Date(today);
-      lastWeek.setDate(today.getDate() - 7);
-      startDate = lastWeek.toISOString().split("T")[0];
-    } else if (selected === "Monthly") {
-      const lastMonth = new Date(today);
-      lastMonth.setMonth(today.getMonth() - 1);
-      startDate = lastMonth.toISOString().split("T")[0];
-    } else if (selected === "Yearly") {
-      const lastYear = new Date(today);
-      lastYear.setFullYear(today.getFullYear() - 1);
-      startDate = lastYear.toISOString().split("T")[0];
-    }
+  const [revenueFilter, setRevenueFilter] = useState("Monthly");
+  const [registeredFilter, setRegisteredFilter] = useState("Monthly");
+  const [subscribedFilter, setSubscribedFilter] = useState("Monthly");
+  const [statesFilter, setStatesFilter] = useState("Monthly");
 
-    updateDateRange({ start_date: startDate, end_date: endDate });
-  };
+  const revenueRange = useMemo(() => getDatesForFilter(revenueFilter), [revenueFilter]);
+  const registeredRange = useMemo(() => getDatesForFilter(registeredFilter), [registeredFilter]);
+  const subscribedRange = useMemo(() => getDatesForFilter(subscribedFilter), [subscribedFilter]);
+  const statesRange = useMemo(() => getDatesForFilter(statesFilter), [statesFilter]);
+
+  const { data: revenueData, isPending: revenueLoading } = useQuery({
+    queryKey: ["admin-dashboard", revenueRange],
+    queryFn: fetchAdminDashboardData,
+    enabled: isEnabled,
+    staleTime: 1000 * 5,
+    refetchInterval: 15000,
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: registeredData, isPending: registeredLoading } = useQuery({
+    queryKey: ["admin-dashboard", registeredRange],
+    queryFn: fetchAdminDashboardData,
+    enabled: isEnabled,
+    staleTime: 1000 * 5,
+    refetchInterval: 15000,
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: subscribedData, isPending: subscribedLoading } = useQuery({
+    queryKey: ["admin-dashboard", subscribedRange],
+    queryFn: fetchAdminDashboardData,
+    enabled: isEnabled,
+    staleTime: 1000 * 5,
+    refetchInterval: 15000,
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: statesData, isPending: statesLoading } = useQuery({
+    queryKey: ["admin-dashboard", statesRange],
+    queryFn: fetchAdminDashboardData,
+    enabled: isEnabled,
+    staleTime: 1000 * 5,
+    refetchInterval: 15000,
+    refetchOnWindowFocus: true,
+  });
 
   if (loading) {
     return (
@@ -135,21 +170,49 @@ const Admin_Home_Dashboard = () => {
           </div>
         ))}
       </div>
-      
+
       {/* Charts Section Placeholder */}
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-        <RevenueChart data={dashboardData?.charts?.revenue_overview || undefined} filter={globalFilter} onFilterChange={handleFilterChange} />
-        <RegisteredUsersChart data={dashboardData?.charts?.registered_users || undefined} filter={globalFilter} onFilterChange={handleFilterChange} />
-        <SubscribedUsersChart data={dashboardData?.charts?.subscribed_users || undefined} filter={globalFilter} onFilterChange={handleFilterChange} />
+        {revenueLoading ? (
+          <ChartLoadingPlaceholder title="Revenue generated overview" />
+        ) : (
+          <RevenueChart
+            data={revenueData?.charts?.revenue_overview || undefined}
+            filter={revenueFilter}
+            onFilterChange={setRevenueFilter}
+          />
+        )}
+        {registeredLoading ? (
+          <ChartLoadingPlaceholder title="Registered Users Overview" />
+        ) : (
+          <RegisteredUsersChart
+            data={registeredData?.charts?.registered_users || undefined}
+            filter={registeredFilter}
+            onFilterChange={setRegisteredFilter}
+          />
+        )}
+        {subscribedLoading ? (
+          <ChartLoadingPlaceholder title="Subscribed Users Overview" />
+        ) : (
+          <SubscribedUsersChart
+            data={subscribedData?.charts?.subscribed_users || undefined}
+            filter={subscribedFilter}
+            onFilterChange={setSubscribedFilter}
+          />
+        )}
         <SubAccountChart data={dashboardData?.charts?.sub_account_stats || undefined} />
       </div>
 
-      <div className="w-full">
-        <TopSellingStatesChart 
-          data={dashboardData?.charts?.states || undefined} 
-          filter={globalFilter} 
-          onFilterChange={handleFilterChange} 
-        />
+      <div className="w-full mt-6">
+        {statesLoading ? (
+          <ChartLoadingPlaceholder title="Top Selling States" />
+        ) : (
+          <TopSellingStatesChart
+            data={statesData?.charts?.states || undefined}
+            filter={statesFilter}
+            onFilterChange={setStatesFilter}
+          />
+        )}
       </div>
 
     </div>

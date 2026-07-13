@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAdminDashboardData } from "../../queries/admin/dashboard";
 import { getToken, getRole } from "../../services/authService";
@@ -8,11 +8,6 @@ export const AdminDashboardContext = createContext();
 export const useAdminDashboard = () => useContext(AdminDashboardContext);
 
 const AdminDashboardProvider = ({ children }) => {
-  const [dateRange, setDateRange] = useState({
-    start_date: "",
-    end_date: "",
-  });
-
   const token = getToken();
   const role = getRole();
   const isEnabled = !!token && role === "dhadmin";
@@ -23,17 +18,13 @@ const AdminDashboardProvider = ({ children }) => {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["admin-dashboard", dateRange],
+    queryKey: ["admin-dashboard"],
     queryFn: fetchAdminDashboardData,
     enabled: isEnabled,
     staleTime: 1000 * 5,
     refetchInterval: 15000,
     refetchOnWindowFocus: true,
   });
-
-  const updateDateRange = (newRange) => {
-    setDateRange((prev) => ({ ...prev, ...newRange }));
-  };
 
   console.log(dashboardData)
 
@@ -43,8 +34,6 @@ const AdminDashboardProvider = ({ children }) => {
         dashboardData,
         loading,
         error,
-        dateRange,
-        updateDateRange,
         refetch,
       }}
     >
@@ -54,3 +43,4 @@ const AdminDashboardProvider = ({ children }) => {
 };
 
 export default AdminDashboardProvider;
+
