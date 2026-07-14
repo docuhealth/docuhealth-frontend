@@ -22,7 +22,7 @@ const PersonIcon = () => (
   </svg>
 );
 
-const EmptyState = () => (
+const EmptyState = ({ selectedRole }) => (
   <div className="flex flex-col justify-center items-center text-center h-full py-12">
     <svg width="180" height="180" viewBox="0 0 366 366" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_d_1517_47151)">
@@ -43,9 +43,15 @@ const EmptyState = () => (
         </filter>
       </defs>
     </svg>
-    <h2 className="font-medium pb-1">No available health personnel!</h2>
+    <h2 className="font-medium pb-1">
+      {selectedRole
+        ? `No ${ROLE_TABS.find((t) => t.value === selectedRole)?.label || "Health Personnel"}!`
+        : "No available health personnel!"}
+    </h2>
     <p className="text-[12px] text-gray-500 max-w-md text-center">
-      You currently don't have any health personnel.
+      {selectedRole
+        ? `You currently don't have any ${(ROLE_TABS.find((t) => t.value === selectedRole)?.label || "health personnel").toLowerCase()}.`
+        : "You currently don't have any health personnel."}
     </p>
   </div>
 );
@@ -124,9 +130,7 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
     return <div className="flex justify-center items-center h-full text-sm py-12">Loading...</div>;
   }
 
-  if (healthPersonnelList.length === 0 && !searchQuery && !selectedRole) {
-    return <EmptyState />;
-  }
+
 
   const colCount = isAdmin ? 8 : 7;
 
@@ -161,11 +165,13 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
         </div>
       </div>
 
-      {healthPersonnelList.length === 0 && (searchQuery || selectedRole) ? (
+      {healthPersonnelList.length === 0 && searchQuery ? (
         <div className="py-12 text-center text-gray-500 text-sm">
-          <p className="font-medium">No results found.</p>
+          <p className="font-medium">No results found for "{searchQuery}"</p>
           <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
         </div>
+      ) : healthPersonnelList.length === 0 && !searchQuery ? (
+        <EmptyState selectedRole={selectedRole} />
       ) : (
         <>
           {/* Desktop table */}
