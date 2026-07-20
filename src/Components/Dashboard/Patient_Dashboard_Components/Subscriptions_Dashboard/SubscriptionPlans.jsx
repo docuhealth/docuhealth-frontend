@@ -133,9 +133,9 @@ const SubscriptionPlans = () => {
             </div>
           </div>
         ) : (
-          // ===== Plans Grid =====
+          // Plans Grid
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* ---------- Static Basic Plan ---------- */}
+            {/* Static Basic Plan */}
             <div className="p-4 rounded-xl bg-[#F5F8F8]">
               <div className="flex justify-between items-center">
                 <p className="text-[12px] text-gray-900 pb-2">
@@ -199,7 +199,7 @@ const SubscriptionPlans = () => {
               </button>
             </div>
 
-            {/* ---------- Dynamic Plans from API ---------- */}
+            {/* Dynamic Plans from API */}
             {subscriptionPlans.map((plan) => (
               <div
                 key={plan.id}
