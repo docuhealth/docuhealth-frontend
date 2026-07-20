@@ -56,7 +56,7 @@ const FAQ_Section = () => {
     <>
       <BackgroundTemplate>
         {/* Full-width wrapper handling background mapping and section identity */}
-        <section className="py-24 text-sm text-[#464646] bg-[#F6FCFE] lg:bg-white" id="faq">
+        <section className="py-24 text-sm text-docuhealth-gray bg-docuhealth-light-blue lg:bg-white" id="faq">
           
           {/* PERFECTLY MATCHED NAVBAR CONTAINER */}
           <div className="max-w-[1440px] 2xl:max-w-[1600px] mx-auto w-full px-8 xl:px-16">
@@ -65,7 +65,7 @@ const FAQ_Section = () => {
               {/* Left side: FAQs */}
               <div className="w-full lg:w-1/2">
                 <motion.h2 
-                  className="text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-[#3E4095] mb-4"
+                  className="text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-docuhealth-primary mb-4"
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
@@ -92,17 +92,17 @@ const FAQ_Section = () => {
                     <motion.div
                       key={index}
                       variants={itemVariants}
-                      className={`bg-white lg:bg-[#f5f9ff] ${openIndex === index ? 'rounded-xs' : 'rounded-full'} overflow-hidden shadow-xs transition-all duration-100`}
+                      className={`bg-white lg:bg-docuhealth-blue-faded ${openIndex === index ? 'rounded-xs' : 'rounded-full'} overflow-hidden shadow-xs transition-all duration-100`}
                     >
                       <button
                         onClick={() => toggleAccordion(index)}
                         className="w-full flex justify-between items-center px-5 py-3 text-left"
                       >
-                        <span className="text-[#3E4095] font-medium text-sm md:text-base 2xl:text-lg">
+                        <span className="text-docuhealth-primary font-medium text-sm md:text-base 2xl:text-lg">
                           {item.question}
                         </span>
                         <Plus
-                          className={`w-5 h-5 text-[#3E4095] transform transition-transform duration-500 ${openIndex === index ? "rotate-90" : "rotate-0"}`}
+                          className={`w-5 h-5 text-docuhealth-primary transform transition-transform duration-500 ${openIndex === index ? "rotate-90" : "rotate-0"}`}
                         />
                       </button>
 

@@ -291,7 +291,7 @@ const PharmacyRequestTable = () => {
                 <button
                   className={` ${
                     activePharmacy ? "hidden" : ""
-                  } px-4 py-1.5 border border-[#0000FF]  text-[#0000FF]   rounded-full text-sm font-medium  transition-colors`}
+                  } px-4 py-1.5 border border-docuhealth-blue  text-docuhealth-blue   rounded-full text-sm font-medium  transition-colors`}
                   onClick={handleApproveAll}
                 >
                   Approve all selected
@@ -299,7 +299,7 @@ const PharmacyRequestTable = () => {
               </div>
             )}
             <button
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#0000FF] border border-[#0000FF] rounded-full"
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-docuhealth-blue border border-docuhealth-blue rounded-full"
             >
               <Eye size={16} />
               <span onClick={() => setActivePharmacy(!activePharmacy)}>
@@ -713,7 +713,7 @@ const PharmacyRequestTable = () => {
                   key={i + 1}
                   className={`px-3 py-1 mx-1 rounded-full ${
                     currentPage === i + 1
-                      ? "bg-[#0000FF] text-white"
+                      ? "bg-docuhealth-blue text-white"
                       : "bg-gray-300 hover:bg-gray-400"
                   }`}
                   onClick={() => setCurrentPage(i + 1)}

@@ -97,7 +97,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
 
             {isMedicalRecords && (
               <div className="sm:hidden ">
-                <div className="flex justify-start items-center gap-2 pb-4 text-[#647284]">
+                <div className="flex justify-start items-center gap-2 pb-4 text-docuhealth-secondary">
                   <div
                     className="cursor-pointer"
                     onClick={() => {
@@ -114,7 +114,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                     >
                       <path
                         d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"
-                        fill="#1B2B40"
+                        fill="var(--color-docuhealth-dark)"
                       />
                     </svg>
                   </div>
@@ -274,7 +274,7 @@ const UserSubAcctRecordsMobile = ({defaultRecords, subaccounts, togglePopover, f
                             </div>
                             <div className="flex items-center gap-1">
                               <button
-                                className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer"
+                                className="bg-docuhealth-blue py-1 px-3 text-white rounded-full cursor-pointer"
                                 onClick={() => {
                                   if (paymentStatus) {
                                     exportToPDF();

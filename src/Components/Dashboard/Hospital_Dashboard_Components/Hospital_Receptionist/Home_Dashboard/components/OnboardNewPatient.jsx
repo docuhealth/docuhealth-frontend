@@ -264,10 +264,10 @@ const OnboardNewPatient = ({ setNewPatient }) => {
               >
                 <path
                   d="M6.66634 20.0007C6.66634 12.6369 12.6359 6.66732 19.9997 6.66732C27.3635 6.66732 33.333 12.6369 33.333 20.0007C33.333 27.3645 27.3635 33.334 19.9997 33.334C12.6359 33.334 6.66634 27.3645 6.66634 20.0007ZM19.9997 3.33398C10.7949 3.33398 3.33301 10.7959 3.33301 20.0007C3.33301 29.2053 10.7949 36.6673 19.9997 36.6673C29.2043 36.6673 36.6663 29.2053 36.6663 20.0007C36.6663 10.7959 29.2043 3.33398 19.9997 3.33398ZM29.0948 15.7625L26.7378 13.4055L18.333 21.8103L13.6782 17.1555L11.3212 19.5125L18.333 26.5243L29.0948 15.7625Z"
-                  fill="#0B6011"
+                  fill="var(--color-docuhealth-green-dark)"
                 />
               </svg>
-              <p className="pt-1 text-[#0B6011]">Account Creation Successful</p>
+              <p className="pt-1 text-docuhealth-green-dark">Account Creation Successful</p>
 
               <div className="border p-3 rounded-lg my-3 text-xs text-gray-600">
                 <p>
@@ -294,7 +294,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
 
               <div className="w-full text-white">
                 <button
-                  className="bg-[#3E4095] py-3 rounded-full  cursor-pointer w-full"
+                  className="bg-docuhealth-primary py-3 rounded-full  cursor-pointer w-full"
                   onClick={() => {
                     setOnboardingSuccessful(false);
                     setNewPatient(false);
@@ -335,7 +335,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                       value={patientData.email}
                       onChange={handlePatientDataChange}
                       placeholder="e.g tola@gmail.com"
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm focus:outline-hidden focus:border-[#3E4095]"
+                      className="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm focus:outline-hidden focus:border-docuhealth-primary"
                       required
                     />
                   </div>
@@ -349,7 +349,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                       value={patientData.phone_num}
                       onChange={handlePatientDataChange}
                       placeholder="e.g 09011122244"
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm focus:outline-hidden focus:border-[#3E4095]"
+                      className="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm focus:outline-hidden focus:border-docuhealth-primary"
                       required
                     />
                   </div>
@@ -366,7 +366,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                           handlePatientDataChange(e);
                           validatePassword(e.target.value);
                         }}
-                        className={`w-full px-4 py-2 border rounded-lg pl-8 outline-hidden focus:border-[#3E4095] text-sm ${
+                        className={`w-full px-4 py-2 border rounded-lg pl-8 outline-hidden focus:border-docuhealth-primary text-sm ${
                           patientData.password && !isPasswordValid
                             ? "focus:border-red-500"
                             : ""
@@ -398,7 +398,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                         name="confirm_password"
                         value={patientData.confirm_password}
                         onChange={handlePatientDataChange}
-                        className="w-full text-sm px-4 py-2 border rounded-lg pl-8 outline-hidden focus:border-[#3E4095]"
+                        className="w-full text-sm px-4 py-2 border rounded-lg pl-8 outline-hidden focus:border-docuhealth-primary"
                         required
                       />
                       <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
@@ -543,7 +543,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                     </div>
                   )}
                   <div
-                    className="col-span-2 text-center bg-[#3E4095] text-white py-3 px-4 rounded-full cursor-pointer text-sm"
+                    className="col-span-2 text-center bg-docuhealth-primary text-white py-3 px-4 rounded-full cursor-pointer text-sm"
                     onClick={() => handleStepOne()}
                   >
                     <p> Move to step 2 / 3</p>
@@ -562,7 +562,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                       name="firstname"
                       value={patientData.firstname}
                       onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095]  text-sm"
+                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary  text-sm"
                       required
                     />
                   </div>
@@ -575,7 +575,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                       name="lastname"
                       value={patientData.lastname}
                       onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095]  text-sm"
+                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary  text-sm"
                       required
                     />
                   </div>
@@ -588,7 +588,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                       name="middlename"
                       value={patientData.middlename}
                       onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-[#3E4095]  text-sm"
+                      className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary  text-sm"
                     />
                   </div>
                   <div className="mb-2 relative ">
@@ -604,7 +604,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                       }}
                       onFocus={() => setIsOpen(true)} // when clicked/focused
                       onBlur={() => setIsOpen(false)} // when closed
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-sm"
+                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer  text-sm"
                       required
                     >
                       <option value="">Select</option>
@@ -645,12 +645,12 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                       name="dob"
                       value={patientData.dob}
                       onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-[#3E4095]  text-sm"
+                      className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary  text-sm"
                       required
                     />
                   </div>
                   <div
-                    className="col-span-2 text-center bg-[#3E4095] text-white py-3 px-4 rounded-full cursor-pointer text-sm"
+                    className="col-span-2 text-center bg-docuhealth-primary text-white py-3 px-4 rounded-full cursor-pointer text-sm"
                     onClick={() => handleStepTwo()}
                   >
                     <p> Move to step 3 / 3</p>
@@ -684,7 +684,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                       }}
                       onFocus={() => setIsOpen(true)} // when clicked/focused
                       onBlur={() => setIsOpen(false)} // when closed
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer text-sm"
+                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer text-sm"
                       required
                     >
                       <option value="" selected>
@@ -736,7 +736,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                           city: "",
                         }));
                       }}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-[#3E4095] appearance-none text-sm"
+                      className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary appearance-none text-sm"
                       required
                       disabled={!states.length}
                     >
@@ -776,7 +776,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                       name="city"
                       value={patientData.city}
                       onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none text-sm"
+                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none text-sm"
                       required
                     >
                       <option value="">-- Select City --</option>
@@ -816,7 +816,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                       value={patientData.street}
                       placeholder="e.g Olorunda Street"
                       onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] text-sm"
+                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary text-sm"
                       required
                     />
                   </div>
@@ -830,14 +830,14 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                       value={patientData.house_no}
                       placeholder="e.g No. 1234"
                       onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] text-sm"
+                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary text-sm"
                       required
                     />
                   </div>
                   <div
                     className={`col-span-2 text-center text-sm ${
                       isValid && !isPending
-                        ? "bg-[#3E4095] text-white  cursor-pointer"
+                        ? "bg-docuhealth-primary text-white  cursor-pointer"
                         : "cursor-not-allowed bg-gray-300 text-gray-500"
                     } py-3 px-4 rounded-full cursor-pointer`}
                     onClick={handleOnboarding}

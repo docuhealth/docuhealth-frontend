@@ -28,7 +28,7 @@ const PatientInfo = ({ patientFullInfo }) => {
   console.log(patientFullInfo);
   return (
     <>
-      <div className="my-5 bg-[#FAFAFA] rounded-lg border p-4">
+      <div className="my-5 bg-docuhealth-light-gray rounded-lg border p-4">
         <h2 className="font-medium">General Information</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -233,7 +233,7 @@ const PatientMedicalRecord = ({
             {patientMedRecords.map((record) => (
               <div
                 key={record.id}
-                className="bg-[#FAFEFF] border rounded-xl p-5"
+                className="bg-docuhealth-bg-light border rounded-xl p-5"
               >
                 <div className="flex justify-between items-center ">
                   <div className="flex items-center gap-1">
@@ -246,7 +246,7 @@ const PatientMedicalRecord = ({
                     >
                       <path
                         d="M7.50165 9.24984C9.88142 9.24984 11.8452 11.0312 12.1322 13.3332H2.87109C3.15814 11.0312 5.12187 9.24984 7.50165 9.24984ZM6.44401 10.5795C5.60773 10.8447 4.90335 11.4159 4.46914 12.1665H7.50165L6.44401 10.5795ZM8.55953 10.5797L7.50165 12.1665H10.5342C10.1 11.416 9.39574 10.8448 8.55953 10.5797ZM11.0017 1.6665V5.1665C11.0017 7.0995 9.43464 8.6665 7.50165 8.6665C5.56866 8.6665 4.00166 7.0995 4.00166 5.1665V1.6665H11.0017ZM5.16832 5.1665C5.16832 6.45515 6.21299 7.49984 7.50165 7.49984C8.79035 7.49984 9.83499 6.45515 9.83499 5.1665H5.16832ZM9.83499 2.83317H5.16832L5.16826 3.99984H9.83493L9.83499 2.83317Z"
-                        fill="#1B2B40"
+                        fill="var(--color-docuhealth-dark)"
                       />
                     </svg>
                     <p className="font-medium">
@@ -256,8 +256,8 @@ const PatientMedicalRecord = ({
                         : "NIL"}
                     </p>
                   </div>
-                  <div className="bg-[#D2F5DB] px-2 rounded-full">
-                    <p className="text-[#08A913] ">
+                  <div className="bg-docuhealth-light-green px-2 rounded-full">
+                    <p className="text-docuhealth-green ">
                       {formatRecordDate(record.created_at)}
                     </p>
                   </div>
@@ -273,7 +273,7 @@ const PatientMedicalRecord = ({
                     >
                       <path
                         d="M5.16536 2.25V3.41667H3.9987V5.75C3.9987 7.03864 5.04337 8.08333 6.33203 8.08333C7.62067 8.08333 8.66536 7.03864 8.66536 5.75V3.41667H7.4987V2.25H9.2487C9.57087 2.25 9.83203 2.51117 9.83203 2.83333V5.75C9.83203 7.48408 8.57092 8.92362 6.91583 9.20152L6.91536 10.125C6.91536 11.2526 7.82945 12.1667 8.95703 12.1667C9.83046 12.1667 10.5758 11.6182 10.8674 10.8469C10.2569 10.5742 9.83203 9.96172 9.83203 9.25C9.83203 8.28347 10.6155 7.5 11.582 7.5C12.5486 7.5 13.332 8.28347 13.332 9.25C13.332 10.0498 12.7955 10.7243 12.0627 10.9332C11.7046 12.3137 10.4499 13.3333 8.95703 13.3333C7.1851 13.3333 5.7487 11.8969 5.7487 10.125L5.74881 9.20164C4.09342 8.92397 2.83203 7.48431 2.83203 5.75V2.83333C2.83203 2.51117 3.0932 2.25 3.41536 2.25H5.16536ZM11.582 8.66667C11.2599 8.66667 10.9987 8.92782 10.9987 9.25C10.9987 9.57217 11.2599 9.83333 11.582 9.83333C11.9042 9.83333 12.1654 9.57217 12.1654 9.25C12.1654 8.92782 11.9042 8.66667 11.582 8.66667Z"
-                        fill="#1B2B40"
+                        fill="var(--color-docuhealth-dark)"
                       />
                     </svg>
                   </div>
@@ -290,7 +290,7 @@ const PatientMedicalRecord = ({
                     >
                       <path
                         d="M5.16536 12.1665V8.6665H9.83203V12.1665H11.582V2.83317H3.41536V12.1665H5.16536ZM6.33203 12.1665H8.66536V9.83317H6.33203V12.1665ZM12.7487 12.1665H13.9154V13.3332H1.08203V12.1665H2.2487V2.24984C2.2487 1.92767 2.50987 1.6665 2.83203 1.6665H12.1654C12.4875 1.6665 12.7487 1.92767 12.7487 2.24984V12.1665ZM6.91536 5.1665V3.99984H8.08203V5.1665H9.2487V6.33317H8.08203V7.49984H6.91536V6.33317H5.7487V5.1665H6.91536Z"
-                        fill="#1B2B40"
+                        fill="var(--color-docuhealth-dark)"
                       />
                     </svg>
                   </div>
@@ -312,7 +312,7 @@ const PatientMedicalRecord = ({
                     >
                       <path
                         d="M4.58464 2.25016V1.0835H5.7513V2.25016H9.2513V1.0835H10.418V2.25016H12.7513C13.0735 2.25016 13.3346 2.51133 13.3346 2.8335V5.75016H12.168V3.41683H10.418V4.5835H9.2513V3.41683H5.7513V4.5835H4.58464V3.41683H2.83464V11.5835H6.33464V12.7502H2.2513C1.92914 12.7502 1.66797 12.489 1.66797 12.1668V2.8335C1.66797 2.51133 1.92914 2.25016 2.2513 2.25016H4.58464ZM10.418 7.50016C9.12933 7.50016 8.08464 8.54485 8.08464 9.8335C8.08464 11.1221 9.12933 12.1668 10.418 12.1668C11.7066 12.1668 12.7513 11.1221 12.7513 9.8335C12.7513 8.54485 11.7066 7.50016 10.418 7.50016ZM6.91797 9.8335C6.91797 7.9005 8.48498 6.3335 10.418 6.3335C12.351 6.3335 13.918 7.9005 13.918 9.8335C13.918 11.7665 12.351 13.3335 10.418 13.3335C8.48498 13.3335 6.91797 11.7665 6.91797 9.8335ZM9.83463 8.0835V10.0751L11.1722 11.4126L11.9971 10.5877L11.0013 9.59188V8.0835H9.83463Z"
-                        fill="#1B2B40"
+                        fill="var(--color-docuhealth-dark)"
                       />
                     </svg>
                   </div>
@@ -323,7 +323,7 @@ const PatientMedicalRecord = ({
                 </div>
                 <div className="grid grid-cols-2 gap-3 ">
                   <button
-                    className="bg-[#1B2B40] py-2 text-white rounded-full cursor-pointer"
+                    className="bg-docuhealth-dark py-2 text-white rounded-full cursor-pointer"
                     onClick={() => {
                       setSelectedMedicalRecord(record); // ✅ single record
                       setViewDetailMedicalRecord(true);
@@ -332,7 +332,7 @@ const PatientMedicalRecord = ({
                   >
                     <p>View details</p>
                   </button>
-                  <button className="flex justify-center items-center gap-1 py-2 border border-[#1B2B40] rounded-full cursor-pointer">
+                  <button className="flex justify-center items-center gap-1 py-2 border border-docuhealth-dark rounded-full cursor-pointer">
                     <svg
                       width="12"
                       height="12"
@@ -342,7 +342,7 @@ const PatientMedicalRecord = ({
                     >
                       <path
                         d="M6.5 5H9L6 8L3 5H5.5V1.5H6.5V5ZM2 9.5H10V6H11V10C11 10.2761 10.7761 10.5 10.5 10.5H1.5C1.22386 10.5 1 10.2761 1 10V6H2V9.5Z"
-                        fill="#1B2B40"
+                        fill="var(--color-docuhealth-dark)"
                       />
                     </svg>
 
@@ -529,14 +529,14 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
               >
                 <path
                   d="M4.56528 6.41685H11.6654V7.58352H4.56528L7.69426 10.7125L6.86932 11.5374L2.33203 7.00019L6.86932 2.46289L7.69426 3.28785L4.56528 6.41685Z"
-                  fill="#1B2B40"
+                  fill="var(--color-docuhealth-dark)"
                 />
               </svg>
 
               <h2 className=" text-sm">SOAP Note Overview</h2>
             </div>
             <div className=" flex flex-col sm:flex-row justify-end items-center gap-3 w-full sm:w-auto">
-              <div className="flex justify-center items-center gap-1 border border-[#3E4095] py-1.5 px-4 rounded-full w-full sm:w-auto text-[#3E4095] cursor-pointer" onClick={() => setCreateAdditionalNotes(true)}>
+              <div className="flex justify-center items-center gap-1 border border-docuhealth-primary py-1.5 px-4 rounded-full w-full sm:w-auto text-docuhealth-primary cursor-pointer" onClick={() => setCreateAdditionalNotes(true)}>
                 <svg
                   width="14"
                   height="14"
@@ -546,28 +546,28 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                 >
                   <path
                     d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
-                    stroke="#3E4095"
+                    stroke="var(--color-docuhealth-primary)"
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   />
                   <path
                     d="M14 2V8H20"
-                    stroke="#3E4095"
+                    stroke="var(--color-docuhealth-primary)"
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   />
                   <path
                     d="M12 18V12"
-                    stroke="#3E4095"
+                    stroke="var(--color-docuhealth-primary)"
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   />
                   <path
                     d="M9 15H15"
-                    stroke="#3E4095"
+                    stroke="var(--color-docuhealth-primary)"
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -578,7 +578,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
               </div>
             </div>
           </div>
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
             <p className="text-[12px] mb-4">
               {" "}
               Patient's name :{" "}
@@ -680,7 +680,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
           </div>
 
           {/* Vital Signs*/}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
             <p className="font-medium mb-4"> Vital Signs</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[12px]">
@@ -695,7 +695,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                   >
                     <path
                       d="M13.1874 2.81468C13.7081 3.33538 13.7081 4.1796 13.1874 4.7003L11.3018 6.58591L9.41615 4.7003L11.3018 2.81468C11.8225 2.29398 12.6667 2.29398 13.1874 2.81468ZM14.1302 1.87187C13.0888 0.83047 11.4004 0.83047 10.359 1.87187L8.47335 3.75748L8.23762 3.52201C7.97728 3.26166 7.55522 3.26166 7.29482 3.52201C7.03448 3.78236 7.03448 4.20446 7.29482 4.46482L7.53055 4.70054L3.38742 8.84364C3.01516 9.21591 2.76141 9.69004 2.65816 10.2063L2.42427 11.3758C2.37265 11.6338 2.24578 11.8709 2.05964 12.057L1.40229 12.7144C1.14194 12.9748 1.14194 13.3969 1.40229 13.6572L2.3451 14.6C2.60545 14.8604 3.02756 14.8604 3.28791 14.6L3.94526 13.9427C4.13139 13.7566 4.36846 13.6297 4.62658 13.578L5.79602 13.3442C6.31226 13.2409 6.78642 12.9872 7.15868 12.6149L11.3018 8.47178L11.5375 8.70744C11.7978 8.96778 12.22 8.96778 12.4803 8.70744C12.7406 8.44711 12.7406 8.02498 12.4803 7.76464L12.2446 7.52898L14.1302 5.6431C15.1716 4.6017 15.1716 2.91326 14.1302 1.87187ZM8.47335 5.64335L10.359 7.52898L6.21585 11.6721C6.02972 11.8582 5.79265 11.9851 5.53453 12.0367L4.36509 12.2706C3.84885 12.3738 3.37472 12.6276 3.00245 12.9999C3.37472 12.6276 3.62846 12.1535 3.73171 11.6372L3.9656 10.4678C4.01722 10.2097 4.1441 9.97264 4.33023 9.78651L8.47335 5.64335Z"
-                      fill="#3E4095"
+                      fill="var(--color-docuhealth-primary)"
                     />
                   </svg>
                   Blood Pressure
@@ -716,7 +716,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                   >
                     <path
                       d="M5.33203 3.33317C5.33203 1.86041 6.52594 0.666504 7.9987 0.666504C9.47143 0.666504 10.6654 1.86041 10.6654 3.33317V6.8363C11.8744 7.67957 12.6654 9.0807 12.6654 10.6665C12.6654 13.2438 10.576 15.3332 7.9987 15.3332C5.42137 15.3332 3.33203 13.2438 3.33203 10.6665C3.33203 9.0807 4.12304 7.67957 5.33203 6.8363V3.33317ZM6.09483 7.9299C5.20498 8.55057 4.66536 9.56197 4.66536 10.6665C4.66536 12.5074 6.15775 13.9998 7.9987 13.9998C9.83963 13.9998 11.332 12.5074 11.332 10.6665C11.332 9.56197 10.7924 8.55057 9.90256 7.9299L9.33203 7.5319V3.33317C9.33203 2.59679 8.7351 1.99984 7.9987 1.99984C7.2623 1.99984 6.66536 2.59679 6.66536 3.33317V7.5319L6.09483 7.9299ZM5.33203 10.6665H10.6654C10.6654 12.1392 9.47143 13.3332 7.9987 13.3332C6.52594 13.3332 5.33203 12.1392 5.33203 10.6665Z"
-                      fill="#3E4095"
+                      fill="var(--color-docuhealth-primary)"
                     />
                   </svg>
                   Temperature
@@ -736,7 +736,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                   >
                     <path
                       d="M11.0013 2C13.0264 2 14.668 3.66667 14.668 6C14.668 10.6667 9.66797 13.3333 8.0013 14.3333C6.68304 13.5423 3.2793 11.7087 1.91393 8.66733L0.667969 8.66667V7.33333L1.47494 7.33393C1.38414 6.90887 1.33464 6.46434 1.33464 6C1.33464 3.66667 3.0013 2 5.0013 2C6.24128 2 7.33464 2.66667 8.0013 3.33333C8.66797 2.66667 9.7613 2 11.0013 2ZM11.0013 3.33333C10.284 3.33333 9.5075 3.71274 8.9441 4.27614L8.0013 5.21895L7.0585 4.27614C6.49509 3.71274 5.71857 3.33333 5.0013 3.33333C3.70734 3.33333 2.66797 4.43767 2.66797 6C2.66797 6.45695 2.7282 6.90107 2.84569 7.3336L4.29051 7.33333L5.66797 5.03757L7.66797 8.37087L8.2905 7.33333H11.3346V8.66667H9.04544L7.66797 10.9625L5.66797 7.62913L5.04543 8.66667L3.40656 8.66707C3.93282 9.58247 4.73 10.4454 5.76473 11.2686C6.26131 11.6637 6.79097 12.0323 7.3787 12.4025C7.5777 12.5279 7.77537 12.6486 8.0013 12.7835C8.22724 12.6486 8.4249 12.5279 8.6239 12.4025C9.21164 12.0323 9.7413 11.6637 10.2379 11.2686C12.2238 9.68867 13.3346 7.96233 13.3346 6C13.3346 4.42717 12.31 3.33333 11.0013 3.33333Z"
-                      fill="#3E4095"
+                      fill="var(--color-docuhealth-primary)"
                     />
                   </svg>
                   Weight
@@ -756,7 +756,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                   >
                     <path
                       d="M13.4938 3.17157C15.0022 4.68315 15.054 7.09133 13.6511 8.662L7.99863 14.3233L2.34628 8.662C0.943397 7.09133 0.995837 4.67934 2.5036 3.17157C4.01308 1.6621 6.42882 1.61125 7.99936 3.01902C9.56536 1.61333 11.9854 1.66 13.4938 3.17157ZM3.44641 4.11438C2.45325 5.10754 2.40339 6.6982 3.31865 7.7488L7.99863 12.4362L12.6788 7.7488C13.5944 6.6978 13.5447 5.11017 12.55 4.1134C11.5585 3.11986 9.96256 3.07204 8.9149 3.98917L6.11308 6.79127L5.17027 5.84843L7.05336 3.964L6.99883 3.91801C5.949 3.07465 4.41418 3.14662 3.44641 4.11438Z"
-                      fill="#3E4095"
+                      fill="var(--color-docuhealth-primary)"
                     />
                   </svg>
                   Respiratory rate
@@ -776,7 +776,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                   >
                     <path
                       d="M11.0013 2C13.0264 2 14.668 3.66667 14.668 6C14.668 10.6667 9.66797 13.3333 8.0013 14.3333C6.68304 13.5423 3.2793 11.7087 1.91393 8.66733L0.667969 8.66667V7.33333L1.47494 7.33393C1.38414 6.90887 1.33464 6.46434 1.33464 6C1.33464 3.66667 3.0013 2 5.0013 2C6.24128 2 7.33464 2.66667 8.0013 3.33333C8.66797 2.66667 9.7613 2 11.0013 2ZM11.0013 3.33333C10.284 3.33333 9.5075 3.71274 8.9441 4.27614L8.0013 5.21895L7.0585 4.27614C6.49509 3.71274 5.71857 3.33333 5.0013 3.33333C3.70734 3.33333 2.66797 4.43767 2.66797 6C2.66797 6.45695 2.7282 6.90107 2.84569 7.3336L4.29051 7.33333L5.66797 5.03757L7.66797 8.37087L8.2905 7.33333H11.3346V8.66667H9.04544L7.66797 10.9625L5.66797 7.62913L5.04543 8.66667L3.40656 8.66707C3.93282 9.58247 4.73 10.4454 5.76473 11.2686C6.26131 11.6637 6.79097 12.0323 7.3787 12.4025C7.5777 12.5279 7.77537 12.6486 8.0013 12.7835C8.22724 12.6486 8.4249 12.5279 8.6239 12.4025C9.21164 12.0323 9.7413 11.6637 10.2379 11.2686C12.2238 9.68867 13.3346 7.96233 13.3346 6C13.3346 4.42717 12.31 3.33333 11.0013 3.33333Z"
-                      fill="#3E4095"
+                      fill="var(--color-docuhealth-primary)"
                     />
                   </svg>
                   Heart rate
@@ -796,7 +796,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                   >
                     <path
                       d="M11.3333 12.6667H12.6667V9.33333H6.66667V3.33333H3.33333V4.66667H4.66667V6H3.33333V7.33333H5.33333V8.66667H3.33333V10H4.66667V11.3333H3.33333V12.6667H4.66667V11.3333H6V12.6667H7.33333V10.6667H8.66667V12.6667H10V11.3333H11.3333V12.6667ZM8 8H13.3333C13.7015 8 14 8.29847 14 8.66667V13.3333C14 13.7015 13.7015 14 13.3333 14H2.66667C2.29848 14 2 13.7015 2 13.3333V2.66667C2 2.29848 2.29848 2 2.66667 2H7.33333C7.70153 2 8 2.29848 8 2.66667V8Z"
-                      fill="#3E4095"
+                      fill="var(--color-docuhealth-primary)"
                     />
                   </svg>
                   Height
@@ -809,8 +809,8 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
           </div>
 
           {/* 1. Extended Clinical History */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <p className="font-medium mb-4 text-[#1B2B40]">
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+            <p className="font-medium mb-4 text-docuhealth-dark">
               Clinical History Details
             </p>
 
@@ -863,7 +863,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
           </div>
 
           {/* 2. Physical Examinations & Review */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
             <p className="font-medium mb-4">Examination Findings</p>
 
             <div className="text-[12px] pb-3">
@@ -904,7 +904,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
           </div>
 
           {/* 3. Diagnosis & Testing */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
             <p className="font-medium mb-4">Diagnosis & Investigations</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -912,7 +912,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                 <h4 className="text-gray-400 font-normal mb-1">
                   Primary Diagnosis:
                 </h4>
-                <p className="font-medium text-[#3E4095]">
+                <p className="font-medium text-docuhealth-primary">
                   {selectedPatientDetails?.primary_diagnosis || "NIL"}
                 </p>
               </div>
@@ -952,7 +952,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
           </div>
 
           {/* 4. Drug History & Allergies */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
             <p className="font-medium mb-4">Drug History / Allergies</p>
             <div className="text-[12px]">
               <h4 className="text-gray-400 font-normal mb-1">
@@ -970,7 +970,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
           </div>
 
           {/* 5. Patient Education & Problems List */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
             <div className="text-[12px] pb-3">
               <h4 className="text-gray-400 font-normal mb-1">
                 Active Problems List:
@@ -1020,8 +1020,8 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
           </div>
 
           {/* 6. Uploaded Documents / Images */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <p className="font-medium mb-4 text-[#1B2B40]">
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+            <p className="font-medium mb-4 text-docuhealth-dark">
               Uploaded Documents / Images
             </p>
             <div>
@@ -1053,8 +1053,8 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                         className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 sm:items-center bg-white border rounded-lg px-4 py-3 mb-3 "
                       >
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-[12px]">
-                          <div className="p-2 bg-[#3E4095]/10 rounded-md">
-                            <Icon className="text-[#3E4095]" size={20} />
+                          <div className="p-2 bg-docuhealth-primary/10 rounded-md">
+                            <Icon className="text-docuhealth-primary" size={20} />
                           </div>
                           <div>
                             <p className="font-medium text-gray-800">
@@ -1071,7 +1071,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                             href={fileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-1 border border-[#3E4095] text-[#3E4095] rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28"
+                            className="flex items-center justify-center gap-1 border border-docuhealth-primary text-docuhealth-primary rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28"
                           >
                             <Eye className="w-3 h-3" />
                             View
@@ -1079,7 +1079,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                           <a
                             href={fileUrl}
                             download
-                            className="flex items-center justify-center gap-1 bg-[#3E4095] text-white rounded-full font-medium hover:bg-[#2e3070] transition py-1 px-3 w-full sm:w-28"
+                            className="flex items-center justify-center gap-1 bg-docuhealth-primary text-white rounded-full font-medium hover:bg-docuhealth-dark-primary transition py-1 px-3 w-full sm:w-28"
                           >
                             <ArrowDownToLine className="w-3 h-3" />
                             Download
@@ -1096,8 +1096,8 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
           </div>
 
           {/* Drug Records */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <div className=" mb-4">    <p className="font-medium text-[#1B2B40]">Medication / Drug Records</p>
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+            <div className=" mb-4">    <p className="font-medium text-docuhealth-dark">Medication / Drug Records</p>
             </div>
 
             <div className="overflow-x-auto">
@@ -1115,7 +1115,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                   <tbody className="text-[12px]">
                     {selectedPatientDetails.drug_records.map((drug, index) => (
                       <tr key={index} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
-                        <td className="py-3 font-medium text-[#3E4095]">
+                        <td className="py-3 font-medium text-docuhealth-primary">
                           {drug.name}
                         </td>
                         <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
@@ -1143,8 +1143,8 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
           </div>
 
           {/* Care Instructions */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <p className="font-medium mb-4 text-[#1B2B40]">Care Instructions</p>
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+            <p className="font-medium mb-4 text-docuhealth-dark">Care Instructions</p>
             <div className="text-[12px] text-gray-700">
               {selectedPatientDetails?.care_instructions?.length > 0 ? (
                 <ul className="list-disc pl-5 space-y-1">
@@ -1162,8 +1162,8 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
           </div>
 
           {/* Treatment Plan */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <p className="font-medium mb-4 text-[#1B2B40]">Treatment Plan</p>
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+            <p className="font-medium mb-4 text-docuhealth-dark">Treatment Plan</p>
             <div className="text-[12px] text-gray-700">
               {selectedPatientDetails?.treatment_plan?.length > 0 ? (
                 <ul className="list-disc pl-5 space-y-1">
@@ -1181,8 +1181,8 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
           </div>
 
           {/* 7. Follow Up / Appointment */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <p className="font-medium mb-4 text-[#1B2B40]">
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+            <p className="font-medium mb-4 text-docuhealth-dark">
               Follow Up / Appointment
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -1214,8 +1214,8 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
           </div>
 
           {/* 8. Referral Status */}
-          <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-            <p className="font-medium mb-4 text-[#1B2B40]">
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+            <p className="font-medium mb-4 text-docuhealth-dark">
               Referral Information
             </p>
             <div className="space-y-2">
@@ -1487,7 +1487,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                 </label>
                 <textarea
                   rows="5"
-                  className="w-full p-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095] resize-none transition-all placeholder:text-gray-400"
+                  className="w-full p-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-docuhealth-primary focus:border-docuhealth-primary resize-none transition-all placeholder:text-gray-400"
                   placeholder="Enter patient observations, medical history updates, or specific care instructions..."
                   value={noteDescription} // Ensure you have this state defined
                   onChange={(e) => setNoteDescription(e.target.value)}
@@ -1500,7 +1500,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                 </div>
 
                 <button
-                  className={`w-full mt-4 ${isPending ? 'border border-gray-400 bg-gray-400 text-white cursor-not-allowed' : 'bg-[#3E4095] text-white hover:bg-[#2e3070] '} py-2 rounded-full text-sm font-medium transition-colors`}
+                  className={`w-full mt-4 ${isPending ? 'border border-gray-400 bg-gray-400 text-white cursor-not-allowed' : 'bg-docuhealth-primary text-white hover:bg-docuhealth-dark-primary '} py-2 rounded-full text-sm font-medium transition-colors`}
                   onClick={handleCreateAdditionalNote}
                   disabled={isPending}
                 >

@@ -34,7 +34,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
             {!selected.discharge_date && (
             <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
               <button
-                className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto "
+                className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto "
                 onClick={() => {
                   setOtherMedicalServices(true);
                 }}
@@ -43,7 +43,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
               </button>
 
               <button
-                className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto"
+                className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
                 onClick={() => {
                   setTransferRequest(true);
                 }}
@@ -51,7 +51,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                 Transfer to another ward
               </button>
               <button
-                className="py-2.5 px-10 rounded-full bg-[#3E4095] border border-[#3E4095] text-white cursor-pointer w-full lg:w-auto"
+                className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
                 onClick={() => {
                   setDischargePatient(true);
                   setSelectedDischargePatient(selected);

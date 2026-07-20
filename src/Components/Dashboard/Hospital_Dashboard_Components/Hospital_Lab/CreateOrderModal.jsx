@@ -97,7 +97,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
           </p>
           <button
             onClick={handleClose}
-            className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3 rounded-full hover:bg-[#2e3070] transition-colors"
+            className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3 rounded-full hover:bg-docuhealth-dark-primary transition-colors"
           >
             Done
           </button>
@@ -132,7 +132,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
             <button
               onClick={handleOverrideSubmit}
               disabled={isPending}
-              className="flex-1 px-4 py-2 bg-[#3E4095] text-white rounded-lg hover:bg-[#2e3070] transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-docuhealth-primary text-white rounded-lg hover:bg-docuhealth-dark-primary transition-colors disabled:opacity-50"
             >
               {isPending ? "Proceeding..." : "Proceed Anyway"}
             </button>
@@ -149,7 +149,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
         {/* Header */}
         <div className="relative flex items-start justify-center">
           <div className="text-center">
-            <h3 className="text-[20px] font-semibold text-[#1B2B40]">Order Lab test</h3>
+            <h3 className="text-[20px] font-semibold text-docuhealth-dark">Order Lab test</h3>
             <p className="text-sm text-gray-500 mt-1">Kindly order a lab test</p>
           </div>
           <button
@@ -162,12 +162,12 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
 
         {/* Category */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-[#1B2B40] font-medium">Category</label>
+          <label className="text-sm text-docuhealth-dark font-medium">Category</label>
           <div className="relative">
             <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value, test_type: [] })}
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-[#3E4095] transition-colors appearance-none"
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-docuhealth-primary transition-colors appearance-none"
             >
               <option value="" disabled>Select category</option>
               {categories.map((cat) => (
@@ -182,13 +182,13 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
 
         {/* Test Type */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-[#1B2B40] font-medium">Test type</label>
+          <label className="text-sm text-docuhealth-dark font-medium">Test type</label>
           <div className="relative">
             <button
               type="button"
               disabled={!form.category}
               onClick={() => setIsTestTypeDropdownOpen((v) => !v)}
-              className={`w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-left flex justify-between items-center transition-colors ${!form.category ? "opacity-60 cursor-not-allowed bg-gray-50" : "bg-white focus:border-[#3E4095]"}`}
+              className={`w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-left flex justify-between items-center transition-colors ${!form.category ? "opacity-60 cursor-not-allowed bg-gray-50" : "bg-white focus:border-docuhealth-primary"}`}
             >
               <span className="truncate text-gray-700">
                 {isTestTypesLoading
@@ -205,7 +205,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
                   const id = test.sqid || test.name;
                   const checked = form.test_type.includes(id);
                   return (
-                    <label key={id} className={`flex items-center gap-4 px-4 py-3 hover:bg-gray-50 cursor-pointer text-sm text-[#1B2B40] ${index !== fetchedTestTypes.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                    <label key={id} className={`flex items-center gap-4 px-4 py-3 hover:bg-gray-50 cursor-pointer text-sm text-docuhealth-dark ${index !== fetchedTestTypes.length - 1 ? 'border-b border-gray-100' : ''}`}>
                       <input
                         type="checkbox"
                         checked={checked}
@@ -230,12 +230,12 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
 
         {/* Add note */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-[#1B2B40] font-medium">Add note:</label>
+          <label className="text-sm text-docuhealth-dark font-medium">Add note:</label>
           <textarea
             value={form.note}
             onChange={(e) => setForm({ ...form, note: e.target.value })}
             placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
-            className="border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-500 bg-white outline-none focus:border-[#3E4095] transition-colors resize-none h-28"
+            className="border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-500 bg-white outline-none focus:border-docuhealth-primary transition-colors resize-none h-28"
           />
         </div>
 
@@ -243,7 +243,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
         <button
           onClick={handleSubmit}
           disabled={isPending}
-          className="w-full bg-[#3E4095] text-white text-sm font-medium py-2.5 rounded-full transition-colors disabled:opacity-50 hover:bg-[#2e3070]"
+          className="w-full bg-docuhealth-primary text-white text-sm font-medium py-2.5 rounded-full transition-colors disabled:opacity-50 hover:bg-docuhealth-dark-primary"
         >
           {isPending ? (
             <span className="flex items-center justify-center gap-2">

@@ -164,11 +164,11 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
       {selectedUsers.length > 0 && (
         <div
           className={`transition-all duration-300 mb-4 flex items-center justify-between p-3 rounded-lg ${selectedUsers.length > 0
-            ? "bg-[#3E4095]/10 border border-[#3E4095]/20 opacity-100"
+            ? "bg-docuhealth-primary/10 border border-docuhealth-primary/20 opacity-100"
             : "opacity-0 h-0 overflow-hidden"
             }`}
         >
-          <p className="text-sm text-[#3E4095] font-medium">
+          <p className="text-sm text-docuhealth-primary font-medium">
             {selectedUsers.length} user(s) selected
           </p>
           <div className="flex gap-2">
@@ -215,7 +215,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
       <div className="hidden lg:flex lg:flex-col">
         <div className="grid grid-cols-9 text-left text-xs bg-gray-100 py-5 rounded-md">
           <div className=" w-full pl-5 flex items-center gap-2 col-span-2 ">
-            <input type="checkbox" checked={allChecked} disabled={selectableUsers.length === 0} onChange={toggleSelectAll} className="w-4 h-4 accent-[#3E4095] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" />
+            <input type="checkbox" checked={allChecked} disabled={selectableUsers.length === 0} onChange={toggleSelectAll} className="w-4 h-4 accent-docuhealth-primary cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" />
             <p>Name</p>
           </div>
           {selectedRole === "hospital" ? (
@@ -251,7 +251,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
               return (
                 <div key={idx} className="grid grid-cols-9 items-center py-4 border-b border-b-gray-200 text-[12px] text-gray-700 text-left w-full hover:bg-gray-50">
                   <div className="font-semibold col-span-2 w-full pl-5 flex items-center gap-2">
-                    <input type="checkbox" checked={isSelected} onChange={() => toggleUser(currentId)} className="w-4 h-4 accent-[#3E4095] cursor-pointer" />
+                    <input type="checkbox" checked={isSelected} onChange={() => toggleUser(currentId)} className="w-4 h-4 accent-docuhealth-primary cursor-pointer" />
                     {isHospital && user.profile_image ? (
                        <img src={user.profile_image.url} className="w-6 h-6 rounded-full object-cover shrink-0" alt="" />
                     ) : null}
@@ -319,7 +319,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
       <div className="flex lg:hidden mb-2 justify-between items-center px-1">
         {selectableUsers.length > 0 && (
           <label className="flex items-center gap-2 text-sm text-gray-600 font-medium cursor-pointer">
-            <input type="checkbox" checked={allChecked} disabled={selectableUsers.length === 0} onChange={toggleSelectAll} className="w-4 h-4 accent-[#3E4095] disabled:opacity-50 disabled:cursor-not-allowed" />
+            <input type="checkbox" checked={allChecked} disabled={selectableUsers.length === 0} onChange={toggleSelectAll} className="w-4 h-4 accent-docuhealth-primary disabled:opacity-50 disabled:cursor-not-allowed" />
             Select All
           </label>
         )}
@@ -336,11 +336,11 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
             const isSelected = selectedUsers.includes(currentId);
 
             return (
-              <div key={idx} className={`bg-white border rounded-md p-4 transition-transform relative ${isSelected ? 'border-[#3E4095] ring-1 ring-[#3E4095]' : 'border-gray-200'}`}>
+              <div key={idx} className={`bg-white border rounded-md p-4 transition-transform relative ${isSelected ? 'border-docuhealth-primary ring-1 ring-docuhealth-primary' : 'border-gray-200'}`}>
                 
                 {/* Checkbox overlay top-right */}
                 <div className="absolute top-4 right-4 z-10">
-                   <input type="checkbox" checked={isSelected} onChange={() => toggleUser(currentId)} className="w-5 h-5 accent-[#3E4095] cursor-pointer" />
+                   <input type="checkbox" checked={isSelected} onChange={() => toggleUser(currentId)} className="w-5 h-5 accent-docuhealth-primary cursor-pointer" />
                 </div>
 
                 {/* Header */}
@@ -348,7 +348,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
                   {isHospital && user.profile_image ? (
                      <img src={user.profile_image.url} className="w-10 h-10 rounded-full object-cover shrink-0" alt="" />
                   ) : (
-                     <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-[14px] font-bold text-[#3E4095] shrink-0">
+                     <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-[14px] font-bold text-docuhealth-primary shrink-0">
                        {isHospital ? user.name?.[0]?.toUpperCase() : user.full_name?.[0]?.toUpperCase() || "U"}
                      </div>
                   )}

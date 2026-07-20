@@ -112,7 +112,7 @@ const EmergencyModeForm = ({ emergencyFormToggle, name, medicalRecordToggle, rec
             )}
 
             <div
-              className={`bg-[#0000FF] text-center text-sm text-white rounded-full py-2 cursor-pointer ${
+              className={`bg-docuhealth-blue text-center text-sm text-white rounded-full py-2 cursor-pointer ${
                 step === 1 && (!formData.name || !formData.firstEmergency)
                   ? "opacity-50 cursor-not-allowed"
                   : ""

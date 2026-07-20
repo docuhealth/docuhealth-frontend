@@ -19,7 +19,7 @@ const NoteSection = ({
   setActiveInput,
 }) => (
   <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3 bg-white">
-    <p className="font-medium text-[#1B2B40] mb-2">{title}</p>
+    <p className="font-medium text-docuhealth-dark mb-2">{title}</p>
 
     <div className="space-y-2 max-h-[200px] overflow-y-auto mb-2">
       {data[field].map((item, idx) => (
@@ -47,12 +47,12 @@ const NoteSection = ({
           value={inputs[field]}
           onChange={(e) => setInputs({ ...inputs, [field]: e.target.value })}
           placeholder={placeholder}
-          className="flex-1 border rounded p-2 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none"
+          className="flex-1 border rounded p-2 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none"
         />
         <button
           type="button"
           onClick={() => handleAddListItem(field)}
-          className="bg-[#3E4095] text-white px-3 py-1 rounded text-[12px] cursor-pointer"
+          className="bg-docuhealth-primary text-white px-3 py-1 rounded text-[12px] cursor-pointer"
         >
           Add
         </button>
@@ -69,7 +69,7 @@ const NoteSection = ({
         <button
           type="button"
           onClick={() => setActiveInput(field)}
-          className="flex items-center gap-1 text-[#3E4095] font-medium text-[12px] cursor-pointer"
+          className="flex items-center gap-1 text-docuhealth-primary font-medium text-[12px] cursor-pointer"
         >
           <Plus size={14} /> Add note
         </button>
@@ -227,7 +227,7 @@ const PrescribeMedication = ({
         <button
           onClick={handleSubmit}
           disabled={isPending}
-          className={`py-3 px-8 rounded-full text-white bg-[#3E4095] cursor-pointer ${
+          className={`py-3 px-8 rounded-full text-white bg-docuhealth-primary cursor-pointer ${
             isPending ? "opacity-70 cursor-not-allowed" : ""
           }`}
         >

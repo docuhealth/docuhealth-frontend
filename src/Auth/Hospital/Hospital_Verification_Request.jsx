@@ -109,7 +109,7 @@ const Hospital_Verification_Request = () => {
                 <div className="w-full flex-1">
                     <div className="hidden sm:flex justify-center items-center py-10 h-screen">
                         <Link to="/">
-                            <div className="fixed top-10 left-10 flex gap-1 items-center font-semibold text-[#3E4095]">
+                            <div className="fixed top-10 left-10 flex gap-1 items-center font-semibold text-docuhealth-primary">
                                 <img src={docuhealth_logo} alt="Logo" className="w-6" />
                                 <h1 className="text-xl">DocuHealth</h1>
                             </div>
@@ -130,7 +130,7 @@ const Hospital_Verification_Request = () => {
                                     <div className="relative">
                                         <input
                                             type="email"
-                                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             required
@@ -146,8 +146,8 @@ const Hospital_Verification_Request = () => {
                                         htmlFor="file-upload"
                                         className="flex items-center justify-center gap-2 border-2 border-dashed border-gray-400 rounded-lg p-3 cursor-pointer hover:bg-gray-50 transition"
                                     >
-                                        <UploadCloud className="w-5 h-5 text-[#3E4095]" />
-                                        <span className="text-[#3E4095] font-medium">
+                                        <UploadCloud className="w-5 h-5 text-docuhealth-primary" />
+                                        <span className="text-docuhealth-primary font-medium">
                                             Click to upload
                                         </span>
                                     </label>
@@ -201,7 +201,7 @@ const Hospital_Verification_Request = () => {
                                     disabled={loading}
                                     className={`w-full ${loading
                                         ? "bg-gray-400 cursor-not-allowed"
-                                        : "bg-[#3E4095] cursor-pointer"
+                                        : "bg-docuhealth-primary cursor-pointer"
                                         } text-white py-3 rounded-full transition-colors`}
                                 >
                                     {loading ? (
@@ -222,7 +222,7 @@ const Hospital_Verification_Request = () => {
             </div>
 
             <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
-                <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+                <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-docuhealth-primary">
                     <img src={docuhealth_logo} alt="Logo" className="w-6" />
                     <h1 className="text-xl">DocuHealth</h1>
                 </div>
@@ -240,7 +240,7 @@ const Hospital_Verification_Request = () => {
                             <div className="relative">
                                 <input
                                     type="email"
-                                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
@@ -256,8 +256,8 @@ const Hospital_Verification_Request = () => {
                                 htmlFor="file-upload"
                                 className="flex items-center justify-center gap-2 border-2 border-dashed border-gray-400 rounded-lg p-3 cursor-pointer hover:bg-gray-50 transition"
                             >
-                                <UploadCloud className="w-5 h-5 text-[#3E4095]" />
-                                <span className="text-[#3E4095] font-medium">
+                                <UploadCloud className="w-5 h-5 text-docuhealth-primary" />
+                                <span className="text-docuhealth-primary font-medium">
                                     Click to upload
                                 </span>
                             </label>
@@ -317,7 +317,7 @@ const Hospital_Verification_Request = () => {
                             disabled={loading}
                             className={`w-full ${loading
                                 ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-[#3E4095] cursor-pointer"
+                                : "bg-docuhealth-primary cursor-pointer"
                                 } text-white py-3 rounded-full transition-colors`}
                         >
                             {loading ? (

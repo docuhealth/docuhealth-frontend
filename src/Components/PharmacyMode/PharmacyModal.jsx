@@ -30,7 +30,7 @@ const PharmacyModal = ({ setPharmacyMode, setPharmacyModeProceed }) => {
           <label
             className={`flex items-center p-3 border rounded-lg cursor-pointer text-sm ${
               selectedOption === "generate"
-                ? "border-[#0000FF]"
+                ? "border-docuhealth-blue"
                 : "border-gray-300"
             }`}
           >
@@ -48,7 +48,7 @@ const PharmacyModal = ({ setPharmacyMode, setPharmacyModeProceed }) => {
           <label
             className={`flex items-center p-3 border rounded-lg cursor-pointer text-sm ${
               selectedOption === "upload"
-                ? "border-[#0000FF]"
+                ? "border-docuhealth-blue"
                 : "border-gray-300"
             }`}
           >
@@ -65,7 +65,7 @@ const PharmacyModal = ({ setPharmacyMode, setPharmacyModeProceed }) => {
 
           <label
             className={`flex items-center p-3 border rounded-lg cursor-pointer text-sm ${
-              selectedOption === "reset" ? "border-[#0000FF]" : "border-gray-300"
+              selectedOption === "reset" ? "border-docuhealth-blue" : "border-gray-300"
             }`}
           >
             <input
@@ -82,7 +82,7 @@ const PharmacyModal = ({ setPharmacyMode, setPharmacyModeProceed }) => {
 
         <button
             onClick={handleProceed}
-          className=" mt-5 w-full bg-[#0000FF] text-white py-2 rounded-full transition"
+          className=" mt-5 w-full bg-docuhealth-blue text-white py-2 rounded-full transition"
         >
           Proceed
         </button>

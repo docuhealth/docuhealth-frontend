@@ -164,7 +164,7 @@ const Hospital_Onboarding = () => {
         if (score <= 3)
             return { strength: score, label: "Fair", color: "bg-yellow-500" };
         if (score <= 4)
-            return { strength: score, label: "Good", color: "bg-[#3E4095]" };
+            return { strength: score, label: "Good", color: "bg-docuhealth-primary" };
         return { strength: score, label: "Strong", color: "bg-green-500" };
     };
 
@@ -254,7 +254,7 @@ const Hospital_Onboarding = () => {
                 <div className="  w-1/2 h-full overflow-y-scroll hide-scrollbar flex-1 ">
                     <div className="hidden sm:flex flex-col  items-start justify-center  py-10 ">
                         <Link to="/">
-                            <div className="pl-10 pb-10 flex gap-1 items-center font-semibold text-[#3E4095]">
+                            <div className="pl-10 pb-10 flex gap-1 items-center font-semibold text-docuhealth-primary">
                                 <img src={docuhealth_logo} alt="Logo" className="w-6" />
                                 <h1 className="text-xl">DocuHealth</h1>
                             </div>
@@ -276,7 +276,7 @@ const Hospital_Onboarding = () => {
                                             <div className="relative">
                                                 <input
                                                     type="email"
-                                                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                                                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                                                     value={email}
                                                     onChange={(e) => setEmail(e.target.value.toLowerCase())}
                                                     required
@@ -290,7 +290,7 @@ const Hospital_Onboarding = () => {
                                             <div className="relative">
                                                 <input
                                                     type="text"
-                                                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                                     placeholder="e.g Jarus Hospital"
                                                     value={name}
                                                     onChange={(e) => setName(e.target.value)}
@@ -305,7 +305,7 @@ const Hospital_Onboarding = () => {
                                             <div className="relative">
                                                 <input
                                                     type="number"
-                                                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                    className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                                     value={phone_num}
                                                     onChange={(e) => setPhone_Num(e.target.value)}
                                                     required
@@ -319,7 +319,7 @@ const Hospital_Onboarding = () => {
                                                 <input
                                                     type={showPassword ? "text" : "password"}
                                                     placeholder=""
-                                                    className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${password && !isPasswordValid
+                                                    className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary ${password && !isPasswordValid
                                                         ? "focus:border-red-500"
                                                         : ""
                                                         }`}
@@ -468,7 +468,7 @@ const Hospital_Onboarding = () => {
                                                 <input
                                                     type={showPassword ? "text" : "password"}
                                                     placeholder=""
-                                                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                                                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                                                     value={confirmPassword}
                                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                                     required
@@ -494,7 +494,7 @@ const Hospital_Onboarding = () => {
                                                 email && name &&
                                                 confirmPassword &&
                                                 password === confirmPassword
-                                                ? "bg-[#3E4095] text-white"
+                                                ? "bg-docuhealth-primary text-white"
                                                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                                 }`}
                                             disabled={
@@ -529,7 +529,7 @@ const Hospital_Onboarding = () => {
                                             <p className="font-semibold pb-1">Country :</p>
                                             <div className="relative w-full">
                                                 <select
-                                                    className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-[#3E4095] outline-hidden appearance-none pr-10"
+                                                    className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-docuhealth-primary outline-hidden appearance-none pr-10"
                                                     value={country}
                                                     onChange={(e) => 
                                                     {
@@ -643,7 +643,7 @@ const Hospital_Onboarding = () => {
                                             <div className="relative">
                                                 <input
                                                     type="text"
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                                     placeholder="e.g olorunda street"
                                                     value={street}
                                                     onChange={(e) => setStreet(e.target.value)}
@@ -658,7 +658,7 @@ const Hospital_Onboarding = () => {
                                             <div className="relative">
                                                 <input
                                                     type="text"
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                                     placeholder="e.g No. 1234"
                                                     value={houseNO}
                                                     onChange={(e) => setHouseNO(e.target.value)}
@@ -675,7 +675,7 @@ const Hospital_Onboarding = () => {
                                                 street &&
                                                 houseNO &&
                                                 !isSubmitting
-                                                ? "bg-[#3E4095] text-white "
+                                                ? "bg-docuhealth-primary text-white "
                                                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                                 } `}
                                             disabled={
@@ -706,7 +706,7 @@ const Hospital_Onboarding = () => {
 
             <div className="h-screen sm:hidden">
                 <div className="h-full overflow-y-scroll hide-scrollbar py-10">
-                    <div className="pl-5 flex gap-1 items-center font-semibold text-[#3E4095]">
+                    <div className="pl-5 flex gap-1 items-center font-semibold text-docuhealth-primary">
                         <img src={docuhealth_logo} alt="Logo" className="w-6" />
                         <h1 className="text-xl">DocuHealth</h1>
                     </div>
@@ -727,7 +727,7 @@ const Hospital_Onboarding = () => {
                                         <div className="relative">
                                             <input
                                                 type="email"
-                                                className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                                                className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value.toLowerCase())}
                                                 required
@@ -741,7 +741,7 @@ const Hospital_Onboarding = () => {
                                         <div className="relative">
                                             <input
                                                 type="text"
-                                                className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                                 placeholder="e.g Jarus Hospital"
                                                 value={name}
                                                 onChange={(e) => setName(e.target.value)}
@@ -756,7 +756,7 @@ const Hospital_Onboarding = () => {
                                         <div className="relative">
                                             <input
                                                 type="number"
-                                                className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                                 value={phone_num}
                                                 onChange={(e) => setPhone_Num(e.target.value)}
                                                 required
@@ -770,7 +770,7 @@ const Hospital_Onboarding = () => {
                                             <input
                                                 type={showPassword ? "text" : "password"}
                                                 placeholder=""
-                                                className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${password && !isPasswordValid
+                                                className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary ${password && !isPasswordValid
                                                     ? "focus:border-red-500"
                                                     : ""
                                                     }`}
@@ -919,7 +919,7 @@ const Hospital_Onboarding = () => {
                                             <input
                                                 type={showPassword ? "text" : "password"}
                                                 placeholder=""
-                                                className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                                                className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                                                 value={confirmPassword}
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                                 required
@@ -945,7 +945,7 @@ const Hospital_Onboarding = () => {
                                             email &&
                                             confirmPassword &&
                                             password === confirmPassword
-                                            ? "bg-[#3E4095] text-white"
+                                            ? "bg-docuhealth-primary text-white"
                                             : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                             }`}
                                         disabled={
@@ -980,7 +980,7 @@ const Hospital_Onboarding = () => {
                                         <p className="font-semibold pb-1">Country :</p>
                                         <div className="relative w-full">
                                             <select
-                                                className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-[#3E4095] outline-hidden appearance-none pr-10"
+                                                className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-docuhealth-primary outline-hidden appearance-none pr-10"
                                                 value={country}
                                                 onChange={(e) => setCountry(e.target.options[e.target.selectedIndex].text)}
                                                 required
@@ -1090,7 +1090,7 @@ const Hospital_Onboarding = () => {
                                         <div className="relative">
                                             <input
                                                 type="text"
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                                 placeholder="e.g olorunda street"
                                                 value={street}
                                                 onChange={(e) => setStreet(e.target.value)}
@@ -1105,7 +1105,7 @@ const Hospital_Onboarding = () => {
                                         <div className="relative">
                                             <input
                                                 type="text"
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                                 placeholder="e.g No. 1234"
                                                 value={houseNO}
                                                 onChange={(e) => setHouseNO(e.target.value)}
@@ -1122,7 +1122,7 @@ const Hospital_Onboarding = () => {
                                             street &&
                                             houseNO &&
                                             !isSubmitting
-                                            ? "bg-[#3E4095] text-white "
+                                            ? "bg-docuhealth-primary text-white "
                                             : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                             } `}
                                         disabled={

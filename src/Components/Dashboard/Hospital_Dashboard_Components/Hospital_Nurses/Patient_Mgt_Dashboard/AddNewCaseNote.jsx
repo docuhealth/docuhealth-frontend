@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInputs, handleAddListItem, handleRemoveItem, activeInput, setActiveInput }) => (
     <div className="border rounded-md p-4 mt-3 bg-gray-50/30">
-        <p className="font-medium text-[#1B2B40] mb-2">{title}</p>
+        <p className="font-medium text-docuhealth-dark mb-2">{title}</p>
 
         <div className="space-y-2 max-h-[200px] overflow-y-auto mb-2">
             {caseNoteData[field].map((item, idx) => (
@@ -27,16 +27,16 @@ const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInput
                     value={inputs[field]}
                     onChange={(e) => setInputs({ ...inputs, [field]: e.target.value })}
                     placeholder={placeholder}
-                    className="flex-1 border rounded p-2 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none"
+                    className="flex-1 border rounded p-2 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none"
                 />
-                <button type="button" onClick={() => handleAddListItem(field)} className="bg-[#3E4095] text-white px-3 py-1 rounded text-[12px]">Add</button>
+                <button type="button" onClick={() => handleAddListItem(field)} className="bg-docuhealth-primary text-white px-3 py-1 rounded text-[12px]">Add</button>
                 <button type="button" onClick={() => setActiveInput(null)} className="text-gray-500 text-[12px]">Cancel</button>
             </div>
         ) : (
             <button
                 type="button"
                 onClick={() => setActiveInput(field)}
-                className="flex items-center gap-1 text-[#3E4095] font-medium text-[12px]"
+                className="flex items-center gap-1 text-docuhealth-primary font-medium text-[12px]"
             >
                 <span className="text-lg">+</span> Add Entry
             </button>
@@ -180,7 +180,7 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
         <div className="bg-white my-5 border rounded-lg pt-5 lg:pt-8 px-4 lg:px-6  pb-8 text-sm ">
             <div className='flex items-center justify-between border-b pb-3'>
                 <div className='flex items-center gap-2 cursor-pointer' onClick={() => setNewCaseNote(false)}>
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4.56528 6.41685H11.6654V7.58352H4.56528L7.69426 10.7125L6.86932 11.5374L2.33203 7.00019L6.86932 2.46289L7.69426 3.28785L4.56528 6.41685Z" fill="#1B2B40" /></svg>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4.56528 6.41685H11.6654V7.58352H4.56528L7.69426 10.7125L6.86932 11.5374L2.33203 7.00019L6.86932 2.46289L7.69426 3.28785L4.56528 6.41685Z" fill="var(--color-docuhealth-dark)" /></svg>
                     <p className="font-medium">New Case Note</p>
                 </div>
             </div>
@@ -197,7 +197,7 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
                 <button
                     onClick={handleSubmit}
                     disabled={isPending}
-                    className={`w-full lg:w-auto bg-[#3E4095] text-white py-2.5 px-20 rounded-full mt-5 text-sm cursor-pointer transition-opacity ${isPending ? 'opacity-50' : 'opacity-100'}`}
+                    className={`w-full lg:w-auto bg-docuhealth-primary text-white py-2.5 px-20 rounded-full mt-5 text-sm cursor-pointer transition-opacity ${isPending ? 'opacity-50' : 'opacity-100'}`}
                 >
                     {isPending ? "Uploading..." : "Upload Case Note"}
                 </button>

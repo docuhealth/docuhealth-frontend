@@ -29,7 +29,7 @@ const Patient_Appointments_Dashboard = () => {
           <div className="relative w-full sm:w-auto">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="flex justify-center  items-center gap-2 px-6 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full hover:bg-blue-50 transition w-full "
+              className="flex justify-center  items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary font-medium rounded-full hover:bg-blue-50 transition w-full "
             >
               Sort by: {selected}
               <ChevronDown

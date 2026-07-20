@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 
 const PharmacyResetMessage = ({setIsPharmacyReset}) => {
     return (
-         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 text-[#1B2B40]">
+         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 text-docuhealth-dark">
                <div className="bg-white  max-w-96 relative w-full p-5 mx-3">
                  <div className="flex flex-row-reverse pb-5 ">
                    <button

@@ -78,7 +78,7 @@ const Partner_Home_Dashboard = () => {
     <div className="min-h-screen bg-gray-50 font-sans">
       {/* Navbar */}
       <nav className="bg-white border-b px-6 py-4 flex justify-between items-center">
-        <div className="   flex gap-1 items-center font-semibold  text-[#3E4095]">
+        <div className="   flex gap-1 items-center font-semibold  text-docuhealth-primary">
           <img src={docuhealth_logo} alt="Logo" className="w-6" />
           <h1 className="text-xl">DocuHealth</h1>
         </div>
@@ -117,7 +117,7 @@ const Partner_Home_Dashboard = () => {
                 </div>
               ) : (
                 <div className="flex items-center bg-gray-50 border rounded-lg px-4 py-2">
-                  <code className="flex-1 text-[#3E4095] font-mono font-medium">
+                  <code className="flex-1 text-docuhealth-primary font-mono font-medium">
                     {data?.client_id}
                   </code>
                 </div>
@@ -134,7 +134,7 @@ const Partner_Home_Dashboard = () => {
               </p>
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="flex justify-center items-center gap-2 bg-[#3E4095] text-white px-6 py-2.5 rounded-full transition-all text-sm font-semibold w-full lg:w-auto cursor-pointer "
+                className="flex justify-center items-center gap-2 bg-docuhealth-primary text-white px-6 py-2.5 rounded-full transition-all text-sm font-semibold w-full lg:w-auto cursor-pointer "
               >
                 <FaSyncAlt className="text-xs" /> Rotate Credentials
               </button>
@@ -143,10 +143,10 @@ const Partner_Home_Dashboard = () => {
         </div>
 
         {/* Support Section */}
-        <div className="my-10 p-6 bg-[#3E4095]/5 border border-[#3E4095]/10 rounded-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="my-10 p-6 bg-docuhealth-primary/5 border border-docuhealth-primary/10 rounded-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row items-start md:items-center gap-4">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm">
-              <FaEnvelope className="text-[#3E4095] text-xl" />
+              <FaEnvelope className="text-docuhealth-primary text-xl" />
             </div>
             <div>
               <h4 className="font-semibold text-gray-800">Got an issue?</h4>
@@ -157,7 +157,7 @@ const Partner_Home_Dashboard = () => {
           </div>
           <a
             href="mailto:admin@docuhealthservices.net"
-            className="bg-white border border-[#3E4095] text-[#3E4095] px-6 py-2 rounded-full font-semibold hover:bg-[#3E4095] hover:text-white transition-all duration-300 text-sm text-center w-full md:w-auto"
+            className="bg-white border border-docuhealth-primary text-docuhealth-primary px-6 py-2 rounded-full font-semibold hover:bg-docuhealth-primary hover:text-white transition-all duration-300 text-sm text-center w-full md:w-auto"
           >
             admin@docuhealthservices.net
           </a>
@@ -187,7 +187,7 @@ const Partner_Home_Dashboard = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg outline-none focus:border-[#3E4095]"
+                  className="w-full px-4 py-2 border rounded-lg outline-none focus:border-docuhealth-primary"
                   placeholder="••••••••"
                 />
               </div>
@@ -253,7 +253,7 @@ const Partner_Home_Dashboard = () => {
 
             <button
               onClick={() => setShowSuccessModal(false)}
-              className="w-full mt-8 bg-[#3E4095] text-white py-2.5 rounded-full transition-all text-sm cursor-pointer"
+              className="w-full mt-8 bg-docuhealth-primary text-white py-2.5 rounded-full transition-all text-sm cursor-pointer"
             >
               I've saved my key, Close
             </button>

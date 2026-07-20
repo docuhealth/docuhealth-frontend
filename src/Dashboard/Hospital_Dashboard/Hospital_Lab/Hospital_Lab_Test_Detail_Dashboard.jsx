@@ -178,7 +178,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
     <div className="mt-6 border border-gray-200 rounded-xl overflow-hidden shadow-sm">
       <div className="bg-gray-50 border-b border-gray-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h3 className="text-base font-bold text-[#1B2B40]">{item.test_info?.name || "Unknown Test"}</h3>
+          <h3 className="text-base font-bold text-docuhealth-dark">{item.test_info?.name || "Unknown Test"}</h3>
           <p className="text-xs font-medium text-gray-500 mt-1">
             Status: <span className={`font-semibold ${statusStyle.color}`}>{statusStyle.label}</span>
           </p>
@@ -197,7 +197,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
               <button
                 onClick={() => setShowAcceptModal(true)}
                 disabled={acceptMutation.isPending || rejectMutation.isPending}
-                className="w-full sm:w-auto border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 py-2 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50"
+                className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary text-xs font-medium px-4 py-2 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50"
               >
                 Accept
               </button>
@@ -208,14 +208,14 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
             <>
               <button
                 onClick={() => setShowSampleModal(true)}
-                className="w-full sm:w-auto border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 py-2 rounded-full hover:bg-indigo-50 transition-colors"
+                className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary text-xs font-medium px-4 py-2 rounded-full hover:bg-indigo-50 transition-colors"
               >
                 {sampleLogged ? "Edit sample" : "Log sample"}
               </button>
               <button
                 onClick={() => navigate("/hospital-lab-upload-result", { state: { order, item } })}
                 disabled={!sampleLogged}
-                className="w-full sm:w-auto bg-[#3E4095] text-white text-xs font-medium px-4 py-2 rounded-full hover:bg-[#2e3070] transition-colors disabled:opacity-40"
+                className="w-full sm:w-auto bg-docuhealth-primary text-white text-xs font-medium px-4 py-2 rounded-full hover:bg-docuhealth-dark-primary transition-colors disabled:opacity-40"
               >
                 Upload result
               </button>
@@ -239,7 +239,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
                 disabled={displayStatus === "rejected" || displayStatus === "accepted" || displayStatus === "approved"}
                 className={`w-full sm:w-auto text-xs font-medium px-4 py-2 rounded-full transition-colors ${
                   displayStatus === "rejected" || displayStatus === "accepted" || displayStatus === "approved"
-                    ? "bg-[#b1b2d4] text-white cursor-not-allowed" : "bg-[#3E4095] text-white hover:bg-[#2e3070]"
+                    ? "bg-docuhealth-primary-soft text-white cursor-not-allowed" : "bg-docuhealth-primary text-white hover:bg-docuhealth-dark-primary"
                 }`}
               >
                 Accept result
@@ -254,7 +254,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="text-xs text-gray-500 mb-1">Specimen needed:</p>
-              <p className="text-sm font-semibold text-[#3E4095]">{specimenLabel}</p>
+              <p className="text-sm font-semibold text-docuhealth-primary">{specimenLabel}</p>
             </div>
             {item.test_info?.special_instructions && (
               <div>
@@ -278,7 +278,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
                 <p className="text-sm font-bold text-gray-800 mb-4">Results</p>
                 <div className="hidden lg:block overflow-x-auto">
                   <div className="min-w-[600px] flex flex-col border border-gray-200 rounded-lg overflow-hidden">
-                    <div className="grid grid-cols-4 text-left text-sm font-semibold text-gray-700 bg-[#F8F9FA] py-3 px-4 border-b border-gray-200">
+                    <div className="grid grid-cols-4 text-left text-sm font-semibold text-gray-700 bg-docuhealth-bg-offwhite py-3 px-4 border-b border-gray-200">
                       <p>Test Parameter</p>
                       <p>Result</p>
                       <p>Reference range</p>
@@ -377,14 +377,14 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
             </p>
             <button
               onClick={() => { setFromAccept(true); setShowAcceptModal(false); setShowSampleModal(true); }}
-              className="w-full bg-[#3E4095] text-white text-sm font-medium py-3 rounded-full transition-colors"
+              className="w-full bg-docuhealth-primary text-white text-sm font-medium py-3 rounded-full transition-colors"
             >
               Accept &amp; Log sample collection now
             </button>
             <button
               onClick={() => acceptMutation.mutate()}
               disabled={acceptMutation.isPending}
-              className="w-full border border-[#3E4095] text-[#3E4095] text-sm font-medium py-3 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50"
+              className="w-full border border-docuhealth-primary text-docuhealth-primary text-sm font-medium py-3 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50"
             >
               {acceptMutation.isPending ? "Accepting..." : "Accept & Log sample collection Later"}
             </button>
@@ -412,7 +412,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
                   type="date"
                   value={sampleDate}
                   onChange={(e) => setSampleDate(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#3E4095]"
+                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-docuhealth-primary"
                 />
               </div>
               <div className="flex flex-col gap-1.5 flex-1">
@@ -421,7 +421,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
                   type="time"
                   value={sampleTime}
                   onChange={(e) => setSampleTime(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#3E4095]"
+                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-docuhealth-primary"
                 />
               </div>
             </div>
@@ -429,7 +429,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
             <button
               onClick={handleSampleSubmit}
               disabled={!sampleDate || !sampleTime || specimenMutation.isPending || acceptMutation.isPending}
-              className="w-full bg-[#3E4095] text-white text-sm font-semibold py-2.5 rounded-full disabled:opacity-50"
+              className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-2.5 rounded-full disabled:opacity-50"
             >
               {(specimenMutation.isPending || acceptMutation.isPending) ? "Saving..." : "Update entry"}
             </button>
@@ -486,7 +486,7 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
   if (orderLoading && !isDirectOrder) {
     return (
       <div className="flex items-center justify-center py-24 text-gray-400 text-sm">
-        <div className="w-5 h-5 border-2 border-[#3E4095] border-t-transparent rounded-full animate-spin mr-3" />
+        <div className="w-5 h-5 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin mr-3" />
         Loading order...
       </div>
     );
@@ -501,7 +501,7 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
       <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-5 py-4 flex items-center gap-3">
         <button
           onClick={() => onBackProp ? onBackProp() : navigate(-1)}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#3E4095] transition-colors w-fit"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-docuhealth-primary transition-colors w-fit"
         >
           <ArrowLeft size={16} />
           Lab Order Details

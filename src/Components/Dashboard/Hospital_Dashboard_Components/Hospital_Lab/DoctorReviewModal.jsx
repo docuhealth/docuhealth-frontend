@@ -15,9 +15,9 @@ const DoctorReviewModal = ({ isOpen, onClose, onConfirm, isPending, type }) => {
           <X size={16} />
         </button>
 
-        <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center mb-4 ${isApprove ? 'border-[#1B2B40]' : 'border-red-500'}`}>
+        <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center mb-4 ${isApprove ? 'border-docuhealth-dark' : 'border-red-500'}`}>
           {isApprove ? (
-            <Info size={22} className="text-[#1B2B40]" />
+            <Info size={22} className="text-docuhealth-dark" />
           ) : (
             <AlertTriangle size={22} className="text-red-500" />
           )}
@@ -39,7 +39,7 @@ const DoctorReviewModal = ({ isOpen, onClose, onConfirm, isPending, type }) => {
           onClick={onConfirm}
           disabled={isPending}
           className={`w-full text-white text-sm font-semibold py-3 rounded-full transition-colors disabled:opacity-60 flex items-center justify-center gap-2 ${
-            isApprove ? "bg-[#3E4095] hover:bg-[#2e3070]" : "bg-red-500 hover:bg-red-600"
+            isApprove ? "bg-docuhealth-primary hover:bg-docuhealth-dark-primary" : "bg-red-500 hover:bg-red-600"
           }`}
         >
           {isPending ? (

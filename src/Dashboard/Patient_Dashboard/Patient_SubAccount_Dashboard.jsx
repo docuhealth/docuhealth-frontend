@@ -330,7 +330,7 @@ const Patient_SubAccount_Dashboard = () => {
 
         <div>
           <button
-            className="flex justify-center items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition w-full cursor-pointer "
+            className="flex justify-center items-center gap-2 px-6 py-2 bg-docuhealth-primary text-white font-medium rounded-full transition w-full cursor-pointer "
             onClick={toggleAcctCreationOverlay}
             disabled={subAcctCreationMutation.isPending}
           >

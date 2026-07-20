@@ -58,7 +58,7 @@ const ImageCustomization = ({ onClose }) => {
       <div className="bg-white w-full max-w-lg rounded-lg shadow overflow-hidden">
         {/* Header */}
         <div className="flex justify-between items-center p-5 border-b">
-          <h3 className="text-md font-medium  text-[#3E4095]">Display Customization</h3>
+          <h3 className="text-md font-medium  text-docuhealth-primary">Display Customization</h3>
           <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
             <X size={16} className="text-gray-500" />
           </button>
@@ -114,7 +114,7 @@ const ImageCustomization = ({ onClose }) => {
              <button
               onClick={handleSubmit}
               disabled={isPending || (!payload.bg_image && !payload.profile_image)}
-              className="flex-2 py-2.5 bg-[#3E4095] text-white rounded-full font-medium flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all "
+              className="flex-2 py-2.5 bg-docuhealth-primary text-white rounded-full font-medium flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all "
             >
               {isPending ? (
                 <>

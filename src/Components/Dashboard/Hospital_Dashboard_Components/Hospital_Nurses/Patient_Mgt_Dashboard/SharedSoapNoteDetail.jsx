@@ -28,7 +28,7 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
       </div>
       
       {/* Basic Info */}
-      <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+      <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
         <p className="text-[12px] mb-4">
           {" "}
           Patient's name :{" "}
@@ -127,8 +127,8 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
 
       {/* Vital Signs */}
       {vitals && (
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-          <p className="font-medium mb-4 text-[#1B2B40]">Vital Signs</p>
+        <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+          <p className="font-medium mb-4 text-docuhealth-dark">Vital Signs</p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div className="text-[12px]">
               <h4 className="text-gray-400 font-normal mb-1">Blood Pressure:</h4>
@@ -159,8 +159,8 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
       )}
 
       {/* Clinical Summary */}
-      <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-        <p className="font-medium mb-4 text-[#1B2B40]">Clinical Summary</p>
+      <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+        <p className="font-medium mb-4 text-docuhealth-dark">Clinical Summary</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="text-[12px]">
@@ -171,7 +171,7 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
           </div>
           <div className="text-[12px]">
             <h4 className="text-gray-400 font-normal mb-1">Primary Diagnosis:</h4>
-            <p className="font-medium text-[#3E4095]">
+            <p className="font-medium text-docuhealth-primary">
               {sharedSoapNoteDetail?.primary_diagnosis || "NIL"}
             </p>
           </div>
@@ -179,8 +179,8 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
       </div>
 
       {/* Drug Records */}
-      <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-        <p className="font-medium mb-4 text-[#1B2B40]">Medication / Drug Records</p>
+      <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+        <p className="font-medium mb-4 text-docuhealth-dark">Medication / Drug Records</p>
         
         <div className="overflow-x-auto">
           {sharedSoapNoteDetail?.drug_records?.length > 0 ? (
@@ -198,7 +198,7 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
               <tbody className="text-[12px]">
                 {sharedSoapNoteDetail.drug_records.map((drug, index) => (
                   <tr key={index} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
-                    <td className="py-3 font-medium text-[#3E4095]">
+                    <td className="py-3 font-medium text-docuhealth-primary">
                       {drug.name}
                     </td>
                     <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
@@ -228,15 +228,15 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
 
       {/* Care Instructions & Treatment Plan */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-          <p className="font-medium mb-4 text-[#1B2B40]">Care Instructions</p>
+        <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+          <p className="font-medium mb-4 text-docuhealth-dark">Care Instructions</p>
           <div className="text-[12px] text-gray-700">
             {renderListOrString(sharedSoapNoteDetail?.care_instructions)}
           </div>
         </div>
 
-        <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-          <p className="font-medium mb-4 text-[#1B2B40]">Treatment Plan</p>
+        <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+          <p className="font-medium mb-4 text-docuhealth-dark">Treatment Plan</p>
           <div className="text-[12px] text-gray-700">
             {renderListOrString(sharedSoapNoteDetail?.treatment_plan)}
           </div>
@@ -244,8 +244,8 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
       </div>
 
       {/* Uploaded Documents */}
-      <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-        <p className="font-medium mb-4 text-[#1B2B40]">
+      <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+        <p className="font-medium mb-4 text-docuhealth-dark">
           Uploaded Documents / Images
         </p>
         <div>
@@ -272,8 +272,8 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
                   className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 sm:items-center bg-white border rounded-lg px-4 py-3 mb-3 "
                 >
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-[12px]">
-                    <div className="p-2 bg-[#3E4095]/10 rounded-md">
-                      <Icon className="text-[#3E4095]" size={20} />
+                    <div className="p-2 bg-docuhealth-primary/10 rounded-md">
+                      <Icon className="text-docuhealth-primary" size={20} />
                     </div>
                     <div>
                       <p className="font-medium text-gray-800">
@@ -290,7 +290,7 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
                       href={fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-1 border border-[#3E4095] text-[#3E4095] rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28"
+                      className="flex items-center justify-center gap-1 border border-docuhealth-primary text-docuhealth-primary rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28"
                     >
                       <Eye className="w-3 h-3" />
                       View
@@ -298,7 +298,7 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
                     <a
                       href={fileUrl}
                       download
-                      className="flex items-center justify-center gap-1 bg-[#3E4095] text-white rounded-full font-medium hover:bg-[#2e3070] transition py-1 px-3 w-full sm:w-28"
+                      className="flex items-center justify-center gap-1 bg-docuhealth-primary text-white rounded-full font-medium hover:bg-docuhealth-dark-primary transition py-1 px-3 w-full sm:w-28"
                     >
                       <ArrowDownToLine className="w-3 h-3" />
                       Download
@@ -314,8 +314,8 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
       </div>
 
       {/* Additional Notes */}
-      <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-        <p className="font-medium mb-4 text-[#1B2B40]">Additional Notes</p>
+      <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+        <p className="font-medium mb-4 text-docuhealth-dark">Additional Notes</p>
         <div className="text-[12px] text-gray-700">
           {sharedSoapNoteDetail?.additional_notes?.length > 0 ? (
             <ul className="list-disc pl-5 space-y-1">
@@ -335,8 +335,8 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
       {renderLabTests(sharedSoapNoteDetail?.lab_tests_info)}
 
       {/* Follow Up / Appointment */}
-      <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-        <p className="font-medium mb-4 text-[#1B2B40]">
+      <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+        <p className="font-medium mb-4 text-docuhealth-dark">
           Follow Up / Appointment
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">

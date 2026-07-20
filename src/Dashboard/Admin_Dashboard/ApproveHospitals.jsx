@@ -86,7 +86,7 @@ const ApproveHospitals = () => {
         return (
             <>
                 <div className="flex justify-end items-end mr-10 mt-10 ">
-                    <p className="rounded-full py-2 px-8 text-sm bg-[#3E4095] text-white cursor-pointer"
+                    <p className="rounded-full py-2 px-8 text-sm bg-docuhealth-primary text-white cursor-pointer"
                         onClick={handleLogout}
                     >Log Out</p>
                 </div>
@@ -104,7 +104,7 @@ const ApproveHospitals = () => {
     return (
         <>
             <div className="flex justify-end items-end mr-10 mt-10 ">
-                <p className="rounded-full py-2 px-8 text-sm bg-[#3E4095] text-white cursor-pointer"
+                <p className="rounded-full py-2 px-8 text-sm bg-docuhealth-primary text-white cursor-pointer"
                     onClick={handleLogout}
                 >Log Out</p>
             </div>

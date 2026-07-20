@@ -121,21 +121,21 @@ const Hospital_Lab_Appointments_Dashboard = () => {
             {appointmentType !== 'history' && (
               <button
                 onClick={() => setAppointmentType('history')}
-                className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+                className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
                 View past appointments
               </button>
             )}
             {appointmentType !== 'today' && (
               <button
                 onClick={() => setAppointmentType('today')}
-                className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+                className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
                 View today's appointments
               </button>
             )}
             {appointmentType !== 'upcoming' && (
               <button
                 onClick={() => setAppointmentType('upcoming')}
-                className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+                className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
                 View upcoming appointments
               </button>
             )}
@@ -154,7 +154,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095]"
+                  className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-docuhealth-primary focus:border-docuhealth-primary"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -163,7 +163,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095]"
+                  className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-docuhealth-primary focus:border-docuhealth-primary"
                 />
               </div>
               {(dateFrom || dateTo) && (

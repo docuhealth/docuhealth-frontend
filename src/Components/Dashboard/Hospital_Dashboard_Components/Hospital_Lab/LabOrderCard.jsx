@@ -92,7 +92,7 @@ const LabOrderCard = ({ order, badge, activeTab }) => {
             },
           })
         }
-        className="mt-2 w-full border border-[#3E4095] text-[#3E4095] text-xs font-medium py-2 rounded-full hover:bg-indigo-50 transition-colors"
+        className="mt-2 w-full border border-docuhealth-primary text-docuhealth-primary text-xs font-medium py-2 rounded-full hover:bg-indigo-50 transition-colors"
       >
         View details
       </button>

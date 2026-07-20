@@ -40,14 +40,14 @@ const Hospital_Nurses_Home_Dashboard = () => {
               {selectedPatient && (
                 <div className="grid grid-cols-1 w-full lg:w-auto lg:flex lg:items-center gap-3">
                   <button
-                    className="py-2 px-10 lg:w-60 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer"
+                    className="py-2 px-10 lg:w-60 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer"
                     onClick={() => setCheckAdditionalNote(true)}
                   >
                     Check additional note
                   </button>
 
                   <button
-                    className="py-2.5 px-10 lg:w-60 rounded-full bg-[#3E4095] text-white cursor-pointer"
+                    className="py-2.5 px-10 lg:w-60 rounded-full bg-docuhealth-primary text-white cursor-pointer"
                     onClick={() => {
                       setVitals(false)
                       setProcessVitals(true)
@@ -81,7 +81,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
                             </div>
                             <div className="flex flex-col justify-center items-center">
                               <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20.0007 36.6654C10.7959 36.6654 3.33398 29.2034 3.33398 19.9987C3.33398 10.7939 10.7959 3.33203 20.0007 3.33203C29.2053 3.33203 36.6673 10.7939 36.6673 19.9987C36.6673 29.2034 29.2053 36.6654 20.0007 36.6654ZM20.0007 33.332C27.3645 33.332 33.334 27.3625 33.334 19.9987C33.334 12.6349 27.3645 6.66536 20.0007 6.66536C12.6369 6.66536 6.66732 12.6349 6.66732 19.9987C6.66732 27.3625 12.6369 33.332 20.0007 33.332ZM21.6673 17.4987V24.9987H23.334V28.332H16.6673V24.9987H18.334V20.832H16.6673V17.4987H21.6673ZM22.5007 13.332C22.5007 14.7127 21.3813 15.832 20.0007 15.832C18.62 15.832 17.5007 14.7127 17.5007 13.332C17.5007 11.9513 18.62 10.832 20.0007 10.832C21.3813 10.832 22.5007 11.9513 22.5007 13.332Z" fill="#1B2B40" />
+                                <path d="M20.0007 36.6654C10.7959 36.6654 3.33398 29.2034 3.33398 19.9987C3.33398 10.7939 10.7959 3.33203 20.0007 3.33203C29.2053 3.33203 36.6673 10.7939 36.6673 19.9987C36.6673 29.2034 29.2053 36.6654 20.0007 36.6654ZM20.0007 33.332C27.3645 33.332 33.334 27.3625 33.334 19.9987C33.334 12.6349 27.3645 6.66536 20.0007 6.66536C12.6369 6.66536 6.66732 12.6349 6.66732 19.9987C6.66732 27.3625 12.6369 33.332 20.0007 33.332ZM21.6673 17.4987V24.9987H23.334V28.332H16.6673V24.9987H18.334V20.832H16.6673V17.4987H21.6673ZM22.5007 13.332C22.5007 14.7127 21.3813 15.832 20.0007 15.832C18.62 15.832 17.5007 14.7127 17.5007 13.332C17.5007 11.9513 18.62 10.832 20.0007 10.832C21.3813 10.832 22.5007 11.9513 22.5007 13.332Z" fill="var(--color-docuhealth-dark)" />
                               </svg>
                               <p className="pt-0.5 font-medium">Additional Info</p>
 
@@ -92,7 +92,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
                             '>
                               {selectedPatient.note}
                             </div>
-                            <button className='w-full rounded-full text-center mt-3 py-2 bg-[#3E4095] cursor-pointer text-white ' onClick={() => setCheckAdditionalNote(false)}>
+                            <button className='w-full rounded-full text-center mt-3 py-2 bg-docuhealth-primary cursor-pointer text-white ' onClick={() => setCheckAdditionalNote(false)}>
                               Done
                             </button>
                           </div>
@@ -136,7 +136,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
           </div>
         </div>
               <div className='text-sm grid grid-cols-1 lg:flex lg:justify-end lg:items-center gap-2 lg:gap-5 mt-5'>
-                <button className='bg-[#3E4095] text-white cursor-pointer py-2.5 px-12 rounded-full' onClick={() => {
+                <button className='bg-docuhealth-primary text-white cursor-pointer py-2.5 px-12 rounded-full' onClick={() => {
                   setVitals(true)
                 }}>
                   Assigned for vitals
@@ -145,7 +145,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
               <div className='bg-white rounded-xl border mt-5 p-5 text-sm text-gray-700'>
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
                   <div className=' flex items-center gap-2 bg-blue-50 p-3 rounded-md'>
-                    <div className='bg-[#3E4095] p-2 rounded-full'>
+                    <div className='bg-docuhealth-primary p-2 rounded-full'>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M22 11V20H20V17H4V20H2V4H4V14H12V7H18C20.2091 7 22 8.79086 22 11ZM20 14V11C20 9.89543 19.1046 9 18 9H14V14H20ZM8 11C8.55228 11 9 10.5523 9 10C9 9.44772 8.55228 9 8 9C7.44772 9 7 9.44772 7 10C7 10.5523 7.44772 11 8 11ZM8 13C6.34315 13 5 11.6569 5 10C5 8.34315 6.34315 7 8 7C9.65685 7 11 8.34315 11 10C11 11.6569 9.65685 13 8 13Z" fill="white" />
                       </svg>
@@ -153,14 +153,14 @@ const Hospital_Nurses_Home_Dashboard = () => {
                     </div>
                     <div>
                       <p className='text-xs'>Beds Available / Total Beds</p>
-                      <p className="text-[#3E4095] font-semibold text-lg">
+                      <p className="text-docuhealth-primary font-semibold text-lg">
                         {(wardInfo?.available_beds ?? "NIL")} / {(wardInfo?.total_beds ?? "NIL")} Beds
                       </p>
 
                     </div>
                   </div>
                   <div className=' flex items-center gap-2 bg-purple-100 p-3 rounded-md'>
-                    <div className='bg-[#9000FF] p-2 rounded-full'>
+                    <div className='bg-docuhealth-purple p-2 rounded-full'>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M22 11V20H20V17H4V20H2V4H4V14H12V7H18C20.2091 7 22 8.79086 22 11ZM20 14V11C20 9.89543 19.1046 9 18 9H14V14H20ZM8 11C8.55228 11 9 10.5523 9 10C9 9.44772 8.55228 9 8 9C7.44772 9 7 9.44772 7 10C7 10.5523 7.44772 11 8 11ZM8 13C6.34315 13 5 11.6569 5 10C5 8.34315 6.34315 7 8 7C9.65685 7 11 8.34315 11 10C11 11.6569 9.65685 13 8 13Z" fill="white" />
                       </svg>
@@ -168,7 +168,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
                     </div>
                     <div>
                       <p className='text-xs'>My ward</p>
-                      <p className='text-[#9000FF] font-semibold text-lg'>  {profile?.ward_info?.name
+                      <p className='text-docuhealth-purple font-semibold text-lg'>  {profile?.ward_info?.name
                         ? profile.ward_info.name.charAt(0).toUpperCase() + profile.ward_info.name.slice(1)
                         : "NIL"}{" "}
                         Ward</p>
@@ -183,7 +183,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
                     Patients in my ward
                   </h2>
                   <Link to ='/hospital-nurses-patients-dashboard'>
-                  <p className='text-sm underline text-[#3E4095]'>view all </p>
+                  <p className='text-sm underline text-docuhealth-primary'>view all </p>
                   
                   </Link>
                   </div>

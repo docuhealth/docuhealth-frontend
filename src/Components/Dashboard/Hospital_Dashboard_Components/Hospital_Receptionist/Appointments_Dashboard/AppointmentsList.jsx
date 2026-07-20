@@ -57,21 +57,21 @@ const AppointmentsList = () => {
           {appointmentType !== 'history' && (
             <button
               onClick={() => setAppointmentType('history')}
-              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+              className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
               View past appointments
             </button>
           )}
           {appointmentType !== 'today' && (
             <button
               onClick={() => setAppointmentType('today')}
-              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+              className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
               View today's appointments
             </button>
           )}
           {appointmentType !== 'upcoming' && (
             <button
               onClick={() => setAppointmentType('upcoming')}
-              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+              className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
               View upcoming appointments
             </button>
           )}
@@ -153,21 +153,21 @@ const AppointmentsList = () => {
         {appointmentType !== 'history' && (
           <button
             onClick={() => setAppointmentType('history')}
-            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+            className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
             View past appointments
           </button>
         )}
         {appointmentType !== 'today' && (
           <button
             onClick={() => setAppointmentType('today')}
-            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+            className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
             View today's appointments
           </button>
         )}
         {appointmentType !== 'upcoming' && (
           <button
             onClick={() => setAppointmentType('upcoming')}
-            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+            className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
             View upcoming appointments
           </button>
         )}
@@ -186,7 +186,7 @@ const AppointmentsList = () => {
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#3E4095]"
+              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-docuhealth-primary"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -195,7 +195,7 @@ const AppointmentsList = () => {
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#3E4095]"
+              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-docuhealth-primary"
             />
           </div>
           {(dateFrom || dateTo) && (
@@ -289,12 +289,12 @@ const AppointmentsList = () => {
             </div>
 
             <button
-              className="border border-[#3E4095] rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300 cursor-pointer flex-1"
+              className="border border-docuhealth-primary rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300 cursor-pointer flex-1"
               onClick={() => {
                 toast.success("Coming Soon !");
               }}
             >
-              <p className="text-[#3E4095]">Send a message</p>
+              <p className="text-docuhealth-primary">Send a message</p>
             </button>
           </div>
         ))}
@@ -317,7 +317,7 @@ const AppointmentsList = () => {
                 >
                   <path
                     d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11Z"
-                    fill="#3E4095"
+                    fill="var(--color-docuhealth-primary)"
                   />
                 </svg>
               </div>
@@ -359,7 +359,7 @@ const AppointmentsList = () => {
 
               {/* Staff Row */}
               <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-lg">
-                <div className="h-8 w-8 rounded-full bg-[#3E4095] flex items-center justify-center text-white">
+                <div className="h-8 w-8 rounded-full bg-docuhealth-primary flex items-center justify-center text-white">
                   <svg
                     width="14"
                     height="14"
@@ -398,7 +398,7 @@ const AppointmentsList = () => {
 
             {/* Action Button */}
             <button
-              className="w-full bg-white border border-[#3E4095] text-[#3E4095] rounded-full py-2.5 text-[13px] font-semibold flex items-center justify-center gap-2 hover:bg-blue-50 active:bg-blue-100 transition-colors"
+              className="w-full bg-white border border-docuhealth-primary text-docuhealth-primary rounded-full py-2.5 text-[13px] font-semibold flex items-center justify-center gap-2 hover:bg-blue-50 active:bg-blue-100 transition-colors"
               onClick={() => toast.success("Coming Soon !")}
             >
               <svg

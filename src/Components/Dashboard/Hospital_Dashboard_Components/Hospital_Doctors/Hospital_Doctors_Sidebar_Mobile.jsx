@@ -35,7 +35,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
               ${openMobileSidebar ? "translate-x-0" : "-translate-x-full"}`}
       >
        <div className="p-4 flex justify-between items-center    ">
-          <div className="flex justify-start items-center gap-1 font-semibold text-[#3E4095]">
+          <div className="flex justify-start items-center gap-1 font-semibold text-docuhealth-primary">
             <img src={hospitalLogo || docuhealth_logo} alt="Logo" className="w-6 h-6 aspect-square object-cover" />
             <h1 className="text-xl">{hospitalName || "DocuHealth"}</h1>
           </div>
@@ -52,14 +52,14 @@ const Hospital_Doctors_Sidebar_Mobile = ({
             >
               <path
                 d="M14.9994 15L9 9M9.00064 15L15 9"
-                stroke="#1B2B40"
+                stroke="var(--color-docuhealth-dark)"
                 stroke-width="1.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
               />
               <path
                 d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z"
-                stroke="#1B2B40"
+                stroke="var(--color-docuhealth-dark)"
                 stroke-width="1.5"
               />
             </svg>
@@ -73,9 +73,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       <li
                         className={`group px-4 py-2   ${
                           currentPath === "/hospital-doctors-home-dashboard"
-                            ? "bg-[#3E4095] text-white"
+                            ? "bg-docuhealth-primary text-white"
                             : "text-gray-700"
-                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                        } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                       >
                         <span>
                           <svg
@@ -95,7 +95,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                               className={`group-hover:fill-white ${
                                 currentPath === "/hospital-doctors-home-dashboard"
                                   ? "fill-white"
-                                  : "fill-[#647284]"
+                                  : "fill-docuhealth-secondary"
                               }`}
                             />
                           </svg>
@@ -110,9 +110,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       <li
                         className={`group px-4 py-2   ${
                           currentPath === "/hospital-doctors-appointments-dashboard"
-                            ? "bg-[#3E4095] text-white"
+                            ? "bg-docuhealth-primary text-white"
                             : "text-gray-700"
-                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                        } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                       >
                         <span>
                           <svg
@@ -124,7 +124,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                             className={`group-hover:fill-white ${
                               currentPath === "/hospital-doctors-appointments-dashboard"
                                 ? "fill-white"
-                                : "fill-[#647284]"
+                                : "fill-docuhealth-secondary"
                             }`}
                           >
                             <path
@@ -133,7 +133,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                                 currentPath ===
                                 "/hospital-doctors-appointments-dashboard"
                                   ? "fill-white"
-                                  : "fill-[#647284]"
+                                  : "fill-docuhealth-secondary"
                               }`}
                             />
                           </svg>
@@ -148,9 +148,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       <li
                         className={`group px-4 py-2   ${
                           currentPath === "/hospital-doctors-lab-dashboard"
-                            ? "bg-[#3E4095] text-white"
+                            ? "bg-docuhealth-primary text-white"
                             : "text-gray-700"
-                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                        } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                       >
                         <span>
                           <svg
@@ -162,7 +162,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                             className={`group-hover:fill-white ${
                               currentPath === "/hospital-doctors-lab-dashboard"
                                 ? "fill-white"
-                                : "fill-[#647284]"
+                                : "fill-docuhealth-secondary"
                             }`}
                           >
                             <path
@@ -170,7 +170,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                               className={`group-hover:fill-white ${
                                 currentPath === "/hospital-doctors-lab-dashboard"
                                   ? "fill-white"
-                                  : "fill-[#647284]"
+                                  : "fill-docuhealth-secondary"
                               }`}
                             />
                           </svg>
@@ -185,9 +185,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       <li
                         className={`group px-4 py-2   ${
                           currentPath === "/hospital-doctors-patients-dashboard"
-                            ? "bg-[#3E4095] text-white"
+                            ? "bg-docuhealth-primary text-white"
                             : "text-gray-700"
-                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                        } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                       >
                         <span>
                           <svg
@@ -199,7 +199,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                             className={`group-hover:fill-white ${
                               currentPath === "/hospital-doctors-patients-dashboard"
                                 ? "fill-white"
-                                : "fill-[#647284]"
+                                : "fill-docuhealth-secondary"
                             }`}
                           >
                             <path
@@ -207,7 +207,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                               className={`group-hover:fill-white ${
                                 currentPath === "/hospital-doctors-patients-dashboard"
                                   ? "fill-white"
-                                  : "fill-[#647284]"
+                                  : "fill-docuhealth-secondary"
                               }`}
                             />
                           </svg>
@@ -223,9 +223,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       <li
                         className={`group px-4 py-2   ${
                           currentPath === "/hospital-doctors-messages-dashboard"
-                            ? "bg-[#3E4095] text-white"
+                            ? "bg-docuhealth-primary text-white"
                             : "text-gray-700"
-                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                        } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                       >
                         <span>
                           <svg
@@ -237,7 +237,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                             className={`group-hover:fill-white ${
                               currentPath === "/hospital-doctors-messages-dashboard"
                                 ? "fill-white"
-                                : "fill-[#647284]"
+                                : "fill-docuhealth-secondary"
                             }`}
                           >
                             <path
@@ -245,7 +245,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                               className={`group-hover:fill-white ${
                                 currentPath === "/hospital-doctors-messages-dashboard"
                                   ? "fill-white"
-                                  : "fill-[#647284]"
+                                  : "fill-docuhealth-secondary"
                               }`}
                             />
                           </svg>
@@ -261,9 +261,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                       <li
                         className={`group px-4 py-2   ${
                           currentPath === "/hospital-doctors-healthpersonnel-dashboard"
-                            ? "bg-[#3E4095] text-white"
+                            ? "bg-docuhealth-primary text-white"
                             : "text-gray-700"
-                        } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                        } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                       >
                         <span>
                           <svg
@@ -275,14 +275,14 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                             className={`group-hover:fill-white ${
                               currentPath === "/hospital-doctors-healthpersonnel-dashboard"
                                 ? "fill-white"
-                                : "fill-[#647284]"
+                                : "fill-docuhealth-secondary"
                             }`}
                           >
                           <path d="M9.99985 12.5013C13.3995 12.5013 16.2048 15.0461 16.6149 18.3346H3.38477C3.79483 15.0461 6.60017 12.5013 9.99985 12.5013ZM8.48893 14.4009C7.29424 14.7796 6.28799 15.5957 5.66769 16.668H9.99985L8.48893 14.4009ZM11.5111 14.4011L9.99985 16.668H14.332C13.7118 15.5959 12.7057 14.7798 11.5111 14.4011ZM14.9998 1.66797V6.66797C14.9998 9.42939 12.7613 11.668 9.99985 11.668C7.23843 11.668 4.99986 9.42939 4.99986 6.66797V1.66797H14.9998ZM6.66652 6.66797C6.66652 8.50889 8.15891 10.0013 9.99985 10.0013C11.8408 10.0013 13.3332 8.50889 13.3332 6.66797H6.66652ZM13.3332 3.33464H6.66652L6.66643 5.0013H13.3331L13.3332 3.33464Z" 
                               className={`group-hover:fill-white ${
                                 currentPath === "/hospital-doctors-healthpersonnel-dashboard"
                                   ? "fill-white"
-                                  : "fill-[#647284]"
+                                  : "fill-docuhealth-secondary"
                               }`}
                             />
                           </svg>
@@ -301,9 +301,9 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                 <li
                   className={`group px-4 py-2   ${
                     currentPath === "/hospital-doctors-settings-dashboard"
-                      ? "bg-[#3E4095] text-white"
+                      ? "bg-docuhealth-primary text-white"
                       : "text-gray-700"
-                  } hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start transition-colors duration-150`}
+                  } hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start transition-colors duration-150`}
                 >
                   <span>
                     <svg
@@ -318,7 +318,7 @@ const Hospital_Doctors_Sidebar_Mobile = ({
                         className={`group-hover:fill-white ${
                           currentPath === "/hospital-doctors-settings-dashboard"
                             ? "fill-white"
-                            : "fill-[#647284]"
+                            : "fill-docuhealth-secondary"
                         }`}
                       />
                     </svg>

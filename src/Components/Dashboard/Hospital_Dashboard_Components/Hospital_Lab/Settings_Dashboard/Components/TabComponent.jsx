@@ -12,7 +12,7 @@ const TabComponent = ({ tabs }) => {
             onClick={() => setActiveTab(index)}
             className={`text-sm px-2 sm:px-4 py-2 sm:text-sm font-medium transition-colors duration-200 ${
               activeTab === index
-                ? "text-[#3E4095] border-b-2 border-[#3E4095] font-semibold"
+                ? "text-docuhealth-primary border-b-2 border-docuhealth-primary font-semibold"
                 : "text-gray-600 hover:text-gray-800"
             }`}
           >

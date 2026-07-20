@@ -25,7 +25,7 @@ const TopSellingStatesChart = ({ data = [], filter = "Monthly", onFilterChange }
       <div className="bg-white p-6 rounded-md border border-gray-200 w-full h-[400px] flex flex-col mt-6">
         <div className="flex justify-between items-start mb-6 w-full">
           <div>
-            <h3 className="text-xs lg:text-lg lg:font-semibold text-[#1B2B40]">
+            <h3 className="text-xs lg:text-lg lg:font-semibold text-docuhealth-dark">
               Top selling states
             </h3>
             <p className="text-sm text-gray-400 mt-1">
@@ -34,7 +34,7 @@ const TopSellingStatesChart = ({ data = [], filter = "Monthly", onFilterChange }
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-[#3E4095]"></span>
+              <span className="w-3 h-3 rounded-full bg-docuhealth-primary"></span>
               <span className="text-xs text-gray-500">
                 State with the most registrations
               </span>
@@ -42,7 +42,7 @@ const TopSellingStatesChart = ({ data = [], filter = "Monthly", onFilterChange }
             <div className="flex items-center gap-2">
               <button 
                 onClick={handleDownload}
-                className="p-1.5 text-gray-500 hover:text-[#3E4095] bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+                className="p-1.5 text-gray-500 hover:text-docuhealth-primary bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
                 title="Download CSV"
               >
                 <Download size={16} />
@@ -71,7 +71,7 @@ const TopSellingStatesChart = ({ data = [], filter = "Monthly", onFilterChange }
     <div className="bg-white p-6 rounded-md border border-gray-200 w-full mt-6">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 w-full">
         <div>
-          <h3 className="text-sm lg:text-lg lg:font-semibold text-[#1F2937]">
+          <h3 className="text-sm lg:text-lg lg:font-semibold text-docuhealth-gray-800">
             Top selling states
           </h3>
           <p className="text-xs lg:text-sm text-gray-400 mt-1 font-medium">
@@ -80,7 +80,7 @@ const TopSellingStatesChart = ({ data = [], filter = "Monthly", onFilterChange }
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#3E4095]"></span>
+            <span className="w-3 h-3 rounded-full bg-docuhealth-primary"></span>
             <span className="text-xs text-gray-400 font-medium">
               State with the most registrations
             </span>
@@ -88,7 +88,7 @@ const TopSellingStatesChart = ({ data = [], filter = "Monthly", onFilterChange }
           <div className="flex items-center gap-2">
             <button 
               onClick={handleDownload}
-              className="p-1.5 text-gray-500 hover:text-[#3E4095] bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              className="p-1.5 text-gray-500 hover:text-docuhealth-primary bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
               title="Download CSV"
             >
               <Download size={16} />
@@ -112,7 +112,7 @@ const TopSellingStatesChart = ({ data = [], filter = "Monthly", onFilterChange }
             <div
               key={item.state}
               className={`rounded-full py-3 px-6 flex items-center justify-center transition-all duration-300 max-w-full ${
-                index === 0 ? "bg-[#3E4095] text-white" : "bg-[#8A8883] text-white"
+                index === 0 ? "bg-docuhealth-primary text-white" : "bg-docuhealth-gray-warm text-white"
               }`}
               style={{ width: `${widthPercent}%` }}
             >

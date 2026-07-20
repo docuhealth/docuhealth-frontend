@@ -26,6 +26,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     { label: "Doctors", value: "doctor" },
     { label: "Nurses", value: "nurse" },
     { label: "Receptionists", value: "receptionist" },
+    { label: "Pharmacists", value: "pharmacist" },
     { label: "Lab Scientists", value: "lab_scientist" },
   ];
 
@@ -86,6 +87,16 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     "Forensic Laboratory Science",
   ];
 
+  const pharmacistSpecializations = [
+    "N/A",
+    "General Pharmacist",
+    "Clinical Pharmacist",
+    "Oncology Pharmacist",
+    "Pediatric Pharmacist",
+    "Nuclear Pharmacist",
+    "Informatics Pharmacist",
+  ];
+
   const specializationOptions =
     newRole === "doctor"
       ? doctorSpecializations
@@ -93,7 +104,9 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
         ? nurseSpecializations
         : newRole === "lab_scientist"
           ? labScientistSpecializations
-          : [];
+          : newRole === "pharmacist"
+            ? pharmacistSpecializations
+            : [];
 
 
   const sortedStaffs = useMemo(() => {
@@ -326,8 +339,8 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
               onClick={() => setSelectedRole(tab.value)}
               className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
                 selectedRole === tab.value
-                  ? "bg-[#3E4095] text-white border-[#3E4095]"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-[#3E4095] hover:text-[#3E4095]"
+                  ? "bg-docuhealth-primary text-white border-docuhealth-primary"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-docuhealth-primary hover:text-docuhealth-primary"
               }`}
             >
               {tab.label}
@@ -424,7 +437,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                   type="checkbox"
                   checked={allChecked}
                   onChange={toggleSelectAll}
-                  className="w-4 h-4 accent-[#3E4095] cursor-pointer"
+                  className="w-4 h-4 accent-docuhealth-primary cursor-pointer"
                 />
                 <p>Name of Staff</p>
               </div>
@@ -445,7 +458,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                       type="checkbox"
                       checked={selectedStaff.includes(staff.staff_id)}
                       onChange={() => toggleStaff(staff.staff_id)}
-                      className="w-4 h-4 accent-[#3E4095] cursor-pointer"
+                      className="w-4 h-4 accent-docuhealth-primary cursor-pointer"
                     />
 
                     {/* Existing Icon and Name */}
@@ -459,7 +472,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                       >
                         <path
                           d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z"
-                          fill="#647284"
+                          fill="var(--color-docuhealth-secondary)"
                         />
                       </svg>
                       <p>
@@ -529,7 +542,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                   type="checkbox"
                   checked={allChecked}
                   onChange={toggleSelectAll}
-                  className="w-5 h-5 accent-[#3E4095] rounded"
+                  className="w-5 h-5 accent-docuhealth-primary rounded"
                 />
                 <span className="text-sm font-medium text-gray-700">
                   {allChecked ? "Deselect All" : "Select All Staffs"}
@@ -549,10 +562,10 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                         type="checkbox"
                         checked={selectedStaff.includes(staff.staff_id)}
                         onChange={() => toggleStaff(staff.staff_id)}
-                        className="w-5 h-5 accent-[#3E4095] cursor-pointer"
+                        className="w-5 h-5 accent-docuhealth-primary cursor-pointer"
                       />
                       {/* Dynamic Avatar with Initials */}
-                      <div className="h-11 w-11 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#3E4095] font-bold text-sm shadow-inner">
+                      <div className="h-11 w-11 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-docuhealth-primary font-bold text-sm shadow-inner">
                         {staff.firstname?.[0]}
                         {staff.lastname?.[0]}
                       </div>
@@ -564,7 +577,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                             : `${staff.firstname} ${staff.lastname}`}
                         </h3>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] bg-[#3E4095] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                          <span className="text-[10px] bg-docuhealth-primary text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
                             {staff.role || "Staff"}
                           </span>
                           <span className="text-[10px] text-gray-400 font-mono">
@@ -595,7 +608,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                           <svg
                             width="20"
                             height="20"
-                            fill="#647284"
+                            fill="var(--color-docuhealth-secondary)"
                             viewBox="0 0 16 16"
                           >
                             <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
@@ -638,7 +651,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                           height="12"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="#3E4095"
+                          stroke="var(--color-docuhealth-primary)"
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -657,7 +670,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                           height="12"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="#3E4095"
+                          stroke="var(--color-docuhealth-primary)"
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -680,7 +693,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                     >
                         Call
                     </a> */}
-                    <button className="flex-1 bg-[#3E4095] py-2.5 rounded-full flex items-center justify-center gap-2 text-[12px] font-bold text-white">
+                    <button className="flex-1 bg-docuhealth-primary py-2.5 rounded-full flex items-center justify-center gap-2 text-[12px] font-bold text-white">
                       Message
                     </button>
                   </div>
@@ -732,13 +745,13 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                         setNewRole(e.target.value);
                         setNewSpecialization("");
                       }}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-[#3E4095] outline-none"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-docuhealth-primary outline-none"
                     >
                       <option value="doctor">Doctor</option>
                       <option value="nurse">Nurse</option>
                       {/* <option value="admin">Admin</option> */}
                       <option value="receptionist">Receptionist</option>
-                      {/* <option value="pharmacist">Pharmacist</option>*/}
+                      <option value="pharmacist">Pharmacist</option>
                       <option value="lab_scientist">Lab Scientist</option>
                     </select>
                   </div>
@@ -751,7 +764,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                       <select
                         value={newSpecialization}
                         onChange={(e) => setNewSpecialization(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-[#3E4095] outline-none"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-docuhealth-primary outline-none"
                       >
                         <option value="">Select Specialization (Optional)</option>
                         {specializationOptions.map((s) => (
@@ -766,7 +779,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                   <button
                     type="submit"
                     disabled={isUpdatingRole}
-                    className="w-full bg-[#3E4095] text-white py-2.5 rounded-full font-medium text-sm hover:bg-[#2e3070] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                    className="w-full bg-docuhealth-primary text-white py-2.5 rounded-full font-medium text-sm hover:bg-docuhealth-dark-primary transition-all flex items-center justify-center gap-2 disabled:opacity-70"
                   >
                     {isUpdatingRole ? (
                       <div className="flex items-center justify-center gap-2">

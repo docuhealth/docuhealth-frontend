@@ -57,7 +57,7 @@ export const renderLabTests = (labTests) => {
         return (
           <div key={idx} className="w-full">
             <div className="flex justify-between items-center mb-4">
-              <p className="text-[16px] font-bold text-[#1B2B40]">{testInfo?.name}</p>
+              <p className="text-[16px] font-bold text-docuhealth-dark">{testInfo?.name}</p>
               <span className={`text-[10px] px-3 py-1.5 rounded-md border font-bold uppercase tracking-wider ${
                 isCompleted ? 'bg-green-50 text-green-600 border-green-100' :
                 labTest.status === 'rejected' ? 'bg-red-50 text-red-500 border-red-100' :
@@ -73,7 +73,7 @@ export const renderLabTests = (labTests) => {
                  <div className="bg-white border border-gray-200 rounded-xl overflow-hidden pb-2">
                    {/* Desktop Table */}
                    <div className="hidden md:flex flex-col text-[13px] w-full pt-4">
-                     <div className="grid grid-cols-4 text-left font-semibold text-gray-700 bg-[#F8F9FA] rounded-full mx-4 py-3 px-6 mb-2">
+                     <div className="grid grid-cols-4 text-left font-semibold text-gray-700 bg-docuhealth-bg-offwhite rounded-full mx-4 py-3 px-6 mb-2">
                        <p>Test</p>
                        <p>Result</p>
                        <p>Reference range</p>

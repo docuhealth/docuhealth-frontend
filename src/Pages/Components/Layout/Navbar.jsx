@@ -93,7 +93,7 @@ const Navbar = ({ showPharmacyMode }) => {
   }, [currentHash]);
 
   return (
-    <div className="text-[#0E0E31] relative z-50">
+    <div className="text-docuhealth-footer-dark relative z-50">
       <motion.div
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -113,9 +113,9 @@ const Navbar = ({ showPharmacyMode }) => {
         {/* Middle Links */}
         <div className="flex justify-center items-center gap-5 text-sm 2xl:text-lg relative">
           <Link to="/"
-            className={`relative font-semibold transition-all hover:text-[#3E4095] ${currentPath === "/"
-                ? "text-[#3E4095] after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-[#3E4095] after:rounded-full"
-                : "text-[#797979] after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-[#3E4095] after:rounded-full after:transition-all after:duration-300 hover:after:w-full"
+            className={`relative font-semibold transition-all hover:text-docuhealth-primary ${currentPath === "/"
+                ? "text-docuhealth-primary after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-docuhealth-primary after:rounded-full"
+                : "text-docuhealth-gray-medium after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-docuhealth-primary after:rounded-full after:transition-all after:duration-300 hover:after:w-full"
               }`}
             onClick={() => toggleDropdown("")}
           >
@@ -126,7 +126,7 @@ const Navbar = ({ showPharmacyMode }) => {
           <div className="relative">
             <button
               onClick={() => toggleDropdown("company")}
-              className={`relative flex items-center gap-1 transition-all hover:text-[#3E4095] hover:scale-105
+              className={`relative flex items-center gap-1 transition-all hover:text-docuhealth-primary hover:scale-105
     ${[
                   "/our-mission",
                   "/our-vision",
@@ -134,8 +134,8 @@ const Navbar = ({ showPharmacyMode }) => {
                   "/legal-notice",
                   "/privacy-policy",
                 ].includes(currentPath)
-                  ? "text-[#3E4095] font-medium after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-full after:h-[3px] after:bg-[#3E4095] after:rounded-full after:transition-all after:duration-300"
-                  : "text-[#797979] after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-0 after:h-[3px] after:bg-[#3E4095] after:rounded-full after:transition-all after:duration-300 hover:after:w-full"
+                  ? "text-docuhealth-primary font-medium after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-full after:h-[3px] after:bg-docuhealth-primary after:rounded-full after:transition-all after:duration-300"
+                  : "text-docuhealth-gray-medium after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-0 after:h-[3px] after:bg-docuhealth-primary after:rounded-full after:transition-all after:duration-300 hover:after:w-full"
                 }`}
             >
               Our Company
@@ -151,16 +151,16 @@ const Navbar = ({ showPharmacyMode }) => {
               <div className="absolute left-0 mt-8 w-48 bg-white border shadow-lg rounded-lg  ">
                 <a
                   href="/#about-us"
-                  className="block px-4 py-2.5 text-sm text-[#797979] hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-t-lg"
+                  className="block px-4 py-2.5 text-sm text-docuhealth-gray-medium hover:bg-gray-100 hover:text-docuhealth-primary hover:rounded-t-lg"
                   onClick={() => toggleDropdown("")}
                 >
                   About Us
                 </a>
                 <Link
                   to="/our-mission"
-                  className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-[#3E4095] ${currentPath === "/our-mission"
-                      ? "text-[#3E4095] font-medium"
-                      : "text-[#797979]"
+                  className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-docuhealth-primary ${currentPath === "/our-mission"
+                      ? "text-docuhealth-primary font-medium"
+                      : "text-docuhealth-gray-medium"
                     }`}
                   onClick={() => toggleDropdown("")}
                 >
@@ -168,9 +168,9 @@ const Navbar = ({ showPharmacyMode }) => {
                 </Link>
                 <Link
                   to="/our-vision"
-                  className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-[#3E4095] ${currentPath === "/our-vision"
-                      ? "text-[#3E4095] font-medium"
-                      : "text-[#797979]"
+                  className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-docuhealth-primary ${currentPath === "/our-vision"
+                      ? "text-docuhealth-primary font-medium"
+                      : "text-docuhealth-gray-medium"
                     }`}
                   onClick={() => toggleDropdown("")}
                 >
@@ -178,9 +178,9 @@ const Navbar = ({ showPharmacyMode }) => {
                 </Link>
                 <Link
                   to="/docuhealth-api"
-                  className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-[#3E4095] ${currentPath === "/docuhealth-api"
-                      ? "text-[#3E4095] font-medium"
-                      : "text-[#797979]"
+                  className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-docuhealth-primary ${currentPath === "/docuhealth-api"
+                      ? "text-docuhealth-primary font-medium"
+                      : "text-docuhealth-gray-medium"
                     }`}
                   onClick={() => toggleDropdown("")}
                 >
@@ -188,9 +188,9 @@ const Navbar = ({ showPharmacyMode }) => {
                 </Link>
                 <Link
                   to="/legal-notice"
-                  className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-[#3E4095] ${currentPath === "/our-legal-notice"
-                      ? "text-[#3E4095] font-medium"
-                      : "text-[#797979]"
+                  className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-docuhealth-primary ${currentPath === "/our-legal-notice"
+                      ? "text-docuhealth-primary font-medium"
+                      : "text-docuhealth-gray-medium"
                     }`}
                   onClick={() => toggleDropdown("")}
                 >
@@ -198,9 +198,9 @@ const Navbar = ({ showPharmacyMode }) => {
                 </Link>
                 <Link
                   to="/terms-and-conditions"
-                  className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-[#3E4095] ${currentPath === "/terms-and-conditions"
-                      ? "text-[#3E4095] font-medium"
-                      : "text-[#797979]"
+                  className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-docuhealth-primary ${currentPath === "/terms-and-conditions"
+                      ? "text-docuhealth-primary font-medium"
+                      : "text-docuhealth-gray-medium"
                     }`}
                   onClick={() => toggleDropdown("")}
                 >
@@ -208,9 +208,9 @@ const Navbar = ({ showPharmacyMode }) => {
                 </Link>
                 <Link
                   to="/privacy-policy"
-                  className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-b-lg ${currentPath === "/our-privacy-policy"
-                      ? "text-[#3E4095] font-medium"
-                      : "text-[#797979]"
+                  className={`block px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-docuhealth-primary hover:rounded-b-lg ${currentPath === "/our-privacy-policy"
+                      ? "text-docuhealth-primary font-medium"
+                      : "text-docuhealth-gray-medium"
                     }`}
                   onClick={() => toggleDropdown("")}
                 >
@@ -222,7 +222,7 @@ const Navbar = ({ showPharmacyMode }) => {
 
           <a
             href="/#our-services"
-            className="text-[#797979] transition-all hover:text-[#3E4095] hover:scale-105"
+            className="text-docuhealth-gray-medium transition-all hover:text-docuhealth-primary hover:scale-105"
             onClick={() => toggleDropdown("")}
           >
             Our Products
@@ -230,7 +230,7 @@ const Navbar = ({ showPharmacyMode }) => {
 
           <a
             href="/#faq"
-            className="text-[#797979] transition-all hover:text-[#3E4095] hover:scale-105"
+            className="text-docuhealth-gray-medium transition-all hover:text-docuhealth-primary hover:scale-105"
             onClick={() => toggleDropdown("")}
           >
             FAQ
@@ -238,7 +238,7 @@ const Navbar = ({ showPharmacyMode }) => {
 
           <a
             href="/#contact-us"
-            className="text-[#797979] transition-all hover:text-[#3E4095] hover:scale-105"
+            className="text-docuhealth-gray-medium transition-all hover:text-docuhealth-primary hover:scale-105"
             onClick={() => toggleDropdown("")}
           >
             Contact Us
@@ -247,10 +247,10 @@ const Navbar = ({ showPharmacyMode }) => {
           <Link
             to="/docuhealth-news"
             onClick={() => toggleDropdown("")}
-            className={`relative transition-all hover:text-[#3E4095] hover:scale-105
+            className={`relative transition-all hover:text-docuhealth-primary hover:scale-105
     ${currentPath === "/docuhealth-news"
-                ? "text-[#3E4095] font-medium after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-full after:h-[3px] after:bg-[#3E4095] after:rounded-full after:transition-all after:duration-300"
-                : "text-[#797979] after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-0 after:h-[3px] after:bg-[#3E4095] after:rounded-full after:transition-all after:duration-300 hover:after:w-full"
+                ? "text-docuhealth-primary font-medium after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-full after:h-[3px] after:bg-docuhealth-primary after:rounded-full after:transition-all after:duration-300"
+                : "text-docuhealth-gray-medium after:content-[''] after:absolute after:left-0 after:bottom-[-3px] after:w-0 after:h-[3px] after:bg-docuhealth-primary after:rounded-full after:transition-all after:duration-300 hover:after:w-full"
               }`}
           >
             DocuHealth News
@@ -261,7 +261,7 @@ const Navbar = ({ showPharmacyMode }) => {
           <div className="relative">
             <button
               onClick={() => toggleDropdown("others")}
-              className="flex items-center gap-1 text-[#797979] transition-all hover:text-[#3E4095] hover:scale-105"
+              className="flex items-center gap-1 text-docuhealth-gray-medium transition-all hover:text-docuhealth-primary hover:scale-105"
             >
               Others
               <ChevronDown
@@ -276,14 +276,14 @@ const Navbar = ({ showPharmacyMode }) => {
                 {/* 
                 <Link
                   to="/privacy-policy"
-                  className="block px-4 py-2.5 text-sm text-[#797979] hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-t-lg"
+                  className="block px-4 py-2.5 text-sm text-docuhealth-gray-medium hover:bg-gray-100 hover:text-docuhealth-primary hover:rounded-t-lg"
                   onClick={() => toggleDropdown("")}
                 >
                   Pharmacy Mode
                 </Link>
                 <Link
                   to="/terms"
-                  className="block px-4 py-2.5 text-sm text-[#797979]  hover:bg-gray-100 hover:text-[#3E4095]"
+                  className="block px-4 py-2.5 text-sm text-docuhealth-gray-medium  hover:bg-gray-100 hover:text-docuhealth-primary"
                   onClick={() => toggleDropdown("")}
                 >
                   Guest Mode
@@ -291,7 +291,7 @@ const Navbar = ({ showPharmacyMode }) => {
                 */}
                 <Link
                   to=""
-                  className="block px-4 py-2.5 text-sm text-[#797979] hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-b-lg"
+                  className="block px-4 py-2.5 text-sm text-docuhealth-gray-medium hover:bg-gray-100 hover:text-docuhealth-primary hover:rounded-b-lg"
                   onClick={() => {
                     toggleDropdown("")
                     toast.success('Coming Soon !')
@@ -309,12 +309,12 @@ const Navbar = ({ showPharmacyMode }) => {
         {/* Right side buttons */}
         <div className="flex justify-center items-center gap-2 text-sm 2xl:text-lg">
           <Link to="/user-create-account">
-            <button className="border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095]">
+            <button className="border border-docuhealth-primary  transition-all hover:bg-docuhealth-primary hover:text-white rounded-full py-2 px-8 text-docuhealth-primary">
               Sign Up
             </button>
           </Link>
           <Link to="/user-login">
-            <button className="border rounded-full py-2 px-8  transition-all hover:bg-[#34345F] bg-[#3E4095] text-white">
+            <button className="border rounded-full py-2 px-8  transition-all hover:bg-docuhealth-nav-dark bg-docuhealth-primary text-white">
               Sign In
             </button>
           </Link>
@@ -428,21 +428,21 @@ const Navbar = ({ showPharmacyMode }) => {
           className={`lg:hidden flex justify-between items-center px-3 py-4 ${currentPath === '/' ? 'bg-none' : 'bg-white'}  `}
         >
           <button onClick={() => setIsOpen(true)} aria-label="menu nav">
-            <i className={`bx bx-menu-alt-left text-3xl ${currentPath === '/' && !isScrolled ? 'text-white' : 'text-[#3E4095]'} `}></i>
+            <i className={`bx bx-menu-alt-left text-3xl ${currentPath === '/' && !isScrolled ? 'text-white' : 'text-docuhealth-primary'} `}></i>
           </button>
           <div className="bg-white p-2 rounded-full">
             <img src={docuhealth_logo} alt="DocuHealth Logo" className="w-6" />
           </div>
         </motion.div>
 
-        <hr className="text-[#BDB5B5]" />
+        <hr className="text-docuhealth-gray-light" />
 
         {/* Sidebar Menu */}
         <div
           className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg transform z-50 lg:hidden ${isOpen
             ? "translate-x-0 z-50 lg:hidden"
             : "-translate-x-full z-50 lg:hidden"
-            } transition-transform duration-300 ease-in-out text-[#0E0E31]`}
+            } transition-transform duration-300 ease-in-out text-docuhealth-footer-dark`}
         >
           {/* Close Button */}
           <div className="flex justify-between items-center px-4 py-4">
@@ -455,7 +455,7 @@ const Navbar = ({ showPharmacyMode }) => {
       height={24}      // maintain aspect ratio
       className="w-6 h-6"
     />
-    <h1 className="text-xl text-[#3E4095]">DocuHealth</h1>
+    <h1 className="text-xl text-docuhealth-primary">DocuHealth</h1>
   </div>
 </Link>
 
@@ -466,13 +466,13 @@ const Navbar = ({ showPharmacyMode }) => {
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex flex-col px-6 mt-4 space-y-4 text-[#797979] text-sm">
+          <nav className="flex flex-col px-6 mt-4 space-y-4 text-docuhealth-gray-medium text-sm">
             {/* Home */}
             <Link
               to="/"
-              className={`relative transition-all hover:text-[#3E4095] ${currentPath === "/"
-                ? "text-[#3E4095] font-medium"
-                : "text-[#797979]"
+              className={`relative transition-all hover:text-docuhealth-primary ${currentPath === "/"
+                ? "text-docuhealth-primary font-medium"
+                : "text-docuhealth-gray-medium"
               }`}
               onClick={() => {
                 setIsOpen(false);
@@ -487,7 +487,7 @@ const Navbar = ({ showPharmacyMode }) => {
             <div>
               <button
                 onClick={() => toggleDropdown("company")}
-                className={`relative flex items-center gap-1 transition-all hover:text-[#3E4095] hover:scale-105
+                className={`relative flex items-center gap-1 transition-all hover:text-docuhealth-primary hover:scale-105
                   ${[
                                 "/our-mission",
                                 "/our-vision",
@@ -495,8 +495,8 @@ const Navbar = ({ showPharmacyMode }) => {
                                 "/legal-notice",
                                 "/privacy-policy",
                               ].includes(currentPath)
-                                ? "text-[#3E4095] font-medium "
-                                : "text-[#797979] "
+                                ? "text-docuhealth-primary font-medium "
+                                : "text-docuhealth-gray-medium "
                               }`}
               >
                 Our Company
@@ -510,7 +510,7 @@ const Navbar = ({ showPharmacyMode }) => {
                 <div className="flex flex-col mt-3 ml-3 space-y-3 text-sm">
                   <a
                     href="/#about-us"
-                  className="block  text-[#797979] hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-t-lg"
+                  className="block  text-docuhealth-gray-medium hover:bg-gray-100 hover:text-docuhealth-primary hover:rounded-t-lg"
                     onClick={() => {
                       setIsOpen(false);
                       toggleDropdown("");
@@ -522,9 +522,9 @@ const Navbar = ({ showPharmacyMode }) => {
                   </a>
                   <Link
                            to="/our-mission"
-                           className={`block  hover:bg-gray-100 hover:text-[#3E4095] ${currentPath === "/our-mission"
-                               ? "text-[#3E4095] font-medium"
-                               : "text-[#797979]"
+                           className={`block  hover:bg-gray-100 hover:text-docuhealth-primary ${currentPath === "/our-mission"
+                               ? "text-docuhealth-primary font-medium"
+                               : "text-docuhealth-gray-medium"
                              }`}
                              onClick={() => {
                                setIsOpen(false);
@@ -541,9 +541,9 @@ const Navbar = ({ showPharmacyMode }) => {
                       toggleDropdown("");
                     }
                     }
-                    className={`block  hover:bg-gray-100 hover:text-[#3E4095] ${currentPath === "/our-vision"
-                      ? "text-[#3E4095] font-medium"
-                      : "text-[#797979]"
+                    className={`block  hover:bg-gray-100 hover:text-docuhealth-primary ${currentPath === "/our-vision"
+                      ? "text-docuhealth-primary font-medium"
+                      : "text-docuhealth-gray-medium"
                     }`}
                   >
                     Our Vision
@@ -555,9 +555,9 @@ const Navbar = ({ showPharmacyMode }) => {
                       toggleDropdown("");
                     }
                     }
-                    className={`block  hover:bg-gray-100 hover:text-[#3E4095] ${currentPath === "/docuhealth-api"
-                      ? "text-[#3E4095] font-medium"
-                      : "text-[#797979]"
+                    className={`block  hover:bg-gray-100 hover:text-docuhealth-primary ${currentPath === "/docuhealth-api"
+                      ? "text-docuhealth-primary font-medium"
+                      : "text-docuhealth-gray-medium"
                     }`}
                   >
                     Docu Health API
@@ -569,9 +569,9 @@ const Navbar = ({ showPharmacyMode }) => {
                       toggleDropdown("");
                     }
                     }
-                    className={`block  hover:bg-gray-100 hover:text-[#3E4095] ${currentPath === "/our-legal-notice"
-                      ? "text-[#3E4095] font-medium"
-                      : "text-[#797979]"
+                    className={`block  hover:bg-gray-100 hover:text-docuhealth-primary ${currentPath === "/our-legal-notice"
+                      ? "text-docuhealth-primary font-medium"
+                      : "text-docuhealth-gray-medium"
                     }`}
                   >
                     Legal Notice
@@ -583,9 +583,9 @@ const Navbar = ({ showPharmacyMode }) => {
                       toggleDropdown("");
                     }
                     }
-                    className={`block  hover:bg-gray-100 hover:text-[#3E4095] ${currentPath === "/terms-and-conditions"
-                      ? "text-[#3E4095] font-medium"
-                      : "text-[#797979]"
+                    className={`block  hover:bg-gray-100 hover:text-docuhealth-primary ${currentPath === "/terms-and-conditions"
+                      ? "text-docuhealth-primary font-medium"
+                      : "text-docuhealth-gray-medium"
                     }`}
                   >
                     Terms and Conditions
@@ -597,9 +597,9 @@ const Navbar = ({ showPharmacyMode }) => {
                       toggleDropdown("");
                     }
                     }
-                    className={`block  hover:bg-gray-100 hover:text-[#3E4095] hover:rounded-b-lg ${currentPath === "/our-privacy-policy"
-                      ? "text-[#3E4095] font-medium"
-                      : "text-[#797979]"
+                    className={`block  hover:bg-gray-100 hover:text-docuhealth-primary hover:rounded-b-lg ${currentPath === "/our-privacy-policy"
+                      ? "text-docuhealth-primary font-medium"
+                      : "text-docuhealth-gray-medium"
                     }`}
                   >
                     Privacy Policy
@@ -647,10 +647,10 @@ const Navbar = ({ showPharmacyMode }) => {
 
             <Link
               to="/docuhealth-news"
-              className={`relative transition-all hover:text-[#3E4095] hover:scale-105
+              className={`relative transition-all hover:text-docuhealth-primary hover:scale-105
                 ${currentPath === "/docuhealth-news"
-                            ? "text-[#3E4095] font-medium "
-                            : "text-[#797979] "
+                            ? "text-docuhealth-primary font-medium "
+                            : "text-docuhealth-gray-medium "
                           }`}
               onClick={() => {
                 setIsOpen(false);
@@ -721,7 +721,7 @@ const Navbar = ({ showPharmacyMode }) => {
           <div className="absolute bottom-8 left-0 w-full px-6">
             <Link to="/user-login">
               <button
-                className="w-full bg-[#3E4095] text-white py-2 rounded-full text-sm"
+                className="w-full bg-docuhealth-primary text-white py-2 rounded-full text-sm"
                 onClick={() => {
                   setIsOpen(false);
                 }}
@@ -731,7 +731,7 @@ const Navbar = ({ showPharmacyMode }) => {
             </Link>
             <Link to="/user-create-account">
               <button
-                className="w-full mt-2 border border-[#3E4095] text-[#3E4095] py-2 rounded-full text-sm"
+                className="w-full mt-2 border border-docuhealth-primary text-docuhealth-primary py-2 rounded-full text-sm"
                 onClick={() => {
                   setIsOpen(false);
                   setOpenDropdown("");

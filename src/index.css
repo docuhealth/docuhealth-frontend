@@ -4,6 +4,55 @@ layer(base);
 @import 'tailwindcss';
 
 @theme {
+  --color-docuhealth-primary: #3E4095;
+  --color-docuhealth-secondary: #647284;
+  --color-docuhealth-dark: #1B2B40;
+  --color-docuhealth-light-gray: #FAFAFA;
+  --color-docuhealth-blue: #0000FF;
+  --color-docuhealth-dark-primary: #2e3070;
+  --color-docuhealth-gray: #464646;
+  --color-docuhealth-gray-medium: #797979;
+  --color-docuhealth-light-blue: #F6FCFE;
+  --color-docuhealth-green: #08A913;
+  --color-docuhealth-light-green: #D2F5DB;
+  --color-docuhealth-gray-dark: #313131;
+  --color-docuhealth-gray-light: #BDB5B5;
+  --color-docuhealth-gray-lighter: #EFEFEF;
+  --color-docuhealth-gray-lightest: #F5F5F5;
+  --color-docuhealth-green-dark: #0B6011;
+  --color-docuhealth-bg-light: #FAFEFF;
+  --color-docuhealth-purple: #9000FF;
+  --color-docuhealth-primary-hover: #33357a;
+  --color-docuhealth-blue-lightest: #ECFAFF;
+  --color-docuhealth-primary-lightest: #EEEEFD;
+  --color-docuhealth-gray-cool: #F5F8F8;
+  --color-docuhealth-primary-faded: #F8F9FF;
+  --color-docuhealth-border-light: #DCE2EA;
+  --color-docuhealth-primary-muted: #e6e6f5;
+  --color-docuhealth-primary-darker: #2e3075;
+  --color-docuhealth-bg-gray: #F2F2F2;
+  --color-docuhealth-blue-bright: #1C1CFE;
+  --color-docuhealth-bg-offwhite: #F8F9FA;
+  --color-docuhealth-primary-deep: #1f1f75;
+  --color-docuhealth-text-main: #212121;
+  --color-docuhealth-text-muted: #727272;
+  --color-docuhealth-nav-dark: #34345F;
+  --color-docuhealth-blue-pale: #E6F4FB;
+  --color-docuhealth-footer-dark: #0E0E31;
+  --color-docuhealth-gray-800: #1F2937;
+  --color-docuhealth-gray-warm: #8A8883;
+  --color-docuhealth-primary-variant: #2e307a;
+  --color-docuhealth-amber-600: #d97706;
+  --color-docuhealth-primary-soft: #b1b2d4;
+  --color-docuhealth-purple-light: #E7E4FD;
+  --color-docuhealth-orange-light: #FDF4E4;
+  --color-docuhealth-red-light: #FDE4E4;
+  --color-docuhealth-blue-soft: #E4ECFD;
+  --color-docuhealth-violet-light: #ECE4FD;
+  --color-docuhealth-blue-faded: #f5f9ff;
+  --color-docuhealth-primary-light: #B9BBFF;
+  --color-docuhealth-border-gray: #DDDDDD;
+
   --animate-slide-up: slideUp 0.5s ease-out;
 
   @keyframes slideUp {

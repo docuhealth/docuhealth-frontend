@@ -28,13 +28,13 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
           <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
             <DynamicDate />
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto " onClick={() => {
+              <button className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto " onClick={() => {
                 setOtherMedicalServices(true)
               }}>
                 Other medical services
 
               </button>
-              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto"
+              <button className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
                 onClick={() => {
                   setRequestAdmission(true)
                 }}
@@ -42,7 +42,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
                 Request for admission
               </button>
               <button
-                className="py-2.5 px-10 rounded-full bg-[#3E4095] border border-[#3E4095] text-white cursor-pointer w-full lg:w-auto"
+                className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
                 onClick={() => {
                   setSoapNoteEntry(true);
                   setSeePatientDetails(false);
@@ -79,7 +79,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
             <DynamicDate />
             <div className="">
               <button
-                className="py-2.5 px-10 rounded-full bg-[#3E4095] text-white cursor-pointer"
+                className="py-2.5 px-10 rounded-full bg-docuhealth-primary text-white cursor-pointer"
                 onClick={() => {
                   setSoapNoteEntry(false);
                 }}

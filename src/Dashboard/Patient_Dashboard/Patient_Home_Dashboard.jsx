@@ -96,7 +96,7 @@ useEffect(() => {
           <div className="relative">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="flex items-center gap-2 px-6 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full hover:bg-blue-50 transition"
+              className="flex items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary font-medium rounded-full hover:bg-blue-50 transition"
             >
               Sort by: {selected}
               <ChevronDown
@@ -121,7 +121,7 @@ useEffect(() => {
           </div>
           <div>
             <button
-              className="flex items-center gap-2 px-6 py-2 border border-[#3E4095] text-[#3E4095]  font-medium rounded-full transition cursor-pointer"
+              className="flex items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary  font-medium rounded-full transition cursor-pointer"
               onClick={() => {
                 if (profile) {
                   const hasSubscription = fetchSubscriptionStatus();
@@ -144,7 +144,7 @@ useEffect(() => {
           </div>
           <div>
             <button
-              className="flex items-center gap-2 px-6 py-2.5 bg-[#3E4095] text-white font-medium rounded-full transition cursor-pointer"
+              className="flex items-center gap-2 px-6 py-2.5 bg-docuhealth-primary text-white font-medium rounded-full transition cursor-pointer"
               onClick={() => {
                 if (profile) {
                   const hasSubscription = fetchSubscriptionStatus();
@@ -185,7 +185,7 @@ useEffect(() => {
           <div className="relative">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="flex justify-center items-center gap-2 px-6 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full hover:bg-blue-50 transition w-full"
+              className="flex justify-center items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary font-medium rounded-full hover:bg-blue-50 transition w-full"
             >
               Sort by: {selected}
               <ChevronDown
@@ -210,7 +210,7 @@ useEffect(() => {
           </div>
           <div>
             <button
-              className="flex justify-center items-center gap-2 px-6 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full transition w-full cursor-pointer"
+              className="flex justify-center items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary font-medium rounded-full transition w-full cursor-pointer"
                onClick={() => {
                 if (profile) {
                   const hasSubscription = fetchSubscriptionStatus();
@@ -236,7 +236,7 @@ useEffect(() => {
           </div>
           <div>
             <button
-              className="flex justify-center items-center gap-2 px-6 py-2 bg-[#3E4095] text-white font-medium rounded-full transition w-full cursor-pointer"
+              className="flex justify-center items-center gap-2 px-6 py-2 bg-docuhealth-primary text-white font-medium rounded-full transition w-full cursor-pointer"
                onClick={() => {
                 if (profile) {
                   const hasSubscription = fetchSubscriptionStatus();

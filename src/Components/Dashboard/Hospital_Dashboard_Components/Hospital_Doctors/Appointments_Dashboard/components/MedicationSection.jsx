@@ -44,7 +44,7 @@ const MedicationSection = ({ medications, setMedications }) => {
 
   return (
     <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-      <p className="font-medium mb-3 text-[#1B2B40]">Medication</p>
+      <p className="font-medium mb-3 text-docuhealth-dark">Medication</p>
 
       {medications.map((med, index) => (
         <div
@@ -58,7 +58,7 @@ const MedicationSection = ({ medications, setMedications }) => {
               placeholder="Drug name..."
               value={med.drug}
               onChange={(e) => handleChange(index, "drug", e.target.value)}
-              className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
+              className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
             />
           </div>
 
@@ -70,7 +70,7 @@ const MedicationSection = ({ medications, setMedications }) => {
                 placeholder="Enter dosage..."
                 value={med.dosage}
                 onChange={(e) => handleChange(index, "dosage", e.target.value)}
-                className="w-1/2 border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
+                className="w-1/2 border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
               />
               <div className="w-1/2 relative">
                 <input
@@ -79,7 +79,7 @@ const MedicationSection = ({ medications, setMedications }) => {
                   placeholder="Unit..."
                   value={med.dosageUnit}
                   onChange={(e) => handleChange(index, "dosageUnit", e.target.value)}
-                  className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
+                  className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
                 />
                 <datalist id={`dosage-units-${index}`}>
                   {dosageUnits.map((unit) => (
@@ -96,7 +96,7 @@ const MedicationSection = ({ medications, setMedications }) => {
               <select
                 value={med.route}
                 onChange={(e) => handleChange(index, "route", e.target.value)}
-                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none appearance-none bg-white pr-8 transition-all"
+                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none appearance-none bg-white pr-8 transition-all"
               >
                 <option value="Oral">Oral</option>
                 <option value="IV">IV = Intravenous</option>
@@ -122,7 +122,7 @@ const MedicationSection = ({ medications, setMedications }) => {
               <select
                 value={med.frequency}
                 onChange={(e) => handleChange(index, "frequency", e.target.value)}
-                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none appearance-none bg-white pr-8 transition-all"
+                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none appearance-none bg-white pr-8 transition-all"
               >
                 <option value="stat">stat - Immediately</option>
                 <option value="once">once - One-time dose</option>
@@ -160,7 +160,7 @@ const MedicationSection = ({ medications, setMedications }) => {
                 value={med.duration}
                 onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
                 onChange={(e) => handleChange(index, "duration", e.target.value)}
-                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
+                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
               />
             </div>
             <div className="flex-1">
@@ -169,7 +169,7 @@ const MedicationSection = ({ medications, setMedications }) => {
                 <select
                   value={med.durationUnit}
                   onChange={(e) => handleChange(index, "durationUnit", e.target.value)}
-                  className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-[#3E4095] outline-none transition-all bg-white"
+                  className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all bg-white"
                 >
                   <option value="Month">Month (s)</option>
                   <option value="Week">Week (s)</option>
@@ -197,7 +197,7 @@ const MedicationSection = ({ medications, setMedications }) => {
 
       <button
         onClick={handleAddMedication}
-        className="text-[#3E4095] font-medium text-[12px] mt-4 flex items-center gap-1"
+        className="text-docuhealth-primary font-medium text-[12px] mt-4 flex items-center gap-1"
       >
         <Plus size={14} /> Add more drugs
       </button>

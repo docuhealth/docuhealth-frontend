@@ -112,7 +112,7 @@ const UserSubAcctUpgradeModal = ({
                         name="child_email"
                         value={subAcctUpgradeData.child_email}
                         onChange={handleSubAcctUpgradeDataChange}
-                        className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-[#3E4095]"
+                        className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary"
                         required
                       />
                     </div>
@@ -125,7 +125,7 @@ const UserSubAcctUpgradeModal = ({
                         name="child_phone_number"
                         value={subAcctUpgradeData.child_phone_number}
                         onChange={handleSubAcctUpgradeDataChange}
-                        className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-[#3E4095]"
+                        className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary"
                         required
                       />
                     </div>
@@ -138,7 +138,7 @@ const UserSubAcctUpgradeModal = ({
                         name="child_hin"
                         value={subAcctUpgradeData.child_hin}
                         onChange={handleSubAcctUpgradeDataChange}
-                        className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-[#3E4095] "
+                        className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary "
                         required
                       />
                     </div>
@@ -167,7 +167,7 @@ const UserSubAcctUpgradeModal = ({
                         }}
                         onFocus={() => setIsOpen(true)} // when clicked/focused
                         onBlur={() => setIsOpen(false)} // when closed
-                        className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer"
+                        className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer"
                         required
                       >
                         <option value="" selected>
@@ -201,7 +201,7 @@ const UserSubAcctUpgradeModal = ({
                     </div>
 
                     <div
-                      className="col-span-2 text-sm text-center bg-[#3E4095] text-white py-3 px-4 rounded-full cursor-pointer "
+                      className="col-span-2 text-sm text-center bg-docuhealth-primary text-white py-3 px-4 rounded-full cursor-pointer "
                       onClick={handleNextStepSubAcctUpgrade}
                     >
                       <p> Move to step 2 / 3</p>
@@ -224,7 +224,7 @@ const UserSubAcctUpgradeModal = ({
                             handleSubAcctUpgradeDataChange(e);
                             validatePassword(e.target.value);
                           }}
-                          className={`w-full px-4 py-2 border rounded-lg pl-8 outline-hidden focus:border-[#3E4095] ${subAcctUpgradeData.child_password &&
+                          className={`w-full px-4 py-2 border rounded-lg pl-8 outline-hidden focus:border-docuhealth-primary ${subAcctUpgradeData.child_password &&
                               !isPasswordValid
                               ? "focus:border-red-500"
                               : ""
@@ -257,7 +257,7 @@ const UserSubAcctUpgradeModal = ({
                           name="confirm_password"
                           value={subAcctUpgradeData.confirm_password}
                           onChange={handleSubAcctUpgradeDataChange}
-                          className="w-full px-4 py-2 border rounded-lg pl-8 outline-hidden focus:border-[#3E4095]"
+                          className="w-full px-4 py-2 border rounded-lg pl-8 outline-hidden focus:border-docuhealth-primary"
                           required
                         />
                         <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
@@ -397,7 +397,7 @@ const UserSubAcctUpgradeModal = ({
                       </div>
                     )}
                     <div
-                      className="col-span-2 text-center bg-[#3E4095] text-white py-3 px-4 rounded-full cursor-pointer"
+                      className="col-span-2 text-center bg-docuhealth-primary text-white py-3 px-4 rounded-full cursor-pointer"
                       onClick={handleFinalStepSubAcctUpgrade}
                     >
                       <p> Move to step 3 / 3</p>
@@ -427,7 +427,7 @@ const UserSubAcctUpgradeModal = ({
                          
                           
                         }
-                        className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-[#3E4095] appearance-none"
+                        className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary appearance-none"
                         required
                         disabled={!states.length}
                       >
@@ -467,7 +467,7 @@ const UserSubAcctUpgradeModal = ({
                         name="child_city"
                         value={subAcctUpgradeData.child_city}
                         onChange={handleSubAcctUpgradeDataChange}
-                        className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-[#3E4095] appearance-none"
+                        className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary appearance-none"
                         required
                       >
                         <option value="" selected>
@@ -509,7 +509,7 @@ const UserSubAcctUpgradeModal = ({
                         value={subAcctUpgradeData.child_house_number}
                         placeholder="e.g No. 1234"
                         onChange={handleSubAcctUpgradeDataChange}
-                        className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095]"
+                        className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary"
                         required
                       />
                     </div>
@@ -523,13 +523,13 @@ const UserSubAcctUpgradeModal = ({
                         value={subAcctUpgradeData.child_street}
                         placeholder="e.g Olorunda Street"
                         onChange={handleSubAcctUpgradeDataChange}
-                        className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095]"
+                        className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary"
                         required
                       />
                     </div>
                     <div
                       className={`col-span-2 text-center ${isValid && !subAcctUpgradeLoading
-                        ? "bg-[#3E4095] text-white  cursor-pointer"
+                        ? "bg-docuhealth-primary text-white  cursor-pointer"
                         : "cursor-not-allowed bg-gray-300 text-gray-500"} py-3 px-4 rounded-full cursor-pointer`}
                       onClick={handleSubAcctUpgrade}
                       disabled={!isValid || subAcctUpgradeLoading}

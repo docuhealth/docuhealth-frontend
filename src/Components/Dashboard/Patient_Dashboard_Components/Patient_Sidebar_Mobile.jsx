@@ -90,7 +90,7 @@ const Patient_Sidebar_Mobile = ({
           ${openMobileSidebar ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="p-4 flex justify-between items-center    ">
-          <div className="flex justify-start items-center gap-1 font-semibold text-[#3E4095]">
+          <div className="flex justify-start items-center gap-1 font-semibold text-docuhealth-primary">
               <img src={docuhealth_logo} alt="Logo" className="w-6" />
                             <h1 className="text-xl">DocuHealth</h1>
           </div>
@@ -107,14 +107,14 @@ const Patient_Sidebar_Mobile = ({
             >
               <path
                 d="M14.9994 15L9 9M9.00064 15L15 9"
-                stroke="#1B2B40"
+                stroke="var(--color-docuhealth-dark)"
                 stroke-width="1.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
               />
               <path
                 d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z"
-                stroke="#1B2B40"
+                stroke="var(--color-docuhealth-dark)"
                 stroke-width="1.5"
               />
             </svg>
@@ -130,9 +130,9 @@ const Patient_Sidebar_Mobile = ({
                 <li
                   className={`group px-4 py-2   ${
                     currentPath === "/user-home-dashboard"
-                      ? "bg-[#3E4095] text-white"
+                      ? "bg-docuhealth-primary text-white"
                       : "text-gray-700"
-                  } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                  } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                 >
                   <span>
                     <svg
@@ -152,7 +152,7 @@ const Patient_Sidebar_Mobile = ({
                         className={`group-hover:fill-white ${
                           currentPath === "/user-home-dashboard"
                             ? "fill-white"
-                            : "fill-[#647284]"
+                            : "fill-docuhealth-secondary"
                         }`}
                       />
                     </svg>
@@ -172,9 +172,9 @@ const Patient_Sidebar_Mobile = ({
                 <li
                   className={`group px-4 py-2   ${
                     currentPath === "/user-drug-records-dashboard"
-                      ? "bg-[#3E4095] text-white"
+                      ? "bg-docuhealth-primary text-white"
                       : "text-gray-700"
-                  } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                  } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                 >
                   <span>
                     <svg
@@ -193,7 +193,7 @@ const Patient_Sidebar_Mobile = ({
                         className={`group-hover:fill-white ${
                           currentPath === "/user-drug-records-dashboard"
                             ? "fill-white"
-                            : "fill-[#647284]"
+                            : "fill-docuhealth-secondary"
                         }`}
                       />
                     </svg>
@@ -210,9 +210,9 @@ const Patient_Sidebar_Mobile = ({
                 <li
                   className={`group px-4 py-2   ${
                     currentPath === "/user-appointments-dashboard"
-                      ? "bg-[#3E4095] text-white"
+                      ? "bg-docuhealth-primary text-white"
                       : "text-gray-700"
-                  } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                  } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                 >
                   <span>
                     <svg
@@ -223,7 +223,7 @@ const Patient_Sidebar_Mobile = ({
                       className={`group-hover:fill-white ${
                         currentPath === "/user-appointments-dashboard"
                           ? "fill-white"
-                          : "fill-[#647284]"
+                          : "fill-docuhealth-secondary"
                       }`}
                       xmlns="http://www.w3.org/2000/svg"
                     >
@@ -232,7 +232,7 @@ const Patient_Sidebar_Mobile = ({
                         className={`group-hover:fill-white ${
                           currentPath === "/user-appointments-dashboard"
                             ? "fill-white"
-                            : "fill-[#647284]"
+                            : "fill-docuhealth-secondary"
                         }`}
                       />
                     </svg>
@@ -253,9 +253,9 @@ const Patient_Sidebar_Mobile = ({
                 <li
                   className={`group px-4 py-2   ${
                     currentPath === "/user-messages-dashboard"
-                      ? "bg-[#3E4095] text-white"
+                      ? "bg-docuhealth-primary text-white"
                       : "text-gray-700"
-                  } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                  } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                 >
                   <span>
                     <svg
@@ -266,7 +266,7 @@ const Patient_Sidebar_Mobile = ({
                       className={`group-hover:fill-white ${
                         currentPath === "/user-messages-dashboard"
                           ? "fill-white"
-                          : "fill-[#647284]"
+                          : "fill-docuhealth-secondary"
                       }`}
                       xmlns="http://www.w3.org/2000/svg"
                     >
@@ -275,7 +275,7 @@ const Patient_Sidebar_Mobile = ({
                         className={`group-hover:fill-white ${
                           currentPath === "/user-messages-dashboard"
                             ? "fill-white"
-                            : "fill-[#647284]"
+                            : "fill-docuhealth-secondary"
                         }`}
                       />
                     </svg>
@@ -296,9 +296,9 @@ const Patient_Sidebar_Mobile = ({
                 <li
                   className={`group px-4 py-2   ${
                     currentPath === "/user-community-dashboard"
-                      ? "bg-[#3E4095] text-white"
+                      ? "bg-docuhealth-primary text-white"
                       : "text-gray-700"
-                  } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                  } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                 >
                   <span>
                     <svg
@@ -309,7 +309,7 @@ const Patient_Sidebar_Mobile = ({
                       className={`group-hover:fill-white ${
                         currentPath === "/user-community-dashboard"
                           ? "fill-white"
-                          : "fill-[#647284]"
+                          : "fill-docuhealth-secondary"
                       }`}
                       xmlns="http://www.w3.org/2000/svg"
                     >
@@ -318,7 +318,7 @@ const Patient_Sidebar_Mobile = ({
                         className={`group-hover:fill-white ${
                           currentPath === "/user-community-dashboard"
                             ? "fill-white"
-                            : "fill-[#647284]"
+                            : "fill-docuhealth-secondary"
                         }`}
                       />
                     </svg>
@@ -339,9 +339,9 @@ const Patient_Sidebar_Mobile = ({
                 <li
                   className={`group px-4 py-2   ${
                     currentPath === "/user-wallet-dashboard"
-                      ? "bg-[#3E4095] text-white"
+                      ? "bg-docuhealth-primary text-white"
                       : "text-gray-700"
-                  } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                  } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                 >
                   <span>
                     <svg
@@ -353,7 +353,7 @@ const Patient_Sidebar_Mobile = ({
                       className={`group-hover:fill-white ${
                         currentPath === "/user-wallet-dashboard"
                           ? "fill-white"
-                          : "fill-[#647284]"
+                          : "fill-docuhealth-secondary"
                       }`}
                     >
                       <path
@@ -361,7 +361,7 @@ const Patient_Sidebar_Mobile = ({
                         className={`group-hover:fill-white ${
                           currentPath === "/user-wallet-dashboard"
                             ? "fill-white"
-                            : "fill-[#647284]"
+                            : "fill-docuhealth-secondary"
                         }`}
                       />
                     </svg>
@@ -378,9 +378,9 @@ const Patient_Sidebar_Mobile = ({
                 <li
                   className={`group px-4 py-2   ${
                     currentPath === "/user-subaccount-dashboard"
-                      ? "bg-[#3E4095] text-white"
+                      ? "bg-docuhealth-primary text-white"
                       : "text-gray-700"
-                  } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                  } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                 >
                   <span>
                     <svg
@@ -392,7 +392,7 @@ const Patient_Sidebar_Mobile = ({
                       className={`group-hover:fill-white ${
                         currentPath === "/user-subaccount-dashboard"
                           ? "fill-white"
-                          : "fill-[#647284]"
+                          : "fill-docuhealth-secondary"
                       }`}
                     >
                       <path
@@ -400,7 +400,7 @@ const Patient_Sidebar_Mobile = ({
                         className={`group-hover:fill-white ${
                           currentPath === "/user-subaccount-dashboard"
                             ? "fill-white"
-                            : "fill-[#647284]"
+                            : "fill-docuhealth-secondary"
                         }`}
                       />
                     </svg>
@@ -417,9 +417,9 @@ const Patient_Sidebar_Mobile = ({
                 <li
                   className={`group px-4 py-2   ${
                     currentPath === "/user-settings-dashboard"
-                      ? "bg-[#3E4095] text-white"
+                      ? "bg-docuhealth-primary text-white"
                       : "text-gray-700"
-                  } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                  } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                 >
                   <span>
                     <svg
@@ -431,7 +431,7 @@ const Patient_Sidebar_Mobile = ({
                       className={`group-hover:fill-white ${
                         currentPath === "/user-settings-dashboard"
                           ? "fill-white"
-                          : "fill-[#647284]"
+                          : "fill-docuhealth-secondary"
                       }`}
                     >
                       <g clip-path="url(#clip0_274_2617)">
@@ -440,7 +440,7 @@ const Patient_Sidebar_Mobile = ({
                           className={`group-hover:fill-white ${
                             currentPath === "/user-settings-dashboard"
                               ? "fill-white"
-                              : "fill-[#647284]"
+                              : "fill-docuhealth-secondary"
                           }`}
                         />
                       </g>
@@ -463,9 +463,9 @@ const Patient_Sidebar_Mobile = ({
                 <li
                   className={`group px-4 py-2   ${
                     currentPath === "/user-subscriptions-dashboard"
-                      ? "bg-[#3E4095] text-white"
+                      ? "bg-docuhealth-primary text-white"
                       : "text-gray-700"
-                  } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                  } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                 >
                   <span>
                     <svg
@@ -477,7 +477,7 @@ const Patient_Sidebar_Mobile = ({
                       className={`group-hover:fill-white ${
                         currentPath === "/user-subscriptions-dashboard"
                           ? "fill-white"
-                          : "fill-[#647284]"
+                          : "fill-docuhealth-secondary"
                       }`}
                     >
                       <path
@@ -485,7 +485,7 @@ const Patient_Sidebar_Mobile = ({
                         className={`group-hover:fill-white ${
                           currentPath === "/user-subscriptions-dashboard"
                             ? "fill-white"
-                            : "fill-[#647284]"
+                            : "fill-docuhealth-secondary"
                         }`}
                       />
                     </svg>
@@ -497,7 +497,7 @@ const Patient_Sidebar_Mobile = ({
             <div onClick={handleLogout}>
               <div className="px-4 my-4">
                 <li
-                  className={`group px-4 py-2  text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                  className={`group px-4 py-2  text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
                 >
                   <svg
                     width="20"
@@ -506,11 +506,11 @@ const Patient_Sidebar_Mobile = ({
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                     className={`group-hover:fill-white 
-                    fill-[#647284]`}
+                    fill-docuhealth-secondary`}
                   >
                     <path
                       d="M3.33329 12.4998H4.99996V16.6665H15V3.33317H4.99996V7.49984H3.33329V2.49984C3.33329 2.0396 3.70639 1.6665 4.16663 1.6665H15.8333C16.2935 1.6665 16.6666 2.0396 16.6666 2.49984V17.4998C16.6666 17.9601 16.2935 18.3332 15.8333 18.3332H4.16663C3.70639 18.3332 3.33329 17.9601 3.33329 17.4998V12.4998ZM8.33329 9.1665V6.6665L12.5 9.99984L8.33329 13.3332V10.8332H1.66663V9.1665H8.33329Z"
-                      className={`group-hover:fill-white fill-[#647284]`}
+                      className={`group-hover:fill-white fill-docuhealth-secondary`}
                     />
                   </svg>
                   Log-out

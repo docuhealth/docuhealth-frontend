@@ -130,8 +130,8 @@ const Vitals = ({ setVitals, setSelectedPatient }) => {
                     <p className="font-medium">
                       {vital.patient.firstname} {vital.patient.lastname}{" "}
                     </p>
-                    <div className="bg-[#D2F5DB] px-2 rounded-full">
-                      <p className="text-[#08A913]">{formatRecordDate(vital.created_at)}</p>
+                    <div className="bg-docuhealth-light-green px-2 rounded-full">
+                      <p className="text-docuhealth-green">{formatRecordDate(vital.created_at)}</p>
                     </div>
                   </div>
 
@@ -163,7 +163,7 @@ const Vitals = ({ setVitals, setSelectedPatient }) => {
                   </div>
 
                   <button
-                    className="text-center mt-3 py-2 border border-[#1B2B40] text-[#1B2B40] w-full rounded-full cursor-pointer"
+                    className="text-center mt-3 py-2 border border-docuhealth-dark text-docuhealth-dark w-full rounded-full cursor-pointer"
                     onClick={() => setSelectedPatient(vital)}
                   >
                     Open

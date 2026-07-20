@@ -74,7 +74,7 @@ const FP = () => {
         <div className="w-full flex-1">
           <div className=" hidden sm:flex justify-center items-center py-10 h-screen ">
             <Link to="/">
-              <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
+              <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-docuhealth-primary">
                 <img src={docuhealth_logo} alt="Logo" className="w-6" />
                 <h1 className="text-xl">DocuHealth</h1>
               </div>
@@ -93,7 +93,7 @@ const FP = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -104,7 +104,7 @@ const FP = () => {
 
                   <button
                     type="submit"
-                    className={`w-full py-3 rounded-full bg-[#3E4095] text-white hover:bg-blue-700"
+                    className={`w-full py-3 rounded-full bg-docuhealth-primary text-white hover:bg-blue-700"
             ${isLoading ? "cursor-not-allowed bg-gray-300 text-gray-500 " : ""}
           `}
                     disabled={isLoading}
@@ -126,7 +126,7 @@ const FP = () => {
 
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
         <Link to="/">
-          <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+          <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-docuhealth-primary">
             <img src={docuhealth_logo} alt="Logo" className="w-6" />
             <h1 className="text-xl">DocuHealth</h1>
           </div>
@@ -146,7 +146,7 @@ const FP = () => {
                   <div className="relative">
                     <input
                       type="text"
-                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                      className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -157,7 +157,7 @@ const FP = () => {
 
                 <button
                   type="submit"
-                  className={`w-full py-3 rounded-full bg-[#3E4095]  text-white hover:bg-blue-700"
+                  className={`w-full py-3 rounded-full bg-docuhealth-primary  text-white hover:bg-blue-700"
             ${isLoading ? "cursor-not-allowed bg-gray-300 text-gray-500 " : ""}
           `}
                   disabled={isLoading}

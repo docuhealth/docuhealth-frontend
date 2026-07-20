@@ -171,21 +171,21 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
           {appointmentType !== 'history' && (
             <button
               onClick={() => setAppointmentType('history')}
-              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+              className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
               View past appointments
             </button>
           )}
           {appointmentType !== 'today' && (
             <button
               onClick={() => setAppointmentType('today')}
-              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+              className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
               View today's appointments
             </button>
           )}
           {appointmentType !== 'upcoming' && (
             <button
               onClick={() => setAppointmentType('upcoming')}
-              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+              className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
               View upcoming appointments
             </button>
           )}
@@ -267,21 +267,21 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
         {appointmentType !== 'history' && (
           <button
             onClick={() => setAppointmentType('history')}
-            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+            className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
             View past appointments
           </button>
         )}
         {appointmentType !== 'today' && (
           <button
             onClick={() => setAppointmentType('today')}
-            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+            className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
             View today's appointments
           </button>
         )}
         {appointmentType !== 'upcoming' && (
           <button
             onClick={() => setAppointmentType('upcoming')}
-            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
+            className="border border-docuhealth-primary text-docuhealth-primary last:bg-docuhealth-primary last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
             View upcoming appointments
           </button>
         )}
@@ -299,7 +299,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095]"
+              className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-docuhealth-primary focus:border-docuhealth-primary"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -308,7 +308,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095]"
+              className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-docuhealth-primary focus:border-docuhealth-primary"
             />
           </div>
           {(dateFrom || dateTo) && (
@@ -685,7 +685,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                   >
                     <path
                       d="M20.0007 36.6654C10.7959 36.6654 3.33398 29.2034 3.33398 19.9987C3.33398 10.7939 10.7959 3.33203 20.0007 3.33203C29.2053 3.33203 36.6673 10.7939 36.6673 19.9987C36.6673 29.2034 29.2053 36.6654 20.0007 36.6654ZM20.0007 33.332C27.3645 33.332 33.334 27.3625 33.334 19.9987C33.334 12.6349 27.3645 6.66536 20.0007 6.66536C12.6369 6.66536 6.66732 12.6349 6.66732 19.9987C6.66732 27.3625 12.6369 33.332 20.0007 33.332ZM21.6673 17.4987V24.9987H23.334V28.332H16.6673V24.9987H18.334V20.832H16.6673V17.4987H21.6673ZM22.5007 13.332C22.5007 14.7127 21.3813 15.832 20.0007 15.832C18.62 15.832 17.5007 14.7127 17.5007 13.332C17.5007 11.9513 18.62 10.832 20.0007 10.832C21.3813 10.832 22.5007 11.9513 22.5007 13.332Z"
-                      fill="#1B2B40"
+                      fill="var(--color-docuhealth-dark)"
                     />
                   </svg>
                   <p className="pt-0.5 font-medium">Patient's Details</p>
@@ -745,7 +745,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                   </div>
                 </div>
                 <button
-                  className="w-full rounded-full text-center mt-3 py-2 bg-[#3E4095] cursor-pointer text-white disabled:opacity-50"
+                  className="w-full rounded-full text-center mt-3 py-2 bg-docuhealth-primary cursor-pointer text-white disabled:opacity-50"
                   onClick={() => {
                     setSelectedPatient(null);
                   }}
@@ -789,7 +789,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                             >
                               <path
                                 d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z"
-                                fill="#3E4095"
+                                fill="var(--color-docuhealth-primary)"
                               />
                             </svg>
                           </div>
@@ -807,7 +807,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
 
                       <div className="w-full pt-8">
                         <button
-                          className="w-full rounded-full border py-2 border-[#3E4095] text-[#3E4095] cursor-pointer"
+                          className="w-full rounded-full border py-2 border-docuhealth-primary text-docuhealth-primary cursor-pointer"
                           onClick={() => {
                             handleAssign(staff.staff_id);
                             setStaffList([]);
@@ -848,7 +848,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                   Add nursing note:
                 </p>
                 <textarea
-                  className="border rounded-lg w-full  h-[100px] p-3 text-[12px] outline-none focus:border-[#3E4095]"
+                  className="border rounded-lg w-full  h-[100px] p-3 text-[12px] outline-none focus:border-docuhealth-primary"
                   value={formData.note}
                   onChange={(e) =>
                     setFormData({ ...formData, note: e.target.value })
@@ -870,7 +870,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                   }}
                   onFocus={() => setIsOpen(true)} // when clicked/focused
                   onBlur={() => setIsOpen(false)} // when closed
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-[12px]"
+                  className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer  text-[12px]"
                   required
                 >
                   <option value="" selected>
@@ -907,7 +907,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                   <select
                     value={selectedDay}
                     onChange={(e) => setSelectedDay(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-[12px] "
+                    className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer  text-[12px] "
                   >
                     {[...Array(31)].map((_, i) => (
                       <option key={i} value={i + 1}>
@@ -937,7 +937,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                   <select
                     value={selectedMonth}
                     onChange={(e) => setSelectedMonth(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-[12px] "
+                    className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer  text-[12px] "
                   >
                     <option value="January" selected>
                       January
@@ -976,7 +976,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                   <select
                     value={selectedYear}
                     onChange={(e) => setSelectedYear(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-[12px] "
+                    className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer  text-[12px] "
                   >
                     <option value="2025" selected>
                       2025
@@ -1005,7 +1005,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                   <select
                     value={selectedTime}
                     onChange={(e) => setSelectedTime(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-[#3E4095] appearance-none cursor-pointer  text-[12px] "
+                    className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer  text-[12px] "
                   >
                     <option value="08:00" selected>
                       08:00 AM
@@ -1041,7 +1041,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
 
               <button
                 disabled={assignDoctorMutation.isPending}
-                className={`mt-6 w-full cursor-pointer bg-[#3E4095] text-white py-2 rounded-full disabled:bg-[#3E4095]/60 ${assignDoctorMutation.isPending ? "bg-[#3E4095]/60 cursor-not-allowed" : ""}} text-sm `}
+                className={`mt-6 w-full cursor-pointer bg-docuhealth-primary text-white py-2 rounded-full disabled:bg-docuhealth-primary/60 ${assignDoctorMutation.isPending ? "bg-docuhealth-primary/60 cursor-not-allowed" : ""}} text-sm `}
                 onClick={handleRequest}
               >
                 {assignDoctorMutation.isPending ? (

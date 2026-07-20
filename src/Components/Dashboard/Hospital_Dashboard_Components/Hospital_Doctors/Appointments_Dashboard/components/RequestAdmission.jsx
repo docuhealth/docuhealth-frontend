@@ -120,7 +120,7 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
           <button className={`py-2  text-white  ${
                   isPending
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-[#3E4095] cursor-pointer"
+                    : "bg-docuhealth-primary cursor-pointer"
                 } rounded-full mt-4  w-full`} 
           disabled={isPending || !form.ward || !form.bed}
           onClick={()=> {

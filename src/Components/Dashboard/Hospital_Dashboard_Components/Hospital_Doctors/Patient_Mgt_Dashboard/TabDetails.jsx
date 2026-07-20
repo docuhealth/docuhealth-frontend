@@ -142,8 +142,8 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
                 {admittedPatient.patient.firstname}{" "}
                 {admittedPatient.patient.lastname}{" "}
               </p>
-              <div className="bg-[#D2F5DB] px-2 rounded-full">
-                <p className="text-[#08A913] ">
+              <div className="bg-docuhealth-light-green px-2 rounded-full">
+                <p className="text-docuhealth-green ">
                   {formatRecordDate(admittedPatient.admission_date)}
                 </p>
               </div>
@@ -166,7 +166,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
               >
                 <path
                   d="M7.50165 9.24984C9.88142 9.24984 11.8452 11.0312 12.1322 13.3332H2.87109C3.15814 11.0312 5.12187 9.24984 7.50165 9.24984ZM6.44401 10.5795C5.60773 10.8447 4.90335 11.4159 4.46914 12.1665H7.50165L6.44401 10.5795ZM8.55953 10.5797L7.50165 12.1665H10.5342C10.1 11.416 9.39574 10.8448 8.55953 10.5797ZM11.0017 1.6665V5.1665C11.0017 7.0995 9.43464 8.6665 7.50165 8.6665C5.56866 8.6665 4.00166 7.0995 4.00166 5.1665V1.6665H11.0017ZM5.16832 5.1665C5.16832 6.45515 6.21299 7.49984 7.50165 7.49984C8.79035 7.49984 9.83499 6.45515 9.83499 5.1665H5.16832ZM9.83499 2.83317H5.16832L5.16826 3.99984H9.83493L9.83499 2.83317Z"
-                  fill="#1B2B40"
+                  fill="var(--color-docuhealth-dark)"
                 />
               </svg>
               <p className="">
@@ -186,7 +186,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
               >
                 <path
                   d="M4.66634 11.666V8.16602H9.33301V11.666H11.083V2.33268H2.91634V11.666H4.66634ZM5.83301 11.666H8.16634V9.33268H5.83301V11.666ZM12.2497 11.666H13.4163V12.8327H0.583008V11.666H1.74967V1.74935C1.74967 1.42719 2.01084 1.16602 2.33301 1.16602H11.6663C11.9885 1.16602 12.2497 1.42719 12.2497 1.74935V11.666ZM6.41634 4.66602V3.49935H7.58301V4.66602H8.74967V5.83268H7.58301V6.99935H6.41634V5.83268H5.24967V4.66602H6.41634Z"
-                  fill="#1B2B40"
+                  fill="var(--color-docuhealth-dark)"
                 />
               </svg>
 
@@ -208,7 +208,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
               >
                 <path
                   d="M12.8337 6.41536V11.6654H11.667V9.91536H2.33366V11.6654H1.16699V2.33203H2.33366V8.16536H7.00033V4.08203H10.5003C11.789 4.08203 12.8337 5.1267 12.8337 6.41536ZM11.667 8.16536V6.41536C11.667 5.77103 11.1447 5.2487 10.5003 5.2487H8.16699V8.16536H11.667ZM4.66699 6.41536C4.98916 6.41536 5.25033 6.15421 5.25033 5.83203C5.25033 5.50987 4.98916 5.2487 4.66699 5.2487C4.34483 5.2487 4.08366 5.50987 4.08366 5.83203C4.08366 6.15421 4.34483 6.41536 4.66699 6.41536ZM4.66699 7.58203C3.7005 7.58203 2.91699 6.79856 2.91699 5.83203C2.91699 4.86554 3.7005 4.08203 4.66699 4.08203C5.63349 4.08203 6.41699 4.86554 6.41699 5.83203C6.41699 6.79856 5.63349 7.58203 4.66699 7.58203Z"
-                  fill="#1B2B40"
+                  fill="var(--color-docuhealth-dark)"
                 />
               </svg>
 
@@ -228,7 +228,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
               >
                 <path
                   d="M4.08366 1.7487V0.582031H5.25033V1.7487H8.75033V0.582031H9.91699V1.7487H12.2503C12.5725 1.7487 12.8337 2.00987 12.8337 2.33203V5.2487H11.667V2.91536H9.91699V4.08203H8.75033V2.91536H5.25033V4.08203H4.08366V2.91536H2.33366V11.082H5.83366V12.2487H1.75033C1.42816 12.2487 1.16699 11.9875 1.16699 11.6654V2.33203C1.16699 2.00987 1.42816 1.7487 1.75033 1.7487H4.08366ZM9.91699 6.9987C8.62835 6.9987 7.58366 8.04339 7.58366 9.33203C7.58366 10.6207 8.62835 11.6654 9.91699 11.6654C11.2056 11.6654 12.2503 10.6207 12.2503 9.33203C12.2503 8.04339 11.2056 6.9987 9.91699 6.9987ZM6.41699 9.33203C6.41699 7.39904 7.984 5.83203 9.91699 5.83203C11.85 5.83203 13.417 7.39904 13.417 9.33203C13.417 11.265 11.85 12.832 9.91699 12.832C7.984 12.832 6.41699 11.265 6.41699 9.33203ZM9.33366 7.58203V9.57365L10.6712 10.9112L11.4961 10.0862L10.5003 9.09041V7.58203H9.33366Z"
-                  fill="#1B2B40"
+                  fill="var(--color-docuhealth-dark)"
                 />
               </svg>
 
@@ -237,7 +237,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
               </p>
             </div>
             <button
-              className="text-center mt-3 py-2.5 border bg-[#1B2B40] text-white w-full rounded-full cursor-pointer"
+              className="text-center mt-3 py-2.5 border bg-docuhealth-dark text-white w-full rounded-full cursor-pointer"
               onClick={() => {
                 setAdvanceCheckUp(true);
                 setSelected(admittedPatient);
@@ -248,7 +248,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
               View patient's details
             </button>
             <button
-              className="text-center mt-3 py-2 border border-[#1B2B40] text-[#1B2B40] w-full rounded-full cursor-pointer"
+              className="text-center mt-3 py-2 border border-docuhealth-dark text-docuhealth-dark w-full rounded-full cursor-pointer"
               onClick={() => {
                 setDischargePatient(!dischargePatient);
                 setSelectedDischargePatient(admittedPatient);
@@ -412,8 +412,8 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
                 {admittedPatient.patient.firstname}{" "}
                 {admittedPatient.patient.lastname}{" "}
               </p>
-              <div className="bg-[#D2F5DB] px-2 rounded-full">
-                <p className="text-[#08A913] ">
+              <div className="bg-docuhealth-light-green px-2 rounded-full">
+                <p className="text-docuhealth-green ">
                   {formatRecordDate(admittedPatient.discharge_date)}
                 </p>
               </div>
@@ -436,7 +436,7 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
               >
                 <path
                   d="M7.50165 9.24984C9.88142 9.24984 11.8452 11.0312 12.1322 13.3332H2.87109C3.15814 11.0312 5.12187 9.24984 7.50165 9.24984ZM6.44401 10.5795C5.60773 10.8447 4.90335 11.4159 4.46914 12.1665H7.50165L6.44401 10.5795ZM8.55953 10.5797L7.50165 12.1665H10.5342C10.1 11.416 9.39574 10.8448 8.55953 10.5797ZM11.0017 1.6665V5.1665C11.0017 7.0995 9.43464 8.6665 7.50165 8.6665C5.56866 8.6665 4.00166 7.0995 4.00166 5.1665V1.6665H11.0017ZM5.16832 5.1665C5.16832 6.45515 6.21299 7.49984 7.50165 7.49984C8.79035 7.49984 9.83499 6.45515 9.83499 5.1665H5.16832ZM9.83499 2.83317H5.16832L5.16826 3.99984H9.83493L9.83499 2.83317Z"
-                  fill="#1B2B40"
+                  fill="var(--color-docuhealth-dark)"
                 />
               </svg>
               <p className="">
@@ -456,7 +456,7 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
               >
                 <path
                   d="M4.66634 11.666V8.16602H9.33301V11.666H11.083V2.33268H2.91634V11.666H4.66634ZM5.83301 11.666H8.16634V9.33268H5.83301V11.666ZM12.2497 11.666H13.4163V12.8327H0.583008V11.666H1.74967V1.74935C1.74967 1.42719 2.01084 1.16602 2.33301 1.16602H11.6663C11.9885 1.16602 12.2497 1.42719 12.2497 1.74935V11.666ZM6.41634 4.66602V3.49935H7.58301V4.66602H8.74967V5.83268H7.58301V6.99935H6.41634V5.83268H5.24967V4.66602H6.41634Z"
-                  fill="#1B2B40"
+                  fill="var(--color-docuhealth-dark)"
                 />
               </svg>
 
@@ -478,7 +478,7 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
               >
                 <path
                   d="M12.8337 6.41536V11.6654H11.667V9.91536H2.33366V11.6654H1.16699V2.33203H2.33366V8.16536H7.00033V4.08203H10.5003C11.789 4.08203 12.8337 5.1267 12.8337 6.41536ZM11.667 8.16536V6.41536C11.667 5.77103 11.1447 5.2487 10.5003 5.2487H8.16699V8.16536H11.667ZM4.66699 6.41536C4.98916 6.41536 5.25033 6.15421 5.25033 5.83203C5.25033 5.50987 4.98916 5.2487 4.66699 5.2487C4.34483 5.2487 4.08366 5.50987 4.08366 5.83203C4.08366 6.15421 4.34483 6.41536 4.66699 6.41536ZM4.66699 7.58203C3.7005 7.58203 2.91699 6.79856 2.91699 5.83203C2.91699 4.86554 3.7005 4.08203 4.66699 4.08203C5.63349 4.08203 6.41699 4.86554 6.41699 5.83203C6.41699 6.79856 5.63349 7.58203 4.66699 7.58203Z"
-                  fill="#1B2B40"
+                  fill="var(--color-docuhealth-dark)"
                 />
               </svg>
 
@@ -498,7 +498,7 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
               >
                 <path
                   d="M4.08366 1.7487V0.582031H5.25033V1.7487H8.75033V0.582031H9.91699V1.7487H12.2503C12.5725 1.7487 12.8337 2.00987 12.8337 2.33203V5.2487H11.667V2.91536H9.91699V4.08203H8.75033V2.91536H5.25033V4.08203H4.08366V2.91536H2.33366V11.082H5.83366V12.2487H1.75033C1.42816 12.2487 1.16699 11.9875 1.16699 11.6654V2.33203C1.16699 2.00987 1.42816 1.7487 1.75033 1.7487H4.08366ZM9.91699 6.9987C8.62835 6.9987 7.58366 8.04339 7.58366 9.33203C7.58366 10.6207 8.62835 11.6654 9.91699 11.6654C11.2056 11.6654 12.2503 10.6207 12.2503 9.33203C12.2503 8.04339 11.2056 6.9987 9.91699 6.9987ZM6.41699 9.33203C6.41699 7.39904 7.984 5.83203 9.91699 5.83203C11.85 5.83203 13.417 7.39904 13.417 9.33203C13.417 11.265 11.85 12.832 9.91699 12.832C7.984 12.832 6.41699 11.265 6.41699 9.33203ZM9.33366 7.58203V9.57365L10.6712 10.9112L11.4961 10.0862L10.5003 9.09041V7.58203H9.33366Z"
-                  fill="#1B2B40"
+                  fill="var(--color-docuhealth-dark)"
                 />
               </svg>
 
@@ -507,7 +507,7 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
               </p>
             </div>
             <button
-              className="text-center mt-3 py-2.5 border bg-[#1B2B40] text-white w-full rounded-full cursor-pointer"
+              className="text-center mt-3 py-2.5 border bg-docuhealth-dark text-white w-full rounded-full cursor-pointer"
               onClick={() => {
                 setAdvanceCheckUp(true);
                 setSelected(admittedPatient);

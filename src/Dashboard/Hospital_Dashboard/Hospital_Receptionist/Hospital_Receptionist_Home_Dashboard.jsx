@@ -78,7 +78,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
             <DynamicDate />
             <div className="w-full sm:w-auto">
               <button
-                className="bg-[#3E4095] py-2.5 px-8 w-full sm:w-auto rounded-full text-white cursor-pointer"
+                className="bg-docuhealth-primary py-2.5 px-8 w-full sm:w-auto rounded-full text-white cursor-pointer"
                 onClick={() => {
                   setBookAppointment(!bookAppointment);
                 }}
@@ -112,7 +112,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                 </div>
               </div>
             </div>
-            <div className="my-5 bg-[#FAFAFA] rounded-xl border p-4">
+            <div className="my-5 bg-docuhealth-light-gray rounded-xl border p-4">
               <h2 className="font-medium">General Information</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -233,14 +233,14 @@ const Hospital_Receptionist_Home_Dashboard = () => {
           {/* Watermark / Helper Text */}
           <div className="text-white text-center mb-4">
             <p className="text-xl font-semibold opacity-90 uppercase tracking-widest">
-              {hospitalName || 'NIL'}  Hospital
+              {hospitalName ? (hospitalName.toUpperCase().endsWith('HOSPITAL') ? hospitalName : `${hospitalName} Hospital`) : "NIL Hospital"}
             </p>
           </div>
         </div>
 
             <div className="text-sm grid grid-cols-1 lg:flex lg:justify-end lg:items-center gap-2 lg:gap-5 mt-5">
               <button
-                className=" border border-[#3E4095] rounded-full py-2.5 px-4 lg:px-8 text-[#3E4095] cursor-pointer"
+                className=" border border-docuhealth-primary rounded-full py-2.5 px-4 lg:px-8 text-docuhealth-primary cursor-pointer"
                 onClick={() => {
                   setNewPatient(!newPatient);
                 }}
@@ -259,7 +259,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                     >
                       <path
                         d="M2.33398 12.834C2.33398 10.2566 4.42332 8.16732 7.00065 8.16732C9.57799 8.16732 11.6673 10.2566 11.6673 12.834H10.5007C10.5007 10.901 8.93364 9.33398 7.00065 9.33398C5.06765 9.33398 3.50065 10.901 3.50065 12.834H2.33398ZM7.00065 7.58398C5.0669 7.58398 3.50065 6.01773 3.50065 4.08398C3.50065 2.15023 5.0669 0.583984 7.00065 0.583984C8.9344 0.583984 10.5007 2.15023 10.5007 4.08398C10.5007 6.01773 8.9344 7.58398 7.00065 7.58398ZM7.00065 6.41732C8.28982 6.41732 9.33398 5.37315 9.33398 4.08398C9.33398 2.79482 8.28982 1.75065 7.00065 1.75065C5.71148 1.75065 4.66732 2.79482 4.66732 4.08398C4.66732 5.37315 5.71148 6.41732 7.00065 6.41732Z"
-                        fill="#647284"
+                        fill="var(--color-docuhealth-secondary)"
                       />
                     </svg>
                   </span>
@@ -275,7 +275,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                   <button
                     onClick={handleHINCheck}
                     disabled={isFetching}
-                    className={`w-full flex-1  py-3  ${isFetching ? "cursor-not-allowed bg-gray-300 text-gray-500" : "bg-[#3E4095] cursor-pointer"}
+                    className={`w-full flex-1  py-3  ${isFetching ? "cursor-not-allowed bg-gray-300 text-gray-500" : "bg-docuhealth-primary cursor-pointer"}
                         
                  rounded-full rounded-l-none   lg:px-8    text-white sm:col-span-2 `}
                   >
@@ -314,7 +314,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
             <div className="bg-white rounded-lg border mt-5 p-4 text-sm text-gray-700">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className=" flex items-center gap-2 bg-blue-50 p-3 rounded-md">
-                  <div className="bg-[#3E4095] p-2 rounded-full">
+                  <div className="bg-docuhealth-primary p-2 rounded-full">
                     <svg
                       width="24"
                       height="24"
@@ -330,14 +330,14 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                   </div>
                   <div>
                     <p className="text-xs">Bed occupied / Available</p>
-                    <p className="text-[#3E4095] font-semibold text-lg">
+                    <p className="text-docuhealth-primary font-semibold text-lg">
                       {" "}
                       {occupiedBeds} / {totalBeds} Beds
                     </p>
                   </div>
                 </div>
                 <div className=" flex items-center gap-2 bg-purple-100 p-3 rounded-md">
-                  <div className="bg-[#9000FF] p-2 rounded-full">
+                  <div className="bg-docuhealth-purple p-2 rounded-full">
                     <svg
                       width="24"
                       height="24"
@@ -353,7 +353,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                   </div>
                   <div>
                     <p className="text-xs">Wards occupied / Available</p>
-                    <p className="text-[#9000FF] font-semibold text-lg">
+                    <p className="text-docuhealth-purple font-semibold text-lg">
                       {" "}
                       {occupiedWards} / {totalWards} Wards
                     </p>

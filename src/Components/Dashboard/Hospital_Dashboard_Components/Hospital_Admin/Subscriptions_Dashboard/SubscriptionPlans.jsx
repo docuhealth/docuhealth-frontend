@@ -127,10 +127,10 @@ const SubscriptionPlans = () => {
             </div>
           </div>
         ) : (
-          // ===== Plans Grid =====
+          // Plans Grid
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* ---------- Static Basic Plan ---------- */}
-            <div className="p-4 rounded-xl bg-[#F5F8F8]">
+            {/* Static Basic Plan */}
+            <div className="p-4 rounded-xl bg-docuhealth-gray-cool">
               <div className="flex justify-between items-center">
                 <p className="text-[12px] text-gray-900 pb-2">
                   Basic Plan
@@ -167,7 +167,7 @@ const SubscriptionPlans = () => {
                   "View patient profile (medical summaries from other hospitals).",
                 ].map((feature, i) => (
                   <p key={i} className="flex items-center text-[12px]">
-                    <i className="bx bx-check text-[#3E4095] text-xl mr-1"></i>
+                    <i className="bx bx-check text-docuhealth-primary text-xl mr-1"></i>
                     {feature}
                   </p>
                 ))}
@@ -196,11 +196,11 @@ const SubscriptionPlans = () => {
               </button>
             </div>
 
-            {/* ---------- Dynamic Plans from API ---------- */}
+            {/* Dynamic Plans from API */}
             {subscriptionPlans.map((plan) => (
               <div
                 key={plan.id}
-                className="p-4 rounded-xl bg-linear-to-b from-[#ECFAFF] to-[#EEEEFD]"
+                className="p-4 rounded-xl bg-linear-to-b from-docuhealth-blue-lightest to-docuhealth-primary-lightest"
               >
                 {/* Header */}
                 <div className="flex justify-between items-center">
@@ -236,14 +236,14 @@ const SubscriptionPlans = () => {
                 <div className="py-5 space-y-1">
                   {plan.features.map((feature, i) => (
                     <p key={i} className="flex items-center text-[12px]">
-                      <i className="bx bx-check text-[#3E4095] text-xl mr-1"></i>
+                      <i className="bx bx-check text-docuhealth-primary text-xl mr-1"></i>
                       {feature}
                     </p>
                   ))}
                 </div>
 
                 <button
-                    className="rounded-full my-4 border border-[#3E4095] text-[#3E4095] font-semibold w-full disabled:cursor-not-allowed disabled:text-gray-500"
+                    className="rounded-full my-4 border border-docuhealth-primary text-docuhealth-primary font-semibold w-full disabled:cursor-not-allowed disabled:text-gray-500"
                     onClick={() => handlePayment(plan.paystack_plan_code)}
                 >
                   <p className="py-3 text-sm text-center">Choose {plan.name}</p>

@@ -90,7 +90,7 @@ const Partner_Create_Account = () => {
         if (score <= 3)
             return { strength: score, label: "Fair", color: "bg-yellow-500" };
         if (score <= 4)
-            return { strength: score, label: "Good", color: "bg-[#3E4095]" };
+            return { strength: score, label: "Good", color: "bg-docuhealth-primary" };
         return { strength: score, label: "Strong", color: "bg-green-500" };
     };
 
@@ -165,7 +165,7 @@ const Partner_Create_Account = () => {
                 <div className="  w-1/2 h-full overflow-y-scroll hide-scrollbar flex-1 ">
                     <div className="hidden sm:flex flex-col  items-start justify-center  py-10 ">
                         <Link to="/">
-                            <div className="pl-10 pb-10 flex gap-1 items-center font-semibold text-[#3E4095]">
+                            <div className="pl-10 pb-10 flex gap-1 items-center font-semibold text-docuhealth-primary">
                                 <img src={docuhealth_logo} alt="Logo" className="w-6" />
                                 <h1 className="text-xl">DocuHealth</h1>
                             </div>
@@ -186,7 +186,7 @@ const Partner_Create_Account = () => {
                                     <div className="relative">
                                         <input
                                             type="email"
-                                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value.toLowerCase())}
                                             required
@@ -200,7 +200,7 @@ const Partner_Create_Account = () => {
                                     <div className="relative">
                                         <input
                                             type="text"
-                                            className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                            className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
                                             required
@@ -214,7 +214,7 @@ const Partner_Create_Account = () => {
                                     <div className="relative">
                                         <input
                                             type="number"
-                                            className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                            className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                             value={phone}
                                             onChange={(e) => setPhone(e.target.value)}
                                             required
@@ -226,7 +226,7 @@ const Partner_Create_Account = () => {
                                     <div className="relative">
                                         <input
                                             type="text"
-                                            className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                            className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                             value={address}
                                             onChange={(e) => setAddress(e.target.value)}
                                             required
@@ -241,7 +241,7 @@ const Partner_Create_Account = () => {
                                         <input
                                             type={showPassword ? "text" : "password"}
                                             placeholder=""
-                                            className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${password && !isPasswordValid
+                                            className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary ${password && !isPasswordValid
                                                 ? "focus:border-red-500"
                                                 : ""
                                                 }`}
@@ -390,7 +390,7 @@ const Partner_Create_Account = () => {
                                         <input
                                             type={showPassword ? "text" : "password"}
                                             placeholder=""
-                                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                                            className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
                                             required
@@ -414,14 +414,14 @@ const Partner_Create_Account = () => {
                                     By Signing up, you agree to our{" "}
                                     <Link
                                         to="/privacy-policy"
-                                        className="text-[#3E4095] hover:underline"
+                                        className="text-docuhealth-primary hover:underline"
                                     >
                                         Privacy Policy
                                     </Link>{" "}
                                     and{" "}
                                     <Link
                                         to="/api-terms-and-conditions"
-                                        className="text-[#3E4095] hover:underline"
+                                        className="text-docuhealth-primary hover:underline"
                                     >
                                         API Terms and Conditions
                                     </Link>
@@ -437,7 +437,7 @@ const Partner_Create_Account = () => {
                                         isPasswordValid &&
                                         confirmPassword === password &&
                                         !isSubmitting
-                                        ? "bg-[#3E4095] text-white hover:bg-[#33357a]"
+                                        ? "bg-docuhealth-primary text-white hover:bg-docuhealth-primary-hover"
                                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                         }`}
 
@@ -463,7 +463,7 @@ const Partner_Create_Account = () => {
                                 Already have an account?{" "}
                                 <Link
                                     to="/partner-login"
-                                    className="text-[#3E4095] hover:underline"
+                                    className="text-docuhealth-primary hover:underline"
                                 >
                                     Sign in
                                 </Link>
@@ -477,7 +477,7 @@ const Partner_Create_Account = () => {
             <div className="h-screen sm:hidden">
                 <div className="h-full overflow-y-scroll hide-scrollbar py-10">
                     <Link to="/">
-                        <div className="pl-5 flex gap-1 items-center font-semibold text-[#3E4095]">
+                        <div className="pl-5 flex gap-1 items-center font-semibold text-docuhealth-primary">
                             <img src={docuhealth_logo} alt="Logo" className="w-6" />
                             <h1 className="text-xl">DocuHealth</h1>
                         </div>
@@ -501,7 +501,7 @@ const Partner_Create_Account = () => {
                                         <div className="relative">
                                             <input
                                                 type="email"
-                                                className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                                                className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value.toLowerCase())}
                                                 required
@@ -516,7 +516,7 @@ const Partner_Create_Account = () => {
                                             <input
                                                 type={showPassword ? "text" : "password"}
                                                 placeholder=""
-                                                className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${password && !isPasswordValid
+                                                className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary ${password && !isPasswordValid
                                                     ? "focus:border-red-500"
                                                     : ""
                                                     }`}
@@ -664,7 +664,7 @@ const Partner_Create_Account = () => {
                                             <input
                                                 type={showPassword ? "text" : "password"}
                                                 placeholder=""
-                                                className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                                                className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                                                 value={confirmPassword}
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                                 required
@@ -690,7 +690,7 @@ const Partner_Create_Account = () => {
                                         className={`w-full transition-colors py-3 rounded-full ${email &&
                                             isPasswordValid &&
                                             confirmPassword === password
-                                            ? "bg-[#3E4095] text-white hover:bg-[#33357a]"
+                                            ? "bg-docuhealth-primary text-white hover:bg-docuhealth-primary-hover"
                                             : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                             }`}
 
@@ -712,7 +712,7 @@ const Partner_Create_Account = () => {
                                         <div className="relative">
                                             <input
                                                 type="text"
-                                                className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                                 value={name}
                                                 onChange={(e) => setName(e.target.value)}
                                                 required
@@ -727,7 +727,7 @@ const Partner_Create_Account = () => {
                                         <div className="relative">
                                             <input
                                                 type="number"
-                                                className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                                 value={phone}
                                                 onChange={(e) => setPhone(e.target.value)}
                                                 required
@@ -742,7 +742,7 @@ const Partner_Create_Account = () => {
                                         <div className="relative">
                                             <input
                                                 type="text"
-                                                className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-[#3E4095]"
+                                                className="w-full px-4 py-3 border rounded-lg pl-3 outline-hidden focus:border-docuhealth-primary"
                                                 value={address}
                                                 onChange={(e) => setAddress(e.target.value)}
                                                 required
@@ -756,14 +756,14 @@ const Partner_Create_Account = () => {
                                         By Signing up, you agree to our{" "}
                                         <Link
                                             to="/privacy-policy"
-                                            className="text-[#3E4095] hover:underline"
+                                            className="text-docuhealth-primary hover:underline"
                                         >
                                             Privacy Policy
                                         </Link>{" "}
                                         and{" "}
                                         <Link
                                             to="/api-terms-and-conditions"
-                                            className="text-[#3E4095] hover:underline"
+                                            className="text-docuhealth-primary hover:underline"
                                         >
                                             API Terms and Conditions
                                         </Link>
@@ -779,7 +779,7 @@ const Partner_Create_Account = () => {
                                             isPasswordValid &&
                                             confirmPassword === password &&
                                             !isSubmitting
-                                            ? "bg-[#3E4095] text-white hover:bg-[#33357a]"
+                                            ? "bg-docuhealth-primary text-white hover:bg-docuhealth-primary-hover"
                                             : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                             }`}
 
@@ -809,7 +809,7 @@ const Partner_Create_Account = () => {
                             Already have an account?{" "}
                             <Link
                                 to="/partner-login"
-                                className="text-[#3E4095] hover:underline"
+                                className="text-docuhealth-primary hover:underline"
                             >
                                 Sign in
                             </Link>
@@ -835,7 +835,7 @@ const Partner_Create_Account = () => {
                             <div>
                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Client ID</label>
                                 <div className="flex items-center gap-2 mt-1 bg-gray-50 border rounded-sm p-3">
-                                    <code className="text-sm flex-1 break-all text-[#3E4095] font-mono">{registrationData?.clientId}</code>
+                                    <code className="text-sm flex-1 break-all text-docuhealth-primary font-mono">{registrationData?.clientId}</code>
                                 </div>
                             </div>
 
@@ -861,7 +861,7 @@ const Partner_Create_Account = () => {
 
                         <button
                             onClick={() => navigate("/partner-login")}
-                            className="w-full mt-8 bg-[#3E4095] text-white py-2.5 rounded-full  transition-all text-sm cursor-pointer" 
+                            className="w-full mt-8 bg-docuhealth-primary text-white py-2.5 rounded-full  transition-all text-sm cursor-pointer" 
                         >
                             I've saved my keys, Proceed to Login
                         </button>

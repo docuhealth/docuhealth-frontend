@@ -39,7 +39,7 @@ const PatientInfoCard = ({
     <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
       <div className={`grid ${gridCols} gap-4 sm:gap-6`}>
         <div className="flex flex-col gap-1">
-          <p className="text-sm font-bold text-[#1B2B40]">{order.name}</p>
+          <p className="text-sm font-bold text-docuhealth-dark">{order.name}</p>
           <p className="text-xs text-gray-500">Patient HIN: {order.hin}</p>
           <p className="text-xs text-gray-500">Age: {ageDisplay}</p>
           <p className="text-xs text-gray-500">Gender: {gender}</p>
@@ -55,18 +55,18 @@ const PatientInfoCard = ({
         {!hideRequestedBy && (
           <div className="flex flex-col gap-1">
             <p className="text-xs text-gray-400">Requested by:</p>
-            <p className="text-sm font-bold text-[#1B2B40]">{requestedBy}</p>
+            <p className="text-sm font-bold text-docuhealth-dark">{requestedBy}</p>
           </div>
         )}
         <div className="flex flex-col gap-1">
           <p className="text-xs text-gray-400">Provider information:</p>
-          <p className="text-sm font-bold text-[#1B2B40]">{order.hospital}</p>
+          <p className="text-sm font-bold text-docuhealth-dark">{order.hospital}</p>
           <p className="text-xs text-gray-500">Email: {email}</p>
         </div>
         <div className="flex flex-col gap-1">
           <p className="text-xs text-gray-400">{dateLabel}</p>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold text-[#1B2B40]">
+            <p className="text-sm font-semibold text-docuhealth-dark">
               {order.datetime}
             </p>
           </div>
@@ -75,14 +75,14 @@ const PatientInfoCard = ({
           <div className="flex flex-col gap-1">
             <p className="text-xs text-gray-400">Sample collection date:</p>
             <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-[#1B2B40]">
+              <p className="text-sm font-semibold text-docuhealth-dark">
                 {order.specimen_collected_at ??
                   (isCompleted ? order.datetime : "—")}
               </p>
               {isInProgress && onEditSample && (
                 <button
                   onClick={onEditSample}
-                  className="text-gray-400 hover:text-[#3E4095] transition-colors"
+                  className="text-gray-400 hover:text-docuhealth-primary transition-colors"
                   title="Edit sample collection info"
                 >
                   <Pencil size={13} />

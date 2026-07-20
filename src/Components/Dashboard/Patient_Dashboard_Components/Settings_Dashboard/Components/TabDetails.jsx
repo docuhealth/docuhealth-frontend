@@ -70,7 +70,7 @@ const AccountSettingsTab = () => {
     if (score <= 3)
       return { strength: score, label: "Fair", color: "bg-yellow-500" };
     if (score <= 4)
-      return { strength: score, label: "Good", color: "bg-[#3E4095]" };
+      return { strength: score, label: "Good", color: "bg-docuhealth-primary" };
     return { strength: score, label: "Strong", color: "bg-green-500" };
   };
 
@@ -236,7 +236,7 @@ const AccountSettingsTab = () => {
                   type="text"
                   value={formData.firstname}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none "
                 />
               </div>
               <div className="">
@@ -252,7 +252,7 @@ const AccountSettingsTab = () => {
                   type="text"
                   value={formData.lastname}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none "
                 />
               </div>
               <div className="">
@@ -268,7 +268,7 @@ const AccountSettingsTab = () => {
                   type="text"
                   value={formData.middlename}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none "
                 />
               </div> */}
 
@@ -286,7 +286,7 @@ const AccountSettingsTab = () => {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none "
                 />
               </div>
 
@@ -304,7 +304,7 @@ const AccountSettingsTab = () => {
                   type="number"
                   value={formData.phone_num}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none "
                 />
               </div>
 
@@ -313,7 +313,7 @@ const AccountSettingsTab = () => {
                 <div className="relative">
                   <select
                     name="gender"
-                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
+                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none "
                     value={formData.gender}
                     onChange={handleChange}
                   >
@@ -351,7 +351,7 @@ const AccountSettingsTab = () => {
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder=""
-                    className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none pl-8 ${formData.password && !isPasswordValid
+                    className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none pl-8 ${formData.password && !isPasswordValid
                       ? "focus:border-red-500"
                       : ""
                       }`}
@@ -498,7 +498,7 @@ const AccountSettingsTab = () => {
                     type={showConfirmPassword ? "text" : "password"}
                     name="confirmPassword"
                     placeholder=""
-                    className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none pl-8 ${formData.confirmPassword && formData.password !== formData.confirmPassword
+                    className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none pl-8 ${formData.confirmPassword && formData.password !== formData.confirmPassword
                       ? "focus:border-red-500"
                       : ""
                       }`}
@@ -531,7 +531,7 @@ const AccountSettingsTab = () => {
                   <input
                     name="DOB"
                     type="date"
-                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none "
+                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none "
                     value={formData.DOB}
                     onChange={handleChange}
                   />
@@ -543,7 +543,7 @@ const AccountSettingsTab = () => {
                   onClick={handleSubmit}
                   disabled={updateAccountMutation.isPending}
                   className={`w-full px-3 sm:px-4 py-2 text-sm font-medium text-white rounded-full shadow-xs focus:outline-hidden transition-all cursor-pointer ${!updateAccountMutation.isPending
-                    ? "bg-[#3E4095] "
+                    ? "bg-docuhealth-primary "
                     : "bg-gray-300 cursor-not-allowed"
                     }`}
                 >
@@ -575,7 +575,7 @@ const AccountSettingsTab = () => {
                   type="button"
                   disabled={updateAccountMutation.isPending}
                   onClick={handleCancel}
-                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-xs cursor-pointer ${!updateAccountMutation.isPending ? 'text-[#3E4095] bg-white border border-[#3E4095] hover:bg-gray-50' : 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-hidden`}
+                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-xs cursor-pointer ${!updateAccountMutation.isPending ? 'text-docuhealth-primary bg-white border border-docuhealth-primary hover:bg-gray-50' : 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-hidden`}
                 >
                   Cancel Changes
                 </button>
@@ -677,15 +677,15 @@ const IDCardTab = () => {
                   if (el.classList.contains("text-white") || el.classList.contains("text-[white]")) {
                     el.style.color = "#ffffff";
                   } else {
-                    el.style.color = "#313131";
+                    el.style.color = "var(--color-docuhealth-gray-dark)";
                   }
                 }
                 if (prop === "backgroundColor") {
                   if (el.classList.contains("bg-white")) el.style.backgroundColor = "#ffffff";
-                  else if (el.classList.contains("bg-[#F2F2F2]")) el.style.backgroundColor = "#F2F2F2";
+                  else if (el.classList.contains("bg-docuhealth-bg-gray")) el.style.backgroundColor = "var(--color-docuhealth-bg-gray)";
                   // Don't override transparent or images
                 }
-                if (prop === "borderColor") el.style.borderColor = "#dddddd";
+                if (prop === "borderColor") el.style.borderColor = "var(--color-docuhealth-border-gray)";
               }
             });
           }
@@ -711,7 +711,7 @@ const IDCardTab = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
         <div>
-          <h2 className="text-lg font-semibold text-[#3E4095]">My DocuHealth Identity Card</h2>
+          <h2 className="text-lg font-semibold text-docuhealth-primary">My DocuHealth Identity Card</h2>
           <p className="text-gray-500 text-sm">
             View and download your official DocuHealth Identity Card.
           </p>
@@ -721,7 +721,7 @@ const IDCardTab = () => {
           <button
             disabled={downloading}
             onClick={handleDownload}
-            className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-white text-sm font-medium transition-all shadow active:scale-95 ${downloading ? "bg-gray-400 cursor-not-allowed" : "bg-[#3E4095] "
+            className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-white text-sm font-medium transition-all shadow active:scale-95 ${downloading ? "bg-gray-400 cursor-not-allowed" : "bg-docuhealth-primary "
               }`}
           >
             {downloading ? (
@@ -754,7 +754,7 @@ const IDCardTab = () => {
       ) : (
         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-10 text-center">
           <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <i className="bx bx-id-card text-4xl text-[#3E4095]"></i>
+            <i className="bx bx-id-card text-4xl text-docuhealth-primary"></i>
           </div>
           <h3 className="text-lg font-semibold text-gray-800 mb-2">ID Card Not Generated</h3>
           <p className="text-gray-600 text-sm max-w-md mx-auto mb-8">
@@ -762,7 +762,7 @@ const IDCardTab = () => {
           </p>
           <button
             onClick={() => navigate("/user-home-dashboard")}
-            className="px-8 py-3 bg-[#3E4095] text-white rounded-full text-sm font-medium hover:bg-[#2e3075] transition-colors"
+            className="px-8 py-3 bg-docuhealth-primary text-white rounded-full text-sm font-medium hover:bg-docuhealth-primary-darker transition-colors"
           >
             Go Generate Now
           </button>

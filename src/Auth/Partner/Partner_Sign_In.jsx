@@ -110,7 +110,7 @@ const Partner_Sign_In = () => {
         <div className="  w-full flex-1">
           <div className=" hidden sm:flex justify-center items-center py-10 h-screen ">
             <Link to="/">
-              <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
+              <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-docuhealth-primary">
                 <img src={docuhealth_logo} alt="Logo" className="w-6" />
                 <h1 className="text-xl">DocuHealth</h1>
               </div>
@@ -132,7 +132,7 @@ const Partner_Sign_In = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                         value={inputValue}
                         onChange={handleInputChange}
                         onInput={handleInputChange}
@@ -149,7 +149,7 @@ const Partner_Sign_In = () => {
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
-                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         onInput={(e) => setPassword(e.target.value)}
@@ -182,7 +182,7 @@ const Partner_Sign_In = () => {
                     <div>
                       <Link
                         // to="/user-forgot-password"
-                        className="underline text-[#3E4095]"
+                        className="underline text-docuhealth-primary"
                       >
                         Forgot Password
                       </Link>
@@ -194,7 +194,7 @@ const Partner_Sign_In = () => {
                     type="submit"
                     className={`w-full py-3 rounded-full ${
                       isFormValid && !isSubmitting
-                        ? "bg-[#3E4095] text-white"
+                        ? "bg-docuhealth-primary text-white"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     }`}
                     onClick={handleSubmit}
@@ -216,7 +216,7 @@ const Partner_Sign_In = () => {
                   Haven't Registered Yet?{" "}
                   <Link
                     to="/partner-create-account"
-                    className="text-[#3E4095] hover:underline"
+                    className="text-docuhealth-primary hover:underline"
                   >
                     Sign Up
                   </Link>
@@ -230,7 +230,7 @@ const Partner_Sign_In = () => {
 
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
         <Link to="/">
-          <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+          <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-docuhealth-primary">
             <img src={docuhealth_logo} alt="Logo" className="w-6" />
             <h1 className="text-xl">DocuHealth</h1>
           </div>
@@ -249,7 +249,7 @@ const Partner_Sign_In = () => {
               <div className="relative">
                 <input
                   type="text"
-                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                   value={inputValue}
                   onChange={handleInputChange}
                   required
@@ -264,7 +264,7 @@ const Partner_Sign_In = () => {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -295,7 +295,7 @@ const Partner_Sign_In = () => {
               <div>
                 <Link
                   //   to="/user-forgot-password"
-                  className="underline text-[#3E4095]"
+                  className="underline text-docuhealth-primary"
                 >
                   Forgot Password
                 </Link>
@@ -307,7 +307,7 @@ const Partner_Sign_In = () => {
               type="submit"
               className={`w-full py-3 rounded-full ${
                 isFormValid && !isSubmitting
-                  ? "bg-[#3E4095] text-white "
+                  ? "bg-docuhealth-primary text-white "
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
               onClick={handleSubmit}
@@ -329,7 +329,7 @@ const Partner_Sign_In = () => {
             Haven't Registered Yet?{" "}
             <Link
               to="/partner-create-account"
-              className="text-[#3E4095] hover:underline"
+              className="text-docuhealth-primary hover:underline"
             >
               Sign Up
             </Link>
