@@ -7,6 +7,7 @@ import OtherMedicalServices from "../../../Components/Dashboard/Hospital_Dashboa
 import TransferToAnotherWard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/TransferToAnotherWard";
 import AfterDischargeSummary from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/AfterDischargeSummary";
 import SoapNoteEntry from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/SoapNoteEntry";
+import PrescribeMedication from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PrescribeMedication";
 
 const Hospital_Doctors_Patients_Dashboard = () => {
   const [advanceCheckUp, setAdvanceCheckUp] = useState(false);
@@ -15,6 +16,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
   const [selected, setSelected] = useState(null);
 
   const [otherMedicalServices, setOtherMedicalServices] = useState(false);
+  const [prescribeMedication, setPrescribeMedication] = useState(false);
   const [transferRequest, setTransferRequest] = useState(false);
 
   const [soapNoteEntry, setSoapNoteEntry] = useState(false);
@@ -73,6 +75,8 @@ const Hospital_Doctors_Patients_Dashboard = () => {
             <OtherMedicalServices
               setOtherMedicalServices={setOtherMedicalServices}
               selectedPatientDetails={selected}
+              setPrescribeMedication={setPrescribeMedication}
+              setSeePatientDetails={setAdvanceCheckUp}
               isFromPatientMgt={true}
             />
           )}
@@ -97,6 +101,20 @@ const Hospital_Doctors_Patients_Dashboard = () => {
             setSoapNoteEntry={setSoapNoteEntry}
             selectedPatientDetails={selected}
           />
+        </>
+      ) : prescribeMedication ? (
+        <>
+          <div className="py-2 text-sm flex justify-between items-center">
+            <DynamicDate />
+          </div>
+          <div>
+            <PrescribeMedication
+              setPrescribeMedication={setPrescribeMedication}
+              selectedPatientDetails={selected}
+              setSeePatientDetails={setAdvanceCheckUp}
+              isFromPatientMgt={true}
+            />
+          </div>
         </>
       ) : (
         <>

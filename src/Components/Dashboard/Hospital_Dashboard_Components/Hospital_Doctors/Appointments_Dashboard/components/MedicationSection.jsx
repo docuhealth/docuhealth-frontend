@@ -24,8 +24,7 @@ const MedicationSection = ({ medications, setMedications }) => {
         dosage: "",
         dosageUnit: "mg",
         route: "Oral",
-        frequency: 1,
-        frequencyUnit: "Daily",
+        frequency: "od_qd",
         duration: "",
         durationUnit: "Month",
       },
@@ -117,34 +116,37 @@ const MedicationSection = ({ medications, setMedications }) => {
             </div>
           </div>
 
-          <div className="lg:col-span-2 flex gap-2">
-            <div className="flex-1">
-              <label className="block text-[12px] font-medium text-gray-700 pb-1">Frequency</label>
-              <input
-                type="number"
-                min={1}
+          <div className="lg:col-span-2 relative">
+            <label className="block text-[12px] font-medium text-gray-700 pb-1">Frequency</label>
+            <div className="relative">
+              <select
                 value={med.frequency}
-                onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
                 onChange={(e) => handleChange(index, "frequency", e.target.value)}
-                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block text-[12px] pb-1">&nbsp;</label>
-              <div className="relative">
-                <select
-                  value={med.frequencyUnit}
-                  onChange={(e) => handleChange(index, "frequencyUnit", e.target.value)}
-                  className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-[#3E4095] outline-none transition-all bg-white"
-                >
-                  <option value="Daily">Daily</option>
-                  <option value="Weekly">Weekly</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
+                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none appearance-none bg-white pr-8 transition-all"
+              >
+                <option value="stat">stat - Immediately</option>
+                <option value="once">once - One-time dose</option>
+                <option value="od_qd">od_qd - Once daily</option>
+                <option value="bd_bid">bd_bid - Twice daily</option>
+                <option value="tds_tid">tds_tid - Three times daily</option>
+                <option value="qid">qid - Four times daily</option>
+                <option value="q3h">q3h - Every 3 hours</option>
+                <option value="q4h">q4h - Every 4 hours</option>
+                <option value="q6h">q6h - Every 6 hours</option>
+                <option value="q8h">q8h - Every 8 hours</option>
+                <option value="q12h">q12h - Every 12 hours</option>
+                <option value="q24h">q24h - Every 24 hours</option>
+                <option value="prn">prn - As needed</option>
+                <option value="mane">mane - Morning</option>
+                <option value="nocte">nocte - Night</option>
+                <option value="alt_days">alt_days - Alternate days</option>
+                <option value="weekly">weekly - Weekly</option>
+                <option value="monthly">monthly - Monthly</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </div>
             </div>
           </div>
@@ -195,7 +197,7 @@ const MedicationSection = ({ medications, setMedications }) => {
 
       <button
         onClick={handleAddMedication}
-        className="text-[#3E4095] font-medium text-[12px] mt-4 flex items-center gap-1 hover:underline transition-all"
+        className="text-[#3E4095] font-medium text-[12px] mt-4 flex items-center gap-1"
       >
         <Plus size={14} /> Add more drugs
       </button>

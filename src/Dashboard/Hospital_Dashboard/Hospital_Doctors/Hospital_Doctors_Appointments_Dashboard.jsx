@@ -5,6 +5,7 @@ import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Compon
 import SoapNoteEntry from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/SoapNoteEntry";
 import RequestAdmission from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/RequestAdmission";
 import OtherMedicalServices from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/OtherMedicalServices";
+import PrescribeMedication from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PrescribeMedication";
 import { DoctorAppointmentsListContext } from "../../../context/HospitalContext/Doctors/DoctorAppointmentsListContext";
 
 const Hospital_Doctors_Appointments_Dashboard = () => {
@@ -14,6 +15,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
   const [otherMedicalServices, setOtherMedicalServices] = useState(false);
+  const [prescribeMedication, setPrescribeMedication] = useState(false);
 
   const [requestAdmission, setRequestAdmission] = useState(false);
 
@@ -59,6 +61,8 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
           {
             otherMedicalServices && (
               <OtherMedicalServices setOtherMedicalServices={setOtherMedicalServices}
+                setPrescribeMedication={setPrescribeMedication}
+                setSeePatientDetails={setSeePatientDetails}
                 selectedPatientDetails={selectedPatientDetails}
               />
             )
@@ -89,6 +93,19 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
               setSoapNoteEntry={setSoapNoteEntry}
               selectedPatientDetails={selectedPatientDetails}
               source="appointments"
+            />
+          </div>
+        </>
+      ) : prescribeMedication ? (
+        <>
+          <div className="py-2 text-sm flex justify-between items-center">
+            <DynamicDate />
+          </div>
+          <div>
+            <PrescribeMedication
+              setPrescribeMedication={setPrescribeMedication}
+              selectedPatientDetails={selectedPatientDetails}
+              setSeePatientDetails={setSeePatientDetails}
             />
           </div>
         </>

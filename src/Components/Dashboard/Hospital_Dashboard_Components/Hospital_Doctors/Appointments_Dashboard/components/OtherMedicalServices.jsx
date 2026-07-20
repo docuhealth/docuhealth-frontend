@@ -66,6 +66,8 @@ const Nurse_Icon = () => (
 const OtherMedicalServices = ({
   setOtherMedicalServices,
   selectedPatientDetails,
+  setPrescribeMedication,
+  setSeePatientDetails,
   isFromPatientMgt = false,
 }) => {
   const [selected, setSelected] = useState(null);
@@ -149,6 +151,14 @@ const OtherMedicalServices = ({
 
   const handleSubmit = async () => {
     setLoading(true);
+
+    if (selected === "pharmacist") {
+      setOtherMedicalServices(false);
+      setPrescribeMedication?.(true);
+      setSeePatientDetails?.(false); // ensure details are hidden
+      setLoading(false);
+      return;
+    }
 
     if (selected != "nurse" && selected != "lab_scientist") {
       toast.error("Feature coming soon");
