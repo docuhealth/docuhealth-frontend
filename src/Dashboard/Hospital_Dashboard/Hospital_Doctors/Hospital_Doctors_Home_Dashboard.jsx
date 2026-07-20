@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useMemo } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import template from "../../../assets/img/template.png";
 import { Stethoscope, CalendarCheck, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
@@ -6,43 +6,67 @@ import { DoctorAppContext } from "../../../context/HospitalContext/Doctors/Docto
 import AdmittedPatientsChart from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/AdmittedPatientsChart";
 import DischargedPatientsChart from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/DischargedPatientsChart";
 import AttendanceOverviewChart from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/AttendanceOverviewChart";
+import { useQuery } from "@tanstack/react-query";
+import { getHospitalToken } from "../../../services/authService";
+import { fetchHospitalDoctorDashboardMetrics } from "../../../queries/Hospital/doctor/dashboard_metrics";
+import { getDatesForFilter } from "../../../utils/dateFilterHelper";
+
+const ChartLoadingPlaceholder = ({ title }) => (
+  <div className="bg-white p-6 rounded-md border border-gray-200 w-full h-[380px] flex flex-col justify-between animate-pulse">
+    <div className="flex justify-between items-center mb-6">
+      <h3 className="text-xs lg:text-lg lg:font-semibold text-gray-800">
+        {title}
+      </h3>
+      <div className="h-8 w-24 bg-gray-200 rounded"></div>
+    </div>
+    <div className="flex-1 flex justify-center items-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3E4095]"></div>
+    </div>
+  </div>
+);
 
 const Hospital_Doctors_Home_Dashboard = () => {
-  const { hospitalName, backgroundImage, dashboardMetrics, dashboardMetricsLoading, updateDateRange } =
+  const { hospitalName, backgroundImage, dashboardMetrics, dashboardMetricsLoading } =
     useContext(DoctorAppContext);
-
-  const [globalFilter, setGlobalFilter] = useState("Monthly");
 
   const backgroundImageUrl = backgroundImage || template;
 
-  const handleFilterChange = (selected) => {
-    setGlobalFilter(selected);
-    const today = new Date();
-    let startDate = "";
-    let endDate = today.toISOString().split("T")[0];
+  const isUserLoggedIn = !!getHospitalToken();
 
-    if (selected === "Daily") {
-      startDate = today.toISOString().split("T")[0];
-    } else if (selected === "Last 24hrs") {
-      const yesterday = new Date(today);
-      yesterday.setDate(today.getDate() - 1);
-      startDate = yesterday.toISOString().split("T")[0];
-    } else if (selected === "Weekly") {
-      const lastWeek = new Date(today);
-      lastWeek.setDate(today.getDate() - 7);
-      startDate = lastWeek.toISOString().split("T")[0];
-    } else if (selected === "Monthly") {
-      const lastMonth = new Date(today);
-      lastMonth.setMonth(today.getMonth() - 1);
-      startDate = lastMonth.toISOString().split("T")[0];
-    } else if (selected === "Yearly") {
-      const lastYear = new Date(today);
-      lastYear.setFullYear(today.getFullYear() - 1);
-      startDate = lastYear.toISOString().split("T")[0];
-    }
+  const [admittedFilter, setAdmittedFilter] = useState("Monthly");
+  const [dischargedFilter, setDischargedFilter] = useState("Monthly");
+  const [attendanceFilter, setAttendanceFilter] = useState("Monthly");
 
-    updateDateRange({ start_date: startDate, end_date: endDate });
-  };
+  const admittedRange = useMemo(() => getDatesForFilter(admittedFilter), [admittedFilter]);
+  const dischargedRange = useMemo(() => getDatesForFilter(dischargedFilter), [dischargedFilter]);
+  const attendanceRange = useMemo(() => getDatesForFilter(attendanceFilter), [attendanceFilter]);
+
+  const { data: admittedMetrics, isPending: admittedLoading } = useQuery({
+    queryKey: ["doctors-dashboard-metrics", admittedRange],
+    queryFn: fetchHospitalDoctorDashboardMetrics,
+    enabled: isUserLoggedIn,
+    staleTime: 1000 * 5,
+    refetchInterval: 15000,
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: dischargedMetrics, isPending: dischargedLoading } = useQuery({
+    queryKey: ["doctors-dashboard-metrics", dischargedRange],
+    queryFn: fetchHospitalDoctorDashboardMetrics,
+    enabled: isUserLoggedIn,
+    staleTime: 1000 * 5,
+    refetchInterval: 15000,
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: attendanceMetrics, isPending: attendanceLoading } = useQuery({
+    queryKey: ["doctors-dashboard-metrics", attendanceRange],
+    queryFn: fetchHospitalDoctorDashboardMetrics,
+    enabled: isUserLoggedIn,
+    staleTime: 1000 * 5,
+    refetchInterval: 15000,
+    refetchOnWindowFocus: true,
+  });
 
   const summary = dashboardMetrics?.summary || {};
 
@@ -131,26 +155,38 @@ const Hospital_Doctors_Home_Dashboard = () => {
       {/* Charts Row */}
       {!dashboardMetricsLoading && (
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-          <AdmittedPatientsChart
-            data={dashboardMetrics?.charts?.admissions_overview || []}
-            filter={globalFilter}
-            onFilterChange={handleFilterChange}
-          />
-          <DischargedPatientsChart
-            data={dashboardMetrics?.charts?.discharged_patients || []}
-            filter={globalFilter}
-            onFilterChange={handleFilterChange}
-          />
+          {admittedLoading ? (
+            <ChartLoadingPlaceholder title="Admitted patients" />
+          ) : (
+            <AdmittedPatientsChart
+              data={admittedMetrics?.charts?.admissions_overview || []}
+              filter={admittedFilter}
+              onFilterChange={setAdmittedFilter}
+            />
+          )}
+          {dischargedLoading ? (
+            <ChartLoadingPlaceholder title="Discharged patients" />
+          ) : (
+            <DischargedPatientsChart
+              data={dischargedMetrics?.charts?.discharged_patients || []}
+              filter={dischargedFilter}
+              onFilterChange={setDischargedFilter}
+            />
+          )}
         </div>
       )}
 
       {!dashboardMetricsLoading && (
         <div className="mt-6 w-full">
-          <AttendanceOverviewChart
-            data={dashboardMetrics?.charts?.attendance_overview || []}
-            filter={globalFilter}
-            onFilterChange={handleFilterChange}
-          />
+          {attendanceLoading ? (
+            <ChartLoadingPlaceholder title="Patient's Attendance overview" />
+          ) : (
+            <AttendanceOverviewChart
+              data={attendanceMetrics?.charts?.attendance_overview || []}
+              filter={attendanceFilter}
+              onFilterChange={setAttendanceFilter}
+            />
+          )}
         </div>
       )}
     </>
