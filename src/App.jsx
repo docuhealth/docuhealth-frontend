@@ -119,7 +119,7 @@ import Hospital_Pharmacist_Appointments_Dashboard from "./Dashboard/Hospital_Das
 import Hospital_Pharmacist_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Pharmacist/Hospital_Pharmacist_Messages_Dashboard";
 import Hospital_Pharmacist_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Pharmacist/Hospital_Pharmacist_HealthPersonnel_Dashboard";
 import Hospital_Pharmacist_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Pharmacist/Hospital_Pharmacist_Settings_Dashboard";
-
+import Hospital_Pharmacist_Prescription_Detail_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Pharmacist/Hospital_Pharmacist_Prescription_Detail_Dashboard";
 
 import Hospital_Lab_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_Lab/Hospital_Lab_Layout";
 import Hospital_Lab_Home_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Home_Dashboard";
@@ -148,7 +148,7 @@ function App() {
   const hostname = window.location.hostname;
 
   //Adjust the condition to remove the true value when deploying to production. This is just for testing purposes to always render the hospital routes.
-  const isHospital = hostname.startsWith("hospital.");
+  const isHospital = true || hostname.startsWith("hospital.");
   // const isHospital = true || hostname.startsWith("hospital.");
 
   return (
@@ -970,6 +970,26 @@ function App() {
                   <HospitalProtectedRoute>
                     <HospitalPharmacistProviders>
                       <Hospital_Pharmacist_Prescriptions_Dashboard />
+                    </HospitalPharmacistProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            
+            <Route
+              path="/hospital-pharmacist-prescription-detail"
+              element={
+                <HospitalPharmacistProviders>
+                  <Hospital_Pharmacist_Layout />
+                </HospitalPharmacistProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalPharmacistProviders>
+                      <Hospital_Pharmacist_Prescription_Detail_Dashboard />
                     </HospitalPharmacistProviders>
                   </HospitalProtectedRoute>
                 }

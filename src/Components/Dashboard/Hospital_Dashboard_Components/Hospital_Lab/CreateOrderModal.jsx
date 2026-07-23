@@ -2,7 +2,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { fetchTestCategories, fetchLabTests } from "../../../../queries/Hospital/lab/requests";
+import { fetchTestCategories, fetchLabTests, createLabTestOrder } from "../../../../queries/Hospital/lab/requests";
 import axiosInstanceHos from "../../../../utils/axiosInstanceHos";
 
 const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
@@ -43,7 +43,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
       if (appointmentSqid) {
         requestPayload.appointment = appointmentSqid;
       }
-      return axiosInstanceHos.post("api/lab/test-orders/create", requestPayload);
+      return createLabTestOrder(requestPayload);
     },
     onSuccess: () => {
       setForm({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });

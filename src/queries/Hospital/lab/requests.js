@@ -59,3 +59,8 @@ export const rejectLabTestResult = async ({ order_sqid, item_sqid }) => {
   const res = await axiosInstanceHos.patch(`api/lab/test-orders/${order_sqid}/items/${item_sqid}/results/reject`);
   return res.data;
 };
+
+export const createLabTestOrder = async (payload) => {
+  const res = await axiosInstanceHos.post("api/lab/test-orders/create", payload);
+  return res.data;
+};

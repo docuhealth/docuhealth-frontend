@@ -1,9 +1,8 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { ArrowLeft, X, Plus } from "lucide-react";
 import toast from "react-hot-toast";
-import MedicationSection from "./MedicationSection";
-import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
-import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
+import MedicationSection from "../Hospital_Doctors/Appointments_Dashboard/components/MedicationSection";
+import axiosInstanceHos from "../../../../utils/axiosInstanceHos";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const NoteSection = ({
@@ -78,21 +77,15 @@ const NoteSection = ({
   </div>
 );
 
-const PrescribeMedication = ({
-  setPrescribeMedication,
+const PharmacistCreateOrder = ({
+  setCreateOrder,
   selectedPatientDetails,
-  setSeePatientDetails,
-  isFromPatientMgt = false,
 }) => {
-  const { profile } = useContext(DoctorAppContext);
   const queryClient = useQueryClient();
 
   const [medications, setMedications] = useState([
     {
-      catalog_drug: null,
       drug: "",
-      strength: "",
-      doseForm: "",
       dosage: "",
       dosageUnit: "mg",
       route: "Oral",
@@ -133,26 +126,21 @@ const PrescribeMedication = ({
     mutationFn: (payload) =>
       axiosInstanceHos.post("api/pharmacy/orders/create", payload),
     onSuccess: () => {
-      toast.success("Prescription sent to pharmacist successfully!");
-      setPrescribeMedication(false);
-      setSeePatientDetails(true);
+      toast.success("Order created successfully!");
+      setCreateOrder(false);
       queryClient.invalidateQueries({
-        queryKey: ["patient-med-records"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["patient-prescriptions"],
+        queryKey: ["pharmacist-prescriptions"],
       });
     },
     onError: (error) => {
-      console.error("Prescription error:", error);
+      console.error("Order error:", error);
       toast.error(
-        error.response?.data?.message || "Failed to prescribe medication",
+        error.response?.data?.message || "Failed to create order",
       );
     },
   });
 
   const handleSubmit = () => {
-    // Basic validation
     const validMedications = medications.filter(
       (m) => m.drug.trim() !== "" && m.dosage !== "" && m.duration !== ""
     );
@@ -163,39 +151,28 @@ const PrescribeMedication = ({
     }
 
     const payload = {
-      patient: selectedPatientDetails?.patient?.hin,
-      order_source: isFromPatientMgt ? "staff_admission_order" : "staff_appointment_order",
-      drugs: validMedications.map(med => {
-        let drugData = {};
-        if (med.catalog_drug) {
-          drugData = { catalog_drug: med.catalog_drug };
-        } else {
-          const manual_drug = {
-            name: med.drug,
-            route: med.route,
-          };
-          if (med.strength) manual_drug.strength = med.strength;
-          if (med.doseForm) manual_drug.dose_form = med.doseForm;
-          drugData = { manual_drug };
+      patient: selectedPatientDetails?.patient?.hin || selectedPatientDetails?.hin,
+      order_source: "walk_in",
+      drugs: validMedications.map(med => ({
+        manual_drug: {
+          name: med.drug,
+          route: med.route,
+          dose_form: "", 
+        },
+        dosage: {
+          quantity: Number(med.dosage) || 0,
+          unit: med.dosageUnit,
+          frequency: med.frequency,
+          duration: {
+            value: Number(med.duration) || 0,
+            rate: med.durationUnit
+          },
+          allergies: allergiesData.allergies
         }
-
-        return {
-          ...drugData,
-          dosage: {
-            quantity: Number(med.dosage) || 0,
-            unit: med.dosageUnit,
-            frequency: med.frequency,
-            duration: {
-              value: Number(med.duration) || 0,
-              rate: med.durationUnit
-            },
-            allergies: allergiesData.allergies
-          }
-        };
-      })
+      }))
     };
 
-    if (!isFromPatientMgt && selectedPatientDetails?.sqid) {
+    if (selectedPatientDetails?.sqid) {
       payload.appointment = selectedPatientDetails.sqid;
     }
 
@@ -207,14 +184,13 @@ const PrescribeMedication = ({
       <div className="flex items-center gap-2 cursor-pointer border-b pb-4 mb-4">
         <div
           onClick={() => {
-            setPrescribeMedication(false);
-            setSeePatientDetails(true);
+            setCreateOrder(false);
           }}
           className="text-gray-500 hover:text-black transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
         </div>
-        <p className="font-medium text-gray-800">Prescribe medication</p>
+        <p className="font-medium text-gray-800">Create order</p>
       </div>
 
       <div className="my-5">
@@ -270,7 +246,7 @@ const PrescribeMedication = ({
               Processing...
             </span>
           ) : (
-            "Upload/send to pharmacist"
+            "Create order"
           )}
         </button>
       </div>
@@ -278,4 +254,4 @@ const PrescribeMedication = ({
   );
 };
 
-export default PrescribeMedication;
+export default PharmacistCreateOrder;

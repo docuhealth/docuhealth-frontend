@@ -113,7 +113,6 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
             title: "Pharmacist",
             subtitle: "Medical personnel",
             icon: <Pharmacist_Icon />,
-            disabled: true,
         },
     ];
 
@@ -244,6 +243,9 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                                         )}
                                         {isStaffSelectedRole === "lab_scientist" && (
                                             <option value="lab_test">Lab test</option>
+                                        )}
+                                        {isStaffSelectedRole === "pharmacist" && (
+                                            <option value="drug_purchase">Drug purchase / refill</option>
                                         )}
                                         {/* <option value="male">Consultation</option>
                                         <option value="female">Vital checkup/other nursing services</option>
