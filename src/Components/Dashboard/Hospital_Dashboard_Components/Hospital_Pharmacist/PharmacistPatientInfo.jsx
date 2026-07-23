@@ -1,6 +1,7 @@
 import React from "react";
 import { ArrowLeft } from "lucide-react";
-import { getAge } from "../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
+import LabTabComponent from "../Hospital_Lab/PatientInfoComponents/LabTabComponent";
+import getTabs from "../Hospital_Lab/PatientInfoComponents/LabTabDetails";
 
 const PharmacistPatientInfo = ({ selectedPatientDetails, setSeePatientDetails, setCreateOrder, hideCreateOrder }) => {
   const p = selectedPatientDetails?.patient ?? {};
@@ -48,33 +49,10 @@ const PharmacistPatientInfo = ({ selectedPatientDetails, setSeePatientDetails, s
         </div>
       </div>
 
-      <div className="py-5 border-b">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div>
-            <p className="text-[12px] text-gray-400">Patient's HIN</p>
-            <p className="font-medium text-[13px]">{p?.hin || selectedPatientDetails?.patient_hin || "N/A"}</p>
-          </div>
-          <div>
-            <p className="text-[12px] text-gray-400">Patient's Age</p>
-            <p className="font-medium text-[13px]">{p?.dob ? getAge(p.dob) : "N/A"}</p>
-          </div>
-          <div>
-            <p className="text-[12px] text-gray-400">Patient's Gender</p>
-            <p className="font-medium text-[13px] capitalize">{p?.gender || p?.sex || "N/A"}</p>
-          </div>
-          <div>
-            <p className="text-[12px] text-gray-400">Phone</p>
-            <p className="font-medium text-[13px]">{p?.phone_num || "N/A"}</p>
-          </div>
-          <div>
-            <p className="text-[12px] text-gray-400">Email</p>
-            <p className="font-medium text-[13px]">{p?.email || "N/A"}</p>
-          </div>
-          <div className="sm:col-span-2 lg:col-span-3">
-            <p className="text-[12px] text-gray-400">Address</p>
-            <p className="font-medium text-[13px]">{p?.street ? `${p.street}, ${p.city}` : "N/A"}</p>
-          </div>
-        </div>
+      <div>
+        <LabTabComponent
+          tabs={getTabs({ patientFullInfo: { patient_info: p || {} } })}
+        />
       </div>
     </div>
   );

@@ -153,28 +153,35 @@ const PharmacistCreateOrder = ({
     const payload = {
       patient: selectedPatientDetails?.patient?.hin || selectedPatientDetails?.hin,
       order_source: "walk_in",
-      drugs: validMedications.map(med => ({
-        manual_drug: {
-          name: med.drug,
-          route: med.route,
-          dose_form: "", 
-        },
-        dosage: {
-          quantity: Number(med.dosage) || 0,
-          unit: med.dosageUnit,
-          frequency: med.frequency,
-          duration: {
-            value: Number(med.duration) || 0,
-            rate: med.durationUnit
-          },
-          allergies: allergiesData.allergies
+      drugs: validMedications.map(med => {
+        let drugData = {};
+        if (med.catalog_drug) {
+          drugData = { catalog_drug: med.catalog_drug };
+        } else {
+          const manual_drug = {
+            name: med.drug,
+            route: med.route,
+          };
+          if (med.strength) manual_drug.strength = med.strength;
+          if (med.doseForm) manual_drug.dose_form = med.doseForm;
+          drugData = { manual_drug };
         }
-      }))
-    };
 
-    if (selectedPatientDetails?.sqid) {
-      payload.appointment = selectedPatientDetails.sqid;
-    }
+        return {
+          ...drugData,
+          dosage: {
+            quantity: Number(med.dosage) || 0,
+            unit: med.dosageUnit,
+            frequency: med.frequency,
+            duration: {
+              value: Number(med.duration) || 0,
+              rate: med.durationUnit
+            },
+            allergies: allergiesData.allergies
+          }
+        };
+      })
+    };
 
     mutate(payload);
   };

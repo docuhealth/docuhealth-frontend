@@ -49,6 +49,7 @@ const MedicationSection = ({ medications, setMedications }) => {
   const [activeSearchIndex, setActiveSearchIndex] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchPage, setSearchPage] = useState(1);
   const searchTimeout = useRef(null);
 
   const handleDrugSearch = (index, query) => {
@@ -62,16 +63,19 @@ const MedicationSection = ({ medications, setMedications }) => {
     if (!query.trim()) {
       setSearchResults([]);
       setActiveSearchIndex(null);
+      setSearchPage(1);
       return;
     }
 
     setActiveSearchIndex(index);
+    setSearchPage(1);
     
     searchTimeout.current = setTimeout(async () => {
       setIsSearching(true);
       try {
         const res = await axiosInstanceHos.get(`/api/pharmacy/drugs/autocomplete?query=${query}`);
-        setSearchResults(res.data.results || []);
+        const data = res.data;
+        setSearchResults(Array.isArray(data) ? data : (data?.results || []));
       } catch (error) {
         console.error("Failed to fetch drugs:", error);
         setSearchResults([]);
@@ -92,6 +96,7 @@ const MedicationSection = ({ medications, setMedications }) => {
     
     setSearchResults([]);
     setActiveSearchIndex(null);
+    setSearchPage(1);
   };
 
   return (
@@ -115,15 +120,41 @@ const MedicationSection = ({ medications, setMedications }) => {
               />
               {activeSearchIndex === index && searchResults.length > 0 && (
                 <ul className="absolute z-10 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto mt-1 top-full">
-                  {searchResults.map((item, idx) => (
+                  {searchResults.slice((searchPage - 1) * 10, searchPage * 10).map((item, idx) => (
                     <li
                       key={idx}
-                      className="p-2.5 text-[12px] hover:bg-docuhealth-primary/10 cursor-pointer text-gray-800"
+                      className="p-2.5 text-[12px] hover:bg-docuhealth-primary/10 cursor-pointer text-gray-800 border-b last:border-0"
                       onClick={() => handleSelectDrug(index, item)}
                     >
-                      {item.display_name}
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-[10px] text-gray-500 mt-0.5">
+                        {item.strength && <span>{item.strength}</span>}
+                        {item.strength && item.dose_form && <span className="mx-1">•</span>}
+                        {item.dose_form && <span>{item.dose_form}</span>}
+                      </div>
                     </li>
                   ))}
+                  {Math.ceil(searchResults.length / 10) > 1 && (
+                    <li className="p-2 border-t flex justify-between items-center bg-gray-50 text-[11px] sticky bottom-0">
+                      <button
+                        type="button"
+                        disabled={searchPage === 1}
+                        onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSearchPage(prev => prev - 1); }}
+                        className={`px-2 py-1 rounded ${searchPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-docuhealth-primary hover:bg-blue-100'}`}
+                      >
+                        Prev
+                      </button>
+                      <span className="text-gray-500">Page {searchPage} of {Math.ceil(searchResults.length / 10)}</span>
+                      <button
+                        type="button"
+                        disabled={searchPage === Math.ceil(searchResults.length / 10)}
+                        onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSearchPage(prev => prev + 1); }}
+                        className={`px-2 py-1 rounded ${searchPage === Math.ceil(searchResults.length / 10) ? 'text-gray-400 cursor-not-allowed' : 'text-docuhealth-primary hover:bg-blue-100'}`}
+                      >
+                        Next
+                      </button>
+                    </li>
+                  )}
                 </ul>
               )}
               {activeSearchIndex === index && isSearching && (

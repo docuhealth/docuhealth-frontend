@@ -134,6 +134,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
             <div>
               <LabTabComponent
                 tabs={getTabs({ patientFullInfo: { patient_info: selectedPatientDetails?.patient || {} } })}
+              />
             </div>
           </div>
 

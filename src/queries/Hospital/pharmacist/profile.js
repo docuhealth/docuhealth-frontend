@@ -2,7 +2,7 @@ import axiosInstanceHos from "../../../utils/axiosInstanceHos";
 
 export const fetchPharmacistProfile = async () => {
   try {
-    const res = await axiosInstanceHos.get("api/pharmacists/dashboard");
+    const res = await axiosInstanceHos.get("api/auth/hospital/staff/profile");
     return res.data;
   } catch (error) {
     console.error("Pharmacist profile endpoint might not exist yet", error);
