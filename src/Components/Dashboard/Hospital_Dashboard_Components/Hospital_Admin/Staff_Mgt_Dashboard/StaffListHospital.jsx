@@ -53,7 +53,14 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     "Dermatologist",
     "Orthopedic",
     "Radiologist",
-    "Anesthesiologist"
+    "Anesthesiologist",
+    "Histopathologist",
+    "Oncopathologist",
+    "Interventional Pathologist",
+    "Surgical Pathologist",
+    "Forensic Pathologist",
+    "Gastrointestinal (GIT) Pathologist",
+    "Family Physician"
   ];
 
   const nurseSpecializations = [

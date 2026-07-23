@@ -70,6 +70,13 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     "Orthopedic",
     "Radiologist",
     "Anesthesiologist",
+    "Histopathologist",
+    "Oncopathologist",
+    "Interventional Pathologist",
+    "Surgical Pathologist",
+    "Forensic Pathologist",
+    "Gastrointestinal (GIT) Pathologist",
+    "Family Physician",
   ];
 
   const nurseSpecializations = [

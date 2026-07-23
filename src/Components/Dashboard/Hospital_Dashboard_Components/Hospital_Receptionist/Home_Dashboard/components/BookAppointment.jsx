@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import CustomTimePicker from "./CustomTimePicker";
 
 const Doctor_Icon = () => (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -397,40 +398,10 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                                     </div>
                                     <div className="relative">
                                         <label className="block text-[12px] pb-1">Select time</label>
-                                        <select
-                                            value={selectedTime}
-                                            onChange={(e) => setSelectedTime(e.target.value)}
-                                            className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer  text-[12px] "
-                                        >
-                                            <option value="08:00" selected>
-                                                08:00 AM
-                                            </option>
-                                            <option value="09:00">09:00 AM</option>
-                                            <option value="10:00">10:00 AM</option>
-                                            <option value="11:00">11:00 AM</option>
-                                            <option value="12:00">12:00 PM</option>
-                                            <option value="13:00">01:00 PM</option>
-                                            <option value="14:00">02:00 PM</option>
-                                            <option value="15:00">03:00 PM</option>
-                                            <option value="16:00">04:00 PM</option>
-                                            <option value="17:00">05:00 PM</option>
-                                        </select>
-                                        <div className="pointer-events-none absolute inset-y-10 right-0 flex items-center pr-2">
-                                            <svg
-                                                className="w-3 h-3 text-gray-400"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M19 9l-7 7-7-7"
-                                                />
-                                            </svg>
-                                        </div>
+                                        <CustomTimePicker 
+                                            value={selectedTime} 
+                                            onChange={setSelectedTime} 
+                                        />
                                     </div>
                                 </div>
 
