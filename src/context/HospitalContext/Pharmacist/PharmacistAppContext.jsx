@@ -33,10 +33,10 @@ const PharmacistProfileProvider = ({ children }) => {
     refetchOnWindowFocus: true,
   });
 
-  const profile = data?.pharmacist;
-  const backgroundImage = data?.theme?.bg_image;
-  const hospitalName = data?.theme?.name;
-  const hospitalLogo = data?.theme?.profile_image;
+  const profile = data?.staff_info;
+  const backgroundImage = data?.hospital_theme?.bg_image;
+  const hospitalName = data?.hospital_info?.name;
+  const hospitalLogo = data?.hospital_theme?.profile_image;
 
   return (
     <PharmacistAppContext.Provider value={{

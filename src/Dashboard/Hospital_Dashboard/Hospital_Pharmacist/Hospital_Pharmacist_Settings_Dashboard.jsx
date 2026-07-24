@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
-import Settings from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Settings_Dashboard/Settings";
+import Settings from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Pharmacist/Settings_Dashboard/Settings";
 import { PharmacistAppContext } from "../../../context/HospitalContext/Pharmacist/PharmacistAppContext";
 
 const Hospital_Pharmacist_Settings_Dashboard = () => {

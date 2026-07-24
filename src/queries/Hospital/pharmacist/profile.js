@@ -8,16 +8,19 @@ export const fetchPharmacistProfile = async () => {
     console.error("Pharmacist profile endpoint might not exist yet", error);
     // Mock data for now if the endpoint doesn't exist
     return {
-      pharmacist: {
+      staff_info: {
         firstname: "Hospital",
         lastname: "Pharmacist",
         role: "pharmacist",
         email: "pharmacist@hospital.com",
       },
-      theme: {
+      hospital_theme: {
         name: "DocuHealth Hospital",
         bg_image: null,
         profile_image: null,
+      },
+      hospital_info: {
+        name: "DocuHealth Hospital"
       }
     };
   }

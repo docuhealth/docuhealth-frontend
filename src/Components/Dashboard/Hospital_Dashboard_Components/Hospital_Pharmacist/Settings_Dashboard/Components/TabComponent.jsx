@@ -1,0 +1,28 @@
+import React, { useState } from "react";
+
+const TabComponent = ({ tabs }) => {
+  const [activeTab, setActiveTab] = useState(0);
+
+  return (
+    <div className="w-full py-3 mx-auto">
+      <div className="flex border-b border-gray-200">
+        {tabs.map((tab, index) => (
+          <button
+            key={index}
+            onClick={() => setActiveTab(index)}
+            className={`text-sm px-2 sm:px-4 py-2 sm:text-sm font-medium transition-colors duration-200 ${
+              activeTab === index
+                ? "text-docuhealth-primary border-b-2 border-docuhealth-primary font-semibold"
+                : "text-gray-600 hover:text-gray-800"
+            }`}
+          >
+            {tab.title}
+          </button>
+        ))}
+      </div>
+      <div className="py-2">{tabs[activeTab].content}</div>
+    </div>
+  );
+};
+
+export default TabComponent;
