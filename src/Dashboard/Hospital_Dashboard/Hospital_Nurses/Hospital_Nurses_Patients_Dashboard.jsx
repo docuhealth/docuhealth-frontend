@@ -61,7 +61,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
               ) : (caseNoteHistory || vitalSignsHistory) && !caseNoteDetail ? (
                 <>
                   <button
-                    className="py-2.5 px-10 w-full lg:w-60 rounded-full bg-[#3E4095] text-white cursor-pointer"
+                    className="py-2.5 px-10 w-full lg:w-60 rounded-full bg-docuhealth-primary text-white cursor-pointer"
                     onClick={() => {
                       setCaseNoteHistory(false);
                       setVitalSignsHistory(false);
@@ -76,7 +76,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                 <>
                   <div className="relative w-full lg:w-60" ref={dropdownRef}>
                     <button
-                      className="flex items-center justify-center py-2 px-6 w-full rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer gap-1"
+                      className="flex items-center justify-center py-2 px-6 w-full rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer gap-1"
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     >
                       <span className="">Vital signs</span>
@@ -123,7 +123,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                   </div>
 
                   <button
-                    className="py-2.5 px-10 w-full lg:w-60 rounded-full bg-[#3E4095] text-white cursor-pointer"
+                    className="py-2.5 px-10 w-full lg:w-60 rounded-full bg-docuhealth-primary text-white cursor-pointer"
                     onClick={() => {
                       setUpdateVitals(true);
                     }}

@@ -6,10 +6,11 @@ import { fetchLabRequests, fetchTestCategories } from "../../../queries/Hospital
 export const LabRequestsContext = createContext();
 
 const TAB_STATUS_MAP = {
-  "Pending Test":   "pending",
-  "In-progress":    "in_progress",
-  "Completed test": "completed",
-  "Rejected test":  "rejected",
+  "Pending Test": "pending",
+  "Sample Collected": "sample_collected",
+  "In-progress": "in_progress",
+  "Result Ready": "result_ready",
+  "Rejected test": "rejected",
 };
 
 const LabRequestsProvider = (props) => {

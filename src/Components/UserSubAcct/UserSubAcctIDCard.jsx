@@ -79,7 +79,7 @@ const UserSubAcctIDCard = ({generateIDCard, setGenerateIDCard, selectedUser, for
                     </div>
                   </div>
                   <div
-                    className=" bg-[#0000FF]  text-center text-white rounded-full py-2 cursor-pointer"
+                    className=" bg-docuhealth-blue  text-center text-white rounded-full py-2 cursor-pointer"
                     onClick={handleIDCreation}
                   >
                     <p>{loadingCard || "Generate ID Card"}</p>
@@ -140,7 +140,7 @@ const UserSubAcctIDCard = ({generateIDCard, setGenerateIDCard, selectedUser, for
                         />
                         <path
                           d="M13.8217 14.9998L7.32764 8.50566L8.50615 7.32715L15.0002 13.8212L21.4943 7.32715L22.6728 8.50566L16.1787 14.9998L22.6728 21.4938L21.4943 22.6724L15.0002 16.1783L8.50615 22.6724L7.32764 21.4938L13.8217 14.9998Z"
-                          fill="#1B2B40"
+                          fill="var(--color-docuhealth-dark)"
                         />
                       </svg>
                     </div>
@@ -160,7 +160,7 @@ const UserSubAcctIDCard = ({generateIDCard, setGenerateIDCard, selectedUser, for
                         </div>
                       </div>
                       <div className=" text-center">
-                        <div className="w-16 h-16 mx-auto mb-2 border-2 border-[#1C1CFE] rounded-full flex items-center justify-center text-[#1C1CFE] text-lg font-bold">
+                        <div className="w-16 h-16 mx-auto mb-2 border-2 border-docuhealth-blue-bright rounded-full flex items-center justify-center text-docuhealth-blue-bright text-lg font-bold">
                           {selectedUser
                             ? selectedUser
                                 .split(" ")
@@ -180,28 +180,28 @@ const UserSubAcctIDCard = ({generateIDCard, setGenerateIDCard, selectedUser, for
 
                         <div className="flex justify-between text-left text-[13px] mt-4 w-full ">
                           <div>
-                            <h3 className="font-semibold text-[#313131]">
+                            <h3 className="font-semibold text-docuhealth-gray-dark">
                               Emergency Numbers
                             </h3>
-                            <p className="text-[#313131] text-[10px]">
+                            <p className="text-docuhealth-gray-dark text-[10px]">
                               {formData.firstEmergency || ""}
                             </p>
-                            <p className="text-[#313131] text-[10px]">
+                            <p className="text-docuhealth-gray-dark text-[10px]">
                               {formData.secondEmergency || ""}
                             </p>
                           </div>
                           <div>
-                            <h3 className="font-semibold text-[#313131]">
+                            <h3 className="font-semibold text-docuhealth-gray-dark">
                               Emergency Address
                             </h3>
-                            <p className="text-[#313131] max-w-28 wrap-break-word text-[10px]">
+                            <p className="text-docuhealth-gray-dark max-w-28 wrap-break-word text-[10px]">
                               {formData.emergencyAddress || ""}
                             </p>
                           </div>
                         </div>
                       </div>
                       <div>
-                        <p className="text-[#313131] text-[11px] text-center pt-8">
+                        <p className="text-docuhealth-gray-dark text-[11px] text-center pt-8">
                           www.docuhealthservices.com
                         </p>
                       </div>
@@ -221,14 +221,14 @@ const UserSubAcctIDCard = ({generateIDCard, setGenerateIDCard, selectedUser, for
                       </div>
                     </div>
                     <div className="flex justify-center flex-col items-center">
-                      <div className="bg-[#F2F2F2] p-2 rounded-full">
+                      <div className="bg-docuhealth-bg-gray p-2 rounded-full">
                         <img src={logo} alt="" />
                       </div>
                       <div className="text-center pt-3 ">
-                        <h3 className=" text-[#313131]  pb-1">
+                        <h3 className=" text-docuhealth-gray-dark  pb-1">
                           Basic instruction
                         </h3>
-                        <p className="text-[#313131] text-[10px]">
+                        <p className="text-docuhealth-gray-dark text-[10px]">
                           This card is linked to your Health Identification
                           Number (HIN). Present it at any DocuHealth-enabled
                           hospital to access your medical summary. Keep it safe
@@ -236,19 +236,19 @@ const UserSubAcctIDCard = ({generateIDCard, setGenerateIDCard, selectedUser, for
                         </p>
                       </div>
                       <div className="text-center pt-3 ">
-                        <h3 className=" text-[#313131]  pb-1">Warning!!!</h3>
-                        <p className="text-[#313131] text-[10px]">
+                        <h3 className=" text-docuhealth-gray-dark  pb-1">Warning!!!</h3>
+                        <p className="text-docuhealth-gray-dark text-[10px]">
                           This card belongs to the registered patient. If found,
                           please return it to the nearest hospital or contact
                           support@docuhealthservices.net.
                         </p>
-                        <p className="text-[#313131] text-[10px] py-2">
+                        <p className="text-docuhealth-gray-dark text-[10px] py-2">
                           www.docuhealthservices.net
                         </p>
                       </div>
                     </div>
                     <div>
-                      <p className="text-[#313131] text-[11px] text-center pt-4 ">
+                      <p className="text-docuhealth-gray-dark text-[11px] text-center pt-4 ">
                         Health is wealth, and a healthy Nigeria is a stronger
                         Nigeria
                       </p>

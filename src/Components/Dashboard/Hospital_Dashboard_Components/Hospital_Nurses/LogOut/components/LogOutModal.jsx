@@ -48,7 +48,7 @@ const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selec
                                                 <div className="flex items-center gap-2">
                                                     <div className="bg-blue-50 p-2 rounded-full">
                                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z" fill="#3E4095" />
+                                                            <path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z" fill="var(--color-docuhealth-primary)" />
                                                         </svg>
                                                     </div>
                                                     <div>
@@ -65,13 +65,13 @@ const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selec
                                             <div className="w-full pt-8">
                                                 <button
                                                     disabled={isAnyLoading}
-                                                    className={`w-full rounded-full border py-2 border-[#3E4095] flex items-center justify-center gap-2 ${isAnyLoading ? "opacity-50 cursor-not-allowed" : "text-[#3E4095] cursor-pointer hover:bg-blue-50"
+                                                    className={`w-full rounded-full border py-2 border-docuhealth-primary flex items-center justify-center gap-2 ${isAnyLoading ? "opacity-50 cursor-not-allowed" : "text-docuhealth-primary cursor-pointer hover:bg-blue-50"
                                                         }`}
                                                     onClick={() => handleFinalRequest(staff.staff_id)}
                                                 >
                                                     {isThisStaffLoading ? (
                                                         <>
-                                                            <div className="w-4 h-4 border-2 border-[#3E4095]/30 border-t-[#3E4095] rounded-full animate-spin" />
+                                                            <div className="w-4 h-4 border-2 border-docuhealth-primary/30 border-t-[#3E4095] rounded-full animate-spin" />
                                                             <span>Assigning...</span>
                                                         </>
                                                     ) : (
@@ -104,7 +104,7 @@ const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selec
                         {/* Icon & Title */}
                         <div className="flex flex-col items-center mb-6">
                             <svg width="50" height="50" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20.0007 36.6654C10.7959 36.6654 3.33398 29.2034 3.33398 19.9987C3.33398 10.7939 10.7959 3.33203 20.0007 3.33203C29.2053 3.33203 36.6673 10.7939 36.6673 19.9987C36.6673 29.2034 29.2053 36.6654 20.0007 36.6654ZM20.0007 33.332C27.3645 33.332 33.334 27.3625 33.334 19.9987C33.334 12.6349 27.3645 6.66536 20.0007 6.66536C12.6369 6.66536 6.66732 12.6349 6.66732 19.9987C6.66732 27.3625 12.6369 33.332 20.0007 33.332ZM21.6673 17.4987V24.9987H23.334V28.332H16.6673V24.9987H18.334V20.832H16.6673V17.4987H21.6673ZM22.5007 13.332C22.5007 14.7127 21.3813 15.832 20.0007 15.832C18.62 15.832 17.5007 14.7127 17.5007 13.332C17.5007 11.9513 18.62 10.832 20.0007 10.832C21.3813 10.832 22.5007 11.9513 22.5007 13.332Z" fill="#1B2B40" />
+                                <path d="M20.0007 36.6654C10.7959 36.6654 3.33398 29.2034 3.33398 19.9987C3.33398 10.7939 10.7959 3.33203 20.0007 3.33203C29.2053 3.33203 36.6673 10.7939 36.6673 19.9987C36.6673 29.2034 29.2053 36.6654 20.0007 36.6654ZM20.0007 33.332C27.3645 33.332 33.334 27.3625 33.334 19.9987C33.334 12.6349 27.3645 6.66536 20.0007 6.66536C12.6369 6.66536 6.66732 12.6349 6.66732 19.9987C6.66732 27.3625 12.6369 33.332 20.0007 33.332ZM21.6673 17.4987V24.9987H23.334V28.332H16.6673V24.9987H18.334V20.832H16.6673V17.4987H21.6673ZM22.5007 13.332C22.5007 14.7127 21.3813 15.832 20.0007 15.832C18.62 15.832 17.5007 14.7127 17.5007 13.332C17.5007 11.9513 18.62 10.832 20.0007 10.832C21.3813 10.832 22.5007 11.9513 22.5007 13.332Z" fill="var(--color-docuhealth-dark)" />
                             </svg>
 
                             <h2 className=" font-medium text-gray-800 mt-2">Handover/Log-out</h2>
@@ -129,9 +129,9 @@ const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selec
                                         type="checkbox"
                                         checked={handoverOptions.patientManagement}
                                         onChange={() => setHandoverOptions(prev => ({ ...prev, patientManagement: !prev.patientManagement }))}
-                                        className="w-4 h-4 accent-[#3E4095] cursor-pointer"
+                                        className="w-4 h-4 accent-docuhealth-primary cursor-pointer"
                                     />
-                                    <span className="text-gray-700 font-medium text-sm group-hover:text-[#3E4095]">Patient management</span>
+                                    <span className="text-gray-700 font-medium text-sm group-hover:text-docuhealth-primary">Patient management</span>
                                 </label>
 
                                 <label className="flex items-center gap-3 cursor-pointer group">
@@ -139,9 +139,9 @@ const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selec
                                         type="checkbox"
                                         checked={handoverOptions.myAppointments}
                                         onChange={() => setHandoverOptions(prev => ({ ...prev, myAppointments: !prev.myAppointments }))}
-                                        className="w-4 h-4 accent-[#3E4095] cursor-pointer"
+                                        className="w-4 h-4 accent-docuhealth-primary cursor-pointer"
                                     />
-                                    <span className="text-gray-700 font-medium text-sm group-hover:text-[#3E4095]">My appointments</span>
+                                    <span className="text-gray-700 font-medium text-sm group-hover:text-docuhealth-primary">My appointments</span>
                                 </label>
                             </div>
                         </div>
@@ -151,7 +151,7 @@ const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selec
                             disabled={!isAnyOptionSelected || isFetching} // Disable if fetching
                             onClick={() => onLogout(handoverOptions)}
                             className={`w-full py-3 rounded-full transition-all shadow active:scale-95 flex items-center justify-center gap-2 text-sm ${isAnyOptionSelected && !isFetching
-                                ? "bg-[#3E4095] text-white cursor-pointer"
+                                ? "bg-docuhealth-primary text-white cursor-pointer"
                                 : "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
                                 }`}
                         >

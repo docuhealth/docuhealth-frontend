@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 const About_Us_Section = () => {
   return (
     <>
-      <div className="relative py-20 bg-[#F6FCFE] overflow-hidden" id="about-us">
+      <div className="relative py-20 bg-docuhealth-light-blue overflow-hidden" id="about-us">
       <div className="max-w-[1440px] 2xl:max-w-[1600px] mx-auto w-full px-8 xl:px-16">
         <div className="flex flex-col-reverse lg:flex-row items-start gap-7 ">
           <motion.div 
@@ -29,10 +29,10 @@ const About_Us_Section = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
           >
-            <h2 className="font-semibold pb-4 text-2xl lg:text-3xl text-[#3E4095] 2xl:text-4xl">
+            <h2 className="font-semibold pb-4 text-2xl lg:text-3xl text-docuhealth-primary 2xl:text-4xl">
               About DocuHealth
             </h2>
-            <div className="text-sm 2xl:text-xl space-y-4 text-[#464646] leading-6">
+            <div className="text-sm 2xl:text-xl space-y-4 text-docuhealth-gray leading-6">
               <p>
                 DocuHealth Services unifies Nigeria’s healthcare ecosystem
                 through a trusted, data-driven network that gives every patient

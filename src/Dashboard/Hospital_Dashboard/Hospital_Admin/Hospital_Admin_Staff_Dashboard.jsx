@@ -26,7 +26,7 @@ const Hospital_Admin_Staff_Dashboard = () => {
                     <div className="relative w-full sm:w-auto">
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="flex justify-center items-center gap-2 px-6 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full hover:bg-blue-50 transition w-full sm:w-auto"
+                            className="flex justify-center items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary font-medium rounded-full hover:bg-blue-50 transition w-full sm:w-auto"
                         >
                             Filter by: {selected}
                             <ChevronDown
@@ -50,7 +50,7 @@ const Hospital_Admin_Staff_Dashboard = () => {
                     </div>
                     <div className="w-full sm:w-auto">
                         <button
-                            className="flex justify-center items-center gap-2 px-6 py-2.5 bg-[#3E4095] text-white font-medium rounded-full transition cursor-pointer w-full sm:w-auto"
+                            className="flex justify-center items-center gap-2 px-6 py-2.5 bg-docuhealth-primary text-white font-medium rounded-full transition cursor-pointer w-full sm:w-auto"
                             onClick={() => {
                                 setCreateNewStaff(!createNewStaff)
                             }}

@@ -64,7 +64,7 @@ const AccountSettingsTab = () => {
     if (score <= 1) return { strength: score, label: "Very Weak", color: "bg-red-500" };
     if (score <= 2) return { strength: score, label: "Weak", color: "bg-orange-500" };
     if (score <= 3) return { strength: score, label: "Fair", color: "bg-yellow-500" };
-    if (score <= 4) return { strength: score, label: "Good", color: "bg-[#3E4095]" };
+    if (score <= 4) return { strength: score, label: "Good", color: "bg-docuhealth-primary" };
     return { strength: score, label: "Strong", color: "bg-green-500" };
   };
 
@@ -186,7 +186,7 @@ const AccountSettingsTab = () => {
               </div>
               <div className="mt-3">
                 <label htmlFor="firstname" className="block text-[12px] font-medium text-gray-700 mb-0.5">
-                  FirstName
+                  First Name
                 </label>
                 <input
                   id="firstname"
@@ -194,12 +194,12 @@ const AccountSettingsTab = () => {
                   type="text"
                   value={formData.firstname}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none"
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none"
                 />
               </div>
               <div className="mt-3">
                 <label htmlFor="lastname" className="block text-[12px] font-medium text-gray-700 mb-0.5">
-                  LastName
+                  Last Name
                 </label>
                 <input
                   id="lastname"
@@ -207,7 +207,7 @@ const AccountSettingsTab = () => {
                   type="text"
                   value={formData.lastname}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none"
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none"
                 />
               </div>
               <button
@@ -216,7 +216,7 @@ const AccountSettingsTab = () => {
                   updateNameMutation.isPending ||
                   (!formData.firstname.trim() && !formData.lastname.trim())
                 }
-                className="mt-4 text-[12px] w-full lg:w-[50%] py-2 bg-[#3E4095] text-white rounded-full text-sm disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                className="mt-4 text-[12px] w-full lg:w-[50%] py-2 bg-docuhealth-primary text-white rounded-full text-sm disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
                 {updateNameMutation.isPending ? (
                   <>
@@ -244,7 +244,7 @@ const AccountSettingsTab = () => {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none"
+                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none"
                 />
               </div>
               <button
@@ -254,7 +254,7 @@ const AccountSettingsTab = () => {
                   !formData?.email?.includes("@") ||
                   !formData?.email?.includes(".")
                 }
-                className="mt-4 text-[12px] w-full lg:w-[50%] py-2 bg-[#3E4095] text-white rounded-full text-sm disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                className="mt-4 text-[12px] w-full lg:w-[50%] py-2 bg-docuhealth-primary text-white rounded-full text-sm disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
                 {requestOtpMutation.isPending ? (
                   <>
@@ -274,7 +274,7 @@ const AccountSettingsTab = () => {
                     <input
                       type={showPassword ? "text" : "password"}
                       name="oldPassword"
-                      className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none pl-8"
+                      className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none pl-8"
                       value={formData.oldPassword}
                       onChange={handleChange}
                     />
@@ -291,7 +291,7 @@ const AccountSettingsTab = () => {
                     <input
                       type={showPassword ? "text" : "password"}
                       name="newPassword"
-                      className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none pl-8 ${
+                      className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none pl-8 ${
                         formData.newPassword && !isPasswordValid ? "focus:border-red-500" : ""
                       }`}
                       value={formData.newPassword}
@@ -349,7 +349,7 @@ const AccountSettingsTab = () => {
                     <input
                       type={showPassword ? "text" : "password"}
                       name="confirmPassword"
-                      className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-[#3E4095] text-sm appearance-none pl-8 ${
+                      className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none pl-8 ${
                         formData.confirmPassword && formData.newPassword !== formData.confirmPassword ? "focus:border-red-500" : ""
                       }`}
                       value={formData.confirmPassword}
@@ -381,7 +381,7 @@ const AccountSettingsTab = () => {
                     formData.newPassword !== formData.confirmPassword ||
                     !formData.confirmPassword
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-[#3E4095]"
+                      : "bg-docuhealth-primary"
                   }`}
                 >
                   {updatePasswordMutation.isPending ? (
@@ -403,7 +403,7 @@ const AccountSettingsTab = () => {
           <div className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50 px-3">
             <div className="bg-white rounded-lg py-6 px-3.5 lg:px-6 w-full max-w-sm relative">
               <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-medium text-[#3E4095]">Verify Email</h3>
+                <h3 className="text-sm font-medium text-docuhealth-primary">Verify Email</h3>
                 <button onClick={() => setShowOtpModal(false)} className="text-gray-700">
                   <FaTimes />
                 </button>
@@ -415,12 +415,12 @@ const AccountSettingsTab = () => {
                 maxLength={6}
                 value={formData.otp}
                 onChange={handleChange}
-                className="w-full py-2 text-center text-sm tracking-widest border-2 rounded-lg focus:border-[#3E4095] outline-none mb-3"
+                className="w-full py-2 text-center text-sm tracking-widest border-2 rounded-lg focus:border-docuhealth-primary outline-none mb-3"
               />
               <button
                 onClick={handleVerifyEmail}
                 disabled={verifyOtpMutation.isPending || !formData.otp.trim()}
-                className="w-full py-2 bg-[#3E4095] text-white rounded-full text-[12px] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                className="w-full py-2 bg-docuhealth-primary text-white rounded-full text-[12px] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
                 {verifyOtpMutation.isPending ? (
                   <>

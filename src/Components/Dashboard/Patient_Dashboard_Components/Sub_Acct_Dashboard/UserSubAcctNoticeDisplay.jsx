@@ -39,7 +39,7 @@ const UserSubAcctNoticeDisplay = ({ noticeDisplay, noticeMessage, paymentStatus,
                 </p>
                 <div className="text-sm grid grid-cols-1 sm:grid-cols-2 w-full gap-2 sm:gap-4">
                   <button
-                    className="bg-[#3E4095] text-white py-2 px-3 rounded-full cursor-pointer"
+                    className="bg-docuhealth-primary text-white py-2 px-3 rounded-full cursor-pointer"
                     onClick={
                       // () => {
                       // if (paymentStatus) {
@@ -56,7 +56,7 @@ const UserSubAcctNoticeDisplay = ({ noticeDisplay, noticeMessage, paymentStatus,
                     Create a sub account
                   </button>
                   <button
-                    className="border border-[#3E4095] text-[#3E4095] py-2 px-3 rounded-full cursor-pointer"
+                    className="border border-docuhealth-primary text-docuhealth-primary py-2 px-3 rounded-full cursor-pointer"
                     onClick={closeNoticeMessage}
                   >
                     Close

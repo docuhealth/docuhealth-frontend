@@ -66,7 +66,7 @@ const Newsletter = () => {
             />
             <button
               type="submit"
-              className="w-full  bg-[#212121]/60 lg:bg-[#3E4095] py-3  
+              className="w-full  bg-docuhealth-text-main/60 lg:bg-docuhealth-primary py-3  
                         
                  rounded-full sm:rounded-l-none       text-white sm:col-span-2 "
             >

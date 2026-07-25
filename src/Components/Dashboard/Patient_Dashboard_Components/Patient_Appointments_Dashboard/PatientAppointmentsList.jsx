@@ -130,7 +130,7 @@ const PatientAppointmentsList = ({selected}) => {
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#3E4095]"
+              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-docuhealth-primary"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -139,7 +139,7 @@ const PatientAppointmentsList = ({selected}) => {
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#3E4095]"
+              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-docuhealth-primary"
             />
           </div>
           {(dateFrom || dateTo) && (
@@ -176,7 +176,7 @@ const PatientAppointmentsList = ({selected}) => {
             </div>
             <button 
               onClick={() => toast.success("Coming Soon!")}
-              className="border border-[#3E4095] text-[#3E4095] rounded-full py-2 px-6 hover:bg-blue-50 transition-colors text-sm font-medium"
+              className="border border-docuhealth-primary text-docuhealth-primary rounded-full py-2 px-6 hover:bg-blue-50 transition-colors text-sm font-medium"
             >
               Send message
             </button>
@@ -195,7 +195,7 @@ const PatientAppointmentsList = ({selected}) => {
                 <p className="text-xs text-gray-500">{formatTime(apt.scheduled_time)}</p>
               </div>
               <div className="bg-blue-50 p-2 rounded-lg">
-                <CalendarIcon size={18} className="text-[#3E4095]" />
+                <CalendarIcon size={18} className="text-docuhealth-primary" />
               </div>
             </div>
             
@@ -212,7 +212,7 @@ const PatientAppointmentsList = ({selected}) => {
 
             <button 
               onClick={() => toast.success("Coming Soon!")}
-              className="w-full flex items-center justify-center gap-2 bg-[#3E4095] text-white rounded-full py-2.5 text-[13px] font-medium"
+              className="w-full flex items-center justify-center gap-2 bg-docuhealth-primary text-white rounded-full py-2.5 text-[13px] font-medium"
             >
               <MessageSquare size={16} />
               Send a message

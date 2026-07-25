@@ -15,7 +15,7 @@ const TabComponent = ({ tabs }) => {
             onClick={() => setTab(t.status)}
             className={`text-sm px-4 py-2 font-medium transition-all duration-200 
               ${activeStatus === t.status 
-                ? "text-[#3E4095] border-b-2 border-[#3E4095] font-semibold" 
+                ? "text-docuhealth-primary border-b-2 border-docuhealth-primary font-semibold" 
                 : "text-gray-600 hover:text-gray-800"}`}
           >
             {t.title}

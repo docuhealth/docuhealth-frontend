@@ -38,31 +38,31 @@ const HeroPG = () => {
         >
           <div className="flex-1 w-full">
             <motion.h1 
-              className="text-3xl lg:text-5xl 2xl:text-6xl font-bold leading-[50px] lg:leading-[60px] pb-5 text-[#212121] text-center lg:text-left"
+              className="text-3xl lg:text-5xl 2xl:text-6xl font-bold leading-[50px] lg:leading-[60px] pb-5 text-docuhealth-text-main text-center lg:text-left"
               variants={itemVariants}
             >
               Nigeria's First{" "}
-              <span className="text-[#3E4095] block underline-double">
+              <span className="text-docuhealth-primary block underline-double">
                 Centralized
               </span>{" "}
               <span className="block">Healthcare Platform</span>
             </motion.h1>
             <motion.p 
-              className="font-normal pb-10 text-[#727272] text-sm  2xl:text-xl hidden lg:block "
+              className="font-normal pb-10 text-docuhealth-text-muted text-sm  2xl:text-xl hidden lg:block "
               variants={itemVariants}
             >
               Connecting Patients, Providers, and Payers through One <br />{" "}
               Secure Healthcare System.
             </motion.p>
             <motion.p 
-              className="font-normal pb-10 text-[#727272] text-sm text-center lg:hidden "
+              className="font-normal pb-10 text-docuhealth-text-muted text-sm text-center lg:hidden "
               variants={itemVariants}
             >
               Connecting Patients, Providers, and Payers through One Secure
               Healthcare System.
             </motion.p>
             <motion.div className="text-sm flex flex-col lg:flex-row items-center gap-3" variants={itemVariants}>
-              <a href='#contact-us' className="hidden  group w-full lg:w-auto justify-center border border-[#3E4095]  transition-all hover:bg-[#3E4095] hover:text-white rounded-full py-2 px-8 text-[#3E4095] lg:flex items-center gap-1 2xl:text-xl cursor-pointer">
+              <a href='#contact-us' className="hidden  group w-full lg:w-auto justify-center border border-docuhealth-primary  transition-all hover:bg-docuhealth-primary hover:text-white rounded-full py-2 px-8 text-docuhealth-primary lg:flex items-center gap-1 2xl:text-xl cursor-pointer">
                 Partner with Us as A Healthcare Provider
                 <svg
                   width="16"
@@ -73,12 +73,12 @@ const HeroPG = () => {
                 >
                   <path
                     d="M10.6688 6.27614L4.93109 12.0139L3.98828 11.0711L9.72601 5.33333H4.66883V4H12.0021V11.3333H10.6688V6.27614Z"
-                    className="fill-[#3E4095] transition-all duration-300 group-hover:fill-white"
+                    className="fill-docuhealth-primary transition-all duration-300 group-hover:fill-white"
                   />
                 </svg>
               </a>
 
-              <Link to='/user-login' className="border w-full lg:w-auto  rounded-full py-2 px-8  transition-all hover:bg-[#34345F] bg-[#3E4095] text-white flex items-center gap-1 justify-center 2xl:text-xl cursor-pointer">
+              <Link to='/user-login' className="border w-full lg:w-auto  rounded-full py-2 px-8  transition-all hover:bg-docuhealth-nav-dark bg-docuhealth-primary text-white flex items-center gap-1 justify-center 2xl:text-xl cursor-pointer">
                 
                   Get your HIN
                 
@@ -169,12 +169,12 @@ const HeroPG = () => {
               variants={itemVariants}
             >
               Nigeria's First{" "}
-              <span className="text-[#B9BBFF] block sm:inline ">Centralized</span>{" "}
+              <span className="text-docuhealth-primary-light block sm:inline ">Centralized</span>{" "}
               <span className="block">Healthcare Platform</span>
             </motion.h1>
             <div className="sm:max-w-sm mx-auto ">
               <motion.p 
-                className="font-normal pb-5 text-[#DDDDDD] text-sm text-center lg:hidden "
+                className="font-normal pb-5 text-docuhealth-border-gray text-sm text-center lg:hidden "
                 variants={itemVariants}
               >
                 Connecting Patients, Providers, and Payers through One Secure
@@ -184,7 +184,7 @@ const HeroPG = () => {
 
             <motion.div className="text-sm flex flex-col lg:flex-row items-center gap-3" variants={itemVariants}>
 
-              <a href='#contact-us' className="w-full lg:w-auto justify-center   transition-all bg-white rounded-full py-2 px-8 text-[#3E4095] flex sm:hidden items-center gap-1 cursor-pointer">
+              <a href='#contact-us' className="w-full lg:w-auto justify-center   transition-all bg-white rounded-full py-2 px-8 text-docuhealth-primary flex sm:hidden items-center gap-1 cursor-pointer">
             
                   Partner with Us
                
@@ -197,14 +197,14 @@ const HeroPG = () => {
                 >
                   <path
                     d="M10.6688 6.27614L4.93109 12.0139L3.98828 11.0711L9.72601 5.33333H4.66883V4H12.0021V11.3333H10.6688V6.27614Z"
-                    className="fill-[#3E4095] transition-all duration-300"
+                    className="fill-docuhealth-primary transition-all duration-300"
                   />
                 </svg>
 
               </a>
 
 
-              <a href='#contact-us' className="w-full lg:w-auto justify-center cursor-pointer  transition-all bg-white rounded-full py-2 px-8 text-[#3E4095] hidden sm:flex lg:hidden items-center gap-1">
+              <a href='#contact-us' className="w-full lg:w-auto justify-center cursor-pointer  transition-all bg-white rounded-full py-2 px-8 text-docuhealth-primary hidden sm:flex lg:hidden items-center gap-1">
             
                   Partner with Us as A Healthcare Provider
             

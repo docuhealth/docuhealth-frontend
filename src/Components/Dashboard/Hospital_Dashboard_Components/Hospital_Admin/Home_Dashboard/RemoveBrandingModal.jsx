@@ -30,7 +30,7 @@ const RemoveBrandingModal = ({ onClose, type }) => {
   });
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 text-[#3E4095]">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 text-docuhealth-primary">
       <div className="bg-white w-full max-w-lg rounded-lg shadow overflow-hidden transform transition-all animate-in fade-in zoom-in duration-300">
         {/* Header */}
         <div className="flex justify-between items-center py-3 px-5 border-b border-gray-100">

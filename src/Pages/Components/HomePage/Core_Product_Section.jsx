@@ -59,13 +59,13 @@ const Core_Product_Section = () => {
     <>
       <BackgroundTemplate>
         {/* Full-width container handling vertical padding and background mapping */}
-        <div className="py-24 text-sm text-[#464646]" id="our-services">
+        <div className="py-24 text-sm text-docuhealth-gray" id="our-services">
           
           {/* PERFECTLY MATCHED NAVBAR CONTAINER */}
           <div className="max-w-[1440px] 2xl:max-w-[1600px] mx-auto w-full px-8 xl:px-16">
             
             <motion.h2 
-              className="font-semibold pb-4 text-2xl lg:text-3xl 2xl:text-4xl text-[#3E4095] text-center"
+              className="font-semibold pb-4 text-2xl lg:text-3xl 2xl:text-4xl text-docuhealth-primary text-center"
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -98,10 +98,10 @@ const Core_Product_Section = () => {
                     variants={cardVariants}
                   >
                     <div>
-                      <div className="w-16 h-16 bg-[#3E4095] rounded-full flex items-center justify-center mb-4">
+                      <div className="w-16 h-16 bg-docuhealth-primary rounded-full flex items-center justify-center mb-4">
                         <Icon className="w-8 h-8 text-white" />
                       </div>
-                      <h3 className="text-[#3E4095] font-semibold text-lg mb-2 2xl:text-xl">
+                      <h3 className="text-docuhealth-primary font-semibold text-lg mb-2 2xl:text-xl">
                         {core_product.title}
                       </h3>
                       <p className="text-gray-600 mb-4 font-semibold 2xl:text-lg">

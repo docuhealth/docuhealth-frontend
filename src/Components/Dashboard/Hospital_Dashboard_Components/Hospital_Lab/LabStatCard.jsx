@@ -6,9 +6,9 @@ const LabStatCard = ({ title, value, trend, trendText, icon, bgClass, isLoading 
       <div className={`w-10 h-10 rounded-sm flex items-center justify-center border ${bgClass}`}>
         {icon}
       </div>
-      <p className="text-sm font-semibold text-[#1B2B40]">{title}</p>
+      <p className="text-sm font-semibold text-docuhealth-dark">{title}</p>
     </div>
-    <p className="text-3xl font-semibold text-[#647284] mb-3">
+    <p className="text-3xl font-semibold text-docuhealth-secondary mb-3">
       {isLoading ? "—" : value}
     </p>
     <p className="text-xs text-gray-500 font-medium flex items-center gap-1 flex-wrap">

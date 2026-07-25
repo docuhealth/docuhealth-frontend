@@ -39,7 +39,7 @@ const CustomDropdown = ({ options, value, onChange }) => {
               type="button"
               className={`block w-full text-left px-4 py-2 text-xs sm:text-sm transition-colors ${
                 value === option
-                  ? "bg-gray-50 text-[#3E4095] font-medium"
+                  ? "bg-gray-50 text-docuhealth-primary font-medium"
                   : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
               }`}
               onClick={() => handleSelect(option)}

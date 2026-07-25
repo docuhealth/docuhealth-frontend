@@ -11,28 +11,28 @@ const API_Terms_And_Conditions_Page = () => {
           <meta name="description" content="Terms and Conditions governing the use of DocuHealth After Visit Summary (AVS) API." />
           <link rel="canonical" href="https://docuhealthservices.net/api-terms-and-conditions" />
       </Helmet>
-      <div className='min-h-screen text-[#3E4095] text-sm px-5 lg:px-16 pt-8 lg:pt-0'>
+      <div className='min-h-screen text-docuhealth-primary text-sm px-5 lg:px-16 pt-8 lg:pt-0'>
         <Link to='/docuhealth-api'>
           <div className='lg:flex justify-start items-center py-5 hidden '>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M5.21861 7.33327L8.79461 3.75726L7.85181 2.81445L2.66634 7.99993L7.85181 13.1853L8.79461 12.2425L5.21861 8.6666H13.333V7.33327H5.21861Z" fill="#3E4095" />
+              <path d="M5.21861 7.33327L8.79461 3.75726L7.85181 2.81445L2.66634 7.99993L7.85181 13.1853L8.79461 12.2425L5.21861 8.6666H13.333V7.33327H5.21861Z" fill="var(--color-docuhealth-primary)" />
             </svg>
             <p className='ml-2'>Back to API Page</p>
           </div>
         </Link>
-        <hr className='text-[#BDB5B5] hidden lg:block' />
+        <hr className='text-docuhealth-gray-light hidden lg:block' />
         
-        <div className='bg-[#F6FCFE] flex flex-col justify-center items-center my-16 sm:my-10 py-16 border rounded-md text-center px-4'>
-            <h1 className='text-3xl lg:text-4xl font-bold text-[#3E4095] uppercase tracking-wider mb-2'>
+        <div className='bg-docuhealth-light-blue flex flex-col justify-center items-center my-16 sm:my-10 py-16 border rounded-md text-center px-4'>
+            <h1 className='text-3xl lg:text-4xl font-bold text-docuhealth-primary uppercase tracking-wider mb-2'>
                 DocuHealth
             </h1>
-            <h2 className='text-2xl lg:text-3xl font-semibold text-[#3E4095] uppercase'>
+            <h2 className='text-2xl lg:text-3xl font-semibold text-docuhealth-primary uppercase'>
                 After Visit Summary API – Terms & Conditions
             </h2>
         </div>
 
         <div className='mx-auto'>
-          <div className="space-y-8 text-sm text-[#464646] mb-20 leading-relaxed">
+          <div className="space-y-8 text-sm text-docuhealth-gray mb-20 leading-relaxed">
             <p className='text-base'>
               These Terms govern access to and use of the <strong>DocuHealth After Visit Summary (AVS) API ("API", "Service")</strong> 
               by any third-party developer, organization, or Electronic Medical Record (EMR) system <strong>("Developer", "You")</strong>.
@@ -41,13 +41,13 @@ const API_Terms_And_Conditions_Page = () => {
               The API is designed for the secure uploading and retrieval (viewing) of patient After Visit Summaries 
               within approved healthcare systems.
             </p>
-            <p className="font-semibold text-[#3E4095] text-base">
+            <p className="font-semibold text-docuhealth-primary text-base">
               By accessing or using the API, You agree to be bound by these Terms.
             </p>
 
             {/* 1. Purpose of the API */}
             <section>
-              <h3 className="text-lg font-bold text-[#3E4095] mb-3">1. Purpose of the API</h3>
+              <h3 className="text-lg font-bold text-docuhealth-primary mb-3">1. Purpose of the API</h3>
               <p>
                 The DocuHealth AVS API enables secure upload and retrieval of structured post-encounter patient 
                 summaries generated from clinical data, including:
@@ -71,7 +71,7 @@ const API_Terms_And_Conditions_Page = () => {
 
             {/* 2. License & Access Rights */}
             <section>
-              <h3 className="text-lg font-bold text-[#3E4095] mb-3">2. License & Access Rights</h3>
+              <h3 className="text-lg font-bold text-docuhealth-primary mb-3">2. License & Access Rights</h3>
               <ol className="list-decimal pl-6 space-y-2">
                 <li>DocuHealth grants You a limited, non-exclusive, non-transferable, revocable license to use the API solely for secure integration of upload and viewing functionality within Your EMR system.</li>
                 <li>You may not resell, sublicense, or redistribute the API or its data.</li>
@@ -80,7 +80,7 @@ const API_Terms_And_Conditions_Page = () => {
 
             {/* 3. Data Usage & Restrictions */}
             <section>
-              <h3 className="text-lg font-bold text-[#3E4095] mb-3">3. Data Usage & Restrictions</h3>
+              <h3 className="text-lg font-bold text-docuhealth-primary mb-3">3. Data Usage & Restrictions</h3>
               <ol className="list-decimal pl-6 space-y-2">
                 <li>API data must only be used for authorized clinical upload, retrieval, and viewing purposes.</li>
                 <li>You shall not alter, distort, or misrepresent clinical information.</li>
@@ -91,7 +91,7 @@ const API_Terms_And_Conditions_Page = () => {
 
             {/* 4. Patient Data Handling */}
             <section>
-              <h3 className="text-lg font-bold text-[#3E4095] mb-3">4. Patient Data Handling</h3>
+              <h3 className="text-lg font-bold text-docuhealth-primary mb-3">4. Patient Data Handling</h3>
               <ol className="list-decimal pl-6 space-y-2">
                 <li>All data transmitted and retrieved via the API is sensitive medical information.</li>
                 <li>Developers must comply with applicable healthcare privacy and data protection laws.</li>
@@ -103,7 +103,7 @@ const API_Terms_And_Conditions_Page = () => {
 
             {/* 5. Internal Clinical Documentation Rule */}
             <section>
-              <h3 className="text-lg font-bold text-[#3E4095] mb-3">5. Internal Clinical Documentation Rule</h3>
+              <h3 className="text-lg font-bold text-docuhealth-primary mb-3">5. Internal Clinical Documentation Rule</h3>
               <p>
                 DocuHealth distinguishes between Internal Clinical Records (not exposed via API) and Structured After 
                 Visit Summary (AVS) (exposed via API for upload and viewing only).
@@ -116,7 +116,7 @@ const API_Terms_And_Conditions_Page = () => {
 
             {/* 6. Security Requirements */}
             <section>
-              <h3 className="text-lg font-bold text-[#3E4095] mb-3">6. Security Requirements</h3>
+              <h3 className="text-lg font-bold text-docuhealth-primary mb-3">6. Security Requirements</h3>
               <ol className="list-decimal pl-6 space-y-2">
                 <li>Implement secure authentication (API keys, OAuth, or approved method).</li>
                 <li>Ensure all upload and retrieval requests are authenticated.</li>
@@ -128,7 +128,7 @@ const API_Terms_And_Conditions_Page = () => {
 
             {/* 7. Patient Subscription-Based Access Control */}
             <section>
-              <h3 className="text-lg font-bold text-[#3E4095] mb-3">7. Patient Subscription-Based Access Control</h3>
+              <h3 className="text-lg font-bold text-docuhealth-primary mb-3">7. Patient Subscription-Based Access Control</h3>
               <p>
                 API access for viewing AVS data is strictly dependent on the patient’s subscription status within the 
                 DocuHealth system.
@@ -147,7 +147,7 @@ const API_Terms_And_Conditions_Page = () => {
 
             {/* 8. Compliance Responsibilities */}
             <section>
-              <h3 className="text-lg font-bold text-[#3E4095] mb-3">8. Compliance Responsibilities</h3>
+              <h3 className="text-lg font-bold text-docuhealth-primary mb-3">8. Compliance Responsibilities</h3>
               <p>
                 You are solely responsible for compliance with healthcare regulations, privacy laws, and EMR 
                 governance policies.
@@ -156,7 +156,7 @@ const API_Terms_And_Conditions_Page = () => {
 
             {/* 9. Service Availability */}
             <section>
-              <h3 className="text-lg font-bold text-[#3E4095] mb-3">9. Service Availability</h3>
+              <h3 className="text-lg font-bold text-docuhealth-primary mb-3">9. Service Availability</h3>
               <p>
                 DocuHealth strives for high availability but does not guarantee uninterrupted service. Maintenance may 
                 affect API access.
@@ -165,7 +165,7 @@ const API_Terms_And_Conditions_Page = () => {
 
             {/* 10. Intellectual Property */}
             <section>
-              <h3 className="text-lg font-bold text-[#3E4095] mb-3">10. Intellectual Property</h3>
+              <h3 className="text-lg font-bold text-docuhealth-primary mb-3">10. Intellectual Property</h3>
               <p>
                 All rights in the API remain the exclusive property of DocuHealth. No ownership rights are granted.
               </p>
@@ -173,7 +173,7 @@ const API_Terms_And_Conditions_Page = () => {
 
             {/* 11. Termination */}
             <section>
-              <h3 className="text-lg font-bold text-[#3E4095] mb-3">11. Termination</h3>
+              <h3 className="text-lg font-bold text-docuhealth-primary mb-3">11. Termination</h3>
               <p>
                 DocuHealth may suspend or terminate access for violations, security risks, or misuse. Developers may 
                 stop usage at any time.
@@ -182,7 +182,7 @@ const API_Terms_And_Conditions_Page = () => {
 
             {/* 12. Disclaimer of Medical Liability */}
             <section>
-              <h3 className="text-lg font-bold text-[#3E4095] mb-3">12. Disclaimer of Medical Liability</h3>
+              <h3 className="text-lg font-bold text-docuhealth-primary mb-3">12. Disclaimer of Medical Liability</h3>
               <p>
                 DocuHealth is not responsible for clinical decisions, misinterpretation of data, or patient outcomes.
               </p>
@@ -190,7 +190,7 @@ const API_Terms_And_Conditions_Page = () => {
 
             {/* 13. Acceptance of Terms */}
             <section>
-              <h3 className="text-lg font-bold text-[#3E4095] mb-3">13. Acceptance of Terms</h3>
+              <h3 className="text-lg font-bold text-docuhealth-primary mb-3">13. Acceptance of Terms</h3>
               <p>
                 By using the API, You confirm acceptance of these Terms and full responsibility for system usage.
               </p>

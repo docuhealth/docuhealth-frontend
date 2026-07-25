@@ -31,7 +31,7 @@ const AdmittedPatientsChart = ({ data = [], filter = "Monthly", onFilterChange }
           <div className="flex items-center gap-2">
             <button
               onClick={handleDownload}
-              className="p-1.5 text-gray-500 hover:text-[#3E4095] bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              className="p-1.5 text-gray-500 hover:text-docuhealth-primary bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
               title="Download CSV"
             >
               <Download size={16} />
@@ -86,7 +86,7 @@ const AdmittedPatientsChart = ({ data = [], filter = "Monthly", onFilterChange }
         smooth: true,
         showSymbol: false,
         lineStyle: {
-          color: "#3E4095",
+          color: "var(--color-docuhealth-primary)",
           width: 3,
         },
         areaStyle: {
@@ -109,7 +109,7 @@ const AdmittedPatientsChart = ({ data = [], filter = "Monthly", onFilterChange }
         <div className="flex items-center gap-2">
           <button
             onClick={handleDownload}
-            className="p-1.5 text-gray-500 hover:text-[#3E4095] bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+            className="p-1.5 text-gray-500 hover:text-docuhealth-primary bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
             title="Download CSV"
           >
             <Download size={16} />

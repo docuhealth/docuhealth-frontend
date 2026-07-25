@@ -5,6 +5,7 @@ import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Compon
 import SoapNoteEntry from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/SoapNoteEntry";
 import RequestAdmission from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/RequestAdmission";
 import OtherMedicalServices from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/OtherMedicalServices";
+import PrescribeMedication from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PrescribeMedication";
 import { DoctorAppointmentsListContext } from "../../../context/HospitalContext/Doctors/DoctorAppointmentsListContext";
 
 const Hospital_Doctors_Appointments_Dashboard = () => {
@@ -14,6 +15,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
   const [otherMedicalServices, setOtherMedicalServices] = useState(false);
+  const [prescribeMedication, setPrescribeMedication] = useState(false);
 
   const [requestAdmission, setRequestAdmission] = useState(false);
 
@@ -26,13 +28,13 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
           <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
             <DynamicDate />
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto " onClick={() => {
+              <button className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto " onClick={() => {
                 setOtherMedicalServices(true)
               }}>
                 Other medical services
 
               </button>
-              <button className="py-2.5 px-10 rounded-full text-[#3E4095] border border-[#3E4095] cursor-pointer w-full lg:w-auto"
+              <button className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
                 onClick={() => {
                   setRequestAdmission(true)
                 }}
@@ -40,7 +42,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
                 Request for admission
               </button>
               <button
-                className="py-2.5 px-10 rounded-full bg-[#3E4095] border border-[#3E4095] text-white cursor-pointer w-full lg:w-auto"
+                className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
                 onClick={() => {
                   setSoapNoteEntry(true);
                   setSeePatientDetails(false);
@@ -59,6 +61,8 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
           {
             otherMedicalServices && (
               <OtherMedicalServices setOtherMedicalServices={setOtherMedicalServices}
+                setPrescribeMedication={setPrescribeMedication}
+                setSeePatientDetails={setSeePatientDetails}
                 selectedPatientDetails={selectedPatientDetails}
               />
             )
@@ -75,7 +79,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
             <DynamicDate />
             <div className="">
               <button
-                className="py-2.5 px-10 rounded-full bg-[#3E4095] text-white cursor-pointer"
+                className="py-2.5 px-10 rounded-full bg-docuhealth-primary text-white cursor-pointer"
                 onClick={() => {
                   setSoapNoteEntry(false);
                 }}
@@ -92,6 +96,19 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
             />
           </div>
         </>
+      ) : prescribeMedication ? (
+        <>
+          <div className="py-2 text-sm flex justify-between items-center">
+            <DynamicDate />
+          </div>
+          <div>
+            <PrescribeMedication
+              setPrescribeMedication={setPrescribeMedication}
+              selectedPatientDetails={selectedPatientDetails}
+              setSeePatientDetails={setSeePatientDetails}
+            />
+          </div>
+        </>
       ) : (
         <>
           <div className="py-2 text-sm flex justify-between items-center">
@@ -99,9 +116,6 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
           </div>
           <div className="bg-white my-5  rounded-lg ">
             <div className=" border rounded-lg p-4 lg:p-6">
-              <h2 className=" mb-4 pb-2 border-b font-medium capitalize">
-                {appointmentType === 'upcoming' ? 'Upcoming' : appointmentType === 'today' ? "Today's" : 'Past'} Appointments List
-              </h2>
               <div>
                 <AppointmentsList
                   setSeePatientDetails={setSeePatientDetails}

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 const Our_Locations_Section = () => {
   return (
     /* Full-width container background wrapper */
-    <section className="py-10 lg:pt-20 text-sm text-[#464646] bg-white overflow-hidden" id="our-locations">
+    <section className="py-10 lg:pt-20 text-sm text-docuhealth-gray bg-white overflow-hidden" id="our-locations">
       
       {/* PERFECTLY MATCHED NAVBAR CONTAINER */}
       <div className="max-w-[1440px] 2xl:max-w-[1600px] mx-auto w-full px-8 xl:px-16 flex flex-col items-center">
@@ -16,7 +16,7 @@ const Our_Locations_Section = () => {
           viewport={{ once: true }}
           className="w-full text-center mb-12"
         >
-          <h2 className="text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-[#3E4095] mb-4 block">
+          <h2 className="text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-docuhealth-primary mb-4 block">
             Our Locations
           </h2>
           <p className="text-sm text-gray-600 max-w-2xl mx-auto">
@@ -32,15 +32,15 @@ const Our_Locations_Section = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
             viewport={{ once: true }}
-            className="flex flex-col items-center justify-between p-8 bg-[#F6FCFE] rounded-lg border hover:shadow transition-all text-center min-h-[250px]"
+            className="flex flex-col items-center justify-between p-8 bg-docuhealth-light-blue rounded-lg border hover:shadow transition-all text-center min-h-[250px]"
           >
             <div className="flex flex-col items-center">
-              <div className="bg-[#3E4095] p-4 rounded-full mb-4 shadow-sm">
+              <div className="bg-docuhealth-primary p-4 rounded-full mb-4 shadow-sm">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z" fill="#FFFFFF"/>
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-[#3E4095] mb-3">Osun State Branch</h3>
+              <h3 className="text-xl font-bold text-docuhealth-primary mb-3">Osun State Branch</h3>
               <p className="font-medium text-gray-600">MDS Under Bridge, After Justrite</p>
             </div>
           </motion.div>
@@ -62,7 +62,7 @@ const Our_Locations_Section = () => {
                 </div>
                 <h3 className="text-xl font-bold text-gray-500 mb-3">Lagos State Branch</h3>
               </div>
-              <span className="bg-[#E6F4FB] text-[#3E4095] text-xs font-bold px-4 py-1.5 rounded-full border border-blue-100 uppercase tracking-wide mt-auto">
+              <span className="bg-docuhealth-blue-pale text-docuhealth-primary text-xs font-bold px-4 py-1.5 rounded-full border border-blue-100 uppercase tracking-wide mt-auto">
                 Coming Soon
               </span>
             </div>
@@ -85,7 +85,7 @@ const Our_Locations_Section = () => {
                 </div>
                 <h3 className="text-xl font-bold text-gray-500 mb-3">More Locations</h3>
               </div>
-              <span className="bg-[#E6F4FB] text-[#3E4095] text-xs font-bold px-4 py-1.5 rounded-full border border-blue-100 uppercase tracking-wide mt-auto">
+              <span className="bg-docuhealth-blue-pale text-docuhealth-primary text-xs font-bold px-4 py-1.5 rounded-full border border-blue-100 uppercase tracking-wide mt-auto">
                 Expanding Soon
               </span>
             </div>

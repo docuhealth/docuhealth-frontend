@@ -15,7 +15,7 @@ const TabComponent2 = ({ tabs }) => {
             onClick={() => setActiveTab(index)}
             className={`text-[13px] px-2 sm:px-6 py-2 sm:py-3 font-medium transition-colors duration-200 cursor-pointer text-center sm:whitespace-nowrap sm:shrink-0 rounded-lg sm:rounded-none ${
               activeTab === index
-                ? "bg-[#3E4095] text-white sm:bg-transparent sm:text-[#3E4095] sm:border-b-2 sm:border-[#3E4095] font-semibold"
+                ? "bg-docuhealth-primary text-white sm:bg-transparent sm:text-docuhealth-primary sm:border-b-2 sm:border-docuhealth-primary font-semibold"
                 : "text-gray-600 hover:bg-gray-100 hover:text-gray-800 sm:hover:bg-transparent sm:border-b-2 sm:border-transparent"
             }`}
           >

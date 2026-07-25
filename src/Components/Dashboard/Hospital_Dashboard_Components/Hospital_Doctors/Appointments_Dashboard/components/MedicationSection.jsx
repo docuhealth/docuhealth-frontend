@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
+import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import { Plus, X } from "lucide-react";
 
 const dosageUnits = [
@@ -20,12 +21,14 @@ const MedicationSection = ({ medications, setMedications }) => {
     setMedications([
       ...medications,
       {
+        catalog_drug: null,
         drug: "",
+        strength: "",
+        doseForm: "",
         dosage: "",
         dosageUnit: "mg",
         route: "Oral",
-        frequency: 1,
-        frequencyUnit: "Daily",
+        frequency: "od_qd",
         duration: "",
         durationUnit: "Month",
       },
@@ -43,9 +46,62 @@ const MedicationSection = ({ medications, setMedications }) => {
     setMedications(updated);
   };
 
+  const [activeSearchIndex, setActiveSearchIndex] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchPage, setSearchPage] = useState(1);
+  const searchTimeout = useRef(null);
+
+  const handleDrugSearch = (index, query) => {
+    handleChange(index, "drug", query);
+    handleChange(index, "catalog_drug", null); 
+
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+
+    if (!query.trim()) {
+      setSearchResults([]);
+      setActiveSearchIndex(null);
+      setSearchPage(1);
+      return;
+    }
+
+    setActiveSearchIndex(index);
+    setSearchPage(1);
+    
+    searchTimeout.current = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const res = await axiosInstanceHos.get(`/api/pharmacy/drugs/autocomplete?query=${query}`);
+        const data = res.data;
+        setSearchResults(Array.isArray(data) ? data : (data?.results || []));
+      } catch (error) {
+        console.error("Failed to fetch drugs:", error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500);
+  };
+
+  const handleSelectDrug = (index, item) => {
+    const updated = [...medications];
+    updated[index].drug = item.name;
+    updated[index].catalog_drug = item.rxcui;
+    updated[index].strength = item.strength || "";
+    updated[index].doseForm = item.dose_form || "";
+    updated[index].route = item.route || "Oral";
+    setMedications(updated);
+    
+    setSearchResults([]);
+    setActiveSearchIndex(null);
+    setSearchPage(1);
+  };
+
   return (
     <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-      <p className="font-medium mb-3 text-[#1B2B40]">Medication</p>
+      <p className="font-medium mb-3 text-docuhealth-dark">Medication</p>
 
       {medications.map((med, index) => (
         <div
@@ -54,13 +110,104 @@ const MedicationSection = ({ medications, setMedications }) => {
         >
           <div className="lg:col-span-3">
             <label className="block text-[12px] font-medium text-gray-700 pb-1">Drug Name</label>
-            <input
-              type="text"
-              placeholder="Drug name..."
-              value={med.drug}
-              onChange={(e) => handleChange(index, "drug", e.target.value)}
-              className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Drug name..."
+                value={med.drug}
+                onChange={(e) => handleDrugSearch(index, e.target.value)}
+                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all mb-4"
+              />
+              {activeSearchIndex === index && searchResults.length > 0 && (
+                <ul className="absolute z-10 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto mt-1 top-full">
+                  {searchResults.slice((searchPage - 1) * 10, searchPage * 10).map((item, idx) => (
+                    <li
+                      key={idx}
+                      className="p-2.5 text-[12px] hover:bg-docuhealth-primary/10 cursor-pointer text-gray-800 border-b last:border-0"
+                      onClick={() => handleSelectDrug(index, item)}
+                    >
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-[10px] text-gray-500 mt-0.5">
+                        {item.strength && <span>{item.strength}</span>}
+                        {item.strength && item.dose_form && <span className="mx-1">•</span>}
+                        {item.dose_form && <span>{item.dose_form}</span>}
+                      </div>
+                    </li>
+                  ))}
+                  {Math.ceil(searchResults.length / 10) > 1 && (
+                    <li className="p-2 border-t flex justify-between items-center bg-gray-50 text-[11px] sticky bottom-0">
+                      <button
+                        type="button"
+                        disabled={searchPage === 1}
+                        onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSearchPage(prev => prev - 1); }}
+                        className={`px-2 py-1 rounded ${searchPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-docuhealth-primary hover:bg-blue-100'}`}
+                      >
+                        Prev
+                      </button>
+                      <span className="text-gray-500">Page {searchPage} of {Math.ceil(searchResults.length / 10)}</span>
+                      <button
+                        type="button"
+                        disabled={searchPage === Math.ceil(searchResults.length / 10)}
+                        onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSearchPage(prev => prev + 1); }}
+                        className={`px-2 py-1 rounded ${searchPage === Math.ceil(searchResults.length / 10) ? 'text-gray-400 cursor-not-allowed' : 'text-docuhealth-primary hover:bg-blue-100'}`}
+                      >
+                        Next
+                      </button>
+                    </li>
+                  )}
+                </ul>
+              )}
+              {activeSearchIndex === index && isSearching && (
+                <div className="absolute right-3 top-2.5">
+                  <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                  </svg>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <div className="w-1/2">
+                <label className="block text-[12px] font-medium text-gray-700 pb-1">Strength <span className="text-gray-400 font-normal">(not compulsory)</span></label>
+                <input
+                  type="text"
+                  placeholder="Strength..."
+                  value={med.strength}
+                  disabled={!!med.catalog_drug}
+                  onChange={(e) => handleChange(index, "strength", e.target.value)}
+                  className={`w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all ${med.catalog_drug ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+                />
+              </div>
+              <div className="w-1/2">
+                <label className="block text-[12px] font-medium text-gray-700 pb-1">Dose Form <span className="text-gray-400 font-normal">(not compulsory)</span></label>
+                <div className="relative">
+                  <select
+                    value={med.doseForm}
+                    disabled={!!med.catalog_drug}
+                    onChange={(e) => handleChange(index, "doseForm", e.target.value)}
+                    className={`w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none appearance-none pr-8 transition-all ${med.catalog_drug ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white'}`}
+                  >
+                    <option value="" disabled>Form...</option>
+                    <option value="Tablet">Tablet</option>
+                    <option value="Capsule">Capsule</option>
+                    <option value="Syrup">Syrup</option>
+                    <option value="Suspension">Suspension</option>
+                    <option value="Injection">Injection</option>
+                    <option value="Ointment">Ointment</option>
+                    <option value="Cream">Cream</option>
+                    <option value="Drops">Drops</option>
+                    <option value="Inhaler">Inhaler</option>
+                    <option value="Suppository">Suppository</option>
+                    <option value="Patch">Patch</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="lg:col-span-3">
@@ -71,7 +218,7 @@ const MedicationSection = ({ medications, setMedications }) => {
                 placeholder="Enter dosage..."
                 value={med.dosage}
                 onChange={(e) => handleChange(index, "dosage", e.target.value)}
-                className="w-1/2 border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
+                className="w-1/2 border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
               />
               <div className="w-1/2 relative">
                 <input
@@ -80,7 +227,7 @@ const MedicationSection = ({ medications, setMedications }) => {
                   placeholder="Unit..."
                   value={med.dosageUnit}
                   onChange={(e) => handleChange(index, "dosageUnit", e.target.value)}
-                  className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
+                  className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
                 />
                 <datalist id={`dosage-units-${index}`}>
                   {dosageUnits.map((unit) => (
@@ -96,8 +243,9 @@ const MedicationSection = ({ medications, setMedications }) => {
             <div className="relative">
               <select
                 value={med.route}
+                disabled={!!med.catalog_drug}
                 onChange={(e) => handleChange(index, "route", e.target.value)}
-                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none appearance-none bg-white pr-8 transition-all"
+                className={`w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none appearance-none pr-8 transition-all ${med.catalog_drug ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white'}`}
               >
                 <option value="Oral">Oral</option>
                 <option value="IV">IV = Intravenous</option>
@@ -117,34 +265,37 @@ const MedicationSection = ({ medications, setMedications }) => {
             </div>
           </div>
 
-          <div className="lg:col-span-2 flex gap-2">
-            <div className="flex-1">
-              <label className="block text-[12px] font-medium text-gray-700 pb-1">Frequency</label>
-              <input
-                type="number"
-                min={1}
+          <div className="lg:col-span-2 relative">
+            <label className="block text-[12px] font-medium text-gray-700 pb-1">Frequency</label>
+            <div className="relative">
+              <select
                 value={med.frequency}
-                onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
                 onChange={(e) => handleChange(index, "frequency", e.target.value)}
-                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block text-[12px] pb-1">&nbsp;</label>
-              <div className="relative">
-                <select
-                  value={med.frequencyUnit}
-                  onChange={(e) => handleChange(index, "frequencyUnit", e.target.value)}
-                  className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-[#3E4095] outline-none transition-all bg-white"
-                >
-                  <option value="Daily">Daily</option>
-                  <option value="Weekly">Weekly</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
+                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none appearance-none bg-white pr-8 transition-all"
+              >
+                <option value="stat">stat - Immediately</option>
+                <option value="once">once - One-time dose</option>
+                <option value="od_qd">od_qd - Once daily</option>
+                <option value="bd_bid">bd_bid - Twice daily</option>
+                <option value="tds_tid">tds_tid - Three times daily</option>
+                <option value="qid">qid - Four times daily</option>
+                <option value="q3h">q3h - Every 3 hours</option>
+                <option value="q4h">q4h - Every 4 hours</option>
+                <option value="q6h">q6h - Every 6 hours</option>
+                <option value="q8h">q8h - Every 8 hours</option>
+                <option value="q12h">q12h - Every 12 hours</option>
+                <option value="q24h">q24h - Every 24 hours</option>
+                <option value="prn">prn - As needed</option>
+                <option value="mane">mane - Morning</option>
+                <option value="nocte">nocte - Night</option>
+                <option value="alt_days">alt_days - Alternate days</option>
+                <option value="weekly">weekly - Weekly</option>
+                <option value="monthly">monthly - Monthly</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </div>
             </div>
           </div>
@@ -158,7 +309,7 @@ const MedicationSection = ({ medications, setMedications }) => {
                 value={med.duration}
                 onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
                 onChange={(e) => handleChange(index, "duration", e.target.value)}
-                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
+                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
               />
             </div>
             <div className="flex-1">
@@ -167,7 +318,7 @@ const MedicationSection = ({ medications, setMedications }) => {
                 <select
                   value={med.durationUnit}
                   onChange={(e) => handleChange(index, "durationUnit", e.target.value)}
-                  className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-[#3E4095] outline-none transition-all bg-white"
+                  className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all bg-white"
                 >
                   <option value="Month">Month (s)</option>
                   <option value="Week">Week (s)</option>
@@ -195,7 +346,7 @@ const MedicationSection = ({ medications, setMedications }) => {
 
       <button
         onClick={handleAddMedication}
-        className="text-[#3E4095] font-medium text-[12px] mt-4 flex items-center gap-1 hover:underline transition-all"
+        className="text-docuhealth-primary font-medium text-[12px] mt-4 flex items-center gap-1"
       >
         <Plus size={14} /> Add more drugs
       </button>

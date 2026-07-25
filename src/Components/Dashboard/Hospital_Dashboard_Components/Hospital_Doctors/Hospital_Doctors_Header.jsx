@@ -38,7 +38,7 @@ const Hospital_Doctors_Header = () => {
 
         <div className="flex items-center gap-6">
           {/* Notifications */}
-          <button className="relative p-2 text-gray-400 hover:text-[#3E4095] hover:bg-indigo-50 rounded-full transition-all">
+          <button className="relative p-2 text-gray-400 hover:text-docuhealth-primary hover:bg-indigo-50 rounded-full transition-all">
             <span className="absolute top-2 right-2.5 bg-red-500 border-2 border-white rounded-full w-2.5 h-2.5"></span>
             <Bell className="w-5 h-5" />
           </button>
@@ -49,14 +49,14 @@ const Hospital_Doctors_Header = () => {
               <p className="text-sm font-bold text-gray-900 leading-tight">
                 {profile ? `${profile.firstname} ${profile.lastname}` : "Loading..."}
               </p>
-              <p className="text-[11px] font-medium text-[#3E4095] bg-indigo-50 px-2 py-0.5 rounded mt-1 inline-block">
+              <p className="text-[11px] font-medium text-docuhealth-primary bg-indigo-50 px-2 py-0.5 rounded mt-1 inline-block">
                 Hospital Doctor
               </p>
             </div>
             {hospitalLogo ? (
               <img src={hospitalLogo} alt="Hospital Logo" className="w-10 h-10 rounded-full object-cover shadow-md" />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#3E4095] to-indigo-400 flex justify-center items-center text-white text-sm font-bold shadow-md">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-docuhealth-primary to-indigo-400 flex justify-center items-center text-white text-sm font-bold shadow-md">
                 {initials}
               </div>
             )}
@@ -95,7 +95,7 @@ const Hospital_Doctors_Header = () => {
                     {hospitalLogo ? (
                       <img src={hospitalLogo} alt="Hospital Logo" className="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-50" />
                     ) : (
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#3E4095] to-indigo-400  flex items-center justify-center text-white text-xs font-bold ring-2 ring-indigo-50">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-docuhealth-primary to-indigo-400  flex items-center justify-center text-white text-xs font-bold ring-2 ring-indigo-50">
                         {initials}
                       </div>
                     )}

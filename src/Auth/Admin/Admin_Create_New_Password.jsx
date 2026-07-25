@@ -151,7 +151,7 @@ const ASNW = () => {
       <div className=" w-1/2 h-full overflow-y-scroll hide-scrollbar flex-1">
         <div className="hidden sm:flex flex-col  items-start justify-center py-10 ">
           <Link to="/">
-          <div className="pl-10 pb-10 flex gap-1 items-center font-semibold text-[#3E4095]">
+          <div className="pl-10 pb-10 flex gap-1 items-center font-semibold text-docuhealth-primary">
               <img src={docuhealth_logo} alt="Logo" className="w-6" />
               <h1 className="text-xl">DocuHealth</h1>
             </div>
@@ -173,7 +173,7 @@ const ASNW = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${password && !isPasswordValid
+                    className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary ${password && !isPasswordValid
                       ? "focus:border-red-500"
                       : ""
                       }`}
@@ -320,7 +320,7 @@ const ASNW = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Confirm your password"
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
@@ -346,7 +346,7 @@ const ASNW = () => {
                 disabled={isLoading}
                 className={`w-full py-3 rounded-full ${isLoading
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-[#3E4095] text-white "
+                  : "bg-docuhealth-primary text-white "
                   }`}
               >
 
@@ -374,19 +374,19 @@ const ASNW = () => {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <circle cx="50" cy="50.4014" r="50" fill="#0B6011" />
+              <circle cx="50" cy="50.4014" r="50" fill="var(--color-docuhealth-green-dark)" />
               <path
                 d="M44.6659 58.857L69.1789 34.344L72.9501 38.1152L44.6659 66.3994L27.6953 49.429L31.4666 45.6578L44.6659 58.857Z"
                 fill="white"
               />
             </svg>
           </div>
-          <p className="text-[#0B6011] mb-4 text-sm text-center ">
+          <p className="text-docuhealth-green-dark mb-4 text-sm text-center ">
             You have successfully reset your password!
           </p>
           <div className="flex justify-center w-full">
             <button
-              className="bg-[#3E4095] w-full rounded-full text-white px-4 py-2 cursor-pointer"
+              className="bg-docuhealth-primary w-full rounded-full text-white px-4 py-2 cursor-pointer"
               onClick={handleNavigation}
             >
               Go To SignIn
@@ -398,7 +398,7 @@ const ASNW = () => {
 
     <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
       <Link to="/">
-        <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+        <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-docuhealth-primary">
           <img src={docuhealth_logo} alt="Logo" className="w-6" />
           <h1 className="text-xl">DocuHealth</h1>
         </div>
@@ -421,7 +421,7 @@ const ASNW = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095] ${password && !isPasswordValid ? "focus:border-red-500" : ""
+                  className={`w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary ${password && !isPasswordValid ? "focus:border-red-500" : ""
                     }`}
                   value={password}
                   onChange={(e) => {
@@ -565,7 +565,7 @@ const ASNW = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Confirm your password"
-                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -591,7 +591,7 @@ const ASNW = () => {
               disabled={isLoading}
               className={`w-full py-3 rounded-full ${isLoading
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-[#3E4095] text-white "
+                : "bg-docuhealth-primary text-white "
                 }`}
             >
               {isLoading ? (<div className="flex items-center justify-center gap-2">

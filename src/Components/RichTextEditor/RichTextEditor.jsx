@@ -10,7 +10,7 @@ const ToolbarButton = ({ onClick, active, children }) => (
     type="button"
     onMouseDown={(e) => { e.preventDefault(); onClick(); }}
     className={`p-1.5 rounded transition-colors ${
-      active ? "bg-[#3E4095] text-white" : "text-gray-500 hover:bg-gray-100"
+      active ? "bg-docuhealth-primary text-white" : "text-gray-500 hover:bg-gray-100"
     }`}
   >
     {children}
@@ -36,7 +36,7 @@ const RichTextEditor = ({ placeholder = "Start typing...", onChange }) => {
   if (!editor) return null;
 
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden focus-within:border-[#3E4095] transition-colors">
+    <div className="border border-gray-200 rounded-lg overflow-hidden focus-within:border-docuhealth-primary transition-colors">
       {/* Toolbar */}
       <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-gray-100 bg-gray-50 flex-wrap">
         <ToolbarButton

@@ -39,7 +39,7 @@ const UserSubAcctRecordsMobile = ({
   if (isPending) {
     return (
       <div className="flex justify-center py-10">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3E4095]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-docuhealth-primary"></div>
       </div>
     );
   }
@@ -62,7 +62,7 @@ const UserSubAcctRecordsMobile = ({
             {/* Header: Name and Action */}
             <div className="flex justify-between items-start p-4 pb-0">
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#3E4095] font-bold shadow-sm">
+                <div className="h-12 w-12 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-docuhealth-primary font-bold shadow-sm">
                   {subaccount.firstname?.[0]}{subaccount.lastname?.[0]}
                 </div>
                 <div>
@@ -80,7 +80,7 @@ const UserSubAcctRecordsMobile = ({
                 <button
                   onClick={() => togglePopover(index)}
                   className={`p-2 rounded-full transition-colors ${
-                    openPopover === index ? "bg-gray-100 text-[#3E4095]" : "text-gray-400 hover:bg-gray-50"
+                    openPopover === index ? "bg-gray-100 text-docuhealth-primary" : "text-gray-400 hover:bg-gray-50"
                   }`}
                 >
                   <MoreVertical className="w-5 h-5" />
@@ -92,7 +92,7 @@ const UserSubAcctRecordsMobile = ({
                     <div className="fixed inset-0 z-20" onClick={() => setOpenPopover(null)}></div>
                     <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-lg p-1.5 w-56 z-30 animate-in fade-in zoom-in duration-150">
                       <button
-                        className="w-full flex items-center gap-3 text-[12px] text-gray-700 hover:bg-indigo-50 hover:text-[#3E4095] p-2.5 rounded-lg transition-colors"
+                        className="w-full flex items-center gap-3 text-[12px] text-gray-700 hover:bg-indigo-50 hover:text-docuhealth-primary p-2.5 rounded-lg transition-colors"
                         onClick={() => {
                           setOpenPopover(null);
                           setViewDetailMedicalRecord(true);
@@ -104,7 +104,7 @@ const UserSubAcctRecordsMobile = ({
                       </button>
 
                       <button
-                        className="w-full flex items-center gap-3 text-[12px] text-gray-700 hover:bg-indigo-50 hover:text-[#3E4095] p-2.5 rounded-lg transition-colors"
+                        className="w-full flex items-center gap-3 text-[12px] text-gray-700 hover:bg-indigo-50 hover:text-docuhealth-primary p-2.5 rounded-lg transition-colors"
                         onClick={() => {
                           setOpenPopover(null);
                           setDisplaySubAcctModal(true);
@@ -117,13 +117,13 @@ const UserSubAcctRecordsMobile = ({
                       <button
                         disabled={isCreatingID}
                         className={`w-full flex items-center gap-3 text-[12px] p-2.5 rounded-lg transition-colors ${
-                          isCreatingID ? "text-gray-300" : "text-gray-700 hover:bg-indigo-50 hover:text-[#3E4095]"
+                          isCreatingID ? "text-gray-300" : "text-gray-700 hover:bg-indigo-50 hover:text-docuhealth-primary"
                         }`}
                         onClick={() => {
                           if (isCreatingID) return;
                           
-                          const is_subscribed = fetchSubscriptionStatus();
-                          if (!is_subscribed) {
+                          const hasSubscription = fetchSubscriptionStatus();
+                          if (!hasSubscription) {
                             toast.error("Please subscribe to access feature");
                             navigate("/user-subscriptions-dashboard");
                             return;

@@ -8,6 +8,7 @@ const ROLE_TABS = [
   { label: "Doctors",       value: "doctor" },
   { label: "Nurses",        value: "nurse" },
   { label: "Receptionists", value: "receptionist" },
+  { label: "Pharmacists",   value: "pharmacist" },
   { label: "Lab Scientists",value: "lab_scientist" },
 ];
 
@@ -18,11 +19,11 @@ const displayName = (staff) =>
 
 const PersonIcon = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" />
+    <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="var(--color-docuhealth-secondary)" />
   </svg>
 );
 
-const EmptyState = () => (
+const EmptyState = ({ selectedRole }) => (
   <div className="flex flex-col justify-center items-center text-center h-full py-12">
     <svg width="180" height="180" viewBox="0 0 366 366" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_d_1517_47151)">
@@ -43,9 +44,15 @@ const EmptyState = () => (
         </filter>
       </defs>
     </svg>
-    <h2 className="font-medium pb-1">No available health personnel!</h2>
+    <h2 className="font-medium pb-1">
+      {selectedRole
+        ? `No ${ROLE_TABS.find((t) => t.value === selectedRole)?.label || "Health Personnel"}!`
+        : "No available health personnel!"}
+    </h2>
     <p className="text-[12px] text-gray-500 max-w-md text-center">
-      You currently don't have any health personnel.
+      {selectedRole
+        ? `You currently don't have any ${(ROLE_TABS.find((t) => t.value === selectedRole)?.label || "health personnel").toLowerCase()}.`
+        : "You currently don't have any health personnel."}
     </p>
   </div>
 );
@@ -54,13 +61,13 @@ const MobileCard = ({ staff, isAdmin }) => (
   <div className="bg-white border border-gray-200 rounded-lg p-5 active:bg-gray-50 transition-all">
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-3">
-        <div className="h-11 w-11 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#3E4095] font-bold text-sm shadow-inner">
+        <div className="h-11 w-11 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-docuhealth-primary font-bold text-sm shadow-inner">
           {staff.firstname?.[0]}{staff.lastname?.[0]}
         </div>
         <div className="min-w-0">
           <h3 className="font-bold text-gray-900 text-[15px] truncate">{displayName(staff)}</h3>
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] bg-[#3E4095] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+            <span className="text-[10px] bg-docuhealth-primary text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
               {staff.role || "Staff"}
             </span>
             <span className="text-[10px] text-gray-400 font-mono">#{staff.staff_id || "N/A"}</span>
@@ -75,7 +82,7 @@ const MobileCard = ({ staff, isAdmin }) => (
     <div className="grid grid-cols-1 gap-2 bg-gray-50 rounded-lg p-3 mb-4">
       <div className="flex items-center gap-2 text-gray-600">
         <div className="bg-white p-1.5 rounded-md shadow-sm">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3E4095" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-docuhealth-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
           </svg>
         </div>
@@ -83,7 +90,7 @@ const MobileCard = ({ staff, isAdmin }) => (
       </div>
       <div className="flex items-center gap-2 text-gray-600">
         <div className="bg-white p-1.5 rounded-md shadow-sm">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3E4095" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-docuhealth-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
             <polyline points="22,6 12,13 2,6"></polyline>
           </svg>
@@ -93,11 +100,11 @@ const MobileCard = ({ staff, isAdmin }) => (
     </div>
 
     <div className="flex gap-2">
-      <button className="flex-1 bg-[#3E4095] py-2.5 rounded-full flex items-center justify-center gap-2 text-[12px] font-bold text-white">
+      <button className="flex-1 bg-docuhealth-primary py-2.5 rounded-full flex items-center justify-center gap-2 text-[12px] font-bold text-white">
         Message
       </button>
       {isAdmin && (
-        <button className="flex-1 border border-[#3E4095] text-[#3E4095] py-2.5 rounded-full flex items-center justify-center gap-2 text-[12px] font-bold hover:bg-indigo-50 transition-colors">
+        <button className="flex-1 border border-docuhealth-primary text-docuhealth-primary py-2.5 rounded-full flex items-center justify-center gap-2 text-[12px] font-bold hover:bg-indigo-50 transition-colors">
           Edit
         </button>
       )}
@@ -124,9 +131,7 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
     return <div className="flex justify-center items-center h-full text-sm py-12">Loading...</div>;
   }
 
-  if (healthPersonnelList.length === 0 && !searchQuery && !selectedRole) {
-    return <EmptyState />;
-  }
+
 
   const colCount = isAdmin ? 8 : 7;
 
@@ -151,8 +156,8 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
               onClick={() => setSelectedRole(tab.value)}
               className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
                 selectedRole === tab.value
-                  ? "bg-[#3E4095] text-white border-[#3E4095]"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-[#3E4095] hover:text-[#3E4095]"
+                  ? "bg-docuhealth-primary text-white border-docuhealth-primary"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-docuhealth-primary hover:text-docuhealth-primary"
               }`}
             >
               {tab.label}
@@ -161,11 +166,13 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
         </div>
       </div>
 
-      {healthPersonnelList.length === 0 && (searchQuery || selectedRole) ? (
+      {healthPersonnelList.length === 0 && searchQuery ? (
         <div className="py-12 text-center text-gray-500 text-sm">
-          <p className="font-medium">No results found.</p>
+          <p className="font-medium">No results found for "{searchQuery}"</p>
           <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
         </div>
+      ) : healthPersonnelList.length === 0 && !searchQuery ? (
+        <EmptyState selectedRole={selectedRole} />
       ) : (
         <>
           {/* Desktop table */}
@@ -192,7 +199,7 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
                 <p>{staff.gender || "—"}</p>
                 {isAdmin && (
                   <div className="flex items-center gap-2">
-                    <button className="text-[#3E4095] text-xs font-medium hover:underline">Edit</button>
+                    <button className="text-docuhealth-primary text-xs font-medium hover:underline">Edit</button>
                     <button className="text-red-500 text-xs font-medium hover:underline">Remove</button>
                   </div>
                 )}

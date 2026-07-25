@@ -35,25 +35,36 @@ export const renderListOrString = (content) => {
 
 export const renderLabTests = (labTests) => {
   if (!labTests || labTests.length === 0) return null;
+  
+  const flatItems = labTests.reduce((acc, orderOrItem) => {
+    if (orderOrItem.items && Array.isArray(orderOrItem.items)) {
+      return acc.concat(orderOrItem.items);
+    }
+    return acc.concat([orderOrItem]);
+  }, []);
+
+  if (flatItems.length === 0) return null;
+
   return (
     <div className="my-8 flex flex-col gap-8">
-      {labTests.map((labTest, idx) => {
+      {flatItems.map((labTest, idx) => {
         const testInfo = labTest.test_info;
         const resultInfo = labTest.result_info;
         const resultParams = resultInfo?.parameters || [];
-        const isCompleted = labTest.status === "completed" || labTest.status === "accepted";
+        const isCompleted = labTest.status === "completed" || labTest.status === "accepted" || labTest.status === "result_ready" || labTest.status === "approved";
         const hasResults = resultParams.length > 0;
         
         return (
           <div key={idx} className="w-full">
             <div className="flex justify-between items-center mb-4">
-              <p className="text-[16px] font-bold text-[#1B2B40]">{testInfo?.name}</p>
+              <p className="text-[16px] font-bold text-docuhealth-dark">{testInfo?.name}</p>
               <span className={`text-[10px] px-3 py-1.5 rounded-md border font-bold uppercase tracking-wider ${
-                labTest.status === 'completed' || labTest.status === 'accepted' ? 'bg-green-50 text-green-600 border-green-100' :
+                isCompleted ? 'bg-green-50 text-green-600 border-green-100' :
                 labTest.status === 'rejected' ? 'bg-red-50 text-red-500 border-red-100' :
+                labTest.status === 'sample_collected' ? 'bg-blue-50 text-blue-600 border-blue-100' :
                 'bg-yellow-50 text-yellow-600 border-yellow-100'
               }`}>
-                {labTest.status}
+                {labTest.status?.replace(/_/g, ' ')}
               </span>
             </div>
             
@@ -62,7 +73,7 @@ export const renderLabTests = (labTests) => {
                  <div className="bg-white border border-gray-200 rounded-xl overflow-hidden pb-2">
                    {/* Desktop Table */}
                    <div className="hidden md:flex flex-col text-[13px] w-full pt-4">
-                     <div className="grid grid-cols-4 text-left font-semibold text-gray-700 bg-[#F8F9FA] rounded-full mx-4 py-3 px-6 mb-2">
+                     <div className="grid grid-cols-4 text-left font-semibold text-gray-700 bg-docuhealth-bg-offwhite rounded-full mx-4 py-3 px-6 mb-2">
                        <p>Test</p>
                        <p>Result</p>
                        <p>Reference range</p>

@@ -128,7 +128,7 @@ const Hospital_Verify_OTP = () => {
         <div className="w-full flex-1">
           <div className="hidden sm:flex justify-center items-center py-10 h-screen">
 
-                <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-[#3E4095]">
+                <div className=" fixed top-10 left-10  flex gap-1 items-center font-semibold text-docuhealth-primary">
                                     <img src={docuhealth_logo} alt="Logo" className="w-6" />
                                     <h1 className="text-xl">DocuHealth</h1>
                                   </div>
@@ -152,7 +152,7 @@ const Hospital_Verify_OTP = () => {
                       value={digit}
                       onChange={(e) => handleChange(e.target.value, index)}
                       onKeyDown={(e) => handleKeyDown(e, index)}
-                      className="w-12 h-12 text-center border-b-2  outline-hidden focus:border-[#3E4095] border-gray-400"
+                      className="w-12 h-12 text-center border-b-2  outline-hidden focus:border-docuhealth-primary border-gray-400"
                       onBlur={(e) => {
                         if (e.target.value) {
                           e.target.classList.remove("border-blue-500");
@@ -169,7 +169,7 @@ const Hospital_Verify_OTP = () => {
                     You did not receive the OTP?{" "}
                     <span
                       onClick={handleResend}
-                      className="text-[#3E4095] hover:underline cursor-pointer"
+                      className="text-docuhealth-primary hover:underline cursor-pointer"
                     >
                       Click to resend
                     </span>
@@ -183,7 +183,7 @@ const Hospital_Verify_OTP = () => {
                   className={`w-full py-3 rounded-full ${
                     isLoading
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-[#3E4095] text-white "
+                      : "bg-docuhealth-primary text-white "
                   }`}
                 >
            
@@ -201,7 +201,7 @@ const Hospital_Verify_OTP = () => {
       </div>
 
       <div className="h-screen flex flex-col justify-center items-center sm:hidden py-10">
-    <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-[#3E4095]">
+    <div className=" fixed top-10 left-5  flex gap-1 items-center font-semibold text-docuhealth-primary">
           <img src={docuhealth_logo} alt="Logo" className="w-6" />
           <h1 className="text-xl">DocuHealth</h1>
         </div>
@@ -219,7 +219,7 @@ const Hospital_Verify_OTP = () => {
                 <div className="relative">
                   <input
                     type="number"
-                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-[#3E4095]"
+                    className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                     value={mobileOTP}
                     onChange={(e) => setMobileOTP(e.target.value)}
                     required
@@ -234,7 +234,7 @@ const Hospital_Verify_OTP = () => {
                   You did not receive the OTP?{" "}
                   <span
                     onClick={handleResend}
-                    className="text-[#3E4095] hover:underline cursor-pointer"
+                    className="text-docuhealth-primary hover:underline cursor-pointer"
                   >
                     Click to resend
                   </span>
@@ -248,7 +248,7 @@ const Hospital_Verify_OTP = () => {
                 className={`w-full py-3 rounded-full ${
                   isLoading
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#3E4095] text-white "
+                    : "bg-docuhealth-primary text-white "
                 }`}
               >
              {isLoading ? (     <div className="flex items-center justify-center gap-2">

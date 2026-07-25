@@ -18,7 +18,7 @@ const ResultTableEditor = ({
             placeholder="Table title (e.g. Typhoid Fever Widal Test)"
             value={table.title}
             onChange={(e) => updateTableTitle(table.id, e.target.value)}
-            className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-[#3E4095] transition-colors"
+            className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-docuhealth-primary transition-colors"
           />
           <button
             onClick={() => removeTable(table.id)}
@@ -48,7 +48,7 @@ const ResultTableEditor = ({
                       placeholder="Test name"
                       value={row.test}
                       onChange={(e) => updateRow(table.id, row.id, "test", e.target.value)}
-                      className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-[#3E4095]"
+                      className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-docuhealth-primary"
                     />
                   </td>
                   <td className="py-2 pr-3">
@@ -57,7 +57,7 @@ const ResultTableEditor = ({
                       placeholder="e.g. 1:80"
                       value={row.result}
                       onChange={(e) => updateRow(table.id, row.id, "result", e.target.value)}
-                      className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-[#3E4095]"
+                      className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-docuhealth-primary"
                     />
                   </td>
                   <td className="py-2 pr-3">
@@ -66,14 +66,14 @@ const ResultTableEditor = ({
                       placeholder="e.g. <1:160"
                       value={row.reference}
                       onChange={(e) => updateRow(table.id, row.id, "reference", e.target.value)}
-                      className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-[#3E4095]"
+                      className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-docuhealth-primary"
                     />
                   </td>
                   <td className="py-2 pr-3">
                     <select
                       value={row.status}
                       onChange={(e) => updateRow(table.id, row.id, "status", e.target.value)}
-                      className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-[#3E4095] bg-white"
+                      className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-docuhealth-primary bg-white"
                     >
                       <option>Negative</option>
                       <option>Positive</option>
@@ -97,7 +97,7 @@ const ResultTableEditor = ({
 
         <button
           onClick={() => addRow(table.id)}
-          className="self-start text-xs text-[#3E4095] hover:underline flex items-center gap-1"
+          className="self-start text-xs text-docuhealth-primary hover:underline flex items-center gap-1"
         >
           <Plus size={12} /> Add row
         </button>
@@ -106,7 +106,7 @@ const ResultTableEditor = ({
 
     <button
       onClick={addTable}
-      className="flex items-center gap-1 text-sm text-[#3E4095] hover:underline w-fit"
+      className="flex items-center gap-1 text-sm text-docuhealth-primary hover:underline w-fit"
     >
       <Plus size={14} /> Add new test result table
     </button>

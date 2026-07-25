@@ -150,7 +150,7 @@ const Admin_Hospital_Requests_Dashboard = () => {
                                     <div className="absolute right-0 top-10 w-40 bg-white border border-gray-200 rounded-md shadow z-50 p-2">
                                       <button 
                                         onClick={(e) => { e.stopPropagation(); setViewDetailRequest(req); setActiveMenu(null); }} 
-                                        className="w-full text-left p-2 rounded font-medium transition-colors hover:bg-blue-50 text-[#3E4095]"
+                                        className="w-full text-left p-2 rounded font-medium transition-colors hover:bg-blue-50 text-docuhealth-primary"
                                       >
                                         View more info
                                       </button>
@@ -188,7 +188,7 @@ const Admin_Hospital_Requests_Dashboard = () => {
                             <div className="flex items-center gap-3 pb-3 border-b border-gray-50 mb-3">
                               <div className="bg-blue-50 p-2 rounded-full">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M4 19V6.2C4 5.0799 4 4.51984 4.21799 4.09202C4.40973 3.71569 4.71569 3.40973 5.09202 3.21799C5.51984 3 6.0799 3 7.2 3H16.8C17.9201 3 18.4802 3 18.908 3.21799C19.2843 3.40973 19.5903 3.71569 19.782 4.09202C20 4.51984 20 5.0799 20 6.2V19M4 19H20M4 19H2C2 19 2 21 4 21H20C22 21 22 19 20 19M12 7V11M10 9H14" stroke="#3E4095" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                  <path d="M4 19V6.2C4 5.0799 4 4.51984 4.21799 4.09202C4.40973 3.71569 4.71569 3.40973 5.09202 3.21799C5.51984 3 6.0799 3 7.2 3H16.8C17.9201 3 18.4802 3 18.908 3.21799C19.2843 3.40973 19.5903 3.71569 19.782 4.09202C20 4.51984 20 5.0799 20 6.2V19M4 19H20M4 19H2C2 19 2 21 4 21H20C22 21 22 19 20 19M12 7V11M10 9H14" stroke="var(--color-docuhealth-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                               </div>
                               <div>
@@ -227,14 +227,14 @@ const Admin_Hospital_Requests_Dashboard = () => {
                             {/* Action Buttons */}
                             <div className="flex flex-wrap gap-2 mt-2">
                               <button
-                                className="bg-white border border-[#3E4095] text-[#3E4095] rounded-full py-2 text-[12px] font-semibold flex items-center justify-center flex-1 hover:bg-blue-50 transition-colors"
+                                className="bg-white border border-docuhealth-primary text-docuhealth-primary rounded-full py-2 text-[12px] font-semibold flex items-center justify-center flex-1 hover:bg-blue-50 transition-colors"
                                 onClick={() => setViewDetailRequest(req)}
                               >
                                 View Details
                               </button>
                               {req.status !== "approved" && (
                                 <button
-                                  className="bg-[#3E4095] border border-[#3E4095] text-white rounded-full py-2 text-[12px] font-semibold flex items-center justify-center flex-1 hover:bg-[#2e3070] transition-colors"
+                                  className="bg-docuhealth-primary border border-docuhealth-primary text-white rounded-full py-2 text-[12px] font-semibold flex items-center justify-center flex-1 hover:bg-docuhealth-dark-primary transition-colors"
                                   onClick={() => approveHospital(req.sqid)}
                                   disabled={approving === req.sqid}
                                 >

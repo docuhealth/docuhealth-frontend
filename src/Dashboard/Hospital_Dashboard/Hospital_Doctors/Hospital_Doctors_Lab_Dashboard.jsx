@@ -69,7 +69,7 @@ const Hospital_Doctors_Lab_Dashboard = () => {
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-[#3E4095]"
+                className="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-docuhealth-primary"
               />
             </div>
           </div>
@@ -109,11 +109,11 @@ const Hospital_Doctors_Lab_Dashboard = () => {
                 {patientLabRecords.map((record) => (
                   <div key={record.sqid || record.id} className="bg-white border rounded-xl p-4">
                     <div className="flex justify-between items-center mb-1">
-                      <p className="font-bold text-[#1B2B40] text-[15px]">
+                      <p className="font-bold text-docuhealth-dark text-[15px]">
                         {record?.patient_info?.firstname} {record?.patient_info?.lastname}
                       </p>
-                      <div className="bg-[#e6e6f5] px-3 py-1 rounded-full">
-                        <p className="text-[#3E4095] text-[11px] font-medium">
+                      <div className="bg-docuhealth-primary-muted px-3 py-1 rounded-full">
+                        <p className="text-docuhealth-primary text-[11px] font-medium">
                           Lab result
                         </p>
                       </div>
@@ -122,12 +122,12 @@ const Hospital_Doctors_Lab_Dashboard = () => {
                     <div className="flex flex-col gap-1.5 mb-3">
                       <div className="flex items-center gap-1">
                         <p className="text-gray-400 text-xs">Test Order Status: </p>
-                        <p className="text-[#08A913] text-xs font-semibold capitalize">{record?.status || "Ready"}</p>
+                        <p className="text-docuhealth-green text-xs font-semibold capitalize">{record?.status || "Ready"}</p>
                       </div>
                       <div className="flex items-center gap-1">
                         <p className="text-gray-400 text-xs">Approval Status: </p>
                         <p className={`text-xs font-semibold capitalize ${
-                          record?.result_info?.status === 'approved' || record?.result_info?.status === 'accepted' ? 'text-[#08A913]' : 
+                          record?.result_info?.status === 'approved' || record?.result_info?.status === 'accepted' ? 'text-docuhealth-green' : 
                           record?.result_info?.status === 'rejected' ? 'text-red-500' : 
                           record?.result_info?.status === 'pending' ? 'text-amber-500' : 'text-gray-500'
                         }`}>
@@ -156,7 +156,7 @@ const Hospital_Doctors_Lab_Dashboard = () => {
 
                     <button 
                       onClick={() => setSelectedRecord(record)}
-                      className="w-full bg-[#3E4095] hover:bg-[#2e3070] text-white text-[12px] font-medium py-2 rounded-full transition-colors cursor-pointer"
+                      className="w-full bg-docuhealth-primary hover:bg-docuhealth-dark-primary text-white text-[12px] font-medium py-2 rounded-full transition-colors cursor-pointer"
                     >
                       Open
                     </button>

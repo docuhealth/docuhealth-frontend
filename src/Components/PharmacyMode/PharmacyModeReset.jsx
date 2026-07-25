@@ -84,7 +84,7 @@ const PharmacyModeReset = ({setPharmacyModeProceed, setIsPharmacyReset}) => {
                       value={formData.emailAddress}
                       onChange={handleChange}
                       placeholder="Enter your email address"
-                      className="w-full px-3 py-2 border rounded-md text-gray-500 focus:outline-hidden focus:ring-2 focus:ring-[#0000FF]  text-sm"
+                      className="w-full px-3 py-2 border rounded-md text-gray-500 focus:outline-hidden focus:ring-2 focus:ring-docuhealth-blue  text-sm"
                     />
                   </div>
    
@@ -95,7 +95,7 @@ const PharmacyModeReset = ({setPharmacyModeProceed, setIsPharmacyReset}) => {
       
               <button
                 onClick={handleSubmit}
-                className="mt-4 w-full bg-[#0000FF] text-white py-2 rounded-full transition text-sm"
+                className="mt-4 w-full bg-docuhealth-blue text-white py-2 rounded-full transition text-sm"
               >
                 {loading ? 'Requesting a new phramacy code' : 'Request a new pharmacy code'}
               </button>

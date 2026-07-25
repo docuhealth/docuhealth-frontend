@@ -46,7 +46,7 @@ const EmergencyNotice = ({
                   </p>
                 </div>
                 <div
-                  className=" bg-[#0000FF]  text-center text-white rounded-full py-2 cursor-pointer"
+                  className=" bg-docuhealth-blue  text-center text-white rounded-full py-2 cursor-pointer"
                   onClick={() => {
                     if (paymentStatus === true) {
                       console.log(paymentStatus)

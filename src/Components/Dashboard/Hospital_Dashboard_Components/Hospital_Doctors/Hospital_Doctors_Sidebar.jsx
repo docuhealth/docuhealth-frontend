@@ -20,7 +20,7 @@ const Hospital_Doctors_Sidebar = () => {
     <>
      <div className="flex flex-col h-screen">
        <div className="pt-5 pl-5 pb-3 flex justify-between items-center  ">
-        <div className="flex justify-start items-center gap-1 font-semibold text-[#3E4095]">
+        <div className="flex justify-start items-center gap-1 font-semibold text-docuhealth-primary">
           <img src={hospitalLogo || docuhealth_logo} alt="Logo" className="w-6 h-6 aspect-square object-cover" />
           <h1 className="text-xl">{hospitalName || "DocuHealth"}</h1>
         </div>
@@ -32,9 +32,9 @@ const Hospital_Doctors_Sidebar = () => {
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-doctors-home-dashboard"
-                    ? "bg-[#3E4095] text-white"
+                    ? "bg-docuhealth-primary text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -54,7 +54,7 @@ const Hospital_Doctors_Sidebar = () => {
                       className={`group-hover:fill-white ${
                         currentPath === "/hospital-doctors-home-dashboard"
                           ? "fill-white"
-                          : "fill-[#647284]"
+                          : "fill-docuhealth-secondary"
                       }`}
                     />
                   </svg>
@@ -68,9 +68,9 @@ const Hospital_Doctors_Sidebar = () => {
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-doctors-appointments-dashboard"
-                    ? "bg-[#3E4095] text-white"
+                    ? "bg-docuhealth-primary text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -82,7 +82,7 @@ const Hospital_Doctors_Sidebar = () => {
                     className={`group-hover:fill-white ${
                       currentPath === "/hospital-doctors-appointments-dashboard"
                         ? "fill-white"
-                        : "fill-[#647284]"
+                        : "fill-docuhealth-secondary"
                     }`}
                   >
                     <path
@@ -91,7 +91,7 @@ const Hospital_Doctors_Sidebar = () => {
                         currentPath ===
                         "/hospital-doctors-appointments-dashboard"
                           ? "fill-white"
-                          : "fill-[#647284]"
+                          : "fill-docuhealth-secondary"
                       }`}
                     />
                   </svg>
@@ -105,9 +105,9 @@ const Hospital_Doctors_Sidebar = () => {
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-doctors-lab-dashboard"
-                    ? "bg-[#3E4095] text-white"
+                    ? "bg-docuhealth-primary text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -119,7 +119,7 @@ const Hospital_Doctors_Sidebar = () => {
                     className={`group-hover:fill-white ${
                       currentPath === "/hospital-doctors-lab-dashboard"
                         ? "fill-white"
-                        : "fill-[#647284]"
+                        : "fill-docuhealth-secondary"
                     }`}
                   >
                     <path
@@ -127,7 +127,7 @@ const Hospital_Doctors_Sidebar = () => {
                       className={`group-hover:fill-white ${
                         currentPath === "/hospital-doctors-lab-dashboard"
                           ? "fill-white"
-                          : "fill-[#647284]"
+                          : "fill-docuhealth-secondary"
                       }`}
                     />
                   </svg>
@@ -141,9 +141,9 @@ const Hospital_Doctors_Sidebar = () => {
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-doctors-patients-dashboard"
-                    ? "bg-[#3E4095] text-white"
+                    ? "bg-docuhealth-primary text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -155,7 +155,7 @@ const Hospital_Doctors_Sidebar = () => {
                     className={`group-hover:fill-white ${
                       currentPath === "/hospital-doctors-patients-dashboard"
                         ? "fill-white"
-                        : "fill-[#647284]"
+                        : "fill-docuhealth-secondary"
                     }`}
                   >
                     <path
@@ -163,7 +163,7 @@ const Hospital_Doctors_Sidebar = () => {
                       className={`group-hover:fill-white ${
                         currentPath === "/hospital-doctors-patients-dashboard"
                           ? "fill-white"
-                          : "fill-[#647284]"
+                          : "fill-docuhealth-secondary"
                       }`}
                     />
                   </svg>
@@ -173,55 +173,54 @@ const Hospital_Doctors_Sidebar = () => {
             </div>
           </Link>
 
-          <Link to="/hospital-doctors-messages-dashboard">
-            <div className="px-4 my-4"
-                onClick={()=> {
-                  toast.success('feature coming soon !')
-                }}
+          <div 
+            className="px-4 my-4 cursor-pointer"
+            onClick={()=> {
+              toast.success('feature coming soon !')
+            }}
+          >
+            <li
+              className={`group px-4 py-2 ${
+                currentPath === "/hospital-doctors-messages-dashboard"
+                  ? "bg-docuhealth-primary text-white"
+                  : "text-gray-700"
+              } hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
             >
-              <li
-                className={`group px-4 py-2   ${
-                  currentPath === "/hospital-doctors-messages-dashboard"
-                    ? "bg-[#3E4095] text-white"
-                    : "text-gray-700"
-                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
-              >
-                <span>
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+              <span>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`group-hover:fill-white ${
+                    currentPath === "/hospital-doctors-messages-dashboard"
+                      ? "fill-white"
+                      : "fill-docuhealth-secondary"
+                  }`}
+                >
+                  <path
+                    d="M1.66797 7.49478C1.66797 4.73624 3.89842 2.5 6.66852 2.5H13.3341C16.0958 2.5 18.3346 4.74565 18.3346 7.49478V17.5H6.66852C3.90679 17.5 1.66797 15.2543 1.66797 12.5052V7.49478ZM16.668 15.8333V7.49478C16.668 5.66283 15.1721 4.16667 13.3341 4.16667H6.66852C4.82179 4.16667 3.33464 5.65382 3.33464 7.49478V12.5052C3.33464 14.3372 4.83057 15.8333 6.66852 15.8333H16.668ZM11.668 9.16667H13.3346V10.8333H11.668V9.16667ZM6.66797 9.16667H8.33464V10.8333H6.66797V9.16667Z"
                     className={`group-hover:fill-white ${
                       currentPath === "/hospital-doctors-messages-dashboard"
                         ? "fill-white"
-                        : "fill-[#647284]"
+                        : "fill-docuhealth-secondary"
                     }`}
-                  >
-                    <path
-                      d="M1.66797 7.49478C1.66797 4.73624 3.89842 2.5 6.66852 2.5H13.3341C16.0958 2.5 18.3346 4.74565 18.3346 7.49478V17.5H6.66852C3.90679 17.5 1.66797 15.2543 1.66797 12.5052V7.49478ZM16.668 15.8333V7.49478C16.668 5.66283 15.1721 4.16667 13.3341 4.16667H6.66852C4.82179 4.16667 3.33464 5.65382 3.33464 7.49478V12.5052C3.33464 14.3372 4.83057 15.8333 6.66852 15.8333H16.668ZM11.668 9.16667H13.3346V10.8333H11.668V9.16667ZM6.66797 9.16667H8.33464V10.8333H6.66797V9.16667Z"
-                      className={`group-hover:fill-white ${
-                        currentPath === "/hospital-doctors-messages-dashboard"
-                          ? "fill-white"
-                          : "fill-[#647284]"
-                      }`}
-                    />
-                  </svg>
-                </span>
-                Messages
-              </li>
-            </div>
-          </Link>
+                  />
+                </svg>
+              </span>
+              Messages
+            </li>
+          </div>
 
           <Link to="/hospital-doctors-healthpersonnel-dashboard">
             <div className="px-4 my-4">
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-doctors-healthpersonnel-dashboard"
-                    ? "bg-[#3E4095] text-white"
+                    ? "bg-docuhealth-primary text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -233,14 +232,14 @@ const Hospital_Doctors_Sidebar = () => {
                     className={`group-hover:fill-white ${
                       currentPath === "/hospital-doctors-healthpersonnel-dashboard"
                         ? "fill-white"
-                        : "fill-[#647284]"
+                        : "fill-docuhealth-secondary"
                     }`}
                   >
                   <path d="M9.99985 12.5013C13.3995 12.5013 16.2048 15.0461 16.6149 18.3346H3.38477C3.79483 15.0461 6.60017 12.5013 9.99985 12.5013ZM8.48893 14.4009C7.29424 14.7796 6.28799 15.5957 5.66769 16.668H9.99985L8.48893 14.4009ZM11.5111 14.4011L9.99985 16.668H14.332C13.7118 15.5959 12.7057 14.7798 11.5111 14.4011ZM14.9998 1.66797V6.66797C14.9998 9.42939 12.7613 11.668 9.99985 11.668C7.23843 11.668 4.99986 9.42939 4.99986 6.66797V1.66797H14.9998ZM6.66652 6.66797C6.66652 8.50889 8.15891 10.0013 9.99985 10.0013C11.8408 10.0013 13.3332 8.50889 13.3332 6.66797H6.66652ZM13.3332 3.33464H6.66652L6.66643 5.0013H13.3331L13.3332 3.33464Z" 
                       className={`group-hover:fill-white ${
                         currentPath === "/hospital-doctors-healthpersonnel-dashboard"
                           ? "fill-white"
-                          : "fill-[#647284]"
+                          : "fill-docuhealth-secondary"
                       }`}
                     />
                   </svg>
@@ -259,9 +258,9 @@ const Hospital_Doctors_Sidebar = () => {
               <li
                 className={`group px-4 py-2   ${
                   currentPath === "/hospital-doctors-settings-dashboard"
-                    ? "bg-[#3E4095] text-white"
+                    ? "bg-docuhealth-primary text-white"
                     : "text-gray-700"
-                } text-gray-700 hover:bg-[#3E4095] hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+                } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
               >
                 <span>
                   <svg
@@ -273,7 +272,7 @@ const Hospital_Doctors_Sidebar = () => {
                     className={`group-hover:fill-white ${
                       currentPath === "/hospital-doctors-settings-dashboard"
                         ? "fill-white"
-                        : "fill-[#647284]"
+                        : "fill-docuhealth-secondary"
                     }`}
                   >
                     <path
@@ -281,7 +280,7 @@ const Hospital_Doctors_Sidebar = () => {
                       className={`group-hover:fill-white ${
                         currentPath === "/hospital-doctors-settings-dashboard"
                           ? "fill-white"
-                          : "fill-[#647284]"
+                          : "fill-docuhealth-secondary"
                       }`}
                     />
                   </svg>

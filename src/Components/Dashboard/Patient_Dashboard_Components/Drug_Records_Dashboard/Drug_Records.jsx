@@ -135,7 +135,7 @@ const Drug_Records = () => {
                        <tbody className="text-[12px]">
                          {drugRecords.map((drug, index) => (
                            <tr key={index} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
-                             <td className="py-3 font-medium text-[#3E4095]">
+                             <td className="py-3 font-medium text-docuhealth-primary">
                                {drug.name}
                              </td>
                              <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>

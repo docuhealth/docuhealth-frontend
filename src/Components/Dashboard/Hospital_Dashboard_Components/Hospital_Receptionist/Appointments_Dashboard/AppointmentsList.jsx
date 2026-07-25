@@ -53,30 +53,52 @@ const AppointmentsList = () => {
   if (appointments.length === 0 && !searchQuery && !dateFrom && !dateTo) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full pb-10">
-        <div className="flex flex-col sm:flex-row md:justify-end mb-8 gap-3 w-full">
-          {appointmentType !== 'history' && (
-            <button
-              onClick={() => setAppointmentType('history')}
-              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
-              View past appointments
-            </button>
-          )}
-          {appointmentType !== 'today' && (
+        <div className="w-full mb-8 md:border-b md:border-gray-200">
+          <div className="grid grid-cols-2 gap-3 md:flex md:flex-row md:gap-8">
             <button
               onClick={() => setAppointmentType('today')}
-              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
-              View today's appointments
+              className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
+                appointmentType === 'today'
+                  ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
+                  : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
+              }`}
+            >
+              Today's Appointments
             </button>
-          )}
-          {appointmentType !== 'upcoming' && (
             <button
               onClick={() => setAppointmentType('upcoming')}
-              className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
-              View upcoming appointments
+              className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
+                appointmentType === 'upcoming'
+                  ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
+                  : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
+              }`}
+            >
+              Upcoming Appointments
             </button>
-          )}
+            <button
+              onClick={() => setAppointmentType('history')}
+              className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
+                appointmentType === 'history'
+                  ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
+                  : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
+              }`}
+            >
+              Past Appointments
+            </button>
+          </div>
         </div>
-        <svg
+        
+        {isRefreshing ? (
+          <div className="flex justify-center items-center h-40 text-sm text-gray-500 mt-10">
+            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-docuhealth-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Loading appointments...
+          </div>
+        ) : (
+          <div className="flex flex-col items-center">
+            <svg
           width="180"
           height="180"
           viewBox="0 0 366 366"
@@ -143,34 +165,48 @@ const AppointmentsList = () => {
               : "No appointment history found for this hospital."}
           </p>
         </div>
-      </div>
+      
+          </div>
+        )}
+        </div>
     );
   }
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row md:justify-end mb-8 gap-3 w-full">
-        {appointmentType !== 'history' && (
-          <button
-            onClick={() => setAppointmentType('history')}
-            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
-            View past appointments
-          </button>
-        )}
-        {appointmentType !== 'today' && (
+      <div className="w-full mb-8 md:border-b md:border-gray-200">
+        <div className="grid grid-cols-2 gap-3 md:flex md:flex-row md:gap-8">
           <button
             onClick={() => setAppointmentType('today')}
-            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
-            View today's appointments
+            className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
+              appointmentType === 'today'
+                ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
+                : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
+            }`}
+          >
+            Today's Appointments
           </button>
-        )}
-        {appointmentType !== 'upcoming' && (
           <button
             onClick={() => setAppointmentType('upcoming')}
-            className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
-            View upcoming appointments
+            className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
+              appointmentType === 'upcoming'
+                ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
+                : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
+            }`}
+          >
+            Upcoming Appointments
           </button>
-        )}
+          <button
+            onClick={() => setAppointmentType('history')}
+            className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
+              appointmentType === 'history'
+                ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
+                : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
+            }`}
+          >
+            Past Appointments
+          </button>
+        </div>
       </div>
 
       <div className="mb-4 w-full">
@@ -186,7 +222,7 @@ const AppointmentsList = () => {
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#3E4095]"
+              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-docuhealth-primary"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -195,7 +231,7 @@ const AppointmentsList = () => {
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#3E4095]"
+              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-docuhealth-primary"
             />
           </div>
           {(dateFrom || dateTo) && (
@@ -289,12 +325,12 @@ const AppointmentsList = () => {
             </div>
 
             <button
-              className="border border-[#3E4095] rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300 cursor-pointer flex-1"
+              className="border border-docuhealth-primary rounded-full py-2 px-5 w-full lg:w-auto hover:bg-blue-50 transition-all duration-300 cursor-pointer flex-1"
               onClick={() => {
                 toast.success("Coming Soon !");
               }}
             >
-              <p className="text-[#3E4095]">Send a message</p>
+              <p className="text-docuhealth-primary">Send a message</p>
             </button>
           </div>
         ))}
@@ -317,7 +353,7 @@ const AppointmentsList = () => {
                 >
                   <path
                     d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11Z"
-                    fill="#3E4095"
+                    fill="var(--color-docuhealth-primary)"
                   />
                 </svg>
               </div>
@@ -359,7 +395,7 @@ const AppointmentsList = () => {
 
               {/* Staff Row */}
               <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-lg">
-                <div className="h-8 w-8 rounded-full bg-[#3E4095] flex items-center justify-center text-white">
+                <div className="h-8 w-8 rounded-full bg-docuhealth-primary flex items-center justify-center text-white">
                   <svg
                     width="14"
                     height="14"
@@ -398,7 +434,7 @@ const AppointmentsList = () => {
 
             {/* Action Button */}
             <button
-              className="w-full bg-white border border-[#3E4095] text-[#3E4095] rounded-full py-2.5 text-[13px] font-semibold flex items-center justify-center gap-2 hover:bg-blue-50 active:bg-blue-100 transition-colors"
+              className="w-full bg-white border border-docuhealth-primary text-docuhealth-primary rounded-full py-2.5 text-[13px] font-semibold flex items-center justify-center gap-2 hover:bg-blue-50 active:bg-blue-100 transition-colors"
               onClick={() => toast.success("Coming Soon !")}
             >
               <svg

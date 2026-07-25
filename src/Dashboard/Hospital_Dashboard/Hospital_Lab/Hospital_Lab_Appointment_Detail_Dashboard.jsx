@@ -35,7 +35,7 @@ const getParamStatus = (value, p) => {
 
 const ParamIcon = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" />
+    <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="var(--color-docuhealth-secondary)" />
   </svg>
 );
 
@@ -149,7 +149,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
       <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#3E4095] transition-colors w-fit"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-docuhealth-primary transition-colors w-fit"
         >
           <ArrowLeft size={16} />
           {headerLabel}
@@ -174,10 +174,10 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
               <button
                 onClick={() => setShowAcceptModal(true)}
                 disabled={acceptMutation.isPending}
-                className="border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50 flex items-center gap-1"
+                className="border border-docuhealth-primary text-docuhealth-primary text-xs font-medium px-4 sm:px-5 py-2 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50 flex items-center gap-1"
               >
                 {acceptMutation.isPending ? (
-                  <><div className="w-3 h-3 border-2 border-[#3E4095] border-t-transparent rounded-full animate-spin" /> Accepting...</>
+                  <><div className="w-3 h-3 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin" /> Accepting...</>
                 ) : "Accept request"}
               </button>
             </>
@@ -188,14 +188,14 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
             <>
               <button
                 onClick={() => setShowSampleModal(true)}
-                className="border border-[#3E4095] text-[#3E4095] text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-indigo-50 transition-colors"
+                className="border border-docuhealth-primary text-docuhealth-primary text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-indigo-50 transition-colors"
               >
                 {sampleLogged ? "Edit test order" : "Log sample collection"}
               </button>
               <button
                 onClick={() => navigate("/hospital-lab-upload-result", { state: { order } })}
                 disabled={!sampleLogged}
-                className="bg-[#3E4095] text-white text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-[#2e3070] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="bg-docuhealth-primary text-white text-xs font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-docuhealth-dark-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Upload test result
               </button>
@@ -236,7 +236,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
           </div>
           <div>
             <p className="text-xs text-gray-500 mb-1">Specimen needed:</p>
-            <p className="text-sm font-semibold text-[#3E4095]">{specimenLabel}</p>
+            <p className="text-sm font-semibold text-docuhealth-primary">{specimenLabel}</p>
           </div>
           {order.test_info?.special_instructions && (
             <div>
@@ -262,7 +262,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
           </div>
           <div>
             <p className="text-xs text-gray-500 mb-1">Specimen needed:</p>
-            <p className="text-sm font-semibold text-[#3E4095]">{specimenLabel}</p>
+            <p className="text-sm font-semibold text-docuhealth-primary">{specimenLabel}</p>
           </div>
           {order.note && (
             <div>
@@ -278,7 +278,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
         <>
           {resultParams.length > 0 && (
             <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
-              <p className="text-xs sm:text-sm font-semibold text-[#1B2B40] mb-4">{order.test}</p>
+              <p className="text-xs sm:text-sm font-semibold text-docuhealth-dark mb-4">{order.test}</p>
               <div className="overflow-x-auto">
                 <div className="min-w-[600px] flex flex-col mt-2">
                   <div className="grid grid-cols-6 text-left text-sm bg-gray-100 py-5 rounded-md">
@@ -373,14 +373,14 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
             </p>
             <button
               onClick={() => { setShowAcceptModal(false); setShowSampleModal(true); }}
-              className="w-full bg-[#3E4095] text-white text-sm font-medium py-3 rounded-full border border-transparent transition-colors"
+              className="w-full bg-docuhealth-primary text-white text-sm font-medium py-3 rounded-full border border-transparent transition-colors"
             >
               Accept &amp; Log sample collection now
             </button>
             <button
               onClick={() => { setShowAcceptModal(false); acceptMutation.mutate(); }}
               disabled={acceptMutation.isPending}
-              className="w-full border border-[#3E4095] text-[#3E4095] text-sm font-medium py-3 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50"
+              className="w-full border border-docuhealth-primary text-docuhealth-primary text-sm font-medium py-3 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50"
             >
               Accept &amp; Log sample collection Later
             </button>
@@ -396,7 +396,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
             {/* Header */}
             <div className="flex items-start justify-between">
               <div className="flex-1 text-center pr-6">
-                <h3 className="text-base font-bold text-[#1B2B40]">Patient's Lab test Request</h3>
+                <h3 className="text-base font-bold text-docuhealth-dark">Patient's Lab test Request</h3>
                 <p className="text-sm text-gray-500 mt-1">Kindly fill up to proceed!</p>
               </div>
               <button
@@ -414,7 +414,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
                 <select
                   value={selectedCategory}
                   onChange={(e) => { setSelectedCategory(e.target.value); setSelectedTestType(""); }}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none appearance-none focus:border-[#3E4095] transition-colors cursor-pointer"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none appearance-none focus:border-docuhealth-primary transition-colors cursor-pointer"
                 >
                   <option value="">Select category</option>
                   {categories.map((cat) => (
@@ -433,7 +433,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
                   value={selectedTestType}
                   onChange={(e) => setSelectedTestType(e.target.value)}
                   disabled={!selectedCategory}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none appearance-none focus:border-[#3E4095] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none appearance-none focus:border-docuhealth-primary transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">{isTestTypesLoading ? "Loading tests..." : "Select test type"}</option>
                   {testTypes.map((t) => (
@@ -453,7 +453,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
                     type="date"
                     value={requestDate}
                     onChange={(e) => setRequestDate(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-[#3E4095] transition-colors"
+                    className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-docuhealth-primary transition-colors"
                   />
                 </div>
               </div>
@@ -464,7 +464,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
                     type="time"
                     value={requestTime}
                     onChange={(e) => setRequestTime(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-[#3E4095] transition-colors"
+                    className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-docuhealth-primary transition-colors"
                   />
                 </div>
               </div>
@@ -474,7 +474,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
             <button
               onClick={handleCreateTestOrder}
               disabled={!canCreateOrder || accepting}
-              className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {accepting ? (
                 <span className="flex items-center justify-center gap-2">

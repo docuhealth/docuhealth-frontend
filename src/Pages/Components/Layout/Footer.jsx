@@ -22,18 +22,18 @@ const Footer = () => {
       <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto w-full">
         
         <Newsletter />
-        <hr className='border-[#BDB5B5]/30 mx-5 sm:mx-16' />
+        <hr className='border-docuhealth-gray-light/30 mx-5 sm:mx-16' />
 
         {/* Desktop Layout */}
         <div className="hidden lg:flex flex-row flex-wrap justify-between px-5 sm:px-16 py-14 text-white gap-10 lg:gap-0">
           {/* Left Section */}
           <div className="max-w-sm">
             <h1 className="text-3xl 2xl:text-4xl font-bold mb-2">DOCUHEALTH</h1>
-            <p className="text-sm 2xl:text-lg mb-4 text-[#EFEFEF]">
+            <p className="text-sm 2xl:text-lg mb-4 text-docuhealth-gray-lighter">
               Nigeria’s First Centralized Healthcare Platform
             </p>
             
-            <div className="flex space-x-4 pb-5 text-[#EFEFEF]/80">
+            <div className="flex space-x-4 pb-5 text-docuhealth-gray-lighter/80">
               <a href="https://x.com/docuhealth_ng?s=21&t=FutCRTGkQ92qZSH7s9tCwA" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
                 <Twitter className="w-5 h-5 hover:text-white transition-colors" />
               </a>
@@ -81,7 +81,7 @@ const Footer = () => {
           {/* Middle Section */}
           <div>
             <h2 className="text-xl 2xl:text-2xl font-semibold mb-3">Our Company</h2>
-            <ul className="space-y-2 2xl:text-lg text-sm text-[#EFEFEF] opacity-90">
+            <ul className="space-y-2 2xl:text-lg text-sm text-docuhealth-gray-lighter opacity-90">
               <li><a href="/#about-us" className="hover:underline">About us</a></li>
               <li><Link to="/our-mission" className="hover:underline">Mission</Link></li>
               <li><Link to="/our-vision" className="hover:underline">Vision</Link></li>
@@ -95,7 +95,7 @@ const Footer = () => {
           {/* Right Section */}
           <div>
             <h2 className="text-xl 2xl:text-2xl font-semibold mb-3">Contact us</h2>
-            <ul className="space-y-2 2xl:text-lg text-sm text-[#EFEFEF] opacity-90">
+            <ul className="space-y-2 2xl:text-lg text-sm text-docuhealth-gray-lighter opacity-90">
               <li>+2348081988860</li>
               <li>
                 <a href="mailto:support@docuhealthservices.net" className="hover:underline">
@@ -110,7 +110,7 @@ const Footer = () => {
         <div className="lg:hidden flex flex-row flex-wrap justify-between px-5 sm:px-16 py-14 text-white gap-10">
           <div>
             <h2 className="text-xl font-semibold mb-3">Our Company</h2>
-            <ul className="space-y-2 text-sm text-[#EFEFEF] opacity-90">
+            <ul className="space-y-2 text-sm text-docuhealth-gray-lighter opacity-90">
               <li><a href="/#about-us">About us</a></li>
               <li><Link to="/our-mission">Mission</Link></li>
               <li><Link to="/our-vision">Vision</Link></li>
@@ -123,7 +123,7 @@ const Footer = () => {
 
           <div>
             <h2 className="text-xl font-semibold mb-3">Contact us</h2>
-            <ul className="space-y-2 text-sm text-[#EFEFEF] opacity-90">
+            <ul className="space-y-2 text-sm text-docuhealth-gray-lighter opacity-90">
               <li>+2348081988860</li>
               <li>
                 <a href="mailto:support@docuhealthservices.net">
@@ -140,11 +140,11 @@ const Footer = () => {
 
           <div className="w-full">
             <h1 className="text-3xl font-bold mb-2">DOCUHEALTH</h1>
-            <p className="text-sm mb-4 text-[#EFEFEF]">
+            <p className="text-sm mb-4 text-docuhealth-gray-lighter">
               Nigeria’s First Centralized Healthcare Platform
             </p>
             
-            <div className="flex space-x-4 pb-5 text-[#EFEFEF]/80">
+            <div className="flex space-x-4 pb-5 text-docuhealth-gray-lighter/80">
               <a href="https://x.com/docuhealth_ng?s=21&t=FutCRTGkQ92qZSH7s9tCwA" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
                 <Twitter className="w-5 h-5" />
               </a>
@@ -184,14 +184,14 @@ const Footer = () => {
           </div>
         </div>
 
-        <hr className='border-[#BDB5B5]/30 mx-5 sm:mx-16' />
+        <hr className='border-docuhealth-gray-light/30 mx-5 sm:mx-16' />
         
         {/* Copyright Footer text */}
-        <div className='text-center text-[#BDB5B5] py-5'>
-          <p className='hidden sm:block text-sm text-[#EFEFEF] 2xl:text-lg'>  
+        <div className='text-center text-docuhealth-gray-light py-5'>
+          <p className='hidden sm:block text-sm text-docuhealth-gray-lighter 2xl:text-lg'>  
             &copy; {new Date().getFullYear()} Docuhealth Services Limited. All rights reserved. Designed and developed by Docuhealth Tech Team.
           </p>
-          <p className='block sm:hidden p-3 text-xs text-[#EFEFEF] pb-5'>  
+          <p className='block sm:hidden p-3 text-xs text-docuhealth-gray-lighter pb-5'>  
             &copy; {new Date().getFullYear()} Docuhealth Services Limited. All rights reserved. Designed and developed by Docuhealth Tech Team.
           </p>
         </div>

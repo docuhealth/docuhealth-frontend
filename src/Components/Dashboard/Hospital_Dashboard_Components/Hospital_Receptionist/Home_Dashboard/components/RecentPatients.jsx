@@ -147,7 +147,7 @@ const RecentPatients = () => {
                                 <div className='font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-1 '>
 
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" />
+                                        <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="var(--color-docuhealth-secondary)" />
                                     </svg>
 
                                     <p> {patient.patient.firstname} {patient.patient.lastname}</p>
@@ -163,7 +163,7 @@ const RecentPatients = () => {
                                 <div className='font-semibold w-full py-6  flex items-center gap-1 '>
 
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" />
+                                        <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="var(--color-docuhealth-secondary)" />
                                     </svg>
 
                                     <p> {patient.staff.role === 'doctor'
@@ -188,7 +188,7 @@ const RecentPatients = () => {
                         {/* Header: Avatar, Name and Gender Tag */}
                         <div className="flex justify-between items-start mb-4">
                             <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-blue-50 text-[#3E4095] flex items-center justify-center font-bold text-sm border border-blue-100 uppercase">
+                                <div className="h-10 w-10 rounded-full bg-blue-50 text-docuhealth-primary flex items-center justify-center font-bold text-sm border border-blue-100 uppercase">
                                     {patient.patient.firstname[0]}{patient.patient.lastname[0]}
                                 </div>
                                 <div>
@@ -210,7 +210,7 @@ const RecentPatients = () => {
                             <div>
                                 <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Registration Info</p>
                                 <div className="flex items-center gap-1.5 text-gray-700">
-                                    <i className='bx bx-calendar text-[#3E4095] text-[14px]'></i>
+                                    <i className='bx bx-calendar text-docuhealth-primary text-[14px]'></i>
                                     <p className="text-[11.5px] font-medium leading-none">
                                         {formatFullDate(patient.created_at)}
                                     </p>
@@ -223,7 +223,7 @@ const RecentPatients = () => {
                             <div>
                                 <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Assigned Staff</p>
                                 <div className="flex items-center gap-1.5 text-gray-700">
-                                    <i className='bx bx-shield-quarter text-[#3E4095] text-[14px]'></i>
+                                    <i className='bx bx-shield-quarter text-docuhealth-primary text-[14px]'></i>
                                     <p className="text-[11.5px] font-medium leading-none">
                                     {patient.staff.role === 'doctor'
   ? `Dr. ${patient.staff.firstname} ${patient.staff.lastname}`
@@ -236,8 +236,8 @@ const RecentPatients = () => {
                         </div>
 
                         {/* HIN Masked Section */}
-                        <div className="mt-4 bg-[#F8F9FF] rounded-lg p-2.5 flex justify-between items-center">
-                            <span className="text-[10px] font-semibold text-[#3E4095] uppercase">HIN Number</span>
+                        <div className="mt-4 bg-docuhealth-primary-faded rounded-lg p-2.5 flex justify-between items-center">
+                            <span className="text-[10px] font-semibold text-docuhealth-primary uppercase">HIN Number</span>
                             <span className="text-[12px] font-mono font-bold text-gray-600 tracking-widest">
                                 {patient.patient.hin
                                     ? patient.patient.hin.slice(0, 4) + "••••" + patient.patient.hin.slice(-2)

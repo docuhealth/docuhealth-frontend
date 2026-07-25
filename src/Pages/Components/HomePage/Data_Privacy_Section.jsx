@@ -7,23 +7,23 @@ const Data_Privacy_Section = () => {
   const securityData = [
     {
       text: "End-to-end encryption",
-      color: "bg-[#E7E4FD]",
+      color: "bg-docuhealth-purple-light",
     },
     {
       text: "Role-based data access",
-      color: "bg-[#FDF4E4]",
+      color: "bg-docuhealth-orange-light",
     },
     {
       text: "Secure authentication",
-      color: "bg-[#FDE4E4]",
+      color: "bg-docuhealth-red-light",
     },
     {
       text: "Patient-permission-based access",
-      color: "bg-[#E4ECFD]",
+      color: "bg-docuhealth-blue-soft",
     },
     {
       text: "NDPR compliant under the National Data Protection Commission (NDPC)",
-      color: "bg-[#ECE4FD]",
+      color: "bg-docuhealth-violet-light",
     },
   ];
 
@@ -46,7 +46,7 @@ const Data_Privacy_Section = () => {
     <>
       <BackgroundTemplate>
         {/* Full-width section mapping handling background state changes safely */}
-        <section id="docuhealth_data_privacy" className="py-24 text-sm text-[#464646] bg-white lg:bg-[#F6FCFE]">
+        <section id="docuhealth_data_privacy" className="py-24 text-sm text-docuhealth-gray bg-white lg:bg-docuhealth-light-blue">
           
           {/* PERFECTLY MATCHED NAVBAR CONTAINER */}
           <div className="max-w-[1440px] 2xl:max-w-[1600px] mx-auto w-full px-8 xl:px-16">
@@ -72,7 +72,7 @@ const Data_Privacy_Section = () => {
               {/* Right side: Security Badges */}
               <div className="w-full lg:w-1/2">
                 <motion.h2 
-                  className="text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-[#3E4095] mb-4"
+                  className="text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-docuhealth-primary mb-4"
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
@@ -104,10 +104,10 @@ const Data_Privacy_Section = () => {
                         ${index % 2 === 0 ? "lg:mr-10" : "lg:ml-10"}
                       `}
                     >
-                      <div className="bg-[#1f1f75] p-0.5 rounded-sm flex-shrink-0">
+                      <div className="bg-docuhealth-primary-deep p-0.5 rounded-sm flex-shrink-0">
                         <Check className="text-white w-3 h-3" />
                       </div>
-                      <span className="text-[#1f1f75] text-sm font-medium 2xl:text-lg">
+                      <span className="text-docuhealth-primary-deep text-sm font-medium 2xl:text-lg">
                         {item.text}
                       </span>
                     </motion.div>

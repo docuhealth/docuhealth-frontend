@@ -51,11 +51,10 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({ strength: 0 });
 
-  const personnelOptions = ["doctor", "nurse", "receptionist", "lab_scientist"];
+  const personnelOptions = ["doctor", "nurse", "receptionist", "lab_scientist", "pharmacist"];
 
   // Personnel types that are not assigned to a ward during staff creation.
-  // Add "pharmacist" here once it's introduced as a personnel option.
-  const noWardRoles = ["receptionist", "lab_scientist"];
+  const noWardRoles = ["receptionist", "lab_scientist", "pharmacist"];
 
   const doctorSpecializations = [
     "Surgeon",
@@ -71,6 +70,13 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     "Orthopedic",
     "Radiologist",
     "Anesthesiologist",
+    "Histopathologist",
+    "Oncopathologist",
+    "Interventional Pathologist",
+    "Surgical Pathologist",
+    "Forensic Pathologist",
+    "Gastrointestinal (GIT) Pathologist",
+    "Family Physician",
   ];
 
   const nurseSpecializations = [
@@ -104,6 +110,16 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     "Forensic Laboratory Science",
   ];
 
+  const pharmacistSpecializations = [
+    "N/A",
+    "General Pharmacist",
+    "Clinical Pharmacist",
+    "Oncology Pharmacist",
+    "Pediatric Pharmacist",
+    "Nuclear Pharmacist",
+    "Informatics Pharmacist",
+  ];
+
   const specializationOptions =
     form.personnel === "doctor"
       ? doctorSpecializations
@@ -111,7 +127,9 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
         ? nurseSpecializations
         : form.personnel === "lab_scientist"
           ? labScientistSpecializations
-          : [];
+          : form.personnel === "pharmacist"
+            ? pharmacistSpecializations
+            : [];
 
   const gender = ["male", "female"];
 
@@ -174,7 +192,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     if (score <= 3)
       return { strength: score, label: "Fair", color: "bg-yellow-500" };
     if (score <= 4)
-      return { strength: score, label: "Good", color: "bg-[#3E4095]" };
+      return { strength: score, label: "Good", color: "bg-docuhealth-primary" };
     return { strength: score, label: "Strong", color: "bg-green-500" };
   };
 
@@ -289,7 +307,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
           {/* Progress Bar */}
           <div className="w-full bg-gray-200 h-2 rounded-full mt-2">
             <div
-              className={`bg-[#3E4095] h-2 rounded-full transition-all duration-500 ease-in-out`}
+              className={`bg-docuhealth-primary h-2 rounded-full transition-all duration-500 ease-in-out`}
               style={{ width: step === 1 ? "50%" : "100%" }}
             ></div>
           </div>
@@ -310,13 +328,13 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                 placeholder="First name"
                 value={form.firstname}
                 onChange={(e) => handleChange("firstname", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm focus:border-[#3E4095]"
+                className="border p-2 rounded-lg outline-none text-sm focus:border-docuhealth-primary"
               />
               <input
                 placeholder="Last name"
                 value={form.lastname}
                 onChange={(e) => handleChange("lastname", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm focus:border-[#3E4095]"
+                className="border p-2 rounded-lg outline-none text-sm focus:border-docuhealth-primary"
               />
 
               <input
@@ -324,13 +342,13 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                 type="number"
                 value={form.phone}
                 onChange={(e) => handleChange("phone", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm focus:border-[#3E4095]"
+                className="border p-2 rounded-lg outline-none text-sm focus:border-docuhealth-primary"
               />
 
               <select
                 value={form.gender}
                 onChange={(e) => handleChange("gender", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm  focus:border-[#3E4095]"
+                className="border p-2 rounded-lg outline-none text-sm  focus:border-docuhealth-primary"
               >
                 <option value="">Gender</option>
                 {gender.map((p) => (
@@ -344,7 +362,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
               <select
                 value={form.personnel}
                 onChange={(e) => handleChange("personnel", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-[#3E4095]"
+                className="border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-docuhealth-primary"
               >
                 <option value="">Healthcare personnel</option>
                 {personnelOptions.map((p) => (
@@ -376,7 +394,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                 disabled={noWardRoles.includes(form.personnel)}
                 value={form.ward}
                 onChange={(e) => handleChange("ward", e.target.value)}
-                className={`border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-[#3E4095] ${
+                className={`border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-docuhealth-primary ${
                   noWardRoles.includes(form.personnel) ? "bg-gray-100" : ""
                 }`}
               >
@@ -391,7 +409,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
             <button
               onClick={() => handleNextStep()}
-              className="mt-5 bg-[#3E4095] text-white px-4 py-2 rounded-full text-sm w-full cursor-pointer"
+              className="mt-5 bg-docuhealth-primary text-white px-4 py-2 rounded-full text-sm w-full cursor-pointer"
             >
               Proceed
             </button>
@@ -424,7 +442,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
             <label className="font-medium text-sm">Invitation message</label>
             <textarea
-              className="w-full rounded-lg outline-none p-3 my-2 h-40 text-sm focus:border-[#3E4095] hide-scrollbar border max-h-[200px]"
+              className="w-full rounded-lg outline-none p-3 my-2 h-40 text-sm focus:border-docuhealth-primary hide-scrollbar border max-h-[200px]"
               value={invitationHTML}
               readOnly
             />
@@ -433,7 +451,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
               placeholder="Enter email address"
               value={form.email}
               onChange={(e) => handleChange("email", e.target.value)}
-              className="border p-2 text-sm rounded-lg w-full mt-4 outline-none focus:border-[#3E4095]"
+              className="border p-2 text-sm rounded-lg w-full mt-4 outline-none focus:border-docuhealth-primary"
             />
 
             <div className="mt-4">
@@ -441,12 +459,12 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
               <input
                 value={form.password}
                 readOnly
-                className="border p-2 rounded-lg focus:border-[#3E4095] w-full mt-2 text-sm outline-none"
+                className="border p-2 rounded-lg focus:border-docuhealth-primary w-full mt-2 text-sm outline-none"
               />
             </div>
 
             <button
-              className={`mt-5 ${createStaffMutation.isPending ? "bg-gray-400 cursor-not-allowed" : "bg-[#3E4095] cursor-pointer"}  text-white px-4 py-2 rounded-full w-full text-sm `}
+              className={`mt-5 ${createStaffMutation.isPending ? "bg-gray-400 cursor-not-allowed" : "bg-docuhealth-primary cursor-pointer"}  text-white px-4 py-2 rounded-full w-full text-sm `}
               disabled={createStaffMutation.isPending}
               onClick={handleSubmit}
             >

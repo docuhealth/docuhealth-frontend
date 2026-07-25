@@ -14,7 +14,7 @@ const RecentVitalSigns = ({ vitalSigns, setViewRecentVitals, currentPage, setCur
         className="flex justify-start items-center gap-1 cursor-pointer border-b pb-3"
         onClick={() => setViewRecentVitals(false)}
       >
-        <ChevronLeft size={18} className="text-[#1B2B40]" />
+        <ChevronLeft size={18} className="text-docuhealth-dark" />
         <h2 className="text-sm font-medium">Recent Vital Signs</h2>
       </div>
 

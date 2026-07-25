@@ -23,14 +23,14 @@ const CaseNoteDetail = ({ caseNoteDetail, setCaseNoteDetail }) => {
           >
             <path
               d="M4.56528 6.41685H11.6654V7.58352H4.56528L7.69426 10.7125L6.86932 11.5374L2.33203 7.00019L6.86932 2.46289L7.69426 3.28785L4.56528 6.41685Z"
-              fill="#1B2B40"
+              fill="var(--color-docuhealth-dark)"
             />
           </svg>
 
           <h2 className=" text-sm">Detailed Case Note Overview</h2>
         </div>
         {/* <div className=" flex flex-col sm:flex-row justify-end items-center gap-3 w-full sm:w-auto">
-          <div className="flex justify-center items-center gap-1 border border-[#3E4095] py-1.5 px-4 rounded-full w-full sm:w-auto text-[#3E4095]">
+          <div className="flex justify-center items-center gap-1 border border-docuhealth-primary py-1.5 px-4 rounded-full w-full sm:w-auto text-docuhealth-primary">
             <svg
               width="14"
               height="14"
@@ -40,18 +40,18 @@ const CaseNoteDetail = ({ caseNoteDetail, setCaseNoteDetail }) => {
             >
               <path
                 d="M8.5 1C8.77615 1 9 1.22386 9 1.5V3.5H10.5C10.7761 3.5 11 3.72386 11 4V9C11 9.27615 10.7761 9.5 10.5 9.5H9V10.5C9 10.7761 8.77615 11 8.5 11H3.5C3.22386 11 3 10.7761 3 10.5V9.5H1.5C1.22386 9.5 1 9.27615 1 9V4C1 3.72386 1.22386 3.5 1.5 3.5H3V1.5C3 1.22386 3.22386 1 3.5 1H8.5ZM8 8.5H4V10H8V8.5ZM10 4.5H2V8.5H3V8C3 7.72385 3.22386 7.5 3.5 7.5H8.5C8.77615 7.5 9 7.72385 9 8V8.5H10V4.5ZM4 5V6H2.5V5H4ZM8 2H4V3.5H8V2Z"
-                fill="#3E4095"
+                fill="var(--color-docuhealth-primary)"
               />
             </svg>
 
             <p>Print summary</p>
           </div>
-          <div className="flex justify-center items-center gap-1 border border-[#3E4095] py-1.5 px-4 rounded-full text-white bg-[#3E4095] w-full sm:w-auto">
+          <div className="flex justify-center items-center gap-1 border border-docuhealth-primary py-1.5 px-4 rounded-full text-white bg-docuhealth-primary w-full sm:w-auto">
             <svg
               width="14"
               height="14"
               viewBox="0 0 12 12"
-              fill="#3E4095"
+              fill="var(--color-docuhealth-primary)"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
@@ -64,7 +64,7 @@ const CaseNoteDetail = ({ caseNoteDetail, setCaseNoteDetail }) => {
           </div>
         </div> */}
       </div>
-      <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+      <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
         <p className="text-[12px] mb-4">
           {" "}
           Patient's name :{" "}
@@ -160,7 +160,7 @@ const CaseNoteDetail = ({ caseNoteDetail, setCaseNoteDetail }) => {
           </div>
         </div>
       </div>
-      <div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
+      <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
         <div className="text-[12px] pb-3">
           <h4 className="text-gray-400 font-normal mb-1">Patient's condition/observation:</h4>
           <ul className="list-disc list-outside pl-5 font-medium ">

@@ -121,7 +121,7 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
 
           <button className={`py-2  text-white  ${mutation.isPending
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-[#3E4095] cursor-pointer"
+              : "bg-docuhealth-primary cursor-pointer"
             } rounded-full mt-4  w-full`}
             disabled={mutation.isPending || !form.new_ward || !form.new_bed}
             onClick={() => {

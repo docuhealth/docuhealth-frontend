@@ -113,32 +113,39 @@ const Hospital_Lab_Appointments_Dashboard = () => {
 
       <div className="bg-white my-5 rounded-lg">
         <div className="border rounded-lg p-4 lg:p-6">
-          <h2 className="mb-4 pb-2 border-b font-medium capitalize">
-            {appointmentType === 'upcoming' ? 'Upcoming' : appointmentType === 'today' ? "Today's" : 'Past'} Appointments List
-          </h2>
-
-          <div className="flex flex-col sm:flex-row md:justify-end mb-8 gap-3 w-full">
-            {appointmentType !== 'history' && (
-              <button
-                onClick={() => setAppointmentType('history')}
-                className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
-                View past appointments
-              </button>
-            )}
-            {appointmentType !== 'today' && (
+          <div className="w-full mb-8 md:border-b md:border-gray-200">
+            <div className="grid grid-cols-2 gap-3 md:flex md:flex-row md:gap-8">
               <button
                 onClick={() => setAppointmentType('today')}
-                className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
-                View today's appointments
+                className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
+                  appointmentType === 'today'
+                    ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
+                    : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
+                }`}
+              >
+                Today's Appointments
               </button>
-            )}
-            {appointmentType !== 'upcoming' && (
               <button
                 onClick={() => setAppointmentType('upcoming')}
-                className="border border-[#3E4095] text-[#3E4095] last:bg-[#3E4095] last:text-white cursor-pointer py-2.5 px-12 rounded-full text-sm w-full sm:w-auto transition-colors">
-                View upcoming appointments
+                className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
+                  appointmentType === 'upcoming'
+                    ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
+                    : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
+                }`}
+              >
+                Upcoming Appointments
               </button>
-            )}
+              <button
+                onClick={() => setAppointmentType('history')}
+                className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
+                  appointmentType === 'history'
+                    ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
+                    : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
+                }`}
+              >
+                Past Appointments
+              </button>
+            </div>
           </div>
 
           <div className="mb-4 w-full space-y-3">
@@ -154,7 +161,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095]"
+                  className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-docuhealth-primary focus:border-docuhealth-primary"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -163,7 +170,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#3E4095] focus:border-[#3E4095]"
+                  className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-docuhealth-primary focus:border-docuhealth-primary"
                 />
               </div>
               {(dateFrom || dateTo) && (
@@ -184,7 +191,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
           </div>
 
           <div className="text-[12px] my-4">
-            {loading ? (
+            {loading || (isRefreshing && appointments.length === 0) ? (
               <div className="py-12 text-center text-gray-400 text-sm">Loading appointments...</div>
             ) : appointments.length === 0 ? (
               <div className="py-12 text-center text-gray-400 text-sm">

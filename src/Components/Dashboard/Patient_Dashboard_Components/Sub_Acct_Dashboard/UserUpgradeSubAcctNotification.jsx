@@ -25,12 +25,12 @@ const UserUpgradeSubAcctNotification = ({ subAcctUpgradeSuccessNot, setSubAcctUp
                                         <div className="pb-2">
 
                                             <svg width="70" height="71" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <circle cx="50" cy="50.4014" r="50" fill="#0B6011" />
+                                                <circle cx="50" cy="50.4014" r="50" fill="var(--color-docuhealth-green-dark)" />
                                                 <path d="M44.6659 58.857L69.1789 34.344L72.9501 38.1152L44.6659 66.3994L27.6953 49.429L31.4666 45.6578L44.6659 58.857Z" fill="white" />
                                             </svg>
 
                                         </div>
-                                        <p className="text-[#0B6011] mb-4 text-sm sm:text-sm ">
+                                        <p className="text-docuhealth-green-dark mb-4 text-sm sm:text-sm ">
                                             Account Upgrade Successful
                                         </p>
 

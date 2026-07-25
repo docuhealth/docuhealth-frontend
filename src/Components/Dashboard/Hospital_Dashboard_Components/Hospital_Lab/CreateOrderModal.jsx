@@ -2,13 +2,15 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { fetchTestCategories, fetchLabTests } from "../../../../queries/Hospital/lab/requests";
+import { fetchTestCategories, fetchLabTests, createLabTestOrder } from "../../../../queries/Hospital/lab/requests";
 import axiosInstanceHos from "../../../../utils/axiosInstanceHos";
 
 const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
   const [form, setForm] = useState({ category: "", test_type: [], note: "" });
+
+  const [duplicateWarning, setDuplicateWarning] = useState(null);
 
   const { data: categoriesData } = useQuery({
     queryKey: ["lab-test-categories"],
@@ -28,22 +30,32 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: (payload) => {
-      const promises = payload.test_type.map((testSqid) => {
-        const requestPayload = {
+      const requestPayload = {
+        patient: patientHin,
+        items_data: payload.test_type.map((testSqid) => ({
           test: testSqid,
-          patient: patientHin,
           note: payload.note,
-        };
-        return axiosInstanceHos.post("api/lab/test-orders/create", requestPayload);
-      });
-      return Promise.all(promises);
+        })),
+      };
+      if (payload.ignore_duplicate_warning) {
+        requestPayload.ignore_duplicate_warning = true;
+      }
+      if (appointmentSqid) {
+        requestPayload.appointment = appointmentSqid;
+      }
+      return createLabTestOrder(requestPayload);
     },
     onSuccess: () => {
-      setForm({ category: "", test_type: [], note: "" });
+      setForm({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });
+      setDuplicateWarning(null);
       setShowSuccess(true);
     },
     onError: (err) => {
-      toast.error(err.response?.data?.message || "Failed to create order.");
+      if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {
+        setDuplicateWarning(err.response.data.duplicate_warning);
+      } else {
+        toast.error(err.response?.data?.message || "Failed to create order.");
+      }
     },
   });
 
@@ -52,13 +64,18 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
       toast.error("Please select a category and at least one test type.");
       return;
     }
-    mutate(form);
+    mutate({ ...form, ignore_duplicate_warning: false });
+  };
+
+  const handleOverrideSubmit = () => {
+    mutate({ ...form, ignore_duplicate_warning: true });
   };
 
   const handleClose = () => {
-    setForm({ category: "", test_type: [], note: "" });
+    setForm({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });
     setIsTestTypeDropdownOpen(false);
     setShowSuccess(false);
+    setDuplicateWarning(null);
     onClose();
   };
 
@@ -80,10 +97,46 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
           </p>
           <button
             onClick={handleClose}
-            className="w-full bg-[#3E4095] text-white text-sm font-semibold py-3 rounded-full hover:bg-[#2e3070] transition-colors"
+            className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3 rounded-full hover:bg-docuhealth-dark-primary transition-colors"
           >
             Done
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (duplicateWarning) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+        <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 flex flex-col gap-6">
+          <div className="text-center">
+            <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Duplicate Order Detected</h3>
+            <p className="text-sm text-gray-600 mb-4 whitespace-pre-wrap text-left bg-orange-50 p-3 rounded-md">
+              {duplicateWarning}
+            </p>
+            <p className="text-sm text-gray-600 font-medium">Are you sure you want to proceed?</p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setDuplicateWarning(null)}
+              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleOverrideSubmit}
+              disabled={isPending}
+              className="flex-1 px-4 py-2 bg-docuhealth-primary text-white rounded-lg hover:bg-docuhealth-dark-primary transition-colors disabled:opacity-50"
+            >
+              {isPending ? "Proceeding..." : "Proceed Anyway"}
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -96,7 +149,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
         {/* Header */}
         <div className="relative flex items-start justify-center">
           <div className="text-center">
-            <h3 className="text-[20px] font-semibold text-[#1B2B40]">Order Lab test</h3>
+            <h3 className="text-[20px] font-semibold text-docuhealth-dark">Order Lab test</h3>
             <p className="text-sm text-gray-500 mt-1">Kindly order a lab test</p>
           </div>
           <button
@@ -109,12 +162,12 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
 
         {/* Category */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-[#1B2B40] font-medium">Category</label>
+          <label className="text-sm text-docuhealth-dark font-medium">Category</label>
           <div className="relative">
             <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value, test_type: [] })}
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-[#3E4095] transition-colors appearance-none"
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-docuhealth-primary transition-colors appearance-none"
             >
               <option value="" disabled>Select category</option>
               {categories.map((cat) => (
@@ -129,13 +182,13 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
 
         {/* Test Type */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-[#1B2B40] font-medium">Test type</label>
+          <label className="text-sm text-docuhealth-dark font-medium">Test type</label>
           <div className="relative">
             <button
               type="button"
               disabled={!form.category}
               onClick={() => setIsTestTypeDropdownOpen((v) => !v)}
-              className={`w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-left flex justify-between items-center transition-colors ${!form.category ? "opacity-60 cursor-not-allowed bg-gray-50" : "bg-white focus:border-[#3E4095]"}`}
+              className={`w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-left flex justify-between items-center transition-colors ${!form.category ? "opacity-60 cursor-not-allowed bg-gray-50" : "bg-white focus:border-docuhealth-primary"}`}
             >
               <span className="truncate text-gray-700">
                 {isTestTypesLoading
@@ -152,7 +205,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
                   const id = test.sqid || test.name;
                   const checked = form.test_type.includes(id);
                   return (
-                    <label key={id} className={`flex items-center gap-4 px-4 py-3 hover:bg-gray-50 cursor-pointer text-sm text-[#1B2B40] ${index !== fetchedTestTypes.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                    <label key={id} className={`flex items-center gap-4 px-4 py-3 hover:bg-gray-50 cursor-pointer text-sm text-docuhealth-dark ${index !== fetchedTestTypes.length - 1 ? 'border-b border-gray-100' : ''}`}>
                       <input
                         type="checkbox"
                         checked={checked}
@@ -177,12 +230,12 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
 
         {/* Add note */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-[#1B2B40] font-medium">Add note:</label>
+          <label className="text-sm text-docuhealth-dark font-medium">Add note:</label>
           <textarea
             value={form.note}
             onChange={(e) => setForm({ ...form, note: e.target.value })}
             placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
-            className="border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-500 bg-white outline-none focus:border-[#3E4095] transition-colors resize-none h-28"
+            className="border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-500 bg-white outline-none focus:border-docuhealth-primary transition-colors resize-none h-28"
           />
         </div>
 
@@ -190,7 +243,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
         <button
           onClick={handleSubmit}
           disabled={isPending}
-          className="w-full bg-[#3E4095] text-white text-sm font-medium py-2.5 rounded-full transition-colors disabled:opacity-50 hover:bg-[#2e3070]"
+          className="w-full bg-docuhealth-primary text-white text-sm font-medium py-2.5 rounded-full transition-colors disabled:opacity-50 hover:bg-docuhealth-dark-primary"
         >
           {isPending ? (
             <span className="flex items-center justify-center gap-2">

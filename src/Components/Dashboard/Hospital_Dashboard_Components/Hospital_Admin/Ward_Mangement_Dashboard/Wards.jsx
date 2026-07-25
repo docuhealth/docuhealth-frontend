@@ -89,7 +89,7 @@ const Wards = () => {
   return (
     <>
     <div className="flex justify-end items-center mb-6">
-        <span className="bg-indigo-100 text-[#3E4095] text-xs font-semibold px-3 py-1 rounded-full">
+        <span className="bg-indigo-100 text-docuhealth-primary text-xs font-semibold px-3 py-1 rounded-full">
           Total: {count}
         </span>
       </div>
@@ -107,7 +107,7 @@ const Wards = () => {
                 <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-2">
    <div className="p-2 bg-indigo-50 rounded border">
-                    <Bed className="w-5 h-5 text-[#3E4095]" />
+                    <Bed className="w-5 h-5 text-docuhealth-primary" />
                   </div>
                   <div>
                       <h3 className=" font-semibold text-gray-900 truncate">{ward.name || "General Ward"}</h3>
@@ -145,7 +145,7 @@ const Wards = () => {
                   <div className="w-full bg-gray-100 h-1.5 rounded-full">
                     <div 
                       className={`h-full rounded-full transition-all duration-500 ${
-                        percentage > 90 ? "bg-red-500" : "bg-[#3E4095]"
+                        percentage > 90 ? "bg-red-500" : "bg-docuhealth-primary"
                       }`}
                       style={{ width: `${percentage}%` }}
                     />
@@ -155,7 +155,7 @@ const Wards = () => {
 
               {/* Action Button */}
               <button 
-                className="w-full py-4 bg-white border-t border-gray-100 text-[#3E4095] text-xs font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 mt-auto"
+                className="w-full py-4 bg-white border-t border-gray-100 text-docuhealth-primary text-xs font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 mt-auto"
                 onClick={() => console.log(`Managing Ward ${ward.id}`)}
               >
                 MANAGE WARD <ArrowRight className="w-3.5 h-3.5" />

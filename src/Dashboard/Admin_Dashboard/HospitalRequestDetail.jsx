@@ -26,8 +26,8 @@ const HospitalRequestDetail = ({
       </div>
 
       {/* All details card */}
-      <div className="p-5 mb-5 bg-[#FAFAFA] border rounded-lg">
-        <h3 className="text-md font-medium text-[#1B2B40] mb-6">All details</h3>
+      <div className="p-5 mb-5 bg-docuhealth-light-gray border rounded-lg">
+        <h3 className="text-md font-medium text-docuhealth-dark mb-6">All details</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 
@@ -56,8 +56,8 @@ const HospitalRequestDetail = ({
         </div>
       </div>
 
-<div className="p-5 my-5 bg-[#FAFAFA] border rounded-lg">
-          <p className="font-medium mb-4 text-[#1B2B40]">
+<div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+          <p className="font-medium mb-4 text-docuhealth-dark">
             Hospital's uploaded Documents/images
           </p>
           <div>
@@ -89,8 +89,8 @@ const HospitalRequestDetail = ({
                       className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 sm:items-center bg-white border rounded-lg px-4 py-3 mb-3 "
                     >
                       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-[12px]">
-                        <div className="p-2 bg-[#3E4095]/10 rounded-md">
-                          <Icon className="text-[#3E4095]" size={20} />
+                        <div className="p-2 bg-docuhealth-primary/10 rounded-md">
+                          <Icon className="text-docuhealth-primary" size={20} />
                         </div>
                         <div>
                           <p className="font-medium text-gray-800">
@@ -107,7 +107,7 @@ const HospitalRequestDetail = ({
                           href={fileUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-1 border border-[#3E4095] text-[#3E4095] rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28"
+                          className="flex items-center justify-center gap-1 border border-docuhealth-primary text-docuhealth-primary rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28"
                         >
                           <Eye className="w-3 h-3" />
                           View
@@ -116,7 +116,7 @@ const HospitalRequestDetail = ({
                                     href={fileUrl}
                                     target="_blank"
                                     download
-                                    className="flex items-center justify-center gap-1 bg-[#3E4095] text-white rounded-full font-medium hover:bg-[#2e3070] transition py-1 px-3 w-full sm:w-28"
+                                    className="flex items-center justify-center gap-1 bg-docuhealth-primary text-white rounded-full font-medium hover:bg-docuhealth-dark-primary transition py-1 px-3 w-full sm:w-28"
                                   >
                                     <ArrowDownToLine className="w-3 h-3" />
                                     Download
@@ -142,7 +142,7 @@ const HospitalRequestDetail = ({
         </button>
         {selectedRequest.status !== "approved" && (
           <button 
-            className="bg-[#3E4095] text-white px-6 py-2 text-xs rounded-full font-medium hover:bg-[#2e3070] transition flex justify-center items-center gap-2"
+            className="bg-docuhealth-primary text-white px-6 py-2 text-xs rounded-full font-medium hover:bg-docuhealth-dark-primary transition flex justify-center items-center gap-2"
             onClick={() => approveHospital(selectedRequest.sqid)}
             disabled={approving === selectedRequest.sqid}
           >

@@ -141,7 +141,7 @@ const PatientsAssignedToMyWard = () => {
                     <div className='font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-1 '>
 
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="#647284" />
+                            <path d="M11.6654 12.834H10.4987V11.6673C10.4987 10.7008 9.71522 9.91732 8.7487 9.91732H5.2487C4.2822 9.91732 3.4987 10.7008 3.4987 11.6673V12.834H2.33203V11.6673C2.33203 10.0565 3.63787 8.75065 5.2487 8.75065H8.7487C10.3595 8.75065 11.6654 10.0565 11.6654 11.6673V12.834ZM6.9987 7.58398C5.0657 7.58398 3.4987 6.01698 3.4987 4.08398C3.4987 2.15099 5.0657 0.583984 6.9987 0.583984C8.93169 0.583984 10.4987 2.15099 10.4987 4.08398C10.4987 6.01698 8.93169 7.58398 6.9987 7.58398ZM6.9987 6.41732C8.28734 6.41732 9.33203 5.37265 9.33203 4.08398C9.33203 2.79532 8.28734 1.75065 6.9987 1.75065C5.71003 1.75065 4.66536 2.79532 4.66536 4.08398C4.66536 5.37265 5.71003 6.41732 6.9987 6.41732Z" fill="var(--color-docuhealth-secondary)" />
                         </svg>
 
                         <p> {patient.patient.firstname} {patient.patient.lastname}</p>
@@ -172,7 +172,7 @@ const PatientsAssignedToMyWard = () => {
           <div key={index} className="bg-white border border-gray-200 rounded-md p-4 ">
             <div className="flex justify-between items-start border-b border-gray-50 pb-3 mb-3">
               <div className="flex items-center gap-3">
-                <div className="bg-blue-50 text-[#3E4095] h-10 w-10 rounded-full flex items-center justify-center font-bold">
+                <div className="bg-blue-50 text-docuhealth-primary h-10 w-10 rounded-full flex items-center justify-center font-bold">
                   {patient.patient.firstname[0]}{patient.patient.lastname[0]}
                 </div>
                 <div>
@@ -180,7 +180,7 @@ const PatientsAssignedToMyWard = () => {
                   <p className="text-[11px] text-gray-500 uppercase tracking-tight">{patient.patient.gender} patient</p>
                 </div>
               </div>
-              <span className="text-[10px] bg-blue-50 text-[#3E4095] px-2 py-1 rounded-md font-medium">
+              <span className="text-[10px] bg-blue-50 text-docuhealth-primary px-2 py-1 rounded-md font-medium">
                 Admitted
               </span>
             </div>

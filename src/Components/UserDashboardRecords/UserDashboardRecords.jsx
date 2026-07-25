@@ -179,7 +179,7 @@ const UserDashboardRecords = ({
                             </div>
                             <div className="flex items-center gap-1">
                               <button
-                                className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer text-sm"
+                                className="bg-docuhealth-blue py-1 px-3 text-white rounded-full cursor-pointer text-sm"
                                 onClick={() => {
                                   if (paymentStatus) {
                                     exportToPDF;
@@ -562,7 +562,7 @@ const UserDashboardRecords = ({
                           </div>
                           <div className="flex items-center gap-1">
                             <button
-                              className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer"
+                              className="bg-docuhealth-blue py-1 px-3 text-white rounded-full cursor-pointer"
                               onClick={() => {
                                 if (paymentStatus) {
                                   exportToPDF;
@@ -908,7 +908,7 @@ const UserDashboardRecords = ({
                   key={i + 1}
                   className={`px-3 py-1 mx-1 rounded-full ${
                     currentPage === i + 1
-                      ? "bg-[#0000FF] text-white"
+                      ? "bg-docuhealth-blue text-white"
                       : "bg-gray-300 hover:bg-gray-400"
                   }`}
                   onClick={() => setCurrentPage(i + 1)}

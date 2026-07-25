@@ -18,7 +18,7 @@ const NoteSection = ({
   setActiveInput,
 }) => (
   <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3 bg-gray-50/30">
-    <p className="font-medium text-[#1B2B40] mb-2">{title}</p>
+    <p className="font-medium text-docuhealth-dark mb-2">{title}</p>
 
     <div className="space-y-2 max-h-[200px] overflow-y-auto mb-2">
       {soapNoteData[field].map((item, idx) => (
@@ -46,12 +46,12 @@ const NoteSection = ({
           value={inputs[field]}
           onChange={(e) => setInputs({ ...inputs, [field]: e.target.value })}
           placeholder={placeholder}
-          className="flex-1 border rounded p-2 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none"
+          className="flex-1 border rounded p-2 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none"
         />
         <button
           type="button"
           onClick={() => handleAddListItem(field)}
-          className="bg-[#3E4095] text-white px-3 py-1 rounded text-[12px]"
+          className="bg-docuhealth-primary text-white px-3 py-1 rounded text-[12px]"
         >
           Add
         </button>
@@ -67,7 +67,7 @@ const NoteSection = ({
       <button
         type="button"
         onClick={() => setActiveInput(field)}
-        className="flex items-center gap-1 text-[#3E4095] font-medium text-[12px]"
+        className="flex items-center gap-1 text-docuhealth-primary font-medium text-[12px]"
       >
         <span className="text-lg">+</span> Add Entry
       </button>
@@ -381,7 +381,7 @@ const AfterDischargeSummary = ({
             />
 
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium mb-3 text-[#1B2B40]">
+              <p className="font-medium mb-3 text-docuhealth-dark">
                 Medication on discharge  (compulsory)
               </p>
 
@@ -399,7 +399,7 @@ const AfterDischargeSummary = ({
                       onChange={(e) =>
                         handleChange(index, "drug", e.target.value)
                       }
-                      className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
+                      className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -415,7 +415,7 @@ const AfterDischargeSummary = ({
                           handleChange(index, "dosage", val);
                         }
                       }}
-                      className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
+                      className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
                     />
                   </div>
 
@@ -427,7 +427,7 @@ const AfterDischargeSummary = ({
                         onChange={(e) =>
                           handleChange(index, "route", e.target.value)
                         }
-                        className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none appearance-none bg-white pr-8 transition-all"
+                        className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none appearance-none bg-white pr-8 transition-all"
                       >
                         <option value="Oral">Oral</option>
                         <option value="IV">IV = Intravenous</option>
@@ -452,7 +452,7 @@ const AfterDischargeSummary = ({
                         value={med.frequency}
                         onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
                         onChange={(e) => handleChange(index, "frequency", e.target.value)}
-                        className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
+                        className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
                       />
                     </div>
                     <div className="flex-1">
@@ -463,7 +463,7 @@ const AfterDischargeSummary = ({
                           onChange={(e) =>
                             handleChange(index, "frequencyUnit", e.target.value)
                           }
-                          className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-[#3E4095] outline-none transition-all bg-white"
+                          className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all bg-white"
                         >
                           <option value="Daily">Daily</option>
                           <option value="Weekly">Weekly</option>
@@ -486,7 +486,7 @@ const AfterDischargeSummary = ({
                         value={med.duration}
                         onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
                         onChange={(e) => handleChange(index, "duration", e.target.value)}
-                        className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-[#3E4095] outline-none transition-all"
+                        className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
                       />
                     </div>
                     <div className="flex-1">
@@ -497,7 +497,7 @@ const AfterDischargeSummary = ({
                           onChange={(e) =>
                             handleChange(index, "durationUnit", e.target.value)
                           }
-                          className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-[#3E4095] outline-none transition-all bg-white"
+                          className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all bg-white"
                         >
                           <option value="Month">Month (s)</option>
                           <option value="Week">Week (s)</option>
@@ -524,7 +524,7 @@ const AfterDischargeSummary = ({
 
               <button
                 onClick={handleAddMedication}
-                className="text-[#3E4095] font-medium text-[12px] mt-4 flex items-center gap-1 hover:underline transition-all"
+                className="text-docuhealth-primary font-medium text-[12px] mt-4 flex items-center gap-1 hover:underline transition-all"
               >
                 <Plus size={14} /> Add more drugs
               </button>
@@ -558,8 +558,8 @@ const AfterDischargeSummary = ({
                   handleFiles(files);
                 }}
               >
-                <UploadCloud className="w-5 h-5 text-[#3E4095]" />
-                <span className="text-[#3E4095] font-medium">
+                <UploadCloud className="w-5 h-5 text-docuhealth-primary" />
+                <span className="text-docuhealth-primary font-medium">
                   Drag & drop or click to upload
                 </span>
               </label>
@@ -779,7 +779,7 @@ const AfterDischargeSummary = ({
                 className={`py-2.5  rounded-full text-sm px-20 sm:mt-5 text-white  w-full ${
                   dischargeMutation.isPending
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-[#3E4095] cursor-pointer"
+                    : "bg-docuhealth-primary cursor-pointer"
                 }`}
                 onClick={() => {
                   handleSubmit();

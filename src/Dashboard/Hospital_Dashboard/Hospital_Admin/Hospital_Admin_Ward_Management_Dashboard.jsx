@@ -49,7 +49,7 @@ const Hospital_Admin_Ward_Management_Dashboard = () => {
         <DynamicDate />
         <div className="w-full sm:w-auto">
           <button
-            className="flex justify-center items-center gap-2 px-8 py-2 border border-[#3E4095] text-[#3E4095] font-medium rounded-full hover:bg-blue-50 transition w-full sm:w-auto cursor-pointer"
+            className="flex justify-center items-center gap-2 px-8 py-2 border border-docuhealth-primary text-docuhealth-primary font-medium rounded-full hover:bg-blue-50 transition w-full sm:w-auto cursor-pointer"
             onClick={() => setShowOverlay(true)}
           >
             Create Ward
@@ -87,7 +87,7 @@ const Hospital_Admin_Ward_Management_Dashboard = () => {
                     type="text"
                     required
                     placeholder="e.g. Emergency"
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none  focus:border-[#3E4095] transition-all"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none  focus:border-docuhealth-primary transition-all"
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
@@ -109,7 +109,7 @@ const Hospital_Admin_Ward_Management_Dashboard = () => {
                   required
                   min="1"
                   placeholder="Enter number of beds"
-                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none  focus:border-[#3E4095] transition-all cursor-pointer"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none  focus:border-docuhealth-primary transition-all cursor-pointer"
                   value={formData.total_beds}
                   onChange={(e) =>
                     setFormData({ ...formData, total_beds: e.target.value })
@@ -128,7 +128,7 @@ const Hospital_Admin_Ward_Management_Dashboard = () => {
                 <button
                   type="submit"
                   disabled={createWardMutation.isPending}
-                  className="flex-1 px-4 py-2.5 bg-[#3E4095] text-white  rounded-full  disabled:opacity-50 transition-all text-sm shadow shadow-indigo-100 cursor-pointer"
+                  className="flex-1 px-4 py-2.5 bg-docuhealth-primary text-white  rounded-full  disabled:opacity-50 transition-all text-sm shadow shadow-indigo-100 cursor-pointer"
                 >
                   {createWardMutation.isPending ? "Creating..." : "Create Ward"}
                 </button>

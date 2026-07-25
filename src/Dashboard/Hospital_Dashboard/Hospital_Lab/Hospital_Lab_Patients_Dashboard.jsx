@@ -38,7 +38,7 @@ const Hospital_Lab_Patients_Dashboard = () => {
       <div className="mt-4 bg-white border border-gray-200 rounded-md p-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
           <div>
-            <h3 className="text-sm font-semibold text-[#1B2B40]">Patients</h3>
+            <h3 className="text-sm font-semibold text-docuhealth-dark">Patients</h3>
             <p className="text-xs text-gray-400 mt-0.5">{filtered.length} patient{filtered.length !== 1 ? "s" : ""} found</p>
           </div>
           <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
@@ -67,7 +67,7 @@ const Hospital_Lab_Patients_Dashboard = () => {
             <tbody className="divide-y divide-gray-50">
               {filtered.map((p) => (
                 <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-3 pr-4 font-medium text-[#1B2B40]">{p.name}</td>
+                  <td className="py-3 pr-4 font-medium text-docuhealth-dark">{p.name}</td>
                   <td className="py-3 pr-4 text-gray-400 font-mono">{p.id}</td>
                   <td className="py-3 pr-4 text-gray-500">{p.tests} test{p.tests !== 1 ? "s" : ""}</td>
                   <td className="py-3 pr-4 text-gray-400">{p.lastVisit}</td>

@@ -84,7 +84,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
         >
           <path
             d="M4.56528 6.41685H11.6654V7.58352H4.56528L7.69426 10.7125L6.86932 11.5374L2.33203 7.00019L6.86932 2.46289L7.69426 3.28785L4.56528 6.41685Z"
-            fill="#1B2B40"
+            fill="var(--color-docuhealth-dark)"
           />
         </svg>
 
@@ -193,7 +193,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
       </div>
       <div className="flex justify-end items-end">
         <button
-          className={`py-2.5 px-10  rounded-full bg-[#3E4095] text-white cursor-pointer mb-5 disabled:bg-[#3E4095]/60 disabled:cursor-not-allowed ${isPending ? "bg-[#3E4095]/60 cursor-not-allowed" : ""}  text-sm`}
+          className={`py-2.5 px-10  rounded-full bg-docuhealth-primary text-white cursor-pointer mb-5 disabled:bg-docuhealth-primary/60 disabled:cursor-not-allowed ${isPending ? "bg-docuhealth-primary/60 cursor-not-allowed" : ""}  text-sm`}
           disabled={
             isPending || isFormIncomplete
           }

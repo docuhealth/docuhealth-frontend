@@ -64,7 +64,7 @@ const UserSubAcctRecords = ({ subAccounts, isPending, setDisplaySubAcctModal, se
             {/* Left Section */}
             <div className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
               <div className="font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-3 ">
-                <div className="w-9 h-9 rounded-full bg-[#3E4095]/10  overflow-hidden flex justify-center items-center text-sm font-semibold text-[#3E4095] ">
+                <div className="w-9 h-9 rounded-full bg-docuhealth-primary/10  overflow-hidden flex justify-center items-center text-sm font-semibold text-docuhealth-primary ">
                   {subaccount
                     ? `${subaccount.firstname?.[0] || ""}${subaccount.lastname?.[0] || ""
                       }`.toUpperCase()
@@ -131,8 +131,8 @@ const UserSubAcctRecords = ({ subAccounts, isPending, setDisplaySubAcctModal, se
                       onClick={() => {
                         if (isCreatingID) return; // Prevent double clicks
                         
-                        const is_subscribed = fetchSubscriptionStatus();
-                        if (!is_subscribed) {
+                        const hasSubscription = fetchSubscriptionStatus();
+                        if (!hasSubscription) {
                           toast.error("Please subscribe to access feature");
                           navigate("/user-subscriptions-dashboard");
                           return;

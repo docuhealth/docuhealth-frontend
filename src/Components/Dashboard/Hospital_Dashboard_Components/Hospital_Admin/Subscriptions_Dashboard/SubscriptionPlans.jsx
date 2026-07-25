@@ -1,10 +1,49 @@
 import React, { useState, useContext } from "react";
 import { HosSubscriptionsContext } from "../../../../../context/HospitalContext/Admin/HosSubscriptionsContext";
+import { HosAppContext } from "../../../../../context/HospitalContext/Admin/HosAppContext";
 import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
 import toast from "react-hot-toast";
 
+// How each subscription status is labelled and coloured in the UI.
+const SUBSCRIPTION_STATUS_META = {
+  active: { label: "ACTIVE", className: "text-green-600" },
+  "non-renewing": { label: "NON-RENEWING", className: "text-amber-600" },
+  attention: { label: "ATTENTION", className: "text-amber-600" },
+  past_due: { label: "PAST DUE", className: "text-red-500" },
+  cancelled: { label: "CANCELLED", className: "text-gray-500" },
+  canceled: { label: "CANCELLED", className: "text-gray-500" },
+  completed: { label: "COMPLETED", className: "text-gray-500" },
+  expired: { label: "EXPIRED", className: "text-red-500" },
+  inactive: { label: "INACTIVE", className: "text-gray-500" },
+};
+
+// Statuses that mean the plan is still live, so the user can't re-subscribe to it.
+const BLOCKING_STATUSES = ["active", "non-renewing"];
+
+const getStatusMeta = (status) => {
+  if (!status) return { label: "", className: "" };
+  const key = String(status).toLowerCase();
+  return (
+    SUBSCRIPTION_STATUS_META[key] || {
+      label: key.replace(/[_-]/g, " ").toUpperCase(),
+      className: "text-gray-500",
+    }
+  );
+};
+
 const SubscriptionPlans = () => {
-  const { subscriptionPlans, loading } = useContext(HosSubscriptionsContext);
+  const { subscriptionPlans, loading: subscriptionDataIsPending } = useContext(HosSubscriptionsContext);
+  const { profile, loading: profileDataIsPending } = useContext(HosAppContext);
+
+  const currentSubscription = profileDataIsPending === false ? profile?.subscription : null;
+  const currentStatus = currentSubscription?.status?.toLowerCase() ?? null;
+  const hospitalIsSubscribed = currentSubscription != null;
+  // The hospital only counts as being on a paid plan while that plan is still live.
+  const hasActivePaidPlan = currentStatus !== null && BLOCKING_STATUSES.includes(currentStatus);
+
+  // True when `planName` is the plan the hospital is currently subscribed to.
+  const isCurrentPlan = (planName) =>
+    hospitalIsSubscribed && currentSubscription.plan_name === planName;
 
   const [paymentUrl, setPaymentUrl] = useState(null);
 
@@ -27,8 +66,24 @@ const SubscriptionPlans = () => {
         });
       }
     } catch (err) {
-      const errorMsg =
-        err.response?.data?.message || "Payment initialization failed.";
+      let errorMsg = "Payment initialization failed.";
+      const data = err.response?.data;
+      if (data) {
+        if (typeof data === "string") {
+          errorMsg = data;
+        } else if (Array.isArray(data.non_field_errors) && data.non_field_errors.length) {
+          errorMsg = data.non_field_errors[0];
+        } else if (data.error || data.message || data.detail) {
+          errorMsg = data.error || data.message || data.detail;
+        } else {
+          // Fall back to the first DRF field error (e.g. { plan: ["..."] })
+          const firstFieldError = Object.values(data).find(
+            (value) => Array.isArray(value) && value.length
+          );
+          if (firstFieldError) errorMsg = firstFieldError[0];
+        }
+      }
+
       toast.error(errorMsg, { id: loadingToast });
       console.error("Payment Error:", err);
     }
@@ -38,7 +93,7 @@ const SubscriptionPlans = () => {
     <>
       <div className="bg-white my-5 border rounded-lg p-4 lg:p-6">
         {/* ===== Loading State ===== */}
-        {loading ? (
+        {subscriptionDataIsPending || profileDataIsPending ? (
           <div className="flex justify-center items-center ">
             <p className="text-gray-600 text-sm animate-pulse">
               Loading subscription plans...
@@ -111,12 +166,17 @@ const SubscriptionPlans = () => {
             </div>
           </div>
         ) : (
-          // ===== Plans Grid =====
+          // Plans Grid
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* ---------- Static Basic Plan ---------- */}
-            <div className="p-4 rounded-xl bg-[#F5F8F8]">
+            {/* Static Basic Plan */}
+            <div className="p-4 rounded-xl bg-docuhealth-gray-cool">
               <div className="flex justify-between items-center">
-                <p className="text-[12px] text-gray-900 pb-2">Basic Plan</p>
+                <p className="text-[12px] text-gray-900 pb-2">
+                  Basic Plan
+                  {!hasActivePaidPlan && (
+                      <span className="text-xs text-green-600 font-bold"> (ACTIVE)</span>
+                  )}
+                </p>
               </div>
 
               {/* Price Section */}
@@ -146,7 +206,7 @@ const SubscriptionPlans = () => {
                   "View patient profile (medical summaries from other hospitals).",
                 ].map((feature, i) => (
                   <p key={i} className="flex items-center text-[12px]">
-                    <i className="bx bx-check text-[#3E4095] text-xl mr-1"></i>
+                    <i className="bx bx-check text-docuhealth-primary text-xl mr-1"></i>
                     {feature}
                   </p>
                 ))}
@@ -166,25 +226,26 @@ const SubscriptionPlans = () => {
               </div>
 
               {/* Button */}
-              <div className="rounded-full my-4 font-semibold">
-                <div className="py-3">
-                  <p
-                    className="text-sm text-center cursor-pointer"
-                    onClick={() =>
-                      toast.success("You are already on the free plan!")
-                    }
-                  >
-                    Choose Free Plan
-                  </p>
-                </div>
-              </div>
+              <button
+                  className="py-3 rounded-full my-4 font-semibold w-full border border-gray-400 disabled:cursor-not-allowed disabled:text-gray-500"
+                  onClick={() => toast.success("You are already on the free plan!")}
+                  disabled={hasActivePaidPlan}
+              >
+                <p className="text-sm text-center">Choose Free Plan</p>
+              </button>
             </div>
 
-            {/* ---------- Dynamic Plans from API ---------- */}
-            {subscriptionPlans.map((plan) => (
+            {/* Dynamic Plans from API */}
+            {subscriptionPlans.map((plan) => {
+              const isPlanCurrent = isCurrentPlan(plan.name);
+              const statusMeta = isPlanCurrent ? getStatusMeta(currentSubscription.status) : null;
+              // Can't re-subscribe to a plan whose subscription is still live.
+              const planIsLocked = isPlanCurrent && BLOCKING_STATUSES.includes(currentStatus);
+
+              return (
               <div
                 key={plan.id}
-                className="p-4 rounded-xl bg-linear-to-b from-[#ECFAFF] to-[#EEEEFD]"
+                className="p-4 rounded-xl bg-linear-to-b from-docuhealth-blue-lightest to-docuhealth-primary-lightest"
               >
                 {/* Header */}
                 <div className="flex justify-between items-center">
@@ -192,7 +253,12 @@ const SubscriptionPlans = () => {
                     className="text-[12px] text-gray-600 pb-2"
                     style={{ color: "#FE9000" }}
                   >
-                    {plan.name}
+                    {plan.name + " "}
+                    {statusMeta && (
+                        <span className={`text-xs font-bold ${statusMeta.className}`}>
+                          ({statusMeta.label})
+                        </span>
+                    )}
                   </p>
                 </div>
 
@@ -215,25 +281,24 @@ const SubscriptionPlans = () => {
                 <div className="py-5 space-y-1">
                   {plan.features.map((feature, i) => (
                     <p key={i} className="flex items-center text-[12px]">
-                      <i className="bx bx-check text-[#3E4095] text-xl mr-1"></i>
+                      <i className="bx bx-check text-docuhealth-primary text-xl mr-1"></i>
                       {feature}
                     </p>
                   ))}
                 </div>
 
-                {/* Button */}
-                <div
-                  onClick={() => handlePayment(plan.paystack_plan_code)}
-                  className="rounded-full my-4 border border-[#3E4095] text-[#3E4095] font-semibold"
+                <button
+                    className="rounded-full my-4 border border-docuhealth-primary text-docuhealth-primary font-semibold w-full disabled:cursor-not-allowed disabled:text-gray-400 disabled:border-gray-300"
+                    onClick={() => handlePayment(plan.paystack_plan_code)}
+                    disabled={planIsLocked}
                 >
-                  <div className="py-3">
-                    <p className="text-sm text-center cursor-pointer">
-                      Choose {plan.name}
-                    </p>
-                  </div>
-                </div>
+                  <p className="py-3 text-sm text-center">
+                    {planIsLocked ? "Current Plan" : `Choose ${plan.name}`}
+                  </p>
+                </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

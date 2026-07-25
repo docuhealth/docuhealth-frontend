@@ -61,7 +61,7 @@ const Id_Card = ({
                       .join(" ")}
 
                     readOnly
-                    className="w-full px-3 py-2 border rounded-md  text-gray-700 focus:outline-hidden focus:ring-2 focus:ring-[#3E4095]"
+                    className="w-full px-3 py-2 border rounded-md  text-gray-700 focus:outline-hidden focus:ring-2 focus:ring-docuhealth-primary"
                   />
                 </div>
 
@@ -75,7 +75,7 @@ const Id_Card = ({
                     value={idCardData.firstEmergency}
                     onChange={handleChange}
                     placeholder="Enter first emergency number"
-                    className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#3E4095]"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-docuhealth-primary"
                   />
                 </div>
 
@@ -89,7 +89,7 @@ const Id_Card = ({
                     value={idCardData.secondEmergency}
                     onChange={handleChange}
                     placeholder="Enter second emergency number"
-                    className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#3E4095]"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-docuhealth-primary"
                   />
                 </div>
 
@@ -102,7 +102,7 @@ const Id_Card = ({
                     value={idCardData.emergencyAddress}
                     onChange={handleChange}
                     placeholder="Enter emergency address"
-                    className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-[#3E4095] h-24 resize-none"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-docuhealth-primary h-24 resize-none"
                   ></textarea>
                 </div>
 
@@ -111,7 +111,7 @@ const Id_Card = ({
                   className={`w-full mt-4 flex items-center justify-center gap-2 py-2 rounded-full  transition-all duration-300 shadow-md 
     ${isCreatingID
                       ? "bg-gray-400 cursor-not-allowed opacity-70"
-                      : "bg-[#3E4095] hover:bg-[#2e3075] hover:shadow-lg active:scale-[0.98] text-white cursor-pointer"
+                      : "bg-docuhealth-primary hover:bg-docuhealth-primary-darker hover:shadow-lg active:scale-[0.98] text-white cursor-pointer"
                     }`}
                   onClick={() => !isCreatingID && handleIDCardCreation(selectedProfile)}
                 >
@@ -186,7 +186,7 @@ const Id_Card = ({
                   />
                   <path
                     d="M13.8217 14.9998L7.32764 8.50566L8.50615 7.32715L15.0002 13.8212L21.4943 7.32715L22.6728 8.50566L16.1787 14.9998L22.6728 21.4938L21.4943 22.6724L15.0002 16.1783L8.50615 22.6724L7.32764 21.4938L13.8217 14.9998Z"
-                    fill="#1B2B40"
+                    fill="var(--color-docuhealth-dark)"
                   />
                 </svg>
               </div>

@@ -18,10 +18,11 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const order = state?.order;
+  const item = state?.item;
 
   const parameters = useMemo(
-    () => order?.test_info?.parameters ?? [],
-    [order]
+    () => item?.test_info?.parameters ?? [],
+    [item]
   );
 
   const [paramValues, setParamValues]       = useState({});
@@ -46,7 +47,7 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
       comments,
     };
     try {
-      await submitMutation.mutateAsync(payload);
+      await submitMutation.mutateAsync({ order_sqid: order?.id, item_sqid: item?.sqid, payload });
       setShowConfirm(false);
       setShowSuccess(true);
     } catch {
@@ -65,7 +66,7 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
       <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-5 py-4">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#3E4095] transition-colors"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-docuhealth-primary transition-colors"
         >
           <ArrowLeft size={16} />
           Upload test result
@@ -79,8 +80,8 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
         <div className="flex flex-col gap-3">
           <p className="text-sm font-medium text-gray-700">
             Test parameters
-            {order?.test && (
-              <span className="ml-2 text-xs font-normal text-teal-600">({order.test})</span>
+            {item?.test_info?.name && (
+              <span className="ml-2 text-xs font-normal text-teal-600">({item.test_info.name})</span>
             )}
           </p>
 
@@ -115,7 +116,7 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
                             onChange={(e) =>
                               setParamValues((prev) => ({ ...prev, [p.sqid]: e.target.value }))
                             }
-                            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-700 outline-none focus:border-[#3E4095] transition-colors"
+                            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-700 outline-none focus:border-docuhealth-primary transition-colors"
                           />
                         </td>
                       </tr>
@@ -151,7 +152,7 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
                         onChange={(e) =>
                           setParamValues((prev) => ({ ...prev, [p.sqid]: e.target.value }))
                         }
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-[#3E4095] transition-colors"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-docuhealth-primary transition-colors"
                       />
                     </div>
                   </div>
@@ -169,7 +170,7 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
             placeholder="Enter interpretation..."
             value={interpretation}
             onChange={(e) => setInterpretation(e.target.value)}
-            className={`w-full border rounded-lg px-4 py-3 text-sm text-gray-700 outline-none resize-none transition-colors ${attempted && !interpretation.trim() ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-[#3E4095]"}`}
+            className={`w-full border rounded-lg px-4 py-3 text-sm text-gray-700 outline-none resize-none transition-colors ${attempted && !interpretation.trim() ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-docuhealth-primary"}`}
           />
           {attempted && !interpretation.trim() && (
             <p className="text-xs text-red-500">Interpretation is required.</p>
@@ -187,7 +188,7 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
             placeholder="Enter clinical correlation..."
             value={clinicalCorrelation}
             onChange={(e) => setClinical(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none focus:border-[#3E4095] resize-none transition-colors"
+            className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none focus:border-docuhealth-primary resize-none transition-colors"
           />
         </div>
 
@@ -202,18 +203,18 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
             placeholder="Enter any additional comments..."
             value={comments}
             onChange={(e) => setComments(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none focus:border-[#3E4095] resize-none transition-colors"
+            className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none focus:border-docuhealth-primary resize-none transition-colors"
           />
         </div>
 
         {/* ── Actions ── */}
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end items-stretch sm:items-center gap-3 pt-2">
-          <button className="flex items-center justify-center gap-2 border border-[#3E4095] text-[#3E4095] text-sm font-medium px-6 py-2.5 rounded-full hover:bg-indigo-50 transition-colors">
+          <button className="flex items-center justify-center gap-2 border border-docuhealth-primary text-docuhealth-primary text-sm font-medium px-6 py-2.5 rounded-full hover:bg-indigo-50 transition-colors">
             <Save size={14} /> Save as draft
           </button>
           <button
             onClick={() => { setAttempted(true); if (interpretation.trim()) setShowConfirm(true); }}
-            className="bg-[#3E4095] text-white text-sm font-medium px-8 py-2.5 rounded-full hover:bg-indigo-700 transition-colors text-center"
+            className="bg-docuhealth-primary text-white text-sm font-medium px-8 py-2.5 rounded-full hover:bg-indigo-700 transition-colors text-center"
           >
             Upload result
           </button>

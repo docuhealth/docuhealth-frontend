@@ -89,7 +89,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry, advance
           >
             <path
               d="M4.56528 6.41685H11.6654V7.58352H4.56528L7.69426 10.7125L6.86932 11.5374L2.33203 7.00019L6.86932 2.46289L7.69426 3.28785L4.56528 6.41685Z"
-              fill="#1B2B40"
+              fill="var(--color-docuhealth-dark)"
             />
           </svg>
         </div>

@@ -9,7 +9,14 @@ const getPatientName = (order) => {
 
 const getHIN = (order) => order.patient_info?.hin || "—";
 
-const getTestName = (order) => order.test_info?.name || "—";
+const getTestName = (order) => {
+  if (order.items && order.items.length > 0) {
+    const names = order.items.map(i => i.test_info?.name).filter(Boolean);
+    if (names.length === 1) return names[0];
+    return `${names.length} Tests: ${names.join(", ")}`;
+  }
+  return order.test_info?.name || "—";
+};
 
 const getHospital = (order) => order.hospital_info?.name || "—";
 
@@ -80,30 +87,12 @@ const LabOrderCard = ({ order, badge, activeTab }) => {
         onClick={() =>
           navigate("/hospital-lab-test-detail", {
             state: {
-              order: {
-                id:          order.sqid,
-                name:        getPatientName(order),
-                hin:         getHIN(order),
-                test:        getTestName(order),
-                hospital:    getHospital(order),
-                datetime:    getDatetime(order),
-                tab:         activeTab,
-                requestedBy: getRequestedBy(order),
-                gender:           order.patient_info?.gender,
-                dob:              order.patient_info?.dob,
-                payment_category: order.patient_info?.payment_category,
-                email:            order.hospital_info?.email,
-                status:      order.status,
-                note:        order.note,
-                test_info:   order.test_info,
-                result_info: order.result_info,
-                rejection_reason: order.rejection_reason,
-                specimen_collected_at: order.specimen_collected_at,
-              },
+              order,
+              tab: activeTab,
             },
           })
         }
-        className="mt-2 w-full border border-[#3E4095] text-[#3E4095] text-xs font-medium py-2 rounded-full hover:bg-indigo-50 transition-colors"
+        className="mt-2 w-full border border-docuhealth-primary text-docuhealth-primary text-xs font-medium py-2 rounded-full hover:bg-indigo-50 transition-colors"
       >
         View details
       </button>

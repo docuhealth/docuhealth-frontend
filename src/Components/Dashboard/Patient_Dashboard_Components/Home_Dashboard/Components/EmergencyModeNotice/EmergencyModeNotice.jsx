@@ -43,7 +43,7 @@ const EmergencyModeNotice = ({emergencyStatusModal, setEmergencyStatusModal, han
                   </p>
                 </div>
                 <div
-                  className=" bg-[#3E4095]  text-center text-white rounded-full py-2 cursor-pointer"
+                  className=" bg-docuhealth-primary  text-center text-white rounded-full py-2 cursor-pointer"
                   onClick={() => {
                         setEmergencyStatusModal(false)
                         handleEmergencyStatusModal()

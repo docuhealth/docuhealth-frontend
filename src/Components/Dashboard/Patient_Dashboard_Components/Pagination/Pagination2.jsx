@@ -66,7 +66,7 @@ const Pagination2 = ({
                                 <button
                                     className={`h-8 min-w-[32px] px-2 rounded-md text-[12px] font-medium transition-all ${
                                         currentPage === page
-                                            ? "bg-[#3E4095] text-white shadow-sm"
+                                            ? "bg-docuhealth-primary text-white shadow-sm"
                                             : "text-gray-600 hover:bg-gray-100 border border-transparent hover:border-gray-200"
                                     }`}
                                     onClick={() => setCurrentPage(page)}

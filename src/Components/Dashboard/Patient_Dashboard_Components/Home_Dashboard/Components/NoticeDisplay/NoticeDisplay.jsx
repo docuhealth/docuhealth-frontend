@@ -1,3 +1,4 @@
+
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -51,11 +52,11 @@ const NoticeDisplay = ({
                   </p>
                 </div>
                 <div
-                  className=" bg-[#3E4095]  text-center text-white rounded-full py-2 cursor-pointer"
+                  className=" bg-docuhealth-primary  text-center text-white rounded-full py-2 cursor-pointer"
                   onClick={() => {
                     if (profile) {
-                      const is_subscribed = fetchSubscriptionStatus();
-                      if (!is_subscribed) {
+                      const hasSubscription = fetchSubscriptionStatus();
+                      if (!hasSubscription) {
                         toast.error("Please subscribe to access feature");
                         navigate("/user-subscriptions-dashboard");
                         closeNoticeMessage();

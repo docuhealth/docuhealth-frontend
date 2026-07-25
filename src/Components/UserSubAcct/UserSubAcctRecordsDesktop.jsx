@@ -101,7 +101,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
 
       {isMedicalRecords && (
         <div className="hidden sm:block bg-white py-10 px-5 rounded-2xl ">
-          <div className="flex justify-start items-center gap-2 pb-4 text-[#647284]">
+          <div className="flex justify-start items-center gap-2 pb-4 text-docuhealth-secondary">
             <div
               className="cursor-pointer"
               onClick={() => {
@@ -118,7 +118,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
               >
                 <path
                   d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"
-                  fill="#1B2B40"
+                  fill="var(--color-docuhealth-dark)"
                 />
               </svg>
             </div>
@@ -275,7 +275,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                         </div>
                         <div className="flex items-center gap-1">
                           <button
-                            className="bg-[#0000FF] py-1 px-3 text-white rounded-full cursor-pointer"
+                            className="bg-docuhealth-blue py-1 px-3 text-white rounded-full cursor-pointer"
                             onClick={() => {
                               if (paymentStatus) {
                                 exportToPDF();
@@ -492,7 +492,7 @@ const UserSubAcctRecordsDesktop = ({defaultRecords, subaccounts, togglePopover, 
                       key={i + 1}
                       className={`px-3 py-1 mx-1 rounded-full ${
                         currentPage === i + 1
-                          ? "bg-[#0000FF] text-white"
+                          ? "bg-docuhealth-blue text-white"
                           : "bg-gray-300 hover:bg-gray-400"
                       }`}
                       onClick={() => setCurrentPage(i + 1)}

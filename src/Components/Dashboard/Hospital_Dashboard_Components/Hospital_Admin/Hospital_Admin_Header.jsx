@@ -43,7 +43,7 @@ const Hospital_Admin_Header = () => {
 
           <div className="flex items-center gap-6">
             {/* Notifications */}
-            <button className="relative p-2 text-gray-400 hover:text-[#3E4095] hover:bg-indigo-50 rounded-full transition-all">
+            <button className="relative p-2 text-gray-400 hover:text-docuhealth-primary hover:bg-indigo-50 rounded-full transition-all">
               <span className="absolute top-2 right-2.5 bg-red-500 border-2 border-white rounded-full w-2.5 h-2.5"></span>
               <Bell className="w-5 h-5" />
             </button>
@@ -54,7 +54,7 @@ const Hospital_Admin_Header = () => {
                 <p className="text-sm font-bold text-gray-900 leading-tight">
                   {profile ? `${profile.name}` : "Loading..."}
                 </p>
-                <p className="text-[11px] font-medium text-[#3E4095] bg-indigo-50 px-2 py-0.5 rounded mt-1 inline-block">
+                <p className="text-[11px] font-medium text-docuhealth-primary bg-indigo-50 px-2 py-0.5 rounded mt-1 inline-block">
                   Hospital Admin
                 </p>
               </div>
@@ -62,7 +62,7 @@ const Hospital_Admin_Header = () => {
                 onClick={() => setIsDesktopPopoverOpen(!isDesktopPopoverOpen)}
                 className="flex items-center gap-2 group"
               >
-                <div className="w-10 h-10 rounded-full bg-linear-to-tr from-[#3E4095] to-indigo-400 flex justify-center items-center text-white text-sm font-bold shadow-md overflow-hidden border border-gray-100 transition-transform group-hover:scale-105">
+                <div className="w-10 h-10 rounded-full bg-linear-to-tr from-docuhealth-primary to-indigo-400 flex justify-center items-center text-white text-sm font-bold shadow-md overflow-hidden border border-gray-100 transition-transform group-hover:scale-105">
                   {profileImage ? (
                     <img
                       src={profileImage}
@@ -144,7 +144,7 @@ const Hospital_Admin_Header = () => {
                 onClick={() => setIsPopoverOpen(!isPopoverOpen)}
                 className="flex items-center gap-1"
               >
-                <div className="w-10 h-10 rounded-full bg-linear-to-tr from-[#3E4095] to-indigo-400 flex justify-center items-center text-white text-sm font-bold shadow-md overflow-hidden border border-gray-100">
+                <div className="w-10 h-10 rounded-full bg-linear-to-tr from-docuhealth-primary to-indigo-400 flex justify-center items-center text-white text-sm font-bold shadow-md overflow-hidden border border-gray-100">
                   {profileImage ? (
                     <img
                       src={profileImage}

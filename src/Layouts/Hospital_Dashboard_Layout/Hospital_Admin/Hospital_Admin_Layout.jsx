@@ -18,7 +18,7 @@ const Hospital_Admin_Layout = () => {
           <Hospital_Admin_Header />
         </header>
         {/* Page content */}
-        <main className="flex-1 p-4 lg:p-6  overflow-y-auto bg-[#F5F5F5]">
+        <main className="flex-1 p-4 lg:p-6  overflow-y-auto bg-docuhealth-gray-lightest">
           <Outlet />
         </main>
       </div>
