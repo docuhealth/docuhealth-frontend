@@ -1,6 +1,7 @@
 import React from "react";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { formatFullDateTime, getAge } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
+import { renderDrugRecords, renderLabTests } from "../../../../../utils/soapNoteHelpers";
 import { Image, FileText, Eye, ArrowDownToLine } from "lucide-react";
 
 const PatientMedicalRecordDetail = ({
@@ -310,21 +311,29 @@ const PatientMedicalRecordDetail = ({
                             {fileName}
                           </p>
                           <p className="text-gray-500">
-                            {fileDate} • {fileSizeMB}
+                            {fileDate}{fileDate && fileSizeMB ? " • " : ""}{fileSizeMB}
                           </p>
                         </div>
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-3 text-[12px] w-full sm:w-auto">
-                        <a
-                          href={fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-1 border border-docuhealth-primary text-docuhealth-primary rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28"
-                        >
-                          <Eye className="w-3 h-3" />
-                          View
-                        </a>
+                          <a
+                            href={fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-1 border border-docuhealth-primary text-docuhealth-primary rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28"
+                          >
+                            <Eye className="w-3 h-3" />
+                            View
+                          </a>
+                          <a
+                            href={fileUrl}
+                            download
+                            className="flex items-center justify-center gap-1 bg-docuhealth-primary text-white rounded-full font-medium hover:bg-docuhealth-dark-primary transition py-1 px-3 w-full sm:w-28"
+                          >
+                            <ArrowDownToLine className="w-3 h-3" />
+                            Download
+                          </a>
                       </div>
                     </div>
                   );
@@ -337,50 +346,13 @@ const PatientMedicalRecordDetail = ({
         </div>
 
         {/* Drug Records */}
-        <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
-          <div className=" mb-4">    <p className="font-medium text-docuhealth-dark">Medication / Drug Records</p>
-          </div>
-
-          <div className="overflow-x-auto">
-            {selectedMedicalRecord?.drug_records?.length > 0 ? (
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="text-[12px] text-gray-400 border-b">
-                    <th className="pb-2 font-normal">Drug Name</th>
-                    <th className="pb-2 font-normal">Route</th>
-                    <th className="pb-2 font-normal">Qty</th>
-                    <th className="pb-2 font-normal">Frequency</th>
-                    <th className="pb-2 font-normal">Duration</th>
-                  </tr>
-                </thead>
-                <tbody className="text-[12px]">
-                  {selectedMedicalRecord.drug_records.map((drug, index) => (
-                    <tr key={index} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
-                      <td className="py-3 font-medium text-docuhealth-primary">
-                        {drug.name}
-                      </td>
-                      <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
-                      <td className="py-3 text-gray-600">{drug.quantity}</td>
-                      <td className="py-3 text-gray-600">
-                        {/* Handling nested frequency object */}
-                        {typeof drug.frequency === 'object'
-                          ? `${drug.frequency.value || ''} ( ${drug.frequency.rate || ''} )`
-                          : drug.frequency || "N/A"}
-                      </td>
-                      <td className="py-3 text-gray-600">
-                        {/* Handling nested duration object */}
-                        {typeof drug.duration === 'object'
-                          ? `${drug.duration.value || ''} ( ${drug.duration.rate || ''} )`
-                          : drug.duration || "N/A"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className="text-[12px] text-gray-500 italic">No medication records available.</p>
-            )}
-          </div>
+        <div className="mb-5">
+          {renderDrugRecords(selectedMedicalRecord?.drug_orders_info || selectedMedicalRecord?.drug_records)}
+        </div>
+        
+        {/* Lab Tests */}
+        <div className="mb-5">
+          {renderLabTests(selectedMedicalRecord?.lab_tests_info || selectedMedicalRecord?.lab_tests)}
         </div>
 
         {/* Care Instructions */}

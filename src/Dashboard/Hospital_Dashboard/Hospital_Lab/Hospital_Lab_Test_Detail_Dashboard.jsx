@@ -43,23 +43,26 @@ const getParamStatus = (value, p) => {
 };
 
 const normalizeOrder = (raw, tab) => ({
-  id:                    raw.sqid,
-  name:                  [raw.patient_info?.firstname, raw.patient_info?.lastname].filter(Boolean).join(" ") || "Unknown",
-  hin:                   raw.patient_info?.hin || "—",
-  hospital:              raw.hospital_info?.name || "—",
+  id:                    raw.order_info?.sqid || raw.order_sqid || raw.order?.sqid || raw.order || raw.sqid || raw.id,
+  name:                  raw.name || [raw.patient_info?.firstname, raw.patient_info?.lastname].filter(Boolean).join(" ") || (raw.test_info ? raw.test_info.name : "Unknown"),
+  hin:                   raw.patient_info?.hin || raw.hin || "—",
+  hospital:              raw.hospital_info?.name || raw.hospital || "—",
   datetime:              raw.created_at
     ? new Date(raw.created_at).toLocaleString("en-US", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
-    : "—",
+    : raw.datetime || "—",
   tab,
   requestedBy:           raw.ordered_by
     ? `${raw.ordered_by.role === "doctor" ? "Dr. " : ""}${raw.ordered_by.firstname || ""} ${raw.ordered_by.lastname || ""}`.trim()
+    : (raw.result_info?.submitted_by ? `${raw.result_info.submitted_by.firstname || ""} ${raw.result_info.submitted_by.lastname || ""}`.trim() : raw.requestedBy),
+  gender:                raw.patient_info?.gender || raw.gender,
+  dob:                   raw.patient_info?.dob || raw.dob,
+  payment_category:      raw.patient_info?.payment_category || raw.payment_category,
+  email:                 raw.hospital_info?.email || raw.email,
+  aggregate_status:      raw.aggregate_status || raw.status,
+  items:                 (raw.items_info?.length ? raw.items_info : null) || (raw.items?.length ? raw.items : null) || (raw.test_info ? [raw] : []),
+  specimen_collected_at: (raw.items_info?.[0]?.specimen_collected_at || raw.items?.[0]?.specimen_collected_at || raw.specimen_collected_at)
+    ? new Date(raw.items_info?.[0]?.specimen_collected_at || raw.items?.[0]?.specimen_collected_at || raw.specimen_collected_at).toLocaleString("en-US", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
     : undefined,
-  gender:                raw.patient_info?.gender,
-  dob:                   raw.patient_info?.dob,
-  payment_category:      raw.patient_info?.payment_category,
-  email:                 raw.hospital_info?.email,
-  aggregate_status:      raw.aggregate_status,
-  items:                 raw.items || [],
 });
 
 const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
@@ -98,8 +101,10 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
     status: null
   }));
 
+  const actualItemSqid = item.sqid;
+
   const acceptMutation = useMutation({ 
-    mutationFn: () => acceptLabRequest({ order_sqid: order.id, item_sqid: item.sqid }),
+    mutationFn: () => acceptLabRequest({ order_sqid: order.id, item_sqid: actualItemSqid }),
     onSuccess: () => {
       toast.success("Request accepted — moved to Sample Collected");
       setShowAcceptModal(false);
@@ -129,7 +134,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   });
 
   const approveMutation = useMutation({
-    mutationFn: () => approveLabTestResult({ order_sqid: order.id, item_sqid: item.sqid }),
+    mutationFn: () => approveLabTestResult({ item_sqid: actualItemSqid }),
     onSuccess: () => {
       toast.success("Result approved successfully!");
       setIsDoctorReviewModalOpen(false);
@@ -143,7 +148,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   });
 
   const rejectDoctorMutation = useMutation({
-    mutationFn: () => rejectLabTestResult({ order_sqid: order.id, item_sqid: item.sqid }),
+    mutationFn: () => rejectLabTestResult({ item_sqid: actualItemSqid }),
     onSuccess: () => {
       toast.success("Result rejected successfully!");
       setIsDoctorReviewModalOpen(false);
@@ -163,7 +168,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
         await acceptMutation.mutateAsync();
         toast.success("Request accepted");
       }
-      await specimenMutation.mutateAsync({ order_sqid: order.id, item_sqid: item.sqid, specimen_collected_at });
+      await specimenMutation.mutateAsync({ order_sqid: order.id, item_sqid: actualItemSqid, specimen_collected_at });
       toast.success(fromAccept ? "Sample collection logged" : "Sample collection updated");
       setShowSampleModal(false);
       setSampleLogged(true);
@@ -175,7 +180,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   };
 
   return (
-    <div className="mt-6 border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+    <div className="mt-6 border border-gray-200 rounded-xl overflow-hidden">
       <div className="bg-gray-50 border-b border-gray-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h3 className="text-base font-bold text-docuhealth-dark">{item.test_info?.name || "Unknown Test"}</h3>
@@ -305,6 +310,43 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
                       );
                     })}
                   </div>
+                </div>
+                
+                {/* Mobile Cards */}
+                <div className="lg:hidden flex flex-col gap-3">
+                  {resultParams.map((p, i) => {
+                    const info = p.parameter_info;
+                    const paramStatus = p.status ?? getParamStatus(p.value, info);
+                    const statusText = paramStatus ?? "—";
+                    const statusLower = statusText.toLowerCase();
+                    const isRed = statusLower === "negative" || statusLower === "abnormal";
+                    const isGreen = statusLower === "positive" || statusLower === "normal";
+
+                    return (
+                      <div key={i} className="border border-gray-100 rounded-lg p-4 bg-gray-50/50">
+                        <div className="flex justify-between items-start mb-3">
+                          <p className="font-bold text-sm text-gray-800">{info.name}</p>
+                          <span className={`text-[10px] px-2 py-1 rounded-md border font-medium capitalize ${
+                            isGreen ? "bg-green-50 text-green-600 border-green-100" :
+                            isRed ? "bg-red-50 text-red-500 border-red-100" :
+                            "bg-gray-100 text-gray-600 border-gray-200"
+                          }`}>
+                            {statusText}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <p className="text-gray-400 mb-1 uppercase text-[10px] font-semibold">Result</p>
+                            <p className="font-semibold text-gray-800">{p.value ?? "—"} {info.unit || ""}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400 mb-1 uppercase text-[10px] font-semibold">Ref Range</p>
+                            <p className="font-medium text-gray-600">{getRefRange(info)}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}
@@ -440,7 +482,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
       <RejectModal
         isOpen={isRejectModalOpen}
         onClose={() => setIsRejectModalOpen(false)}
-        onConfirm={() => rejectMutation.mutate({ order_sqid: order.id, item_sqid: item.sqid, reason: rejectReason })}
+        onConfirm={() => rejectMutation.mutate({ order_sqid: order.id, item_sqid: actualItemSqid, reason: rejectReason })}
         isPending={rejectMutation.isPending}
         value={rejectReason}
         onChange={setRejectReason}
@@ -472,7 +514,7 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
   const queryClient   = useQueryClient();
   const { state }     = useLocation() || {};
   const isDirectOrder = typeof orderIdProp === "object" && orderIdProp !== null;
-  const sqid          = isDirectOrder ? orderIdProp.sqid : (orderIdProp || state?.sqid || state?.order?.id);
+  const sqid          = isDirectOrder ? orderIdProp.sqid : (orderIdProp || state?.sqid || state?.order?.sqid || state?.order?.id);
 
   const { data: fetchedOrder, isLoading: orderLoading } = useQuery({
     queryKey: ["lab-order", sqid],
@@ -480,8 +522,9 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
     enabled:  !!sqid && !isDirectOrder,
   });
 
-  const rawOrder = isDirectOrder ? orderIdProp : fetchedOrder;
-  const order = rawOrder ? normalizeOrder(rawOrder, state?.order?.tab) : (state?.order ?? {});
+  const rawData = isDirectOrder ? orderIdProp : (fetchedOrder || state?.order);
+  const rawOrder = rawData?.results ? rawData.results[0] : rawData;
+  const order = rawOrder ? normalizeOrder(rawOrder, state?.order?.tab) : {};
 
   if (orderLoading && !isDirectOrder) {
     return (
@@ -508,12 +551,12 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
         </button>
       </div>
 
-      <PatientInfoCard
+      {/* <PatientInfoCard
         order={order}
         isCompleted={order.aggregate_status === "result_ready" || order.aggregate_status === "completed"}
         isRejected={order.aggregate_status === "rejected"}
         isInProgress={order.aggregate_status === "in_progress" || order.aggregate_status === "sample_collected"}
-      />
+      /> */}
 
       <div className="mt-6">
         <h2 className="text-lg font-bold text-gray-800 mb-2">Test Items</h2>

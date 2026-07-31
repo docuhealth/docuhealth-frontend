@@ -6,4 +6,4 @@ export const fetchPatientDrugRecords = async ({ queryKey }) => {
   if (search) url += `&search=${search}`;
   const res = await axiosInstance.get(url);
   return res.data;
-};
+};

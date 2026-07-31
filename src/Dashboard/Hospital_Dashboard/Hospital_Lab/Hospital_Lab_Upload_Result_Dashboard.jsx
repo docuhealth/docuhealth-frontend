@@ -37,14 +37,14 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
 
   const handleConfirmUpload = async () => {
     const payload = {
-      order: order?.id,
+      item: item?.sqid,
       parameters: parameters.map((p) => ({
         parameter: p.sqid,
-        value: paramValues[p.sqid] ?? "",
+        value: String(paramValues[p.sqid] ?? ""),
       })),
+      comments,
       interpretation,
       clinical_correlation: clinicalCorrelation,
-      comments,
     };
     try {
       await submitMutation.mutateAsync({ order_sqid: order?.id, item_sqid: item?.sqid, payload });
@@ -214,7 +214,7 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
           </button>
           <button
             onClick={() => { setAttempted(true); if (interpretation.trim()) setShowConfirm(true); }}
-            className="bg-docuhealth-primary text-white text-sm font-medium px-8 py-2.5 rounded-full hover:bg-indigo-700 transition-colors text-center"
+            className="bg-docuhealth-primary border border-transparent text-white text-sm font-medium px-8 py-2.5 rounded-full hover:bg-indigo-700 transition-colors text-center"
           >
             Upload result
           </button>

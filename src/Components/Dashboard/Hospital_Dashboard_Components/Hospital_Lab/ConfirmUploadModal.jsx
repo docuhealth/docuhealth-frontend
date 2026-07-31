@@ -5,12 +5,12 @@ const ConfirmUploadModal = ({ isOpen, onClose, onConfirm, isPending }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-auto p-6 relative flex flex-col items-center text-center">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-auto px-10 py-10 relative flex flex-col items-center text-center">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors"
         >
-          <X size={16} />
+          <X size={24} />
         </button>
 
         <div className="w-12 h-12 rounded-full border-2 border-gray-800 flex items-center justify-center mb-4">

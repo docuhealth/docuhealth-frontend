@@ -10,8 +10,9 @@ const getPatientName = (order) => {
 const getHIN = (order) => order.patient_info?.hin || "—";
 
 const getTestName = (order) => {
-  if (order.items && order.items.length > 0) {
-    const names = order.items.map(i => i.test_info?.name).filter(Boolean);
+  const items = order.items_info || order.items;
+  if (items && items.length > 0) {
+    const names = items.map(i => i.test_info?.name).filter(Boolean);
     if (names.length === 1) return names[0];
     return `${names.length} Tests: ${names.join(", ")}`;
   }
