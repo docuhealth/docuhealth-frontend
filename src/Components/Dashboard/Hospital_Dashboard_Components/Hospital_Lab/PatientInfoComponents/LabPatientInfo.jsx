@@ -10,7 +10,7 @@ import formatRecordDate, {
 } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { fetchTestCategories, fetchLabTests, createLabTestOrder } from "../../../../../queries/Hospital/lab/requests";
-import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 
 const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateOrder }) => {

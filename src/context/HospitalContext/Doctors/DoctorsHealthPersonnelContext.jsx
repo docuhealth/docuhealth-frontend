@@ -1,5 +1,5 @@
 import React, { useEffect, useState, createContext } from "react";
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 import { getHospitalToken } from "../../../services/authService";
 
 

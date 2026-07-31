@@ -1,11 +1,14 @@
-import React, { useContext } from "react";
-import { MedicalRecordsContext } from "../../../../context/PatientContext/MedicalRecordsContext";
+import React, { useState, useEffect, useContext } from "react";
+import { usePatientMedicalRecords } from "../../../../hooks/patients/usePatientMedicalRecords";
+import { getToken } from "../../../../services/authService";
+import useDebounce from "../../../../hooks/useDebounce";
+import { keepPreviousData } from "@tanstack/react-query";
 import Pagination2 from "../Pagination/Pagination2";
 import formatRecordDate from "./Components/formatRecordDate";
 import { formatFullDateTime } from "./Components/formatRecordDate";
 import { truncateWords } from "./Components/formatRecordDate";
 import toast from "react-hot-toast";
-import { AppContext } from "../../../../context/PatientContext/AppContext";
+import { usePatientProfile } from "../../../../hooks/patients/usePatientProfile";
 import { fetchSubscriptionStatus } from "../../../../services/authService";
 import SearchBar from "../../../../Components/SearchBar/SearchBar";
 
@@ -15,16 +18,31 @@ const MedicalRecords = ({
   setSelectedMedicalRecord,
 }) => {
 
-  const { isPending } = useContext(MedicalRecordsContext);
-  const { isFetching } = useContext(MedicalRecordsContext);
-  const { medicalRecords } = useContext(MedicalRecordsContext);
-  const { count } = useContext(MedicalRecordsContext);
-  const { currentPage } = useContext(MedicalRecordsContext);
-  const { setCurrentPage } = useContext(MedicalRecordsContext);
-  const { totalPages } = useContext(MedicalRecordsContext);
-  const { searchQuery, setSearchQuery } = useContext(MedicalRecordsContext);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const pageSize = 6;
+  const debouncedSearch = useDebounce(searchQuery, 300);
+  const isUserLoggedIn = !!getToken();
 
-  const { profile } = useContext(AppContext);
+  const { data, isPending, isFetching, isError, error } = usePatientMedicalRecords(
+    currentPage,
+    pageSize,
+    debouncedSearch,
+    {
+      enabled: isUserLoggedIn,
+      placeholderData: keepPreviousData,
+    }
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
+  const medicalRecords = data?.medical_records?.results || [];
+  const count = data?.medical_records?.count || 0;
+  const totalPages = Math.ceil(count / pageSize);
+
+  const { data: profile } = usePatientProfile();
 
   const sortedRecords = React.useMemo(() => {
     if (!medicalRecords) return [];

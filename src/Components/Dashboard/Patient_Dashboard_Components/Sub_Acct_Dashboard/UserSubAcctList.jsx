@@ -1,20 +1,25 @@
 import React, { useState, useEffect, useContext } from "react";
 import Pagination2 from "../Pagination/Pagination2";
 import toast from "react-hot-toast";
-import { SubAccountContext } from "../../../../context/PatientContext/SubAccountContext";
 import UserSubAcctRecords from "./Components/UserSubAcctRecords";
-import axiosInstance from "../../../../utils/axiosInstance";
+import axiosInstance from "../../../../lib/axios";
 import UserSubAcctMedicalRecords from "./Components/UserSubAcctMedicalRecords";
 import MedicalRecordsDetail from "../Home_Dashboard/MedicalRecordsDetail";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import SearchBar from "../../../../Components/SearchBar/SearchBar";
 
-const UserSubAcctList = ({ setDisplaySubAcctModal }) => {
-  const {
-    subAccounts, isPending, isFetching, count,
-    currentPage, setCurrentPage, totalPages,
-    searchQuery, setSearchQuery,
-  } = useContext(SubAccountContext);
+const UserSubAcctList = ({ 
+  setDisplaySubAcctModal,
+  subAccounts,
+  isPending,
+  isFetching,
+  count,
+  currentPage,
+  setCurrentPage,
+  totalPages,
+  searchQuery,
+  setSearchQuery,
+}) => {
 
 
 

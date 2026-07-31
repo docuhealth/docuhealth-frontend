@@ -1,4 +1,4 @@
-import axiosInstanceAdmin from "../../utils/axiosInstanceAdmin";
+import axiosInstanceAdmin from "../../lib/axios/admin";
 
 // Fetch all subscription plans (admin view)
 export const fetchAllAdminPlans = async () => {

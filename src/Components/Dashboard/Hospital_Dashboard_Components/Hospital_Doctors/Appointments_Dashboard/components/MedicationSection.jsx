@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { Plus, X } from "lucide-react";
 
 const dosageUnits = [

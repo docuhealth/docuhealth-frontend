@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Menu, ChevronDown, LogOut, User } from "lucide-react";
 import Patient_Sidebar_Mobile from "./Patient_Sidebar_Mobile";
-import { AppContext } from "../../../context/PatientContext/AppContext";
+import { usePatientProfile } from "../../../hooks/patients/usePatientProfile";
 
 const Patient_Dashboard_Header = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -11,7 +11,7 @@ const Patient_Dashboard_Header = () => {
     setIsPopoverOpen(!isPopoverOpen);
   };
 
-  const { profile } = useContext(AppContext);
+  const { data: profile } = usePatientProfile();
 
   const navigate = useNavigate()
 

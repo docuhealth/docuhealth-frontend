@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
-import { SubscriptionsContext } from "../../../../context/PatientContext/SubscriptionsContext";
-import { AppContext } from "../../../../context/PatientContext/AppContext.jsx";
-import axiosInstance from "../../../../utils/axiosInstance";
+import { useSubscriptionPlans } from "../../../../hooks/patients/useSubscriptionPlans";
+import { usePatientProfile } from "../../../../hooks/patients/usePatientProfile";
+import axiosInstance from "../../../../lib/axios";
 import toast from "react-hot-toast";
 
 // How each subscription status is labelled and coloured in the UI.
@@ -32,8 +32,9 @@ const getStatusMeta = (status) => {
 };
 
 const SubscriptionPlans = () => {
-  const { subscriptionPlans, isPending: subscriptionDataIsPending } = useContext(SubscriptionsContext);
-  const { profile, isPending: profileDataIsPending } = useContext(AppContext);
+  const { data: subscriptionPlansData, isPending: subscriptionDataIsPending } = useSubscriptionPlans();
+  const subscriptionPlans = subscriptionPlansData || [];
+  const { data: profile, isPending: profileDataIsPending } = usePatientProfile();
 
   // Add this state to your component
   const [paymentUrl, setPaymentUrl] = useState(null);

@@ -1,4 +1,4 @@
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 
 export const fetchLabAppointments = async ({ queryKey }) => {
   const [_key, timeframe, page, search, dateFrom, dateTo] = queryKey;

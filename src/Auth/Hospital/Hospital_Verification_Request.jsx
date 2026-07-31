@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { FaEnvelope } from "react-icons/fa";
 import { X, UploadCloud, FileText } from "lucide-react";
 import toast from "react-hot-toast";
-import axiosInstance from "../../utils/axiosInstance";
+import axiosInstance from "../../lib/axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Hospital_Verification_Request = () => {

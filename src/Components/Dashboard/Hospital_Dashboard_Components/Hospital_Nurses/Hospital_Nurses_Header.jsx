@@ -6,7 +6,7 @@ import { NursesAppContext } from "../../../../context/HospitalContext/Nurses/Nur
 
 import LogOutModal from "./LogOut/components/LogOutModal";
 import toast from "react-hot-toast";
-import axiosInstanceHos from "../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../lib/axios/hospital";
 
 const Hospital_Nurses_Header = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);

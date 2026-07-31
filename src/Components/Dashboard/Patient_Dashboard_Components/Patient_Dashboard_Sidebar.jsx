@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
-import { AppContext } from "../../../context/PatientContext/AppContext";
+import React, { useState, useEffect } from "react";
+import { usePatientProfile } from "../../../hooks/patients/usePatientProfile";
+import { useToggleEmergency } from "../../../hooks/patients/useToggleEmergency";
 import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -8,8 +9,8 @@ import { fetchSubscriptionStatus } from "../../../services/authService";
 import EmergencyModeNotice from "./Home_Dashboard/Components/EmergencyModeNotice/EmergencyModeNotice";
 
 const Patient_Dashboard_Sidebar = () => {
-  const { profile, toggleEmergencyStatus, newEmergencyStatus } =
-    useContext(AppContext);
+  const { data: profile } = usePatientProfile();
+  const { mutateAsync: toggleEmergencyStatus } = useToggleEmergency();
   const [emergencyStatus, setEmergencyStatus] = useState(false);
   const [emergencyStatusModal, setEmergencyStatusModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);

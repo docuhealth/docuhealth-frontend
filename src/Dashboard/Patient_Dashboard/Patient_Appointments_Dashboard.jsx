@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import DynamicDate from "../../Components/DynamicDate/DynamicDate";
-import { AppContext } from "../../context/PatientContext/AppContext";
+import { usePatientProfile } from "../../hooks/patients/usePatientProfile";
 import { ChevronDown } from "lucide-react";
 import PatientAppointmentsList from "../../Components/Dashboard/Patient_Dashboard_Components/Patient_Appointments_Dashboard/PatientAppointmentsList";
 
 const Patient_Appointments_Dashboard = () => {
-  const {profile} = useContext(AppContext);
+  const { data: profile } = usePatientProfile();
 
   const options = ["Latest", "Oldest", "A-Z", "Z-A"];
   const [isOpen, setIsOpen] = useState(false);

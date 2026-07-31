@@ -1,25 +1,35 @@
-import React, { useContext } from "react";
-import { DrugRecordsContext } from "../../../../context/PatientContext/DrugRecordsContext";
+import React, { useState, useEffect } from "react";
+import { usePatientDrugRecords } from "../../../../hooks/patients/usePatientDrugRecords";
+import { getToken } from "../../../../services/authService";
+import useDebounce from "../../../../hooks/useDebounce";
+import { keepPreviousData } from "@tanstack/react-query";
 import Pagination2 from "../Pagination/Pagination2";
 import SearchBar from "../../../../Components/SearchBar/SearchBar";
 
 const Drug_Records = () => {
-  const {
-    drugRecords,
-    isPending,
-    isFetching,
-    error,
-    isError,
-    count,
-    totalPages,
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const pageSize = 6;
+  const debouncedSearch = useDebounce(searchQuery, 300);
+  const isUserLoggedIn = !!getToken();
+
+  const { data, isPending, isFetching, isError, error } = usePatientDrugRecords(
     currentPage,
-    setCurrentPage,
-    searchQuery,
-    setSearchQuery,
-  } = useContext(DrugRecordsContext);
+    pageSize,
+    debouncedSearch,
+    {
+      enabled: isUserLoggedIn,
+      placeholderData: keepPreviousData,
+    }
+  );
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
 
-
+  const drugRecords = data?.results || [];
+  const count = data?.count || 0;
+  const totalPages = Math.ceil(count / pageSize);
 
 
   return (

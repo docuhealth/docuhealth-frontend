@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import Wards from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Ward_Mangement_Dashboard/Wards";
 import { HosAppContext } from "../../../context/HospitalContext/Admin/HosAppContext";
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

@@ -5,7 +5,7 @@ import { formatFullDateTime } from "../../../../Patient_Dashboard_Components/Hom
 import Pagination2 from "../../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import SearchBar from "../../../../../../Components/SearchBar/SearchBar";
 import toast from "react-hot-toast";
-import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import useDebounce from "../../../../../../hooks/useDebounce";
 

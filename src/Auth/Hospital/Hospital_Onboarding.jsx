@@ -5,7 +5,7 @@ import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 import dashb from "../../assets/img/dashb.png";
 import AuthRightSide from "../AuthRightSide";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
-import axiosInstance from "../../utils/axiosInstance";
+import axiosInstance from "../../lib/axios";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { authAPI } from "../../utils/authAPI";

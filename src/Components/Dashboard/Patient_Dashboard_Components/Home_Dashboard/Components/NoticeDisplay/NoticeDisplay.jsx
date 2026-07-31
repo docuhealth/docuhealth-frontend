@@ -2,7 +2,7 @@
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { AppContext } from "../../../../../../context/PatientContext/AppContext";
+import { usePatientProfile } from "../../../../../../hooks/patients/usePatientProfile";
 import { fetchSubscriptionStatus } from "../../../../../../services/authService";
 
 const NoticeDisplay = ({
@@ -11,7 +11,7 @@ const NoticeDisplay = ({
   handleSelection,
 }) => {
   const navigate = useNavigate();
-  const { profile } = useContext(AppContext);
+  const { data: profile } = usePatientProfile();
 
   const noticeMessage = [
     {

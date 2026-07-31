@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { X, Upload, CheckCircle, Loader2 } from "lucide-react";
-import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 
 const ImageCustomization = ({ onClose }) => {

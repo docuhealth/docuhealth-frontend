@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { IdCardContext } from "../../../../../context/PatientContext/IdCardContext";
+import { useIdCardStore } from "../../../../../store/useIdCardStore";
 import { fetchSubscriptionStatus } from "../../../../../services/authService";
 import toast from "react-hot-toast";
 import Id_Card from "../../Home_Dashboard/Components/IdCard/Id_Card";

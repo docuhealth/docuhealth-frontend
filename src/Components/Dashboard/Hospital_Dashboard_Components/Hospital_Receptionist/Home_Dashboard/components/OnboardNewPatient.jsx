@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import toast from "react-hot-toast";
-import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { Country, State, City } from "country-state-city";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 

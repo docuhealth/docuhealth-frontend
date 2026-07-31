@@ -3,7 +3,7 @@ import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { LabAppContext } from "../../../../../../context/HospitalContext/Lab/LabAppContext";
 
 const AccountSettingsTab = () => {

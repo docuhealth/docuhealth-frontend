@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from "react"
 import { useNavigate } from "react-router-dom";
-import { AppContext } from "../../context/PatientContext/AppContext";
-import { IdCardContext } from "../../context/PatientContext/IdCardContext";
+import { usePatientProfile } from "../../hooks/patients/usePatientProfile";
+import { useIdCardStore } from "../../store/useIdCardStore";
+import { useCreateIdCard } from "../../hooks/patients/useCreateIdCard";
 import toast from "react-hot-toast";
 import DynamicDate from "../../Components/DynamicDate/DynamicDate";
 import { ChevronDown } from "lucide-react";
@@ -11,7 +12,7 @@ import MedicalRecordsDetail from "../../Components/Dashboard/Patient_Dashboard_C
 import Id_Card from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/IdCard/Id_Card";
 import { fetchSubscriptionStatus } from "../../services/authService";
 import { useQuery } from "@tanstack/react-query";
-import { fetchPatientVitalSigns } from "../../queries/Patient/patientVitalSigns";
+import { fetchPatientVitalSigns } from "../../services/patientDashboardService";
 import RecentVitalSigns from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/RecentVitalSigns";
 import DrugRecordsOnHome from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/DrugRecordsOnHome";
 
@@ -30,7 +31,7 @@ const Patient_Home_Dashboard = () => {
 
   const [noticeDisplay, setNoticeDisplay] = useState(false);
 
-  const { profile } = useContext(AppContext);
+  const { data: profile } = usePatientProfile();
 
   const {
     onboardIDCard,

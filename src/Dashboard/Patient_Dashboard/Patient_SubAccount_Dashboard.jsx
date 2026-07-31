@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import DynamicDate from "../../Components/DynamicDate/DynamicDate";
 import UserSubAcctNoticeDisplay from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserSubAcctNoticeDisplay";
 import UserSubAcctOverlay from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserCreateSubAcctOverlay";
-import axiosInstance from "../../utils/axiosInstance";
+import axiosInstance from "../../lib/axios";
 import toast from "react-hot-toast";
 import UserSubAcctList from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserSubAcctList";
 import UserSubAcctUpgradeModal from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserSubAcctUpgradeModal";
@@ -11,7 +11,10 @@ import UserUpgradeSubAcctNotification from "../../Components/Dashboard/Patient_D
 import UserSubAcctListMobile from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserSubAcctListMobile";
 import { fetchSubscriptionStatus } from "../../services/authService";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { useSubaccounts } from "../../hooks/patients/useSubaccounts";
+import useDebounce from "../../hooks/useDebounce";
+import { getToken } from "../../services/authService";
 
 const Patient_SubAccount_Dashboard = () => {
     const navigate = useNavigate();
@@ -20,6 +23,30 @@ const Patient_SubAccount_Dashboard = () => {
   const [noticeDisplay, setNoticeDisplay] = useState(false);
   const [showCreateSubAcctOverlay, setShowCreateSubAcctOverlay] =
     useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const pageSize = 6;
+  const debouncedSearch = useDebounce(searchQuery, 300);
+  const isUserLoggedIn = !!getToken();
+
+  const { data: subAccountsData, isPending, isFetching, isError, error } = useSubaccounts(
+    currentPage,
+    pageSize,
+    debouncedSearch,
+    {
+      enabled: isUserLoggedIn,
+      placeholderData: keepPreviousData,
+    }
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
+  const subAccounts = subAccountsData?.results || [];
+  const count = subAccountsData?.count || 0;
+  const totalPages = Math.ceil(count / pageSize);
 
   const [formData, setFormData] = useState({
     firstname: "",
@@ -339,10 +366,30 @@ const Patient_SubAccount_Dashboard = () => {
         </div>
       </div>
       <div className="">
-        <UserSubAcctList setDisplaySubAcctModal={setDisplaySubAcctModal} />
+        <UserSubAcctList 
+          setDisplaySubAcctModal={setDisplaySubAcctModal} 
+          subAccounts={subAccounts}
+          isPending={isPending}
+          isFetching={isFetching}
+          count={count}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPages={totalPages}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
 
         <UserSubAcctListMobile
           setDisplaySubAcctModal={setDisplaySubAcctModal}
+          subAccounts={subAccounts}
+          isPending={isPending}
+          isFetching={isFetching}
+          count={count}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPages={totalPages}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
         />
       </div>
       <UserSubAcctNoticeDisplay

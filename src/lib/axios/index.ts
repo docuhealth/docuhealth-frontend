@@ -1,7 +1,6 @@
-// utils/axiosInstance.js
-import axios from "axios";
-import { getToken, setToken, refreshToken } from "../services/authService";
-import { normalizeEmailFields } from "./normalizationUtils";
+import axios, { InternalAxiosRequestConfig } from "axios";
+import { getToken, refreshToken } from "../../services/authService";
+import { normalizeEmailFields } from "../../utils/normalizationUtils";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -10,10 +9,8 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// Attach token on requests
 axiosInstance.interceptors.request.use(
-  (config) => {
-    // Normalize email fields in payload or params
+  (config: InternalAxiosRequestConfig) => {
     if (config.data) {
       config.data = normalizeEmailFields(config.data);
     }
@@ -27,13 +24,12 @@ axiosInstance.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error: any) => Promise.reject(error)
 );
 
-// Handle token expiration
 axiosInstance.interceptors.response.use(
-  (res) => res,
-  async (error) => {
+  (res: any) => res,
+  async (error: any) => {
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -42,7 +38,6 @@ axiosInstance.interceptors.response.use(
       try {
         const data = await refreshToken();
         if (data?.access_token) {
-          // console.log(data)
           originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
           return axiosInstance(originalRequest);
         }

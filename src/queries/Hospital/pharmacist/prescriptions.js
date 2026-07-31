@@ -1,4 +1,4 @@
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 
 export const fetchPrescriptionDetail = async (sqid) => {
   const { data } = await axiosInstanceHos.get(`api/pharmacy/orders/${sqid}`);

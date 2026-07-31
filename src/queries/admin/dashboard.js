@@ -1,5 +1,5 @@
 // queries/admin/dashboard.js
-import axiosInstanceAdmin from "../../utils/axiosInstanceAdmin";
+import axiosInstanceAdmin from "../../lib/axios/admin";
 
 export const fetchAdminDashboardData = async ({ queryKey }) => {
   const [_key, { start_date, end_date }] = queryKey;

@@ -1,6 +1,5 @@
-// utils/axiosInstanceAdmin.js
-import axios from "axios";
-import { getToken, refreshToken } from "../services/authService";
+import axios, { InternalAxiosRequestConfig } from "axios";
+import { getToken, refreshToken } from "../../services/authService";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -9,22 +8,20 @@ const axiosInstanceAdmin = axios.create({
   withCredentials: true,
 });
 
-// Attach token on requests
 axiosInstanceAdmin.interceptors.request.use(
-  (config) => {
+  (config: InternalAxiosRequestConfig) => {
     const token = getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error: any) => Promise.reject(error)
 );
 
-// Handle token expiration
 axiosInstanceAdmin.interceptors.response.use(
-  (res) => res,
-  async (error) => {
+  (res: any) => res,
+  async (error: any) => {
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {

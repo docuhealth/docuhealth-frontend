@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import axiosInstance from "../../utils/axiosInstance";
+import axiosInstance from "../../lib/axios";
 import toast from "react-hot-toast";
 import Pagination2 from "../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 import SearchBar from "../../Components/SearchBar/SearchBar";

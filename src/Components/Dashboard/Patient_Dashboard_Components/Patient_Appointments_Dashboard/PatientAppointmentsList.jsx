@@ -1,5 +1,8 @@
-import React, { useContext, useMemo } from "react";
-import { AppointmentsContext } from "../../../../context/PatientContext/AppointmentsContext";
+import React, { useState, useEffect, useMemo } from "react";
+import { usePatientAppointments } from "../../../../hooks/patients/usePatientAppointments";
+import { getToken } from "../../../../services/authService";
+import useDebounce from "../../../../hooks/useDebounce";
+import { keepPreviousData } from "@tanstack/react-query";
 import Pagination2 from "../Pagination/Pagination2";
 import { formatFullDate, formatTime } from "./Components/Date_Time_Formatter";
 import { CalendarIcon, UserIcon, Building2, MessageSquare } from "lucide-react";
@@ -7,21 +10,33 @@ import { toast } from "react-hot-toast";
 import SearchBar from "../../../../Components/SearchBar/SearchBar";
 
 const PatientAppointmentsList = ({selected}) => {
-  const {
-    appointments,
-    isPending,
-    isFetching,
-    count,
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const pageSize = 7;
+  const debouncedSearch = useDebounce(searchQuery, 300);
+  const isUserLoggedIn = !!getToken();
+
+  const { data, isFetching, isPending, isError, error } = usePatientAppointments(
     currentPage,
-    totalPages,
-    setCurrentPage,
-    searchQuery,
-    setSearchQuery,
+    pageSize,
+    debouncedSearch,
     dateFrom,
-    setDateFrom,
     dateTo,
-    setDateTo,
-  } = useContext(AppointmentsContext);
+    {
+      enabled: isUserLoggedIn,
+      placeholderData: keepPreviousData,
+    }
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch, dateFrom, dateTo]);
+
+  const appointments = data?.results || [];
+  const count = data?.count || 0;
+  const totalPages = Math.ceil(count / pageSize);
 
   // Keep client-side sort (by the `selected` prop from parent)
   const sortedAppointments = useMemo(() => {

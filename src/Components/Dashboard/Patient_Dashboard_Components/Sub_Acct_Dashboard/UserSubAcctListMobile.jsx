@@ -1,22 +1,24 @@
 import React, { useState, useEffect, useContext } from "react";
 import Pagination2 from "../Pagination/Pagination2";
 import toast from "react-hot-toast";
-import { SubAccountContext } from "../../../../context/PatientContext/SubAccountContext";
 import UserSubAcctRecordsMobile from "./Components/UserSubAcctRecordsMobile";
-import axiosInstance from "../../../../utils/axiosInstance";
+import axiosInstance from "../../../../lib/axios";
 import UserSubAcctMedicalRecords from "./Components/UserSubAcctMedicalRecords";
 import MedicalRecordsDetail from "../Home_Dashboard/MedicalRecordsDetail";
 import SearchBar from "../../../../Components/SearchBar/SearchBar";
 
-const UserSubAcctListMobile = ({ setDisplaySubAcctModal }) => {
-  const { subAccounts } = useContext(SubAccountContext);
-  const { isPending } = useContext(SubAccountContext);
-  const { isFetching } = useContext(SubAccountContext);
-  const { count } = useContext(SubAccountContext);
-  const { currentPage } = useContext(SubAccountContext);
-  const { setCurrentPage } = useContext(SubAccountContext);
-  const { totalPages } = useContext(SubAccountContext);
-  const { searchQuery, setSearchQuery } = useContext(SubAccountContext);
+const UserSubAcctListMobile = ({ 
+  setDisplaySubAcctModal,
+  subAccounts,
+  isPending,
+  isFetching,
+  count,
+  currentPage,
+  setCurrentPage,
+  totalPages,
+  searchQuery,
+  setSearchQuery,
+}) => {
 
   const [viewDetailMedicalRecord, setViewDetailMedicalRecord] = useState(false);
   const [selectedSubAcct, setSelectedSubAcct] = useState(null);

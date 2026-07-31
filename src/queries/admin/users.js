@@ -1,4 +1,4 @@
-import axiosInstanceAdmin from "../../utils/axiosInstanceAdmin";
+import axiosInstanceAdmin from "../../lib/axios/admin";
 
 // Fetch Users (Patients or Hospitals)
 export const fetchAdminUsers = async ({ queryKey }) => {

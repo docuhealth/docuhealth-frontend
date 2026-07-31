@@ -1,5 +1,5 @@
 //this is the profile.js file.
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 
 export const fetchDoctorProfile = async () => {
   const res = await axiosInstanceHos.get("api/doctors/dashboard");

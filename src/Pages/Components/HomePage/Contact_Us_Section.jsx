@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import BackgroundTemplate from "../ui/BackgroundTemplate";
 import toast from "react-hot-toast";
-import axiosInstance from "../../../utils/axiosInstance";
+import axiosInstance from "../../../lib/axios";
 import { motion } from "framer-motion";
 
 const Contact_Us_Section = () => {

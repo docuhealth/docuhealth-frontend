@@ -1,10 +1,10 @@
 import React, { useState, useContext, useRef } from "react";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
-import axiosInstance from "../../../../../utils/axiosInstance";
+import axiosInstance from "../../../../../lib/axios";
 import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { AppContext } from "../../../../../context/PatientContext/AppContext";
+import { usePatientProfile } from "../../../../../hooks/patients/usePatientProfile";
 import html2canvas from "html2canvas";
 import IDCardUI from "../../Home_Dashboard/Components/IdCard/IDCardUI";
 
@@ -640,7 +640,7 @@ const AccountSettingsTab = () => {
 };
 
 const IDCardTab = () => {
-  const { profile } = useContext(AppContext);
+  const { data: profile } = usePatientProfile();
   const cardRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
 

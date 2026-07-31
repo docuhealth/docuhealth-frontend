@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
-import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import TabComponent2 from "./TabComponent2";

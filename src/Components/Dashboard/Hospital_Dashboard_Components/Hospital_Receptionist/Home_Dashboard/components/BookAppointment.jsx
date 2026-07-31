@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import CustomTimePicker from "./CustomTimePicker";
 
 const Doctor_Icon = () => (

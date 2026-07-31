@@ -1,4 +1,4 @@
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 
 // status: "pending" | "sample_collected" | "in_progress" | "result_ready" | "rejected"
 export const fetchLabRequests = async ({ queryKey }) => {

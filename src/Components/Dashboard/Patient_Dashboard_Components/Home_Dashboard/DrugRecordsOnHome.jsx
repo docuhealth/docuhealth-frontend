@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchPatientDrugRecords } from "../../../../queries/Patient/patientDrugRecords";
+import { fetchPatientDrugRecords } from "../../../../services/patientDashboardService";
 import Pagination2 from "../Pagination/Pagination2";
 
 const DrugRecordsOnHome = () => {
@@ -9,7 +9,7 @@ const DrugRecordsOnHome = () => {
 
   const { data, isPending, isFetching, isError, error } = useQuery({
     queryKey: ["drugRecords", currentPage, pageSize],
-    queryFn: fetchPatientDrugRecords,
+    queryFn: () => fetchPatientDrugRecords(currentPage, pageSize),
   });
 
   const drugRecords = data?.results || [];

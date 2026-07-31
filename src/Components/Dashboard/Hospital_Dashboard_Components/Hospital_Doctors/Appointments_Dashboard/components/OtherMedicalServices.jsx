@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { fetchTestCategories, fetchLabTests } from "../../../../../../queries/Hospital/lab/requests";
 

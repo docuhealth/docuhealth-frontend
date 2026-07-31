@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
-import { AppContext } from "../../context/PatientContext/AppContext";
+import { usePatientProfile } from "../../hooks/patients/usePatientProfile";
 import DynamicDate from "../../Components/DynamicDate/DynamicDate";
 import Settings from "../../Components/Dashboard/Patient_Dashboard_Components/Settings_Dashboard/Settings";
 
 const Patient_Settings_Dashboard = () => {
-  const {profile} = useContext(AppContext);
+  const { data: profile } = usePatientProfile();
 
   return (
     <>
