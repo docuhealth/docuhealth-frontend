@@ -1,8 +1,9 @@
-import type { PatientInfo, StaffInfo, HospitalInfo, VitalSignsInfo, InvestigationDoc } from "./shared";
+import type { PatientInfo, StaffInfo, HospitalInfo, VitalSignsInfo, InvestigationDoc, PaginatedResponse } from "./shared";
 import type { AppointmentDetail } from "./appointments";
 import type { DrugRecordDetail } from "./drugs";
 
 export interface MedicalRecord {
+  id?: string | number;
   created_at?: string;
   subaccount?: string;
   patient_info?: PatientInfo;
@@ -19,4 +20,9 @@ export interface MedicalRecord {
   care_instructions?: string[];
   treatment_plan?: string[];
   appointment?: AppointmentDetail;
+}
+
+export interface MedicalRecordsDashboardResponse {
+  medical_records: PaginatedResponse<MedicalRecord>;
+  patient_info?: PatientInfo;
 }

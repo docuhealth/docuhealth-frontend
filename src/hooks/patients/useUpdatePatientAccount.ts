@@ -1,14 +1,14 @@
 import { queryKeys } from "../../lib/queryKeys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { upgradeSubaccount } from "../../services/patientDashboardService";
+import { updatePatientAccount } from "../../services/patientDashboardService";
 
-export function useUpgradeSubaccount(options: any = {}) {
+export function useUpdatePatientAccount(options: any = {}) {
     const queryClient = useQueryClient();
     const { onSuccess, ...restOptions } = options;
     return useMutation({
-        mutationFn: upgradeSubaccount,
+        mutationFn: updatePatientAccount,
         onSuccess: (data: any, variables: any, context: any) => {
-            queryClient.invalidateQueries({ queryKey: queryKeys.subAccountsList });
+            queryClient.invalidateQueries({ queryKey: queryKeys.profile });
             onSuccess?.(data, variables, context);
         },
         ...restOptions,
