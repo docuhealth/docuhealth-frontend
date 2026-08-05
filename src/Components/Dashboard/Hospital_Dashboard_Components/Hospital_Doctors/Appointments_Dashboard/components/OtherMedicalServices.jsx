@@ -238,7 +238,7 @@ const OtherMedicalServices = ({
       const requestPayload = {
         patient: payload.patient_hin,
         order_source: "staff_admission_order",
-        items_data: payload.test_type.map(testSqid => ({
+        items: payload.test_type.map(testSqid => ({
           test: testSqid,
           note: payload.note,
         }))

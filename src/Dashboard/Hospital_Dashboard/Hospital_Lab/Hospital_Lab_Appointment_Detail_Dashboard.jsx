@@ -44,12 +44,27 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
   const { state } = useLocation();
   const { categories } = useContext(LabRequestsContext);
 
-  const raw = state?.appt;
+  const raw = state?.order || state?.appt;
   const order = raw
     ? {
         ...raw,
-        datetime: raw.scheduledAt || raw.datetime || "—",
-        status: raw.status === "upcoming" ? "pending" : (raw.status || "pending"),
+        name: raw.patient_info ? `${raw.patient_info.firstname || ""} ${raw.patient_info.lastname || ""}`.trim() : raw.name,
+        hin: raw.patient_info?.hin || raw.hin,
+        dob: raw.patient_info?.dob || raw.dob,
+        gender: raw.patient_info?.gender || raw.gender,
+        hospital: raw.hospital_info?.name || raw.hospital,
+        email: raw.hospital_info?.email || raw.email,
+        requestedBy: raw.ordered_by ? `${raw.ordered_by.firstname || ""} ${raw.ordered_by.lastname || ""}`.trim() : raw.requestedBy,
+        test: raw.items_info?.[0]?.test_info?.name || raw.items?.[0]?.test_info?.name || raw.test_info?.name || raw.test || "—",
+        datetime: raw.created_at || raw.scheduledAt || raw.datetime || "—",
+        status: raw.aggregate_status || (raw.status === "upcoming" ? "pending" : (raw.status || "pending")),
+        test_info: raw.items_info?.[0]?.test_info || raw.items?.[0]?.test_info || raw.test_info,
+        result_info: raw.items_info?.[0]?.result_info || raw.items?.[0]?.result_info || raw.result_info,
+        note: raw.note,
+        specimen_collected_at: (raw.items_info?.[0]?.specimen_collected_at || raw.items?.[0]?.specimen_collected_at || raw.specimen_collected_at)
+          ? new Date(raw.items_info?.[0]?.specimen_collected_at || raw.items?.[0]?.specimen_collected_at || raw.specimen_collected_at).toLocaleString("en-US", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+          : undefined,
+        rejection_reason: raw.items_info?.[0]?.rejection_reason || raw.items?.[0]?.rejection_reason || raw.rejection_reason,
       }
     : {
         name:     "Amara Osei",

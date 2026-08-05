@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   formatFullDateTime,
   getAge,
 } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { FileText, Eye, ArrowDownToLine, Image, ArrowLeft } from "lucide-react";
-import { renderListOrString, renderLabTests } from "../../../../../utils/soapNoteHelpers";
+import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../../utils/soapNoteHelpers";
 
 const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail }) => {
 
@@ -178,53 +178,7 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
         </div>
       </div>
 
-      {/* Drug Records */}
-      <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
-        <p className="font-medium mb-4 text-docuhealth-dark">Medication / Drug Records</p>
-        
-        <div className="overflow-x-auto">
-          {sharedSoapNoteDetail?.drug_records?.length > 0 ? (
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="text-[12px] text-gray-400 border-b">
-                  <th className="pb-2 font-normal">Drug Name</th>
-                  <th className="pb-2 font-normal">Route</th>
-                  <th className="pb-2 font-normal">Qty</th>
-                  <th className="pb-2 font-normal">Frequency</th>
-                  <th className="pb-2 font-normal">Duration</th>
-                  <th className="pb-2 font-normal">Allergies</th>
-                </tr>
-              </thead>
-              <tbody className="text-[12px]">
-                {sharedSoapNoteDetail.drug_records.map((drug, index) => (
-                  <tr key={index} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
-                    <td className="py-3 font-medium text-docuhealth-primary">
-                      {drug.name}
-                    </td>
-                    <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
-                    <td className="py-3 text-gray-600">{drug.quantity}</td>
-                    <td className="py-3 text-gray-600">
-                      {typeof drug.frequency === 'object'
-                        ? `${drug.frequency.value || ''} ( ${drug.frequency.rate || ''} )`
-                        : drug.frequency || "N/A"}
-                    </td>
-                    <td className="py-3 text-gray-600">
-                      {typeof drug.duration === 'object'
-                        ? `${drug.duration.value || ''} ( ${drug.duration.rate || ''} )`
-                        : drug.duration || "N/A"}
-                    </td>
-                    <td className="py-3 text-red-500 italic">
-                      {drug.allergies?.length > 0 ? drug.allergies.join(", ") : "None"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className="text-[12px] text-gray-500 italic">No medication records available.</p>
-          )}
-        </div>
-      </div>
+      {renderDrugRecords(sharedSoapNoteDetail?.drug_orders_info || sharedSoapNoteDetail?.drug_records)}
 
       {/* Care Instructions & Treatment Plan */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

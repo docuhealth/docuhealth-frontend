@@ -46,17 +46,17 @@ export const logSpecimenCollectionTime = async ({ order_sqid, item_sqid, specime
 };
 
 export const submitTestResult = async ({ order_sqid, item_sqid, payload }) => {
-  const res = await axiosInstanceHos.post(`api/lab/test-orders/${order_sqid}/items/${item_sqid}/results/submit`, { item: payload });
+  const res = await axiosInstanceHos.post(`api/lab/test-orders/${order_sqid}/items/${item_sqid}/result/submit`, payload);
   return res.data;
 };
 
-export const approveLabTestResult = async ({ order_sqid, item_sqid }) => {
-  const res = await axiosInstanceHos.patch(`api/lab/test-orders/${order_sqid}/items/${item_sqid}/results/approve`);
+export const approveLabTestResult = async ({ item_sqid }) => {
+  const res = await axiosInstanceHos.patch(`api/lab/test-orders/items/${item_sqid}/result/approve`);
   return res.data;
 };
 
-export const rejectLabTestResult = async ({ order_sqid, item_sqid }) => {
-  const res = await axiosInstanceHos.patch(`api/lab/test-orders/${order_sqid}/items/${item_sqid}/results/reject`);
+export const rejectLabTestResult = async ({ item_sqid }) => {
+  const res = await axiosInstanceHos.patch(`api/lab/test-orders/items/${item_sqid}/result/reject`);
   return res.data;
 };
 

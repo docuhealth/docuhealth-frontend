@@ -27,8 +27,8 @@ const LabProfileProvider = (props) => {
           total_requests_trend: data.summary.total_items_change ?? data.summary.total_orders_change,
           pending_tests:        data.summary.pending_items ?? data.summary.pending_orders,
           pending_tests_trend:  data.summary.pending_items_change ?? data.summary.pending_orders_change,
-          completed_tests:      data.summary.completed_items ?? data.summary.completed_orders,
-          completed_tests_trend: data.summary.completed_items_change ?? data.summary.completed_orders_change,
+          completed_tests:      data.summary.result_ready ?? data.summary.completed_items ?? data.summary.completed_orders,
+          completed_tests_trend: data.summary.result_ready_change ?? data.summary.completed_items_change ?? data.summary.completed_orders_change,
         } : null,
         recentPatients:  [],
       }}

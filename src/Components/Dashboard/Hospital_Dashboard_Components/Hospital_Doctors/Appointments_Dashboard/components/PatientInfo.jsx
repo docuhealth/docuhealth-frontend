@@ -12,6 +12,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { fetchTestCategories, fetchLabTests } from "../../../../../../queries/Hospital/lab/requests";
 import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
 import toast from "react-hot-toast";
+import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../../../utils/soapNoteHelpers";
 
 const DUMMY_PATIENT_INFO = {
   patient_info: {
@@ -97,7 +98,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
       const requestPayload = {
         patient: selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin,
         order_source: "staff_appointment_order",
-        items_data: payload.test_type.map((testSqid) => ({
+        items: payload.test_type.map((testSqid) => ({
           test: testSqid,
           note: payload.note,
         })),
@@ -483,37 +484,26 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                 </ul>
               </div>
               <div className="text-[12px] ">
-                <p>Medication:</p>
-                <ul className="list-disc list-outside pl-5 font-medium">
-                  {(selectedMedicalRecord?.drug_records || []).map((drug, index) => (
-                    <li key={index}>
-                      {" "}
-                      <span className="font-normal">Name of drug :</span>{" "}
-                      {drug.name} /{" "}
-                      <span className="font-normal">Dosage :</span>{" "}
-                      {drug.quantity}mg /{" "}
-                      <span className="font-normal">Route :</span> {drug.route}{" "}
-                      / <span className="font-normal">Frequency :</span>{" "}
-                      {(drug?.frequency?.value || 'NIL')} {(drug?.frequency?.rate || 'NIL')} /{" "}
-                      <span className="font-normal">Duration :</span>{" "}
-                      {(drug?.duration?.value || 'NIL')} {(drug?.duration?.rate || 'NIL')}
-                    </li>
-                  ))}
-                </ul>
+                {renderDrugRecords(selectedMedicalRecord?.drug_orders_info || selectedMedicalRecord?.drug_records)}
+              </div>
+              <div className="text-[12px] pb-1 mt-6">
+                {renderLabTests(selectedMedicalRecord?.lab_tests_info || selectedMedicalRecord?.lab_tests)}
               </div>
             </div>
             <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl">
               <p className="font-medium mb-4">Uploaded Documents / Images</p>
               <div>
-                {selectedMedicalRecord?.attachments?.length > 0 ? (
-                  selectedMedicalRecord.attachments.map((attachment, index) => {
-                    // Extract file details
-                    const fileName = attachment.filename || "Unnamed file";
-                    const fileUrl = attachment.url;
+                {(selectedMedicalRecord?.investigation_docs || selectedMedicalRecord?.attachments)?.length > 0 ? (
+                  (selectedMedicalRecord?.investigation_docs || selectedMedicalRecord?.attachments).map((attachment, index) => {
+                    const fileName =
+                      attachment.filename || `Document_${index + 1}`;
+                    const fileUrl = attachment.file || attachment.url; // Supporting both common keys
                     const fileSizeMB = attachment.size
                       ? (attachment.size / (1024 * 1024)).toFixed(1) + " MB"
-                      : "Unknown size";
-                    const fileDate = formatFullDateTime(attachment.uploaded_at);
+                      : "0.5 MB"; // Fallback placeholder if size is missing
+                    const fileDate = formatFullDateTime(
+                      selectedMedicalRecord?.created_at,
+                    );
 
                     // Determine file type
                     const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(
@@ -525,7 +515,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     return (
                       <div
                         key={index}
-                        className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 sm:items-center bg-white border rounded-lg px-4 py-3 mb-3 shadow-xs"
+                        className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 sm:items-center bg-white border rounded-lg px-4 py-3 mb-3 "
                       >
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-[12px]">
                           <div className="p-2 bg-docuhealth-primary/10 rounded-md">
@@ -535,41 +525,36 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                             <p className="font-medium text-gray-800">
                               {fileName}
                             </p>
-                            <p className=" text-gray-500">
-                              {fileDate} • {fileSizeMB}
+                            <p className="text-gray-500">
+                              {fileDate}{fileDate && fileSizeMB ? " • " : ""}{fileSizeMB}
                             </p>
                           </div>
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-3 text-[12px] w-full sm:w-auto">
-                          <div className="flex items-center justify-center gap-1 border border-blue-600 text-docuhealth-primary  rounded-full  font-medium hover:bg-blue-50 transition  text-center py-1 px-3 w-full sm:w-28">
+                          <a
+                            href={fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-1 border border-docuhealth-primary text-docuhealth-primary rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28"
+                          >
                             <Eye className="w-3 h-3" />
-                            <a
-                              href={fileUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className=""
-                            >
-                              View
-                            </a>
-                          </div>
-                          <div className=" flex items-center justify-center gap-1 border border-blue-600 bg-docuhealth-primary text-white  rounded-full font-medium hover:bg-blue-700 transition  text-center py-1 px-3 w-full sm:w-28">
+                            View
+                          </a>
+                          <a
+                            href={fileUrl}
+                            download
+                            className="flex items-center justify-center gap-1 bg-docuhealth-primary text-white rounded-full font-medium hover:bg-docuhealth-dark-primary transition py-1 px-3 w-full sm:w-28"
+                          >
                             <ArrowDownToLine className="w-3 h-3" />
-                            <a
-                              href={fileUrl}
-                              target="_blank"
-                              download
-                              className=""
-                            >
-                              Download
-                            </a>
-                          </div>
+                            Download
+                          </a>
                         </div>
                       </div>
                     );
                   })
                 ) : (
-                  <p className="text-[12px] text-gray-500 ">NIL</p>
+                  <p className="text-[12px] text-gray-500">NIL</p>
                 )}
               </div>
             </div>
