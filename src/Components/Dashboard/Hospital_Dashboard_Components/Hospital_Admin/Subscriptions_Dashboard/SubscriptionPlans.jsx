@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { HosSubscriptionsContext } from "../../../../../context/HospitalContext/Admin/HosSubscriptionsContext";
 import { HosAppContext } from "../../../../../context/HospitalContext/Admin/HosAppContext";
-import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 
 // How each subscription status is labelled and coloured in the UI.

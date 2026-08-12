@@ -1,4 +1,4 @@
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 
 export const fetchRecentPatients = async ({ queryKey }) => {
   const [_key, page, search] = queryKey;

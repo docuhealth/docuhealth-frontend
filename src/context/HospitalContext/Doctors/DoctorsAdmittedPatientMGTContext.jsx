@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import useDebounce from "../../../hooks/useDebounce";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 import { getHospitalToken } from "../../../services/authService";
 
 export const DoctorsAdmittedPatientMGTContext = createContext();

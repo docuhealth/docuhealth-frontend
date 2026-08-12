@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 import { getHospitalToken } from "../../../services/authService";
 import useDebounce from "../../../hooks/useDebounce";
 

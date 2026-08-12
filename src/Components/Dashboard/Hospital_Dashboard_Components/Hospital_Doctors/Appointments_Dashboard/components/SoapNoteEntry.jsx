@@ -3,7 +3,7 @@ import { ArrowLeft, X, Plus, UploadCloud, FileText, AlertTriangle } from "lucide
 import { truncateWords } from "../../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import toast from "react-hot-toast";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
-import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 

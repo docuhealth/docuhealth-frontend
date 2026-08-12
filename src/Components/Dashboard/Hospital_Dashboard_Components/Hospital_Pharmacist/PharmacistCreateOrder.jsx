@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ArrowLeft, X, Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import MedicationSection from "../Hospital_Doctors/Appointments_Dashboard/components/MedicationSection";
-import axiosInstanceHos from "../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../lib/axios/hospital";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const NoteSection = ({

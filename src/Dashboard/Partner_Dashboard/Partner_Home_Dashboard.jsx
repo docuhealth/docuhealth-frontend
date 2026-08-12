@@ -9,7 +9,7 @@ import {
   FaLock,
 } from "react-icons/fa";
 import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
-import axiosInstance from "../../utils/axiosInstance";
+import axiosInstance from "../../lib/axios";
 import { useQuery, useMutation, keepPreviousData } from "@tanstack/react-query";
 import { getToken } from "../../services/authService";
 import toast from "react-hot-toast";

@@ -1,6 +1,6 @@
 // appointment.js
 
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 
 export const fetchAppointments = async ({ queryKey }) => {
   const [_key, page, type, search, dateFrom, dateTo] = queryKey;

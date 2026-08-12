@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { fetchTestCategories, fetchLabTests, createLabTestOrder } from "../../../../queries/Hospital/lab/requests";
-import axiosInstanceHos from "../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../lib/axios/hospital";
 
 const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
   const [showSuccess, setShowSuccess] = useState(false);

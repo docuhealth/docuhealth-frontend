@@ -1,5 +1,5 @@
 // utils/authAPI.js.....
-import axiosInstance from "./axiosInstance";
+import axiosInstance from "../lib/axios";
 import toast from "react-hot-toast";
 
 export async function authAPI(method, endpoint, payload = {}, config = {}) {
