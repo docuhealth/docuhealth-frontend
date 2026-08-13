@@ -15,6 +15,7 @@ const User_Create_Account_Verify_OTP = () => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("patient");
   const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
 
   const navigate = useNavigate();
@@ -53,9 +54,35 @@ const User_Create_Account_Verify_OTP = () => {
      
     }finally{
       setIsLoading(false);
-      
+
       setEmail('')
       setOtp('')
+    }
+  };
+
+  const handleResend = async () => {
+    if (!email) {
+      toast.error("Please enter your email address first");
+      return;
+    }
+
+    setIsResending(true);
+    try {
+      const payload = {
+        email: email,
+        verify_url: "https://docuhealthservices.net/user-create-account-verify-otp",
+      };
+
+      const response = await authAPI("POST", "api/auth/resend-otp", payload);
+
+      toast.success(response.message || "OTP sent successfully!");
+    } catch (error: any) {
+      console.error("Error resending OTP:", error);
+      toast.error(
+        error?.error || error?.email?.[0] || error?.detail || error?.message || "Failed to resend OTP, Try Again"
+      );
+    } finally {
+      setIsResending(false);
     }
   };
   return (
@@ -106,6 +133,19 @@ const User_Create_Account_Verify_OTP = () => {
                       />
                       <FaKey className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     </div>
+                  </div>
+
+                  {/* Resend OTP Link */}
+                  <div>
+                    <p className="text-center text-sm text-gray-600 pb-5">
+                      OTP expired or you did not receive it?{" "}
+                      <span
+                        onClick={!isResending ? handleResend : undefined}
+                        className={`text-docuhealth-primary hover:underline ${isResending ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+                      >
+                        {isResending ? "Resending..." : "Click to resend"}
+                      </span>
+                    </p>
                   </div>
 
                   {/* Submit Button */}
@@ -173,6 +213,19 @@ const User_Create_Account_Verify_OTP = () => {
                   />
                   <FaKey className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 </div>
+              </div>
+
+              {/* Resend OTP Link */}
+              <div>
+                <p className="text-center text-sm text-gray-600 pb-5">
+                  OTP expired or you did not receive it?{" "}
+                  <span
+                    onClick={!isResending ? handleResend : undefined}
+                    className={`text-docuhealth-primary hover:underline ${isResending ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+                  >
+                    {isResending ? "Resending..." : "Click to resend"}
+                  </span>
+                </p>
               </div>
 
               {/* Submit Button */}
