@@ -141,7 +141,7 @@ const User_Create_Account_Verify_OTP = () => {
                       OTP expired or you did not receive it?{" "}
                       <span
                         onClick={!isResending ? handleResend : undefined}
-                        className={`text-docuhealth-primary hover:underline ${isResending ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+                        className={`text-docuhealth-primary font-extrabold hover:underline ${isResending ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
                       >
                         {isResending ? "Resending..." : "Click to resend"}
                       </span>

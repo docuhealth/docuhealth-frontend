@@ -307,11 +307,11 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                   and Password you provided after verifying their email within
                   10 mins
                 </p>
-                <p className="pt-2">
+                <p className="pt-2 ">
                   OTP expired or the patient did not receive it?{" "}
                   <span
                     onClick={!isResendingOtp ? handleResendOtp : undefined}
-                    className={`text-docuhealth-primary hover:underline ${isResendingOtp ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+                    className={`text-docuhealth-primary font-extrabold hover:underline ${isResendingOtp ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
                   >
                     {isResendingOtp ? "Resending..." : "Click to resend OTP"}
                   </span>
