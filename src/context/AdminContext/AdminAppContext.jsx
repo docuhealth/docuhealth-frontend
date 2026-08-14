@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getToken, getRole } from "../../services/authService";
-import axiosInstanceAdmin from "../../utils/axiosInstanceAdmin";
+import axiosInstanceAdmin from "../../lib/axios/admin";
 
 export const AdminAppContext = createContext();
 

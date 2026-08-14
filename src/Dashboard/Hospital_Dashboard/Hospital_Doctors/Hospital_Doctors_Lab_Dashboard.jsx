@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 import Hospital_Lab_Test_Detail_Dashboard from "../Hospital_Lab/Hospital_Lab_Test_Detail_Dashboard";
 import useDebounce from "../../../hooks/useDebounce";

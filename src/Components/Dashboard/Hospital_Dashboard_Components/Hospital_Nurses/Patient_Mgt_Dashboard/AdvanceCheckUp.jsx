@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 

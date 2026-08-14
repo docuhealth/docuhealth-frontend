@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HosAppContext } from "../../../../../../context/HospitalContext/Admin/HosAppContext";
 import { HosWardContext } from "../../../../../../context/HospitalContext/HosWardContext";
 
-import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 
 // Backend error responses show up in a few different shapes:

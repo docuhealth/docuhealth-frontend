@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import toast from "react-hot-toast";
-import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { Country, State, City } from "country-state-city";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -10,6 +10,11 @@ const registerPatient = async (payload) => {
     "api/receptionists/patient/register",
     payload,
   );
+  return res.data;
+};
+
+const resendOtp = async (payload) => {
+  const res = await axiosInstanceHos.post("api/auth/resend-otp", payload);
   return res.data;
 };
 
@@ -41,6 +46,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
     house_no: "",
   });
   const [patientHIN, setPatientHIN] = useState("");
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   const handlePatientDataChange = (e) => {
     const { name, value } = e.target;
@@ -177,9 +183,10 @@ const OnboardNewPatient = ({ setNewPatient }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: registerPatient,
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       toast.success("Patient Registration Successful");
       setPatientHIN(data.profile.hin);
+      setRegisteredEmail(variables.email);
       setStep(1);
       setOnboardingSuccessful(true);
 
@@ -210,6 +217,30 @@ const OnboardNewPatient = ({ setNewPatient }) => {
       toast.error(errorMsg);
     },
   });
+
+  const { mutate: sendResendOtp, isPending: isResendingOtp } = useMutation({
+    mutationFn: resendOtp,
+    onSuccess: () => {
+      toast.success("OTP resent successfully!");
+    },
+    onError: (err) => {
+      const errorMsg =
+        err.response?.data?.error ||
+        err.response?.data?.email?.[0] ||
+        err.response?.data?.message ||
+        "Failed to resend OTP.";
+      toast.error(errorMsg);
+    },
+  });
+
+  const handleResendOtp = () => {
+    if (!registeredEmail) return;
+    sendResendOtp({
+      email: registeredEmail,
+      verify_url:
+        "https://docuhealthservices.net/user-create-account-verify-otp",
+    });
+  };
 
   const handleOnboarding = () => {
     if (!isValid) return toast.error("Please fill all fields");
@@ -275,6 +306,15 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                   they can proceed to log into their dashboard using the Email
                   and Password you provided after verifying their email within
                   10 mins
+                </p>
+                <p className="pt-2 ">
+                  OTP expired or the patient did not receive it?{" "}
+                  <span
+                    onClick={!isResendingOtp ? handleResendOtp : undefined}
+                    className={`text-docuhealth-primary font-extrabold hover:underline ${isResendingOtp ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+                  >
+                    {isResendingOtp ? "Resending..." : "Click to resend OTP"}
+                  </span>
                 </p>
               </div>
               <div className="border p-3 rounded-lg mb-5 text-xs text-gray-600 w-full">

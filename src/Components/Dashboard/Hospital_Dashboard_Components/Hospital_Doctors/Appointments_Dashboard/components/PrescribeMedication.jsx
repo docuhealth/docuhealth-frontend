@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { ArrowLeft, X, Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import MedicationSection from "./MedicationSection";
-import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 

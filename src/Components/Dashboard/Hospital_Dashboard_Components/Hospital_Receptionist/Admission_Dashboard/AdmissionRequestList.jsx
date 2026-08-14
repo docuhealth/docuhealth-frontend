@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ReceptionistAdmissionRequestContext } from "../../../../../context/HospitalContext/Receptionist/ReceptionistAdmissionRequestContext";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
-import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import SearchBar from "../../../../SearchBar/SearchBar";
 import toast from "react-hot-toast";
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import axiosInstanceHos from '../../../../../utils/axiosInstanceHos';
+import axiosInstanceHos from '../../../../../lib/axios/hospital';
 import toast from 'react-hot-toast'; // or your preferred toast library
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 

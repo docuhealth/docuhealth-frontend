@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import { HosWardContext } from "../../../../../../context/HospitalContext/HosWardContext";
-import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { toast } from "react-hot-toast";
 import { useMutation } from "@tanstack/react-query";
 

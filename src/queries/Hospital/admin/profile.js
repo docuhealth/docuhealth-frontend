@@ -1,5 +1,5 @@
 // queries/Hospital/admin/profile.js
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 
 export const fetchHospitalProfile = async () => {
   const res = await axiosInstanceHos.get("api/hospitals/info");

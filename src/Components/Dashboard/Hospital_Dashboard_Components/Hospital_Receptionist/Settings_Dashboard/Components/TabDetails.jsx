@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
-import axiosInstanceHos from "../../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { FaTimes } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

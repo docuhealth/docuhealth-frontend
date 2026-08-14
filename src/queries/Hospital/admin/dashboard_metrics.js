@@ -1,5 +1,5 @@
 // queries/Hospital/admin/dashboard_metrics.js
-import axiosInstanceHos from "../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 
 export const fetchHospitalDashboardMetrics = async ({ queryKey }) => {
   const [_key, { start_date, end_date } = {}] = queryKey;

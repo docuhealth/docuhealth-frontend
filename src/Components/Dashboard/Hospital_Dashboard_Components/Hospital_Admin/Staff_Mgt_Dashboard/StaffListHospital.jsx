@@ -1,6 +1,6 @@
 import React, { useState, useContext, useMemo } from "react";
 import { HosStaffsContext } from "../../../../../context/HospitalContext/HosStaffsContext";
-import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import SearchBar from "../../../../SearchBar/SearchBar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import axiosInstanceHos from "../../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { CalendarIcon, ClockIcon, UserIcon, FileText, ArrowLeft, MoreVertical } from "lucide-react";

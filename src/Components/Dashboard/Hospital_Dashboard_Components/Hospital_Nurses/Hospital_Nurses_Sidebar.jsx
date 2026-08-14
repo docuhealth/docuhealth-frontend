@@ -3,7 +3,7 @@ import docuhealth_logo from "../../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import LogOutModal from "./LogOut/components/LogOutModal";
 import { NursesAppContext } from "../../../../context/HospitalContext/Nurses/NursesAppContext";
-import axiosInstanceHos from "../../../../utils/axiosInstanceHos";
+import axiosInstanceHos from "../../../../lib/axios/hospital";
 import toast from 'react-hot-toast';
 
 const Hospital_Nurses_Sidebar = () => {
