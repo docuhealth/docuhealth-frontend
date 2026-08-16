@@ -1,5 +1,5 @@
 import React from "react";
-import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
+import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 import { Link, useLocation } from "react-router-dom";
 
 const DashboardMobileSidebar = ({
