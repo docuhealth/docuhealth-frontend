@@ -3,6 +3,9 @@ import { ArrowLeft } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HosAppContext } from "../../../../../../context/HospitalContext/Admin/HosAppContext";
 import { HosWardContext } from "../../../../../../context/HospitalContext/HosWardContext";
+import Modal from "../../../../../ui/Modal";
+import Button from "../../../../../ui/Button";
+import Input from "../../../../../ui/Input";
 
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
@@ -300,8 +303,8 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-3">
-      <div className="bg-white rounded-md shadow-lg p-6 max-w-xl w-full relative">
+    <Modal isOpen={true} onClose={() => setCreateNewStaff(false)} title="Add a new team member">
+      <div className="p-2">
         <div className="mb-5">
           <p className="text-sm">Step {step} of 2</p>
           {/* Progress Bar */}
@@ -314,41 +317,32 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
         </div>
         {step === 1 && (
           <div className="mx-1 sm:mx-5">
-            <div className="flex items-center justify-between mb-3 ">
-              <h2 className=" text-sm font-medium">Add a new team member</h2>
-              <i
-                onClick={() => {
-                  setCreateNewStaff(false);
-                }}
-                className="bx bx-x text-xl cursor-pointer bg-gray-100 rounded-full"
-              ></i>
-            </div>
             <div className="grid grid-cols-2 gap-4">
-              <input
+              <Input
                 placeholder="First name"
                 value={form.firstname}
                 onChange={(e) => handleChange("firstname", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm focus:border-docuhealth-primary"
+                className="text-sm"
               />
-              <input
+              <Input
                 placeholder="Last name"
                 value={form.lastname}
                 onChange={(e) => handleChange("lastname", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm focus:border-docuhealth-primary"
+                className="text-sm"
               />
 
-              <input
+              <Input
                 placeholder="Phone number"
                 type="number"
                 value={form.phone}
                 onChange={(e) => handleChange("phone", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm focus:border-docuhealth-primary"
+                className="text-sm"
               />
 
               <select
                 value={form.gender}
                 onChange={(e) => handleChange("gender", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm  focus:border-docuhealth-primary"
+                className="border p-2 rounded-lg outline-none text-sm focus:border-docuhealth-primary"
               >
                 <option value="">Gender</option>
                 {gender.map((p) => (
@@ -378,7 +372,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                 value={form.specialization}
                 onChange={(e) => handleChange("specialization", e.target.value)}
                 className={`border p-2 rounded-lg outline-none text-sm col-span-2 ${
-                  form.personnel === "receptionist" ? "bg-gray-100" : ""
+                  form.personnel === "receptionist" ? "bg-gray-100" : "focus:border-docuhealth-primary"
                 }`}
               >
                 <option value="">Area of specialization</option>
@@ -407,37 +401,19 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
               </select>
             </div>
 
-            <button
-              onClick={() => handleNextStep()}
-              className="mt-5 bg-docuhealth-primary text-white px-4 py-2 rounded-full text-sm w-full cursor-pointer"
-            >
-              Proceed
-            </button>
+            <div className="mt-5">
+              <Button onClick={() => handleNextStep()} fullWidth>
+                Proceed
+              </Button>
+            </div>
           </div>
         )}
 
         {step === 2 && (
           <div className="mx-1 sm:mx-5">
-            <div className="flex items-center justify-between mb-3 ">
-              <div className="flex items-center gap-3">
-                <div
-                  onClick={() => {
-                    setStep(step - 1);
-                  }}
-                  className="cursor-pointer"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                </div>
-
-                <h2 className=" text-sm font-medium">Add a new team member</h2>
-              </div>
-
-              <i
-                onClick={() => {
-                  setCreateNewStaff(false);
-                }}
-                class="bx bx-x text-xl cursor-pointer bg-gray-100 rounded-full"
-              ></i>
+            <div className="flex items-center gap-2 mb-3 cursor-pointer text-docuhealth-primary font-medium" onClick={() => setStep(step - 1)}>
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-sm">Back</span>
             </div>
 
             <label className="font-medium text-sm">Invitation message</label>
@@ -447,40 +423,36 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
               readOnly
             />
 
-            <input
+            <Input
               placeholder="Enter email address"
               value={form.email}
               onChange={(e) => handleChange("email", e.target.value)}
-              className="border p-2 text-sm rounded-lg w-full mt-4 outline-none focus:border-docuhealth-primary"
+              className="text-sm mt-4"
             />
 
             <div className="mt-4">
               <label className="font-medium text-sm">Generated password</label>
-              <input
+              <Input
                 value={form.password}
                 readOnly
-                className="border p-2 rounded-lg focus:border-docuhealth-primary w-full mt-2 text-sm outline-none"
+                className="mt-2 text-sm"
               />
             </div>
 
-            <button
-              className={`mt-5 ${createStaffMutation.isPending ? "bg-gray-400 cursor-not-allowed" : "bg-docuhealth-primary cursor-pointer"}  text-white px-4 py-2 rounded-full w-full text-sm `}
-              disabled={createStaffMutation.isPending}
-              onClick={handleSubmit}
-            >
-              {createStaffMutation.isPending ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Adding to team...
-                </div>
-              ) : (
-                "Add to team"
-              )}
-            </button>
+            <div className="mt-5">
+              <Button
+                loading={createStaffMutation.isPending}
+                loadingText="Adding to team..."
+                onClick={handleSubmit}
+                fullWidth
+              >
+                Add to team
+              </Button>
+            </div>
           </div>
         )}
       </div>
-    </div>
+    </Modal>
   );
 };
 

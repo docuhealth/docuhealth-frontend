@@ -3,6 +3,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import CustomTimePicker from "./CustomTimePicker";
+import Modal from "../../../../../ui/Modal";
+import Button from "../../../../../ui/Button";
 
 const Doctor_Icon = () => (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -185,36 +187,29 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
 
 
     return (
-        <>
-            <div className="fixed inset-0 bg-black/50  backdrop-blur-sm flex items-center justify-center z-50 px-2">
-                {staffList.length > 0 ? (
-                    isStaffSelected ? (
-                        <>
-                            <div className="bg-white rounded-lg shadow-lg px-4 py-6 max-w-md w-full relative text-sm">
-                                <div className="flex justify-end">
-                                    <button
-                                        onClick={() => setBookAppointment(false)}
-                                        className="text-gray-500 hover:text-black"
-                                    >
-                                        <i className="bx bx-x text-2xl cursor-pointer"></i>
-                                    </button>
-                                </div>
-                                {/* Title */}
-                                <h2 className="text-center font-semibold text-lg text-gray-800">Appointment Request</h2>
-                                <p className="text-center text-gray-500 mb-4 text-sm">
-                                    What’s the reason for the request?
-                                </p>
-                                <div className="mb-2 text-[12px]">
-                                    <p className="mb-1 text-gray-700 font-medium">Add note :</p>
-                                    <textarea
-                                        className="border rounded-lg w-full  h-[100px] p-3 text-[12px] outline-none focus:border-docuhealth-primary"
-                                        value={formData.note}
-                                        onChange={(e) =>
-                                            setFormData({ ...formData, note: e.target.value })
-                                        }
-                                        placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
-                                    ></textarea>
-                                </div>
+        <Modal 
+            isOpen={true} 
+            onClose={() => setBookAppointment(false)} 
+            title={staffList.length > 0 && !isStaffSelected ? `Choose a preferred ${selected}` : "Appointment Request"}
+            maxWidth={staffList.length > 0 && !isStaffSelected ? "3xl" : "md"}
+        >
+            {staffList.length > 0 ? (
+                isStaffSelected ? (
+                    <div className="text-sm">
+                        <p className="text-center text-gray-500 mb-4 text-sm">
+                            What’s the reason for the request?
+                        </p>
+                        <div className="mb-2 text-[12px]">
+                            <p className="mb-1 text-gray-700 font-medium">Add note :</p>
+                            <textarea
+                                className="border rounded-lg w-full  h-[100px] p-3 text-[12px] outline-none focus:border-docuhealth-primary"
+                                value={formData.note}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, note: e.target.value })
+                                }
+                                placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
+                            ></textarea>
+                        </div>
 
                                 <div className="mb-2 relative ">
                                     <p className="block text-[12px] font-medium text-gray-700 mb-1">
@@ -405,61 +400,21 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                                     </div>
                                 </div>
 
-
-                                <button
-                                    disabled={ !formData.type || mutation.isPending || !selectedDay || !selectedMonth || !selectedTime || !selectedYear || !formData.note}
-                                    className={`mt-6 w-full cursor-pointer bg-docuhealth-primary text-white py-2 rounded-full disabled:bg-docuhealth-primary/60 ${mutation.isPending ? 'bg-docuhealth-primary/60 cursor-not-allowed' : ''}} text-sm `}
-                                    onClick={handleRequest}
-                                >
-                                    {mutation.isPending ? (
-                                        <span className="flex items-center justify-center gap-2">
-                                            <svg
-                                                className="animate-spin h-4 w-4 text-white"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <circle
-                                                    className="opacity-25"
-                                                    cx="12"
-                                                    cy="12"
-                                                    r="10"
-                                                    stroke="currentColor"
-                                                    strokeWidth="4"
-                                                ></circle>
-                                                <path
-                                                    className="opacity-75"
-                                                    fill="currentColor"
-                                                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                                ></path>
-                                            </svg>
-                                            Processing Request
-                                        </span>
-                                    ) : (
-                                        "Proceed"
-                                    )}{" "}
-
-                                </button>
-
-
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="bg-white rounded-lg shadow-lg p-6 max-w-5xl w-full relative text-sm max-h-3/5 overflow-scroll">
-                                <div className="flex justify-between items-center border-b pb-4">
-                                    <h2 className="font-medium">Choose a preferred {selected}</h2>
-                                    {/* Close Button */}
-                                    <div className="">
-                                        <button
-                                            onClick={() => setBookAppointment(false)}
-                                            className="text-gray-500 hover:text-black"
-                                        >
-                                            <i className="bx bx-x text-2xl cursor-pointer"></i>
-                                        </button>
-                                    </div>
+                                <div className="mt-6">
+                                    <Button
+                                        fullWidth
+                                        disabled={!formData.type || mutation.isPending || !selectedDay || !selectedMonth || !selectedTime || !selectedYear || !formData.note}
+                                        loading={mutation.isPending}
+                                        loadingText="Processing Request"
+                                        onClick={handleRequest}
+                                    >
+                                        Proceed
+                                    </Button>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-3 my-5 text-sm gap-3">
+                    </div>
+                ) : (
+                    <div className="text-sm max-h-[60vh] overflow-y-auto">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 my-5 text-sm gap-3">
                                     {staffList.map((staff, index) => (
                                         <div key={index} className="border rounded-md p-3">
                                             <div>
@@ -491,110 +446,69 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
-                        </>
-                    )
-                ) : (
-                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
+                    </div>
+                )
+            ) : (
+                <div className="text-sm">
+                    <p className="text-center text-gray-500 mb-4 text-sm">
+                        Kindly select the type of medical personnel
+                    </p>
 
-                        {/* Close Button */}
-                        <div className="flex justify-end">
+                    {/* Grid */}
+                    <div className="grid grid-cols-2 gap-3">
+                        {personnelTypes.map((item) => (
                             <button
-                                onClick={() => setBookAppointment(false)}
-                                className="text-gray-500 hover:text-black"
-                            >
-                                <i className="bx bx-x text-2xl cursor-pointer"></i>
-                            </button>
-                        </div>
-
-                        {/* Title */}
-                        <h2 className="text-center font-semibold text-lg text-gray-800">Appointment Request</h2>
-                        <p className="text-center text-gray-500 mb-4 text-sm">
-                            Kindly select the type of medical personnel
-                        </p>
-
-                        {/* Grid */}
-                        <div className="grid grid-cols-2 gap-3">
-                            {personnelTypes.map((item) => (
-                                <button
-                                    key={item.id}
-                                    disabled={item.disabled}
-                                    onClick={() => setSelected(item.title)}
-                                    className={`border rounded-lg p-3 flex flex-col gap-2 text-left transition ${item.disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'cursor-pointer'} 
+                                key={item.id}
+                                disabled={item.disabled}
+                                onClick={() => setSelected(item.title)}
+                                className={`border rounded-lg p-3 flex flex-col gap-2 text-left transition ${item.disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'cursor-pointer'} 
 ${selected === item.title ? "border-docuhealth-primary bg-blue-50" : "border-gray-200"}`}
-                                >
-                                    <div className="flex justify-between items-center gap-2">
-                                        <div className="bg-blue-50 p-2 rounded-full">
-                                            {item.icon}
-                                        </div>
-
-
-                                        {/* Hidden radio input */}
-                                        <input
-                                            type="radio"
-                                            name="personnelType"
-                                            value={item.id}
-                                            checked={selected === item.title}
-                                            onChange={() => setSelected(item.id)}
-                                            className="hidden"
-                                        />
-
-                                        {/* Custom radio dot */}
-                                        <span
-                                            className={`w-4 h-4 rounded-full border-2 border-docuhealth-primary flex items-center justify-center`}
-                                        >
-                                            {selected === item.title && (
-                                                <span className="w-2 h-2 rounded-full bg-docuhealth-primary"></span>
-                                            )}
-                                        </span>
+                            >
+                                <div className="flex justify-between items-center gap-2">
+                                    <div className="bg-blue-50 p-2 rounded-full">
+                                        {item.icon}
                                     </div>
-                                    <p className="font-medium">{item.title}</p>
-                                    <p className="text-gray-500 text-xs">{item.subtitle}</p>
-                                </button>
-                            ))}
-                        </div>
 
-                        {/* Proceed Button */}
-                        <button
+
+                                    {/* Hidden radio input */}
+                                    <input
+                                        type="radio"
+                                        name="personnelType"
+                                        value={item.id}
+                                        checked={selected === item.title}
+                                        onChange={() => setSelected(item.id)}
+                                        className="hidden"
+                                    />
+
+                                    {/* Custom radio dot */}
+                                    <span
+                                        className={`w-4 h-4 rounded-full border-2 border-docuhealth-primary flex items-center justify-center`}
+                                    >
+                                        {selected === item.title && (
+                                            <span className="w-2 h-2 rounded-full bg-docuhealth-primary"></span>
+                                        )}
+                                    </span>
+                                </div>
+                                <p className="font-medium">{item.title}</p>
+                                <p className="text-gray-500 text-xs">{item.subtitle}</p>
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="mt-6">
+                        <Button
+                            fullWidth
                             disabled={!selected || loading}
-                            className={`mt-6 w-full cursor-pointer bg-docuhealth-primary text-white py-2 rounded-full disabled:bg-docuhealth-primary/60 ${loading ? 'bg-docuhealth-primary/60 cursor-not-allowed' : ''}} text-sm `}
+                            loading={loading}
+                            loadingText="Fetching Medical Personnel..."
                             onClick={handleSubmit}
                         >
-                            {loading ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <svg
-                                        className="animate-spin h-4 w-4 text-white"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <circle
-                                            className="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            strokeWidth="4"
-                                        ></circle>
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                        ></path>
-                                    </svg>
-                                    Fetching Medical Personnel...
-                                </span>
-                            ) : (
-                                "Proceed"
-                            )}{" "}
-
-                        </button>
+                            Proceed
+                        </Button>
                     </div>
-                )}
-
-            </div >
-
-        </>
+                </div>
+            )}
+        </Modal>
     );
 };
 

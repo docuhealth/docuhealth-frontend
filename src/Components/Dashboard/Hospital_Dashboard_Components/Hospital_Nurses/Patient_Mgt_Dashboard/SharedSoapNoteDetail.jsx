@@ -6,6 +6,8 @@ import {
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { FileText, Eye, ArrowDownToLine, Image, ArrowLeft } from "lucide-react";
 import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../../utils/soapNoteHelpers";
+import PatientInfoCard from "../../../../ui/PatientInfoCard";
+import VitalSignsCard from "../../../../ui/VitalSignsCard";
 
 const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail }) => {
 
@@ -27,135 +29,17 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
         </div>
       </div>
       
-      {/* Basic Info */}
-      <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
-        <p className="text-[12px] mb-4">
-          {" "}
-          Patient's name :{" "}
-          <span className="font-medium text-sm">
-            {" "}
-            {sharedSoapNoteDetail?.patient_info?.firstname}{" "}
-            {sharedSoapNoteDetail?.patient_info?.lastname}
-          </span>
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-          <div className="">
-            <p className="text-[12px]">
-              {" "}
-              Patient's HIN :{" "}
-              <span className="font-medium ">
-                {" "}
-                {sharedSoapNoteDetail?.patient_info?.hin ||
-                  sharedSoapNoteDetail?.subaccount}
-              </span>
-            </p>
-            <p className="text-[12px]">
-              {" "}
-              Patient's Age :{" "}
-              <span className="font-medium ">
-                {" "}
-                {getAge(sharedSoapNoteDetail?.patient_info?.dob) || "NIL"}
-              </span>
-            </p>
-            <p className="text-[12px]">
-              {" "}
-              Patient's Gender :{" "}
-              <span className="font-medium capitalize">
-                {" "}
-                {sharedSoapNoteDetail?.patient_info?.gender || "NIL"}
-              </span>
-            </p>
-          </div>
-          <div className="">
-            <p className="text-[12px]">
-              {" "}
-              Appointed Doctor :{" "}
-              <span className="font-medium ">
-                {" "}
-                {sharedSoapNoteDetail?.staff_info?.firstname}{" "}
-                {sharedSoapNoteDetail?.staff_info?.lastname}
-              </span>
-            </p>
-            <p className="text-[12px]">
-              {" "}
-              Specialisation :{" "}
-              <span className="font-medium">
-                {" "}
-                {sharedSoapNoteDetail?.staff_info?.specialization || "NIL"}
-              </span>
-            </p>
-          </div>
-          <div className="">
-            <p className="text-[12px]">
-              {" "}
-              Hospital :{" "}
-              <span className="font-medium ">
-                {" "}
-                {sharedSoapNoteDetail?.hospital_info?.name || "NIL"}
-              </span>
-            </p>
-            <p className="text-[12px]">
-              {" "}
-              Hospital's Email :{" "}
-              <span className="font-medium ">
-                {" "}
-                {sharedSoapNoteDetail?.hospital_info?.email || "NIL"}
-              </span>
-            </p>
-          </div>
-          <div className="">
-            <p className="text-[12px]">
-              {" "}
-              Status :{" "}
-              <span className="font-medium ">
-                {" "}
-                {sharedSoapNoteDetail?.created_at ? formatRecordDate(sharedSoapNoteDetail.created_at) : "NIL"}
-              </span>
-            </p>
-            <p className="text-[12px]">
-              {" "}
-              Date / Time Uploaded :{" "}
-              <span className="font-medium ">
-                {" "}
-                {sharedSoapNoteDetail?.created_at ? formatFullDateTime(sharedSoapNoteDetail.created_at) : "NIL"}
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
+      <PatientInfoCard
+        className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg"
+        selectedMedicalRecord={sharedSoapNoteDetail}
+      />
 
       {/* Vital Signs */}
       {vitals && (
-        <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
-          <p className="font-medium mb-4 text-docuhealth-dark">Vital Signs</p>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <div className="text-[12px]">
-              <h4 className="text-gray-400 font-normal mb-1">Blood Pressure:</h4>
-              <p className="font-medium">{vitals.blood_pressure || "NIL"}</p>
-            </div>
-            <div className="text-[12px]">
-              <h4 className="text-gray-400 font-normal mb-1">Temperature:</h4>
-              <p className="font-medium">{vitals.temp ? `${vitals.temp} °C` : "NIL"}</p>
-            </div>
-            <div className="text-[12px]">
-              <h4 className="text-gray-400 font-normal mb-1">Heart Rate:</h4>
-              <p className="font-medium">{vitals.heart_rate ? `${vitals.heart_rate} bpm` : "NIL"}</p>
-            </div>
-            <div className="text-[12px]">
-              <h4 className="text-gray-400 font-normal mb-1">Resp. Rate:</h4>
-              <p className="font-medium">{vitals.resp_rate ? `${vitals.resp_rate} bpm` : "NIL"}</p>
-            </div>
-            <div className="text-[12px]">
-              <h4 className="text-gray-400 font-normal mb-1">Weight:</h4>
-              <p className="font-medium">{vitals.weight ? `${vitals.weight} kg` : "NIL"}</p>
-            </div>
-            <div className="text-[12px]">
-              <h4 className="text-gray-400 font-normal mb-1">Height:</h4>
-              <p className="font-medium">{vitals.height ? `${vitals.height} cm` : "NIL"}</p>
-            </div>
-          </div>
-        </div>
+        <VitalSignsCard
+          className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg"
+          vitalSigns={vitals}
+        />
       )}
 
       {/* Clinical Summary */}

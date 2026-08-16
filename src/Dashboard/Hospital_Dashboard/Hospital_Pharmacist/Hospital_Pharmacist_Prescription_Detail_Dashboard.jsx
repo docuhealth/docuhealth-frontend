@@ -4,6 +4,7 @@ import { ArrowLeft, MoreHorizontal, Activity, Thermometer, Heart, Wind, Scaling,
 import { fetchPrescriptionDetail, updateDrugDispenseStatus } from "../../../queries/Hospital/pharmacist/prescriptions";
 import { PharmacistPrescriptionsContext } from "../../../context/HospitalContext/Pharmacist/PharmacistPrescriptionsContext";
 import toast from "react-hot-toast";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../Components/ui/Table";
 
 const calcAge = (dob) => {
   if (!dob) return null;
@@ -191,102 +192,103 @@ const Hospital_Pharmacist_Prescription_Detail_Dashboard = ({ sqid, onBack, isSet
                </div>
              )}
           </div>
-          
           <div className="w-full">
-            <table className="hidden sm:table w-full text-left text-sm whitespace-nowrap">
-              <thead>
-                <tr className="bg-gray-50/50 text-gray-600 font-semibold">
-                  {!isSettled && (
-                    <th className="px-4 py-3 rounded-tl-full rounded-bl-full w-10">
-                      <input 
-                        type="checkbox" 
-                        checked={allSelected}
-                        onChange={handleSelectAll}
-                        className="rounded-sm border-gray-300 w-3.5 h-3.5 text-docuhealth-primary cursor-pointer" 
-                      />
-                    </th>
-                  )}
-                  <th className={`px-4 py-3 ${isSettled ? "rounded-tl-full rounded-bl-full" : ""}`}>Drug(s)</th>
-                  <th className="px-4 py-3">Dosage</th>
-                  <th className="px-4 py-3">Route</th>
-                  <th className="px-4 py-3">Frequency</th>
-                  <th className="px-4 py-3">Duration</th>
-                  <th className="px-4 py-3">Status</th>
-                  {!isSettled && <th className="px-4 py-3 rounded-tr-full rounded-br-full w-10"></th>}
-                  {isSettled && <th className="px-4 py-3 rounded-tr-full rounded-br-full w-1"></th>}
-                </tr>
-              </thead>
-              <tbody>
-                {order.drugs?.map((item, idx) => {
-                  const drug = item.drug_record || {};
-                  const isPending = item.status === "pending";
-                  const statusClass = isPending ? "text-amber-500" : item.status === "unavailable" ? "text-red-500" : "text-green-500";
-                  const isSelected = selectedItems.includes(item.sqid);
-                  
-                  return (
-                    <tr key={item.sqid || idx} className="border-b border-gray-50 last:border-0 text-gray-600">
-                      {!isSettled && (
-                        <td className="px-4 py-4">
-                          {isPending && (
-                            <input 
-                              type="checkbox" 
-                              checked={isSelected}
-                              onChange={(e) => handleSelectOne(item.sqid, e.target.checked)}
-                              className="rounded-sm border-gray-300 w-3.5 h-3.5 text-docuhealth-primary cursor-pointer" 
-                            />
-                          )}
-                        </td>
-                      )}
-                      <td className="px-4 py-4">{drug.name}</td>
-                      <td className="px-4 py-4">{drug.quantity} {drug.unit}</td>
-                      <td className="px-4 py-4">{drug.route}</td>
-                      <td className="px-4 py-4">{drug.frequency}</td>
-                      <td className="px-4 py-4">{drug.duration?.value} {drug.duration?.rate}</td>
-                      <td className={`px-4 py-4 text-[13px] font-semibold capitalize ${statusClass}`}>{item.status}</td>
-                      {!isSettled && (
-                        <td className="px-4 py-4 relative">
-                          {isPending && (
-                            <>
-                              <button 
-                                onClick={() => setOpenMenuId(openMenuId === item.sqid ? null : item.sqid)} 
-                                className="text-gray-400 hover:text-gray-600 flex items-center justify-center cursor-pointer"
-                              >
-                                <MoreHorizontal size={18} />
-                              </button>
-                              
-                              {openMenuId === item.sqid && (
-                                <div className="absolute right-0 top-10 mt-2 bg-white border shadow-sm rounded-sm p-2 w-52 z-30" onClick={(e) => e.stopPropagation()}>
-                                   <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 pt-1">Option card</p>
-                                  <p 
-                                    onClick={() => {
-                                      handleUpdateStatus([item.sqid], "dispensed");
-                                      setOpenMenuId(null);
-                                    }}
-                                    className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer transition-colors"
-                                  >
-                                    Drug has been dispensed
-                                  </p>
-                                  <p 
-                                    onClick={() => {
-                                      handleUpdateStatus([item.sqid], "unavailable");
-                                      setOpenMenuId(null);
-                                    }}
-                                    className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer transition-colors"
-                                  >
-                                    Drug is unavailable
-                                  </p>
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </td>
-                      )}
-                      {isSettled && <td className="px-4 py-4"></td>}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="hidden sm:block">
+              <Table className="w-full text-left text-sm whitespace-nowrap">
+                <TableHeader>
+                  <TableRow className="bg-gray-50/50 text-gray-600 font-semibold">
+                    {!isSettled && (
+                      <TableHead className="px-4 py-3 rounded-tl-full rounded-bl-full w-10">
+                        <input 
+                          type="checkbox" 
+                          checked={allSelected}
+                          onChange={handleSelectAll}
+                          className="rounded-sm border-gray-300 w-3.5 h-3.5 text-docuhealth-primary cursor-pointer" 
+                        />
+                      </TableHead>
+                    )}
+                    <TableHead className={`px-4 py-3 ${isSettled ? "rounded-tl-full rounded-bl-full" : ""}`}>Drug(s)</TableHead>
+                    <TableHead className="px-4 py-3">Dosage</TableHead>
+                    <TableHead className="px-4 py-3">Route</TableHead>
+                    <TableHead className="px-4 py-3">Frequency</TableHead>
+                    <TableHead className="px-4 py-3">Duration</TableHead>
+                    <TableHead className="px-4 py-3">Status</TableHead>
+                    {!isSettled && <TableHead className="px-4 py-3 rounded-tr-full rounded-br-full w-10"></TableHead>}
+                    {isSettled && <TableHead className="px-4 py-3 rounded-tr-full rounded-br-full w-1"></TableHead>}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {order.drugs?.map((item, idx) => {
+                    const drug = item.drug_record || {};
+                    const isPending = item.status === "pending";
+                    const statusClass = isPending ? "text-amber-500" : item.status === "unavailable" ? "text-red-500" : "text-green-500";
+                    const isSelected = selectedItems.includes(item.sqid);
+                    
+                    return (
+                      <TableRow key={item.sqid || idx} className="text-gray-600">
+                        {!isSettled && (
+                          <TableCell className="px-4 py-4">
+                            {isPending && (
+                              <input 
+                                type="checkbox" 
+                                checked={isSelected}
+                                onChange={(e) => handleSelectOne(item.sqid, e.target.checked)}
+                                className="rounded-sm border-gray-300 w-3.5 h-3.5 text-docuhealth-primary cursor-pointer" 
+                              />
+                            )}
+                          </TableCell>
+                        )}
+                        <TableCell className="px-4 py-4">{drug.name}</TableCell>
+                        <TableCell className="px-4 py-4">{drug.quantity} {drug.unit}</TableCell>
+                        <TableCell className="px-4 py-4">{drug.route}</TableCell>
+                        <TableCell className="px-4 py-4">{drug.frequency}</TableCell>
+                        <TableCell className="px-4 py-4">{drug.duration?.value} {drug.duration?.rate}</TableCell>
+                        <TableCell className={`px-4 py-4 text-[13px] font-semibold capitalize ${statusClass}`}>{item.status}</TableCell>
+                        {!isSettled && (
+                          <TableCell className="px-4 py-4 relative">
+                            {isPending && (
+                              <>
+                                <button 
+                                  onClick={() => setOpenMenuId(openMenuId === item.sqid ? null : item.sqid)} 
+                                  className="text-gray-400 hover:text-gray-600 flex items-center justify-center cursor-pointer"
+                                >
+                                  <MoreHorizontal size={18} />
+                                </button>
+                                
+                                {openMenuId === item.sqid && (
+                                  <div className="absolute right-0 top-10 mt-2 bg-white border shadow-sm rounded-sm p-2 w-52 z-30" onClick={(e) => e.stopPropagation()}>
+                                     <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 pt-1">Option card</p>
+                                    <p 
+                                      onClick={() => {
+                                        handleUpdateStatus([item.sqid], "dispensed");
+                                        setOpenMenuId(null);
+                                      }}
+                                      className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer transition-colors"
+                                    >
+                                      Drug has been dispensed
+                                    </p>
+                                    <p 
+                                      onClick={() => {
+                                        handleUpdateStatus([item.sqid], "unavailable");
+                                        setOpenMenuId(null);
+                                      }}
+                                      className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer transition-colors"
+                                    >
+                                      Drug is unavailable
+                                    </p>
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </TableCell>
+                        )}
+                        {isSettled && <TableCell className="px-4 py-4"></TableCell>}
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
 
             {/* Mobile View */}
             <div className="block sm:hidden space-y-4">

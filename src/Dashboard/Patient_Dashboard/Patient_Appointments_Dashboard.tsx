@@ -3,6 +3,7 @@ import DynamicDate from "../../Components/DynamicDate/DynamicDate";
 import { usePatientProfile } from "../../hooks/patients/usePatientProfile";
 import { ChevronDown } from "lucide-react";
 import PatientAppointmentsList from "../../Components/Dashboard/Patient_Dashboard_Components/Patient_Appointments_Dashboard/PatientAppointmentsList";
+import Button from "../../Components/ui/Button";
 
 const Patient_Appointments_Dashboard = () => {
   const { data: profile } = usePatientProfile();
@@ -27,9 +28,11 @@ const Patient_Appointments_Dashboard = () => {
             HIN : <span># {profile ? profile.hin : "loading.."}</span>
           </p>
           <div className="relative w-full sm:w-auto">
-            <button
+            <Button
+              variant="outline"
+              fullWidth
               onClick={() => setIsOpen(!isOpen)}
-              className="flex justify-center  items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary font-medium rounded-full hover:bg-blue-50 transition w-full "
+              className="flex justify-center items-center gap-2 hover:bg-blue-50"
             >
               Sort by: {selected}
               <ChevronDown
@@ -37,7 +40,7 @@ const Patient_Appointments_Dashboard = () => {
                   isOpen ? "rotate-180" : ""
                 }`}
               />
-            </button>
+            </Button>
             {isOpen && (
               <div className="absolute right-0 mt-2 w-full sm:w-40 bg-white border border-gray-200 rounded-xs shadow-lg z-10">
                 {options.map((option) => (

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { fetchSubscriptionStatus } from "../../../../services/authService";
 import Button from "../../../ui/Button";
+import Input from "../../../ui/Input";
+import Modal from "../../../ui/Modal";
 
 interface SubAcctFormData {
   firstname: string;
@@ -34,74 +36,47 @@ const UserSubAcctOverlay = ({
 
   return (
     <div className="">
-      {showCreateSubAcctOverlay && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-3 ">
-          <div className="bg-white rounded-xs shadow-lg p-6 max-w-lg w-full relative max-h-[80vh] overflow-y-auto hide-scrollbar">
-            <div className="flex justify-between items-center pb-8">
-              <div className="flex-1 text-center">
-                <h2 className="text-lg font-semibold">Create Sub Account</h2>
-              </div>
-              <button
-                onClick={toggleAcctCreationOverlay}
-                className="text-gray-500 cursor-pointer"
-              >
-                <i className="bx bx-x text-2xl"></i>
-              </button>
-            </div>
-
-            {/* Form */}
-            <form
-              className=" sm:grid sm:grid-cols-2 sm:gap-3 text-sm"
-              onSubmit={handleSubAcctCreation}
-            >
+      <Modal isOpen={showCreateSubAcctOverlay} onClose={toggleAcctCreationOverlay} title="Create Sub Account">
+        <form
+          className=" sm:grid sm:grid-cols-2 sm:gap-3 text-sm"
+          onSubmit={handleSubAcctCreation}
+        >
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Child's First Name
-                </label>
-                <input
+                <Input
+                  label="Child's First Name"
                   type="text"
                   name="firstname"
                   value={formData.firstname}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary h-10"
                   required
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Child's Last Name
-                </label>
-                <input
+                <Input
+                  label="Child's Last Name"
                   type="text"
                   name="lastname"
                   value={formData.lastname}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary h-10"
                   required
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Child's Middle Name
-                </label>
-                <input
+                <Input
+                  label="Child's Middle Name"
                   type="text"
                   name="middlename"
                   value={formData.middlename}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary h-10"
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Child's Date of Birth
-                </label>
-                <input
+                <Input
+                  label="Child's Date of Birth"
                   type="date"
                   name="dob"
                   value={formData.dob}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary h-10"
                   required
                 />
               </div>
@@ -179,9 +154,7 @@ const UserSubAcctOverlay = ({
                 </Button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 };

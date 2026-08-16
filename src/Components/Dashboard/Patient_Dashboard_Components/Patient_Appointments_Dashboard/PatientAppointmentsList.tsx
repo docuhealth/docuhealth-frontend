@@ -9,6 +9,7 @@ import { CalendarIcon, UserIcon, Building2, MessageSquare } from "lucide-react";
 import { toast } from "react-hot-toast";
 import SearchBar from "../../../../Components/SearchBar/SearchBar";
 import EmptyState from "../../../../Components/ui/EmptyState";
+import Button from "../../../../Components/ui/Button";
 
 interface PatientAppointmentsListProps {
   selected: string;
@@ -104,12 +105,13 @@ const PatientAppointmentsList = ({selected}: PatientAppointmentsListProps) => {
             />
           </div>
           {(dateFrom || dateTo) && (
-            <button
+            <Button
+              variant="ghost"
               onClick={() => { setDateFrom(""); setDateTo(""); }}
-              className="text-xs text-red-400 hover:text-red-600 transition-colors"
+              className="text-xs text-red-400 hover:text-red-600 transition-colors px-2 py-1"
             >
               Clear dates
-            </button>
+            </Button>
           )}
         </div>
         {isFetching && (
@@ -135,12 +137,13 @@ const PatientAppointmentsList = ({selected}: PatientAppointmentsListProps) => {
               <InfoGroup icon={<Building2 size={16}/>} label="Hospital" value={apt?.hospital_info?.name} />
               <InfoGroup icon={<UserIcon size={16}/>} label="Doctor" value={`Dr. ${apt?.staff?.firstname} ${apt?.staff?.lastname}`} />
             </div>
-            <button 
+            <Button 
+              variant="outline"
               onClick={() => toast.success("Coming Soon!")}
-              className="border border-docuhealth-primary text-docuhealth-primary rounded-full py-2 px-6 hover:bg-blue-50 transition-colors text-sm font-medium"
+              className="py-2 px-6 text-sm font-medium"
             >
               Send message
-            </button>
+            </Button>
           </div>
         ))}
       </div>
@@ -171,13 +174,15 @@ const PatientAppointmentsList = ({selected}: PatientAppointmentsListProps) => {
               </div>
             </div>
 
-            <button 
+            <Button 
+              variant="primary"
+              fullWidth
               onClick={() => toast.success("Coming Soon!")}
-              className="w-full flex items-center justify-center gap-2 bg-docuhealth-primary text-white rounded-full py-2.5 text-[13px] font-medium"
+              className="flex items-center justify-center gap-2 py-2.5 text-[13px] font-medium"
             >
               <MessageSquare size={16} />
               Send a message
-            </button>
+            </Button>
           </div>
         ))}
       </div>

@@ -1,19 +1,13 @@
 import { X } from "lucide-react";
+import Modal from "../../../ui/Modal";
+import Button from "../../../ui/Button";
 
 const RejectModal = ({ isOpen, onClose, onConfirm, isPending, value, onChange }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="bg-white rounded-md shadow-xl w-full max-w-md mx-auto p-6 relative flex flex-col gap-4">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          <X size={16} />
-        </button>
-
-        <h3 className="text-base font-semibold text-gray-800">Reject Request</h3>
+    <Modal isOpen={isOpen} onClose={onClose} title="Reject Request">
+      <div className="flex flex-col gap-4 py-2">
         <p className="text-xs text-gray-500">
           Please provide a reason for rejecting this lab request. This will be visible to the requesting doctor.
         </p>
@@ -27,24 +21,26 @@ const RejectModal = ({ isOpen, onClose, onConfirm, isPending, value, onChange })
         />
 
         <div className="flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 border border-gray-300 text-gray-600 text-sm font-medium py-2 rounded-full hover:bg-gray-50 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={isPending || !value.trim()}
-            className="flex-1 bg-red-500 text-white text-sm font-semibold py-2 rounded-full border border-transparent hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
-          >
-            {isPending ? (
-              <><div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" /> Rejecting...</>
-            ) : "Confirm Rejection"}
-          </button>
+          <div className="flex-1">
+            <Button onClick={onClose} variant="outline" fullWidth>
+              Cancel
+            </Button>
+          </div>
+          <div className="flex-1">
+            <Button
+              onClick={onConfirm}
+              disabled={isPending || !value.trim()}
+              loading={isPending}
+              loadingText="Rejecting..."
+              variant="danger"
+              fullWidth
+            >
+              Confirm Rejection
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };
 

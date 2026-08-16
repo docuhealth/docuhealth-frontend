@@ -3,6 +3,8 @@ import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import { toast } from "react-hot-toast";
 import { HosWardContext } from "../../../../../context/HospitalContext/HosWardContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Modal from "../../../../ui/Modal";
+import Button from "../../../../ui/Button";
 
 const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) => {
 
@@ -69,76 +71,58 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
   };
 
   return (
-    <>
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-3 text-sm">
-        <div className="bg-white rounded-md shadow-lg p-6 max-w-md w-full relative">
-          <div className="flex justify-end">
-            <button
-              onClick={() => setRequestAdmission(false)}
-              className="text-gray-500 hover:text-black  "
-            >
-              <i className="bx bx-x text-2xl cursor-pointer"></i>
-            </button>
-          </div>
-          <div className="flex flex-col justify-center items-center pb-5">
-            <p className="pt-0.5 font-medium ">Request for patient transfer</p>
-            <p className="pt-1 text-[12px]">
-              Select the most suitable ward for the patient
-            </p>
-          </div>
-
-          <select
-            value={form.new_ward}
-            onChange={(e) => handleChange("new_ward", e.target.value)}
-            className="border p-2 rounded-lg outline-none text-sm w-full"
-          >
-            <option value="">Assign to ward</option>
-            {wardOptions.map((w) => (
-              <option key={w.id} value={w.id}>
-                {w.name} ward
-              </option>
-            ))}
-          </select>
-
-          {form.new_ward && (
-            <select
-              value={form.new_bed}
-              onChange={(e) => handleChange("new_bed", e.target.value)}
-              className="border p-2 rounded-lg outline-none text-sm w-full mt-3"
-            >
-              <option value="">Select available bed</option>
-              {availableBeds.length > 0 ? (
-                availableBeds.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    Bed {b.bed_number}
-                  </option>
-                ))
-              ) : (
-                <option disabled>No available beds</option>
-              )}
-            </select>
-          )}
-
-          <button className={`py-2  text-white  ${mutation.isPending
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-docuhealth-primary cursor-pointer"
-            } rounded-full mt-4  w-full`}
-            disabled={mutation.isPending || !form.new_ward || !form.new_bed}
-            onClick={() => {
-              handleSubmit()
-            }}>
-            {mutation.isPending ? (
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Transferring patient...
-              </div>
-            ) : (
-              "Proceed"
-            )}
-          </button>
-        </div>
+    <Modal isOpen={true} onClose={() => setRequestAdmission(false)} title="">
+      <div className="flex flex-col justify-center items-center pb-5 pt-2">
+        <p className="pt-0.5 font-medium">Request for patient transfer</p>
+        <p className="pt-1 text-[12px]">
+          Select the most suitable ward for the patient
+        </p>
       </div>
-    </>
+
+      <select
+        value={form.new_ward}
+        onChange={(e) => handleChange("new_ward", e.target.value)}
+        className="border p-2 rounded-lg outline-none text-sm w-full"
+      >
+        <option value="">Assign to ward</option>
+        {wardOptions.map((w) => (
+          <option key={w.id} value={w.id}>
+            {w.name} ward
+          </option>
+        ))}
+      </select>
+
+      {form.new_ward && (
+        <select
+          value={form.new_bed}
+          onChange={(e) => handleChange("new_bed", e.target.value)}
+          className="border p-2 rounded-lg outline-none text-sm w-full mt-3"
+        >
+          <option value="">Select available bed</option>
+          {availableBeds.length > 0 ? (
+            availableBeds.map((b) => (
+              <option key={b.id} value={b.id}>
+                Bed {b.bed_number}
+              </option>
+            ))
+          ) : (
+            <option disabled>No available beds</option>
+          )}
+        </select>
+      )}
+
+      <div className="mt-6">
+        <Button
+          onClick={handleSubmit}
+          disabled={mutation.isPending || !form.new_ward || !form.new_bed}
+          loading={mutation.isPending}
+          loadingText="Transferring patient..."
+          fullWidth
+        >
+          Proceed
+        </Button>
+      </div>
+    </Modal>
   )
 }
 

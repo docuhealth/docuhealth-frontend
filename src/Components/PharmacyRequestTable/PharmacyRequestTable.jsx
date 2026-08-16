@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Eye } from "lucide-react";
 import toast from 'react-hot-toast';
+import Button from "../ui/Button";
 
 
 const ITEMS_PER_PAGE = 7;
@@ -280,34 +281,38 @@ const PharmacyRequestTable = () => {
           <div className="flex gap-3 items-center">
             {selectedRows.size > 0 && (
               <div className=" flex justify-end gap-3">
-                <button
-                  className="px-4 py-1.5 border border-red-400  text-red-400 rounded-full text-sm font-medium  transition-colors"
+                <Button
+                  variant="danger"
+                  className="px-4 py-1.5 text-sm"
                   onClick={handleDeclineAll}
                 >
                   {activePharmacy
                     ? "Block selected pharmacies"
                     : "Decline all selected"}
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="outline"
                   className={` ${
                     activePharmacy ? "hidden" : ""
-                  } px-4 py-1.5 border border-docuhealth-blue  text-docuhealth-blue   rounded-full text-sm font-medium  transition-colors`}
+                  } px-4 py-1.5 text-sm`}
                   onClick={handleApproveAll}
                 >
                   Approve all selected
-                </button>
+                </Button>
               </div>
             )}
-            <button
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-docuhealth-blue border border-docuhealth-blue rounded-full"
+            <Button
+              variant="outline"
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm"
+              onClick={() => setActivePharmacy(!activePharmacy)}
             >
               <Eye size={16} />
-              <span onClick={() => setActivePharmacy(!activePharmacy)}>
+              <span>
                 {activePharmacy
                   ? "View Pharm-Code Request"
                   : "View approved pharmacies"}
               </span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>

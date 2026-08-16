@@ -6,6 +6,8 @@ import { Country, State, City } from 'country-state-city';
 import type { ICountry, IState, ICity } from 'country-state-city';
 import PasswordStrengthMeter from "../../../ui/PasswordStrengthMeter";
 import Spinner from "../../../ui/Spinner";
+import Modal from "../../../ui/Modal";
+import Button from "../../../ui/Button";
 
 interface SubAcctUpgradeData {
   child_email: string;
@@ -110,22 +112,7 @@ const UserSubAcctUpgradeModal = ({
   return (
     <>
       <div>
-        {displaySubAcctModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-3">
-            <div className="bg-white rounded-xs shadow-lg p-6 max-w-lg w-full relative">
-              <div className="flex justify-between items-center pb-5">
-                <div className="flex-1 text-center">
-                  <h2 className="text-md font-semibold">Sub Account Upgrade</h2>
-                </div>
-                <button
-                  onClick={() => {
-                    setDisplaySubAcctModal(false);
-                  }}
-                  className="text-gray-500 hover:text-black"
-                >
-                  <i className="bx bx-x text-2xl"></i>
-                </button>
-              </div>
+        <Modal isOpen={displaySubAcctModal} onClose={() => setDisplaySubAcctModal(false)} title="Sub Account Upgrade">
               <div className=" text-sm text-gray-700">
                 <p>
                   Upgrade this sub-account to a standard account with the
@@ -436,30 +423,21 @@ const UserSubAcctUpgradeModal = ({
                         required
                       />
                     </div>
-                    <div
-                      className={`col-span-2 text-center ${isValid && !subAcctUpgradeLoading
-                        ? "bg-docuhealth-primary text-white  cursor-pointer"
-                        : "cursor-not-allowed bg-gray-300 text-gray-500"} py-3 px-4 rounded-full cursor-pointer`}
-                      onClick={handleSubAcctUpgrade}
-                    >
-                      <p>
-                        {" "}
-                        {subAcctUpgradeLoading ? (
-                          <span className="flex items-center justify-center gap-2">
-                            <Spinner className="h-4 w-4 text-white" />
-                            Upgrading Account...
-                          </span>
-                        ) : (
-                          "Upgrade this account"
-                        )}{" "}
-                      </p>
+                    <div className="col-span-2">
+                      <Button
+                        fullWidth
+                        disabled={!isValid}
+                        loading={subAcctUpgradeLoading}
+                        loadingText="Upgrading Account..."
+                        onClick={handleSubAcctUpgrade}
+                      >
+                        Upgrade this account
+                      </Button>
                     </div>
                   </>
                 )}
               </form>
-            </div>
-          </div>
-        )}
+        </Modal>
       </div>
     </>
   );

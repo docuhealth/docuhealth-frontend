@@ -4,6 +4,9 @@ import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { Country, State, City } from "country-state-city";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Modal from "../../../../../ui/Modal";
+import Button from "../../../../../ui/Button";
+import Input from "../../../../../ui/Input";
 
 const registerPatient = async (payload) => {
   const res = await axiosInstanceHos.post(
@@ -270,657 +273,562 @@ const OnboardNewPatient = ({ setNewPatient }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-2">
+    <Modal
+      isOpen={true}
+      onClose={() => {
+        setOnboardingSuccessful(false);
+        setNewPatient(false);
+      }}
+      title={onboardingSuccessful ? "" : "Register New Patient"}
+    >
       {onboardingSuccessful ? (
-        <>
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
-            <div className="flex justify-end">
-              <button
-                onClick={() => {
-                  setOnboardingSuccessful(false);
-                  setNewPatient(false);
-                }}
-                className="text-gray-500 hover:text-black  "
-              >
-                <i className="bx bx-x text-2xl cursor-pointer"></i>
-              </button>
-            </div>
-            <div className="flex flex-col justify-center items-center ">
-              <svg
-                width="40"
-                height="40"
-                viewBox="0 0 40 40"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M6.66634 20.0007C6.66634 12.6369 12.6359 6.66732 19.9997 6.66732C27.3635 6.66732 33.333 12.6369 33.333 20.0007C33.333 27.3645 27.3635 33.334 19.9997 33.334C12.6359 33.334 6.66634 27.3645 6.66634 20.0007ZM19.9997 3.33398C10.7949 3.33398 3.33301 10.7959 3.33301 20.0007C3.33301 29.2053 10.7949 36.6673 19.9997 36.6673C29.2043 36.6673 36.6663 29.2053 36.6663 20.0007C36.6663 10.7959 29.2043 3.33398 19.9997 3.33398ZM29.0948 15.7625L26.7378 13.4055L18.333 21.8103L13.6782 17.1555L11.3212 19.5125L18.333 26.5243L29.0948 15.7625Z"
-                  fill="var(--color-docuhealth-green-dark)"
-                />
-              </svg>
-              <p className="pt-1 text-docuhealth-green-dark">Account Creation Successful</p>
+        <div className="flex flex-col justify-center items-center text-sm pt-4">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 40 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6.66634 20.0007C6.66634 12.6369 12.6359 6.66732 19.9997 6.66732C27.3635 6.66732 33.333 12.6369 33.333 20.0007C33.333 27.3645 27.3635 33.334 19.9997 33.334C12.6359 33.334 6.66634 27.3645 6.66634 20.0007ZM19.9997 3.33398C10.7949 3.33398 3.33301 10.7959 3.33301 20.0007C3.33301 29.2053 10.7949 36.6673 19.9997 36.6673C29.2043 36.6673 36.6663 29.2053 36.6663 20.0007C36.6663 10.7959 29.2043 3.33398 19.9997 3.33398ZM29.0948 15.7625L26.7378 13.4055L18.333 21.8103L13.6782 17.1555L11.3212 19.5125L18.333 26.5243L29.0948 15.7625Z"
+              fill="var(--color-docuhealth-green-dark)"
+            />
+          </svg>
+          <p className="pt-1 text-docuhealth-green-dark">Account Creation Successful</p>
 
-              <div className="border p-3 rounded-lg my-3 text-xs text-gray-600">
-                <p>
-                  You have successfully created an account for a new patient,
-                  they can proceed to log into their dashboard using the Email
-                  and Password you provided after verifying their email within
-                  10 mins
-                </p>
-                <p className="pt-2 ">
-                  OTP expired or the patient did not receive it?{" "}
-                  <span
-                    onClick={!isResendingOtp ? handleResendOtp : undefined}
-                    className={`text-docuhealth-primary font-extrabold hover:underline ${isResendingOtp ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
-                  >
-                    {isResendingOtp ? "Resending..." : "Click to resend OTP"}
-                  </span>
-                </p>
-              </div>
-              <div className="border p-3 rounded-lg mb-5 text-xs text-gray-600 w-full">
-                <p className="pb-1">
-                  Patient's HIN : {patientHIN || "NIL"} <span></span>
-                </p>
-                <p className="font-medium">
-                  {" "}
-                  Note :{" "}
-                  <span className="font-normal">
-                    {" "}
-                    Don’t share the HIN with any third party aside the patient
-                    or close family member if consented.
-                  </span>
-                </p>
-              </div>
-
-              <div className="w-full text-white">
-                <button
-                  className="bg-docuhealth-primary py-3 rounded-full  cursor-pointer w-full"
-                  onClick={() => {
-                    setOnboardingSuccessful(false);
-                    setNewPatient(false);
-                  }}
-                >
-                  Done
-                </button>
-              </div>
-            </div>
+          <div className="border p-3 rounded-lg my-3 text-xs text-gray-600">
+            <p>
+              You have successfully created an account for a new patient,
+              they can proceed to log into their dashboard using the Email
+              and Password you provided after verifying their email within
+              10 mins
+            </p>
+            <p className="pt-2 ">
+              OTP expired or the patient did not receive it?{" "}
+              <span
+                onClick={!isResendingOtp ? handleResendOtp : undefined}
+                className={`text-docuhealth-primary font-extrabold hover:underline ${isResendingOtp ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+              >
+                {isResendingOtp ? "Resending..." : "Click to resend OTP"}
+              </span>
+            </p>
           </div>
-        </>
+          <div className="border p-3 rounded-lg mb-5 text-xs text-gray-600 w-full">
+            <p className="pb-1">
+              Patient's HIN : {patientHIN || "NIL"} <span></span>
+            </p>
+            <p className="font-medium">
+              {" "}
+              Note :{" "}
+              <span className="font-normal">
+                {" "}
+                Don’t share the HIN with any third party aside the patient
+                or close family member if consented.
+              </span>
+            </p>
+          </div>
+
+          <div className="w-full">
+            <Button
+              fullWidth
+              onClick={() => {
+                setOnboardingSuccessful(false);
+                setNewPatient(false);
+              }}
+            >
+              Done
+            </Button>
+          </div>
+        </div>
       ) : (
-        <>
-          <div className="bg-white rounded-lg shadow-lg px-4 py-6 max-w-lg w-full relative">
-            <div className="flex justify-between items-center pb-5">
-              <div className="flex-1 text-center">
-                <h2 className="text-md font-semibold">Register New Patient</h2>
+        <form className="sm:grid sm:grid-cols-2 sm:gap-3 pt-2">
+          {step == 1 && (
+            <>
+              <div className="mb-2">
+                <Input
+                  label="Patient's Email"
+                  type="email"
+                  name="email"
+                  value={patientData.email}
+                  onChange={handlePatientDataChange}
+                  placeholder="e.g tola@gmail.com"
+                  className="text-sm"
+                  required
+                />
               </div>
-              <button
-                onClick={() => {
-                  setNewPatient(false);
-                }}
-                className="text-gray-500 hover:text-black"
-              >
-                <i className="bx bx-x text-2xl cursor-pointer"></i>
-              </button>
-            </div>
-            <form className=" sm:grid sm:grid-cols-2 sm:gap-3 ">
-              {step == 1 && (
-                <>
-                  <div className="mb-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Patient's Email
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={patientData.email}
-                      onChange={handlePatientDataChange}
-                      placeholder="e.g tola@gmail.com"
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm focus:outline-hidden focus:border-docuhealth-primary"
-                      required
-                    />
-                  </div>
-                  <div className="mb-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Patient's Phone Number
-                    </label>
-                    <input
-                      type="number"
-                      name="phone_num"
-                      value={patientData.phone_num}
-                      onChange={handlePatientDataChange}
-                      placeholder="e.g 09011122244"
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm focus:outline-hidden focus:border-docuhealth-primary"
-                      required
-                    />
-                  </div>
-                  <div className="mb-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Patient's Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        name="password"
-                        value={patientData.password}
-                        onChange={(e) => {
-                          handlePatientDataChange(e);
-                          validatePassword(e.target.value);
-                        }}
-                        className={`w-full px-4 py-2 border rounded-lg pl-8 outline-hidden focus:border-docuhealth-primary text-sm ${
-                          patientData.password && !isPasswordValid
-                            ? "focus:border-red-500"
-                            : ""
+              <div className="mb-2">
+                <Input
+                  label="Patient's Phone Number"
+                  type="number"
+                  name="phone_num"
+                  value={patientData.phone_num}
+                  onChange={handlePatientDataChange}
+                  placeholder="e.g 09011122244"
+                  className="text-sm"
+                  required
+                />
+              </div>
+              <div className="mb-2">
+                <Input
+                  label="Patient's Password"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={patientData.password}
+                  onChange={(e) => {
+                    handlePatientDataChange(e);
+                    validatePassword(e.target.value);
+                  }}
+                  className={`text-sm ${
+                    patientData.password && !isPasswordValid
+                      ? "border-red-500 focus:border-red-500"
+                      : ""
+                  }`}
+                  required
+                  leadingIcon={<FaLock />}
+                  trailingIcon={
+                    showPassword ? <FaEyeSlash /> : <FaEye />
+                  }
+                  onTrailingIconClick={() => setShowPassword(!showPassword)}
+                />
+              </div>
+
+              <div className="mb-4">
+                <Input
+                  label="Confirm Password"
+                  type={showPassword ? "text" : "password"}
+                  name="confirm_password"
+                  value={patientData.confirm_password}
+                  onChange={handlePatientDataChange}
+                  className="text-sm"
+                  required
+                  leadingIcon={<FaLock />}
+                  trailingIcon={
+                    showPassword ? <FaEyeSlash /> : <FaEye />
+                  }
+                  onTrailingIconClick={() => setShowPassword(!showPassword)}
+                />
+              </div>
+              {patientData.password && (
+                <div className="mt-3 p-3 bg-gray-50 rounded-lg col-span-2">
+                  {/* Password Strength Indicator */}
+                  <div className="mb-3">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium text-gray-700">
+                        Password Strength:
+                      </span>
+                      <span
+                        className={`text-sm font-medium ${getPasswordStrength(
+                          patientData.password,
+                        ).color.replace("bg-", "text-")}`}
+                      >
+                        {getPasswordStrength(patientData.password).label}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          getPasswordStrength(patientData.password).color
                         }`}
-                        required
-                      />
-                      <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute top-1/2 right-3 transform -translate-y-1/2"
-                      >
-                        {showPassword ? (
-                          <FaEyeSlash className="h-4 w-4 text-gray-400" />
-                        ) : (
-                          <FaEye className="h-3 w-3 text-gray-400" />
-                        )}
-                      </button>
+                        style={{
+                          width: `${
+                            (getPasswordStrength(patientData.password)
+                              .strength /
+                              5) *
+                            100
+                          }%`,
+                        }}
+                      ></div>
                     </div>
                   </div>
 
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Confirm Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        name="confirm_password"
-                        value={patientData.confirm_password}
-                        onChange={handlePatientDataChange}
-                        className="w-full text-sm px-4 py-2 border rounded-lg pl-8 outline-hidden focus:border-docuhealth-primary"
-                        required
-                      />
-                      <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute top-1/2 right-3 transform -translate-y-1/2"
-                      >
-                        {showPassword ? (
-                          <FaEyeSlash className="h-4 w-4 text-gray-400" />
-                        ) : (
-                          <FaEye className="h-3 w-3 text-gray-400" />
-                        )}
-                      </button>
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Password Requirements:
+                  </p>
+                  <div className="space-y-1">
+                    <div
+                      className={`flex items-center text-sm ${
+                        passwordRequirements.hasLowercase
+                          ? "text-green-600"
+                          : "text-red-500"
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full mr-2 ${
+                          passwordRequirements.hasLowercase
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                        }`}
+                      ></span>
+                      Include lowercase letters (a-z)
+                    </div>
+                    <div
+                      className={`flex items-center text-sm ${
+                        passwordRequirements.hasUppercase
+                          ? "text-green-600"
+                          : "text-red-500"
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full mr-2 ${
+                          passwordRequirements.hasUppercase
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                        }`}
+                      ></span>
+                      Include uppercase letters (A-Z)
+                    </div>
+                    <div
+                      className={`flex items-center text-sm ${
+                        passwordRequirements.hasNumber
+                          ? "text-green-600"
+                          : "text-red-500"
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full mr-2 ${
+                          passwordRequirements.hasNumber
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                        }`}
+                      ></span>
+                      Include at least one number (0-9)
+                    </div>
+                    <div
+                      className={`flex items-center text-sm ${
+                        passwordRequirements.hasSymbol
+                          ? "text-green-600"
+                          : "text-red-500"
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full mr-2 ${
+                          passwordRequirements.hasSymbol
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                        }`}
+                      ></span>
+                      Include at least one symbol (!@#$%^&*)
+                    </div>
+                    <div
+                      className={`flex items-center text-sm ${
+                        passwordRequirements.hasMinLength
+                          ? "text-green-600"
+                          : "text-red-500"
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full mr-2 ${
+                          passwordRequirements.hasMinLength
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                        }`}
+                      ></span>
+                      Be at least 8 characters long
                     </div>
                   </div>
-                  {patientData.password && (
-                    <div className="mt-3 p-3 bg-gray-50 rounded-lg col-span-2">
-                      {/* Password Strength Indicator */}
-                      <div className="mb-3">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm font-medium text-gray-700">
-                            Password Strength:
-                          </span>
-                          <span
-                            className={`text-sm font-medium ${getPasswordStrength(
-                              patientData.password,
-                            ).color.replace("bg-", "text-")}`}
-                          >
-                            {getPasswordStrength(patientData.password).label}
-                          </span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className={`h-2 rounded-full transition-all duration-300 ${
-                              getPasswordStrength(patientData.password).color
-                            }`}
-                            style={{
-                              width: `${
-                                (getPasswordStrength(patientData.password)
-                                  .strength /
-                                  5) *
-                                100
-                              }%`,
-                            }}
-                          ></div>
-                        </div>
-                      </div>
-
-                      <p className="text-sm font-medium text-gray-700 mb-2">
-                        Password Requirements:
+                  {isPasswordValid && (
+                    <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded-sm">
+                      <p className="text-sm text-green-700 font-medium">
+                        ✓ Password meets all requirements!
                       </p>
-                      <div className="space-y-1">
-                        <div
-                          className={`flex items-center text-sm ${
-                            passwordRequirements.hasLowercase
-                              ? "text-green-600"
-                              : "text-red-500"
-                          }`}
-                        >
-                          <span
-                            className={`w-2 h-2 rounded-full mr-2 ${
-                              passwordRequirements.hasLowercase
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                            }`}
-                          ></span>
-                          Include lowercase letters (a-z)
-                        </div>
-                        <div
-                          className={`flex items-center text-sm ${
-                            passwordRequirements.hasUppercase
-                              ? "text-green-600"
-                              : "text-red-500"
-                          }`}
-                        >
-                          <span
-                            className={`w-2 h-2 rounded-full mr-2 ${
-                              passwordRequirements.hasUppercase
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                            }`}
-                          ></span>
-                          Include uppercase letters (A-Z)
-                        </div>
-                        <div
-                          className={`flex items-center text-sm ${
-                            passwordRequirements.hasNumber
-                              ? "text-green-600"
-                              : "text-red-500"
-                          }`}
-                        >
-                          <span
-                            className={`w-2 h-2 rounded-full mr-2 ${
-                              passwordRequirements.hasNumber
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                            }`}
-                          ></span>
-                          Include at least one number (0-9)
-                        </div>
-                        <div
-                          className={`flex items-center text-sm ${
-                            passwordRequirements.hasSymbol
-                              ? "text-green-600"
-                              : "text-red-500"
-                          }`}
-                        >
-                          <span
-                            className={`w-2 h-2 rounded-full mr-2 ${
-                              passwordRequirements.hasSymbol
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                            }`}
-                          ></span>
-                          Include at least one symbol (!@#$%^&*)
-                        </div>
-                        <div
-                          className={`flex items-center text-sm ${
-                            passwordRequirements.hasMinLength
-                              ? "text-green-600"
-                              : "text-red-500"
-                          }`}
-                        >
-                          <span
-                            className={`w-2 h-2 rounded-full mr-2 ${
-                              passwordRequirements.hasMinLength
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                            }`}
-                          ></span>
-                          Be at least 8 characters long
-                        </div>
-                      </div>
-                      {isPasswordValid && (
-                        <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded-sm">
-                          <p className="text-sm text-green-700 font-medium">
-                            ✓ Password meets all requirements!
-                          </p>
-                        </div>
-                      )}
                     </div>
                   )}
-                  <div
-                    className="col-span-2 text-center bg-docuhealth-primary text-white py-3 px-4 rounded-full cursor-pointer text-sm"
-                    onClick={() => handleStepOne()}
-                  >
-                    <p> Move to step 2 / 3</p>
-                  </div>
-                </>
+                </div>
               )}
+              <div className="col-span-2">
+                <Button fullWidth onClick={handleStepOne}>
+                  Move to step 2 / 3
+                </Button>
+              </div>
+            </>
+          )}
 
-              {step == 2 && (
-                <>
-                  <div className="mb-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Patient's First Name
-                    </label>
-                    <input
-                      type="text"
-                      name="firstname"
-                      value={patientData.firstname}
-                      onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary  text-sm"
-                      required
-                    />
-                  </div>
-                  <div className="mb-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Patient's Last Name
-                    </label>
-                    <input
-                      type="text"
-                      name="lastname"
-                      value={patientData.lastname}
-                      onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary  text-sm"
-                      required
-                    />
-                  </div>
-                  <div className="mb-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Patient's Middle Name
-                    </label>
-                    <input
-                      type="text"
-                      name="middlename"
-                      value={patientData.middlename}
-                      onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary  text-sm"
-                    />
-                  </div>
-                  <div className="mb-2 relative ">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Patient's Gender
-                    </label>
-                    <select
-                      name="gender"
-                      value={patientData.gender}
-                      onChange={(e) => {
-                        handlePatientDataChange(e);
-                        setIsOpen(false); // close when user picks option
-                      }}
-                      onFocus={() => setIsOpen(true)} // when clicked/focused
-                      onBlur={() => setIsOpen(false)} // when closed
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer  text-sm"
-                      required
-                    >
-                      <option value="">Select</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                      <option value="unknown">Unknown</option>
-                    </select>
+          {step == 2 && (
+            <>
+              <div className="mb-2">
+                <Input
+                  label="Patient's First Name"
+                  type="text"
+                  name="firstname"
+                  value={patientData.firstname}
+                  onChange={handlePatientDataChange}
+                  className="text-sm"
+                  required
+                />
+              </div>
+              <div className="mb-2">
+                <Input
+                  label="Patient's Last Name"
+                  type="text"
+                  name="lastname"
+                  value={patientData.lastname}
+                  onChange={handlePatientDataChange}
+                  className="text-sm"
+                  required
+                />
+              </div>
+              <div className="mb-2">
+                <Input
+                  label="Patient's Middle Name"
+                  type="text"
+                  name="middlename"
+                  value={patientData.middlename}
+                  onChange={handlePatientDataChange}
+                  className="text-sm"
+                />
+              </div>
+              <div className="mb-2 relative ">
+                <label className="block text-sm font-semibold mb-1">
+                  Patient's Gender
+                </label>
+                <select
+                  name="gender"
+                  value={patientData.gender}
+                  onChange={(e) => {
+                    handlePatientDataChange(e);
+                    setIsOpen(false);
+                  }}
+                  onFocus={() => setIsOpen(true)}
+                  onBlur={() => setIsOpen(false)}
+                  className="w-full border border-gray-300 rounded-lg px-2 py-3 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer text-sm"
+                  required
+                >
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                  <option value="unknown">Unknown</option>
+                </select>
 
-                    {/* Custom dropdown arrow */}
-                    <div
-                      className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-9 right-2 ${
-                        isOpen ? "rotate-180" : "rotate-0"
-                      }`}
-                    >
-                      <svg
-                        className="w-4 h-4 text-gray-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="mb-4 col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1 ">
-                      Patient's Date of Birth
-                    </label>
-                    <input
-                      type="date"
-                      name="dob"
-                      value={patientData.dob}
-                      onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary  text-sm"
-                      required
-                    />
-                  </div>
-                  <div
-                    className="col-span-2 text-center bg-docuhealth-primary text-white py-3 px-4 rounded-full cursor-pointer text-sm"
-                    onClick={() => handleStepTwo()}
+                <div
+                  className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-11 right-3 ${
+                    isOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                >
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <p> Move to step 3 / 3</p>
-                  </div>
-                </>
-              )}
-
-              {step == 3 && (
-                <>
-                  <div className="mb-2 relative">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Patient's Country
-                    </label>
-                    <select
-                      name="country"
-                      value={patientData.country}
-                      onChange={(e) => {
-                        const selected = countries.find(
-                          (c) => c.name === e.target.value,
-                        );
-
-                        setPatientData((prev) => ({
-                          ...prev,
-                          country: selected.name, // save name for payload
-                          countryCode: selected.isoCode, // save isoCode for fetching
-                          state: "",
-                          stateCode: "",
-                          city: "",
-                        }));
-                        setIsOpen(false);
-                      }}
-                      onFocus={() => setIsOpen(true)} // when clicked/focused
-                      onBlur={() => setIsOpen(false)} // when closed
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer text-sm"
-                      required
-                    >
-                      <option value="" selected>
-                        -- Select a country --
-                      </option>
-                      {countries.map((c) => (
-                        <option key={c.isoCode} value={c.name}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-                    <div
-                      className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-9 right-2 ${
-                        isOpen ? "rotate-180" : "rotate-0"
-                      }`}
-                    >
-                      <svg
-                        className="w-4 h-4 text-gray-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="mb-2 relative">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Patient's State of Residence
-                    </label>
-                    <select
-                      value={patientData.state}
-                      name="state"
-                      onChange={(e) => {
-                        const selected = states.find(
-                          (s) => s.name === e.target.value,
-                        );
-
-                        setPatientData((prev) => ({
-                          ...prev,
-                          state: selected.name,
-                          stateCode: selected.isoCode, // needed for city fetching
-                          city: "",
-                        }));
-                      }}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary appearance-none text-sm"
-                      required
-                      disabled={!states.length}
-                    >
-                      <option value="" seleceted>
-                        -- Select your state --
-                      </option>
-                      {states.map((s) => (
-                        <option key={s.isoCode} value={s.name}>
-                          {s.name}
-                        </option>
-                      ))}
-                    </select>
-                    <div
-                      className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-9 right-2 `}
-                    >
-                      <svg
-                        className="w-4 h-4 text-gray-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="mb-2 relative">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Patient's City of Residence
-                    </label>
-                    <select
-                      name="city"
-                      value={patientData.city}
-                      onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none text-sm"
-                      required
-                    >
-                      <option value="">-- Select City --</option>
-                      {cities.map((c) => (
-                        <option key={c.name} value={c.name}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-
-                    <div
-                      className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-9 right-2 `}
-                    >
-                      <svg
-                        className="w-4 h-4 text-gray-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="mb-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Patient's Street of Residence
-                    </label>
-                    <input
-                      type="text"
-                      name="street"
-                      value={patientData.street}
-                      placeholder="e.g Olorunda Street"
-                      onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary text-sm"
-                      required
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
                     />
-                  </div>
-                  <div className="mb-4 col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      House Number
-                    </label>
-                    <input
-                      type="text"
-                      name="house_no"
-                      value={patientData.house_no}
-                      placeholder="e.g No. 1234"
-                      onChange={handlePatientDataChange}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary text-sm"
-                      required
-                    />
-                  </div>
-                  <div
-                    className={`col-span-2 text-center text-sm ${
-                      isValid && !isPending
-                        ? "bg-docuhealth-primary text-white  cursor-pointer"
-                        : "cursor-not-allowed bg-gray-300 text-gray-500"
-                    } py-3 px-4 rounded-full cursor-pointer`}
-                    onClick={handleOnboarding}
-                    disabled={!isValid || isPending}
+                  </svg>
+                </div>
+              </div>
+              <div className="mb-4 col-span-2">
+                <Input
+                  label="Patient's Date of Birth"
+                  type="date"
+                  name="dob"
+                  value={patientData.dob}
+                  onChange={handlePatientDataChange}
+                  className="text-sm"
+                  required
+                />
+              </div>
+              <div className="col-span-2">
+                <Button fullWidth onClick={handleStepTwo}>
+                  Move to step 3 / 3
+                </Button>
+              </div>
+            </>
+          )}
+
+          {step == 3 && (
+            <>
+              <div className="mb-2 relative">
+                <label className="block text-sm font-semibold mb-1">
+                  Patient's Country
+                </label>
+                <select
+                  name="country"
+                  value={patientData.country}
+                  onChange={(e) => {
+                    const selected = countries.find(
+                      (c) => c.name === e.target.value,
+                    );
+
+                    setPatientData((prev) => ({
+                      ...prev,
+                      country: selected.name,
+                      countryCode: selected.isoCode,
+                      state: "",
+                      stateCode: "",
+                      city: "",
+                    }));
+                    setIsOpen(false);
+                  }}
+                  onFocus={() => setIsOpen(true)}
+                  onBlur={() => setIsOpen(false)}
+                  className="w-full border border-gray-300 rounded-lg px-2 py-3 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer text-sm"
+                  required
+                >
+                  <option value="" selected>
+                    -- Select a country --
+                  </option>
+                  {countries.map((c) => (
+                    <option key={c.isoCode} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                <div
+                  className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-11 right-3 ${
+                    isOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                >
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <p>
-                      {" "}
-                      {isPending ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <svg
-                            className="animate-spin h-4 w-4 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                            ></path>
-                          </svg>
-                          Registering Patient...
-                        </span>
-                      ) : (
-                        "Register Patient"
-                      )}{" "}
-                    </p>
-                  </div>
-                </>
-              )}
-            </form>
-          </div>
-        </>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div className="mb-2 relative">
+                <label className="block text-sm font-semibold mb-1">
+                  Patient's State of Residence
+                </label>
+                <select
+                  value={patientData.state}
+                  name="state"
+                  onChange={(e) => {
+                    const selected = states.find(
+                      (s) => s.name === e.target.value,
+                    );
+
+                    setPatientData((prev) => ({
+                      ...prev,
+                      state: selected.name,
+                      stateCode: selected.isoCode,
+                      city: "",
+                    }));
+                  }}
+                  className="w-full border border-gray-300 rounded-lg px-2 py-3  focus:outline-hidden focus:border-docuhealth-primary appearance-none text-sm"
+                  required
+                  disabled={!states.length}
+                >
+                  <option value="" seleceted>
+                    -- Select your state --
+                  </option>
+                  {states.map((s) => (
+                    <option key={s.isoCode} value={s.name}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+                <div
+                  className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-11 right-3 `}
+                >
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div className="mb-2 relative">
+                <label className="block text-sm font-semibold mb-1">
+                  Patient's City of Residence
+                </label>
+                <select
+                  name="city"
+                  value={patientData.city}
+                  onChange={handlePatientDataChange}
+                  className="w-full border border-gray-300 rounded-lg px-2 py-3 focus:outline-hidden focus:border-docuhealth-primary appearance-none text-sm"
+                  required
+                >
+                  <option value="">-- Select City --</option>
+                  {cities.map((c) => (
+                    <option key={c.name} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+
+                <div
+                  className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 absolute inset-y-11 right-3 `}
+                >
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div className="mb-2">
+                <Input
+                  label="Patient's Street of Residence"
+                  type="text"
+                  name="street"
+                  value={patientData.street}
+                  placeholder="e.g Olorunda Street"
+                  onChange={handlePatientDataChange}
+                  className="text-sm"
+                  required
+                />
+              </div>
+              <div className="mb-4 col-span-2">
+                <Input
+                  label="House Number"
+                  type="text"
+                  name="house_no"
+                  value={patientData.house_no}
+                  placeholder="e.g No. 1234"
+                  onChange={handlePatientDataChange}
+                  className="text-sm"
+                  required
+                />
+              </div>
+              <div className="col-span-2">
+                <Button
+                  fullWidth
+                  disabled={!isValid || isPending}
+                  loading={isPending}
+                  loadingText="Registering Patient..."
+                  onClick={handleOnboarding}
+                >
+                  Register Patient
+                </Button>
+              </div>
+            </>
+          )}
+        </form>
       )}
-    </div>
+    </Modal>
   );
 };
 

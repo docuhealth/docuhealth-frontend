@@ -15,6 +15,7 @@ import { usePatientVitalSigns } from "../../hooks/patients/usePatientVitalSigns"
 import RecentVitalSigns from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/RecentVitalSigns";
 import DrugRecordsOnHome from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/DrugRecordsOnHome";
 import { MedicalRecord } from "../../types/patients/home";
+import Button from "../../Components/ui/Button";
 
 const Patient_Home_Dashboard = () => {
     const navigate = useNavigate();
@@ -116,9 +117,10 @@ useEffect(() => {
             </p>
           </div>
           <div className="relative">
-            <button
+            <Button
+              variant="outline"
               onClick={() => setIsOpen(!isOpen)}
-              className="flex items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary font-medium rounded-full hover:bg-blue-50 transition"
+              className="flex items-center gap-2 hover:bg-blue-50"
             >
               Sort by: {selected}
               <ChevronDown
@@ -126,7 +128,7 @@ useEffect(() => {
                   isOpen ? "rotate-180" : ""
                 }`}
               />
-            </button>
+            </Button>
             {isOpen && (
               <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-xs shadow-lg z-10">
                 {options.map((option) => (
@@ -142,8 +144,9 @@ useEffect(() => {
             )}
           </div>
           <div>
-            <button
-              className="flex items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary  font-medium rounded-full transition cursor-pointer"
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
               onClick={() => {
                 if (profile) {
                   const hasSubscription = fetchSubscriptionStatus();
@@ -162,11 +165,12 @@ useEffect(() => {
               }}
             >
               View Recent Vitals
-            </button>
+            </Button>
           </div>
           <div>
-            <button
-              className="flex items-center gap-2 px-6 py-2.5 bg-docuhealth-primary text-white font-medium rounded-full transition cursor-pointer"
+            <Button
+              variant="primary"
+              className="flex items-center gap-2"
               onClick={() => {
                 if (profile) {
                   const hasSubscription = fetchSubscriptionStatus();
@@ -188,7 +192,7 @@ useEffect(() => {
               }}
             >
               Get Identity Card
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -235,9 +239,11 @@ useEffect(() => {
             </p>
           </div>
           <div className="relative">
-            <button
+            <Button
+              variant="outline"
+              fullWidth
               onClick={() => setIsOpen(!isOpen)}
-              className="flex justify-center items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary font-medium rounded-full hover:bg-blue-50 transition w-full"
+              className="flex justify-center items-center gap-2 hover:bg-blue-50"
             >
               Sort by: {selected}
               <ChevronDown
@@ -245,7 +251,7 @@ useEffect(() => {
                   isOpen ? "rotate-180" : ""
                 }`}
               />
-            </button>
+            </Button>
             {isOpen && (
               <div className="absolute right-0 mt-2 w-full bg-white border border-gray-200 rounded-xs shadow-lg z-10">
                 {options.map((option) => (
@@ -261,8 +267,10 @@ useEffect(() => {
             )}
           </div>
           <div>
-            <button
-              className="flex justify-center items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary font-medium rounded-full transition w-full cursor-pointer"
+            <Button
+              variant="outline"
+              fullWidth
+              className="flex justify-center items-center gap-2"
                onClick={() => {
                 if (profile) {
                   const hasSubscription = fetchSubscriptionStatus();
@@ -284,11 +292,13 @@ useEffect(() => {
               }}
             >
               View Recent Vitals
-            </button>
+            </Button>
           </div>
           <div>
-            <button
-              className="flex justify-center items-center gap-2 px-6 py-2 bg-docuhealth-primary text-white font-medium rounded-full transition w-full cursor-pointer"
+            <Button
+              variant="primary"
+              fullWidth
+              className="flex justify-center items-center gap-2"
                onClick={() => {
                 if (profile) {
                   const hasSubscription = fetchSubscriptionStatus();
@@ -310,7 +320,7 @@ useEffect(() => {
               }}
             >
               Get Identity Card
-            </button>
+            </Button>
           </div>
         </div>
       </div>

@@ -1,4 +1,6 @@
 import { X, Info, AlertTriangle } from "lucide-react";
+import Modal from "../../../ui/Modal";
+import Button from "../../../ui/Button";
 
 const DoctorReviewModal = ({ isOpen, onClose, onConfirm, isPending, type }) => {
   if (!isOpen) return null;
@@ -6,15 +8,8 @@ const DoctorReviewModal = ({ isOpen, onClose, onConfirm, isPending, type }) => {
   const isApprove = type === "approve";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-sm mx-auto p-6 relative flex flex-col items-center text-center">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors bg-gray-100 rounded-full p-1"
-        >
-          <X size={16} />
-        </button>
-
+    <Modal isOpen={isOpen} onClose={onClose} title="">
+      <div className="flex flex-col items-center text-center py-2">
         <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center mb-4 ${isApprove ? 'border-docuhealth-dark' : 'border-red-500'}`}>
           {isApprove ? (
             <Info size={22} className="text-docuhealth-dark" />
@@ -27,7 +22,7 @@ const DoctorReviewModal = ({ isOpen, onClose, onConfirm, isPending, type }) => {
           {isApprove ? "Approve/Accept test result?" : "Reject test result?"}
         </h3>
 
-        <div className="border border-gray-200 rounded-md p-4 mb-6  w-full">
+        <div className="border border-gray-200 rounded-md p-4 mb-6 w-full">
           <p className="text-[13px] text-gray-600 leading-relaxed text-left">
             {isApprove 
               ? "By Accepting this test result, you approve that you have checked and validated the result. by proceeding, you agree that the result be added to your SOAP note and patient's AVS!"
@@ -35,21 +30,18 @@ const DoctorReviewModal = ({ isOpen, onClose, onConfirm, isPending, type }) => {
           </p>
         </div>
 
-        <button
+        <Button
           onClick={onConfirm}
           disabled={isPending}
-          className={`w-full text-white text-sm font-semibold py-3 rounded-full transition-colors disabled:opacity-60 flex items-center justify-center gap-2 ${
-            isApprove ? "bg-docuhealth-primary hover:bg-docuhealth-dark-primary" : "bg-red-500 hover:bg-red-600"
-          }`}
+          loading={isPending}
+          loadingText={isApprove ? "Approving..." : "Rejecting..."}
+          variant={isApprove ? "primary" : "danger"}
+          fullWidth
         >
-          {isPending ? (
-            <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> {isApprove ? "Approving..." : "Rejecting..."}</>
-          ) : (
-            isApprove ? "Confirm approval" : "Confirm rejection"
-          )}
-        </button>
+          {isApprove ? "Confirm approval" : "Confirm rejection"}
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 };
 

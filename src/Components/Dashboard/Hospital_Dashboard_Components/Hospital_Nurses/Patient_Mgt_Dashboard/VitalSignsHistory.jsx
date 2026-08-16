@@ -4,6 +4,7 @@ import { Activity, ChevronLeft, ChevronRight } from "lucide-react";
 import { NursesVitalSignsContext } from "../../../../../context/HospitalContext/Nurses/NursesVitalSignsContext";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import SearchBar from "../../../../SearchBar/SearchBar";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../../../Components/ui/Table";
 
 const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
     const hin = selected?.patient?.hin;
@@ -137,22 +138,22 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
                 ) : (
                     <>
                         <div className="overflow-x-hidden hidden lg:block">
-                            <table className=" w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-gray-50 text-gray-600 border-b">
-                                        <th className="py-3 px-4 font-medium border-r last:border-r-0">Date & Time</th>
-                                        <th className="py-3 px-4 font-medium text-center border-r last:border-r-0">BP (mmHg)</th>
-                                        <th className="py-3 px-4 font-medium text-center border-r last:border-r-0">Temp (°C)</th>
-                                        <th className="py-3 px-4 font-medium text-center border-r last:border-r-0">HR (Bpm)</th>
-                                        <th className="py-3 px-4 font-medium text-center border-r last:border-r-0">RR (/Min)</th>
-                                        <th className="py-3 px-4 font-medium text-center border-r last:border-r-0">Height (m)</th>
-                                        <th className="py-3 px-4 font-medium text-center">Weight (Kg)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="bg-gray-50 text-gray-600 border-b">
+                                        <TableHead className="py-3 px-4 font-medium border-r last:border-r-0">Date & Time</TableHead>
+                                        <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">BP (mmHg)</TableHead>
+                                        <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">Temp (°C)</TableHead>
+                                        <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">HR (Bpm)</TableHead>
+                                        <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">RR (/Min)</TableHead>
+                                        <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">Height (m)</TableHead>
+                                        <TableHead className="py-3 px-4 font-medium text-center">Weight (Kg)</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
                                     {vitals?.map((record, index) => (
-                                        <tr key={index} className="border-b hover:bg-gray-50 transition-colors">
-                                            <td className="py-3 px-4 border-r last:border-r-0">
+                                        <TableRow key={index}>
+                                            <TableCell className="py-3 px-4 border-r last:border-r-0">
                                                 <div className="flex flex-col">
                                                     <span className="font-medium text-gray-800">
                                                         {new Date(record.created_at).toLocaleDateString("en-US", {
@@ -168,17 +169,17 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
                                                         })}
                                                     </span>
                                                 </div>
-                                            </td>
-                                            <td className="py-3 px-4 text-center border-r last:border-r-0">{record.blood_pressure || "—"}</td>
-                                            <td className="py-3 px-4 text-center border-r last:border-r-0">{record.temp || "—"}</td>
-                                            <td className="py-3 px-4 text-center border-r last:border-r-0">{record.heart_rate || "—"}</td>
-                                            <td className="py-3 px-4 text-center border-r last:border-r-0">{record.resp_rate || "—"}</td>
-                                            <td className="py-3 px-4 text-center border-r last:border-r-0">{record.height || "—"}</td>
-                                            <td className="py-3 px-4 text-center">{record.weight || "—"}</td>
-                                        </tr>
+                                            </TableCell>
+                                            <TableCell className="py-3 px-4 text-center border-r last:border-r-0">{record.blood_pressure || "—"}</TableCell>
+                                            <TableCell className="py-3 px-4 text-center border-r last:border-r-0">{record.temp || "—"}</TableCell>
+                                            <TableCell className="py-3 px-4 text-center border-r last:border-r-0">{record.heart_rate || "—"}</TableCell>
+                                            <TableCell className="py-3 px-4 text-center border-r last:border-r-0">{record.resp_rate || "—"}</TableCell>
+                                            <TableCell className="py-3 px-4 text-center border-r last:border-r-0">{record.height || "—"}</TableCell>
+                                            <TableCell className="py-3 px-4 text-center">{record.weight || "—"}</TableCell>
+                                        </TableRow>
                                     ))}
-                                </tbody>
-                            </table>
+                                </TableBody>
+                            </Table>
                         </div>
                         <div className="lg:hidden flex flex-col gap-4 ">
                             {vitals?.map((record, index) => (
