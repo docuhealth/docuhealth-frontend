@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
+import GeneralPatientInfoForm from "../../../Components/ui/GeneralPatientInfoForm";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import template from "../../../assets/img/template.png";
 import OnboardNewPatient from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home_Dashboard/components/OnboardNewPatient";
@@ -112,112 +113,31 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                 </div>
               </div>
             </div>
-            <div className="my-5 bg-docuhealth-light-gray rounded-xl border p-4">
-              <h2 className="font-medium">General Information</h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    First Name
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value={patientDetails.firstname}
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    Last Name
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value={patientDetails.lastname}
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    Date of birth
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value={patientDetails.dob}
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    Email address
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value={patientDetails.email || "NIL"}
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    Phone number
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value={patientDetails.phone_num}
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">
-                    Home address
-                  </p>
-
-                  <textarea
-                    readOnly
-                    rows={3}
-                    className="w-full text-gray-500 rounded-lg text-sm bg-white border px-3 py-2 resize-none"
-                    value={
-                      patientDetails?.street
-                        ? `${patientDetails.street}, ${patientDetails.city}, ${patientDetails.state}, ${patientDetails.country}`
-                        : "NIL"
-                    }
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    Assigned doctor
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value="NIL"
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    Date of last visit
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value="NIL"
-                  />
-                </div>
+            <GeneralPatientInfoForm patient={patientDetails}>
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1 ">
+                  Assigned doctor
+                </p>
+                <input
+                  type="text"
+                  readOnly
+                  className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
+                  value="NIL"
+                />
               </div>
-            </div>
+
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1 ">
+                  Date of last visit
+                </p>
+                <input
+                  type="text"
+                  readOnly
+                  className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
+                  value="NIL"
+                />
+              </div>
+            </GeneralPatientInfoForm>
           </div>
         </>
       ) : (

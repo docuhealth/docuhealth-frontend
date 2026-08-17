@@ -24,6 +24,7 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import {useMutation, useQueryClient } from "@tanstack/react-query";
 import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../../../utils/soapNoteHelpers";
 import PatientInfoCard from "../../../../../ui/PatientInfoCard";
+import GeneralPatientInfoForm from "../../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import ClinicalSummaryCard from "../../../../../ui/ClinicalSummaryCard";
 
@@ -31,88 +32,7 @@ const PatientInfo = ({ patientFullInfo }) => {
   console.log(patientFullInfo);
   return (
     <>
-      <div className="my-5 bg-docuhealth-light-gray rounded-lg border p-4">
-        <h2 className="font-medium">General Information</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              First Name
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={patientFullInfo?.patient_info?.firstname}
-            />
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">Last Name</p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={patientFullInfo?.patient_info?.lastname}
-            />
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Date of birth
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={patientFullInfo?.patient_info?.dob}
-            />
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Email address
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={patientFullInfo?.patient_info?.email || "NIL"}
-            />
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Phone number
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={patientFullInfo?.patient_info?.phone_num}
-            />
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Home address
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={
-                patientFullInfo?.patient_info?.street +
-                ", " +
-                patientFullInfo?.patient_info?.city +
-                ", " +
-                patientFullInfo?.patient_info?.state +
-                ", " +
-                patientFullInfo?.patient_info?.country || "NIL"
-              }
-            />
-          </div>
-
+      <GeneralPatientInfoForm patient={patientFullInfo?.patient_info}>
           <div>
             <p className="text-sm font-medium text-gray-500 mb-1 ">
               Assigned doctor
@@ -136,8 +56,7 @@ const PatientInfo = ({ patientFullInfo }) => {
               value="NIL"
             />
           </div>
-        </div>
-      </div>
+      </GeneralPatientInfoForm>
 
       <VitalSignsCard
         className="my-5 bg-docuhealth-light-gray rounded-lg border p-4"

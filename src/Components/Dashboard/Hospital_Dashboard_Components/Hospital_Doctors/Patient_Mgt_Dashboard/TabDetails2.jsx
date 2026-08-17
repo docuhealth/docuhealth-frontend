@@ -24,6 +24,7 @@ import {
 import toast from "react-hot-toast";
 import Hospital_Lab_Test_Detail_Dashboard from "../../../../../Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Test_Detail_Dashboard";
 import PatientInfoCard from "../../../../ui/PatientInfoCard";
+import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 import ClinicalSummaryCard from "../../../../ui/ClinicalSummaryCard";
 
@@ -34,88 +35,7 @@ const PatientInfo = ({ patientFullInfo, selected }) => {
 
   return (
     <>
-      <div className="mb-5 bg-docuhealth-light-gray rounded-lg border p-4">
-        <h2 className="font-medium">General Information</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              First Name
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={patientFullInfo?.patient_info?.firstname}
-            />
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">Last Name</p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={patientFullInfo?.patient_info?.lastname}
-            />
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Date of birth
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={patientFullInfo?.patient_info?.dob}
-            />
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Email address
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={patientFullInfo?.patient_info?.email || "NIL"}
-            />
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Phone number
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={patientFullInfo?.patient_info?.phone_num}
-            />
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Home address
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={
-                patientFullInfo?.patient_info?.street +
-                ", " +
-                patientFullInfo?.patient_info?.city +
-                ", " +
-                patientFullInfo?.patient_info?.state +
-                ", " +
-                patientFullInfo?.patient_info?.country || "NIL"
-              }
-            />
-          </div>
-
+      <GeneralPatientInfoForm patient={patientFullInfo?.patient_info}>
           <div>
             <p className="text-sm font-medium text-gray-500 mb-1 ">
               Admission Date / Time
@@ -185,8 +105,7 @@ const PatientInfo = ({ patientFullInfo, selected }) => {
               value={patientFullInfo?.patient_info?.gender}
             />
           </div>
-        </div>
-      </div>
+      </GeneralPatientInfoForm>
       <VitalSignsCard
         className="my-5 bg-docuhealth-light-gray rounded-lg border p-4"
         title={`Latest vital signs (Created : ${formatFullDateTime(patientFullInfo?.latest_vitals?.created_at)})`}

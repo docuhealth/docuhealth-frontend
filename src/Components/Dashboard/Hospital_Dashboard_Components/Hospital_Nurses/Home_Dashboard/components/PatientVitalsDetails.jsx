@@ -1,4 +1,6 @@
 import React from 'react'
+import moment from 'moment'
+import GeneralPatientInfoForm from "../../../../../ui/GeneralPatientInfoForm";
 
 const PatientVitalsDetails = ({ selectedPatient, setSelectedPatient }) => {
 
@@ -41,80 +43,7 @@ const PatientVitalsDetails = ({ selectedPatient, setSelectedPatient }) => {
                         </div>
                     </div>
                 </div>
-                <div className="my-5 bg-docuhealth-light-gray rounded-xl border p-4">
-                <h2 className="font-medium">General Information</h2>
-
-                <div className="grid  gap-4 mt-4">
-
-                    <div>
-                        <p className="text-sm font-medium text-gray-500 mb-1 ">First Name</p>
-                        <input
-                            type="text"
-                            readOnly
-                            className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                            value={selectedPatient?.patient?.firstname}
-                        />
-                    </div>
-
-                    <div>
-                        <p className="text-sm font-medium text-gray-500 mb-1 ">Last Name</p>
-                        <input
-                            type="text"
-                            readOnly
-                            className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                            value={selectedPatient?.patient?.lastname}
-                        />
-                    </div>
-
-                    <div>
-                        <p className="text-sm font-medium text-gray-500 mb-1 ">Date of birth</p>
-                        <input
-                            type="text"
-                            readOnly
-                            className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                            value={selectedPatient?.patient?.dob}
-                        />
-                    </div>
-
-                    <div>
-                        <p className="text-sm font-medium text-gray-500 mb-1 ">Email address</p>
-                        <input
-                            type="text"
-                            readOnly
-                            className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                            value={selectedPatient?.patient?.email || 'NIL'}
-                        />
-                    </div>
-
-                    <div>
-                        <p className="text-sm font-medium text-gray-500 mb-1 ">Phone number</p>
-                        <input
-                            type="text"
-                            readOnly
-                            className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                            value={selectedPatient?.patient?.phone_num}
-                        />
-                    </div>
-
-                
-
-                    <div>
-                    <p className="text-sm font-medium text-gray-500 mb-1">
-                      Home address
-                    </p>
-
-                    <textarea
-                      readOnly
-                      rows={3}
-                      className="w-full text-gray-500 rounded-lg text-sm bg-white border px-3 py-2 resize-none"
-                      value={
-                        selectedPatient?.patient?.street
-                          ? `${selectedPatient.patient?.street}, ${selectedPatient.patient?.city}, ${selectedPatient.patient?.state}, ${selectedPatient.patient?.country}`
-                          : "NIL"
-                      }
-                    />
-                  </div>
-
+                <GeneralPatientInfoForm patient={selectedPatient?.patient}>
                     <div className='lg:col-span-2'>
                         <p className="text-sm font-medium text-gray-500 mb-1  ">Assigned staff</p>
                         <input
@@ -126,11 +55,7 @@ const PatientVitalsDetails = ({ selectedPatient, setSelectedPatient }) => {
                                 : "NIL"}
                         />
                     </div>
-
-                
-
-                </div>
-            </div>
+                </GeneralPatientInfoForm>
     
         </div>
     )

@@ -88,7 +88,7 @@ const Hospital_Sign_In = () => {
       } catch (error) {
         console.log(error);
         toast.error(
-          error.response.data.detail || "Login failed. Please try again.",
+          error?.response?.data?.detail || "Login failed. Please try again.",
         );
         setIsSubmitting(false);
       } finally {
