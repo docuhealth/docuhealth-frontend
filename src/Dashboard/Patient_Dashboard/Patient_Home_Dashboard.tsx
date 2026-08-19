@@ -50,6 +50,11 @@ const Patient_Home_Dashboard = () => {
   const { data: vitalSigns, isPending: loadingVitals } = usePatientVitalSigns(vitalPage);
 
 useEffect(() => {
+    // Don't nag users who already have their HIN / Identity Card.
+    if (!profile || profile.id_card_generated) {
+      return;
+    }
+
     // 1. Delay the initial appearance by 3 seconds (3000ms)
     const initialDelay = setTimeout(() => {
       setNoticeDisplay(true);
@@ -64,7 +69,7 @@ useEffect(() => {
       clearTimeout(initialDelay);
       clearInterval(interval);
     };
-  }, []);
+  }, [profile]);
 
   const handleSelect = (option: string) => {
     setSelected(option);
@@ -178,10 +183,9 @@ useEffect(() => {
                     navigate("/user-subscriptions-dashboard");
                     return;
                   }
-                  if(profile.id_card_generated){
-                      toast.error("ID Card is already generated !");
-                      toast.success('Visit the settings page to view it.')
-                      return
+                  if (profile.id_card_generated) {
+                    navigate("/user-settings-dashboard?tab=id-card");
+                    return;
                   }
                   handleSelection(profile);
                 } else {
@@ -190,7 +194,7 @@ useEffect(() => {
                 }
               }}
             >
-              Get Identity Card
+              {profile?.id_card_generated ? "View Identity Card" : "Get Identity Card"}
             </Button>
           </div>
         </div>
@@ -304,10 +308,9 @@ useEffect(() => {
                     navigate("/user-subscriptions-dashboard");
                     return;
                   }
-                  if(profile.id_card_generated){
-                      toast.error("ID Card is already generated !");
-                      toast.success('Visit the settings page to view it.')
-                      return
+                  if (profile.id_card_generated) {
+                    navigate("/user-settings-dashboard?tab=id-card");
+                    return;
                   }
                   handleSelection(profile);
                 } else {
@@ -316,7 +319,7 @@ useEffect(() => {
                 }
               }}
             >
-              Get Identity Card
+              {profile?.id_card_generated ? "View Identity Card" : "Get Identity Card"}
             </Button>
           </div>
         </div>
