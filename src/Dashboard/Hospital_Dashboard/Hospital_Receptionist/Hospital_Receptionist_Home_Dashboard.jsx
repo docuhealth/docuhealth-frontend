@@ -28,8 +28,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
   const { wards } = useContext(HosWardContext);
   const { hospitalName, backgroundImage } = useContext(ReceptionistAppContext);
 
-    const backgroundImageUrl = backgroundImage || template
-  
+  const backgroundImageUrl = backgroundImage || template;
 
   const totalBeds = wards?.reduce((sum, w) => sum + w.total_beds, 0) || 0;
   const availableBeds =
@@ -75,7 +74,10 @@ const Hospital_Receptionist_Home_Dashboard = () => {
   };
 
   const checkInPatientApi = async (payload) => {
-    const res = await axiosInstanceHos.post("api/receptionists/check-in", payload);
+    const res = await axiosInstanceHos.post(
+      "api/receptionists/check-in",
+      payload,
+    );
     return res.data;
   };
 
@@ -122,7 +124,9 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                 {checkInMutation.isPending && (
                   <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                 )}
-                {checkInMutation.isPending ? "Checking In..." : "Check Patient In"}
+                {checkInMutation.isPending
+                  ? "Checking In..."
+                  : "Check Patient In"}
               </button>
             </div>
           </div>
@@ -182,19 +186,23 @@ const Hospital_Receptionist_Home_Dashboard = () => {
         <>
           <div className="py-2">
             <DynamicDate />
-             <div
-          className="relative mt-4 w-full h-[300px] rounded-xl bg-cover bg-center flex flex-col items-center justify-center border border-gray-300"
-          style={{
-            backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${backgroundImageUrl})`
-          }}
-        >
-          {/* Watermark / Helper Text */}
-          <div className="text-white text-center mb-4">
-            <p className="text-xl font-semibold opacity-90 uppercase tracking-widest">
-              {hospitalName ? (hospitalName.toUpperCase().endsWith('HOSPITAL') ? hospitalName : `${hospitalName} Hospital`) : "NIL Hospital"}
-            </p>
-          </div>
-        </div>
+            <div
+              className="relative mt-4 w-full h-[300px] rounded-xl bg-cover bg-center flex flex-col items-center justify-center border border-gray-300"
+              style={{
+                backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${backgroundImageUrl})`,
+              }}
+            >
+              {/* Watermark / Helper Text */}
+              <div className="text-white text-center mb-4">
+                <p className="text-xl font-semibold opacity-90 uppercase tracking-widest">
+                  {hospitalName
+                    ? hospitalName.toUpperCase().endsWith("HOSPITAL")
+                      ? hospitalName
+                      : `${hospitalName} Hospital`
+                    : "NIL Hospital"}
+                </p>
+              </div>
+            </div>
 
             <div className="text-sm grid grid-cols-1 lg:flex lg:justify-end lg:items-center gap-2 lg:gap-5 mt-5">
               <button
@@ -330,6 +338,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                 </div>
               </div>
             </div>
+
             <div className="bg-white rounded-lg my-5 ">
               <div className=" border rounded-lg p-4 lg:p-6">
                 <h2 className=" mb-4 pb-2 border-b font-medium">
@@ -361,16 +370,29 @@ const Hospital_Receptionist_Home_Dashboard = () => {
       >
         <div className="flex flex-col justify-center items-center text-sm pt-4 px-2 text-center pb-2">
           <div className="bg-[#E7F8ED] p-3 rounded-full mb-4 inline-flex items-center justify-center">
-             <div className="bg-[#32CC54] rounded-full flex items-center justify-center h-16 w-16 shadow-[0px_0px_0px_8px_rgba(50,204,84,0.15)]">
-                <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                   <path d="M2 9L9 16L22 2" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-             </div>
+            <div className="bg-[#32CC54] rounded-full flex items-center justify-center h-16 w-16 shadow-[0px_0px_0px_8px_rgba(50,204,84,0.15)]">
+              <svg
+                width="24"
+                height="18"
+                viewBox="0 0 24 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 9L9 16L22 2"
+                  stroke="white"
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
           </div>
           <p className="font-semibold text-gray-800 mb-6 text-base">
-            Patient has been successfully checked-in and moved to the nursing queue!
+            Patient has been successfully checked-in and moved to the nursing
+            queue!
           </p>
-          <button 
+          <button
             className="w-full bg-[#32CC54] hover:bg-[#28A745] text-white py-3 rounded-full font-medium transition-colors cursor-pointer"
             onClick={() => setCheckPatientIn(false)}
           >

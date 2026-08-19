@@ -9,7 +9,7 @@ import { formatFullDateTime } from "./Components/formatRecordDate";
 import { truncateWords } from "./Components/formatRecordDate";
 import toast from "react-hot-toast";
 import { usePatientProfile } from "../../../../hooks/patients/usePatientProfile";
-import { fetchSubscriptionStatus } from "../../../../services/authService";
+import { useHasActiveSubscription } from "../../../../hooks/patients/useHasActiveSubscription";
 import SearchBar from "../../../../Components/SearchBar/SearchBar";
 import EmptyState from "../../../../Components/ui/EmptyState";
 import { MedicalRecord } from "../../../../types/patients/home";
@@ -51,6 +51,7 @@ const MedicalRecords = ({
   const totalPages = Math.ceil(count / pageSize);
 
   const { data: profile } = usePatientProfile();
+  const hasSubscription = useHasActiveSubscription();
 
   const sortedRecords = React.useMemo(() => {
     if (!medicalRecords) return [];
@@ -215,8 +216,6 @@ const MedicalRecords = ({
                 className="bg-docuhealth-dark py-2 text-white rounded-full "
                 onClick={() => {
                   if (profile) {
-                    const hasSubscription = fetchSubscriptionStatus();
-                    
                     if (!hasSubscription) {
                       toast.error("Please subscribe to access feature");
                       return;

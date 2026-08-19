@@ -99,7 +99,6 @@ import Hospital_Receptionist_Settings_Dashboard from "./Dashboard/Hospital_Dashb
 import Hospital_Receptionist_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Receptionist/Hospital_Receptionist_HealthPersonnel_Dashboard";
 import Hospital_Receptionist_Admission_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Receptionist/Hospital_Receptionist_Admission_Dashboard";
 
-
 import HospitalAdminProviders from "./Providers/Hospital/HospitalAdminProviders";
 import HospitalReceptionistProviders from "./Providers/Hospital/HospitalReceptionistProviders";
 import HospitalDoctorProviders from "./Providers/Hospital/HospitalDoctorProviders";
@@ -151,8 +150,8 @@ function App() {
   const hostname = window.location.hostname;
 
   //Adjust the condition to remove the true value when deploying to production. This is just for testing purposes to always render the hospital routes.
-  const isHospital = true || hostname.startsWith("hospital.");
   // const isHospital = true || hostname.startsWith("hospital.");
+  const isHospital = hostname.startsWith("hospital.");
 
   return (
     <HelmetProvider>
@@ -998,7 +997,7 @@ function App() {
                 }
               />
             </Route>
-            
+
             <Route
               path="/hospital-pharmacist-prescriptions-dashboard"
               element={
@@ -1018,7 +1017,7 @@ function App() {
                 }
               />
             </Route>
-            
+
             <Route
               path="/hospital-pharmacist-prescription-detail"
               element={

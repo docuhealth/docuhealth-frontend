@@ -5,12 +5,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import DashboardLayout from "../../Components/ui/DashboardLayout";
 import { usePatientProfile } from "../../hooks/patients/usePatientProfile";
 import { useToggleEmergency } from "../../hooks/patients/useToggleEmergency";
-import { fetchSubscriptionStatus } from "../../services/authService";
+import { useHasActiveSubscription } from "../../hooks/patients/useHasActiveSubscription";
 import EmergencyModeNotice from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/EmergencyModeNotice/EmergencyModeNotice";
 import docuhealth_logo from "../../assets/img/docuhealth_logo.png";
 
 const Patient_Dashboard_Layout = () => {
   const { data: profile } = usePatientProfile();
+  const hasSubscription = useHasActiveSubscription();
   const { mutateAsync: toggleEmergencyStatus } = useToggleEmergency();
   const [emergencyStatus, setEmergencyStatus] = useState(false);
   const [emergencyStatusModal, setEmergencyStatusModal] = useState(false);
@@ -27,8 +28,6 @@ const Patient_Dashboard_Layout = () => {
   }, [profile]);
 
   const handleToggle = async () => {
-    const hasSubscription = fetchSubscriptionStatus();
-
     if (isLoading) {
       toast.error("Please wait, loading your profile...");
       return;

@@ -2,7 +2,7 @@ import React from "react";
 import Spinner from "./Spinner";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "outline" | "danger" | "ghost";
+  variant?: "primary" | "outline" | "danger" | "ghost" | "success";
   loading?: boolean;
   loadingText?: string;
   fullWidth?: boolean;
@@ -17,6 +17,8 @@ const VARIANT_CLASSES: Record<NonNullable<ButtonProps["variant"]>, string> = {
     "bg-red-500 text-white disabled:bg-red-300 disabled:text-gray-100",
   ghost:
     "bg-transparent text-gray-700 hover:bg-gray-100 disabled:text-gray-400",
+  success:
+    "bg-docuhealth-green text-white disabled:bg-gray-300 disabled:text-gray-500",
 };
 
 /**

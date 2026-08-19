@@ -8,7 +8,7 @@ import UserSubAcctList from "../../Components/Dashboard/Patient_Dashboard_Compon
 import UserSubAcctUpgradeModal from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserSubAcctUpgradeModal";
 import UserUpgradeSubAcctNotification from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserUpgradeSubAcctNotification";
 import UserSubAcctListMobile from "../../Components/Dashboard/Patient_Dashboard_Components/Sub_Acct_Dashboard/UserSubAcctListMobile";
-import { fetchSubscriptionStatus } from "../../services/authService";
+import { useHasActiveSubscription } from "../../hooks/patients/useHasActiveSubscription";
 
 import { keepPreviousData } from "@tanstack/react-query";
 import { useSubaccounts } from "../../hooks/patients/useSubaccounts";
@@ -30,6 +30,7 @@ const Patient_SubAccount_Dashboard = () => {
   const pageSize = 6;
   const debouncedSearch = useDebounce(searchQuery, 300);
   const isUserLoggedIn = !!getToken();
+  const hasSubscription = useHasActiveSubscription();
 
   const { data: subAccountsData, isPending, isFetching, isError, error } = useSubaccounts(
     currentPage,
@@ -148,9 +149,6 @@ const Patient_SubAccount_Dashboard = () => {
   });
 
   const handleSubAcctUpgrade = async () => {
-
-    const hasSubscription = fetchSubscriptionStatus();
-
 
     setSubAcctUpgradeLoading(true);
 
@@ -272,8 +270,6 @@ const Patient_SubAccount_Dashboard = () => {
 
   const handleSubAcctCreation = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const hasSubscription = fetchSubscriptionStatus();
 
     if (!isFormValid) {
       toast.error("Please fill all required fields correctly.");
