@@ -9,6 +9,7 @@ import CaseNoteDetail from '../../../Components/Dashboard/Hospital_Dashboard_Com
 import VitalSignsHistory from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/VitalSignsHistory'
 import SharedSoapNotes from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SharedSoapNotes'
 import SharedSoapNoteDetail from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SharedSoapNoteDetail'
+import NursePatientInfo from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Appointments_Dashboard/components/NursePatientInfo'
 import { NursesAppointmentsListContext } from '../../../context/HospitalContext/Nurses/NursesAppointmentsListContext'
 
 const Hospital_Nurses_Appointments_Dashboard = () => {
@@ -23,13 +24,20 @@ const Hospital_Nurses_Appointments_Dashboard = () => {
   const [sharedSoapNoteHistory, setSharedSoapNoteHistory] = useState(false);
   const [sharedSoapNoteDetail, setSharedSoapNoteDetail] = useState(false);
   const [selectedPatientForSharedSoap, setSelectedPatientForSharedSoap] = useState(null);
+  const [seePatientDetails, setSeePatientDetails] = useState(false);
+  const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
   const { appointmentType } = useContext(NursesAppointmentsListContext);
 
   return (
     <>
-      <div className='py-2 text-sm flex justify-between items-center'>
+      <div className='py-2 text-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
         <DynamicDate />
+        {seePatientDetails && (
+          <button className="text-white bg-docuhealth-primary hover:bg-docuhealth-primary/90 rounded-full w-full md:w-auto px-5 py-3 text-sm font-medium transition-colors">
+            View discharge note summary
+          </button>
+        )}
       </div>
       {
         updateVitals ? (
@@ -67,12 +75,28 @@ const Hospital_Nurses_Appointments_Dashboard = () => {
             setSharedSoapNoteHistory={setSharedSoapNoteHistory}
             setSharedSoapNoteDetail={setSharedSoapNoteDetail}
           />
+        ) : seePatientDetails ? (
+          <NursePatientInfo
+            selectedPatientDetails={selectedPatientDetails}
+            setSeePatientDetails={setSeePatientDetails}
+          />
         ) : (
           <>
             <div className="bg-white my-5  rounded-lg ">
               <div className=" border rounded-lg p-4 lg:p-6">
                 <div>
-                  <AppointmentsList setNewCaseNote={setNewCaseNote} setCaseNoteHistory={setCaseNoteHistory} setVitalSignsHistory={setVitalSignsHistory} setUpdateVitals={setUpdateVitals} setSelectedPatientForVitals={setSelectedPatientForVitals} setSelectedPatientForCASE={setSelectedPatientForCASE} setSharedSoapNoteHistory={setSharedSoapNoteHistory} setSelectedPatientForSharedSoap={setSelectedPatientForSharedSoap} />
+                  <AppointmentsList 
+                    setNewCaseNote={setNewCaseNote} 
+                    setCaseNoteHistory={setCaseNoteHistory} 
+                    setVitalSignsHistory={setVitalSignsHistory} 
+                    setUpdateVitals={setUpdateVitals} 
+                    setSelectedPatientForVitals={setSelectedPatientForVitals} 
+                    setSelectedPatientForCASE={setSelectedPatientForCASE} 
+                    setSharedSoapNoteHistory={setSharedSoapNoteHistory} 
+                    setSelectedPatientForSharedSoap={setSelectedPatientForSharedSoap}
+                    setSeePatientDetails={setSeePatientDetails}
+                    setDashboardSelectedPatientDetails={setSelectedPatientDetails}
+                  />
                 </div>
               </div>
             </div>

@@ -11,7 +11,7 @@ import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SearchBar from "../../../../SearchBar/SearchBar";
 
-const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals, setVitalSignsHistory, setSelectedPatientForVitals, setSelectedPatientForCASE, setSharedSoapNoteHistory, setSelectedPatientForSharedSoap }) => {
+const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals, setVitalSignsHistory, setSelectedPatientForVitals, setSelectedPatientForCASE, setSharedSoapNoteHistory, setSelectedPatientForSharedSoap, setSeePatientDetails, setDashboardSelectedPatientDetails }) => {
   const {
     appointments,
     count,
@@ -30,7 +30,6 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
     isRefreshing,
   } = useContext(NursesAppointmentsListContext);
   const queryClient = useQueryClient();
-  const [selectedPatient, setSelectedPatient] = useState(null);
   const [staffList, setStaffList] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -458,7 +457,8 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                     <p
                       className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                       onClick={() => {
-                        setSelectedPatient(appointment);
+                        setSeePatientDetails(true);
+                        setDashboardSelectedPatientDetails(appointment);
                         setOpenPopover(null);
                       }}
                     >
@@ -522,8 +522,9 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
   `}
                       onClick={() => {
                         if (!fetchingPersonnel) {
-                          fetchHealthPersonnel();
-                          setSelectedPatientDetails(appointment);
+                          setSeePatientDetails(true);
+                          setDashboardSelectedPatientDetails(appointment);
+                          setOpenPopover(null);
                         }
                       }}
                     >
@@ -574,7 +575,8 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                       <button
                         className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"
                         onClick={() => {
-                          setSelectedPatient(appointment);
+                          setSeePatientDetails(true);
+                          setDashboardSelectedPatientDetails(appointment);
                           setOpenPopover(null);
                         }}
                       >
@@ -634,8 +636,10 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                       <button
                         className={`w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors     ${fetchingPersonnel ? "pointer-events-none opacity-50" : ""}`}
                         onClick={() => {
-                          if (!fetchingPersonnel) fetchHealthPersonnel();
-                          setSelectedPatientDetails(appointment);
+                          if (!fetchingPersonnel) {
+                            fetchHealthPersonnel();
+                            setDashboardSelectedPatientDetails(appointment);
+                          }
                           setOpenPopover(null);
                         }}
                       >
@@ -698,101 +702,6 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
         />
       </div>
       </>)}
-      {selectedPatient && (
-        <>
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 text-sm">
-            <div className="bg-white rounded-lg shadow-lg p-4 max-w-md w-full relative text-sm mx-3">
-              <div className="text-[13px]">
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => setSelectedPatient(null)}
-                    className="text-gray-500 hover:text-black  "
-                  >
-                    <i className="bx bx-x text-2xl cursor-pointer"></i>
-                  </button>
-                </div>
-                <div className="flex flex-col justify-center items-center">
-                  <svg
-                    width="40"
-                    height="40"
-                    viewBox="0 0 40 40"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M20.0007 36.6654C10.7959 36.6654 3.33398 29.2034 3.33398 19.9987C3.33398 10.7939 10.7959 3.33203 20.0007 3.33203C29.2053 3.33203 36.6673 10.7939 36.6673 19.9987C36.6673 29.2034 29.2053 36.6654 20.0007 36.6654ZM20.0007 33.332C27.3645 33.332 33.334 27.3625 33.334 19.9987C33.334 12.6349 27.3645 6.66536 20.0007 6.66536C12.6369 6.66536 6.66732 12.6349 6.66732 19.9987C6.66732 27.3625 12.6369 33.332 20.0007 33.332ZM21.6673 17.4987V24.9987H23.334V28.332H16.6673V24.9987H18.334V20.832H16.6673V17.4987H21.6673ZM22.5007 13.332C22.5007 14.7127 21.3813 15.832 20.0007 15.832C18.62 15.832 17.5007 14.7127 17.5007 13.332C17.5007 11.9513 18.62 10.832 20.0007 10.832C21.3813 10.832 22.5007 11.9513 22.5007 13.332Z"
-                      fill="var(--color-docuhealth-dark)"
-                    />
-                  </svg>
-                  <p className="pt-0.5 font-medium">Patient's Details</p>
-                </div>
-                <div className="mt-5 border rounded-md p-2">
-                  <div className="mb-1 flex items-center gap-1">
-                    <p className="font-medium">Name of patient:</p>
-                    <p className=" text-gray-600">
-                      {" "}
-                      {selectedPatient?.patient?.firstname &&
-                        selectedPatient?.patient?.lastname
-                        ? `${selectedPatient.patient.firstname} ${selectedPatient.patient.lastname}`
-                        : "NIL"}
-                    </p>
-                  </div>
-                  <div className="mb-1 flex items-center gap-1">
-                    <p className="font-medium">Gender:</p>
-                    <p className=" text-gray-600">
-                      {selectedPatient?.patient?.gender ?? "NIL"}
-                    </p>
-                  </div>
-                  <div className="mb-1 flex items-center gap-1">
-                    <p className="font-medium">D.O.B:</p>
-                    <p className=" text-gray-600">
-                      {selectedPatient?.patient?.dob ?? "NIL"}
-                    </p>
-                  </div>
-                  <div className="mb-1 flex items-center gap-1">
-                    <p className="font-medium">State of origin:</p>
-                    <p className=" text-gray-600">
-                      {selectedPatient?.patient?.state ?? "NIL"}
-                    </p>
-                  </div>
-                  <div className="mb-1 flex items-center gap-1">
-                    <p className="font-medium">Contact Info:</p>
-                    <p className=" text-gray-600">
-                      {selectedPatient?.patient?.phone_num ?? "NIL"}
-                    </p>
-                  </div>
-                  <div className="mb-1 flex items-center flex-wrap gap-1">
-                    <p className="font-medium">Contact Adress:</p>
-                    <p className=" text-gray-600">
-                      {selectedPatient?.patient?.street +
-                        ", " +
-                        selectedPatient?.patient?.city +
-                        ", " +
-                        selectedPatient?.patient?.state +
-                        ", " +
-                        selectedPatient?.patient?.country || "NIL"}
-                    </p>
-                  </div>
-                  <div className="mb-1 flex items-center gap-1">
-                    <p className="font-medium">Note:</p>
-                    <p className=" text-gray-600">
-                      {selectedPatient?.note ?? "NIL"}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  className="w-full rounded-full text-center mt-3 py-2 bg-docuhealth-primary cursor-pointer text-white disabled:opacity-50"
-                  onClick={() => {
-                    setSelectedPatient(null);
-                  }}
-                >
-                  Done
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
       {staffList && staffList.length !== 0 && (
         <>
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-3">
@@ -809,7 +718,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                   </button>
                 </div>
               </div>
-              <div className="flex flex-col my-5 gap-3 text-sm max-h-3/5 overflow-scroll w-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5 text-sm max-h-[60vh] overflow-y-auto w-full">
                 {staffList.map((staff, index) => (
                   <div key={index} className="border rounded-md p-3">
                     <div>

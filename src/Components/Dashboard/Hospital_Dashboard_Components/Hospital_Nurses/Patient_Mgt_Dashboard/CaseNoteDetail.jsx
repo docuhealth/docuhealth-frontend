@@ -82,7 +82,7 @@ const CaseNoteDetail = ({ caseNoteDetail, setCaseNoteDetail }) => {
               Patient's HIN :{" "}
               <span className="font-medium ">
                 {" "}
-                {caseNoteDetail?.patient_info?.hin ||
+                {(caseNoteDetail?.patient_info?.hin || caseNoteDetail?.patient?.hin) ||
                   caseNoteDetail?.subaccount}
               </span>
             </p>

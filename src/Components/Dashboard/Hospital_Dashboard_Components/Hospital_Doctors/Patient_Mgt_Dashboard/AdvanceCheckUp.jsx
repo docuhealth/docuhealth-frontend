@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry, advanceCheckUpSource }) => {
   const { setTab } = useContext(DoctorsAdmittedPatientMGTContext);
 
-  const hin = selected?.patient?.hin;
+  const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
   const pageSize = 6;
 
   const [currentPage, setCurrentPage] = useState(1);

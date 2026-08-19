@@ -71,7 +71,7 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
     const [activeInput, setActiveInput] = useState(null);
 
     useEffect(() => {
-        const hin = selected?.patient?.hin;
+        const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
         if (hin) {
             const savedDraft = sessionStorage.getItem(`case_note_draft_${hin}`);
             if (savedDraft) {
@@ -82,13 +82,13 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
 
             setIsRestored(true);
         }
-    }, [selected?.patient?.hin]);
+    }, [(selected?.patient_info?.hin || selected?.patient?.hin)]);
 
 
     useEffect(() => {
         if (!isRestored) return;
 
-        const hin = selected?.patient?.hin;
+        const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
         if (hin) {
             const draft = {
                 caseNoteData,
@@ -96,7 +96,7 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
             };
             sessionStorage.setItem(`case_note_draft_${hin}`, JSON.stringify(draft));
         }
-    }, [caseNoteData, inputs, isRestored, selected?.patient?.hin]);
+    }, [caseNoteData, inputs, isRestored, (selected?.patient_info?.hin || selected?.patient?.hin)]);
 
 
 
@@ -126,8 +126,8 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
         onSuccess: () => {
             toast.success("Case note uploaded successfully!");
 
-            if (selected?.patient?.hin) {
-        sessionStorage.removeItem(`case_note_draft_${selected.patient.hin}`);
+            if (selected?.patient_info?.hin || selected?.patient?.hin) {
+        sessionStorage.removeItem(`case_note_draft_${selected.patient_info.hin}`);
     }
 
 
@@ -135,7 +135,7 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
 
             // 2. Invalidate the specific patient's case notes list
             queryClient.invalidateQueries({
-                queryKey: ["patient-case-notes", selected?.patient?.hin]
+                queryKey: ["patient-case-notes", (selected?.patient_info?.hin || selected?.patient?.hin)]
             });
 
             // 3. Reset and Close
@@ -149,7 +149,7 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
 
     const handleSubmit = () => {
         const fullPayload = {
-            patient: selected?.patient?.hin,
+            patient: (selected?.patient_info?.hin || selected?.patient?.hin),
             observation: caseNoteData.observations,
             care: caseNoteData.nursingCare,
             response: caseNoteData.patientResponse,

@@ -10,7 +10,7 @@ import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagina
 const CaseNote = ({ selected, setCaseNoteHistory, setCaseNoteDetail }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const menuRef = useRef(null);
-  const hin = selected?.patient?.hin;
+  const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
 
   const {
     caseNotes,

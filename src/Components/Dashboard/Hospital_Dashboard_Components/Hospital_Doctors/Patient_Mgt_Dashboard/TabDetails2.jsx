@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import PatientMedicalRecordDetail from "./PatientMedicalRecordDetail";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";

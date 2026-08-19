@@ -61,7 +61,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
         appt: {
           id:          appt.id,
           name:        getPatientName(appt),
-          hin:         appt.patient_hin || appt.patient?.hin || appt.hin || "—",
+          hin:         appt.patient_hin || appt.patient_info?.hin || appt.hin || "—",
           test:        getTestName(appt),
           hospital:    appt.hospital_name || appt.hospital || "—",
           scheduledAt: appt.scheduled_time || appt.scheduled_at || appt.datetime || null,
@@ -86,7 +86,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
   };
 
   const handleCreateOrder = (appt) => {
-    setOrderPatientHin(appt.patient_hin || appt.patient?.hin || appt.hin || null);
+    setOrderPatientHin(appt.patient_hin || appt.patient_info?.hin || appt.hin || null);
     setShowOrderModal(true);
   };
 

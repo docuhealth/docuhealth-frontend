@@ -138,7 +138,7 @@ const Vitals = ({ setVitals, setSelectedPatient }) => {
                   <div className="border-b py-2">
                     <p className="text-gray-600">
                       HIN:{" "}
-                      {vital.patient.hin.slice(0, 4) + "••••••" + vital.patient.hin.slice(-2)}
+                      {vital.patient_info.hin.slice(0, 4) + "••••••" + vital.patient_info.hin.slice(-2)}
                     </p>
                   </div>
 

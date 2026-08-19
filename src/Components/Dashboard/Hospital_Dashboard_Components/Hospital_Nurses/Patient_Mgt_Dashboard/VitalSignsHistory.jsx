@@ -7,7 +7,7 @@ import SearchBar from "../../../../SearchBar/SearchBar";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../../../Components/ui/Table";
 
 const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
-    const hin = selected?.patient?.hin;
+    const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
     const {
         vitals,
         count,

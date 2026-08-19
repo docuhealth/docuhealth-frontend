@@ -48,7 +48,7 @@ const Hospital_Lab_Home_Dashboard = () => {
     p.name ||
     "Unknown";
 
-  const getPatientHIN = (p) => p.patient_hin || p.patient?.hin || p.hin || "—";
+  const getPatientHIN = (p) => p.patient_hin || p.patient_info?.hin || p.hin || "—";
 
   const getPatientSex = (p) => p.patient_sex || p.patient?.sex || p.patient?.gender || p.sex || "—";
 

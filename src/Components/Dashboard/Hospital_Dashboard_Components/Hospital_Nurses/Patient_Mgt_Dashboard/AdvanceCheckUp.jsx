@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 
 const AdvanceCheckUp = ({ selected, setAdvanceCheckUp }) => {
-const hin = selected?.patient?.hin;
+const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
 
 
   const { data: patientFullInfo, isLoading, isError } = useQuery({

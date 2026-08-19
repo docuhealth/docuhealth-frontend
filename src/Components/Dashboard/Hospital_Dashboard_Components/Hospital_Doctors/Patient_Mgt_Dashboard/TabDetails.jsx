@@ -151,7 +151,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
             <div className="border-b py-2">
               <p className="text-gray-600">
                 HIN :{" "}
-                {admittedPatient?.patient_info?.hin ? admittedPatient.patient_info.hin.slice(0, 4) +
+                {(admittedPatient?.patient_info?.hin || admittedPatient?.patient?.hin) ? admittedPatient.patient_info.hin.slice(0, 4) +
                   "••••••" +
                   admittedPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
@@ -421,7 +421,7 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
             <div className="border-b py-2">
               <p className="text-gray-600">
                 HIN :{" "}
-                {admittedPatient?.patient_info?.hin ? admittedPatient.patient_info.hin.slice(0, 4) +
+                {(admittedPatient?.patient_info?.hin || admittedPatient?.patient?.hin) ? admittedPatient.patient_info.hin.slice(0, 4) +
                   "••••••" +
                   admittedPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>

@@ -44,7 +44,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const [orderForm, setOrderForm] = useState({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });
   const [duplicateWarning, setDuplicateWarning] = useState(null);
 
-  const hin = selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin;
+  const hin = (selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin) || selectedPatientDetails?.patient_hin;
   const pageSize = 6;
 
   const { data: patientFullInfo, isLoading: loadingInfo } = useQuery({
@@ -99,7 +99,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const { mutate: createOrder, isPending: isOrderPending } = useMutation({
     mutationFn: (payload) => {
       const requestPayload = {
-        patient: selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin,
+        patient: (selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin) || selectedPatientDetails?.patient_hin,
         order_source: "staff_appointment_order",
         items: payload.test_type.map((testSqid) => ({
           test: testSqid,

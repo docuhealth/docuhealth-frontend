@@ -135,7 +135,7 @@ const AdmittedPatientsTab = () => {
                                 </div>
                             </div>
                             <div className='border-b py-2'>
-                                <p className='text-gray-600'>HIN : {admittedPatient?.patient_info?.hin ? admittedPatient.patient_info.hin.slice(0, 4) + "••••••" + admittedPatient.patient_info.hin.slice(-2) : 'N/A'}</p>
+                                <p className='text-gray-600'>HIN : {(admittedPatient?.patient_info?.hin || admittedPatient?.patient?.hin) ? admittedPatient.patient_info.hin.slice(0, 4) + "••••••" + admittedPatient.patient_info.hin.slice(-2) : 'N/A'}</p>
                             </div>
                             <div className="flex items-center gap-1 text-gray-600 pt-3">
                                 <svg
@@ -439,7 +439,7 @@ const DischargedPatientsTab = () => {
                                 </div>
                             </div>
                             <div className='border-b py-2'>
-                                <p className='text-gray-600'>HIN : {admittedPatient?.patient_info?.hin ? admittedPatient.patient_info.hin.slice(0, 4) + "••••••" + admittedPatient.patient_info.hin.slice(-2) : 'N/A'}</p>
+                                <p className='text-gray-600'>HIN : {(admittedPatient?.patient_info?.hin || admittedPatient?.patient?.hin) ? admittedPatient.patient_info.hin.slice(0, 4) + "••••••" + admittedPatient.patient_info.hin.slice(-2) : 'N/A'}</p>
                             </div>
                             <div className="flex items-center gap-1 text-gray-600 pt-3">
                                 <svg

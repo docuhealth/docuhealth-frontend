@@ -154,8 +154,8 @@ const RecentPatients = () => {
                                 </div>
                                 <p className='col-span-2'>{formatFullDate(patient.created_at)} / {formatTime(patient.created_at)}</p>
                                 <p>
-                                    {patient.patient.hin
-                                        ? patient.patient.hin.slice(0, 4) + "••••••" + patient.patient.hin.slice(-2)
+                                    {patient.patient_info.hin
+                                        ? patient.patient_info.hin.slice(0, 4) + "••••••" + patient.patient_info.hin.slice(-2)
                                         : ""}
                                 </p>
 
@@ -201,7 +201,7 @@ const RecentPatients = () => {
                                 </div>
                             </div>
                             <span className="bg-gray-50 text-gray-600 text-[10px] px-2 py-1 rounded-md border border-gray-100 font-medium uppercase tracking-wider">
-                                {patient.patient.hin?.slice(-4) || "N/A"}
+                                {patient.patient_info.hin?.slice(-4) || "N/A"}
                             </span>
                         </div>
 
@@ -239,8 +239,8 @@ const RecentPatients = () => {
                         <div className="mt-4 bg-docuhealth-primary-faded rounded-lg p-2.5 flex justify-between items-center">
                             <span className="text-[10px] font-semibold text-docuhealth-primary uppercase">HIN Number</span>
                             <span className="text-[12px] font-mono font-bold text-gray-600 tracking-widest">
-                                {patient.patient.hin
-                                    ? patient.patient.hin.slice(0, 4) + "••••" + patient.patient.hin.slice(-2)
+                                {patient.patient_info.hin
+                                    ? patient.patient_info.hin.slice(0, 4) + "••••" + patient.patient_info.hin.slice(-2)
                                     : "—"}
                             </span>
                         </div>

@@ -10,6 +10,7 @@ import Modal from "../../../../ui/Modal";
 import Button from "../../../../ui/Button";
 import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
+import RecentCareActivitiesModal from "./RecentCareActivitiesModal";
 
 const getBadgeStyle = (status) => {
   switch (status) {
@@ -43,6 +44,7 @@ const getCallUpStatus = (status) => {
 const DoctorEncounterTable = () => {
   const { encounters, loading, activeTab, claimPatient } = useContext(DoctorEncounterContext);
   const [selectedPatientForWall, setSelectedPatientForWall] = useState(null);
+  const [selectedPatientForActivities, setSelectedPatientForActivities] = useState(null);
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
@@ -291,7 +293,7 @@ const DoctorEncounterTable = () => {
                   </TableCell>
                   <TableCell className="border-b border-gray-200">
                     <button 
-                      onClick={() => setSelectedPatientForWall(encounter)}
+                      onClick={() => activeTab === "Active" ? setSelectedPatientForActivities(encounter) : setSelectedPatientForWall(encounter)}
                       className="bg-blue-50 text-docuhealth-primary hover:bg-blue-100 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors"
                     >
                       {activeTab === "Pending" ? "Open Patient's wall" : 
@@ -386,7 +388,7 @@ const DoctorEncounterTable = () => {
 
               <div className="flex flex-col gap-2.5 mt-2">
                 <button 
-                  onClick={() => setSelectedPatientForWall(encounter)}
+                  onClick={() => activeTab === "Active" ? setSelectedPatientForActivities(encounter) : setSelectedPatientForWall(encounter)}
                   className="w-full bg-blue-50 text-docuhealth-primary hover:bg-blue-100 py-2.5 rounded-full font-medium text-xs transition-colors"
                 >
                   {activeTab === "Pending" ? "Open Patient's wall" : 
@@ -398,6 +400,13 @@ const DoctorEncounterTable = () => {
           );
         })}
       </div>
+      
+      {/* Recent Care Activities Modal */}
+      <RecentCareActivitiesModal 
+        isOpen={!!selectedPatientForActivities} 
+        onClose={() => setSelectedPatientForActivities(null)} 
+        encounter={selectedPatientForActivities} 
+      />
     </>
   );
 };

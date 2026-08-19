@@ -10,7 +10,7 @@ import useDebounce from "../../../../../hooks/useDebounce";
 const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, setSharedSoapNoteDetail }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const menuRef = useRef(null);
-  const hin = selected?.patient?.hin;
+  const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");

@@ -42,7 +42,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const { mutate: createOrder, isPending: isOrderPending } = useMutation({
     mutationFn: (payload) => {
       const requestPayload = {
-        patient: selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin,
+        patient: (selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin) || selectedPatientDetails?.patient_hin,
         order_source: "walk_in",
         items_data: payload.test_type.map((testSqid) => ({
           test: testSqid,
