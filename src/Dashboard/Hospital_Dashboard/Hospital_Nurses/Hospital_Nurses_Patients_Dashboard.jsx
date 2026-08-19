@@ -10,6 +10,7 @@ import CaseNoteDetail from "../../../Components/Dashboard/Hospital_Dashboard_Com
 import VitalSignsHistory from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/VitalSignsHistory";
 import SharedSoapNotes from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SharedSoapNotes";
 import SharedSoapNoteDetail from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SharedSoapNoteDetail";
+import AddNursingAdmissionNote from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddNursingAdmissionNote";
 import { ChevronDown } from "lucide-react";
 
 const Hospital_Nurses_Patients_Dashboard = () => {
@@ -26,6 +27,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
   const [caseNoteDetail, setCaseNoteDetail] = useState(false);
   const [sharedSoapNoteHistory, setSharedSoapNoteHistory] = useState(false);
   const [sharedSoapNoteDetail, setSharedSoapNoteDetail] = useState(false);
+  const [showAdmissionNote, setShowAdmissionNote] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -46,6 +48,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
       setCaseNoteDetail(false);
       setNewCaseNote(false);
       setUpdateVitals(false);
+      setShowAdmissionNote(false);
     }
   }, [advanceCheckUp]);
 
@@ -66,6 +69,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                       setCaseNoteHistory(false);
                       setVitalSignsHistory(false);
                       setSharedSoapNoteHistory(false);
+                      setShowAdmissionNote(false);
                       setNewCaseNote(true);
                     }}
                   >
@@ -107,17 +111,6 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                         >
                           Vital signs history
                         </button>
-                        <button
-                          className="w-full text-left px-3  py-2.5 hover:bg-gray-100 text-gray-700 transition-colors"
-                          onClick={() => {
-                            setSharedSoapNoteHistory(true);
-                            setVitalSignsHistory(false);
-                            setCaseNoteHistory(false);
-                            setIsDropdownOpen(false);
-                          }}
-                        >
-                          View Shared SOAP Notes
-                        </button>
                       </div>
                     )}
                   </div>
@@ -130,6 +123,25 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                   >
                     Update Vitals
                   </button>
+                  
+                  {!showAdmissionNote && (
+                    <button
+                      className="py-2.5 px-6 w-full lg:w-auto rounded-full bg-docuhealth-primary text-white cursor-pointer flex items-center justify-center gap-2 font-medium transition-colors"
+                      onClick={() => {
+                        setCaseNoteHistory(false);
+                        setVitalSignsHistory(false);
+                        setSharedSoapNoteHistory(false);
+                        setNewCaseNote(false);
+                        setUpdateVitals(false);
+                        setShowAdmissionNote(true);
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 1V13M1 7H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      Add nursing admission note
+                    </button>
+                  )}
                 </>
               )}
             </div>
@@ -170,11 +182,17 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                 setNewCaseNote={setNewCaseNote}
               />
             </>
+          ) : showAdmissionNote ? (
+            <AddNursingAdmissionNote
+              selected={selected}
+              setShowAdmissionNote={setShowAdmissionNote}
+            />
           ) : (
             <div className="bg-white my-5 border rounded-lg p-5 text-sm">
               <AdvanceCheckUp
                 selected={selected}
                 setAdvanceCheckUp={setAdvanceCheckUp}
+                setSharedSoapNoteDetail={setSharedSoapNoteDetail}
               />
             </div>
           )}

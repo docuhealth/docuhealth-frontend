@@ -18,7 +18,7 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
   const vitals = sharedSoapNoteDetail?.vital_signs_info;
 
   return (
-    <div className="bg-white my-5 border rounded-lg pt-5 lg:pt-8 px-4 lg:px-6 text-sm ">
+    <div className="text-sm">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap sm:gap-0  border-b pb-4 w-full">
         <div
           className="flex justify-start items-center gap-1 cursor-pointer"

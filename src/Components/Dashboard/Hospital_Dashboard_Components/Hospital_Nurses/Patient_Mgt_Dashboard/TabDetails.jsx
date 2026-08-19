@@ -5,6 +5,8 @@ import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboa
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { NursesAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Nurses/NursesAdmittedPatientMGTContext";
 import SearchBar from "../../../../SearchBar/SearchBar";
+import Modal from "../../../../ui/Modal";
+import Button from "../../../../ui/Button";
 
 
 const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected }) => {
@@ -20,7 +22,8 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
         isRefreshing
     } = useContext(NursesAdmittedPatientMGTContext);
 
-    const [selectedPatient, setSelectedPatient] = useState(null);
+    const [patientToAdmit, setPatientToAdmit] = useState(null);
+    const [isAdmissionModalOpen, setIsAdmissionModalOpen] = useState(false);
 
     const sortedAdmittedPatients = useMemo(() => {
         // Sort by admission date (Most recent first)
@@ -197,118 +200,53 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
 
                                 <p className="">{formatFullDateTime(admittedPatient.admission_date)}</p>
                             </div>
-                            <button className="text-center mt-3 py-2.5 border bg-docuhealth-dark text-white w-full rounded-full cursor-pointer"
-                                onClick={() => setSelectedPatient(admittedPatient)}
-                            >
-                                View patient's details
-                            </button>
-                            <button className="text-center mt-3 py-2 border border-docuhealth-dark text-docuhealth-dark w-full rounded-full cursor-pointer"
+                            <button className="text-center mt-3 py-2 border border-docuhealth-dark text-docuhealth-dark w-full rounded-full cursor-pointer  font-medium text-sm"
                                 onClick={() => {
-                                    setAdvanceCheckUp(true)
-                                    setSelected(admittedPatient)
+                                    setPatientToAdmit(admittedPatient);
+                                    setIsAdmissionModalOpen(true);
                                 }}
                             >
-                                Advance Checkup
+                                Open details
                             </button>
                         </div>
                     ))
                 }
             </div>
-            {selectedPatient && (
-                <>
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 text-sm px-3">
-                        <div className="bg-white rounded-lg shadow-lg p-4  max-w-md w-full relative text-sm">
-                            <div className='flex justify-end'>
-                                <button
-                                    onClick={() => setSelectedPatient(null)}
-                                    className="text-gray-500 hover:text-black  "
-                                >
-                                    <i className="bx bx-x text-2xl cursor-pointer"></i>
-                                </button>
-                            </div>
-                            <div className="flex flex-col justify-center items-center">
-                                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M20.0007 36.6654C10.7959 36.6654 3.33398 29.2034 3.33398 19.9987C3.33398 10.7939 10.7959 3.33203 20.0007 3.33203C29.2053 3.33203 36.6673 10.7939 36.6673 19.9987C36.6673 29.2034 29.2053 36.6654 20.0007 36.6654ZM20.0007 33.332C27.3645 33.332 33.334 27.3625 33.334 19.9987C33.334 12.6349 27.3645 6.66536 20.0007 6.66536C12.6369 6.66536 6.66732 12.6349 6.66732 19.9987C6.66732 27.3625 12.6369 33.332 20.0007 33.332ZM21.6673 17.4987V24.9987H23.334V28.332H16.6673V24.9987H18.334V20.832H16.6673V17.4987H21.6673ZM22.5007 13.332C22.5007 14.7127 21.3813 15.832 20.0007 15.832C18.62 15.832 17.5007 14.7127 17.5007 13.332C17.5007 11.9513 18.62 10.832 20.0007 10.832C21.3813 10.832 22.5007 11.9513 22.5007 13.332Z" fill="var(--color-docuhealth-dark)" />
-                                </svg>
-                                <p className="pt-0.5 font-medium">Patient's Details</p>
+            <Modal isOpen={isAdmissionModalOpen} onClose={() => setIsAdmissionModalOpen(false)} title="">
+                <div className="relative flex flex-col items-center mb-6 pt-4">
+                    <button
+                        onClick={() => setIsAdmissionModalOpen(false)}
+                        className="absolute -top-2 -right-2 p-1 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                    >
+                        <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                    </button>
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.0007 36.6654C10.7959 36.6654 3.33398 29.2034 3.33398 19.9987C3.33398 10.7939 10.7959 3.33203 20.0007 3.33203C29.2053 3.33203 36.6673 10.7939 36.6673 19.9987C36.6673 29.2034 29.2053 36.6654 20.0007 36.6654ZM20.0007 33.332C27.3645 33.332 33.334 27.3625 33.334 19.9987C33.334 12.6349 27.3645 6.66536 20.0007 6.66536C12.6369 6.66536 6.66732 12.6349 6.66732 19.9987C6.66732 27.3625 12.6369 33.332 20.0007 33.332ZM21.6673 17.4987V24.9987H23.334V28.332H16.6673V24.9987H18.334V20.832H16.6673V17.4987H21.6673ZM22.5007 13.332C22.5007 14.7127 21.3813 15.832 20.0007 15.832C18.62 15.832 17.5007 14.7127 17.5007 13.332C17.5007 11.9513 18.62 10.832 20.0007 10.832C21.3813 10.832 22.5007 11.9513 22.5007 13.332Z" fill="var(--color-docuhealth-dark)" />
+                    </svg>
 
-                            </div>
-                            <div className="border rounded-md my-3 p-3 text-[13px] space-y-2">
+                    <h2 className="font-medium text-gray-800 mt-3 text-[17px]">Add Nursing Admission Note</h2>
+                </div>
 
-                                <p>
-                                    <strong>Name of patient:</strong>{" "}
-                                    {selectedPatient?.patient_info?.firstname && selectedPatient?.patient_info?.lastname
-                                        ? `${selectedPatient.patient_info.firstname} ${selectedPatient.patient_info.lastname}`
-                                        : "NIL"}
-                                </p>
+                <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 mb-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)]">
+                    <p className="text-gray-600 text-[14.5px] leading-[1.6]">
+                        This patient was newly admitted and sent to your ward! To proceed with other nursing tasks, you need to add an admission note!
+                    </p>
+                </div>
 
-                                <p>
-                                    <strong>Gender:</strong>{" "}
-                                    {selectedPatient?.patient_info?.gender ?? "NIL"}
-                                </p>
-
-                                <p>
-                                    <strong>D.O.B:</strong>{" "}
-                                    {selectedPatient?.patient_info?.dob
-                                        ? selectedPatient.patient_info.dob
-                                        : "NIL"}
-                                </p>
-
-                                <p>
-                                    <strong>State of Origin:</strong>{" "}
-                                    {selectedPatient?.patient_info?.state ?? "NIL"}
-                                </p>
-
-                                <p>
-                                    <strong>Contact info:</strong>{" "}
-                                    {selectedPatient?.patient_info?.phone_num ?? "NIL"}
-                                </p>
-
-                                <p>
-                                    <strong>Address:</strong>{" "}
-                                    {selectedPatient?.patient_info?.street ?? "NIL"}
-                                </p>
-
-                                <p>
-                                    <strong>Assigned doctor:</strong>{" "}
-                                    {selectedPatient?.staff
-                                        ? `Dr. ${selectedPatient.staff.firstname} ${selectedPatient.staff.lastname}`
-                                        : "NIL"}
-                                </p>
-
-                                <p>
-                                    <strong>Ward placed:</strong>{" "}
-                                    {selectedPatient?.ward_info?.name ?? "NIL"}
-                                </p>
-
-                                <p>
-                                    <strong>Bed Assigned:</strong>{" "}
-                                    {selectedPatient?.bed_info?.bed_number
-                                        ? `Bed ${selectedPatient.bed_info.bed_number}`
-                                        : "NIL"}
-                                </p>
-
-                                <p>
-                                    <strong>Date of Admission:</strong>{" "}
-                                    {selectedPatient?.admission_date
-                                        ? formatFullDateTime(selectedPatient.admission_date)
-                                        : "NIL"}
-                                </p>
-
-                                <p>
-                                    <strong>Date of Discharge:</strong>{" "}
-                                    {selectedPatient?.discharge_date
-                                        ? formatFullDateTime(selectedPatient.discharge_date)
-                                        : "Pending"}
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-                </>
-            )}
+                <Button 
+                    fullWidth 
+                    className="bg-docuhealth-primary hover:bg-docuhealth-primary/90 text-white py-3 rounded-full font-medium"
+                    onClick={() => {
+                        setIsAdmissionModalOpen(false);
+                        setAdvanceCheckUp(true);
+                        setSelected(patientToAdmit);
+                    }}
+                >
+                    Add Nursing Admission Note
+                </Button>
+            </Modal>
             <Pagination2 count={count}
                 currentPage={currentPage}
                 totalPages={totalPages}

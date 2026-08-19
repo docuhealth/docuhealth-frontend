@@ -10,6 +10,7 @@ import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SearchBar from "../../../../SearchBar/SearchBar";
+import Modal from "../../../../ui/Modal";
 
 const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals, setVitalSignsHistory, setSelectedPatientForVitals, setSelectedPatientForCASE, setSharedSoapNoteHistory, setSelectedPatientForSharedSoap, setSeePatientDetails, setDashboardSelectedPatientDetails }) => {
   const {
@@ -51,6 +52,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
   const [openPopover, setOpenPopover] = useState(null);
   const [fetchingPersonnel, setFetchingPersonnel] = useState(false);
   const [isStaffSelected, setIsStaffSelected] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
@@ -116,11 +118,11 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
         payload,
       ),
     onSuccess: () => {
-      toast.success("Consultation booked successfully!");
       queryClient.invalidateQueries({ queryKey: ["nurse-appointments"] });
 
       setIsStaffSelected(false);
       setOpenPopover(null);
+      setIsSuccessModalOpen(true);
     },
     onError: (err) => {
       console.error("Error booking consultation:", err);
@@ -522,8 +524,12 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
   `}
                       onClick={() => {
                         if (!fetchingPersonnel) {
-                          setSeePatientDetails(true);
-                          setDashboardSelectedPatientDetails(appointment);
+                          fetchHealthPersonnel();
+                          setFormData({
+                            ...formData,
+                            patient_hin: appointment.patient.hin,
+                            appointment_id: appointment.id,
+                          });
                           setOpenPopover(null);
                         }
                       }}
@@ -638,7 +644,11 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                         onClick={() => {
                           if (!fetchingPersonnel) {
                             fetchHealthPersonnel();
-                            setDashboardSelectedPatientDetails(appointment);
+                            setFormData({
+                              ...formData,
+                              patient_hin: appointment.patient.hin,
+                              appointment_id: appointment.id,
+                            });
                           }
                           setOpenPopover(null);
                         }}
@@ -1021,6 +1031,40 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
           </div>
         </>
       )}
+
+      <Modal
+        isOpen={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        title=""
+        maxWidth="md"
+      >
+        <div className="flex flex-col justify-center items-center text-sm pt-4 pb-8">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 40 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6.66634 20.0007C6.66634 12.6369 12.6359 6.66732 19.9997 6.66732C27.3635 6.66732 33.333 12.6369 33.333 20.0007C33.333 27.3645 27.3635 33.334 19.9997 33.334C12.6359 33.334 6.66634 27.3645 6.66634 20.0007ZM19.9997 3.33398C10.7949 3.33398 3.33301 10.7959 3.33301 20.0007C3.33301 29.2053 10.7949 36.6673 19.9997 36.6673C29.2043 36.6673 36.6663 29.2053 36.6663 20.0007C36.6663 10.7959 29.2043 3.33398 19.9997 3.33398ZM29.0948 15.7625L26.7378 13.4055L18.333 21.8103L13.6782 17.1555L11.3212 19.5125L18.333 26.5243L29.0948 15.7625Z"
+              fill="var(--color-docuhealth-green-dark)"
+            />
+          </svg>
+          <p className="pt-3 font-medium text-docuhealth-green-dark">Success!</p>
+          <p className="mt-2 text-center text-gray-600 px-4">
+            You have successfully booked a consultation for a patient
+          </p>
+          <div className="w-full px-6 mt-6">
+            <button
+              className="w-full bg-docuhealth-primary text-white py-2.5 rounded-full text-sm font-medium"
+              onClick={() => setIsSuccessModalOpen(false)}
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

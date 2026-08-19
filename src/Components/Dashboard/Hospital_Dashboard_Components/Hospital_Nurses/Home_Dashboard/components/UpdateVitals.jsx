@@ -3,6 +3,8 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { NursesAppContext } from "../../../../../../context/HospitalContext/Nurses/NursesAppContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ChevronDown } from "lucide-react";
+import Modal from "../../../../../ui/Modal";
 
 const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
   const queryClient = useQueryClient()
@@ -12,7 +14,11 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
   const [heartRate, setHeartRate] = useState("");
+  const [bmi, setBmi] = useState("");
+  const [painScore, setPainScore] = useState("0 (No pain)");
+  const [sp02, setSp02] = useState("");
   const [staffID, setStaffID] = useState("");
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   const { profile } = useContext(NursesAppContext);
 
@@ -28,10 +34,9 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
     mutationFn: (payload) =>
       axiosInstanceHos.post("api/nurses/vital-signs/update", payload),
     onSuccess: () => {
-      toast.success("Vitals updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["patient-info"] })
       resetForm();
-      setUpdateVitals(false);
+      setIsSuccessModalOpen(true);
     },
     onError: (err) => {
       console.error("Error updating vitals:", err);
@@ -46,6 +51,9 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
     setHeight("");
     setWeight("");
     setHeartRate("");
+    setBmi("");
+    setPainScore("0 (No pain)");
+    setSp02("");
   };
 
   const isFormIncomplete =
@@ -64,6 +72,9 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
       weight: weight,
       heart_rate: heartRate,
       ...(height && { height }),
+      ...(bmi && { bmi }),
+      ...(painScore && { pain_score: painScore }),
+      ...(sp02 && { sp02 }),
     };
 
     mutate(payload);
@@ -189,6 +200,57 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
               </span>
             </div>
           </div>
+          <div className="relative">
+            <p className="pb-1">BMI</p>
+            <div className="relative">
+              <input
+                type="number"
+                id="bmi"
+                className="w-full text-sm border px-3 py-2 rounded-sm pr-10 focus:outline-none" // add padding-right for the unit
+                placeholder="Enter BMI"
+                value={bmi}
+                onChange={(e) => setBmi(e.target.value)}
+              />
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-[12px]">
+                BMI
+              </span>
+            </div>
+          </div>
+          <div className="relative">
+            <p className="pb-1">Pain Score</p>
+            <div className="relative">
+              <select
+                id="painScore"
+                value={painScore}
+                onChange={(e) => setPainScore(e.target.value)}
+                className="w-full text-sm border px-3 py-2 rounded-sm pr-8 focus:outline-none bg-white appearance-none text-gray-600"
+              >
+                <option value="0 (No pain)">0 (No pain)</option>
+                <option value="1–3 (Mild Pain)">1–3 (Mild Pain)</option>
+                <option value="4–6 (Moderate Pain)">4–6 (Moderate Pain)</option>
+                <option value="7–10 (Severe Pain)">7–10 (Severe Pain)</option>
+              </select>
+              <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-500">
+                <ChevronDown size={16} />
+              </div>
+            </div>
+          </div>
+          <div className="relative">
+            <p className="pb-1">SPO2</p>
+            <div className="relative">
+              <input
+                type="number"
+                id="sp02"
+                className="w-full text-sm border px-3 py-2 rounded-sm pr-10 focus:outline-none"
+                placeholder="98"
+                value={sp02}
+                onChange={(e) => setSp02(e.target.value)}
+              />
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-[12px]">
+                %
+              </span>
+            </div>
+          </div>
         </div>
       </div>
       <div className="flex justify-end items-end">
@@ -230,6 +292,46 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
           )}{" "}
         </button>
       </div>
+
+      <Modal
+        isOpen={isSuccessModalOpen}
+        onClose={() => {
+          setIsSuccessModalOpen(false);
+          setUpdateVitals(false);
+        }}
+        title=""
+        maxWidth="md"
+      >
+        <div className="flex flex-col justify-center items-center text-sm pt-4 pb-8">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 40 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6.66634 20.0007C6.66634 12.6369 12.6359 6.66732 19.9997 6.66732C27.3635 6.66732 33.333 12.6369 33.333 20.0007C33.333 27.3645 27.3635 33.334 19.9997 33.334C12.6359 33.334 6.66634 27.3645 6.66634 20.0007ZM19.9997 3.33398C10.7949 3.33398 3.33301 10.7959 3.33301 20.0007C3.33301 29.2053 10.7949 36.6673 19.9997 36.6673C29.2043 36.6673 36.6663 29.2053 36.6663 20.0007C36.6663 10.7959 29.2043 3.33398 19.9997 3.33398ZM29.0948 15.7625L26.7378 13.4055L18.333 21.8103L13.6782 17.1555L11.3212 19.5125L18.333 26.5243L29.0948 15.7625Z"
+              fill="var(--color-docuhealth-green-dark)"
+            />
+          </svg>
+          <p className="pt-3 font-medium text-docuhealth-green-dark">Success!</p>
+          <p className="mt-2 text-center text-gray-600 px-4">
+            You have successfully updated the vitals of this patient ( these details repectively )
+          </p>
+          <div className="w-full px-6 mt-6">
+            <button
+              className="w-full bg-docuhealth-primary text-white py-2.5 rounded-full text-sm font-medium"
+              onClick={() => {
+                setIsSuccessModalOpen(false);
+                setUpdateVitals(false);
+              }}
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

@@ -6,9 +6,11 @@ import { CalendarIcon, ClockIcon, UserIcon, FileText, ArrowLeft, MoreVertical } 
 import SearchBar from "../../../../SearchBar/SearchBar";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import useDebounce from "../../../../../hooks/useDebounce";
+import SharedSoapNoteDetail from "./SharedSoapNoteDetail";
 
-const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, setSharedSoapNoteDetail }) => {
+const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [localDetail, setLocalDetail] = useState(null);
   const menuRef = useRef(null);
   const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
 
@@ -57,18 +59,18 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, setSharedSoapNote
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  if (localDetail) {
+    return (
+      <SharedSoapNoteDetail
+        sharedSoapNoteDetail={localDetail}
+        setSharedSoapNoteDetail={setLocalDetail}
+      />
+    );
+  }
+
   return (
-    <div className="bg-white my-5 border rounded-lg pt-5 lg:pt-8 px-4 lg:px-6 text-sm ">
-      <div
-        className="flex justify-start items-center gap-1 cursor-pointer border-b pb-3"
-        onClick={() => setSharedSoapNoteHistory(false)}
-      >
-        <ArrowLeft size={16} />
-
-        <h2 className=" text-sm">View Shared SOAP Notes</h2>
-      </div>
-
-      <div className="my-4">
+    <div className="text-sm">
+      <div className="mb-4">
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
@@ -245,10 +247,13 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, setSharedSoapNote
                     </button>
 
                     {openMenuId === note.id && (
-                      <div className="absolute right-0 top-10 z-10 w-40 bg-white rounded-md shadow text-sm border border-gray-100  animate-in fade-in zoom-in duration-200">
+                      <div 
+                        onMouseDown={(e) => e.stopPropagation()}
+                        className="absolute right-0 top-10 z-10 w-40 bg-white rounded-md shadow text-sm border border-gray-100  animate-in fade-in zoom-in duration-200">
                         <button
-                          onClick={() => {
-                            setSharedSoapNoteDetail(note);
+                          onMouseDown={(e) => {
+                            e.preventDefault(); // prevent focus issues
+                            setLocalDetail(note);
                             setOpenMenuId(null);
                           }}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:rounded-md transition-colors"
