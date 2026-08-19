@@ -62,6 +62,41 @@ const Hospital_Doctors_Sidebar = () => {
                 Overview
               </li>
             </div>
+          <Link to="/hospital-doctors-encounter-dashboard">
+            <div className="px-4 my-4">
+              <li
+                className={`group px-4 py-2   ${
+                  currentPath === "/hospital-doctors-encounter-dashboard"
+                    ? "bg-docuhealth-primary text-white"
+                    : "text-gray-700"
+                } text-gray-700 hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start`}
+              >
+                <span>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`group-hover:fill-white ${
+                      currentPath === "/hospital-doctors-encounter-dashboard"
+                        ? "fill-white"
+                        : "fill-docuhealth-secondary"
+                    }`}
+                  >
+                    <path
+                      d="M17.5 5.83333V17.5C17.5 17.9602 17.1269 18.3333 16.6667 18.3333H3.33333C2.8731 18.3333 2.5 17.9602 2.5 17.5V5.83333C2.5 5.3731 2.8731 5 3.33333 5H5.83333V3.33333C5.83333 2.8731 6.20643 2.5 6.66667 2.5H13.3333C13.7936 2.5 14.1667 2.8731 14.1667 3.33333V5H16.6667C17.1269 5 17.5 5.3731 17.5 5.83333ZM12.5 5V4.16667H7.5V5H12.5ZM10 13.3333H12.5V11.6667H10V9.16667H8.33333V11.6667H5.83333V13.3333H8.33333V15.8333H10V13.3333Z"
+                      className={`group-hover:fill-white ${
+                        currentPath === "/hospital-doctors-encounter-dashboard"
+                          ? "fill-white"
+                          : "fill-docuhealth-secondary"
+                      }`}
+                    />
+                  </svg>
+                </span>
+                Doctor Encounter
+              </li>
+            </div>
           </Link>
           <Link to="/hospital-doctors-appointments-dashboard">
             <div className="px-4 my-4">

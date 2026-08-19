@@ -280,6 +280,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
         setNewPatient(false);
       }}
       title={onboardingSuccessful ? "" : "Register New Patient"}
+      maxWidth="lg"
     >
       {onboardingSuccessful ? (
         <div className="flex flex-col justify-center items-center text-sm pt-4">

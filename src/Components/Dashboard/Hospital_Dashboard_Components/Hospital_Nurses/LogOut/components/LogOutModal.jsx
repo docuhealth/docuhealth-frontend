@@ -23,7 +23,7 @@ const LogOutModal = ({ isOpen, onClose, onLogout, staffList, setStaffList, selec
         <>
             {staffList ? (
                 <Modal isOpen={isOpen} onClose={() => setStaffList('')} title={`Choose a preferred ${selected}`}>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-3 my-2 text-sm gap-3 max-h-[60vh] overflow-y-auto">
+                    <div className="flex flex-col my-2 text-sm gap-3 max-h-[60vh] overflow-y-auto w-full">
                         {staffList.map((staff, index) => {
                             const isThisStaffLoading = processingId === staff.staff_id;
                             const isAnyLoading = processingId !== null;

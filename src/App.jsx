@@ -82,6 +82,7 @@ import Hospital_Admin_Subscriptions_Dashboard from "./Dashboard/Hospital_Dashboa
 
 import Hospital_Doctors_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_Doctors/Hospital_Doctors_Layout";
 import Hospital_Doctors_Home_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Home_Dashboard";
+import Hospital_Doctors_Encounter_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Encounter_Dashboard";
 import Hospital_Doctors_Appointments_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Appointments_Dashboard";
 import Hospital_Doctors_Patients_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Patients_Dashboard";
 import Hospital_Doctors_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Messages_Dashboard";
@@ -98,6 +99,7 @@ import Hospital_Receptionist_Settings_Dashboard from "./Dashboard/Hospital_Dashb
 import Hospital_Receptionist_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Receptionist/Hospital_Receptionist_HealthPersonnel_Dashboard";
 import Hospital_Receptionist_Admission_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Receptionist/Hospital_Receptionist_Admission_Dashboard";
 
+
 import HospitalAdminProviders from "./Providers/Hospital/HospitalAdminProviders";
 import HospitalReceptionistProviders from "./Providers/Hospital/HospitalReceptionistProviders";
 import HospitalDoctorProviders from "./Providers/Hospital/HospitalDoctorProviders";
@@ -110,6 +112,7 @@ import Hospital_Nurses_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dash
 import Hospital_Nurses_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Messages_Dashboard";
 import Hospital_Nurses_Patients_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Patients_Dashboard";
 import Hospital_Nurses_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Settings_Dashboard";
+import Hospital_Nurses_Nursing_Encounter_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Nursing_Encounter_Dashboard";
 
 import HospitalPharmacistProviders from "./Providers/Hospital/HospitalPharmacistProviders";
 import Hospital_Pharmacist_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_Pharmacist/Hospital_Pharmacist_Layout";
@@ -148,7 +151,7 @@ function App() {
   const hostname = window.location.hostname;
 
   //Adjust the condition to remove the true value when deploying to production. This is just for testing purposes to always render the hospital routes.
-  const isHospital = hostname.startsWith("hospital.");
+  const isHospital = true || hostname.startsWith("hospital.");
   // const isHospital = true || hostname.startsWith("hospital.");
 
   return (
@@ -367,6 +370,25 @@ function App() {
                   <HospitalProtectedRoute>
                     <HospitalDoctorProviders>
                       <Hospital_Doctors_Home_Dashboard />
+                    </HospitalDoctorProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-doctors-encounter-dashboard"
+              element={
+                <HospitalDoctorProviders>
+                  <Hospital_Doctors_Layout />
+                </HospitalDoctorProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalDoctorProviders>
+                      <Hospital_Doctors_Encounter_Dashboard />
                     </HospitalDoctorProviders>
                   </HospitalProtectedRoute>
                 }
@@ -795,6 +817,7 @@ function App() {
                 }
               />
             </Route>
+
             <Route
               path="/hospital-receptionist-admission-dashboard"
               element={
@@ -889,6 +912,26 @@ function App() {
                   <HospitalProtectedRoute>
                     <HospitalNursesProviders>
                       <Hospital_Nurses_HealthPersonnel_Dashboard />
+                    </HospitalNursesProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+
+            <Route
+              path="/hospital-nurses-nursing-encounter"
+              element={
+                <HospitalNursesProviders>
+                  <Hospital_Nurses_Layout />
+                </HospitalNursesProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalNursesProviders>
+                      <Hospital_Nurses_Nursing_Encounter_Dashboard />
                     </HospitalNursesProviders>
                   </HospitalProtectedRoute>
                 }

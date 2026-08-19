@@ -101,6 +101,7 @@ const Hospital_Receptionist_Sidebar_Mobile = ({
                 </li>
               </div>
             </Link>
+
             <Link to="/hospital-receptionist-admission-dashboard"
               onClick={() => setOpenMobileSidebar(false)}>
               <div className="px-4 my-4">

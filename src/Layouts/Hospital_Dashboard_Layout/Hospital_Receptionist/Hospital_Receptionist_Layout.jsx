@@ -32,6 +32,7 @@ const Hospital_Receptionist_Layout = () => {
         </svg>
       ),
     },
+
     {
       name: "Admission Requests",
       path: "/hospital-receptionist-admission-dashboard",

@@ -57,7 +57,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
 
   const handleSubmit = () => {
     const payload = {
-      patient: selectedPatient.patient.hin,
+      patient: selectedPatient.patient_info?.hin,
       blood_pressure: bloodPressure,
       temp: temperature,
       resp_rate: respRate,

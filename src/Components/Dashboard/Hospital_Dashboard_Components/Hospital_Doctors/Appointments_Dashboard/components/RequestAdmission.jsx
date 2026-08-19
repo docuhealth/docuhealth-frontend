@@ -17,10 +17,10 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
   const [form, setForm] = useState({
     ward: "",
     bed: "",
-    patient_hin: selectedPatientDetails
+    patient: selectedPatientDetails
       ? selectedPatientDetails?.patient?.hin
       : "",
-    staff_id: profile ? profile.staff_id : "",
+    check_in: selectedPatientDetails?.sqid || "",
   });
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
     setForm((prev) => ({ ...prev, [field]: value }));
 
     if (field === "ward") {
-      const selected = wardOptions.find((w) => w.id === Number(value));
+      const selected = wardOptions.find((w) => w.sqid === value || w.id === Number(value));
 
       if (selected) {
         const beds = selected.beds.filter((b) => b.status === "available");
@@ -84,7 +84,7 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
       >
         <option value="">Assign to ward</option>
         {wardOptions.map((w) => (
-          <option key={w.id} value={w.id}>
+          <option key={w.sqid || w.id} value={w.sqid || w.id}>
             {w.name} ward
           </option>
         ))}
@@ -99,7 +99,7 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
           <option value="">Select available bed</option>
           {availableBeds.length > 0 ? (
             availableBeds.map((b) => (
-              <option key={b.id} value={b.id}>
+              <option key={b.sqid || b.id} value={b.sqid || b.id}>
                 Bed {b.bed_number}
               </option>
             ))

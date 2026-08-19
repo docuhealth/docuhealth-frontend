@@ -15,9 +15,23 @@ const DashboardHeader = ({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [openMobileSidebar, setOpenMobileSidebar] = useState(false);
 
+  const displayName = profile
+    ? (profile.firstname || profile.lastname
+        ? `${profile.firstname || ""} ${profile.lastname || ""}`.trim()
+        : profile.name)
+    : "Loading...";
+
+  const displayFirstName = profile
+    ? (profile.firstname || profile.name || "...")
+    : "...";
+
   const initials = profile
-    ? `${profile.firstname?.[0] || ""}${profile.lastname?.[0] || ""}`.toUpperCase()
+    ? (profile.firstname || profile.lastname
+        ? `${profile.firstname?.[0] || ""}${profile.lastname?.[0] || ""}`.toUpperCase()
+        : profile.name?.substring(0, 2)?.toUpperCase() || "NA")
     : "NA";
+
+    console.log(profile)
 
   return (
     <>
@@ -29,7 +43,7 @@ const DashboardHeader = ({
               Dashboard
             </h2>
             <p className="text-lg font-medium text-gray-800">
-              Welcome back, {profile ? profile.firstname : "..."} 👋
+              Welcome back, {displayFirstName} 👋
             </p>
           </div>
 
@@ -44,7 +58,7 @@ const DashboardHeader = ({
             <div className="flex items-center gap-3 pl-6 border-l border-gray-100">
               <div className="text-right">
                 <p className="text-sm font-bold text-gray-900 leading-tight">
-                  {profile ? `${profile.firstname} ${profile.lastname}` : "Loading..."}
+                  {displayName}
                 </p>
                 <p className="text-[11px] font-medium text-docuhealth-primary bg-indigo-50 px-2 py-0.5 rounded mt-1 inline-block">
                   {roleLabel || "User"}
@@ -79,7 +93,7 @@ const DashboardHeader = ({
                 Welcome back
               </p>
               <p className="text-sm font-medium text-gray-800">
-                {profile ? profile.firstname : "..."} !
+                {displayFirstName} !
               </p>
             </div>
           </div>
@@ -118,7 +132,7 @@ const DashboardHeader = ({
                 <div className="absolute right-0 top-14 w-48 bg-white border border-gray-100 shadow rounded-lg p-2 animate-in fade-in zoom-in duration-200">
                   <div className="px-3 py-2 mb-1 border-b border-gray-50">
                     <p className="text-xs font-bold text-gray-900 truncate">
-                      {profile?.firstname} {profile?.lastname}
+                      {displayName}
                     </p>
                     <p className="text-[10px] text-gray-500">{roleLabel || "User"}</p>
                   </div>

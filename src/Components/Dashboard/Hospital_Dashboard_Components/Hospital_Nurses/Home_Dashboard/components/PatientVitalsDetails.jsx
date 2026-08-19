@@ -29,13 +29,13 @@ const PatientVitalsDetails = ({ selectedPatient, setSelectedPatient }) => {
                 <div className='py-5 border-b'>
                     <div className="flex items-center">
                         <div className="w-14 h-14 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center text-xl font-semibold">
-                            {`${selectedPatient?.patient?.firstname?.[0] ?? ''}${selectedPatient?.patient?.lastname?.[0] ?? ''}`.toUpperCase()}
+                            {`${selectedPatient?.patient_info?.firstname?.[0] ?? ''}${selectedPatient?.patient_info?.lastname?.[0] ?? ''}`.toUpperCase()}
 
                         </div>
 
                         <div className="flex flex-col items-start">
                             <p className="ml-2 text-sm font-medium">
-                                {selectedPatient?.patient?.firstname} {selectedPatient?.patient?.lastname}
+                                {selectedPatient?.patient_info?.firstname} {selectedPatient?.patient_info?.lastname}
                             </p>
                             <p className="ml-2 text-[12px] text-gray-500">
                                 patient

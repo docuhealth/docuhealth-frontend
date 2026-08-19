@@ -28,7 +28,7 @@ const Button = ({
   variant = "primary",
   loading = false,
   loadingText,
-  fullWidth = false,
+  fullWidth = true,
   disabled,
   className = "",
   children,
@@ -36,7 +36,7 @@ const Button = ({
 }: ButtonProps) => {
   return (
     <button
-      className={`py-3 px-4 rounded-full font-medium text-center transition-all disabled:cursor-not-allowed ${VARIANT_CLASSES[variant]} ${
+      className={`py-3 px-4 rounded-full font-medium text-center whitespace-nowrap transition-all disabled:cursor-not-allowed ${VARIANT_CLASSES[variant]} ${
         fullWidth ? "w-full" : ""
       } ${className}`}
       disabled={disabled || loading}

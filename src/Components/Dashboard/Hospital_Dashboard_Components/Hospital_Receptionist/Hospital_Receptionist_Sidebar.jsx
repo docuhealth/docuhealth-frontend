@@ -59,6 +59,7 @@ const Hospital_Receptionist_Sidebar = () => {
               </li>
             </div>
           </Link>
+
           <Link to="/hospital-receptionist-admission-dashboard">
             <div className="px-4 my-4">
               <li

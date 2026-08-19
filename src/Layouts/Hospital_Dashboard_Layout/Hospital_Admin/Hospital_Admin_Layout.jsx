@@ -149,6 +149,7 @@ const Hospital_Admin_Layout = () => {
         </svg>
       ),
     },
+    /*
     {
       name: "Subscriptions",
       path: "/hospital-admin-subscriptions-dashboard",
@@ -168,6 +169,7 @@ const Hospital_Admin_Layout = () => {
         </svg>
       ),
     },
+    */
   ];
 
   const bottomNavItems = [

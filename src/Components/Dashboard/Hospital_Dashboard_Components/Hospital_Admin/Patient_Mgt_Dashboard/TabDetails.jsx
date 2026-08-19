@@ -24,11 +24,11 @@ const AdmittedPatientsTab = () => {
       const searchStr = searchQuery.toLowerCase();
       
       return (
-        item.patient.firstname?.toLowerCase().includes(searchStr) ||
-        item.patient.lastname?.toLowerCase().includes(searchStr) ||
-        item.patient.hin?.toLowerCase().includes(searchStr) ||
-        item.staff?.firstname?.toLowerCase().includes(searchStr) ||
-        item.staff?.lastname?.toLowerCase().includes(searchStr) ||
+        item.patient_info?.firstname?.toLowerCase().includes(searchStr) ||
+        item.patient_info?.lastname?.toLowerCase().includes(searchStr) ||
+        item.patient_info?.hin?.toLowerCase().includes(searchStr) ||
+        item.staff_info?.firstname?.toLowerCase().includes(searchStr) ||
+        item.staff_info?.lastname?.toLowerCase().includes(searchStr) ||
         item.ward_info?.name?.toLowerCase().includes(searchStr)
       );
     });
@@ -128,8 +128,8 @@ const AdmittedPatientsTab = () => {
           <div key={index} className="border p-3 rounded-xl">
             <div className="flex justify-between items-center">
               <p>
-                {admittedPatient.patient.firstname}{" "}
-                {admittedPatient.patient.lastname}{" "}
+                {admittedPatient?.patient_info?.firstname}{" "}
+                {admittedPatient?.patient_info?.lastname}{" "}
               </p>
               <div className="bg-docuhealth-light-green px-2 rounded-full">
                 <p className="text-docuhealth-green ">
@@ -140,9 +140,9 @@ const AdmittedPatientsTab = () => {
             <div className="border-b py-2">
               <p className="text-gray-600">
                 HIN :{" "}
-                {admittedPatient.patient.hin.slice(0, 4) +
+                {admittedPatient?.patient_info?.hin ? admittedPatient.patient_info.hin.slice(0, 4) +
                   "••••••" +
-                  admittedPatient.patient.hin.slice(-2)}
+                  admittedPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
             </div>
             <div className="flex items-center gap-1 text-gray-600 pt-3">
@@ -160,8 +160,8 @@ const AdmittedPatientsTab = () => {
               </svg>
               <p className="">
                 {" "}
-                {admittedPatient?.staff
-                  ? `${admittedPatient.staff.firstname} ${admittedPatient.staff.lastname}`
+                {admittedPatient?.staff_info
+                  ? `${admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`
                   : "NIL"}
               </p>
             </div>
@@ -264,37 +264,37 @@ const AdmittedPatientsTab = () => {
               <div className="border rounded-md my-3 p-3 text-[13px] space-y-2">
                 <p>
                   <strong>Name of patient:</strong>{" "}
-                  {selectedPatient?.patient?.firstname &&
-                  selectedPatient?.patient?.lastname
-                    ? `${selectedPatient.patient.firstname} ${selectedPatient.patient.lastname}`
+                  {selectedPatient?.patient_info?.firstname &&
+                  selectedPatient?.patient_info?.lastname
+                    ? `${selectedPatient.patient_info.firstname} ${selectedPatient.patient_info.lastname}`
                     : "NIL"}
                 </p>
 
                 <p>
                   <strong>Gender:</strong>{" "}
-                  {selectedPatient?.patient?.gender ?? "NIL"}
+                  {selectedPatient?.patient_info?.gender ?? "NIL"}
                 </p>
 
                 <p>
                   <strong>D.O.B:</strong>{" "}
-                  {selectedPatient?.patient?.dob
-                    ? selectedPatient.patient.dob
+                  {selectedPatient?.patient_info?.dob
+                    ? selectedPatient.patient_info.dob
                     : "NIL"}
                 </p>
 
                 <p>
                   <strong>State of Origin:</strong>{" "}
-                  {selectedPatient?.patient?.state ?? "NIL"}
+                  {selectedPatient?.patient_info?.state ?? "NIL"}
                 </p>
 
                 <p>
                   <strong>Contact info:</strong>{" "}
-                  {selectedPatient?.patient?.phone_num ?? "NIL"}
+                  {selectedPatient?.patient_info?.phone_num ?? "NIL"}
                 </p>
 
                 <p>
                   <strong>Address:</strong>{" "}
-                  {selectedPatient?.patient?.street ?? "NIL"}
+                  {selectedPatient?.patient_info?.street ?? "NIL"}
                 </p>
 
                 <p>
@@ -364,11 +364,11 @@ const DischargedPatientsTab = () => {
       const searchStr = searchQuery.toLowerCase();
       
       return (
-        item.patient.firstname?.toLowerCase().includes(searchStr) ||
-        item.patient.lastname?.toLowerCase().includes(searchStr) ||
-        item.patient.hin?.toLowerCase().includes(searchStr) ||
-        item.staff?.firstname?.toLowerCase().includes(searchStr) ||
-        item.staff?.lastname?.toLowerCase().includes(searchStr) ||
+        item.patient_info?.firstname?.toLowerCase().includes(searchStr) ||
+        item.patient_info?.lastname?.toLowerCase().includes(searchStr) ||
+        item.patient_info?.hin?.toLowerCase().includes(searchStr) ||
+        item.staff_info?.firstname?.toLowerCase().includes(searchStr) ||
+        item.staff_info?.lastname?.toLowerCase().includes(searchStr) ||
         item.ward_info?.name?.toLowerCase().includes(searchStr)
       );
     });
@@ -469,8 +469,8 @@ const DischargedPatientsTab = () => {
           <div key={index} className="border p-3 rounded-xl">
             <div className="flex justify-between items-center">
               <p>
-                {admittedPatient.patient.firstname}{" "}
-                {admittedPatient.patient.lastname}{" "}
+                {admittedPatient?.patient_info?.firstname}{" "}
+                {admittedPatient?.patient_info?.lastname}{" "}
               </p>
               <div className="bg-docuhealth-light-green px-2 rounded-full">
                 <p className="text-docuhealth-green ">
@@ -481,9 +481,9 @@ const DischargedPatientsTab = () => {
             <div className="border-b py-2">
               <p className="text-gray-600">
                 HIN :{" "}
-                {admittedPatient.patient.hin.slice(0, 4) +
+                {admittedPatient?.patient_info?.hin ? admittedPatient.patient_info.hin.slice(0, 4) +
                   "••••••" +
-                  admittedPatient.patient.hin.slice(-2)}
+                  admittedPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
             </div>
             <div className="flex items-center gap-1 text-gray-600 pt-3">
@@ -501,8 +501,8 @@ const DischargedPatientsTab = () => {
               </svg>
               <p className="">
                 {" "}
-                {admittedPatient?.staff
-                  ? `${admittedPatient.staff.firstname} ${admittedPatient.staff.lastname}`
+                {admittedPatient?.staff_info
+                  ? `${admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`
                   : "NIL"}
               </p>
             </div>
@@ -607,37 +607,37 @@ const DischargedPatientsTab = () => {
                 <div className="border rounded-md my-3 p-3 text-[13px] space-y-2">
                   <p>
                     <strong>Name of patient:</strong>{" "}
-                    {selectedPatient?.patient?.firstname &&
-                    selectedPatient?.patient?.lastname
-                      ? `${selectedPatient.patient.firstname} ${selectedPatient.patient.lastname}`
+                    {selectedPatient?.patient_info?.firstname &&
+                    selectedPatient?.patient_info?.lastname
+                      ? `${selectedPatient.patient_info.firstname} ${selectedPatient.patient_info.lastname}`
                       : "NIL"}
                   </p>
 
                   <p>
                     <strong>Gender:</strong>{" "}
-                    {selectedPatient?.patient?.gender ?? "NIL"}
+                    {selectedPatient?.patient_info?.gender ?? "NIL"}
                   </p>
 
                   <p>
                     <strong>D.O.B:</strong>{" "}
-                    {selectedPatient?.patient?.dob
-                      ? selectedPatient.patient.dob
+                    {selectedPatient?.patient_info?.dob
+                      ? selectedPatient.patient_info.dob
                       : "NIL"}
                   </p>
 
                   <p>
                     <strong>State of Origin:</strong>{" "}
-                    {selectedPatient?.patient?.state ?? "NIL"}
+                    {selectedPatient?.patient_info?.state ?? "NIL"}
                   </p>
 
                   <p>
                     <strong>Contact info:</strong>{" "}
-                    {selectedPatient?.patient?.phone_num ?? "NIL"}
+                    {selectedPatient?.patient_info?.phone_num ?? "NIL"}
                   </p>
 
                   <p>
                     <strong>Address:</strong>{" "}
-                    {selectedPatient?.patient?.street ?? "NIL"}
+                    {selectedPatient?.patient_info?.street ?? "NIL"}
                   </p>
 
                   <p>

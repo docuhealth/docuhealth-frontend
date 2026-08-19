@@ -393,6 +393,8 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => 
 
     if (source === "appointments" && selectedPatientDetails?.sqid) {
       formData.append("appointment", selectedPatientDetails.sqid);
+    } else if (selectedPatientDetails?.sqid) {
+      formData.append("check_in", selectedPatientDetails.sqid);
     }
 
     attachments.forEach((fileObj) => {

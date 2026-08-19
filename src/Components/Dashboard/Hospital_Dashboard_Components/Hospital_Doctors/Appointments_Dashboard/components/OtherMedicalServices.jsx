@@ -556,7 +556,7 @@ const OtherMedicalServices = ({
                     </button>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-3 my-5 text-sm gap-3">
+                <div className="flex flex-col my-5 text-sm gap-3 w-full">
                   {staffList.map((staff, index) => (
                     <div key={index} className="border rounded-md p-3">
                       <div>

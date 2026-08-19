@@ -26,9 +26,9 @@ const AdmissionRequestList = () => {
   const queryClient = useQueryClient();
 
   const admissionMutation = useMutation({
-    mutationFn: (admissionRequestID) => {
+    mutationFn: (admissionRequestSQID) => {
       return axiosInstanceHos.patch(
-        `api/hospitals/admissions/${admissionRequestID}/confirm`,
+        `api/hospitals/admissions/${admissionRequestSQID}/confirm`,
       );
     },
     onSuccess: () => {
@@ -48,9 +48,30 @@ const AdmissionRequestList = () => {
     },
   });
 
-  const onAdmitClick = (id) => {
-    // You can add additional logic here, like a confirmation dialog
-    admissionMutation.mutate(id);
+  const rejectMutation = useMutation({
+    mutationFn: (admissionRequestSQID) => {
+      return axiosInstanceHos.patch(
+        `api/receptionists/admissions/${admissionRequestSQID}/reject`,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["hospital-admission-requests"],
+      });
+      toast.success("Admission request rejected");
+    },
+    onError: (err) => {
+      console.error("Error rejecting admission:", err);
+      toast.error(err.response?.data?.message || err.response?.data?.detail || "Error rejecting admission");
+    },
+  });
+
+  const onAdmitClick = (sqid) => {
+    admissionMutation.mutate(sqid);
+  };
+
+  const onRejectClick = (sqid) => {
+    rejectMutation.mutate(sqid);
   };
 
   if (loading) {
@@ -161,8 +182,8 @@ const AdmissionRequestList = () => {
             <div key={index} className="border p-3 rounded-xl">
               <div className="flex justify-between items-center">
                 <p>
-                  {admissionRequest.patient.firstname}{" "}
-                  {admissionRequest.patient.lastname}{" "}
+                  {admissionRequest.patient_info?.firstname}{" "}
+                  {admissionRequest.patient_info?.lastname}{" "}
                 </p>
                 <div className="bg-docuhealth-light-green px-2 rounded-full">
                   <p className="text-docuhealth-green ">
@@ -173,9 +194,11 @@ const AdmissionRequestList = () => {
               <div className="border-b py-2">
                 <p className="text-gray-600">
                   HIN :{" "}
-                  {admissionRequest.patient.hin.slice(0, 4) +
+                  {admissionRequest.patient_info?.hin ? 
+                    admissionRequest.patient_info.hin.slice(0, 4) +
                     "••••••" +
-                    admissionRequest.patient.hin.slice(-2)}
+                    admissionRequest.patient_info.hin.slice(-2)
+                    : "NIL"}
                 </p>
               </div>
               <div className="flex items-center gap-1 text-gray-600 pt-3">
@@ -193,8 +216,8 @@ const AdmissionRequestList = () => {
                 </svg>
                 <p className="">
                   {" "}
-                  {admissionRequest?.staff
-                    ? `${admissionRequest?.staff?.role === "doctor" ? `Dr. ` + admissionRequest.staff.firstname : admissionRequest.staff.firstname} ${admissionRequest.staff.lastname}`
+                  {admissionRequest?.staff_info
+                    ? `${admissionRequest?.staff_info?.role === "doctor" ? `Dr. ` + admissionRequest.staff_info.firstname : admissionRequest.staff_info.firstname} ${admissionRequest.staff_info.lastname}`
                     : "NIL"}
                 </p>
               </div>
@@ -217,16 +240,34 @@ const AdmissionRequestList = () => {
                   {admissionRequest?.ward_info
                     ? `${admissionRequest.ward_info.name} ward`
                     : "NIL"}
+                  {admissionRequest?.bed_info
+                    ? ` (Bed ${admissionRequest.bed_info.bed_number})`
+                    : ""}
                 </p>
               </div>
 
-              <button
-                className="text-center mt-3 py-2 border border-docuhealth-dark w-full rounded-full cursor-pointer disabled:opacity-50"
-                disabled={admissionMutation.isPending}
-                onClick={() => onAdmitClick(admissionRequest.id)}
-              >
-                {isMutatingThis ? "Admitting..." : "Admit patient"}
-              </button>
+              {admissionRequest.status === "pending" ? (
+                <div className="flex gap-2 mt-3">
+                  <button
+                    className="text-center py-2 border border-docuhealth-dark w-full rounded-full cursor-pointer disabled:opacity-50"
+                    disabled={admissionMutation.isPending || rejectMutation.isPending}
+                    onClick={() => onAdmitClick(admissionRequest.sqid)}
+                  >
+                    {isMutatingThis ? "Admitting..." : "Admit"}
+                  </button>
+                  <button
+                    className="text-center py-2 border border-red-500 text-red-500 w-full rounded-full cursor-pointer disabled:opacity-50"
+                    disabled={admissionMutation.isPending || rejectMutation.isPending}
+                    onClick={() => onRejectClick(admissionRequest.sqid)}
+                  >
+                    {rejectMutation.isPending && rejectMutation.variables === admissionRequest.sqid ? "Rejecting..." : "Reject"}
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-3 py-2 text-center text-gray-500 bg-gray-50 border border-gray-100 rounded-full text-[13px] font-medium capitalize">
+                  {admissionRequest.status}
+                </div>
+              )}
             </div>
           )
 

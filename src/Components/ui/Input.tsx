@@ -25,7 +25,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ) => {
     return (
       <div className={`w-full ${containerClassName}`}>
-        {label && <p className="font-semibold pb-1">{label}</p>}
+        {label && <p className="font-semibold pb-1 whitespace-nowrap">{label}</p>}
         <div className="relative">
           {leadingIcon && (
             <div className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400">

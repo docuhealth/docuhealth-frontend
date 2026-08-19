@@ -11,7 +11,8 @@ import AppointmentsList from "../../../Components/Dashboard/Hospital_Dashboard_C
 import RecentPatients from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home_Dashboard/components/RecentPatients";
 import { HosWardContext } from "../../../context/HospitalContext/HosWardContext";
 import { ReceptionistAppContext } from "../../../context/HospitalContext/Receptionist/ReceptionistAppContext";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Modal from "../../../Components/ui/Modal";
 
 const Hospital_Receptionist_Home_Dashboard = () => {
   const queryClient = useQueryClient();
@@ -21,6 +22,8 @@ const Hospital_Receptionist_Home_Dashboard = () => {
   const [patientDetails, setPatientDetails] = useState([]);
   // const [patientEmail, setPatientEmail] = useState('')
   const [bookAppointment, setBookAppointment] = useState(false);
+
+  const [checkPatientIn, setCheckPatientIn] = useState(false);
 
   const { wards } = useContext(HosWardContext);
   const { hospitalName, backgroundImage } = useContext(ReceptionistAppContext);
@@ -71,20 +74,55 @@ const Hospital_Receptionist_Home_Dashboard = () => {
     }
   };
 
+  const checkInPatientApi = async (payload) => {
+    const res = await axiosInstanceHos.post("api/receptionists/check-in", payload);
+    return res.data;
+  };
+
+  const checkInMutation = useMutation({
+    mutationFn: checkInPatientApi,
+    onSuccess: () => {
+      setCheckPatientIn(true);
+      queryClient.invalidateQueries(["receptionist-recent-patients"]);
+    },
+    onError: (err) => {
+      const errorMsg =
+        err.response?.data?.patient?.[0] ||
+        err.response?.data?.message ||
+        "Check-In failed!";
+      toast.error(errorMsg);
+    },
+  });
+
+  const handleCheckIn = () => {
+    if (!patientDetails?.hin) return toast.error("Patient details not found.");
+    checkInMutation.mutate({ patient: patientDetails.hin });
+  };
+
   return (
     <>
       {checkHIN ? (
         <>
           <div className="py-2 text-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 w-full sm:w-auto">
             <DynamicDate />
-            <div className="w-full sm:w-auto">
+            <div className="w-full flex flex-col sm:flex-row gap-2 sm:w-auto">
               <button
-                className="bg-docuhealth-primary py-2.5 px-8 w-full sm:w-auto rounded-full text-white cursor-pointer"
+                className="border border-docuhealth-primary text-docuhealth-primary py-2 px-8 w-full sm:w-auto rounded-full cursor-pointer"
                 onClick={() => {
                   setBookAppointment(!bookAppointment);
                 }}
               >
                 Book an appointment
+              </button>
+              <button
+                className="bg-docuhealth-primary py-2.5 px-8 w-full sm:w-auto rounded-full text-white cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
+                onClick={handleCheckIn}
+                disabled={checkInMutation.isPending}
+              >
+                {checkInMutation.isPending && (
+                  <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                )}
+                {checkInMutation.isPending ? "Checking In..." : "Check Patient In"}
               </button>
             </div>
           </div>
@@ -314,6 +352,32 @@ const Hospital_Receptionist_Home_Dashboard = () => {
           patientDetails={patientDetails}
         />
       )}
+
+      <Modal
+        isOpen={checkPatientIn}
+        onClose={() => setCheckPatientIn(false)}
+        title=""
+        maxWidth="sm"
+      >
+        <div className="flex flex-col justify-center items-center text-sm pt-4 px-2 text-center pb-2">
+          <div className="bg-[#E7F8ED] p-3 rounded-full mb-4 inline-flex items-center justify-center">
+             <div className="bg-[#32CC54] rounded-full flex items-center justify-center h-16 w-16 shadow-[0px_0px_0px_8px_rgba(50,204,84,0.15)]">
+                <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M2 9L9 16L22 2" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+             </div>
+          </div>
+          <p className="font-semibold text-gray-800 mb-6 text-base">
+            Patient has been successfully checked-in and moved to the nursing queue!
+          </p>
+          <button 
+            className="w-full bg-[#32CC54] hover:bg-[#28A745] text-white py-3 rounded-full font-medium transition-colors cursor-pointer"
+            onClick={() => setCheckPatientIn(false)}
+          >
+            Done
+          </button>
+        </div>
+      </Modal>
     </>
   );
 };

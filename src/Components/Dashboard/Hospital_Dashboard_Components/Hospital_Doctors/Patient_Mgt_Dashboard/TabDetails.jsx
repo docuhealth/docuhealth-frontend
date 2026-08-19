@@ -139,8 +139,8 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
           <div key={index} className="border p-3 rounded-xl">
             <div className="flex justify-between items-center">
               <p>
-                {admittedPatient.patient.firstname}{" "}
-                {admittedPatient.patient.lastname}{" "}
+                {admittedPatient?.patient_info?.firstname}{" "}
+                {admittedPatient?.patient_info?.lastname}{" "}
               </p>
               <div className="bg-docuhealth-light-green px-2 rounded-full">
                 <p className="text-docuhealth-green ">
@@ -151,9 +151,9 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
             <div className="border-b py-2">
               <p className="text-gray-600">
                 HIN :{" "}
-                {admittedPatient.patient.hin.slice(0, 4) +
+                {admittedPatient?.patient_info?.hin ? admittedPatient.patient_info.hin.slice(0, 4) +
                   "••••••" +
-                  admittedPatient.patient.hin.slice(-2)}
+                  admittedPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
             </div>
             <div className="flex items-center gap-1 text-gray-600 pt-3">
@@ -171,8 +171,8 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
               </svg>
               <p className="">
                 {" "}
-                {admittedPatient?.staff
-                  ? `${admittedPatient.staff.firstname} ${admittedPatient.staff.lastname}`
+                {admittedPatient?.staff_info
+                  ? `${admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`
                   : "NIL"}
               </p>
             </div>
@@ -409,8 +409,8 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
           <div key={index} className="border p-3 rounded-xl">
             <div className="flex justify-between items-center">
               <p>
-                {admittedPatient.patient.firstname}{" "}
-                {admittedPatient.patient.lastname}{" "}
+                {admittedPatient?.patient_info?.firstname}{" "}
+                {admittedPatient?.patient_info?.lastname}{" "}
               </p>
               <div className="bg-docuhealth-light-green px-2 rounded-full">
                 <p className="text-docuhealth-green ">
@@ -421,9 +421,9 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
             <div className="border-b py-2">
               <p className="text-gray-600">
                 HIN :{" "}
-                {admittedPatient.patient.hin.slice(0, 4) +
+                {admittedPatient?.patient_info?.hin ? admittedPatient.patient_info.hin.slice(0, 4) +
                   "••••••" +
-                  admittedPatient.patient.hin.slice(-2)}
+                  admittedPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
             </div>
             <div className="flex items-center gap-1 text-gray-600 pt-3">
@@ -441,8 +441,8 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
               </svg>
               <p className="">
                 {" "}
-                {admittedPatient?.staff
-                  ? `${admittedPatient.staff.firstname} ${admittedPatient.staff.lastname}`
+                {admittedPatient?.staff_info
+                  ? `${admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`
                   : "NIL"}
               </p>
             </div>
