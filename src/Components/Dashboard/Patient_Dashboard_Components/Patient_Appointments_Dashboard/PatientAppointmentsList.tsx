@@ -15,7 +15,7 @@ interface PatientAppointmentsListProps {
   selected: string;
 }
 
-const PatientAppointmentsList = ({selected}: PatientAppointmentsListProps) => {
+const PatientAppointmentsList = ({ selected }: PatientAppointmentsListProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -128,73 +128,73 @@ const PatientAppointmentsList = ({selected}: PatientAppointmentsListProps) => {
           <p className="text-xs text-gray-400 mt-1">Try a different search term or date range.</p>
         </div>
       ) : (
-   <div className="my-4">
-      <div className="hidden lg:block">
-        {sortedAppointments.map((apt) => (
-          <div key={apt.id} className="flex items-center justify-between p-4 mb-4 border border-gray-200 rounded-md transition-shadow bg-white ">
-            <div className="flex items-center gap-6 flex-1">
-              <InfoGroup icon={<CalendarIcon size={16}/>} label="Date / Time" value={`${formatFullDate(apt.scheduled_time)} | ${formatTime(apt.scheduled_time)}`} />
-              <InfoGroup icon={<Building2 size={16}/>} label="Hospital" value={apt?.hospital_info?.name} />
-              <InfoGroup icon={<UserIcon size={16}/>} label="Doctor" value={`Dr. ${apt?.staff?.firstname} ${apt?.staff?.lastname}`} />
-            </div>
-            <Button 
-              variant="outline"
-              onClick={() => toast.success("Coming Soon!")}
-              className="py-2 px-6 text-sm font-medium"
-            >
-              Send message
-            </Button>
+        <div className="my-4">
+          <div className="hidden lg:block">
+            {sortedAppointments.map((apt) => (
+              <div key={apt.id} className="flex items-center justify-between p-4 mb-4 border border-gray-200 rounded-md transition-shadow bg-white ">
+                <div className="flex items-center gap-6 flex-1">
+                  <InfoGroup icon={<CalendarIcon size={16} />} label="Date / Time" value={`${formatFullDate(apt.scheduled_time)} | ${formatTime(apt.scheduled_time)}`} />
+                  <InfoGroup icon={<Building2 size={16} />} label="Hospital" value={apt?.hospital_info?.name} />
+                  <InfoGroup icon={<UserIcon size={16} />} label="Doctor" value={`Dr. ${apt?.staff?.firstname} ${apt?.staff?.lastname}`} />
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => toast.success("Coming Soon!")}
+                  className="py-2 px-6 w-fit! text-sm font-medium"
+                >
+                  Send message
+                </Button>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* --- MOBILE VIEW (Vertical Cards) --- */}
-      <div className="block lg:hidden space-y-4">
-        {sortedAppointments.map((apt) => (
-          <div key={apt.id} className="p-4 border border-gray-200 rounded-md bg-white ">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <p className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Schedule</p>
-                <p className="text-sm font-semibold">{formatFullDate(apt.scheduled_time)}</p>
-                <p className="text-xs text-gray-500">{formatTime(apt.scheduled_time)}</p>
-              </div>
-              <div className="bg-blue-50 p-2 rounded-lg">
-                <CalendarIcon size={18} className="text-docuhealth-primary" />
-              </div>
-            </div>
-            
-            <div className="space-y-3 mb-4">
-              <div className="flex items-center gap-3">
-                <Building2 size={14} className="text-gray-400" />
-                <p className="text-sm text-gray-700">{apt?.hospital_info?.name}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <UserIcon size={14} className="text-gray-400" />
-                <p className="text-sm text-gray-700">Dr. {apt?.staff?.firstname} {apt?.staff?.lastname}</p>
-              </div>
-            </div>
+          {/* --- MOBILE VIEW (Vertical Cards) --- */}
+          <div className="block lg:hidden space-y-4">
+            {sortedAppointments.map((apt) => (
+              <div key={apt.id} className="p-4 border border-gray-200 rounded-md bg-white ">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <p className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Schedule</p>
+                    <p className="text-sm font-semibold">{formatFullDate(apt.scheduled_time)}</p>
+                    <p className="text-xs text-gray-500">{formatTime(apt.scheduled_time)}</p>
+                  </div>
+                  <div className="bg-blue-50 p-2 rounded-lg">
+                    <CalendarIcon size={18} className="text-docuhealth-primary" />
+                  </div>
+                </div>
 
-            <Button 
-              variant="primary"
-              fullWidth
-              onClick={() => toast.success("Coming Soon!")}
-              className="flex items-center justify-center gap-2 py-2.5 text-[13px] font-medium"
-            >
-              <MessageSquare size={16} />
-              Send a message
-            </Button>
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <Building2 size={14} className="text-gray-400" />
+                    <p className="text-sm text-gray-700">{apt?.hospital_info?.name}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <UserIcon size={14} className="text-gray-400" />
+                    <p className="text-sm text-gray-700">Dr. {apt?.staff?.firstname} {apt?.staff?.lastname}</p>
+                  </div>
+                </div>
+
+                <Button
+                  variant="primary"
+                  fullWidth
+                  onClick={() => toast.success("Coming Soon!")}
+                  className="flex items-center justify-center gap-2 py-2.5 text-[13px] font-medium"
+                >
+                  <MessageSquare size={16} />
+                  Send a message
+                </Button>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <Pagination2
-        count={count}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        setCurrentPage={setCurrentPage}
-      />
-    </div>
-    )}
+          <Pagination2
+            count={count}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
+          />
+        </div>
+      )}
     </>
   );
 };
