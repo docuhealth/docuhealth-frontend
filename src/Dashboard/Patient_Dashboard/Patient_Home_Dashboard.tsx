@@ -10,7 +10,7 @@ import NoticeDisplay from "../../Components/Dashboard/Patient_Dashboard_Componen
 import MedicalRecords from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/MedicalRecords";
 import MedicalRecordsDetail from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/MedicalRecordsDetail";
 import Id_Card from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/IdCard/Id_Card";
-import { fetchSubscriptionStatus } from "../../services/authService";
+import { useHasActiveSubscription } from "../../hooks/patients/useHasActiveSubscription";
 import { usePatientVitalSigns } from "../../hooks/patients/usePatientVitalSigns";
 import RecentVitalSigns from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/RecentVitalSigns";
 import DrugRecordsOnHome from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/DrugRecordsOnHome";
@@ -45,6 +45,7 @@ const Patient_Home_Dashboard = () => {
     selectedProfile,
   } = useIdCardStore();
   const { mutate: handleIDCardCreation, isPending: isCreatingID } = useCreateIdCard();
+  const hasSubscription = useHasActiveSubscription();
 
   const { data: vitalSigns, isPending: loadingVitals } = usePatientVitalSigns(vitalPage);
 
@@ -149,7 +150,6 @@ useEffect(() => {
               className="flex items-center gap-2"
               onClick={() => {
                 if (profile) {
-                  const hasSubscription = fetchSubscriptionStatus();
                   if (!hasSubscription) {
                     toast.error("Please subscribe to access feature");
                     navigate("/user-subscriptions-dashboard");
@@ -173,7 +173,6 @@ useEffect(() => {
               className="flex items-center gap-2"
               onClick={() => {
                 if (profile) {
-                  const hasSubscription = fetchSubscriptionStatus();
                   if (!hasSubscription) {
                     toast.error("Please subscribe to access feature");
                     navigate("/user-subscriptions-dashboard");
@@ -273,7 +272,6 @@ useEffect(() => {
               className="flex justify-center items-center gap-2"
                onClick={() => {
                 if (profile) {
-                  const hasSubscription = fetchSubscriptionStatus();
                   if (!hasSubscription) {
                     toast.error("Please subscribe to access feature");
                     navigate("/user-subscriptions-dashboard");
@@ -301,7 +299,6 @@ useEffect(() => {
               className="flex justify-center items-center gap-2"
                onClick={() => {
                 if (profile) {
-                  const hasSubscription = fetchSubscriptionStatus();
                   if (!hasSubscription) {
                     toast.error("Please subscribe to access feature");
                     navigate("/user-subscriptions-dashboard");

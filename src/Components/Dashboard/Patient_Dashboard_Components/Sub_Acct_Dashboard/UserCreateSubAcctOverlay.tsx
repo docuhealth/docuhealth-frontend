@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { fetchSubscriptionStatus } from "../../../../services/authService";
 import Button from "../../../ui/Button";
 import Input from "../../../ui/Input";
 import Modal from "../../../ui/Modal";

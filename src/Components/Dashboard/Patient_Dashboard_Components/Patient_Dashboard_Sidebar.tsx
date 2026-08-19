@@ -5,11 +5,12 @@ import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { fetchSubscriptionStatus } from "../../../services/authService";
+import { useHasActiveSubscription } from "../../../hooks/patients/useHasActiveSubscription";
 import EmergencyModeNotice from "./Home_Dashboard/Components/EmergencyModeNotice/EmergencyModeNotice";
 
 const Patient_Dashboard_Sidebar = () => {
   const { data: profile } = usePatientProfile();
+  const hasSubscription = useHasActiveSubscription();
   const { mutateAsync: toggleEmergencyStatus } = useToggleEmergency();
   const [emergencyStatus, setEmergencyStatus] = useState(false);
   const [emergencyStatusModal, setEmergencyStatusModal] = useState(false);
@@ -29,8 +30,6 @@ const Patient_Dashboard_Sidebar = () => {
   }, [profile]);
 
   const handleToggle = async () => {
-    const hasSubscription = fetchSubscriptionStatus()
-
     if (isLoading) {
       toast.error("Please wait, loading your profile...");
       return;

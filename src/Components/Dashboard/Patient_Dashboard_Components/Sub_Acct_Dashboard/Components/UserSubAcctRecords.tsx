@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useIdCardStore } from "../../../../../store/useIdCardStore";
 import { useCreateIdCard } from "../../../../../hooks/patients/useCreateIdCard";
-import { fetchSubscriptionStatus } from "../../../../../services/authService";
+import { useHasActiveSubscription } from "../../../../../hooks/patients/useHasActiveSubscription";
 import toast from "react-hot-toast";
 import Id_Card from "../../Home_Dashboard/Components/IdCard/Id_Card";
 import { SubAccount } from "../../../../../types/patients/sub-accounts";
@@ -32,6 +32,7 @@ const UserSubAcctRecords = ({ subAccounts, isPending, setDisplaySubAcctModal, se
     selectedProfile
   } = useIdCardStore();
   const { mutate: handleIDCardCreation, isPending: isCreatingID } = useCreateIdCard();
+  const hasSubscription = useHasActiveSubscription();
 
   const togglePopover = (index?: number | null) => {
     setOpenPopover(openPopover === index ? null : (index ?? null));
@@ -130,7 +131,6 @@ const UserSubAcctRecords = ({ subAccounts, isPending, setDisplaySubAcctModal, se
                         }`}
                         onClick={() => {
                           if (isCreatingID) return;
-                          const hasSubscription = fetchSubscriptionStatus();
                           if (!hasSubscription) {
                             toast.error("Please subscribe to access feature");
                             navigate("/user-subscriptions-dashboard");

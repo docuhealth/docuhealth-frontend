@@ -4,6 +4,7 @@ import { usePatientProfile } from "../../../../hooks/patients/usePatientProfile"
 import { useSubscribeToPlan } from "../../../../hooks/patients/useSubscribeToPlan";
 import toast from "react-hot-toast";
 import EmptyState from "../../../../Components/ui/EmptyState";
+import { hasActiveSubscription } from "../../../../utils/subscriptionUtils";
 
 // How each subscription status is labelled and coloured in the UI.
 const SUBSCRIPTION_STATUS_META: Record<string, { label: string; className: string }> = {
@@ -17,9 +18,6 @@ const SUBSCRIPTION_STATUS_META: Record<string, { label: string; className: strin
   expired: { label: "EXPIRED", className: "text-red-500" },
   inactive: { label: "INACTIVE", className: "text-gray-500" },
 };
-
-// Statuses that mean the plan is still live, so the user can't re-subscribe to it.
-const BLOCKING_STATUSES = ["active", "non-renewing"];
 
 const getStatusMeta = (status?: string | null) => {
   if (!status) return { label: "", className: "" };
@@ -80,14 +78,16 @@ const SubscriptionPlans = () => {
   };
 
   const currentSubscription = profileDataIsPending === false ? profile?.subscription : null;
-  const currentStatus = currentSubscription?.status?.toLowerCase() ?? null;
-  const userIsSubscribed = !!currentSubscription;
   // The user only counts as being on a paid plan while that plan is still live.
-  const hasActivePaidPlan = currentStatus !== null && BLOCKING_STATUSES.includes(currentStatus);
+  // `api/patients/dashboard` (what `profile` comes from) reports this via a plain
+  // `is_subscribed` boolean rather than a `status` string — see hasActiveSubscription.
+  const hasActivePaidPlan = hasActiveSubscription(currentSubscription);
 
   // True when `planName` is the plan the user is currently subscribed to.
+  // The API names this field `name`, not `plan_name` — check both for safety.
   const isCurrentPlan = (planName: string) =>
-    userIsSubscribed && currentSubscription?.plan_name === planName;
+    hasActivePaidPlan &&
+    (currentSubscription?.plan_name === planName || currentSubscription?.name === planName);
 
   return (
     <>
@@ -119,7 +119,7 @@ const SubscriptionPlans = () => {
                 <p className="text-[12px] text-gray-900 pb-2">
                   Basic Plan
                   {!hasActivePaidPlan && (
-                      <span className="text-xs text-green-600 font-bold"> (ACTIVE)</span>
+                    <span className="text-xs text-green-600 font-bold"> (ACTIVE)</span>
                   )}
                 </p>
               </div>
@@ -169,9 +169,9 @@ const SubscriptionPlans = () => {
 
               {/* Button */}
               <button
-                  className="py-3 rounded-full my-4 font-semibold w-full border border-gray-400 disabled:cursor-not-allowed disabled:text-gray-500"
-                  onClick={() => toast.success("You are already on the free plan!")}
-                  disabled={hasActivePaidPlan}
+                className="py-3 rounded-full my-4 font-semibold w-full border border-gray-400 disabled:cursor-not-allowed disabled:text-gray-500"
+                onClick={() => toast.success("You are already on the free plan!")}
+                disabled={hasActivePaidPlan}
               >
                 <p className="text-sm text-center">Choose Free Plan</p>
               </button>
@@ -180,65 +180,73 @@ const SubscriptionPlans = () => {
             {/* Dynamic Plans from API */}
             {subscriptionPlans.map((plan) => {
               const isPlanCurrent = isCurrentPlan(plan.name);
-              const statusMeta = isPlanCurrent ? getStatusMeta(currentSubscription?.status) : null;
-              // Can't re-subscribe to a plan whose subscription is still live.
-              const planIsLocked = isPlanCurrent && !!currentStatus && BLOCKING_STATUSES.includes(currentStatus);
+              // `status` is only present on the login response, not on the dashboard
+              // endpoint this page actually reads from — fall back to a plain "ACTIVE"
+              // label when the plan is current but no status string was sent.
+              const statusMeta = isPlanCurrent
+                ? currentSubscription?.status
+                  ? getStatusMeta(currentSubscription.status)
+                  : SUBSCRIPTION_STATUS_META.active
+                : null;
+              // Can't re-subscribe to a plan that's already active (isCurrentPlan already
+              // implies hasActivePaidPlan).
+              const planIsLocked = isPlanCurrent;
 
               return (
-              <div
-                key={plan.id}
-                className="p-4 rounded-xl bg-linear-to-b from-docuhealth-blue-lightest to-docuhealth-primary-lightest"
-              >
-                {/* Header */}
-                <div className="flex justify-between items-center">
-                  <p
-                    className="text-[12px] text-gray-600 pb-2"
-                    style={{ color: "#FE9000" }}
-                  >
-                    {plan.name + " "}
-                    {statusMeta && (
+                <div
+                  key={plan.id}
+                  className="p-4 rounded-xl bg-linear-to-b from-docuhealth-blue-lightest to-docuhealth-primary-lightest"
+                >
+                  {/* Header */}
+                  <div className="flex justify-between items-center">
+                    <p
+                      className="text-[12px] text-gray-600 pb-2"
+                      style={{ color: "#FE9000" }}
+                    >
+                      {plan.name + " "}
+                      {statusMeta && (
                         <span className={`text-xs font-bold ${statusMeta.className}`}>
                           ({statusMeta.label})
                         </span>
-                    )}
-                  </p>
-                </div>
-
-                {/* Price Section */}
-                <div className="pb-4">
-                  <p className="text-2xl font-semibold pb-2">
-                    ₦{plan.price}
-                    <span className="text-sm font-normal text-gray-500">
-                      /{plan.interval}
-                    </span>
-                  </p>
-                  <p className="text-[12px] text-gray-600 leading-4">
-                    {plan.description}
-                  </p>
-                </div>
-
-                <hr />
-
-                {/* Features */}
-                <div className="py-5 space-y-1">
-                  {plan.features.map((feature, i) => (
-                    <p key={i} className="flex items-center text-[12px]">
-                      <i className="bx bx-check text-docuhealth-primary text-xl mr-1"></i>
-                      {feature}
+                      )}
                     </p>
-                  ))}
-                </div>
+                  </div>
 
-                <button
+                  {/* Price Section */}
+                  <div className="pb-4">
+                    <p className="text-2xl font-semibold pb-2">
+                      ₦{plan.price}
+                      <span className="text-sm font-normal text-gray-500">
+                        /{plan.interval}
+                      </span>
+                    </p>
+                    <p className="text-[12px] text-gray-600 leading-4">
+                      {plan.description}
+                    </p>
+                  </div>
+
+                  <hr />
+
+                  {/* Features */}
+                  <div className="py-5 space-y-1">
+                    {plan.features.map((feature, i) => (
+                      <p key={i} className="flex items-center text-[12px]">
+                        <i className="bx bx-check text-docuhealth-primary text-xl mr-1"></i>
+                        {feature}
+                      </p>
+                    ))}
+                  </div>
+
+                  <button
                     className="rounded-full my-4 border border-docuhealth-primary text-docuhealth-primary font-semibold w-full disabled:cursor-not-allowed disabled:text-gray-400 disabled:border-gray-300"
                     onClick={() => handlePayment(plan.paystack_plan_code)}
                     disabled={planIsLocked}
-                >
-                  <p className="py-3 text-sm text-center">
-                    {planIsLocked ? "Current Plan" : `Choose ${plan.name}`}
-                  </p>
-                </button>
-              </div>
+                  >
+                    <p className="py-3 text-sm text-center">
+                      {planIsLocked ? "Current Plan" : `Choose ${plan.name}`}
+                    </p>
+                  </button>
+                </div>
               );
             })}
           </div>
