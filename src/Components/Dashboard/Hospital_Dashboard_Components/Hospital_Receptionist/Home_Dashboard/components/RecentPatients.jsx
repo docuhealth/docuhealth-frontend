@@ -4,7 +4,7 @@ import Pagination2 from '../../../../Patient_Dashboard_Components/Pagination/Pag
 import { formatFullDate, formatTime } from '../../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter';
 import SearchBar from '../../../../../SearchBar/SearchBar';
 
-const RecentPatients = () => {
+const RecentPatients = ({ onSelectPatient }) => {
 
     const {
         recentPatients,
@@ -27,6 +27,9 @@ const RecentPatients = () => {
             return Math.abs(timeA - now) - Math.abs(timeB - now);
         });
     }, [recentPatients]);
+
+    // HIN can come back on either patient_info or the nested patient object
+    const getHin = (patient) => patient.patient_info?.hin || patient.patient?.hin || "";
 
     if (loading) {
         return (
@@ -143,7 +146,10 @@ const RecentPatients = () => {
                 {
                     sortedPatients.map((patient, index) => (
                         <div key={index} className='relative'>
-                            <div className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
+                            <div
+                                onClick={() => onSelectPatient?.(patient)}
+                                className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+                            >
                                 <div className='font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-1 '>
 
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -154,8 +160,8 @@ const RecentPatients = () => {
                                 </div>
                                 <p className='col-span-2'>{formatFullDate(patient.created_at)} / {formatTime(patient.created_at)}</p>
                                 <p>
-                                    {patient.patient_info.hin
-                                        ? patient.patient_info.hin.slice(0, 4) + "••••••" + patient.patient_info.hin.slice(-2)
+                                    {getHin(patient)
+                                        ? getHin(patient).slice(0, 4) + "••••••" + getHin(patient).slice(-2)
                                         : ""}
                                 </p>
 
@@ -183,7 +189,8 @@ const RecentPatients = () => {
                 {sortedPatients.map((patient, index) => (
                     <div
                         key={index}
-                        className="bg-white border border-gray-200 rounded-md p-5  duration-200"
+                        onClick={() => onSelectPatient?.(patient)}
+                        className="bg-white border border-gray-200 rounded-md p-5 duration-200 cursor-pointer hover:border-docuhealth-primary transition-colors"
                     >
                         {/* Header: Avatar, Name and Gender Tag */}
                         <div className="flex justify-between items-start mb-4">
@@ -201,7 +208,7 @@ const RecentPatients = () => {
                                 </div>
                             </div>
                             <span className="bg-gray-50 text-gray-600 text-[10px] px-2 py-1 rounded-md border border-gray-100 font-medium uppercase tracking-wider">
-                                {patient.patient_info.hin?.slice(-4) || "N/A"}
+                                {getHin(patient).slice(-4) || "N/A"}
                             </span>
                         </div>
 
@@ -239,8 +246,8 @@ const RecentPatients = () => {
                         <div className="mt-4 bg-docuhealth-primary-faded rounded-lg p-2.5 flex justify-between items-center">
                             <span className="text-[10px] font-semibold text-docuhealth-primary uppercase">HIN Number</span>
                             <span className="text-[12px] font-mono font-bold text-gray-600 tracking-widest">
-                                {patient.patient_info.hin
-                                    ? patient.patient_info.hin.slice(0, 4) + "••••" + patient.patient_info.hin.slice(-2)
+                                {getHin(patient)
+                                    ? getHin(patient).slice(0, 4) + "••••" + getHin(patient).slice(-2)
                                     : "—"}
                             </span>
                         </div>
