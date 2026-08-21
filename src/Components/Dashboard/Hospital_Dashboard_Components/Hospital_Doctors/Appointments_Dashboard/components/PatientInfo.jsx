@@ -16,6 +16,7 @@ import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../
 import PatientInfoCard from "../../../../../ui/PatientInfoCard";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import ClinicalSummaryCard from "../../../../../ui/ClinicalSummaryCard";
+import OutpatientDischargeSummary from "../../Patient_Mgt_Dashboard/OutpatientDischargeSummary";
 
 const DUMMY_PATIENT_INFO = {
   patient_info: {
@@ -32,7 +33,7 @@ const DUMMY_PATIENT_INFO = {
   },
 };
 
-const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateOrder }) => {
+const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateOrder, isOutpatient }) => {
   const [viewDetailMedicalRecord, setViewDetailMedicalRecord] = useState(false);
   const [selectedMedicalRecord, setSelectedMedicalRecord] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,6 +44,8 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
   const [orderForm, setOrderForm] = useState({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });
   const [duplicateWarning, setDuplicateWarning] = useState(null);
+  
+  const [showDischargeModal, setShowDischargeModal] = useState(false);
 
   const hin = (selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin) || selectedPatientDetails?.patient_hin;
   const pageSize = 6;
@@ -351,6 +354,12 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     Create a test order
                   </button>
                 )}
+                <button
+                  onClick={() => setShowDischargeModal(true)}
+                  className="w-full sm:w-auto border border-docuhealth-primary bg-docuhealth-primary text-white text-sm rounded-full px-6 py-2 transition-colors cursor-pointer"
+                >
+                  Discharge Patient
+                </button>
               </div>
             </div>
 
@@ -358,6 +367,11 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
               <div className="flex justify-center items-center gap-3 px-2 py-3">
                 <p className="text-sm text-gray-500 pt-2">Loading patient data...</p>
               </div>
+            ) : showDischargeModal ? (
+              <OutpatientDischargeSummary
+                selectedPatient={selectedPatientDetails}
+                onClose={() => setShowDischargeModal(false)}
+              />
             ) : (
               <>
                 <div className="py-5 border-b">
@@ -371,46 +385,34 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                         {patientFullInfo?.patient_info?.firstname}{" "}
                         {patientFullInfo?.patient_info?.lastname}
                       </p>
-                      <p className="text-[14px] text-gray-500">
-                        {patientFullInfo?.patient_info?.plan_type
-                          ? `${patientFullInfo.patient_info.plan_type} patient`
-                          : "patient"}
-                      </p>
+                      <p className="text-[14px] text-gray-500 mt-0.5">patient</p>
                     </div>
                   </div>
                 </div>
 
-            <div>
-              <TabComponent
-                tabs={getTabs({
-                  medloading: medLoading,
-                  soapNotesLoading: soapLoading,
-                  patientMedRecords: medRecordsData?.results || [],
-                  patientSoapNotes: soapNotesData?.results || [],
-                  patientFullInfo,
-
-                  count: medRecordsData?.count || 0,
-                  currentPage,
-                  totalPages: Math.ceil(
-                    (medRecordsData?.count || 0) / pageSize,
-                  ),
-
-                  setCurrentPage,
-
-                  soapCount: soapNotesData?.count || 0,
-                  soapCurrentPage,
-                  soapTotalPages: Math.ceil(
-                    (soapNotesData?.count || 0) / pageSize,
-                  ),
-
-                  setSoapCurrentPage,
-
-                  setSelectedMedicalRecord,
-                  setViewDetailMedicalRecord,
-                })}
-              />
-            </div>
-            </>
+                <TabComponent
+                  tabs={getTabs({
+                    patientFullInfo,
+                    medRecordsData: medRecordsData?.results || [],
+                    soapNotesData: soapNotesData?.results || [],
+                    medLoading,
+                    soapLoading,
+                    count: medRecordsData?.count || 0,
+                    currentPage,
+                    totalPages: Math.ceil((medRecordsData?.count || 0) / pageSize),
+                    setCurrentPage,
+                    soapCount: soapNotesData?.count || 0,
+                    soapCurrentPage,
+                    soapTotalPages: Math.ceil((soapNotesData?.count || 0) / pageSize),
+                    setSoapCurrentPage,
+                    selectedPatientDetails,
+                    setSelectedMedicalRecord,
+                    setViewDetailMedicalRecord,
+                    viewDetailMedicalRecord,
+                    selectedMedicalRecord,
+                  })}
+                />
+              </>
             )}
           </div>
         </>
@@ -589,6 +591,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
           </div>
         </div>
       )}
+
     </>
   );
 };

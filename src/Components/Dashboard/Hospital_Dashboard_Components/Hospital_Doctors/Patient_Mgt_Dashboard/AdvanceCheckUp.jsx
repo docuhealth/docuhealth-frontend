@@ -72,6 +72,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry, advance
 
   return (
     <>
+      <div className="bg-white my-5 border rounded-2xl pt-8 px-6 text-sm">
       <div className="flex items-center gap-1 cursor-pointer border-b pb-3">
         <div
           onClick={() => {
@@ -155,6 +156,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry, advance
           />
         </>
       )}
+      </div>
     </>
   );
 };

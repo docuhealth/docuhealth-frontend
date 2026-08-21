@@ -114,6 +114,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
               <PatientInfo
                 setSeePatientDetails={setAdvanceCheckUp}
                 selectedPatientDetails={selected}
+                isOutpatient={true}
               />
             ) : (
               <AdvanceCheckUp
