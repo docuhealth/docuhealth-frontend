@@ -4,7 +4,7 @@ import AppointmentsList from "../../../Components/Dashboard/Hospital_Dashboard_C
 import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PatientInfo";
 import SoapNoteEntry from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/SoapNoteEntry";
 import RequestAdmission from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/RequestAdmission";
-import OtherMedicalServices from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/OtherMedicalServices";
+import OtherMedicalServicesFab from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/OtherMedicalServicesFab";
 import PrescribeMedication from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PrescribeMedication";
 import { DoctorAppointmentsListContext } from "../../../context/HospitalContext/Doctors/DoctorAppointmentsListContext";
 
@@ -14,7 +14,6 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
   const [soapNoteEntry, setSoapNoteEntry] = useState(false);
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
-  const [otherMedicalServices, setOtherMedicalServices] = useState(false);
   const [prescribeMedication, setPrescribeMedication] = useState(false);
 
   const [requestAdmission, setRequestAdmission] = useState(false);
@@ -28,12 +27,6 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
           <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
             <DynamicDate />
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-              <button className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto " onClick={() => {
-                setOtherMedicalServices(true)
-              }}>
-                Other medical services
-
-              </button>
               <button className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
                 onClick={() => {
                   setRequestAdmission(true)
@@ -58,15 +51,13 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
               selectedPatientDetails={selectedPatientDetails}
             />
           </div>
-          {
-            otherMedicalServices && (
-              <OtherMedicalServices setOtherMedicalServices={setOtherMedicalServices}
-                setPrescribeMedication={setPrescribeMedication}
-                setSeePatientDetails={setSeePatientDetails}
-                selectedPatientDetails={selectedPatientDetails}
-              />
-            )
-          }
+          <OtherMedicalServicesFab
+            selectedPatientDetails={selectedPatientDetails}
+            onOrderPharmacy={() => {
+              setPrescribeMedication(true);
+              setSeePatientDetails(false);
+            }}
+          />
           {
             requestAdmission && (
               <RequestAdmission setRequestAdmission={setRequestAdmission} selectedPatientDetails={selectedPatientDetails} />

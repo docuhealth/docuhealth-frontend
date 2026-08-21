@@ -13,7 +13,6 @@ import { HosWardContext } from "../../../context/HospitalContext/HosWardContext"
 import { ReceptionistAppContext } from "../../../context/HospitalContext/Receptionist/ReceptionistAppContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Modal from "../../../Components/ui/Modal";
-import { formatFullDate, formatTime } from "../../../Components/Dashboard/Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
 import {
   fetchPaymentProviders,
   savePatientPaymentCategory,
@@ -121,9 +120,6 @@ const Hospital_Receptionist_Home_Dashboard = () => {
   const [bookAppointment, setBookAppointment] = useState(false);
 
   const [checkPatientIn, setCheckPatientIn] = useState(false);
-  // true when the details panel was opened from the Recent Patients list
-  // (patient is already checked in, so the CTA differs from the HIN-lookup flow)
-  const [alreadyCheckedIn, setAlreadyCheckedIn] = useState(false);
   const [showPaymentCategoryModal, setShowPaymentCategoryModal] = useState(false);
   // Display casing ("Private" | "HMO" | "Company"); lowercased when sent to the API.
   // Backend default for a patient with nothing saved is "private".
@@ -254,40 +250,6 @@ const Hospital_Receptionist_Home_Dashboard = () => {
     checkInMutation.mutate({ patient: patientDetails.hin });
   };
 
-  const handleViewRecentPatient = async (patient) => {
-    const hin = patient.patient_info?.hin || patient.patient?.hin || "";
-    if (!hin) {
-      toast.error("Patient's HIN not found.");
-      return;
-    }
-
-    const toastId = toast.loading("Loading patient details...");
-    try {
-      // Pull the authoritative record from the API rather than trusting
-      // whatever partial fields happened to be on the recent-patients row
-      const data = await fetchPatientByHIN(hin);
-      setPatientDetails({
-        ...data,
-        assignedDoctor: patient.staff
-          ? patient.staff.role === "doctor"
-            ? `Dr. ${patient.staff.firstname} ${patient.staff.lastname}`
-            : `${patient.staff.firstname} ${patient.staff.lastname}`
-          : "NIL",
-        lastVisit: patient.created_at
-          ? `${formatFullDate(patient.created_at)} / ${formatTime(patient.created_at)}`
-          : "NIL",
-      });
-      setAlreadyCheckedIn(true);
-      setCheckHIN(true);
-      toast.dismiss(toastId);
-    } catch (err) {
-      toast.dismiss(toastId);
-      toast.error(
-        err?.response?.data?.message || "Failed to fetch patient details.",
-      );
-    }
-  };
-
   // Pre-fill from whatever's already saved for this patient (payment_provider
   // comes embedded on the patient-details response) rather than always
   // defaulting the modal to blank/HMO.
@@ -352,27 +314,24 @@ const Hospital_Receptionist_Home_Dashboard = () => {
               >
                 Book an appointment
               </button>
-              {alreadyCheckedIn ? (
-                <button
-                  className="bg-docuhealth-primary py-2.5 px-8 w-full sm:w-auto rounded-full text-white cursor-pointer"
-                  onClick={handleChoosePaymentCategory}
-                >
-                  Choose patient payment category
-                </button>
-              ) : (
-                <button
-                  className="bg-docuhealth-primary py-2.5 px-8 w-full sm:w-auto rounded-full text-white cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
-                  onClick={handleCheckIn}
-                  disabled={checkInMutation.isPending}
-                >
-                  {checkInMutation.isPending && (
-                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  )}
-                  {checkInMutation.isPending
-                    ? "Checking In..."
-                    : "Check Patient In"}
-                </button>
-              )}
+              <button
+                className="border border-docuhealth-primary text-docuhealth-primary py-2 px-8 w-full sm:w-auto rounded-full cursor-pointer"
+                onClick={handleChoosePaymentCategory}
+              >
+                Choose patient payment category
+              </button>
+              <button
+                className="bg-docuhealth-primary py-2.5 px-8 w-full sm:w-auto rounded-full text-white cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
+                onClick={handleCheckIn}
+                disabled={checkInMutation.isPending}
+              >
+                {checkInMutation.isPending && (
+                  <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                )}
+                {checkInMutation.isPending
+                  ? "Checking In..."
+                  : "Check Patient In"}
+              </button>
             </div>
           </div>
           <div className="bg-white rounded-xl border mt-3 p-5 text-sm">
@@ -380,7 +339,6 @@ const Hospital_Receptionist_Home_Dashboard = () => {
               <div
                 onClick={() => {
                   setCheckHIN(false);
-                  setAlreadyCheckedIn(false);
                 }}
               >
                 <ArrowLeft className="w-4 h-4 text-gray-800" />
@@ -598,7 +556,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                   Recent Patients attended to
                 </h2>
                 <div>
-                  <RecentPatients onSelectPatient={handleViewRecentPatient} />
+                  <RecentPatients />
                 </div>
               </div>
             </div>

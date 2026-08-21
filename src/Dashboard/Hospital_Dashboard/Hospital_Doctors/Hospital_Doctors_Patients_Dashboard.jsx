@@ -3,7 +3,7 @@ import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import TabComponent from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/TabComponent";
 import getTabs from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/TabDetails";
 import AdvanceCheckUp from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/AdvanceCheckUp";
-import OtherMedicalServices from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/OtherMedicalServices";
+import OtherMedicalServicesFab from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/OtherMedicalServicesFab";
 import TransferToAnotherWard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/TransferToAnotherWard";
 import AfterDischargeSummary from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/AfterDischargeSummary";
 import SoapNoteEntry from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/SoapNoteEntry";
@@ -36,7 +36,6 @@ const Hospital_Doctors_Patients_Dashboard = () => {
     }
   }, [location, navigate, setTab]);
 
-  const [otherMedicalServices, setOtherMedicalServices] = useState(false);
   const [prescribeMedication, setPrescribeMedication] = useState(false);
   const [transferRequest, setTransferRequest] = useState(false);
   const [requestAdmission, setRequestAdmission] = useState(false);
@@ -55,15 +54,6 @@ const Hospital_Doctors_Patients_Dashboard = () => {
             <DynamicDate />
             {!selected.discharge_date && (
             <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
-              <button
-                className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto "
-                onClick={() => {
-                  setOtherMedicalServices(true);
-                }}
-              >
-                Other medical services
-              </button>
-
               {advanceCheckUpSource === "outpatient" ? (
                 <>
                   <button
@@ -109,6 +99,15 @@ const Hospital_Doctors_Patients_Dashboard = () => {
             </div>
             )}
           </div>
+          {!selected.discharge_date && (
+            <OtherMedicalServicesFab
+              selectedPatientDetails={selected}
+              onOrderPharmacy={() => {
+                setPrescribeMedication(true);
+                setAdvanceCheckUp(false);
+              }}
+            />
+          )}
           <div className="text-sm">
             {advanceCheckUpSource === "outpatient" ? (
               <PatientInfo
@@ -125,16 +124,6 @@ const Hospital_Doctors_Patients_Dashboard = () => {
               />
             )}
           </div>
-          {otherMedicalServices && (
-            <OtherMedicalServices
-              setOtherMedicalServices={setOtherMedicalServices}
-              selectedPatientDetails={selected}
-              setPrescribeMedication={setPrescribeMedication}
-              setSeePatientDetails={setAdvanceCheckUp}
-              isFromPatientMgt={true}
-            />
-          )}
-
           {dischargePatient && (
             <AfterDischargeSummary
               selectedDischargePatient={selectedDischargePatient}

@@ -176,7 +176,7 @@ const AdmissionRequestList = () => {
         {admissionRequests.map((admissionRequest, index) => {
           const isMutatingThis =
             admissionMutation.isPending &&
-            admissionMutation.variables === admissionRequest.id;
+            admissionMutation.variables === admissionRequest.sqid;
 
           return (
             <div key={index} className="border p-3 rounded-xl">
