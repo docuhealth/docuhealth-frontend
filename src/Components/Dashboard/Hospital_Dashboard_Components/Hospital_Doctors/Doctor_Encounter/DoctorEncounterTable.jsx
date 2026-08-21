@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import moment from "moment";
 import { User, X, ClipboardList, ChevronDown, Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { DoctorEncounterContext } from "../../../../../context/HospitalContext/Doctors/DoctorEncounterContext";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../../ui/Table";
 import EmptyState from "../../../../ui/EmptyState";
@@ -36,13 +37,14 @@ const getTriageColor = (priority) => {
 };
 
 const getCallUpStatus = (status) => {
-  if (status === "called_up" || status === "in_progress") return { text: "Active", style: "bg-green-100 text-green-600" };
-  if (status === "closed") return { text: "Closed", style: "bg-green-100 text-green-600" };
+  if (status === "doctor_active") return { text: "Active", style: "bg-green-100 text-green-600" };
+  if (status === "closed") return { text: "Closed", style: "bg-gray-100 text-gray-500" };
   return { text: "Awaiting", style: "bg-amber-50 text-amber-500" };
 };
 
 const DoctorEncounterTable = () => {
   const { encounters, loading, activeTab, claimPatient } = useContext(DoctorEncounterContext);
+  const navigate = useNavigate();
   const [selectedPatientForWall, setSelectedPatientForWall] = useState(null);
   const [selectedPatientForActivities, setSelectedPatientForActivities] = useState(null);
   const [showClaimModal, setShowClaimModal] = useState(false);
@@ -91,6 +93,10 @@ const DoctorEncounterTable = () => {
     const closeSuccessAndWall = () => {
       setShowSuccessModal(false);
       setSelectedPatientForWall(null);
+      // Auto navigate to the outpatient dashboard and open this patient's details
+      navigate("/hospital-doctors-patients-dashboard", { 
+        state: { openOutpatient: encounter } 
+      });
     };
 
     return (
@@ -239,7 +245,7 @@ const DoctorEncounterTable = () => {
                 ? `${encounter.patient_info.firstname} ${encounter.patient_info.lastname}`
                 : "Unknown Patient";
               
-              const waitTime = moment().diff(moment(encounter.created_at), 'minutes');
+              const waitTime = moment().diff(moment(encounter.escalated_at || encounter.created_at), 'minutes');
               const formattedWaitTime = waitTime > 60 
                 ? `${Math.floor(waitTime / 60)} hrs ${waitTime % 60} mins` 
                 : `${waitTime} mins`;
@@ -314,7 +320,7 @@ const DoctorEncounterTable = () => {
             ? `${encounter.patient_info.firstname} ${encounter.patient_info.lastname}`
             : "Unknown Patient";
           
-          const waitTime = moment().diff(moment(encounter.created_at), 'minutes');
+          const waitTime = moment().diff(moment(encounter.escalated_at || encounter.created_at), 'minutes');
           const formattedWaitTime = waitTime > 60 
             ? `${Math.floor(waitTime / 60)} hrs ${waitTime % 60} mins` 
             : `${waitTime} mins`;

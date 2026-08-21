@@ -15,16 +15,23 @@ import VitalSignsCard from "../../../../ui/VitalSignsCard";
 const getBadgeStyle = (status) => {
   switch (status) {
     case "pending":
+    case "doctor_idle":
       return "bg-amber-100 text-amber-600";
-    case "in_progress":
+    case "nursing_active":
+    case "doctor_active":
       return "bg-blue-100 text-blue-600";
-    case "recorded":
-      return "bg-green-100 text-green-600";
-    case "escalated":
+    case "nursing_idle":
       return "bg-purple-100 text-purple-600";
+    case "closed":
+      return "bg-green-100 text-green-600";
     default:
       return "bg-gray-100 text-gray-600";
   }
+};
+
+const formatStatus = (status) => {
+  if (!status) return "Pending";
+  return status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
 
 const getTriageColor = (priority) => {
@@ -36,12 +43,13 @@ const getTriageColor = (priority) => {
 };
 
 const getCallUpStatus = (status) => {
-  if (status === "called_up") return { text: "Called-up", style: "bg-green-100 text-green-500" };
+  if (status === "doctor_active") return { text: "Doctor Active", style: "bg-green-100 text-green-500" };
+  if (status === "closed") return { text: "Closed", style: "bg-gray-100 text-gray-500" };
   return { text: "Awaiting", style: "bg-amber-50 text-amber-500" };
 };
 
 const NursingEncounterTable = () => {
-  const { encounters, loading, activeTab, startEncounter } = useContext(NursingEncounterContext);
+  const { encounters, loading, activeTab, startEncounter, submitAssessment } = useContext(NursingEncounterContext);
   const [selectedPatientForDetails, setSelectedPatientForDetails] = useState(null);
   const [selectedPatientForEncounter, setSelectedPatientForEncounter] = useState(null);
   const [viewEncounterDetails, setViewEncounterDetails] = useState(null);
@@ -66,31 +74,31 @@ const NursingEncounterTable = () => {
     setEncounterFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const getAssessmentPayload = () => {
+    return {
+      triage_priority: encounterFormData.triage_priority,
+      notes: encounterFormData.notes,
+      vital_signs: {
+        ...(encounterFormData.blood_pressure && { blood_pressure: encounterFormData.blood_pressure }),
+        ...(encounterFormData.temp && { temp: parseFloat(encounterFormData.temp) }),
+        ...(encounterFormData.heart_rate && { heart_rate: parseInt(encounterFormData.heart_rate) }),
+        ...(encounterFormData.resp_rate && { resp_rate: parseInt(encounterFormData.resp_rate) }),
+        ...(encounterFormData.height && { height: parseFloat(encounterFormData.height) }),
+        ...(encounterFormData.weight && { weight: parseFloat(encounterFormData.weight) }),
+        ...(encounterFormData.bmi && { bmi: parseFloat(encounterFormData.bmi) }),
+        ...(encounterFormData.pain_score && { pain_score: encounterFormData.pain_score }),
+        ...(encounterFormData.sp02 && { sp02: encounterFormData.sp02 })
+      }
+    };
+  };
+
   const handleRecordEncounter = async () => {
     if (!selectedPatientForEncounter) return;
     setSubmittingEncounter(true);
     try {
-      const payload = {
-        triage_priority: encounterFormData.triage_priority,
-        notes: encounterFormData.notes,
-        vital_signs: {
-          ...(encounterFormData.blood_pressure && { blood_pressure: encounterFormData.blood_pressure }),
-          ...(encounterFormData.temp && { temp: parseFloat(encounterFormData.temp) }),
-          ...(encounterFormData.heart_rate && { heart_rate: parseInt(encounterFormData.heart_rate) }),
-          ...(encounterFormData.resp_rate && { resp_rate: parseInt(encounterFormData.resp_rate) }),
-          ...(encounterFormData.height && { height: parseFloat(encounterFormData.height) }),
-          ...(encounterFormData.weight && { weight: parseFloat(encounterFormData.weight) }),
-          ...(encounterFormData.bmi && { bmi: parseFloat(encounterFormData.bmi) }),
-          ...(encounterFormData.pain_score && { pain_score: encounterFormData.pain_score }),
-          ...(encounterFormData.sp02 && { sp02: encounterFormData.sp02 })
-        }
-      };
-
-      await axiosInstanceHos.post(`/api/nurses/check-ins/${selectedPatientForEncounter.sqid}/encounter-card`, payload);
-      toast.success("Encounter recorded successfully!");
-      // Don't close modal here, allow them to escalate if they want. Or maybe close it? The user said "Change the button from Update Vitals Only to Record Encounter, Then the endpoint to send patient to doctor's queue."
-    } catch (error) {
-      toast.error(error.response?.data?.check_in?.[0] || error.response?.data?.check_in || "Failed to record encounter.");
+      const payload = getAssessmentPayload();
+      const success = await submitAssessment(selectedPatientForEncounter.sqid, payload, false);
+      if (success) setSelectedPatientForEncounter(null);
     } finally {
       setSubmittingEncounter(false);
     }
@@ -100,11 +108,9 @@ const NursingEncounterTable = () => {
     if (!selectedPatientForEncounter) return;
     setEscalating(true);
     try {
-      await axiosInstanceHos.post(`/api/nurses/check-ins/${selectedPatientForEncounter.sqid}/escalate`, {});
-      toast.success("Patient sent to doctor's queue!");
-      setSelectedPatientForEncounter(null); // Close modal
-    } catch (error) {
-      toast.error(error.response?.data?.check_in?.[0] || error.response?.data?.check_in || "Failed to escalate patient.");
+      const payload = getAssessmentPayload();
+      const success = await submitAssessment(selectedPatientForEncounter.sqid, payload, true);
+      if (success) setSelectedPatientForEncounter(null);
     } finally {
       setEscalating(false);
     }
@@ -267,18 +273,21 @@ const NursingEncounterTable = () => {
                       </span>
                     ) : (
                       <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getBadgeStyle(encounter.status)}`}>
-                        {encounter.status === "in_progress" ? "In Progress" : encounter.status || "Pending"}
+                        {formatStatus(encounter.status)}
                       </span>
                     )}
                   </TableCell>
                   <TableCell className="border-b border-gray-200">
                     <div className="flex items-center gap-2">
                          <button 
-                        onClick={() => {
-                          startEncounter(encounter.sqid);
-                          setSelectedPatientForEncounter(encounter);
+                        onClick={async () => {
+                          const success = await startEncounter(encounter.sqid);
+                          if (success) {
+                            setSelectedPatientForEncounter(encounter);
+                          }
                         }}
-                        className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors"
+                        disabled={encounter.status === "nursing_active" && !(JSON.parse(localStorage.getItem("reservedEncounters") || "[]").includes(encounter.sqid))}
+                        className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Start clinical encounter
                       </button>
@@ -348,7 +357,7 @@ const NursingEncounterTable = () => {
                   </span>
                 ) : (
                   <span className={`px-2.5 py-1 rounded-full text-[10px] font-medium capitalize border ${getBadgeStyle(encounter.status)}`}>
-                    {encounter.status === "in_progress" ? "In Progress" : encounter.status || "Pending"}
+                    {formatStatus(encounter.status)}
                   </span>
                 )}
               </div>
@@ -394,11 +403,14 @@ const NursingEncounterTable = () => {
                 ) : (
                   <>
                     <button 
-                      onClick={() => {
-                        startEncounter(encounter.sqid);
-                        setSelectedPatientForEncounter(encounter);
+                      onClick={async () => {
+                        const success = await startEncounter(encounter.sqid);
+                        if (success) {
+                          setSelectedPatientForEncounter(encounter);
+                        }
                       }}
-                      className="w-full bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 py-2.5 rounded-full font-medium text-xs transition-colors"
+                      disabled={encounter.status === "nursing_active" && !(JSON.parse(localStorage.getItem("reservedEncounters") || "[]").includes(encounter.sqid))}
+                      className="w-full bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 py-2.5 rounded-full font-medium text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Start clinical encounter
                     </button>
@@ -490,12 +502,15 @@ const NursingEncounterTable = () => {
             {/* Action Button */}
             <div className="w-full flex justify-end mt-8">
               <button 
-                onClick={() => {
-                  setSelectedPatientForDetails(null);
-                  startEncounter(selectedPatientForDetails.sqid);
-                  setSelectedPatientForEncounter(selectedPatientForDetails);
+                onClick={async () => {
+                  const success = await startEncounter(selectedPatientForDetails.sqid);
+                  if (success) {
+                    setSelectedPatientForDetails(null);
+                    setSelectedPatientForEncounter(selectedPatientForDetails);
+                  }
                 }}
-                className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-8 py-3 rounded-full font-medium text-sm transition-colors"
+                disabled={selectedPatientForDetails.status === "nursing_active" && !(JSON.parse(localStorage.getItem("reservedEncounters") || "[]").includes(selectedPatientForDetails.sqid))}
+                className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-8 py-3 rounded-full font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Start clinical encounter
               </button>

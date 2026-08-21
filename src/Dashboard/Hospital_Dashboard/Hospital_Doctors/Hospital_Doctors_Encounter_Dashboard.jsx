@@ -4,7 +4,7 @@ import { DoctorEncounterContext } from "../../../context/HospitalContext/Doctors
 import DoctorEncounterTable from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Doctor_Encounter/DoctorEncounterTable";
 import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 
-const tabs = ["Pending", "Active", "Closed"];
+const tabs = ["Pending", "Active"];
 
 const Hospital_Doctors_Encounter_Dashboard = () => {
   const { activeTab, setActiveTab, currentPage, totalPages, setCurrentPage, count } = useContext(DoctorEncounterContext);

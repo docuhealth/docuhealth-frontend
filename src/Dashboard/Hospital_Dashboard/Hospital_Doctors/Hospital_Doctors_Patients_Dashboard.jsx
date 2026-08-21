@@ -8,6 +8,11 @@ import TransferToAnotherWard from "../../../Components/Dashboard/Hospital_Dashbo
 import AfterDischargeSummary from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/AfterDischargeSummary";
 import SoapNoteEntry from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/SoapNoteEntry";
 import PrescribeMedication from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PrescribeMedication";
+import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PatientInfo";
+import RequestAdmission from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/RequestAdmission";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useContext } from "react";
+import { DoctorsAdmittedPatientMGTContext } from "../../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
 
 const Hospital_Doctors_Patients_Dashboard = () => {
   const [advanceCheckUp, setAdvanceCheckUp] = useState(false);
@@ -15,9 +20,26 @@ const Hospital_Doctors_Patients_Dashboard = () => {
 
   const [selected, setSelected] = useState(null);
 
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { setTab } = useContext(DoctorsAdmittedPatientMGTContext);
+
+  useEffect(() => {
+    if (location.state?.openOutpatient) {
+      setAdvanceCheckUp(true);
+      setSelected(location.state.openOutpatient);
+      setAdvanceCheckUpSource("outpatient");
+      setTab("outpatient");
+      
+      // Clear the state so it doesn't re-trigger on refresh
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location, navigate, setTab]);
+
   const [otherMedicalServices, setOtherMedicalServices] = useState(false);
   const [prescribeMedication, setPrescribeMedication] = useState(false);
   const [transferRequest, setTransferRequest] = useState(false);
+  const [requestAdmission, setRequestAdmission] = useState(false);
 
   const [soapNoteEntry, setSoapNoteEntry] = useState(false);
 
@@ -42,34 +64,65 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                 Other medical services
               </button>
 
-              <button
-                className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
-                onClick={() => {
-                  setTransferRequest(true);
-                }}
-              >
-                Transfer to another ward
-              </button>
-              <button
-                className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
-                onClick={() => {
-                  setDischargePatient(true);
-                  setSelectedDischargePatient(selected);
-                  //   setSeePatientDetails(false);
-                }}
-              >
-                Discharge Patient
-              </button>
+              {advanceCheckUpSource === "outpatient" ? (
+                <>
+                  <button
+                    className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                    onClick={() => {
+                      setRequestAdmission(true);
+                    }}
+                  >
+                    Request for admission
+                  </button>
+                  <button
+                    className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
+                    onClick={() => {
+                      setSoapNoteEntry(true);
+                      setAdvanceCheckUp(false);
+                    }}
+                  >
+                    + Add new SOAP Note
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                    onClick={() => {
+                      setTransferRequest(true);
+                    }}
+                  >
+                    Transfer to another ward
+                  </button>
+                  <button
+                    className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
+                    onClick={() => {
+                      setDischargePatient(true);
+                      setSelectedDischargePatient(selected);
+                      //   setSeePatientDetails(false);
+                    }}
+                  >
+                    Discharge Patient
+                  </button>
+                </>
+              )}
             </div>
             )}
           </div>
-          <div className="bg-white my-5 border rounded-lg p-5 text-sm">
-            <AdvanceCheckUp
-              selected={selected}
-              setAdvanceCheckUp={setAdvanceCheckUp}
-              setSoapNoteEntry={setSoapNoteEntry}
-              advanceCheckUpSource = {advanceCheckUpSource}
-            />
+          <div className="text-sm">
+            {advanceCheckUpSource === "outpatient" ? (
+              <PatientInfo
+                setSeePatientDetails={setAdvanceCheckUp}
+                selectedPatientDetails={selected}
+              />
+            ) : (
+              <AdvanceCheckUp
+                selected={selected}
+                setAdvanceCheckUp={setAdvanceCheckUp}
+                setSoapNoteEntry={setSoapNoteEntry}
+                advanceCheckUpSource={advanceCheckUpSource}
+              />
+            )}
           </div>
           {otherMedicalServices && (
             <OtherMedicalServices
@@ -92,6 +145,13 @@ const Hospital_Doctors_Patients_Dashboard = () => {
             <TransferToAnotherWard
               setRequestAdmission={setTransferRequest}
               selectedPatientDetails={selected}
+            />
+          )}
+
+          {requestAdmission && advanceCheckUpSource === "outpatient" && (
+            <RequestAdmission 
+              setRequestAdmission={setRequestAdmission} 
+              selectedPatientDetails={selected} 
             />
           )}
         </>

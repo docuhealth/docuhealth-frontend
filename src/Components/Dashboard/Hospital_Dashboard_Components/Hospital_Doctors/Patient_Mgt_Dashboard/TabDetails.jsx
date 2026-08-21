@@ -5,6 +5,7 @@ import Pagination from "../../../Patient_Dashboard_Components/Pagination/Paginat
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { DoctorsAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
+import { DoctorsOutPatientMGTContext } from "../../../../../context/HospitalContext/Doctors/DoctorsOutPatientMGTContext";
 import AfterDischargeSummary from "./AfterDischargeSummary";
 import SearchBar from "../../../../SearchBar/SearchBar";
 
@@ -281,6 +282,122 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
   );
 };
 
+const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSource }) => {
+  const {
+    outPatients,
+    loading,
+    count,
+    currentPage,
+    totalPages,
+    fetchOutPatients,
+    tab,
+    searchQuery,
+    setSearchQuery,
+    isRefreshing,
+  } = useContext(DoctorsOutPatientMGTContext);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+
+  const sortedOutPatients = useMemo(() => {
+    return [...outPatients].sort((a, b) => {
+      const dateA = new Date(a.admission_date).getTime();
+      const dateB = new Date(b.admission_date).getTime();
+      return dateB - dateA;
+    });
+  }, [outPatients]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-full text-sm">
+        Loading...
+      </div>
+    );
+  }
+
+  if (outPatients.length === 0 && !searchQuery) {
+    return (
+      <div className="flex flex-col justify-center items-center text-center  h-full">
+        <h2 className="font-medium pb-1 mt-4">No out patients!</h2>
+        <div className="max-w-md text-center">
+          <p className="text-[12px] text-gray-500">
+            You currently don’t have any out patients.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="mb-4">
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search patient's name or HIN..."
+        />
+        {isRefreshing && (
+          <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
+            <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
+            Searching...
+          </p>
+        )}
+      </div>
+
+      {outPatients.length === 0 && searchQuery ? (
+        <div className="py-12 text-center text-gray-500 text-sm">
+          <p className="font-medium">No results found.</p>
+          <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
+        </div>
+      ) : (
+      <>
+      <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {sortedOutPatients.map((outPatient, index) => (
+          <div key={index} className="border p-3 rounded-xl">
+            <div className="flex justify-between items-center">
+              <p>
+                {outPatient?.patient_info?.firstname}{" "}
+                {outPatient?.patient_info?.lastname}{" "}
+              </p>
+              <div className="bg-docuhealth-light-green px-2 rounded-full">
+                <p className="text-docuhealth-green ">
+                  {formatRecordDate(outPatient.admission_date)}
+                </p>
+              </div>
+            </div>
+            <div className="border-b py-2">
+              <p className="text-gray-600">
+                HIN :{" "}
+                {(outPatient?.patient_info?.hin || outPatient?.patient?.hin) ? outPatient.patient_info.hin.slice(0, 4) +
+                  "••••••" +
+                  outPatient.patient_info.hin.slice(-2) : 'N/A'}
+              </p>
+            </div>
+            <button
+              className="text-center mt-4 py-2.5 border bg-docuhealth-dark text-white w-full rounded-full cursor-pointer"
+              onClick={() => {
+                setAdvanceCheckUp(true);
+                setSelected(outPatient);
+                setSelectedPatient(outPatient);
+                setAdvanceCheckUpSource('outpatient')
+              }}
+            >
+              View patient's details
+            </button>
+          </div>
+        ))}
+      </div>
+      </>)}
+
+      <Pagination
+        count={count}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        fetchData={fetchOutPatients}
+        tab={tab}
+      />
+    </>
+  );
+};
+
 const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSource }) => {
   const {
     admittedPatients,
@@ -540,6 +657,18 @@ const getTabs = (advanceCheckUp, setAdvanceCheckUp, setSelected, setAdvanceCheck
     content: (
       <AdmittedPatientsTab
         advanceCheckUp={advanceCheckUp}
+        setAdvanceCheckUp={setAdvanceCheckUp}
+        setSelected={setSelected}
+        setAdvanceCheckUpSource={setAdvanceCheckUpSource}
+      />
+    ),
+  },
+
+  {
+    title: "Out Patients",
+    status: "outpatient",
+    content: (
+      <OutPatientsTab
         setAdvanceCheckUp={setAdvanceCheckUp}
         setSelected={setSelected}
         setAdvanceCheckUpSource={setAdvanceCheckUpSource}

@@ -391,9 +391,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => 
 
     formData.append("next_appointment", JSON.stringify(appointment));
 
-    if (source === "appointments" && selectedPatientDetails?.sqid) {
-      formData.append("appointment", selectedPatientDetails.sqid);
-    } else if (selectedPatientDetails?.sqid) {
+    if (source !== "appointments" && selectedPatientDetails?.sqid) {
       formData.append("check_in", selectedPatientDetails.sqid);
     }
 

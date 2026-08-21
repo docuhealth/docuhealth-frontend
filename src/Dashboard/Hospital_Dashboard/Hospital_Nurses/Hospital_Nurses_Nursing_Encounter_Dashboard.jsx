@@ -4,7 +4,7 @@ import { NursingEncounterContext } from "../../../context/HospitalContext/Nurses
 import NursingEncounterTable from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Nursing_Encounter/NursingEncounterTable";
 import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 
-const tabs = ["Pending", "Closed", "Doctor’s call-up/consultation"];
+const tabs = ["Pending", "Doctor’s call-up/consultation"];
 
 const Hospital_Nurses_Nursing_Encounter_Dashboard = () => {
   const { activeTab, setActiveTab, currentPage, totalPages, setCurrentPage, count } = useContext(NursingEncounterContext);

@@ -5,9 +5,8 @@ import toast from "react-hot-toast";
 export const DoctorEncounterContext = createContext();
 
 const TAB_STATUS_MAP = {
-  "Pending": "escalated",
-  "Active": "in_progress",
-  "Closed": "closed",
+  "Pending": "doctor_idle",
+  "Active": "doctor_active",
 };
 
 export const DoctorEncounterProvider = ({ children }) => {

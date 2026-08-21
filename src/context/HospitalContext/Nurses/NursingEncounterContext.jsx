@@ -6,8 +6,7 @@ export const NursingEncounterContext = createContext();
 
 const TAB_STATUS_MAP = {
   "Pending": "pending",
-  "Closed": "recorded",
-  "Doctor’s call-up/consultation": "escalated",
+  "Doctor’s call-up/consultation": "sent_to_doctor",
 };
 
 export const NursingEncounterProvider = ({ children }) => {
@@ -30,25 +29,13 @@ export const NursingEncounterProvider = ({ children }) => {
     try {
       const status = TAB_STATUS_MAP[activeTab];
       
-
-
       let url = `api/nurses/check-ins?status=${status}&page=${currentPage}`;
 
       const response = await axiosInstanceHos.get(url);
       const data = response.data;
       
       if (data?.results) {
-        // Intercept and override status with localStorage state to simulate backend
-        const localInProgress = JSON.parse(localStorage.getItem("inProgressEncounters") || "[]");
-        
-        const mappedResults = data.results.map((enc) => {
-          if (localInProgress.includes(enc.sqid)) {
-            return { ...enc, status: "in_progress" };
-          }
-          return enc;
-        });
-
-        setEncounters(mappedResults);
+        setEncounters(data.results);
         setCount(data.count || 0);
         // Assuming page size is 10
         setTotalPages(Math.ceil((data.count || 0) / 10) || 1);
@@ -72,18 +59,46 @@ export const NursingEncounterProvider = ({ children }) => {
     fetchEncounters();
   }, [activeTab, currentPage]);
 
-  const startEncounter = (sqid) => {
-    // Save to localStorage
-    const localInProgress = JSON.parse(localStorage.getItem("inProgressEncounters") || "[]");
-    if (!localInProgress.includes(sqid)) {
-      localInProgress.push(sqid);
-      localStorage.setItem("inProgressEncounters", JSON.stringify(localInProgress));
-    }
+  const startEncounter = async (sqid) => {
+    try {
+      await axiosInstanceHos.post(`/api/nurses/check-ins/${sqid}/reserve`, {});
+      
+      // Save to localStorage so we know this nurse reserved it
+      const localInProgress = JSON.parse(localStorage.getItem("reservedEncounters") || "[]");
+      if (!localInProgress.includes(sqid)) {
+        localInProgress.push(sqid);
+        localStorage.setItem("reservedEncounters", JSON.stringify(localInProgress));
+      }
 
-    // Update local state immediately
-    setEncounters((prev) =>
-      prev.map((enc) => (enc.sqid === sqid ? { ...enc, status: "in_progress" } : enc))
-    );
+      // Update local state immediately
+      setEncounters((prev) =>
+        prev.map((enc) => (enc.sqid === sqid ? { ...enc, status: "nursing_active" } : enc))
+      );
+      
+      return true;
+    } catch (error) {
+      toast.error(error.response?.data?.check_in?.[0] || error.response?.data?.check_in || "Failed to reserve encounter.");
+      return false;
+    }
+  };
+
+  const submitAssessment = async (sqid, payload, escalate = false) => {
+    try {
+      const finalPayload = { ...payload, escalate };
+      await axiosInstanceHos.post(`/api/nurses/check-ins/${sqid}/nursing-assessment`, finalPayload);
+      
+      // Remove from localStorage
+      const localInProgress = JSON.parse(localStorage.getItem("reservedEncounters") || "[]");
+      const updatedLocal = localInProgress.filter((id) => id !== sqid);
+      localStorage.setItem("reservedEncounters", JSON.stringify(updatedLocal));
+
+      toast.success(escalate ? "Patient sent to doctor's queue!" : "Encounter recorded successfully!");
+      fetchEncounters(); // Invalidate queries/refetch
+      return true;
+    } catch (error) {
+      toast.error(error.response?.data?.check_in?.[0] || error.response?.data?.check_in || "Failed to submit assessment.");
+      return false;
+    }
   };
 
   return (
@@ -98,7 +113,8 @@ export const NursingEncounterProvider = ({ children }) => {
         totalPages,
         count,
         fetchEncounters,
-        startEncounter
+        startEncounter,
+        submitAssessment
       }}
     >
       {children}
