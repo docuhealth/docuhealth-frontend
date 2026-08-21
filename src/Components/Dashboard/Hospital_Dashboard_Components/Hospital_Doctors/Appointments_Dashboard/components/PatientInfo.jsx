@@ -13,6 +13,7 @@ import { fetchTestCategories, fetchLabTests } from "../../../../../../queries/Ho
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../../../utils/soapNoteHelpers";
+import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import PatientInfoCard from "../../../../../ui/PatientInfoCard";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import ClinicalSummaryCard from "../../../../../ui/ClinicalSummaryCard";
@@ -47,7 +48,8 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   
   const [showDischargeModal, setShowDischargeModal] = useState(false);
 
-  const hin = (selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin) || selectedPatientDetails?.patient_hin;
+  const orderContext = resolveOrderContext(selectedPatientDetails);
+  const hin = orderContext.hin;
   const pageSize = 6;
 
   const { data: patientFullInfo, isLoading: loadingInfo } = useQuery({
@@ -102,15 +104,15 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const { mutate: createOrder, isPending: isOrderPending } = useMutation({
     mutationFn: (payload) => {
       const requestPayload = {
-        patient: (selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin) || selectedPatientDetails?.patient_hin,
-        order_source: "staff_appointment_order",
+        patient: orderContext.hin,
+        order_source: orderContext.orderSource,
         items: payload.test_type.map((testSqid) => ({
           test: testSqid,
           note: payload.note,
         })),
       };
-      if (selectedPatientDetails?.sqid) {
-        requestPayload.appointment = selectedPatientDetails.sqid;
+      if (orderContext.checkIn) {
+        requestPayload.check_in = orderContext.checkIn;
       }
       if (payload.ignore_duplicate_warning) {
         requestPayload.ignore_duplicate_warning = true;

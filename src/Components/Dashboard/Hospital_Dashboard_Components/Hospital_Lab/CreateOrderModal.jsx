@@ -7,7 +7,7 @@ import axiosInstanceHos from "../../../../lib/axios/hospital";
 import Button from "../../../ui/Button";
 import Modal from "../../../ui/Modal";
 
-const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
+const CreateOrderModal = ({ isOpen, onClose, patientHin }) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
   const [form, setForm] = useState({ category: "", test_type: [], note: "" });
@@ -42,9 +42,9 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin, appointmentSqid }) => {
       if (payload.ignore_duplicate_warning) {
         requestPayload.ignore_duplicate_warning = true;
       }
-      if (appointmentSqid) {
-        requestPayload.appointment = appointmentSqid;
-      }
+      // Note: the `appointment` field has been removed from the lab order
+      // serializer — this modal is only ever given a bare patientHin by
+      // its caller, so there's nothing here to link an order to.
       return createLabTestOrder(requestPayload);
     },
     onSuccess: () => {

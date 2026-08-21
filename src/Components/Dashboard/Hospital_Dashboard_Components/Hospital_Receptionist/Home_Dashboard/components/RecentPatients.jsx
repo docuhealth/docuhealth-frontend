@@ -4,7 +4,7 @@ import Pagination2 from '../../../../Patient_Dashboard_Components/Pagination/Pag
 import { formatFullDate, formatTime } from '../../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter';
 import SearchBar from '../../../../../SearchBar/SearchBar';
 
-const RecentPatients = ({ onSelectPatient }) => {
+const RecentPatients = () => {
 
     const {
         recentPatients,
@@ -146,10 +146,7 @@ const RecentPatients = ({ onSelectPatient }) => {
                 {
                     sortedPatients.map((patient, index) => (
                         <div key={index} className='relative'>
-                            <div
-                                onClick={() => onSelectPatient?.(patient)}
-                                className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-                            >
+                            <div className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
                                 <div className='font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-1 '>
 
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -189,8 +186,7 @@ const RecentPatients = ({ onSelectPatient }) => {
                 {sortedPatients.map((patient, index) => (
                     <div
                         key={index}
-                        onClick={() => onSelectPatient?.(patient)}
-                        className="bg-white border border-gray-200 rounded-md p-5 duration-200 cursor-pointer hover:border-docuhealth-primary transition-colors"
+                        className="bg-white border border-gray-200 rounded-md p-5 duration-200"
                     >
                         {/* Header: Avatar, Name and Gender Tag */}
                         <div className="flex justify-between items-start mb-4">

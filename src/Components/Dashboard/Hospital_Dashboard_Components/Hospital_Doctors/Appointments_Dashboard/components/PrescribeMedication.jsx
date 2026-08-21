@@ -5,6 +5,7 @@ import MedicationSection from "./MedicationSection";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 
 const NoteSection = ({
   title,
@@ -82,10 +83,10 @@ const PrescribeMedication = ({
   setPrescribeMedication,
   selectedPatientDetails,
   setSeePatientDetails,
-  isFromPatientMgt = false,
 }) => {
   const { profile } = useContext(DoctorAppContext);
   const queryClient = useQueryClient();
+  const orderContext = resolveOrderContext(selectedPatientDetails);
 
   const [medications, setMedications] = useState([
     {
@@ -163,8 +164,8 @@ const PrescribeMedication = ({
     }
 
     const payload = {
-      patient: selectedPatientDetails?.patient?.hin,
-      order_source: isFromPatientMgt ? "staff_admission_order" : "staff_appointment_order",
+      patient: orderContext.hin,
+      order_source: orderContext.orderSource,
       drugs: validMedications.map(med => {
         let drugData = {};
         if (med.catalog_drug) {
@@ -195,8 +196,8 @@ const PrescribeMedication = ({
       })
     };
 
-    if (!isFromPatientMgt && selectedPatientDetails?.sqid) {
-      payload.appointment = selectedPatientDetails.sqid;
+    if (orderContext.checkIn) {
+      payload.check_in = orderContext.checkIn;
     }
 
     mutate(payload);

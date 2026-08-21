@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 import { useMutation } from "@tanstack/react-query";
 import Modal from "../../../../../ui/Modal";
 import Button from "../../../../../ui/Button";
+import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 
 const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
   const { profile } = useContext(DoctorAppContext);
@@ -14,13 +15,16 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
   const [wardOptions, setWardOptions] = useState([]);
   const [availableBeds, setAvailableBeds] = useState([]);
 
+  const admissionContext = resolveOrderContext(selectedPatientDetails);
+
   const [form, setForm] = useState({
     ward: "",
     bed: "",
-    patient: selectedPatientDetails
-      ? selectedPatientDetails?.patient?.hin
-      : "",
-    check_in: selectedPatientDetails?.sqid || "",
+    patient: admissionContext.hin,
+    // Only a genuinely open check-in should be linked here — sending an
+    // appointment's sqid (or an empty string) as `check_in` gets rejected
+    // as "Check-in not found at this hospital."
+    ...(admissionContext.checkIn ? { check_in: admissionContext.checkIn } : {}),
   });
 
   useEffect(() => {
