@@ -236,7 +236,7 @@ const Hospital_Admin_Sidebar = () => {
           </Link>
 
           {/* Subscriptions */}
-          <Link to="/hospital-admin-subscriptions-dashboard">
+          {/* <Link to="/hospital-admin-subscriptions-dashboard">
             <div className="px-4 my-4">
               <li
                 className={`group px-4 py-2 ${
@@ -264,7 +264,7 @@ const Hospital_Admin_Sidebar = () => {
                 Subscriptions
               </li>
             </div>
-          </Link>
+          </Link> */}
         </ul>
       </nav>
 

@@ -165,7 +165,7 @@ const Hospital_Admin_Sidebar_Mobile = ({ openMobileSidebar, setOpenMobileSidebar
             </Link>
 
             {/* Subscriptions */}
-            <Link to="/hospital-admin-subscriptions-dashboard" onClick={() => setOpenMobileSidebar(false)}>
+            {/* <Link to="/hospital-admin-subscriptions-dashboard" onClick={() => setOpenMobileSidebar(false)}>
               <div className="px-4 my-4">
                 <li className={`group px-4 py-2 ${currentPath === "/hospital-admin-subscriptions-dashboard" ? "bg-docuhealth-primary text-white" : "text-gray-700"} hover:bg-docuhealth-primary hover:text-white rounded-lg flex items-center gap-2 justify-start transition-colors duration-150`}>
                   <span>
@@ -176,7 +176,7 @@ const Hospital_Admin_Sidebar_Mobile = ({ openMobileSidebar, setOpenMobileSidebar
                   Subscriptions
                 </li>
               </div>
-            </Link>
+            </Link> */}
           </ul>
         </nav>
 
