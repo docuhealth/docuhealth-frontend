@@ -332,7 +332,7 @@ function App() {
                 }
               />
             </Route>
-            <Route
+            {/* <Route
               path="/hospital-admin-subscriptions-dashboard"
               element={
                 <HospitalAdminProviders>
@@ -350,7 +350,7 @@ function App() {
                   </HospitalProtectedRoute>
                 }
               />
-            </Route>
+            </Route> */}
 
             {/* Hospital Doctors Routes */}
             <Route
