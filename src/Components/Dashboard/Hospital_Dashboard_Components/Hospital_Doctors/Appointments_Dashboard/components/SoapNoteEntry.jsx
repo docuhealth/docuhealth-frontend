@@ -83,6 +83,13 @@ const NoteSection = ({
 const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => {
   const { profile, hospitals } = useContext(DoctorAppContext);
 
+  // Different dashboards pass the selected patient under different keys
+  // (appointments flow uses `.patient`, patient-mgt flow uses `.patient_info`).
+  const patientHin =
+    selectedPatientDetails?.patient?.hin ||
+    selectedPatientDetails?.patient_info?.hin ||
+    "";
+
   const queryClient = useQueryClient();
 
   const [step, setStep] = useState(1);
@@ -216,14 +223,14 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => 
   };
 
   const { data: selectedPatientFetchedInfo, isLoading } = useQuery({
-    queryKey: ["patient-details-soap", selectedPatientDetails.patient.hin],
+    queryKey: ["patient-details-soap", patientHin],
     queryFn: async () => {
       const res = await axiosInstanceHos.get(
-        `api/doctors/patient/info/${selectedPatientDetails.patient.hin}`,
+        `api/doctors/patient/info/${patientHin}`,
       );
       return res.data;
     },
-    enabled: !!selectedPatientDetails.patient.hin,
+    enabled: !!patientHin,
     keeepPreviousData: true,
   });
 
@@ -233,9 +240,9 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => 
     onSuccess: () => {
       toast.success("SOAP Note created successfully !");
 
-      const hin = selectedPatientDetails.patient.hin
-      
-      sessionStorage.removeItem(`soap_draft_${selectedPatientDetails.patient.hin}`);
+      const hin = patientHin
+
+      sessionStorage.removeItem(`soap_draft_${patientHin}`);
       setSoapNoteEntry(false);
       queryClient.invalidateQueries({
         queryKey: ["patient-med-records", hin],
@@ -310,7 +317,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => 
 
     const payload = {
       staff: profile?.staff_id || "",
-      patient: selectedPatientDetails.patient.hin || "",
+      patient: patientHin || "",
       ...(selectedPatientFetchedInfo?.latest_vitals?.id && { vital_signs: selectedPatientFetchedInfo.latest_vitals.id }),
       referred_docuhealth_hosp: soapNoteData.referred_docuhealth_hosp,
       referred_hosp: soapNoteData.referred_hosp,
@@ -363,7 +370,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => 
       type: "consultation",
     };
 
-    formData.append("patient", selectedPatientDetails.patient.hin);
+    formData.append("patient", patientHin);
     formData.append("chief_complaint", soapNoteData.chief_complaint);
     formData.append("primary_diagnosis", soapNoteData.primary_diagnosis);
 
@@ -424,17 +431,17 @@ useEffect(() => {
     isShared
   };
   
-  if (selectedPatientDetails?.patient?.hin) {
+  if (patientHin) {
     sessionStorage.setItem(
-      `soap_draft_${selectedPatientDetails.patient.hin}`, 
+      `soap_draft_${patientHin}`,
       JSON.stringify(soapDraft)
     );
   }
-}, [isRestored,step, soapNoteData, selectedDay, selectedMonth, selectedYear, selectedTime, note, inputs, isShared, selectedPatientDetails.patient.hin]);
+}, [isRestored,step, soapNoteData, selectedDay, selectedMonth, selectedYear, selectedTime, note, inputs, isShared, patientHin]);
 
 
 useEffect(() => {
-  const hin = selectedPatientDetails?.patient?.hin;
+  const hin = patientHin;
   if (hin) {
     const savedDraft = sessionStorage.getItem(`soap_draft_${hin}`);
     if (savedDraft) {
@@ -452,7 +459,7 @@ useEffect(() => {
     }
     setIsRestored(true);
   }
-}, [selectedPatientDetails?.patient?.hin]);
+}, [patientHin]);
 
   return (
     <>

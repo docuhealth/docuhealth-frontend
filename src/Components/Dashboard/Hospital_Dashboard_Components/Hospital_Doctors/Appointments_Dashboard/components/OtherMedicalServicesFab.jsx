@@ -2,6 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import OrderLabModal from "./OrderLabModal";
 import RequestVitalsModal from "./RequestVitalsModal";
+import FluidIntakeOutputModal from "./FluidIntakeOutputModal";
+import WardProcedureModal from "./WardProcedureModal";
+import GlucoseMonitoringModal from "./GlucoseMonitoringModal";
+import DrugTaskModal from "./DrugTaskModal";
+import IVFluidModal from "./IVFluidModal";
+import SeizureEventModal from "./SeizureEventModal";
 
 // `action: null` means there's no flow built for that item yet, so it just
 // surfaces a "coming soon" toast instead of opening a modal with nothing
@@ -10,12 +16,13 @@ const QUICK_SERVICES = [
   { id: "lab", label: "Order lab", action: "lab" },
   { id: "scan", label: "Order scan/X-ray", action: null },
   { id: "pharmacy", label: "Order pharmacy", action: "pharmacy" },
-  { id: "drug-task", label: "Drug task (nurse)", action: null },
+  { id: "drug-task", label: "Drug task (nurse)", action: "drug-task" },
   { id: "vitals", label: "Vitals", action: "vitals" },
-  { id: "procedure", label: "Procedure", action: null },
-  { id: "input-output", label: "Input and output", action: null },
-  { id: "seizure", label: "Seizure events", action: null },
-  { id: "glucose", label: "Glucose monitoring", action: null },
+  { id: "procedure", label: "Procedure", action: "procedure" },
+  { id: "input-output", label: "Input and output", action: "input-output" },
+  { id: "iv-fluid", label: "IV fluid", action: "iv-fluid" },
+  { id: "seizure", label: "Seizure events", action: "seizure" },
+  { id: "glucose", label: "Glucose monitoring", action: "glucose" },
 ];
 
 /**
@@ -28,7 +35,7 @@ const QUICK_SERVICES = [
  */
 const OtherMedicalServicesFab = ({ selectedPatientDetails, onOrderPharmacy }) => {
   const [open, setOpen] = useState(false);
-  const [activeModal, setActiveModal] = useState(null); // "lab" | "vitals" | null
+  const [activeModal, setActiveModal] = useState(null); // "lab" | "vitals" | "input-output" | "procedure" | "glucose" | "drug-task" | "iv-fluid" | "seizure" | null
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -59,6 +66,24 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, onOrderPharmacy }) =>
         break;
       case "vitals":
         setActiveModal("vitals");
+        break;
+      case "input-output":
+        setActiveModal("input-output");
+        break;
+      case "procedure":
+        setActiveModal("procedure");
+        break;
+      case "glucose":
+        setActiveModal("glucose");
+        break;
+      case "drug-task":
+        setActiveModal("drug-task");
+        break;
+      case "iv-fluid":
+        setActiveModal("iv-fluid");
+        break;
+      case "seizure":
+        setActiveModal("seizure");
         break;
       case "pharmacy":
         onOrderPharmacy?.();
@@ -113,6 +138,24 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, onOrderPharmacy }) =>
           selectedPatientDetails={selectedPatientDetails}
           onClose={() => setActiveModal(null)}
         />
+      )}
+      {activeModal === "input-output" && (
+        <FluidIntakeOutputModal onClose={() => setActiveModal(null)} />
+      )}
+      {activeModal === "procedure" && (
+        <WardProcedureModal onClose={() => setActiveModal(null)} />
+      )}
+      {activeModal === "glucose" && (
+        <GlucoseMonitoringModal onClose={() => setActiveModal(null)} />
+      )}
+      {activeModal === "drug-task" && (
+        <DrugTaskModal onClose={() => setActiveModal(null)} />
+      )}
+      {activeModal === "iv-fluid" && (
+        <IVFluidModal onClose={() => setActiveModal(null)} />
+      )}
+      {activeModal === "seizure" && (
+        <SeizureEventModal onClose={() => setActiveModal(null)} />
       )}
     </>
   );
