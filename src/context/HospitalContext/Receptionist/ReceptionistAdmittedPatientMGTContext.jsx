@@ -8,7 +8,7 @@ export const ReceptionistAdmittedPatientMGTContext = createContext();
 
 const ReceptionistAdmittedPatientMGTProvider = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [tab, setTab] = useState("active");
+  const [tab, setTab] = useState("inpatient");
   const [searchQuery, setSearchQuery] = useState("");
   const pageSize = 6;
 
@@ -18,7 +18,7 @@ const ReceptionistAdmittedPatientMGTProvider = (props) => {
   const { data, isLoading: loading, isFetching } = useQuery({
     queryKey: ["hospital-patients-receptionist", tab, currentPage, debouncedSearch],
     queryFn: async () => {
-      let url = `api/hospitals/admissions/${tab}?page=${currentPage}&size=${pageSize}`;
+      let url = `api/hospitals/patients?status=${tab}&page=${currentPage}&size=${pageSize}`;
       if (debouncedSearch) url += `&search=${debouncedSearch}`;
       const res = await axiosInstanceHos.get(url);
       return res.data;

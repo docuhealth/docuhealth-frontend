@@ -6,6 +6,7 @@ export const NursingEncounterContext = createContext();
 
 const TAB_STATUS_MAP = {
   "Pending": "pending",
+  "Closed": "closed",
   "Doctor’s call-up/consultation": "sent_to_doctor",
 };
 
@@ -61,13 +62,21 @@ export const NursingEncounterProvider = ({ children }) => {
 
   const startEncounter = async (sqid) => {
     try {
+      const localInProgress = JSON.parse(localStorage.getItem("reservedEncounters") || "[]");
+      const encounter = encounters.find((enc) => enc.sqid === sqid);
+
+      // If already reserved by this nurse, just return true to open the modal without hitting the API again
+      if (localInProgress.includes(sqid) && encounter?.status === "nursing_active") {
+        return true;
+      }
+
       await axiosInstanceHos.post(`/api/nurses/check-ins/${sqid}/reserve`, {});
       
       // Save to localStorage so we know this nurse reserved it
-      const localInProgress = JSON.parse(localStorage.getItem("reservedEncounters") || "[]");
-      if (!localInProgress.includes(sqid)) {
-        localInProgress.push(sqid);
-        localStorage.setItem("reservedEncounters", JSON.stringify(localInProgress));
+      const updatedLocalInProgress = JSON.parse(localStorage.getItem("reservedEncounters") || "[]");
+      if (!updatedLocalInProgress.includes(sqid)) {
+        updatedLocalInProgress.push(sqid);
+        localStorage.setItem("reservedEncounters", JSON.stringify(updatedLocalInProgress));
       }
 
       // Update local state immediately

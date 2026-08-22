@@ -5,25 +5,30 @@ import { HosAdmittedPatientMGTContext } from "../../../../../context/HospitalCon
 const TabComponent = ({ tabs }) => {
   const { tab: activeStatus, setTab } = useContext(HosAdmittedPatientMGTContext);
 
+  const activeTabData = tabs.find((t) => (Array.isArray(t.status) ? t.status.includes(activeStatus) : t.status === activeStatus)) || tabs[0];
+
   return (
     <div>
-      <div className="flex border-b border-gray-200">
-        {tabs.map((t, index) => (
-          <button
-            key={index}
-            onClick={() => setTab(t.status)}
-            className={`text-sm px-4 py-2 font-medium transition-all duration-200 
-              ${activeStatus === t.status 
-                ? "text-docuhealth-primary border-b-2 border-docuhealth-primary font-semibold" 
-                : "text-gray-600 hover:text-gray-800"}`}
-          >
-            {t.title}
-          </button>
-        ))}
+      <div className="flex border-b border-gray-200 overflow-x-auto">
+        {tabs.map((t, index) => {
+          const isActive = Array.isArray(t.status) ? t.status.includes(activeStatus) : activeStatus === t.status;
+          return (
+            <button
+              key={t.status || index}
+              onClick={() => setTab(t.defaultStatus || t.status)}
+              className={`text-sm px-4 py-2 font-medium transition-all duration-200 whitespace-nowrap
+                ${isActive 
+                  ? "text-docuhealth-primary border-b-2 border-docuhealth-primary font-semibold" 
+                  : "text-gray-600 hover:text-gray-800"}`}
+            >
+              {t.title}
+            </button>
+          );
+        })}
       </div>
       {/* Render the content based on the active status */}
-      <div className="py-2">
-        {tabs.find(t => t.status === activeStatus)?.content}
+      <div className="py-2 animate-in fade-in duration-300">
+        {activeTabData?.content}
       </div>
     </div>
   );

@@ -5,7 +5,6 @@ import Pagination from "../../../Patient_Dashboard_Components/Pagination/Paginat
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { DoctorsAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
-import { DoctorsOutPatientMGTContext } from "../../../../../context/HospitalContext/Doctors/DoctorsOutPatientMGTContext";
 import AfterDischargeSummary from "./AfterDischargeSummary";
 import SearchBar from "../../../../SearchBar/SearchBar";
 
@@ -139,9 +138,16 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
         {sortedAdmittedPatients.map((admittedPatient, index) => (
           <div key={index} className="border p-3 rounded-xl">
             <div className="flex justify-between items-center">
-              <p>
-                {admittedPatient?.patient_info?.firstname}{" "}
-                {admittedPatient?.patient_info?.lastname}{" "}
+              <p className="flex items-center gap-2">
+                <span>
+                  {admittedPatient?.patient_info?.firstname}{" "}
+                  {admittedPatient?.patient_info?.lastname}{" "}
+                </span>
+                {admittedPatient?.patient_info?.payment_provider?.type && (
+                  <span className="text-[10px] font-bold uppercase bg-docuhealth-light-green text-docuhealth-green px-2 py-0.5 rounded-full">
+                    {admittedPatient.patient_info.payment_provider.type}
+                  </span>
+                )}
               </p>
               <div className="bg-docuhealth-light-green px-2 rounded-full">
                 <p className="text-docuhealth-green ">
@@ -284,23 +290,23 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
 
 const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSource }) => {
   const {
-    outPatients,
+    admittedPatients: outPatients,
     loading,
     count,
     currentPage,
     totalPages,
-    fetchOutPatients,
+    refetch: fetchOutPatients,
     tab,
     searchQuery,
     setSearchQuery,
     isRefreshing,
-  } = useContext(DoctorsOutPatientMGTContext);
+  } = useContext(DoctorsAdmittedPatientMGTContext);
   const [selectedPatient, setSelectedPatient] = useState(null);
 
   const sortedOutPatients = useMemo(() => {
     return [...outPatients].sort((a, b) => {
-      const dateA = new Date(a.admission_date).getTime();
-      const dateB = new Date(b.admission_date).getTime();
+      const dateA = new Date(a.created_at || a.admission_date).getTime();
+      const dateB = new Date(b.created_at || b.admission_date).getTime();
       return dateB - dateA;
     });
   }, [outPatients]);
@@ -353,9 +359,16 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
         {sortedOutPatients.map((outPatient, index) => (
           <div key={index} className="border p-3 rounded-xl">
             <div className="flex justify-between items-center">
-              <p>
-                {outPatient?.patient_info?.firstname}{" "}
-                {outPatient?.patient_info?.lastname}{" "}
+              <p className="flex items-center gap-2">
+                <span>
+                  {outPatient?.patient_info?.firstname}{" "}
+                  {outPatient?.patient_info?.lastname}{" "}
+                </span>
+                {outPatient?.patient_info?.payment_provider?.type && (
+                  <span className="text-[10px] font-bold uppercase bg-docuhealth-light-green text-docuhealth-green px-2 py-0.5 rounded-full">
+                    {outPatient.patient_info.payment_provider.type}
+                  </span>
+                )}
               </p>
               <div className="bg-docuhealth-light-green px-2 rounded-full">
                 <p className="text-docuhealth-green ">
@@ -370,6 +383,29 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
                   "••••••" +
                   outPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
+            </div>
+            <div className="flex items-center gap-1 text-gray-600 pt-3">
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7.50165 9.24984C9.88142 9.24984 11.8452 11.0312 12.1322 13.3332H2.87109C3.15814 11.0312 5.12187 9.24984 7.50165 9.24984ZM6.44401 10.5795C5.60773 10.8447 4.90335 11.4159 4.46914 12.1665H7.50165L6.44401 10.5795ZM8.55953 10.5797L7.50165 12.1665H10.5342C10.1 11.416 9.39574 10.8448 8.55953 10.5797ZM11.0017 1.6665V5.1665C11.0017 7.0995 9.43464 8.6665 7.50165 8.6665C5.56866 8.6665 4.00166 7.0995 4.00166 5.1665V1.6665H11.0017ZM5.16832 5.1665C5.16832 6.45515 6.21299 7.49984 7.50165 7.49984C8.79035 7.49984 9.83499 6.45515 9.83499 5.1665H5.16832ZM9.83499 2.83317H5.16832L5.16826 3.99984H9.83493L9.83499 2.83317Z" fill="var(--color-docuhealth-dark)"/>
+              </svg>
+              <p className="">
+                {" "}
+                {outPatient?.staff_info
+                  ? `${'Dr. ' + outPatient.staff_info.firstname} ${outPatient.staff_info.lastname}`
+                  : "NIL"}
+              </p>
+            </div>
+            <div className="flex items-center gap-1 text-gray-600 pt-1 ">
+              <i className="bx bx-phone text-[15px] text-docuhealth-dark"></i>
+              <p className="">
+                {outPatient?.patient_info?.phone_num || "No phone number"}
+              </p>
+            </div>
+            <div className="flex items-center gap-1 text-gray-600 pt-1 pb-3 border-b">
+              <svg width="15" height="15" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.08366 1.7487V0.582031H5.25033V1.7487H8.75033V0.582031H9.91699V1.7487H12.2503C12.5725 1.7487 12.8337 2.00987 12.8337 2.33203V5.2487H11.667V2.91536H9.91699V4.08203H8.75033V2.91536H5.25033V4.08203H4.08366V2.91536H2.33366V11.082H5.83366V12.2487H1.75033C1.42816 12.2487 1.16699 11.9875 1.16699 11.6654V2.33203C1.16699 2.00987 1.42816 1.7487 1.75033 1.7487H4.08366ZM9.91699 6.9987C8.62835 6.9987 7.58366 8.04339 7.58366 9.33203C7.58366 10.6207 8.62835 11.6654 9.91699 11.6654C11.2056 11.6654 12.2503 10.6207 12.2503 9.33203C12.2503 8.04339 11.2056 6.9987 9.91699 6.9987ZM6.41699 9.33203C6.41699 7.39904 7.984 5.83203 9.91699 5.83203C11.85 5.83203 13.417 7.39904 13.417 9.33203C13.417 11.265 11.85 12.832 9.91699 9.33203ZM9.33366 7.58203V9.57365L10.6712 10.9112L11.4961 10.0862L10.5003 9.09041V7.58203H9.33366Z" fill="var(--color-docuhealth-dark)"/>
+              </svg>
+              <p className="">{formatFullDateTime(outPatient.created_at || outPatient.admission_date)}</p>
             </div>
             <button
               className="text-center mt-4 py-2.5 border bg-docuhealth-dark text-white w-full rounded-full cursor-pointer"
@@ -416,8 +452,8 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
   // Client-side sort only (search is handled server-side)
   const sortedAdmittedPatients = useMemo(() => {
     return [...admittedPatients].sort((a, b) => {
-      const dateA = new Date(a.admission_date).getTime();
-      const dateB = new Date(b.admission_date).getTime();
+      const dateA = new Date(a.discharge_date || a.closed_at).getTime();
+      const dateB = new Date(b.discharge_date || b.closed_at).getTime();
       return dateB - dateA;
     });
   }, [admittedPatients]);
@@ -525,13 +561,20 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
         {sortedAdmittedPatients.map((admittedPatient, index) => (
           <div key={index} className="border p-3 rounded-xl">
             <div className="flex justify-between items-center">
-              <p>
-                {admittedPatient?.patient_info?.firstname}{" "}
-                {admittedPatient?.patient_info?.lastname}{" "}
+              <p className="flex items-center gap-2">
+                <span>
+                  {admittedPatient?.patient_info?.firstname}{" "}
+                  {admittedPatient?.patient_info?.lastname}{" "}
+                </span>
+                {admittedPatient?.patient_info?.payment_provider?.type && (
+                  <span className="text-[10px] font-bold uppercase bg-docuhealth-light-green text-docuhealth-green px-2 py-0.5 rounded-full">
+                    {admittedPatient.patient_info.payment_provider.type}
+                  </span>
+                )}
               </p>
               <div className="bg-docuhealth-light-green px-2 rounded-full">
                 <p className="text-docuhealth-green ">
-                  {formatRecordDate(admittedPatient.discharge_date)}
+                  {formatRecordDate(admittedPatient.discharge_date || admittedPatient.closed_at)}
                 </p>
               </div>
             </div>
@@ -620,7 +663,7 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
               </svg>
 
               <p className="">
-                {formatFullDateTime(admittedPatient.discharge_date) || 'Pending'}
+                {formatFullDateTime(admittedPatient.discharge_date || admittedPatient.closed_at) || 'Pending'}
               </p>
             </div>
             <button
@@ -650,10 +693,42 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
   );
 };
 
+const DischargedPatientsWrapper = (props) => {
+  const { tab: activeStatus, setTab } = useContext(DoctorsAdmittedPatientMGTContext);
+
+  return (
+    <div className="flex flex-col">
+      <div className="flex gap-4 border-b border-gray-200 mb-4">
+        <button
+          className={`py-2 px-2 text-sm font-medium border-b-2 ${
+            activeStatus === "inpatient_discharge"
+              ? "border-docuhealth-primary text-docuhealth-primary"
+              : "border-transparent text-gray-500 hover:text-gray-700"
+          }`}
+          onClick={() => setTab("inpatient_discharge")}
+        >
+          Inpatient Discharges
+        </button>
+        <button
+          className={`py-2 px-2 text-sm font-medium border-b-2 ${
+            activeStatus === "outpatient_discharge"
+              ? "border-docuhealth-primary text-docuhealth-primary"
+              : "border-transparent text-gray-500 hover:text-gray-700"
+          }`}
+          onClick={() => setTab("outpatient_discharge")}
+        >
+          Outpatient Discharges
+        </button>
+      </div>
+      <DischargedPatientsTab {...props} />
+    </div>
+  );
+};
+
 const getTabs = (advanceCheckUp, setAdvanceCheckUp, setSelected, setAdvanceCheckUpSource) => [
   {
     title: "Admitted Patients",
-    status: "active",
+    status: "inpatient",
     content: (
       <AdmittedPatientsTab
         advanceCheckUp={advanceCheckUp}
@@ -678,9 +753,10 @@ const getTabs = (advanceCheckUp, setAdvanceCheckUp, setSelected, setAdvanceCheck
 
   {
     title: "Discharged Patients",
-    status: "discharged",
-    content: <DischargedPatientsTab
-      setAdvanceCheckUp={setAdvanceCheckUp}
+    status: ["inpatient_discharge", "outpatient_discharge"],
+    defaultStatus: "inpatient_discharge",
+    content: <DischargedPatientsWrapper
+      advanceCheckUp={advanceCheckUp}
       setSelected={setSelected}
       setAdvanceCheckUpSource={setAdvanceCheckUpSource}
     />,

@@ -7,7 +7,7 @@ import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Compone
 const tabs = ["Pending", "Active"];
 
 const Hospital_Doctors_Encounter_Dashboard = () => {
-  const { activeTab, setActiveTab, currentPage, totalPages, setCurrentPage, count } = useContext(DoctorEncounterContext);
+  const { activeTab, setActiveTab, currentPage, totalPages, setCurrentPage, count, selectedPatientForWall } = useContext(DoctorEncounterContext);
 
   return (
     <>
@@ -17,8 +17,9 @@ const Hospital_Doctors_Encounter_Dashboard = () => {
 
       <div className="mt-4 bg-white border border-gray-200 rounded-xl p-4 sm:p-6">
         {/* Tabs */}
-        <div className="flex overflow-x-auto border-b border-gray-200 mb-6 gap-2 sm:gap-6 hide-scrollbar">
-          {tabs.map((tab) => (
+        {!selectedPatientForWall && (
+          <div className="flex overflow-x-auto border-b border-gray-200 mb-6 gap-2 sm:gap-6 hide-scrollbar">
+            {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -32,6 +33,7 @@ const Hospital_Doctors_Encounter_Dashboard = () => {
             </button>
           ))}
         </div>
+        )}
 
         {/* Table Content */}
         <div className="w-full">

@@ -8,7 +8,7 @@ export const HosAdmittedPatientMGTContext = createContext();
 
 const HosAdmittedPatientMGTProvider = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [tab, setTab] = useState('active'); // 'active' or 'discharged'
+  const [tab, setTab] = useState("inpatient");
   const [searchQuery, setSearchQuery] = useState("");
   const pageSize = 6;
   const isUserLoggedIn = !!getHospitalToken();
@@ -20,14 +20,13 @@ const HosAdmittedPatientMGTProvider = ({ children }) => {
   }, [debouncedSearch]);
 
   const { data, isLoading: loading, isFetching } = useQuery({
-    queryKey: ["hospital-patients", tab, currentPage, debouncedSearch],
+    queryKey: ["hospital-patients-admin", tab, currentPage, debouncedSearch],
     queryFn: async () => {
-      const params = new URLSearchParams({ page: currentPage, size: pageSize });
-      if (debouncedSearch) params.append("search", debouncedSearch);
-
-      const res = await axiosInstanceHos.get(
-        `api/hospitals/admissions/${tab}?${params.toString()}`
-      );
+      let url = `api/hospitals/patients?status=${tab}&page=${currentPage}&size=${pageSize}`;
+      if (debouncedSearch) {
+        url += `&search=${debouncedSearch}`;
+      }
+      const res = await axiosInstanceHos.get(url);
       return res.data;
     },
     enabled: isUserLoggedIn,

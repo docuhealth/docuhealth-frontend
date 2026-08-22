@@ -70,7 +70,7 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, onOrderPharmacy }) =>
 
   return (
     <>
-      <div ref={containerRef} className="fixed bottom-6 right-6 z-40">
+      <div ref={containerRef} className="fixed bottom-16 right-8 z-40">
         {open && (
           <div className="absolute bottom-[72px] right-0 w-68 max-w-[75vw] rounded-3xl bg-white p-4 shadow-2xl">
             <ul>

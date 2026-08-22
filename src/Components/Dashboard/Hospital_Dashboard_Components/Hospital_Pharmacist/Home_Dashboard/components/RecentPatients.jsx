@@ -186,7 +186,7 @@ const RecentPatients = () => {
       ) : (
       <>
             <div className='hidden lg:flex lg:flex-col '>
-                <div className="grid grid-cols-6 text-left text-sm bg-gray-100 py-5 rounded-md">
+                <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
 
                     <div className="col-span-2 w-full pl-5 flex items-center gap-2">
                         <p>Patient's Name</p>
@@ -195,11 +195,12 @@ const RecentPatients = () => {
                     <p className='col-span-2'>Date / Time</p>
                     <p>HIN</p>
                     <p>Sex</p>
+                    <p>Action</p>
                 </div>
                 {
                     sortedPatients.map((patient, index) => (
                         <div key={index} className='relative'>
-                            <div className="grid grid-cols-6 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
+                            <div className="grid grid-cols-7 items-center text-[12px] text-gray-700 text-left w-full  border-b border-b-gray-200">
                                 <div className='font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-1 '>
 
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -216,6 +217,7 @@ const RecentPatients = () => {
                                 </p>
 
                                 <p>{patient.gender}</p>
+                                <p className="capitalize font-medium text-docuhealth-primary bg-docuhealth-primary/10 px-2 py-1 rounded-md inline-block max-w-fit">{patient.action ? patient.action.replace(/_/g, ' ') : 'N/A'}</p>
 
                             </div>
                         </div>
@@ -249,7 +251,7 @@ const RecentPatients = () => {
                         </div>
 
                         {/* Main Info Grid */}
-                        <div className="grid grid-cols-1 gap-y-4 pt-3 border-t border-gray-50">
+                        <div className="grid grid-cols-2 gap-y-4 pt-3 border-t border-gray-50">
                             <div>
                                 <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Registration Info</p>
                                 <div className="flex items-center gap-1.5 text-gray-700">
@@ -262,6 +264,18 @@ const RecentPatients = () => {
                                     at {formatTime(patient.last_dispensed_at)}
                                 </p>
                             </div>
+                            
+                            {patient.action && (
+                                <div>
+                                    <p className="text-[10px] text-gray-400 uppercase tracking-tighter mb-0.5">Action</p>
+                                    <div className="flex items-center gap-1.5 text-gray-700">
+                                        <i className='bx bx-check-circle text-docuhealth-primary text-[14px]'></i>
+                                        <p className="text-[11.5px] font-medium leading-none capitalize text-docuhealth-primary">
+                                            {patient.action.replace(/_/g, ' ')}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* HIN Masked Section */}

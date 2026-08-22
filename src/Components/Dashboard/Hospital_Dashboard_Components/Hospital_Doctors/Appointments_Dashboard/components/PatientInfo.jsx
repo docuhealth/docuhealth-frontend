@@ -387,7 +387,14 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                         {patientFullInfo?.patient_info?.firstname}{" "}
                         {patientFullInfo?.patient_info?.lastname}
                       </p>
-                      <p className="text-[14px] text-gray-500 mt-0.5">patient</p>
+                      <p className="text-[14px] text-gray-500 mt-0.5 flex items-center gap-1">
+                        <span className="font-medium">patient</span>
+                        {(selectedPatientDetails?.patient_info?.payment_provider?.type || patientFullInfo?.patient_info?.payment_provider?.type || patientFullInfo?.patient_info?.plan_type) && (
+                          <span className="text-[10px] font-bold uppercase bg-docuhealth-light-green text-docuhealth-green px-2 py-0.5 rounded-full">
+                            {selectedPatientDetails?.patient_info?.payment_provider?.type || patientFullInfo?.patient_info?.payment_provider?.type || patientFullInfo?.patient_info?.plan_type}
+                          </span>
+                        )}
+                      </p>
                     </div>
                   </div>
                 </div>

@@ -16,7 +16,7 @@ import { DoctorsAdmittedPatientMGTContext } from "../../../context/HospitalConte
 
 const Hospital_Doctors_Patients_Dashboard = () => {
   const [advanceCheckUp, setAdvanceCheckUp] = useState(false);
-  const [advanceCheckUpSource, setAdvanceCheckUpSource] = useState("active");
+  const [advanceCheckUpSource, setAdvanceCheckUpSource] = useState("inpatient");
 
   const [selected, setSelected] = useState(null);
 

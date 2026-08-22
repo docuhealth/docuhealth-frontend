@@ -351,11 +351,18 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                   {`${patientDetails.firstname?.[0] || ""}${patientDetails.lastname?.[0] || ""}`.toUpperCase()}
                 </div>
 
-                <div className="flex flex-col items-start">
-                  <p className="ml-2 text-sm font-medium">
+                <div className="flex flex-col items-start ml-2">
+                  <p className="text-sm font-medium">
                     {patientDetails.firstname} {patientDetails.lastname}
                   </p>
-                  <p className="ml-2 text-[12px] text-gray-500">patient</p>
+                  <p className="text-[12px] text-gray-500 mt-0.5 flex items-center gap-1">
+                    {(patientDetails?.payment_provider?.type || patientDetails?.plan_type) && (
+                      <span className="text-[10px] text-green-700 font-bold bg-green-100 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                        {patientDetails?.payment_provider?.type || patientDetails?.plan_type}
+                      </span>
+                    )}
+                    patient
+                  </p>
                 </div>
               </div>
             </div>
@@ -588,7 +595,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
         isOpen={checkPatientIn}
         onClose={() => setCheckPatientIn(false)}
         title=""
-        maxWidth="sm"
+        maxWidth="md"
       >
         <div className="flex flex-col justify-center items-center text-sm pt-4 px-2 text-center pb-2">
           <div className="bg-[#E7F8ED] p-3 rounded-full mb-4 inline-flex items-center justify-center">
@@ -627,7 +634,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
         isOpen={showPaymentCategorySuccessModal}
         onClose={() => setShowPaymentCategorySuccessModal(false)}
         title=""
-        maxWidth="sm"
+        maxWidth="md"
       >
         <div className="flex flex-col justify-center items-center text-sm pt-4 px-2 text-center pb-2">
           <div className="bg-[#E7F8ED] p-3 rounded-full mb-4 inline-flex items-center justify-center">
@@ -666,7 +673,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
         isOpen={showPaymentCategoryModal}
         onClose={() => setShowPaymentCategoryModal(false)}
         title=""
-        maxWidth="sm"
+        maxWidth="md"
       >
         <div className="flex flex-col text-sm">
           <div className="flex justify-end -mt-2 -mr-2 mb-1">
@@ -721,7 +728,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
         isOpen={showHmoProviderModal}
         onClose={() => setShowHmoProviderModal(false)}
         title=""
-        maxWidth="sm"
+        maxWidth="md"
       >
         <div className="flex flex-col text-sm">
           <div className="flex justify-end -mt-2 -mr-2 mb-1">
@@ -785,7 +792,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
         isOpen={showCompanyPartnerModal}
         onClose={() => setShowCompanyPartnerModal(false)}
         title=""
-        maxWidth="sm"
+        maxWidth="md"
       >
         <div className="flex flex-col text-sm">
           <div className="flex justify-end -mt-2 -mr-2 mb-1">

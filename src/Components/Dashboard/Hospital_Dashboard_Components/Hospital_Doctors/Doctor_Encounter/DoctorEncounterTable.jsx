@@ -43,10 +43,17 @@ const getCallUpStatus = (status) => {
 };
 
 const DoctorEncounterTable = () => {
-  const { encounters, loading, activeTab, claimPatient } = useContext(DoctorEncounterContext);
+  const { 
+    encounters, 
+    loading, 
+    activeTab, 
+    claimPatient,
+    selectedPatientForWall,
+    setSelectedPatientForWall,
+    selectedPatientForActivities,
+    setSelectedPatientForActivities
+  } = useContext(DoctorEncounterContext);
   const navigate = useNavigate();
-  const [selectedPatientForWall, setSelectedPatientForWall] = useState(null);
-  const [selectedPatientForActivities, setSelectedPatientForActivities] = useState(null);
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
@@ -67,7 +74,7 @@ const DoctorEncounterTable = () => {
       country: patientData.country || "N/A"
     };
 
-    const vitalsData = encounter.vital_signs || encounter.vitals || {};
+    const vitalsData = encounter.latest_vitals || encounter.vital_signs || encounter.vitals || {};
     const mockVitals = {
       blood_pressure: vitalsData.blood_pressure || vitalsData.bp || "N/A",
       temp: vitalsData.temp || vitalsData.temperature || "N/A",
@@ -250,8 +257,8 @@ const DoctorEncounterTable = () => {
                 ? `${Math.floor(waitTime / 60)} hrs ${waitTime % 60} mins` 
                 : `${waitTime} mins`;
               
-              const nurseName = encounter.staff_info 
-                ? `Nurse ${encounter.staff_info.firstname || encounter.staff_info.first_name || ""} ${encounter.staff_info.lastname || encounter.staff_info.last_name || ""}` 
+              const nurseName = encounter.escalated_by 
+                ? `Nurse ${encounter.escalated_by.firstname || encounter.escalated_by.first_name || ""} ${encounter.escalated_by.lastname || encounter.escalated_by.last_name || ""}` 
                 : "Unknown";
 
               return (
@@ -267,11 +274,11 @@ const DoctorEncounterTable = () => {
                   {activeTab === "Active" ? (
                     <>
                       <TableCell className="text-gray-600 border-b border-gray-200">
-                        {moment(encounter.claimed_at || encounter.created_at).format("MMM DD, YYYY / hh:mm A")}
+                        {moment(encounter.last_doctor_interaction?.created_at || encounter.claimed_at || encounter.created_at).format("MMM DD, YYYY / hh:mm A")}
                       </TableCell>
                       <TableCell className="text-gray-600 border-b border-gray-200">
-                        {encounter.claimed_by_info 
-                          ? `Dr. ${encounter.claimed_by_info.firstname || encounter.claimed_by_info.first_name || ""} ${encounter.claimed_by_info.lastname || encounter.claimed_by_info.last_name || ""}`
+                        {encounter.last_doctor_interaction?.staff 
+                          ? `Dr. ${encounter.last_doctor_interaction.staff.firstname || encounter.last_doctor_interaction.staff.first_name || ""} ${encounter.last_doctor_interaction.staff.lastname || encounter.last_doctor_interaction.staff.last_name || ""}`
                           : "None"}
                       </TableCell>
                     </>
@@ -325,8 +332,8 @@ const DoctorEncounterTable = () => {
             ? `${Math.floor(waitTime / 60)} hrs ${waitTime % 60} mins` 
             : `${waitTime} mins`;
             
-          const nurseName = encounter.staff_info 
-            ? `Nurse ${encounter.staff_info.firstname || encounter.staff_info.first_name || ""} ${encounter.staff_info.lastname || encounter.staff_info.last_name || ""}` 
+          const nurseName = encounter.escalated_by 
+            ? `Nurse ${encounter.escalated_by.firstname || encounter.escalated_by.first_name || ""} ${encounter.escalated_by.lastname || encounter.escalated_by.last_name || ""}` 
             : "Unknown";
 
           return (
@@ -361,15 +368,15 @@ const DoctorEncounterTable = () => {
                   <>
                     <div className="flex flex-col bg-gray-50 rounded-lg p-2 border border-gray-100">
                       <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Last Encounter</span>
-                      <span className="text-xs font-bold text-gray-700">{moment(encounter.claimed_at || encounter.created_at).format("hh:mm A")}</span>
+                      <span className="text-xs font-bold text-gray-700">{moment(encounter.last_doctor_interaction?.created_at || encounter.claimed_at || encounter.created_at).format("hh:mm A")}</span>
                     </div>
                     <div className="flex justify-between items-center bg-gray-50 rounded-lg p-3 border border-gray-100 col-span-2">
                       <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
                         Doctor Encountered
                       </span>
                       <span className="text-sm font-bold text-gray-700">
-                        {encounter.claimed_by_info 
-                          ? `Dr. ${encounter.claimed_by_info.firstname || encounter.claimed_by_info.first_name || ""} ${encounter.claimed_by_info.lastname || encounter.claimed_by_info.last_name || ""}`
+                        {encounter.last_doctor_interaction?.staff 
+                          ? `Dr. ${encounter.last_doctor_interaction.staff.firstname || encounter.last_doctor_interaction.staff.first_name || ""} ${encounter.last_doctor_interaction.staff.lastname || encounter.last_doctor_interaction.staff.last_name || ""}`
                           : "None"}
                       </span>
                     </div>

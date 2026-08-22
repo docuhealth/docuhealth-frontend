@@ -8,7 +8,7 @@ export const NursesAdmittedPatientMGTContext = createContext();
 
 const NursesAdmittedPatientMGTProvider = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [tab, setTab] = useState("active"); // 'active' or 'discharged'
+  const [tab, setTab] = useState("inpatient"); // 'inpatient', 'outpatient', 'inpatient_discharge', 'outpatient_discharge'
   const [searchQuery, setSearchQuery] = useState("");
   const pageSize = 6;
   const isUserLoggedIn = !!getHospitalToken();
@@ -19,7 +19,7 @@ const NursesAdmittedPatientMGTProvider = (props) => {
     // 🔹 The Key is the secret: it tracks both status, page, and search
     queryKey: ["hospital-patients-nurse", tab, currentPage, debouncedSearch],
     queryFn: async () => {
-      let url = `api/hospitals/admissions/${tab}?page=${currentPage}&size=${pageSize}`;
+      let url = `api/hospitals/patients?status=${tab}&page=${currentPage}&size=${pageSize}`;
       if (debouncedSearch) {
         url += `&search=${debouncedSearch}`;
       }

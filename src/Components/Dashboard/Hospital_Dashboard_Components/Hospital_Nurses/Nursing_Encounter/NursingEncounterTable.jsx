@@ -42,6 +42,14 @@ const getTriageColor = (priority) => {
   return "text-gray-600";
 };
 
+const getTriageBadgeStyle = (priority) => {
+  const p = (priority || "routine").toLowerCase();
+  if (p === "routine") return "bg-green-100 text-green-600 border-green-200";
+  if (p === "urgent") return "bg-orange-100 text-orange-600 border-orange-200";
+  if (p === "emergency") return "bg-red-100 text-red-600 border-red-200";
+  return "bg-gray-100 text-gray-600 border-gray-200";
+};
+
 const getCallUpStatus = (status) => {
   if (status === "doctor_active") return { text: "Doctor Active", style: "bg-green-100 text-green-500" };
   if (status === "closed") return { text: "Closed", style: "bg-gray-100 text-gray-500" };
@@ -130,7 +138,7 @@ const NursingEncounterTable = () => {
       country: patientData.country || "N/A"
     };
 
-    const vitalsData = viewEncounterDetails.vital_signs || viewEncounterDetails.vitals || {};
+    const vitalsData = viewEncounterDetails.latest_vitals || viewEncounterDetails.vital_signs || viewEncounterDetails.vitals || {};
     const mockVitals = {
       blood_pressure: vitalsData.blood_pressure || vitalsData.bp || "N/A",
       temp: vitalsData.temp || vitalsData.temperature || "N/A",
@@ -241,7 +249,7 @@ const NursingEncounterTable = () => {
                     </span>
                   </TableCell>
                   <TableCell className="text-gray-600 border-b border-gray-200">
-                    N/A
+                    {encounter.claimed_by ? `Dr. ${encounter.claimed_by.firstname || ''} ${encounter.claimed_by.lastname || ''}`.trim() : "N/A"}
                   </TableCell>
                   <TableCell className="border-b border-gray-200">
                     <button 
@@ -261,14 +269,14 @@ const NursingEncounterTable = () => {
                   </TableCell>
                   <TableCell className="text-gray-600 border-b border-gray-200">
                     {activeTab === "Closed" 
-                      ? encounter.claimed_by_info 
-                        ? `Nurse ${encounter.claimed_by_info.firstname || encounter.claimed_by_info.first_name || ""} ${encounter.claimed_by_info.lastname || encounter.claimed_by_info.last_name || ""}`
+                      ? encounter.escalated_by 
+                        ? `Nurse ${encounter.escalated_by.firstname || encounter.escalated_by.first_name || ""} ${encounter.escalated_by.lastname || encounter.escalated_by.last_name || ""}`
                         : "Unknown"
                       : formattedWaitTime}
                   </TableCell>
                   <TableCell className="border-b border-gray-200">
                     {activeTab === "Closed" ? (
-                      <span className="px-3 py-1 rounded-full text-xs font-medium capitalize bg-green-100 text-green-600">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getTriageBadgeStyle(encounter.triage_priority)}`}>
                         {encounter.triage_priority || "Routine"}
                       </span>
                     ) : (
@@ -348,7 +356,7 @@ const NursingEncounterTable = () => {
                   </div>
                 </div>
                 {activeTab === "Closed" ? (
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-medium capitalize border bg-green-100 text-green-600 border-green-200">
+                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-medium capitalize border ${getTriageBadgeStyle(encounter.triage_priority)}`}>
                     {encounter.triage_priority || "Routine"}
                   </span>
                 ) : activeTab === "Doctor’s call-up/consultation" ? (
@@ -374,7 +382,9 @@ const NursingEncounterTable = () => {
                     </div>
                     <div className="flex flex-col bg-gray-50 rounded-lg p-2 border border-gray-100">
                       <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Doctor Involved</span>
-                      <span className="text-xs font-bold text-gray-700">N/A</span>
+                      <span className="text-xs font-bold text-gray-700">
+                        {encounter.claimed_by ? `Dr. ${encounter.claimed_by.firstname || ''} ${encounter.claimed_by.lastname || ''}`.trim() : "N/A"}
+                      </span>
                     </div>
                   </>
                 ) : (
@@ -493,7 +503,12 @@ const NursingEncounterTable = () => {
               />
               <Input
                 label="Home address"
-                value={selectedPatientForDetails.patient_info?.address || "N/A"}
+                value={[
+                  selectedPatientForDetails.patient_info?.street,
+                  selectedPatientForDetails.patient_info?.city,
+                  selectedPatientForDetails.patient_info?.state,
+                  selectedPatientForDetails.patient_info?.country
+                ].filter(Boolean).join(", ") || "N/A"}
                 readOnly
                 className="bg-gray-50 text-gray-500 border-gray-200"
               />

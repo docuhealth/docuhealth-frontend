@@ -8,7 +8,7 @@ export const DoctorsAdmittedPatientMGTContext = createContext();
 
 const DoctorsAdmittedPatientMGTProvider = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [tab, setTab] = useState("active");
+  const [tab, setTab] = useState("inpatient");
   const [searchQuery, setSearchQuery] = useState("");
   const pageSize = 6;
   const isUserLoggedIn = !!getHospitalToken();
@@ -25,7 +25,7 @@ const DoctorsAdmittedPatientMGTProvider = ({ children }) => {
     queryFn: async () => {
       const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : '';
       const res = await axiosInstanceHos.get(
-        `api/hospitals/admissions/${tab}?page=${currentPage}&size=${pageSize}${searchParam}`
+        `api/hospitals/patients?status=${tab}&page=${currentPage}&size=${pageSize}${searchParam}`
       );
       return res.data;
     },

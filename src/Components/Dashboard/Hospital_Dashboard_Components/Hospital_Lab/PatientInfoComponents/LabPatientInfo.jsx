@@ -122,10 +122,13 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     {p?.firstname}{" "}
                     {p?.lastname}
                   </p>
-                  <p className="text-[14px] text-gray-500">
-                    {p?.plan_type
-                      ? `${p.plan_type} patient`
-                      : "patient"}
+                  <p className="text-[14px] text-gray-500 mt-0.5 flex items-center gap-1">
+                    {(p?.payment_provider?.type || p?.plan_type) && (
+                      <span className="text-[10px] text-green-700 font-bold bg-green-100 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                        {p?.payment_provider?.type || p?.plan_type}
+                      </span>
+                    )}
+                    patient
                   </p>
                 </div>
               </div>

@@ -435,7 +435,7 @@ const PatientSOAPNotes = ({
     );
   }
 
-  if (patientSoapNotes.length === 0) {
+  if (!patientSoapNotes || patientSoapNotes.length === 0) {
     return (
       <>
         {

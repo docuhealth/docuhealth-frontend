@@ -92,7 +92,14 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail }
               <h2 className="text-xl font-semibold text-gray-900">
                 {patient?.firstname} {patient?.lastname}
               </h2>
-              <p className="text-sm text-green-500 font-medium mt-1">HMO Patient</p>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-sm text-gray-500 font-medium">patient</p>
+                {(selected?.patient_info?.payment_provider?.type || patientFullInfo?.patient_info?.payment_provider?.type) && (
+                  <span className="text-[10px] font-bold uppercase bg-docuhealth-light-green text-docuhealth-green px-2 py-0.5 rounded-full">
+                    {selected?.patient_info?.payment_provider?.type || patientFullInfo.patient_info.payment_provider.type}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 

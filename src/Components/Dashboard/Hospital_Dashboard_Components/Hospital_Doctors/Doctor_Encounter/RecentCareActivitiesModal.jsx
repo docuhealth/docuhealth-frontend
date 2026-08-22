@@ -144,8 +144,8 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
               <CreditCard className="w-4 h-4" />
               <span className="text-sm font-semibold">Payment category</span>
             </div>
-            <p className="text-sm text-gray-800 ml-6">
-              {patientData.payment_category || patientData.patient_category || "HMO patient"}
+            <p className="text-sm text-gray-800 ml-6 capitalize">
+              {((patientData.payment_provider?.type || patientData.payment_category || patientData.patient_category || "HMO") + " patient")}
             </p>
           </div>
         </div>

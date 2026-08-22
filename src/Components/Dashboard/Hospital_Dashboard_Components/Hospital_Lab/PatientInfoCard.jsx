@@ -43,11 +43,11 @@ const PatientInfoCard = ({
           <p className="text-xs text-gray-500">Patient HIN: {order.hin}</p>
           <p className="text-xs text-gray-500">Age: {ageDisplay}</p>
           <p className="text-xs text-gray-500">Gender: {gender}</p>
-          {order.payment_category && (
+          {(order.payment_provider?.type || order.payment_category) && (
             <p className="text-xs text-gray-500">
               Payment category:{" "}
-              <span className="text-teal-600 font-medium">
-                {order.payment_category}
+              <span className="text-teal-600 font-medium capitalize">
+                {order.payment_provider?.type || order.payment_category}
               </span>
             </p>
           )}

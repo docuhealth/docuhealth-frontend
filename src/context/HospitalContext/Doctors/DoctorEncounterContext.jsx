@@ -13,6 +13,8 @@ export const DoctorEncounterProvider = ({ children }) => {
   const [encounters, setEncounters] = useState([]);
   const [activeTab, setActiveTab] = useState("Pending");
   const [loading, setLoading] = useState(false);
+  const [selectedPatientForWall, setSelectedPatientForWall] = useState(null);
+  const [selectedPatientForActivities, setSelectedPatientForActivities] = useState(null);
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,13 +78,21 @@ export const DoctorEncounterProvider = ({ children }) => {
         encounters,
         activeTab,
         setActiveTab,
+        setEncounters,
         loading,
+        setLoading,
         currentPage,
         setCurrentPage,
         totalPages,
+        setTotalPages,
         count,
+        setCount,
         fetchEncounters,
-        claimPatient
+        claimPatient,
+        selectedPatientForWall,
+        setSelectedPatientForWall,
+        selectedPatientForActivities,
+        setSelectedPatientForActivities,
       }}
     >
       {children}

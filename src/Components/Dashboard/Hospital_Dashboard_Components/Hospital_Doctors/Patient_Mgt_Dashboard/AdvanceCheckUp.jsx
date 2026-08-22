@@ -115,7 +115,14 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry, advance
                   {patientFullInfo?.patient_info?.firstname}{" "}
                   {patientFullInfo?.patient_info?.lastname}
                 </p>
-                <p className="ml-2 text-[12px] text-gray-500">patient</p>
+                <div className="ml-2 flex items-center gap-2">
+                  <p className="text-[12px] text-gray-500">patient</p>
+                  {(selected?.patient_info?.payment_provider?.type || patientFullInfo?.patient_info?.payment_provider?.type) && (
+                    <span className="text-[10px] font-bold uppercase bg-docuhealth-light-green text-docuhealth-green px-2 py-0.5 rounded-full">
+                      {selected?.patient_info?.payment_provider?.type || patientFullInfo.patient_info.payment_provider.type}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>

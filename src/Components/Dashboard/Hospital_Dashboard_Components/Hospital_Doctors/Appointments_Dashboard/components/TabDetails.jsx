@@ -151,7 +151,7 @@ const PatientMedicalRecord = ({
     );
   }
 
-  if (patientMedRecords.length === 0) {
+  if (!patientMedRecords || patientMedRecords.length === 0) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
@@ -378,7 +378,7 @@ const PatientSOAPNotes = ({
     );
   }
 
-  if (patientSoapNotes.length === 0) {
+  if (!patientSoapNotes || patientSoapNotes.length === 0) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
