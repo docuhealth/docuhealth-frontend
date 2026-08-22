@@ -119,7 +119,6 @@ const Hospital_Doctors_Patients_Dashboard = () => {
               <AdvanceCheckUp
                 selected={selected}
                 setAdvanceCheckUp={setAdvanceCheckUp}
-                setSoapNoteEntry={setSoapNoteEntry}
                 advanceCheckUpSource={advanceCheckUpSource}
               />
             )}

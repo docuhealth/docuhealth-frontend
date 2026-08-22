@@ -8,7 +8,7 @@ const TabComponent2 = ({ tabs }) => {
   return (
     <div className="w-full py-3 mx-auto">
       {/* Tab Headers */}
-      <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2 border-b-0 sm:border-b border-gray-200 pb-4 sm:pb-0 sm:mb-5">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2 sm:overflow-x-auto border-b-0 sm:border-b border-gray-200 pb-4 sm:pb-0 sm:mb-5">
         {tabs.map((tab, index) => (
           <button
             key={index}

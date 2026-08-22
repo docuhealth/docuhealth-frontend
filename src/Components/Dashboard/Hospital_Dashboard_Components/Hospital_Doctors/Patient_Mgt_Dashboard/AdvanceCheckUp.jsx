@@ -8,7 +8,7 @@ import getTabs from "./TabDetails2";
 import { DoctorsAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
 import { useQuery } from "@tanstack/react-query";
 
-const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry, advanceCheckUpSource }) => {
+const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, advanceCheckUpSource }) => {
   const { setTab } = useContext(DoctorsAdmittedPatientMGTContext);
 
   const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
@@ -156,9 +156,6 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSoapNoteEntry, advance
               setViewDetailMedicalRecord,
               viewDetailMedicalRecord,
               selectedMedicalRecord,
-
-              setSoapNoteEntry,
-              setAdvanceCheckUp,
             })}
           />
         </>
