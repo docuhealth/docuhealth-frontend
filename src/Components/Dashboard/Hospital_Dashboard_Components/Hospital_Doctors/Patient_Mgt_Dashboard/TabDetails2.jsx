@@ -769,38 +769,42 @@ const PatientSOAPNotes = ({
 
           {renderLabTests(selectedPatientDetails?.lab_tests_info)}
 
-          {/* 7. Follow Up / Appointment */}
-          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
-            <p className="font-medium mb-4 text-docuhealth-dark">
-              Follow Up / Appointment
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <p className="text-[12px] text-gray-500">
-                Type:{" "}
-                <span className="font-medium text-gray-900 capitalize">
-                  {selectedPatientDetails?.appointment_info?.type || "NIL"}
-                </span>
+          {/* 7. Follow Up / Appointment — appointment_info was removed from
+              the SOAP note response; only render this if it's actually
+              present (older notes created before the check-in migration). */}
+          {selectedPatientDetails?.appointment_info && (
+            <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+              <p className="font-medium mb-4 text-docuhealth-dark">
+                Follow Up / Appointment
               </p>
-              <p className="text-[12px] text-gray-500">
-                Scheduled:{" "}
-                <span className="font-medium text-gray-900">
-                  {selectedPatientDetails?.appointment_info?.scheduled_time
-                    ? formatFullDateTime(
-                      selectedPatientDetails.appointment_info.scheduled_time,
-                    )
-                    : "NIL"}
-                </span>
-              </p>
-              {selectedPatientDetails?.appointment?.note && (
-                <p className="text-[12px] text-gray-500 col-span-2 mt-1">
-                  Note:{" "}
-                  <span className="font-medium text-gray-900 italic">
-                    "{selectedPatientDetails.appointment.note}"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <p className="text-[12px] text-gray-500">
+                  Type:{" "}
+                  <span className="font-medium text-gray-900 capitalize">
+                    {selectedPatientDetails.appointment_info.type || "NIL"}
                   </span>
                 </p>
-              )}
+                <p className="text-[12px] text-gray-500">
+                  Scheduled:{" "}
+                  <span className="font-medium text-gray-900">
+                    {selectedPatientDetails.appointment_info.scheduled_time
+                      ? formatFullDateTime(
+                        selectedPatientDetails.appointment_info.scheduled_time,
+                      )
+                      : "NIL"}
+                  </span>
+                </p>
+                {selectedPatientDetails.appointment_info.note && (
+                  <p className="text-[12px] text-gray-500 col-span-2 mt-1">
+                    Note:{" "}
+                    <span className="font-medium text-gray-900 italic">
+                      "{selectedPatientDetails.appointment_info.note}"
+                    </span>
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* 8. Referral Status */}
           <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
