@@ -6,6 +6,7 @@ import { HosWardContext } from "../../../../../../context/HospitalContext/HosWar
 import Modal from "../../../../../ui/Modal";
 import Button from "../../../../../ui/Button";
 import Input from "../../../../../ui/Input";
+import Select from "../../../../../ui/Select";
 
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
@@ -54,7 +55,13 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({ strength: 0 });
 
-  const personnelOptions = ["doctor", "nurse", "receptionist", "lab_scientist", "pharmacist"];
+  const personnelOptions = [
+    "doctor",
+    "nurse",
+    "receptionist",
+    "lab_scientist",
+    "pharmacist",
+  ];
 
   // Personnel types that are not assigned to a ward during staff creation.
   const noWardRoles = ["receptionist", "lab_scientist", "pharmacist"];
@@ -62,6 +69,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const doctorSpecializations = [
     "Surgeon",
     "General Dentist",
+    "Optician",
     "Gynecologist",
     "Obstetrician",
     "Pediatrician",
@@ -303,7 +311,11 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   };
 
   return (
-    <Modal isOpen={true} onClose={() => setCreateNewStaff(false)} title="Add a new team member">
+    <Modal
+      isOpen={true}
+      onClose={() => setCreateNewStaff(false)}
+      title="Add a new team member"
+    >
       <div className="p-2">
         <div className="mb-5">
           <p className="text-sm">Step {step} of 2</p>
@@ -316,7 +328,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
           </div>
         </div>
         {step === 1 && (
-          <div className="mx-1 sm:mx-5">
+          <div className="">
             <div className="grid grid-cols-2 gap-4">
               <Input
                 placeholder="First name"
@@ -339,10 +351,10 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                 className="text-sm"
               />
 
-              <select
+              <Select
                 value={form.gender}
                 onChange={(e) => handleChange("gender", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm focus:border-docuhealth-primary"
+                className="text-sm"
               >
                 <option value="">Gender</option>
                 {gender.map((p) => (
@@ -350,30 +362,32 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                     {p}
                   </option>
                 ))}
-              </select>
+              </Select>
 
               {/* Personnel Dropdown */}
-              <select
+              <Select
                 value={form.personnel}
                 onChange={(e) => handleChange("personnel", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-docuhealth-primary"
+                className="text-sm"
+                containerClassName="col-span-2"
               >
                 <option value="">Healthcare personnel</option>
                 {personnelOptions.map((p) => (
                   <option key={p} value={p}>
-                    {p.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                    {p
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}
                   </option>
                 ))}
-              </select>
+              </Select>
 
               {/* Specialization dropdown */}
-              <select
+              <Select
                 disabled={form.personnel === "receptionist" || !form.personnel}
                 value={form.specialization}
                 onChange={(e) => handleChange("specialization", e.target.value)}
-                className={`border p-2 rounded-lg outline-none text-sm col-span-2 ${
-                  form.personnel === "receptionist" ? "bg-gray-100" : "focus:border-docuhealth-primary"
-                }`}
+                className="text-sm"
+                containerClassName="col-span-2"
               >
                 <option value="">Area of specialization</option>
                 {specializationOptions.map((s) => (
@@ -381,16 +395,15 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                     {s}
                   </option>
                 ))}
-              </select>
+              </Select>
 
               {/* Ward dropdown */}
-              <select
+              <Select
                 disabled={noWardRoles.includes(form.personnel)}
                 value={form.ward}
                 onChange={(e) => handleChange("ward", e.target.value)}
-                className={`border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-docuhealth-primary ${
-                  noWardRoles.includes(form.personnel) ? "bg-gray-100" : ""
-                }`}
+                className="text-sm"
+                containerClassName="col-span-2"
               >
                 <option value="">Assign to ward</option>
                 {wardOptions.map((w) => (
@@ -398,7 +411,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                     {w.name + " ward"}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             <div className="mt-5">
@@ -410,8 +423,11 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
         )}
 
         {step === 2 && (
-          <div className="mx-1 sm:mx-5">
-            <div className="flex items-center gap-2 mb-3 cursor-pointer text-docuhealth-primary font-medium" onClick={() => setStep(step - 1)}>
+          <div className="">
+            <div
+              className="flex items-center gap-2 mb-3 cursor-pointer text-docuhealth-primary font-medium"
+              onClick={() => setStep(step - 1)}
+            >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm">Back</span>
             </div>
@@ -432,11 +448,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
             <div className="mt-4">
               <label className="font-medium text-sm">Generated password</label>
-              <Input
-                value={form.password}
-                readOnly
-                className="mt-2 text-sm"
-              />
+              <Input value={form.password} readOnly className="mt-2 text-sm" />
             </div>
 
             <div className="mt-5">
