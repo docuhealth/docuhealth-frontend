@@ -1,37 +1,41 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
 
-export interface SelectOption {
+export interface SearchableSelectOption {
   value: string;
   label: string;
   [key: string]: unknown;
 }
 
-export interface SelectProps {
+export interface SearchableSelectProps {
   value?: string;
-  onChange: (value: string, option: SelectOption) => void;
-  options: SelectOption[];
+  onChange: (value: string, option: SearchableSelectOption) => void;
+  options: SearchableSelectOption[];
   placeholder?: string;
-  label?: string;
-  error?: string;
+  isLoading?: boolean;
+  emptyText?: string;
   disabled?: boolean;
   className?: string;
 }
 
-// Same button-trigger + option-panel look as SearchableSelect, minus the
-// search box — for option lists short enough that filtering is overkill
-// (gender, roles, wards, ...). Keep the two in sync visually.
-const Select = ({
+// Dropdown with an in-panel search box, used anywhere a select needs to be
+// filterable (HMO providers, company partners, specializations, ...). Fully
+// self-contained — its open/search state resets for free whenever the
+// parent unmounts it. `options` is [{ value, label, ...anythingElse }];
+// `onChange(value, option)` hands back the whole option so callers can keep
+// the full record (e.g. sqid + name), not just the value.
+const SearchableSelect = ({
   value,
   onChange,
   options,
   placeholder = "Select an option",
-  label,
-  error,
+  isLoading = false,
+  emptyText = "No options found.",
   disabled = false,
   className = "",
-}: SelectProps) => {
+}: SearchableSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,21 +48,22 @@ const Select = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const filteredOptions = options.filter((option) =>
+    option.label.toLowerCase().includes(search.toLowerCase())
+  );
   const selectedLabel = options.find((option) => option.value === value)?.label;
 
   return (
     <div className={`relative w-full ${className}`} ref={ref}>
-      {label && <p className="font-semibold pb-1 whitespace-nowrap">{label}</p>}
-
       <button
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`w-full flex items-center justify-between border rounded-lg px-3 py-3 text-sm text-left focus:outline-hidden focus:border-docuhealth-primary ${
+        className={`w-full flex items-center justify-between border border-gray-300 rounded-lg px-3 py-3 text-sm text-left focus:outline-hidden focus:border-docuhealth-primary ${
           disabled
-            ? "bg-gray-100 cursor-not-allowed border-gray-300"
+            ? "bg-gray-100 cursor-not-allowed"
             : "cursor-pointer hover:border-docuhealth-primary"
-        } ${error ? "border-red-500 focus:border-red-500" : "border-gray-300"}`}
+        }`}
       >
         <span className={selectedLabel ? "" : "text-gray-400"}>
           {selectedLabel || placeholder}
@@ -72,15 +77,29 @@ const Select = ({
 
       {isOpen && !disabled && (
         <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
+          <div className="relative p-2 border-b border-gray-100">
+            <Search className="w-4 h-4 text-gray-400 absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              autoFocus
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search..."
+              className="w-full pl-8 pr-2 py-2 text-sm border border-gray-200 rounded-md focus:outline-hidden focus:border-docuhealth-primary"
+            />
+          </div>
           <div className="max-h-48 overflow-y-auto">
-            {options.length > 0 ? (
-              options.map((option) => (
+            {isLoading ? (
+              <p className="px-4 py-3 text-sm text-gray-400">Loading...</p>
+            ) : filteredOptions.length > 0 ? (
+              filteredOptions.map((option) => (
                 <button
                   key={option.value}
                   type="button"
                   onClick={() => {
                     onChange(option.value, option);
                     setIsOpen(false);
+                    setSearch("");
                   }}
                   className={`w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer ${
                     option.value === value
@@ -92,17 +111,13 @@ const Select = ({
                 </button>
               ))
             ) : (
-              <p className="px-4 py-3 text-sm text-gray-400">No options found.</p>
+              <p className="px-4 py-3 text-sm text-gray-400">{emptyText}</p>
             )}
           </div>
         </div>
       )}
-
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 };
 
-Select.displayName = "Select";
-
-export default Select;
+export default SearchableSelect;

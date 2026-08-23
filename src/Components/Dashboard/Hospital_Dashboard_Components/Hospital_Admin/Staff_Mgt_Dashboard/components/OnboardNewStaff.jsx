@@ -7,6 +7,7 @@ import Modal from "../../../../../ui/Modal";
 import Button from "../../../../../ui/Button";
 import Input from "../../../../../ui/Input";
 import Select from "../../../../../ui/Select";
+import SearchableSelect from "../../../../../ui/SearchableSelect";
 
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
@@ -67,68 +68,70 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const noWardRoles = ["receptionist", "lab_scientist", "pharmacist"];
 
   const doctorSpecializations = [
-    "Surgeon",
-    "General Dentist",
-    "Optician",
-    "Gynecologist",
-    "Obstetrician",
-    "Pediatrician",
-    "Cardiologist",
-    "Endocrinologist",
-    "General Practitioner",
-    "Neurologist",
-    "Dermatologist",
-    "Orthopedic",
-    "Radiologist",
     "Anesthesiologist",
-    "Histopathologist",
-    "Oncopathologist",
-    "Interventional Pathologist",
-    "Surgical Pathologist",
+    "Cardiologist",
+    "Dermatologist",
+    "Endocrinologist",
+    "Family Physician",
     "Forensic Pathologist",
     "Gastrointestinal (GIT) Pathologist",
-    "Family Physician",
+    "General Dentist",
+    "General Practitioner",
+    "Gynecologist",
+    "Histopathologist",
+    "Interventional Pathologist",
+    "Neurologist",
+    "Obstetrician",
+    "Oncopathologist",
+    "Optician",
+    "Orthopedic",
+    "Pediatrician",
+    "Radiologist",
+    "Surgeon",
+    "Surgical Pathologist",
   ];
 
   const nurseSpecializations = [
-    "General Nurse / Registered Nurse (RN)",
-    "Pediatric Nurse",
-    "Geriatric Nurse",
-    "Neonatal Nurse",
-    "Obstetric / Midwife Nurse",
-    "Mental Health / Psychiatric Nurse",
-    "Oncology Nurse",
     "Cardiac / Critical Care Nurse",
-    "Emergency / Trauma Nurse",
     "Community Health Nurse",
+    "Emergency / Trauma Nurse",
+    "General Nurse / Registered Nurse (RN)",
+    "Geriatric Nurse",
     "Home Health Nurse",
-    "Surgical / Operating Room (OR) Nurse",
+    "Hospice / Palliative Care Nurse",
+    "Infection Control Nurse",
+    "Mental Health / Psychiatric Nurse",
+    "Neonatal Nurse",
     "Nurse Anesthetist",
     "Nurse Educator",
     "Nurse Researcher",
-    "Infection Control Nurse",
-    "Hospice / Palliative Care Nurse",
+    "Obstetric / Midwife Nurse",
+    "Oncology Nurse",
+    "Pediatric Nurse",
+    "Surgical / Operating Room (OR) Nurse",
   ];
 
+  // "N/A" stays pinned first — it's a "no specialization" option, not part
+  // of the alphabetized list below it.
   const labScientistSpecializations = [
     "N/A",
-    "Hematology and Blood Transfusion",
     "Chemical Pathology",
-    "Medical Microbiology",
-    "Immunology and Immunochemistry",
-    "Histopathology and Cytopathology",
-    "Molecular Diagnostics",
     "Forensic Laboratory Science",
+    "Hematology and Blood Transfusion",
+    "Histopathology and Cytopathology",
+    "Immunology and Immunochemistry",
+    "Medical Microbiology",
+    "Molecular Diagnostics",
   ];
 
   const pharmacistSpecializations = [
     "N/A",
-    "General Pharmacist",
     "Clinical Pharmacist",
+    "General Pharmacist",
+    "Informatics Pharmacist",
+    "Nuclear Pharmacist",
     "Oncology Pharmacist",
     "Pediatric Pharmacist",
-    "Nuclear Pharmacist",
-    "Informatics Pharmacist",
   ];
 
   const specializationOptions =
@@ -353,65 +356,46 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
               <Select
                 value={form.gender}
-                onChange={(e) => handleChange("gender", e.target.value)}
-                className="text-sm"
-              >
-                <option value="">Gender</option>
-                {gender.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </Select>
+                onChange={(value) => handleChange("gender", value)}
+                options={gender.map((p) => ({ value: p, label: p }))}
+                placeholder="Gender"
+              />
 
               {/* Personnel Dropdown */}
               <Select
                 value={form.personnel}
-                onChange={(e) => handleChange("personnel", e.target.value)}
-                className="text-sm"
-                containerClassName="col-span-2"
-              >
-                <option value="">Healthcare personnel</option>
-                {personnelOptions.map((p) => (
-                  <option key={p} value={p}>
-                    {p
-                      .replace(/_/g, " ")
-                      .replace(/\b\w/g, (c) => c.toUpperCase())}
-                  </option>
-                ))}
-              </Select>
+                onChange={(value) => handleChange("personnel", value)}
+                options={personnelOptions.map((p) => ({
+                  value: p,
+                  label: p.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+                }))}
+                placeholder="Healthcare personnel"
+                className="col-span-2"
+              />
 
-              {/* Specialization dropdown */}
-              <Select
+              {/* Specialization dropdown — searchable since some of these
+                  lists (doctor, nurse) run over a dozen options deep. */}
+              <SearchableSelect
                 disabled={form.personnel === "receptionist" || !form.personnel}
                 value={form.specialization}
-                onChange={(e) => handleChange("specialization", e.target.value)}
-                className="text-sm"
-                containerClassName="col-span-2"
-              >
-                <option value="">Area of specialization</option>
-                {specializationOptions.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </Select>
+                onChange={(value) => handleChange("specialization", value)}
+                options={specializationOptions.map((s) => ({ value: s, label: s }))}
+                placeholder="Area of specialization"
+                className="col-span-2"
+              />
 
               {/* Ward dropdown */}
               <Select
                 disabled={noWardRoles.includes(form.personnel)}
                 value={form.ward}
-                onChange={(e) => handleChange("ward", e.target.value)}
-                className="text-sm"
-                containerClassName="col-span-2"
-              >
-                <option value="">Assign to ward</option>
-                {wardOptions.map((w) => (
-                  <option key={w.id} value={w.id}>
-                    {w.name + " ward"}
-                  </option>
-                ))}
-              </Select>
+                onChange={(value) => handleChange("ward", value)}
+                options={wardOptions.map((w) => ({
+                  value: w.id,
+                  label: w.name.charAt(0).toUpperCase() + w.name.slice(1) + " ward",
+                }))}
+                placeholder="Assign to ward"
+                className="col-span-2"
+              />
             </div>
 
             <div className="mt-5">
