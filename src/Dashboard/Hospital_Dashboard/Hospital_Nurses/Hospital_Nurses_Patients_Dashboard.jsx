@@ -111,17 +111,29 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                         >
                           Vital signs history
                         </button>
+                        <button
+                          className="w-full text-left px-3  py-2.5 hover:bg-gray-100 text-gray-700 transition-colors"
+                          onClick={() => {
+                            setUpdateVitals(true);
+                            setVitalSignsHistory(false);
+                            setCaseNoteHistory(false);
+                            setSharedSoapNoteHistory(false);
+                            setIsDropdownOpen(false);
+                          }}
+                        >
+                          Update Vitals
+                        </button>
                       </div>
                     )}
                   </div>
 
                   <button
-                    className="py-2.5 px-10 w-full lg:w-60 rounded-full bg-docuhealth-primary text-white cursor-pointer"
+                    className="py-2.5 px-10 w-full lg:w-60 rounded-full bg-docuhealth-primary text-white cursor-pointer flex justify-center items-center"
                     onClick={() => {
-                      setUpdateVitals(true);
+                      console.log("Quick log clicked");
                     }}
                   >
-                    Update Vitals
+                    Quick log
                   </button>
                   
                   {!showAdmissionNote && (

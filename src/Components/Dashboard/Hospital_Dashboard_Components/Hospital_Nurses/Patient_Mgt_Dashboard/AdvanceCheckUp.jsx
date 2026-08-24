@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import AdvanceCheckUpTabComponent from "./AdvanceCheckUpTabComponent";
 import { getAdvanceCheckUpTabs } from "./AdvanceCheckUpTabDetails";
+import { NursesAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Nurses/NursesAdmittedPatientMGTContext";
 
 const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail }) => {
+  const context = useContext(NursesAdmittedPatientMGTContext);
+  const isOutPatient = context?.tab === "outpatient" || context?.tab === "outpatient_discharge";
   const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
   const [activeTab, setActiveTab] = useState("info");
 
@@ -104,7 +107,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail }
           </div>
 
           <AdvanceCheckUpTabComponent 
-            tabs={getAdvanceCheckUpTabs(patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail)}
+            tabs={getAdvanceCheckUpTabs(patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail, isOutPatient, setAdvanceCheckUp)}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
           />

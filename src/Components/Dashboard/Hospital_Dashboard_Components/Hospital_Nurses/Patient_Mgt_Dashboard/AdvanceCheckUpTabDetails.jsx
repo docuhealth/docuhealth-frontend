@@ -1,9 +1,10 @@
 import React from "react";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 import SharedSoapNotes from "./SharedSoapNotes";
+import NursingTasksQueue from "./NursingTasksQueue";
 
-export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail) => {
-    return [
+export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail, isOutPatient = false, setAdvanceCheckUp = null) => {
+    const tabs = [
         {
             title: "Patient's information",
             status: "info",
@@ -73,9 +74,7 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
             title: "My nursing tasks queue",
             status: "tasks",
             content: (
-                <div className="bg-gray-50 rounded-xl border p-12 text-center text-gray-500">
-                    <p>My nursing tasks queue coming soon...</p>
-                </div>
+                <NursingTasksQueue setAdvanceCheckUp={setAdvanceCheckUp} />
             )
         },
         {
@@ -99,4 +98,10 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
             )
         }
     ];
+
+    if (isOutPatient) {
+        return tabs.filter(t => t.status === "info" || t.status === "soap");
+    }
+
+    return tabs;
 };
