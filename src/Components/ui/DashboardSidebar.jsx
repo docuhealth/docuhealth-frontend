@@ -14,7 +14,7 @@ const DashboardSidebar = ({
   const currentPath = location.pathname;
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-full">
       <div className="pt-5 pl-5 pb-3 flex justify-between items-center shrink-0">
         <div className="flex justify-start items-center gap-1 font-semibold text-docuhealth-primary">
           <img src={hospitalLogo || docuhealth_logo} alt="Logo" className="w-6 h-6 aspect-square object-cover" />
@@ -22,7 +22,11 @@ const DashboardSidebar = ({
         </div>
       </div>
       
-      <nav className="flex-1 text-sm overflow-y-auto">
+      {/* nav + bottom block share one scroll container instead of nav scrolling
+          internally while the bottom block is pinned below it via flex-grow math
+          — see DashboardMobileSidebar for why that pinning isn't reliable. */}
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col">
+      <nav className="text-sm">
         <ul>
           {navItems.map((item, index) => {
             const isActive = currentPath === item.path || (item.activePaths && item.activePaths.includes(currentPath));
@@ -59,7 +63,7 @@ const DashboardSidebar = ({
         </ul>
       </nav>
 
-      <div className="text-sm border-t border-gray-100 pb-4 pt-2 shrink-0">
+      <div className="text-sm border-t border-gray-100 pb-4 pt-2 mt-auto shrink-0">
         <ul>
           {bottomNavItems.map((item, index) => {
             const isActive = currentPath === item.path || (item.activePaths && item.activePaths.includes(currentPath));
@@ -107,6 +111,7 @@ const DashboardSidebar = ({
           </div>
         </ul>
         {customBottomContent}
+      </div>
       </div>
     </div>
   );
