@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
-import { Search, ChevronDown, Plus } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import TaskCreationModal, { FIELD_BOX_CLASS } from "./TaskCreationModal";
+import Input from "../../../../../ui/Input";
+import Select from "../../../../../ui/Select";
 
 const ROUTE_OPTIONS = ["Oral", "IV", "IM", "SC", "Topical", "Sublingual", "Rectal", "Inhalation"];
 
@@ -25,11 +27,6 @@ const DRUG_FREQUENCY_OPTIONS = [
   "PRN (As needed)",
 ];
 
-const ROW_LABEL_CLASS = "block text-sm font-medium text-gray-700 mb-1";
-const ROW_INPUT_CLASS =
-  "w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-docuhealth-primary placeholder:text-gray-400";
-const ROW_SELECT_CLASS = `${ROW_INPUT_CLASS} appearance-none cursor-pointer pr-8`;
-
 const createEmptyDrugRow = (id) => ({
   id,
   drugName: "",
@@ -41,75 +38,45 @@ const createEmptyDrugRow = (id) => ({
 
 const DrugRow = ({ row, onChange }) => {
   const updateRowField = (field) => (e) => onChange({ ...row, [field]: e.target.value });
+  const updateRowValue = (field) => (value) => onChange({ ...row, [field]: value });
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
-      <div>
-        <label className={ROW_LABEL_CLASS}>Drug name</label>
-        <div className="relative">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            className={`${ROW_INPUT_CLASS} pl-9`}
-            placeholder="enter medication"
-            value={row.drugName}
-            onChange={updateRowField("drugName")}
-          />
-        </div>
-      </div>
+      <Input
+        label="Drug name"
+        leadingIcon={<Search className="w-4 h-4" />}
+        placeholder="enter medication"
+        value={row.drugName}
+        onChange={updateRowField("drugName")}
+      />
 
-      <div>
-        <label className={ROW_LABEL_CLASS}>Duration</label>
-        <div className="relative">
-          <select className={ROW_SELECT_CLASS} value={row.duration} onChange={updateRowField("duration")}>
-            {DRUG_DURATION_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-        </div>
-      </div>
+      <Select
+        label="Duration"
+        value={row.duration}
+        onChange={updateRowValue("duration")}
+        options={DRUG_DURATION_OPTIONS.map((option) => ({ value: option, label: option }))}
+      />
 
-      <div>
-        <label className={ROW_LABEL_CLASS}>Dosage</label>
-        <input
-          type="text"
-          className={ROW_INPUT_CLASS}
-          placeholder="Enter dosage..."
-          value={row.dosage}
-          onChange={updateRowField("dosage")}
-        />
-      </div>
+      <Input
+        label="Dosage"
+        placeholder="Enter dosage..."
+        value={row.dosage}
+        onChange={updateRowField("dosage")}
+      />
 
-      <div>
-        <label className={ROW_LABEL_CLASS}>Route</label>
-        <div className="relative">
-          <select className={ROW_SELECT_CLASS} value={row.route} onChange={updateRowField("route")}>
-            {ROUTE_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-        </div>
-      </div>
+      <Select
+        label="Route"
+        value={row.route}
+        onChange={updateRowValue("route")}
+        options={ROUTE_OPTIONS.map((option) => ({ value: option, label: option }))}
+      />
 
-      <div>
-        <label className={ROW_LABEL_CLASS}>Frequency</label>
-        <div className="relative">
-          <select className={ROW_SELECT_CLASS} value={row.frequency} onChange={updateRowField("frequency")}>
-            {DRUG_FREQUENCY_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-        </div>
-      </div>
+      <Select
+        label="Frequency"
+        value={row.frequency}
+        onChange={updateRowValue("frequency")}
+        options={DRUG_FREQUENCY_OPTIONS.map((option) => ({ value: option, label: option }))}
+      />
     </div>
   );
 };

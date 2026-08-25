@@ -7,6 +7,7 @@ import {
 } from "../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
 import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
 import SearchBar from "../../../../SearchBar/SearchBar";
+import Input from "../../../../ui/Input";
 
 const AppointmentsList = ({
   setSeePatientDetails,
@@ -228,20 +229,22 @@ const AppointmentsList = ({
         <div className="flex flex-wrap gap-3">
           <div className="flex items-center gap-2">
             <label className="text-xs text-gray-500 whitespace-nowrap">From:</label>
-            <input
+            <Input
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-docuhealth-primary focus:border-docuhealth-primary"
+              containerClassName="w-auto"
+              className="text-sm"
             />
           </div>
           <div className="flex items-center gap-2">
             <label className="text-xs text-gray-500 whitespace-nowrap">To:</label>
-            <input
+            <Input
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-docuhealth-primary focus:border-docuhealth-primary"
+              containerClassName="w-auto"
+              className="text-sm"
             />
           </div>
           {(dateFrom || dateTo) && (

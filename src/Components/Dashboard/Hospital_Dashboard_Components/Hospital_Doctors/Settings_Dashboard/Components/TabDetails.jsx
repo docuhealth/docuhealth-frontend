@@ -5,6 +5,7 @@ import { FaTimes } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
+import Input from "../../../../../ui/Input";
 
 const AccountSettingsTab = () => {
   const { profile } = useContext(DoctorAppContext);
@@ -224,35 +225,23 @@ const AccountSettingsTab = () => {
                 <p>Profile Info</p>
               </div>
               <div className=" mt-3">
-                <label
-                  htmlFor="name"
-                  className="block text-[12px] font-medium text-gray-700 mb-0.5"
-                >
-                  First Name
-                </label>
-                <input
+                <Input
+                  label="First Name"
                   id="firstname"
                   name="firstname"
-                  type="text"
                   value={formData.firstname}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none "
+                  className="h-[38px] text-sm"
                 />
               </div>
               <div className=" mt-3">
-                <label
-                  htmlFor="name"
-                  className="block text-[12px] font-medium text-gray-700 mb-0.5"
-                >
-                  Last Name
-                </label>
-                <input
+                <Input
+                  label="Last Name"
                   id="lastname"
                   name="lastname"
-                  type="text"
                   value={formData.lastname}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none "
+                  className="h-[38px] text-sm"
                 />
               </div>
 
@@ -280,19 +269,14 @@ const AccountSettingsTab = () => {
                 <p>Login Credentials</p>
               </div>
               <div className=" mt-3">
-                <label
-                  htmlFor="email"
-                  className="block text-[12px] font-medium text-gray-700 mb-0.5"
-                >
-                  Email Address
-                </label>
-                <input
+                <Input
+                  label="Email Address"
                   id="email"
                   name="email"
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none "
+                  className="h-[38px] text-sm"
                 />
               </div>
 
@@ -318,66 +302,50 @@ const AccountSettingsTab = () => {
 
               <div className="mt-10">
                 <div className="mb-3">
-                  <p className="block text-[12px] font-medium text-gray-700 mb-0.5">
-                    Old Password :
-                  </p>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      name="oldPassword"
-                      placeholder=""
-                      className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none pl-8`}
-                      value={formData.oldPassword}
-                      onChange={(e) => {
-                        handleChange(e);
-                      }}
-                    />
-                    <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute top-1/2 right-3 transform -translate-y-1/2"
-                    >
-                      {showPassword ? (
+                  <Input
+                    label="Old Password :"
+                    type={showPassword ? "text" : "password"}
+                    name="oldPassword"
+                    className="h-[38px] text-sm"
+                    value={formData.oldPassword}
+                    onChange={(e) => {
+                      handleChange(e);
+                    }}
+                    leadingIcon={<FaLock className="h-3 w-3" />}
+                    trailingIcon={
+                      showPassword ? (
                         <FaEyeSlash className="h-3 w-3 text-gray-400" />
                       ) : (
                         <FaEye className="h-3 w-3 text-gray-400" />
-                      )}
-                    </button>
-                  </div>
+                      )
+                    }
+                    onTrailingIconClick={() => setShowPassword(!showPassword)}
+                  />
                 </div>
                 <div className="relative text-sm ">
-                  <p className="block text-[12px] font-medium text-gray-700 mb-0.5">
-                    New Password :
-                  </p>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      name="newPassword"
-                      placeholder=""
-                      className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none pl-8 ${
-                        formData.newPassword && !isPasswordValid
-                          ? "focus:border-red-500"
-                          : ""
-                      }`}
-                      value={formData.newPassword}
-                      onChange={(e) => {
-                        handleChange(e);
-                      }}
-                    />
-                    <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute top-1/2 right-3 transform -translate-y-1/2"
-                    >
-                      {showPassword ? (
+                  <Input
+                    label="New Password :"
+                    type={showPassword ? "text" : "password"}
+                    name="newPassword"
+                    className={`h-[38px] text-sm ${
+                      formData.newPassword && !isPasswordValid
+                        ? "focus:border-red-500"
+                        : ""
+                    }`}
+                    value={formData.newPassword}
+                    onChange={(e) => {
+                      handleChange(e);
+                    }}
+                    leadingIcon={<FaLock className="h-3 w-3" />}
+                    trailingIcon={
+                      showPassword ? (
                         <FaEyeSlash className="h-3 w-3 text-gray-400" />
                       ) : (
                         <FaEye className="h-3 w-3 text-gray-400" />
-                      )}
-                    </button>
-                  </div>
+                      )
+                    }
+                    onTrailingIconClick={() => setShowPassword(!showPassword)}
+                  />
 
                   {/* Password Requirements Checker */}
                   {formData.newPassword && (
@@ -510,35 +478,27 @@ const AccountSettingsTab = () => {
                 </div>
 
                 <div className="mt-4">
-                  <p className="block text-[12px] font-medium text-gray-700 mb-0.5">
-                    Confirm Password :
-                  </p>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      name="confirmPassword"
-                      placeholder=""
-                      className={`w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none pl-8 ${
-                        formData.confirmPassword && formData.newPassword !== formData.confirmPassword
-                          ? "focus:border-red-500"
-                          : ""
-                      }`}
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                    />
-                    <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute top-1/2 right-3 transform -translate-y-1/2"
-                    >
-                      {showPassword ? (
+                  <Input
+                    label="Confirm Password :"
+                    type={showPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    className={`h-[38px] text-sm ${
+                      formData.confirmPassword && formData.newPassword !== formData.confirmPassword
+                        ? "focus:border-red-500"
+                        : ""
+                    }`}
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    leadingIcon={<FaLock className="h-3 w-3" />}
+                    trailingIcon={
+                      showPassword ? (
                         <FaEyeSlash className="h-3 w-3 text-gray-400" />
                       ) : (
                         <FaEye className="h-3 w-3 text-gray-400" />
-                      )}
-                    </button>
-                  </div>
+                      )
+                    }
+                    onTrailingIconClick={() => setShowPassword(!showPassword)}
+                  />
                   {formData.confirmPassword && formData.newPassword !== formData.confirmPassword && (
                     <p className="text-red-500 text-[10px] mt-1">Passwords do not match</p>
                   )}
@@ -595,13 +555,13 @@ const AccountSettingsTab = () => {
                 Enter the OTP sent to {formData.email}
               </p>
 
-              <input
+              <Input
                 name="otp"
                 placeholder="Enter OTP"
                 maxLength={6}
                 value={formData.otp}
                 onChange={handleChange}
-                className="w-full py-2 text-center text-sm tracking-widest border-2 rounded-lg focus:border-docuhealth-primary outline-none mb-3"
+                className="text-center text-sm tracking-widest border-2 mb-3"
               />
 
               <button

@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import Input from "./Input";
 
 const GeneralPatientInfoForm = ({ patient, children }) => {
   return (
@@ -7,65 +8,15 @@ const GeneralPatientInfoForm = ({ patient, children }) => {
       <h2 className="font-medium">General Information</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <div>
-          <p className="text-sm font-medium text-gray-500 mb-1 ">
-            First Name
-          </p>
-          <input
-            type="text"
-            readOnly
-            className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-            value={patient?.firstname || ""}
-          />
-        </div>
+        <Input label="First Name" readOnly value={patient?.firstname || ""} />
 
-        <div>
-          <p className="text-sm font-medium text-gray-500 mb-1 ">
-            Last Name
-          </p>
-          <input
-            type="text"
-            readOnly
-            className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-            value={patient?.lastname || ""}
-          />
-        </div>
+        <Input label="Last Name" readOnly value={patient?.lastname || ""} />
 
-        <div>
-          <p className="text-sm font-medium text-gray-500 mb-1 ">
-            Date of birth
-          </p>
-          <input
-            type="text"
-            readOnly
-            className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-            value={patient?.dob || ""}
-          />
-        </div>
+        <Input label="Date of birth" readOnly value={patient?.dob || ""} />
 
-        <div>
-          <p className="text-sm font-medium text-gray-500 mb-1 ">
-            Email address
-          </p>
-          <input
-            type="text"
-            readOnly
-            className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-            value={patient?.email || "NIL"}
-          />
-        </div>
+        <Input label="Email address" readOnly value={patient?.email || "NIL"} />
 
-        <div>
-          <p className="text-sm font-medium text-gray-500 mb-1 ">
-            Phone number
-          </p>
-          <input
-            type="text"
-            readOnly
-            className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-            value={patient?.phone_num || ""}
-          />
-        </div>
+        <Input label="Phone number" readOnly value={patient?.phone_num || ""} />
 
         <div>
           <p className="text-sm font-medium text-gray-500 mb-1">

@@ -4,6 +4,7 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { fetchTestCategories, fetchLabTests } from "../../../../../../queries/Hospital/lab/requests";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import Select from "../../../../../ui/Select";
 
 /**
  * Standalone "Order lab" flow opened directly from the
@@ -158,24 +159,15 @@ const OrderLabModal = ({ selectedPatientDetails, onClose }) => {
             </p>
 
             <div className="mb-4 text-[12px]">
-              <p className="block font-medium text-gray-700 mb-1">Category</p>
-              <div className="relative">
-                <select
-                  className="border rounded-lg w-full p-2.5 text-[12px] outline-none focus:border-docuhealth-primary appearance-none"
-                  value={formData.category}
-                  onChange={(e) => {
-                    setFormData({ ...formData, category: e.target.value, test_type: [] });
-                  }}
-                >
-                  <option value="" disabled>Select category</option>
-                  {categories.map((cat) => (
-                    <option key={cat.sqid} value={cat.sqid}>{cat.name}</option>
-                  ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
-                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                </div>
-              </div>
+              <Select
+                label="Category"
+                value={formData.category}
+                onChange={(value) => {
+                  setFormData({ ...formData, category: value, test_type: [] });
+                }}
+                options={categories.map((cat) => ({ value: cat.sqid, label: cat.name }))}
+                placeholder="Select category"
+              />
             </div>
 
             <div className="mb-4 relative text-[12px]">

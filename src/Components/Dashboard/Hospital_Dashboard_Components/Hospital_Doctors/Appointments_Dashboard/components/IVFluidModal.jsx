@@ -1,10 +1,7 @@
 import React, { useState } from "react";
-import { ChevronDown, X } from "lucide-react";
-import TaskCreationModal, {
-  FIELD_BOX_CLASS,
-  FIELD_LABEL_CLASS,
-  SELECT_CLASS,
-} from "./TaskCreationModal";
+import { X } from "lucide-react";
+import TaskCreationModal, { FIELD_BOX_CLASS, FIELD_LABEL_CLASS } from "./TaskCreationModal";
+import Select from "../../../../../ui/Select";
 
 const DRUG_ADDITIVE_OPTIONS = [
   "Potassium Chloride (KCl)",
@@ -58,23 +55,14 @@ const IVFluidTopSection = ({
     <>
       <div className={FIELD_BOX_CLASS}>
         <label className={FIELD_LABEL_CLASS}>Drugs/Additive</label>
-        <div className="relative">
-          <select
-            className={SELECT_CLASS}
-            value=""
-            onChange={(e) => {
-              if (e.target.value) onAddAdditive(e.target.value);
-            }}
-          >
-            <option value="">Select drugs/additive</option>
-            {availableAdditives.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="w-4 h-4 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-        </div>
+        <Select
+          value=""
+          onChange={(value) => {
+            if (value) onAddAdditive(value);
+          }}
+          options={availableAdditives.map((option) => ({ value: option, label: option }))}
+          placeholder="Select drugs/additive"
+        />
 
         {drugsAdditive.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-4">
@@ -100,76 +88,40 @@ const IVFluidTopSection = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div className={FIELD_BOX_CLASS}>
           <label className={FIELD_LABEL_CLASS}>Fluid solution type</label>
-          <div className="relative">
-            <select
-              className={SELECT_CLASS}
-              value={fluidType}
-              onChange={(e) => setFluidType(e.target.value)}
-            >
-              {FLUID_SOLUTION_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="w-4 h-4 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-          </div>
+          <Select
+            value={fluidType}
+            onChange={setFluidType}
+            options={FLUID_SOLUTION_OPTIONS.map((option) => ({ value: option, label: option }))}
+          />
         </div>
 
         <div className={FIELD_BOX_CLASS}>
           <label className={FIELD_LABEL_CLASS}>Volume per bag</label>
-          <div className="relative">
-            <select
-              className={SELECT_CLASS}
-              value={volumePerBag}
-              onChange={(e) => setVolumePerBag(e.target.value)}
-            >
-              {VOLUME_PER_BAG_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="w-4 h-4 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-          </div>
+          <Select
+            value={volumePerBag}
+            onChange={setVolumePerBag}
+            options={VOLUME_PER_BAG_OPTIONS.map((option) => ({ value: option, label: option }))}
+          />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div className={FIELD_BOX_CLASS}>
           <label className={FIELD_LABEL_CLASS}>Total Plan / Number of Bags</label>
-          <div className="relative">
-            <select
-              className={SELECT_CLASS}
-              value={totalPlan}
-              onChange={(e) => setTotalPlan(e.target.value)}
-            >
-              {TOTAL_PLAN_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="w-4 h-4 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-          </div>
+          <Select
+            value={totalPlan}
+            onChange={setTotalPlan}
+            options={TOTAL_PLAN_OPTIONS.map((option) => ({ value: option, label: option }))}
+          />
         </div>
 
         <div className={FIELD_BOX_CLASS}>
           <label className={FIELD_LABEL_CLASS}>Infusion Rate / Duration</label>
-          <div className="relative">
-            <select
-              className={SELECT_CLASS}
-              value={infusionDuration}
-              onChange={(e) => setInfusionDuration(e.target.value)}
-            >
-              {INFUSION_DURATION_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="w-4 h-4 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-          </div>
+          <Select
+            value={infusionDuration}
+            onChange={setInfusionDuration}
+            options={INFUSION_DURATION_OPTIONS.map((option) => ({ value: option, label: option }))}
+          />
         </div>
       </div>
     </>

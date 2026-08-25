@@ -31,8 +31,10 @@ import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 import ClinicalSummaryCard from "../../../../ui/ClinicalSummaryCard";
 import SoapNoteEntry from "../Appointments_Dashboard/components/SoapNoteEntry";
+import Input from "../../../../ui/Input";
+import PatientHandoverTab from "./PatientHandoverTab";
 
-const PatientInfo = ({ patientFullInfo, selected }) => {
+export const PatientInfo = ({ patientFullInfo, selected }) => {
   console.log(selected);
 
 
@@ -40,75 +42,41 @@ const PatientInfo = ({ patientFullInfo, selected }) => {
   return (
     <>
       <GeneralPatientInfoForm patient={patientFullInfo?.patient_info}>
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Admission Date / Time
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={formatFullDateTime(selected?.admission_date)}
-            />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Discharge Date / Time
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={selected?.discharge_date ? formatFullDateTime(selected.discharge_date) : 'Still Admitted'}
-            />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Ward Placed
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={selected?.ward_info?.name + ' ward'}
-            />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Assigned Bed
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={"Bed " + selected?.bed_info?.bed_number}
-            />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Doctor in charge
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={
-                "Dr. " +
-                selected?.staff?.firstname +
-                " " +
-                selected?.staff?.lastname
-              }
-            />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">Gender</p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value={patientFullInfo?.patient_info?.gender}
-            />
-          </div>
+          <Input
+            label="Admission Date / Time"
+            readOnly
+            value={formatFullDateTime(selected?.admission_date)}
+          />
+          <Input
+            label="Discharge Date / Time"
+            readOnly
+            value={selected?.discharge_date ? formatFullDateTime(selected.discharge_date) : 'Still Admitted'}
+          />
+          <Input
+            label="Ward Placed"
+            readOnly
+            value={selected?.ward_info?.name + ' ward'}
+          />
+          <Input
+            label="Assigned Bed"
+            readOnly
+            value={"Bed " + selected?.bed_info?.bed_number}
+          />
+          <Input
+            label="Doctor in charge"
+            readOnly
+            value={
+              "Dr. " +
+              selected?.staff?.firstname +
+              " " +
+              selected?.staff?.lastname
+            }
+          />
+          <Input
+            label="Gender"
+            readOnly
+            value={patientFullInfo?.patient_info?.gender}
+          />
       </GeneralPatientInfoForm>
       <VitalSignsCard
         className="my-5 bg-docuhealth-light-gray rounded-lg border p-4"
@@ -187,7 +155,7 @@ const PatientInfo = ({ patientFullInfo, selected }) => {
   );
 };
 
-const PatientMedicalRecord = ({
+export const PatientMedicalRecord = ({
   patientMedRecords,
   count,
   currentPage,
@@ -418,7 +386,7 @@ const PatientMedicalRecord = ({
   );
 };
 
-const PatientSOAPNotes = ({
+export const PatientSOAPNotes = ({
   soapNotesLoading,
   patientSoapNotes,
   soapCount,
@@ -1314,71 +1282,6 @@ const PatientLabRecords = ({
 };
 
 
-const ComingSoonPlaceholder = ({ description }) => {
-  return (
-    <div className="flex flex-col justify-center items-center text-center h-full">
-      <svg
-        width="200"
-        height="200"
-        viewBox="0 0 366 366"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <g filter="url(#filter0_d_1501_46523)">
-          <circle cx="183" cy="171" r="159" fill="#DBDBDB" />
-        </g>
-        <circle cx="183" cy="171" r="132" fill="#F6F6F6" />
-        <path
-          d="M183 233.5C148.482 233.5 120.5 205.518 120.5 171C120.5 136.482 148.482 108.5 183 108.5C217.518 108.5 245.5 136.482 245.5 171C245.5 205.518 217.518 233.5 183 233.5ZM183 221C210.614 221 233 198.614 233 171C233 143.386 210.614 121 183 121C155.386 121 133 143.386 133 171C133 198.614 155.386 221 183 221ZM176.75 139.75H189.25V152.25H176.75V139.75ZM176.75 164.75H189.25V202.25H176.75V164.75Z"
-          fill="#929AA3"
-        />
-        <defs>
-          <filter
-            id="filter0_d_1501_46523"
-            x="0"
-            y="0"
-            width="366"
-            height="366"
-            filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
-          >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
-            <feColorMatrix
-              in="SourceAlpha"
-              type="matrix"
-              values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-              result="hardAlpha"
-            />
-            <feOffset dy="12" />
-            <feGaussianBlur stdDeviation="12" />
-            <feComposite in2="hardAlpha" operator="out" />
-            <feColorMatrix
-              type="matrix"
-              values="0 0 0 0 0.927885 0 0 0 0 0.927885 0 0 0 0 0.927885 0 0 0 0.15 0"
-            />
-            <feBlend
-              mode="normal"
-              in2="BackgroundImageFix"
-              result="effect1_dropShadow_1501_46523"
-            />
-            <feBlend
-              mode="normal"
-              in="SourceGraphic"
-              in2="effect1_dropShadow_1501_46523"
-              result="shape"
-            />
-          </filter>
-        </defs>
-      </svg>
-
-      <h2 className="font-medium pb-1">Coming soon!</h2>
-      <div className="max-w-md text-center">
-        <p className="text-[12px] text-gray-500">{description}</p>
-      </div>
-    </div>
-  );
-};
-
 // Dummy data only — real patient identity, mocked clinical content, until
 // the progress-note API exists.
 const buildDummyProgressNotes = (patientFullInfo, selected) => {
@@ -1862,10 +1765,6 @@ const ProgressNote = ({ selected, patientFullInfo }) => {
   );
 };
 
-const Handover = () => (
-  <ComingSoonPlaceholder description="Shift handover for this patient will be available here soon." />
-);
-
 const getTabs = ({
   medloading,
   soapNotesLoading,
@@ -1891,33 +1790,53 @@ const getTabs = ({
   labCurrentPage,
   labTotalPages,
   setLabCurrentPage,
-}) => [
+  advanceCheckUpSource,
+}) => {
+  const medRecordsTab = {
+    title: "Patient's medical record",
+    content: viewDetailMedicalRecord ? (
+      <PatientMedicalRecordDetail
+        selectedMedicalRecord={selectedMedicalRecord}
+        setViewDetailMedicalRecord={setViewDetailMedicalRecord}
+      />
+    ) : (
+      <PatientMedicalRecord
+        medloading={medloading}
+        patientMedRecords={patientMedRecords}
+        count={count}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+        setSelectedMedicalRecord={setSelectedMedicalRecord}
+        setViewDetailMedicalRecord={setViewDetailMedicalRecord}
+      />
+    ),
+  };
+
+  // Discharged patients get a trimmed-down details page — just their info
+  // and their medical record (which is where the discharge summary that
+  // was submitted lives). The ongoing-care tabs (SOAP Notes, Progress Note,
+  // Handover) don't apply once a patient's already been discharged.
+  if (advanceCheckUpSource === "discharged") {
+    return [
+      {
+        title: "Patient's information",
+        content: (
+          <PatientInfo patientFullInfo={patientFullInfo} selected={selected} />
+        ),
+      },
+      medRecordsTab,
+    ];
+  }
+
+  return [
     {
       title: "Patient Info",
       content: (
         <PatientInfo patientFullInfo={patientFullInfo} selected={selected} />
       ),
     },
-    {
-      title: "Med Records",
-      content: viewDetailMedicalRecord ? (
-        <PatientMedicalRecordDetail
-          selectedMedicalRecord={selectedMedicalRecord}
-          setViewDetailMedicalRecord={setViewDetailMedicalRecord}
-        />
-      ) : (
-        <PatientMedicalRecord
-          medloading={medloading}
-          patientMedRecords={patientMedRecords}
-          count={count}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          setCurrentPage={setCurrentPage}
-          setSelectedMedicalRecord={setSelectedMedicalRecord}
-          setViewDetailMedicalRecord={setViewDetailMedicalRecord}
-        />
-      ),
-    },
+    { ...medRecordsTab, title: "Med Records" },
     {
       title: "SOAP Notes",
       content: (
@@ -1938,8 +1857,8 @@ const getTabs = ({
     },
     {
       title: "Handover",
-      content: <Handover />,
-    }
+      content: <PatientHandoverTab selected={selected} patientFullInfo={patientFullInfo} />,
+    },
     // {
     //   title: "Lab Results",
     //   content: (
@@ -1954,5 +1873,6 @@ const getTabs = ({
     //   ),
     // },
   ];
+};
 
 export default getTabs;

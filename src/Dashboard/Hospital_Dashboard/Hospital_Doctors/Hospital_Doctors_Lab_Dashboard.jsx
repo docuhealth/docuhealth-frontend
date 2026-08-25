@@ -5,6 +5,7 @@ import axiosInstanceHos from "../../../lib/axios/hospital";
 import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 import Hospital_Lab_Test_Detail_Dashboard from "../Hospital_Lab/Hospital_Lab_Test_Detail_Dashboard";
 import useDebounce from "../../../hooks/useDebounce";
+import Input from "../../../Components/ui/Input";
 
 const Hospital_Doctors_Lab_Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -55,23 +56,21 @@ const Hospital_Doctors_Lab_Dashboard = () => {
             <h2 className="font-medium capitalize">
               Lab Results Approvals
             </h2>
-            <div className="relative w-full sm:w-64">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+            <Input
+              placeholder="Search name or ID..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              leadingIcon={
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-              </span>
-              <input
-                type="text"
-                placeholder="Search name or ID..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-docuhealth-primary"
-              />
-            </div>
+              }
+              containerClassName="w-full sm:w-64"
+              className="text-sm"
+            />
           </div>
 
           {labLoading ? (

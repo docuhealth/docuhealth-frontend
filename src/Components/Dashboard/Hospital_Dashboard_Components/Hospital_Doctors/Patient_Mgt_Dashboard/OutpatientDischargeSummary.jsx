@@ -1,72 +1,13 @@
 import React, { useState } from "react";
-import { ArrowLeft, X, Plus, Info, Check } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import MedicationSection from "../Appointments_Dashboard/components/MedicationSection";
-import Modal from "../../../../ui/Modal";
-
-// Sub-component for Confirm Discharge Modal
-const ConfirmDischargeModal = ({ isOpen, onConfirm, onCancel, isPending }) => {
-  return (
-    <Modal isOpen={isOpen} onClose={onCancel} maxWidth="md" className="!p-1 text-center">
-      <div className="flex justify-end mb-2">
-        <button onClick={onCancel} className="text-gray-400 hover:text-gray-600 bg-gray-100 rounded-full p-1">
-          <X size={18} />
-        </button>
-      </div>
-      <div className="flex justify-center mb-4">
-        <div className="w-12 h-12 rounded-full border-2 border-docuhealth-primary text-docuhealth-primary flex items-center justify-center">
-          <Info size={24} />
-        </div>
-      </div>
-      <h2 className="text-xl font-semibold text-docuhealth-dark mb-4">Discharge patient</h2>
-      <p className="text-gray-600 text-sm mb-8 px-4">
-        Are you sure this patient is clear for discharge? By proceeding you agree that you have carried out every necessary test and you are certain that the patient is good to go!
-      </p>
-      <button
-        onClick={onConfirm}
-        disabled={isPending}
-        className={`w-full py-3 rounded-full text-white font-medium flex justify-center items-center gap-2 ${
-          isPending ? "bg-docuhealth-primary/70 cursor-not-allowed" : "bg-docuhealth-primary hover:bg-docuhealth-primary/90"
-        }`}
-      >
-        {isPending ? (
-          <>
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            Confirming...
-          </>
-        ) : (
-          "Confirm discharge"
-        )}
-      </button>
-    </Modal>
-  );
-};
-
-// Sub-component for Success Modal
-const SuccessModal = ({ isOpen, onDone }) => {
-  return (
-    <Modal isOpen={isOpen} onClose={onDone} maxWidth="sm" className="!rounded-3xl !p-3 text-center">
-      <div className="flex justify-center mb-6 mt-4">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-          <div className="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center text-white">
-            <Check size={32} strokeWidth={3} />
-          </div>
-        </div>
-      </div>
-      <p className="text-docuhealth-dark font-medium mb-8 px-4 leading-relaxed">
-        You have successfully discharged<br />this patient from the hospital!
-      </p>
-      <button
-        onClick={onDone}
-        className="w-full py-3.5 bg-green-500 hover:bg-green-600 rounded-full text-white font-medium"
-      >
-        Done
-      </button>
-    </Modal>
-  );
-};
+import Input from "../../../../ui/Input";
+import Select from "../../../../ui/Select";
+import ConfirmDischargeModal from "./ConfirmDischargeModal";
+import DischargeSuccessModal from "./DischargeSuccessModal";
 
 const OutpatientDischargeSummary = ({ selectedPatient, onClose }) => {
   const queryClient = useQueryClient();
@@ -269,23 +210,21 @@ const OutpatientDischargeSummary = ({ selectedPatient, onClose }) => {
                 <label className="block text-xs font-semibold text-gray-700 mb-2">Follow-up clinic selection</label>
                 <div className="flex flex-col gap-3">
                   {!formData.will_continue_followup ? (
-                    <input 
-                      type="text"
+                    <Input
                       name="referral"
                       value={formData.referral}
                       onChange={handleTextChange}
                       placeholder="Enter Referral Hospital HIN"
-                      className="w-full md:w-1/2 border border-gray-200 rounded-lg p-3 text-sm focus:border-docuhealth-primary outline-none"
+                      containerClassName="w-full md:w-1/2"
                     />
                   ) : (
-                    <div className="relative w-full md:w-1/2">
-                      <select className="w-full border border-gray-200 rounded-lg p-3 text-sm text-gray-400 bg-gray-50 outline-none appearance-none" disabled>
-                        <option>Medical Outpatient Clinic</option>
-                      </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                      </div>
-                    </div>
+                    <Select
+                      value="Medical Outpatient Clinic"
+                      onChange={() => {}}
+                      options={[{ value: "Medical Outpatient Clinic", label: "Medical Outpatient Clinic" }]}
+                      disabled
+                      className="w-full md:w-1/2"
+                    />
                   )}
                   <label className="flex items-center gap-2 text-xs text-gray-600 font-medium cursor-pointer w-fit">
                     <input
@@ -303,35 +242,29 @@ const OutpatientDischargeSummary = ({ selectedPatient, onClose }) => {
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-2">Follow-up date/time</label>
                 <div className="flex flex-col sm:flex-row gap-4 w-full md:w-1/2">
-                  <div className="relative flex-1">
-                    <input
-                      type="date"
-                      value={followUpDate}
-                      onChange={(e) => setFollowUpDate(e.target.value)}
-                      className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:border-docuhealth-primary outline-none text-gray-600"
-                    />
-                  </div>
-                  <div className="relative flex-1">
-                    <input
-                      type="time"
-                      value={followUpTime}
-                      onChange={(e) => setFollowUpTime(e.target.value)}
-                      className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:border-docuhealth-primary outline-none text-gray-600"
-                    />
-                  </div>
+                  <Input
+                    type="date"
+                    value={followUpDate}
+                    onChange={(e) => setFollowUpDate(e.target.value)}
+                    containerClassName="flex-1"
+                  />
+                  <Input
+                    type="time"
+                    value={followUpTime}
+                    onChange={(e) => setFollowUpTime(e.target.value)}
+                    containerClassName="flex-1"
+                  />
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-2">Pending results/investigations</label>
-                <div className="relative">
-                  <select className="w-full border border-gray-200 rounded-lg p-3 text-sm text-gray-500 bg-white outline-none appearance-none">
-                    <option>Select pending investigations/results (Patient's will receive these results once available)</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                  </div>
-                </div>
+                <Select
+                  value=""
+                  onChange={() => {}}
+                  options={[]}
+                  placeholder="Select pending investigations/results (Patient's will receive these results once available)"
+                />
               </div>
 
               <div>
@@ -369,11 +302,11 @@ const OutpatientDischargeSummary = ({ selectedPatient, onClose }) => {
         isPending={dischargeMutation.isPending}
       />
 
-      <SuccessModal
+      <DischargeSuccessModal
         isOpen={showSuccessModal}
         onDone={() => {
           setShowSuccessModal(false);
-          onClose(); 
+          onClose();
         }}
       />
     </>

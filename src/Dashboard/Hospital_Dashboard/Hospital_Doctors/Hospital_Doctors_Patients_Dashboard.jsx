@@ -5,7 +5,7 @@ import getTabs from "../../../Components/Dashboard/Hospital_Dashboard_Components
 import AdvanceCheckUp from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/AdvanceCheckUp";
 import OtherMedicalServicesFab from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/OtherMedicalServicesFab";
 import TransferToAnotherWard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/TransferToAnotherWard";
-import AfterDischargeSummary from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/AfterDischargeSummary";
+import InpatientDischargeSummary from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/InpatientDischargeSummary";
 import SoapNoteEntry from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/SoapNoteEntry";
 import PrescribeMedication from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PrescribeMedication";
 import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PatientInfo";
@@ -46,57 +46,92 @@ const Hospital_Doctors_Patients_Dashboard = () => {
   const [selectedDischargePatient, setSelectedDischargePatient] =
     useState(null);
 
+  // "tabs" | "discharge-summary" | "soap-history" — which view a discharged
+  // patient's details page is showing. Reset whenever a different patient
+  // is opened so it doesn't carry over between patients.
+  const [dischargedView, setDischargedView] = useState("tabs");
+  useEffect(() => {
+    setDischargedView("tabs");
+  }, [selected]);
+
   return (
     <>
-      {advanceCheckUp ? (
+      {dischargePatient ? (
+        <>
+          <div className="py-2 text-sm flex justify-between items-center">
+            <DynamicDate />
+          </div>
+          <InpatientDischargeSummary
+            selectedDischargePatient={selectedDischargePatient}
+            setDischargePatient={setDischargePatient}
+          />
+        </>
+      ) : advanceCheckUp ? (
         <>
           <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start gap-3 lg:gap-0 lg:items-center">
             <DynamicDate />
-            {!selected.discharge_date && (
-            <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
-              {advanceCheckUpSource === "outpatient" ? (
-                <>
-                  <button
-                    className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
-                    onClick={() => {
-                      setRequestAdmission(true);
-                    }}
-                  >
-                    Request for admission
-                  </button>
-                  <button
-                    className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
-                    onClick={() => {
-                      setSoapNoteEntry(true);
-                      setAdvanceCheckUp(false);
-                    }}
-                  >
-                    + Add new SOAP Note
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
-                    onClick={() => {
-                      setTransferRequest(true);
-                    }}
-                  >
-                    Transfer to another ward
-                  </button>
-                  <button
-                    className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
-                    onClick={() => {
-                      setDischargePatient(true);
-                      setSelectedDischargePatient(selected);
-                      //   setSeePatientDetails(false);
-                    }}
-                  >
-                    Discharge Patient
-                  </button>
-                </>
-              )}
-            </div>
+            {advanceCheckUpSource === "discharged" ? (
+              <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
+                <button
+                  className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                  onClick={() => setDischargedView("discharge-summary")}
+                >
+                  View discharge summary
+                </button>
+                <button
+                  className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                  onClick={() => setDischargedView("soap-history")}
+                >
+                  View soap note history
+                </button>
+              </div>
+            ) : (
+              !selected.discharge_date && (
+              <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
+                {advanceCheckUpSource === "outpatient" ? (
+                  <>
+                    <button
+                      className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                      onClick={() => {
+                        setRequestAdmission(true);
+                      }}
+                    >
+                      Request for admission
+                    </button>
+                    <button
+                      className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
+                      onClick={() => {
+                        setSoapNoteEntry(true);
+                        setAdvanceCheckUp(false);
+                      }}
+                    >
+                      + Add new SOAP Note
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                      onClick={() => {
+                        setTransferRequest(true);
+                      }}
+                    >
+                      Transfer to another ward
+                    </button>
+                    <button
+                      className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
+                      onClick={() => {
+                        setDischargePatient(true);
+                        setSelectedDischargePatient(selected);
+                        //   setSeePatientDetails(false);
+                      }}
+                    >
+                      Discharge Patient
+                    </button>
+                  </>
+                )}
+              </div>
+              )
             )}
           </div>
           {!selected.discharge_date && (
@@ -120,16 +155,11 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                 selected={selected}
                 setAdvanceCheckUp={setAdvanceCheckUp}
                 advanceCheckUpSource={advanceCheckUpSource}
+                dischargedView={dischargedView}
+                setDischargedView={setDischargedView}
               />
             )}
           </div>
-          {dischargePatient && (
-            <AfterDischargeSummary
-              selectedDischargePatient={selectedDischargePatient}
-              setDischargePatient={setDischargePatient}
-            />
-          )}
-
           {transferRequest && (
             <TransferToAnotherWard
               setRequestAdmission={setTransferRequest}
@@ -172,7 +202,16 @@ const Hospital_Doctors_Patients_Dashboard = () => {
           </div>
           <div className="bg-white my-5 border rounded-lg p-5">
             <TabComponent
-              tabs={getTabs(advanceCheckUp, setAdvanceCheckUp, setSelected, setAdvanceCheckUpSource)}
+              tabs={getTabs(
+                advanceCheckUp,
+                setAdvanceCheckUp,
+                setSelected,
+                setAdvanceCheckUpSource,
+                (patient) => {
+                  setDischargePatient(true);
+                  setSelectedDischargePatient(patient);
+                },
+              )}
             />
           </div>
         </>
