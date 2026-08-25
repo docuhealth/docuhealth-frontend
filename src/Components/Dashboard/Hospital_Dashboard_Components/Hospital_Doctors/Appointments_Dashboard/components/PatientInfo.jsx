@@ -18,6 +18,7 @@ import PatientInfoCard from "../../../../../ui/PatientInfoCard";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import ClinicalSummaryCard from "../../../../../ui/ClinicalSummaryCard";
 import OutpatientDischargeSummary from "../../Patient_Mgt_Dashboard/OutpatientDischargeSummary";
+import Select from "../../../../../ui/Select";
 
 const DUMMY_PATIENT_INFO = {
   patient_info: {
@@ -447,24 +448,13 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
             </div>
 
             {/* Category */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm text-docuhealth-dark font-medium">Category</label>
-              <div className="relative">
-                <select
-                  value={orderForm.category}
-                  onChange={(e) => setOrderForm({ ...orderForm, category: e.target.value, test_type: [] })}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-docuhealth-primary transition-colors appearance-none"
-                >
-                  <option value="" disabled>Select category</option>
-                  {categories.map((cat) => (
-                    <option key={cat.sqid || cat.id} value={cat.sqid || cat.id}>{cat.name}</option>
-                  ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-400">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                </div>
-              </div>
-            </div>
+            <Select
+              label="Category"
+              value={orderForm.category}
+              onChange={(value) => setOrderForm({ ...orderForm, category: value, test_type: [] })}
+              options={categories.map((cat) => ({ value: String(cat.sqid || cat.id), label: cat.name }))}
+              placeholder="Select category"
+            />
 
             {/* Test Type */}
             <div className="flex flex-col gap-1.5">

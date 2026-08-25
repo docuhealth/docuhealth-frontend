@@ -27,35 +27,16 @@ import PatientInfoCard from "../../../../../ui/PatientInfoCard";
 import GeneralPatientInfoForm from "../../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import ClinicalSummaryCard from "../../../../../ui/ClinicalSummaryCard";
+import Input from "../../../../../ui/Input";
 
 const PatientInfo = ({ patientFullInfo }) => {
   console.log(patientFullInfo);
   return (
     <>
       <GeneralPatientInfoForm patient={patientFullInfo?.patient_info}>
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Assigned doctor
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value="NIL"
-            />
-          </div>
+          <Input label="Assigned doctor" readOnly value="NIL" />
 
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1 ">
-              Date of last visit
-            </p>
-            <input
-              type="text"
-              readOnly
-              className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-              value="NIL"
-            />
-          </div>
+          <Input label="Date of last visit" readOnly value="NIL" />
       </GeneralPatientInfoForm>
 
       <VitalSignsCard

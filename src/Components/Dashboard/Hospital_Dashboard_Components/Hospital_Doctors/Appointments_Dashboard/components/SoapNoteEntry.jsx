@@ -8,6 +8,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Modal from "../../../../../ui/Modal";
 import Button from "../../../../../ui/Button";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
+import Input from "../../../../../ui/Input";
+import Select from "../../../../../ui/Select";
 
 
 const NoteSection = ({
@@ -45,13 +47,13 @@ const NoteSection = ({
 
     {activeInput === field ? (
       <div className="flex gap-2">
-        <input
+        <Input
           autoFocus
-          type="text"
           value={inputs[field]}
           onChange={(e) => setInputs({ ...inputs, [field]: e.target.value })}
           placeholder={placeholder}
-          className="flex-1 border rounded p-2 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none"
+          containerClassName="flex-1"
+          className="text-[12px]"
         />
         <button
           type="button"
@@ -836,149 +838,44 @@ useEffect(() => {
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
               <p className="font-medium text-docuhealth-dark">Follow up / Next appointment (compulsory)</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mt-3 gap-3">
-                <div className="">
-                  <label className="block text-[12px] pb-1">Day</label>
-                  <div className="relative">
-                    <select
-                      value={selectedDay}
-                      onChange={(e) => setSelectedDay(e.target.value)}
-                      className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-8"
-                    >
-                      {[...Array(31)].map((_, i) => (
-                        <option key={i} value={i + 1}>
-                          {i + 1}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                      <svg
-                        className="w-3 h-3 text-gray-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-                <div className="">
-                  <label className="block text-[12px] pb-1">Month</label>
-                  <div className="relative">
-                    <select
-                      value={selectedMonth}
-                      onChange={(e) => setSelectedMonth(e.target.value)}
-                      className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-8"
-                    >
-                      <option value="January">
-                        January
-                      </option>
-                      <option value="February">February</option>
-                      <option value="March">March</option>
-                      <option value="April">April</option>
-                      <option value="May">May</option>
-                      <option value="June">June</option>
-                      <option value="July">July</option>
-                      <option value="August">August</option>
-                      <option value="September">September</option>
-                      <option value="October">October</option>
-                      <option value="November">November</option>
-                      <option value="December">December</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                      <svg
-                        className="w-3 h-3 text-gray-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-                <div className="">
-                  <label className="block text-[12px] pb-1">Year</label>
-                  <div className="relative">
-                    <select
-                      value={selectedYear}
-                      onChange={(e) => setSelectedYear(e.target.value)}
-                      className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-8"
-                    >
-                      <option value="2024">2024</option>
-                      <option value="2025">2025</option>
-                      <option value="2026">2026</option>
-                      <option value="2027">2027</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                      <svg
-                        className="w-3 h-3 text-gray-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-                <div className="">
-                  <label className="block text-[12px] pb-1">Select time</label>
-                  <div className="relative">
-                    <select
-                      value={selectedTime}
-                      onChange={(e) => setSelectedTime(e.target.value)}
-                      className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-8"
-                    >
-                      <option value="08:00">
-                        08:00 AM
-                      </option>
-                      <option value="09:00">09:00 AM</option>
-                      <option value="10:00">10:00 AM</option>
-                      <option value="11:00">11:00 AM</option>
-                      <option value="12:00">12:00 PM</option>
-                      <option value="13:00">01:00 PM</option>
-                      <option value="14:00">02:00 PM</option>
-                      <option value="15:00">03:00 PM</option>
-                      <option value="16:00">04:00 PM</option>
-                      <option value="17:00">05:00 PM</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                      <svg
-                        className="w-3 h-3 text-gray-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
+                <Select
+                  label="Day"
+                  value={String(selectedDay)}
+                  onChange={(value) => setSelectedDay(value)}
+                  options={[...Array(31)].map((_, i) => ({ value: String(i + 1), label: String(i + 1) }))}
+                />
+                <Select
+                  label="Month"
+                  value={selectedMonth}
+                  onChange={(value) => setSelectedMonth(value)}
+                  options={[
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December",
+                  ].map((month) => ({ value: month, label: month }))}
+                />
+                <Select
+                  label="Year"
+                  value={String(selectedYear)}
+                  onChange={(value) => setSelectedYear(value)}
+                  options={["2024", "2025", "2026", "2027"].map((year) => ({ value: year, label: year }))}
+                />
+                <Select
+                  label="Select time"
+                  value={selectedTime}
+                  onChange={(value) => setSelectedTime(value)}
+                  options={[
+                    { value: "08:00", label: "08:00 AM" },
+                    { value: "09:00", label: "09:00 AM" },
+                    { value: "10:00", label: "10:00 AM" },
+                    { value: "11:00", label: "11:00 AM" },
+                    { value: "12:00", label: "12:00 PM" },
+                    { value: "13:00", label: "01:00 PM" },
+                    { value: "14:00", label: "02:00 PM" },
+                    { value: "15:00", label: "03:00 PM" },
+                    { value: "16:00", label: "04:00 PM" },
+                    { value: "17:00", label: "05:00 PM" },
+                  ]}
+                />
                 <div className="relative col-span-1 sm:col-span-2 lg:col-span-4">
                   <label className="block text-[12px] ">Note</label>
                   <textarea
@@ -998,59 +895,26 @@ useEffect(() => {
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
               <p className="font-medium">Referral (optional) </p>
               <div className="mt-3">
-                <label className="block text-[12px] pb-1">
-                  Refer to (DocuHealth Hospital) :
-                </label>
-                <div className="relative">
-                  <select
-                    name="referred_docuhealth_hosp" // Matches key in state
-                    value={soapNoteData.referred_docuhealth_hosp}
-                    onChange={handleTextChange}
-                    className="w-full border rounded p-2 text-[12px] focus:outline-none appearance-none bg-white pr-8"
-                  >
-                    {!soapNoteData.referred_docuhealth_hosp && (
-                      <option value="">Select Hospital</option>
-                    )}
-                    {hospitals &&
-                      hospitals
-                        .filter(
-                          (hospital) =>
-                            hospital.name && hospital.name.trim() !== "",
-                        )
-                        .map((hospital, idx) => (
-                          <option key={idx} value={hospital.hin}>
-                            {hospital.name}
-                          </option>
-                        ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                    <svg
-                      className="w-3 h-3 text-gray-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                </div>
+                <Select
+                  label="Refer to (DocuHealth Hospital) :"
+                  value={soapNoteData.referred_docuhealth_hosp}
+                  onChange={(value) =>
+                    setSoapNoteData((prev) => ({ ...prev, referred_docuhealth_hosp: value }))
+                  }
+                  options={(hospitals || [])
+                    .filter((hospital) => hospital.name && hospital.name.trim() !== "")
+                    .map((hospital) => ({ value: hospital.hin, label: hospital.name }))}
+                  placeholder="Select Hospital"
+                />
               </div>
               <div className="relative mt-2">
-                <label className="block text-[12px] pb-1">
-                  Other hospitals outside Docuhealth
-                </label>
-                <input
+                <Input
+                  label="Other hospitals outside Docuhealth"
                   name="referred_hosp" // Matches key in state
                   placeholder="Enter the hospital details (including Name and Address)..."
                   value={soapNoteData.referred_hosp}
                   onChange={handleTextChange}
-                  className="w-full border rounded p-2 text-[12px] focus:outline-none"
+                  className="text-[12px]"
                 />
               </div>
             </div>

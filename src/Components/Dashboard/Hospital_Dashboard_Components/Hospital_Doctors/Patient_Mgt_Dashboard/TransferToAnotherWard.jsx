@@ -5,6 +5,7 @@ import { HosWardContext } from "../../../../../context/HospitalContext/HosWardCo
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Modal from "../../../../ui/Modal";
 import Button from "../../../../ui/Button";
+import Select from "../../../../ui/Select";
 
 const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) => {
 
@@ -79,36 +80,22 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
         </p>
       </div>
 
-      <select
+      <Select
         value={form.new_ward}
-        onChange={(e) => handleChange("new_ward", e.target.value)}
-        className="border p-2 rounded-lg outline-none text-sm w-full"
-      >
-        <option value="">Assign to ward</option>
-        {wardOptions.map((w) => (
-          <option key={w.sqid || w.id} value={w.sqid || w.id}>
-            {w.name} ward
-          </option>
-        ))}
-      </select>
+        onChange={(value) => handleChange("new_ward", value)}
+        options={wardOptions.map((w) => ({ value: String(w.sqid || w.id), label: `${w.name} ward` }))}
+        placeholder="Assign to ward"
+      />
 
       {form.new_ward && (
-        <select
+        <Select
           value={form.new_bed}
-          onChange={(e) => handleChange("new_bed", e.target.value)}
-          className="border p-2 rounded-lg outline-none text-sm w-full mt-3"
-        >
-          <option value="">Select available bed</option>
-          {availableBeds.length > 0 ? (
-            availableBeds.map((b) => (
-              <option key={b.sqid || b.id} value={b.sqid || b.id}>
-                Bed {b.bed_number}
-              </option>
-            ))
-          ) : (
-            <option disabled>No available beds</option>
-          )}
-        </select>
+          onChange={(value) => handleChange("new_bed", value)}
+          options={availableBeds.map((b) => ({ value: String(b.sqid || b.id), label: `Bed ${b.bed_number}` }))}
+          placeholder={availableBeds.length > 0 ? "Select available bed" : "No available beds"}
+          disabled={availableBeds.length === 0}
+          className="mt-3"
+        />
       )}
 
       <div className="mt-6">

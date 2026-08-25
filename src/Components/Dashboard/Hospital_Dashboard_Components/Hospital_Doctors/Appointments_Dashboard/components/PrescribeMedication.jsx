@@ -6,6 +6,7 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import Input from "../../../../../ui/Input";
 
 const NoteSection = ({
   title,
@@ -42,13 +43,13 @@ const NoteSection = ({
 
     {activeInput === field ? (
       <div className="flex gap-2 mt-4">
-        <input
+        <Input
           autoFocus
-          type="text"
           value={inputs[field]}
           onChange={(e) => setInputs({ ...inputs, [field]: e.target.value })}
           placeholder={placeholder}
-          className="flex-1 border rounded p-2 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none"
+          containerClassName="flex-1"
+          className="text-[12px]"
         />
         <button
           type="button"

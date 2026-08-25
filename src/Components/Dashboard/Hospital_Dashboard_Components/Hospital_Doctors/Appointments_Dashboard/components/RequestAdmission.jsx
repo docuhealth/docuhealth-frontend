@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 import { useMutation } from "@tanstack/react-query";
 import Modal from "../../../../../ui/Modal";
 import Button from "../../../../../ui/Button";
+import Select from "../../../../../ui/Select";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 
 const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
@@ -81,36 +82,22 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
         </p>
       </div>
 
-      <select
+      <Select
         value={form.ward}
-        onChange={(e) => handleChange("ward", e.target.value)}
-        className="border p-2 rounded-lg outline-none text-sm w-full"
-      >
-        <option value="">Assign to ward</option>
-        {wardOptions.map((w) => (
-          <option key={w.sqid || w.id} value={w.sqid || w.id}>
-            {w.name} ward
-          </option>
-        ))}
-      </select>
+        onChange={(value) => handleChange("ward", value)}
+        options={wardOptions.map((w) => ({ value: String(w.sqid || w.id), label: `${w.name} ward` }))}
+        placeholder="Assign to ward"
+      />
 
       {form.ward && (
-        <select
+        <Select
           value={form.bed}
-          onChange={(e) => handleChange("bed", e.target.value)}
-          className="border p-2 rounded-lg outline-none text-sm w-full mt-3"
-        >
-          <option value="">Select available bed</option>
-          {availableBeds.length > 0 ? (
-            availableBeds.map((b) => (
-              <option key={b.sqid || b.id} value={b.sqid || b.id}>
-                Bed {b.bed_number}
-              </option>
-            ))
-          ) : (
-            <option disabled>No available beds</option>
-          )}
-        </select>
+          onChange={(value) => handleChange("bed", value)}
+          options={availableBeds.map((b) => ({ value: String(b.sqid || b.id), label: `Bed ${b.bed_number}` }))}
+          placeholder={availableBeds.length > 0 ? "Select available bed" : "No available beds"}
+          disabled={availableBeds.length === 0}
+          className="mt-3"
+        />
       )}
 
       <div className="mt-6">

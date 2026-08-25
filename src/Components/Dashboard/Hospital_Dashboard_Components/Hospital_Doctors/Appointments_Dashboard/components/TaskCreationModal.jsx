@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { ClipboardList, ChevronDown } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import toast from "react-hot-toast";
 import Input from "../../../../../ui/Input";
+import Select from "../../../../../ui/Select";
 
 export const DEFAULT_FREQUENCY_OPTIONS = [
   "Q1H (Every hour)",
@@ -35,8 +36,6 @@ const DEFAULT_START_TIME = "11:00";
 
 export const FIELD_LABEL_CLASS = "block text-sm font-medium text-docuhealth-primary mb-2";
 export const FIELD_BOX_CLASS = "border border-gray-200 rounded-2xl p-5";
-export const SELECT_CLASS =
-  "w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none focus:border-docuhealth-primary appearance-none cursor-pointer";
 
 /**
  * Shared "create a task" modal shell for the OtherMedicalServicesFab
@@ -87,6 +86,8 @@ const TaskCreationModal = ({
 
   const updateField = (field) => (e) =>
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+  const updateValue = (field) => (value) =>
+    setFormData((prev) => ({ ...prev, [field]: value }));
 
   const isFormFilled =
     (topSection ? isTopSectionValid : !!formData.primary) &&
@@ -161,20 +162,11 @@ const TaskCreationModal = ({
           ) : (
             <div className={FIELD_BOX_CLASS}>
               <label className={FIELD_LABEL_CLASS}>{primaryLabel}</label>
-              <div className="relative">
-                <select
-                  className={SELECT_CLASS}
-                  value={formData.primary}
-                  onChange={updateField("primary")}
-                >
-                  {primaryOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="w-4 h-4 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
+              <Select
+                value={formData.primary}
+                onChange={updateValue("primary")}
+                options={primaryOptions.map((option) => ({ value: option, label: option }))}
+              />
             </div>
           )}
 
@@ -182,38 +174,20 @@ const TaskCreationModal = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className={FIELD_BOX_CLASS}>
                 <label className={FIELD_LABEL_CLASS}>{frequencyLabel}</label>
-                <div className="relative">
-                  <select
-                    className={SELECT_CLASS}
-                    value={formData.frequency}
-                    onChange={updateField("frequency")}
-                  >
-                    {frequencyOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="w-4 h-4 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
+                <Select
+                  value={formData.frequency}
+                  onChange={updateValue("frequency")}
+                  options={frequencyOptions.map((option) => ({ value: option, label: option }))}
+                />
               </div>
 
               <div className={FIELD_BOX_CLASS}>
                 <label className={FIELD_LABEL_CLASS}>Duration</label>
-                <div className="relative">
-                  <select
-                    className={SELECT_CLASS}
-                    value={formData.duration}
-                    onChange={updateField("duration")}
-                  >
-                    {durationOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="w-4 h-4 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
+                <Select
+                  value={formData.duration}
+                  onChange={updateValue("duration")}
+                  options={durationOptions.map((option) => ({ value: option, label: option }))}
+                />
               </div>
             </div>
           )}
@@ -230,20 +204,11 @@ const TaskCreationModal = ({
 
             <div className={FIELD_BOX_CLASS}>
               <label className={FIELD_LABEL_CLASS}>Level of priority</label>
-              <div className="relative">
-                <select
-                  className={SELECT_CLASS}
-                  value={formData.priority}
-                  onChange={updateField("priority")}
-                >
-                  {priorityOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="w-4 h-4 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
+              <Select
+                value={formData.priority}
+                onChange={updateValue("priority")}
+                options={priorityOptions.map((option) => ({ value: option, label: option }))}
+              />
             </div>
           </div>
 

@@ -5,10 +5,9 @@ import Pagination from "../../../Patient_Dashboard_Components/Pagination/Paginat
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { DoctorsAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
-import AfterDischargeSummary from "./AfterDischargeSummary";
 import SearchBar from "../../../../SearchBar/SearchBar";
 
-const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSource }) => {
+const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSource, onDischargePatient }) => {
   const {
     admittedPatients,
     loading,
@@ -22,10 +21,6 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
     isRefreshing,
   } = useContext(DoctorsAdmittedPatientMGTContext);
   const [selectedPatient, setSelectedPatient] = useState(null);
-
-  const [dischargePatient, setDischargePatient] = useState(false);
-  const [selectedDischargePatient, setSelectedDischargePatient] =
-    useState(null);
 
   const sortedAdmittedPatients = useMemo(() => {
     return [...admittedPatients].sort((a, b) => {
@@ -256,25 +251,13 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
             </button>
             <button
               className="text-center mt-3 py-2 border border-docuhealth-dark text-docuhealth-dark w-full rounded-full cursor-pointer"
-              onClick={() => {
-                setDischargePatient(!dischargePatient);
-                setSelectedDischargePatient(admittedPatient);
-              }}
+              onClick={() => onDischargePatient(admittedPatient)}
             >
               Discharge Patient
             </button>
           </div>
         ))}
       </div>
-
-      {dischargePatient && (
-        <>
-          <AfterDischargeSummary
-            selectedDischargePatient={selectedDischargePatient}
-            setDischargePatient={setDischargePatient}
-          />
-        </>
-      )}
       </>)}
 
       <Pagination
@@ -725,7 +708,7 @@ const DischargedPatientsWrapper = (props) => {
   );
 };
 
-const getTabs = (advanceCheckUp, setAdvanceCheckUp, setSelected, setAdvanceCheckUpSource) => [
+const getTabs = (advanceCheckUp, setAdvanceCheckUp, setSelected, setAdvanceCheckUpSource, onDischargePatient) => [
   {
     title: "Admitted Patients",
     status: "inpatient",
@@ -735,6 +718,7 @@ const getTabs = (advanceCheckUp, setAdvanceCheckUp, setSelected, setAdvanceCheck
         setAdvanceCheckUp={setAdvanceCheckUp}
         setSelected={setSelected}
         setAdvanceCheckUpSource={setAdvanceCheckUpSource}
+        onDischargePatient={onDischargePatient}
       />
     ),
   },
@@ -757,6 +741,7 @@ const getTabs = (advanceCheckUp, setAdvanceCheckUp, setSelected, setAdvanceCheck
     defaultStatus: "inpatient_discharge",
     content: <DischargedPatientsWrapper
       advanceCheckUp={advanceCheckUp}
+      setAdvanceCheckUp={setAdvanceCheckUp}
       setSelected={setSelected}
       setAdvanceCheckUpSource={setAdvanceCheckUpSource}
     />,
