@@ -33,7 +33,7 @@ const DashboardMobileSidebar = ({
         onClick={() => setOpenMobileSidebar(false)}
       />
       <div
-        className={`w-64 h-screen flex flex-col fixed top-0 left-0 z-50 bg-white transform transition-transform duration-300 ease-in-out
+        className={`w-64 h-dvh flex flex-col fixed top-0 left-0 z-50 bg-white transform transition-transform duration-300 ease-in-out
               ${openMobileSidebar ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="p-4 flex justify-between items-center shrink-0">
@@ -72,7 +72,16 @@ const DashboardMobileSidebar = ({
           </div>
         </div>
         
-        <nav className="flex-1 text-sm overflow-y-auto">
+        {/* nav + bottom block share ONE scroll container instead of nav scrolling
+            internally while the bottom block is pinned via flex-grow math. Pinning
+            it exactly to the bottom depends on the fixed drawer's h-dvh height
+            being measured consistently, which mobile browsers don't always
+            guarantee as their toolbar shows/hides — when it's off, the pinned
+            block (Logout, Emergency Mode) ends up rendered past the visible edge
+            with no way to reach it. Scrolling the whole thing guarantees everything
+            stays reachable no matter how that height comes out. */}
+        <div className="flex-1 min-h-0 overflow-y-auto flex flex-col">
+        <nav className="text-sm">
           <ul>
             {navItems.map((item, index) => {
               const isActive = currentPath === item.path || (item.activePaths && item.activePaths.includes(currentPath));
@@ -118,7 +127,7 @@ const DashboardMobileSidebar = ({
           </ul>
         </nav>
 
-        <div className="text-sm border-t border-gray-100 pb-4 pt-2 shrink-0">
+        <div className="text-sm border-t border-gray-100 pb-4 pt-2 mt-auto shrink-0">
           <ul>
             {bottomNavItems.map((item, index) => {
               const isActive = currentPath === item.path || (item.activePaths && item.activePaths.includes(currentPath));
@@ -179,6 +188,7 @@ const DashboardMobileSidebar = ({
             </div>
           </ul>
           {customBottomContent}
+        </div>
         </div>
       </div>
     </>
