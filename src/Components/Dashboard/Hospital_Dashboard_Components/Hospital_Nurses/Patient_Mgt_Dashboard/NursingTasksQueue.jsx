@@ -14,7 +14,7 @@ const demoTasks = [
   },
   {
     id: 2,
-    status: "Completed",
+    status: "Pending",
     dateTime: "Aug 24, 2026 / 08:30 AM",
     task: "Check Blood Pressure",
     orderingDoctor: "Dr. Adams",
@@ -22,7 +22,7 @@ const demoTasks = [
   },
   {
     id: 3,
-    status: "In-progress",
+    status: "Pending",
     dateTime: "Aug 24, 2026 / 11:15 AM",
     task: "Check blood sugar level",
     orderingDoctor: "Dr. Clark",
@@ -35,6 +35,30 @@ const demoTasks = [
     task: "Monitor urine output",
     orderingDoctor: "Dr. Clark",
     type: "input_output_monitoring",
+  },
+  {
+    id: 5,
+    status: "Pending",
+    dateTime: "Aug 24, 2026 / 02:00 PM",
+    task: "Monitor for seizure events",
+    orderingDoctor: "Dr. Evans",
+    type: "seizure_event_monitoring",
+  },
+  {
+    id: 6,
+    status: "Pending",
+    dateTime: "Aug 24, 2026 / 04:30 PM",
+    task: "Lumbar Puncture",
+    orderingDoctor: "Dr. Bello",
+    type: "procedure_monitoring",
+  },
+  {
+    id: 7,
+    status: "Pending",
+    dateTime: "Aug 24, 2026 / 06:00 PM",
+    task: "Administer Normal Saline",
+    orderingDoctor: "Dr. Evans",
+    type: "iv_fluid_monitoring",
   }
 ];
 
@@ -188,6 +212,24 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
   const [showGlucoseRecord, setShowGlucoseRecord] = useState(false);
   const [showIORecord, setShowIORecord] = useState(false);
   const [showIOEntry, setShowIOEntry] = useState(false);
+  const [vitalsInfoModalOpen, setVitalsInfoModalOpen] = useState(false);
+  const [showVitalsEntry, setShowVitalsEntry] = useState(false);
+  const [showVitalsRecord, setShowVitalsRecord] = useState(false);
+  const [vitalsSubmitSuccessModalOpen, setVitalsSubmitSuccessModalOpen] = useState(false);
+  
+  const [seizureInfoModalOpen, setSeizureInfoModalOpen] = useState(false);
+  const [showSeizureEntry, setShowSeizureEntry] = useState(false);
+  const [showSeizureRecord, setShowSeizureRecord] = useState(false);
+  const [seizureSubmitSuccessModalOpen, setSeizureSubmitSuccessModalOpen] = useState(false);
+
+  const [showProcedureEntry, setShowProcedureEntry] = useState(false);
+  const [showProcedureRecord, setShowProcedureRecord] = useState(false);
+  const [procedureSubmitSuccessModalOpen, setProcedureSubmitSuccessModalOpen] = useState(false);
+
+  const [showIVFluidEntry, setShowIVFluidEntry] = useState(false);
+  const [showIVFluidRecord, setShowIVFluidRecord] = useState(false);
+  const [ivFluidSubmitSuccessModalOpen, setIvFluidSubmitSuccessModalOpen] = useState(false);
+
   const [selectedOutputType, setSelectedOutputType] = useState("Urine");
   const [isCalculatingIO, setIsCalculatingIO] = useState(false);
   const [ioCalculationModalOpen, setIoCalculationModalOpen] = useState(false);
@@ -195,6 +237,10 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
   const [tasksCurrentPage, setTasksCurrentPage] = useState(1);
   const [medsCurrentPage, setMedsCurrentPage] = useState(1);
   const [glucoseCurrentPage, setGlucoseCurrentPage] = useState(1);
+  const [vitalsCurrentPage, setVitalsCurrentPage] = useState(1);
+  const [seizureCurrentPage, setSeizureCurrentPage] = useState(1);
+  const [procedureCurrentPage, setProcedureCurrentPage] = useState(1);
+  const [ivFluidCurrentPage, setIvFluidCurrentPage] = useState(1);
 
   const demoGlucoseRecords = [
     { id: 1, date: "14/03/2026", time: "12 PM", reading: "12.2 mg/gl", context: "Post-meal", insulinStatus: "Not Given", status: "Pending" },
@@ -227,6 +273,50 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
     { id: 6, date: "14/03/2026", dueTime: "12 PM", intakeSource: "Oral", fluidFeed: "Water", intakeVolume: "250 ml", timeRec: "11:45 AM", intakeRoute: "Oral", outputType: "Urine", outputChar: "Clear yellow", outputVolume: "250ml", outputTimeRec: "11:40 AM", timeInterval: "0-4 hours", status: "Completed" },
     { id: 7, date: "14/03/2026", dueTime: "12 PM", intakeSource: "Oral", fluidFeed: "Water", intakeVolume: "250 ml", timeRec: "11:45 AM", intakeRoute: "Oral", outputType: "Urine", outputChar: "Clear yellow", outputVolume: "250ml", outputTimeRec: "11:40 AM", timeInterval: "0-4 hours", status: "Completed" },
     { id: 8, date: "14/03/2026", dueTime: "12 PM", intakeSource: "Oral", fluidFeed: "Water", intakeVolume: "250 ml", timeRec: "11:45 AM", intakeRoute: "Oral", outputType: "Urine", outputChar: "Clear yellow", outputVolume: "250ml", outputTimeRec: "11:40 AM", timeInterval: "0-4 hours", status: "Completed" },
+  ];
+
+  const demoVitalsRecords = [
+    { id: 1, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 2, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 3, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 4, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 5, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 6, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 7, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 8, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
+  ];
+
+  const demoSeizureRecords = [
+    { id: 1, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
+    { id: 2, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
+    { id: 3, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
+    { id: 4, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
+    { id: 5, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
+    { id: 6, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
+    { id: 7, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
+    { id: 8, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
+  ];
+
+  const demoProcedureRecords = [
+    { id: 1, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
+    { id: 2, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
+    { id: 3, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
+    { id: 4, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
+    { id: 5, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
+    { id: 6, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
+    { id: 7, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
+    { id: 8, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
+  ];
+
+  const demoIVFluidRecords = [
+    { id: 1, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
+    { id: 2, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
+    { id: 3, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
+    { id: 4, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
+    { id: 5, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
+    { id: 6, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
+    { id: 7, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
+    { id: 8, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
   ];
 
   const getMedStatusColor = (status) => {
@@ -294,7 +384,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
 
   return (
     <div className="text-[12px] my-4 text-left">
-      {!showMedicationRecord && !showGlucoseRecord && !showIOEntry && !showIORecord ? (
+      {!showMedicationRecord && !showGlucoseRecord && !showIOEntry && !showIORecord && !showVitalsEntry && !showVitalsRecord && !showSeizureEntry && !showSeizureRecord && !showProcedureEntry && !showProcedureRecord && !showIVFluidEntry && !showIVFluidRecord ? (
         <>
           <div className="flex justify-end mb-4 relative gap-2">
         <div className="relative" ref={filterDropdownRef}>
@@ -482,6 +572,66 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
                             Input and Output record
                           </button>
                         </>
+                      ) : task.type === 'vitals_monitoring' ? (
+                        <>
+                          <button 
+                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setVitalsInfoModalOpen(true); }}
+                          >
+                            Add new entry
+                          </button>
+                          <button 
+                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowVitalsRecord(true); }}
+                          >
+                            Vital Signs Record
+                          </button>
+                        </>
+                      ) : task.type === 'seizure_event_monitoring' ? (
+                        <>
+                          <button 
+                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowSeizureEntry(true); }}
+                          >
+                            Add new entry
+                          </button>
+                          <button 
+                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowSeizureRecord(true); }}
+                          >
+                            View seizure records
+                          </button>
+                        </>
+                      ) : task.type === 'procedure_monitoring' ? (
+                        <>
+                          <button 
+                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowProcedureEntry(true); }}
+                          >
+                            Add new entry
+                          </button>
+                          <button 
+                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowProcedureRecord(true); }}
+                          >
+                            Procedure record
+                          </button>
+                        </>
+                      ) : task.type === 'iv_fluid_monitoring' ? (
+                        <>
+                          <button 
+                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIVFluidEntry(true); }}
+                          >
+                            Add new entry
+                          </button>
+                          <button 
+                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIVFluidRecord(true); }}
+                          >
+                            IV Fluid record
+                          </button>
+                        </>
                       ) : (
                         <button 
                           className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap" 
@@ -563,9 +713,69 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
                             Input and Output record
                           </button>
                         </>
+                      ) : task.type === 'vitals_monitoring' ? (
+                        <>
+                          <button 
+                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                            onClick={() => { setOpenPopover(null); setVitalsInfoModalOpen(true); }}
+                          >
+                            Add new entry
+                          </button>
+                          <button 
+                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                            onClick={() => { setOpenPopover(null); setShowVitalsRecord(true); }}
+                          >
+                            Vital Signs Record
+                          </button>
+                        </>
+                      ) : task.type === 'seizure_event_monitoring' ? (
+                        <>
+                          <button 
+                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                            onClick={() => { setOpenPopover(null); setShowSeizureEntry(true); }}
+                          >
+                            Add new entry
+                          </button>
+                          <button 
+                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                            onClick={() => { setOpenPopover(null); setShowSeizureRecord(true); }}
+                          >
+                            View seizure records
+                          </button>
+                        </>
+                      ) : task.type === 'procedure_monitoring' ? (
+                        <>
+                          <button 
+                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                            onClick={() => { setOpenPopover(null); setShowProcedureEntry(true); }}
+                          >
+                            Add new entry
+                          </button>
+                          <button 
+                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                            onClick={() => { setOpenPopover(null); setShowProcedureRecord(true); }}
+                          >
+                            Procedure record
+                          </button>
+                        </>
+                      ) : task.type === 'iv_fluid_monitoring' ? (
+                        <>
+                          <button 
+                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                            onClick={() => { setOpenPopover(null); setShowIVFluidEntry(true); }}
+                          >
+                            Add new entry
+                          </button>
+                          <button 
+                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                            onClick={() => { setOpenPopover(null); setShowIVFluidRecord(true); }}
+                          >
+                            IV Fluid record
+                          </button>
+                        </>
                       ) : (
                         <button 
-                          className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" 
+                          className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
                           onClick={() => { setOpenPopover(null); setShowMedicationRecord(true); }}
                         >
                           View medication record
@@ -619,8 +829,8 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
       <Pagination2 count={20} currentPage={tasksCurrentPage} totalPages={8} setCurrentPage={setTasksCurrentPage} />
         </>
       ) : showMedicationRecord ? (
-        <>
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-white rounded-xl border border-gray-100 p-4 lg:p-6 mb-6">
+          <div className="mb-6 flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
             <div className="flex items-center gap-3">
               <button 
                   onClick={() => setShowMedicationRecord(false)}
@@ -628,34 +838,34 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
               >
                   <ArrowLeft className="w-4 h-4" /> Back to tasks
               </button>
-              <h2 className="text-[16px] font-bold text-gray-800">Patient's drug chart</h2>
             </div>
           </div>
+          <h2 className="text-[16px] font-bold text-gray-800 mb-6">Patient's drug chart</h2>
 
           {/* Desktop Table */}
-          <div className="hidden lg:block bg-white border border-gray-200 rounded-2xl overflow-hidden mb-4 overflow-x-auto">
+          <div className="hidden lg:block overflow-x-auto">
              <table className="w-full text-left border-collapse min-w-[700px]">
                <thead>
-                 <tr className="border-b border-gray-200 bg-white">
-                   <th className="py-5 px-6 font-bold text-gray-700 w-[15%]">Date</th>
-                   <th className="py-5 px-6 font-bold text-gray-700 w-[10%]">Due Time</th>
-                   <th className="py-5 px-6 font-bold text-gray-700 w-[20%]">Drug name</th>
-                   <th className="py-5 px-6 font-bold text-gray-700 w-[15%]">Dosage</th>
-                   <th className="py-5 px-6 font-bold text-gray-700 w-[10%]">Route</th>
-                   <th className="py-5 px-6 font-bold text-gray-700 w-[20%]">Frequency</th>
-                   <th className="py-5 px-6 font-bold text-gray-700 w-[10%]">Status</th>
+                 <tr className="border border-gray-100 rounded-full bg-white text-[13px]">
+                   <th className="py-5 px-4 font-bold text-gray-700 w-[15%] rounded-l-full">Date</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[10%]">Due Time</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[20%]">Drug name</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[15%]">Dosage</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[10%]">Route</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[20%]">Frequency</th>
+                   <th className="py-5 px-4 font-bold text-gray-700 w-[10%] rounded-r-full">Status</th>
                  </tr>
                </thead>
                <tbody>
                  {demoMedRecords.map((med) => (
                    <tr key={med.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
-                     <td className="py-4 px-6 flex items-center gap-2 text-gray-600"><Calendar className="w-3.5 h-3.5" /> {med.date}</td>
-                     <td className="py-4 px-6 text-gray-600">{med.time}</td>
-                     <td className="py-4 px-6 font-semibold text-gray-800">{med.drug}</td>
-                     <td className="py-4 px-6 text-gray-600">{med.dosage}</td>
-                     <td className="py-4 px-6 text-gray-600">{med.route}</td>
-                     <td className="py-4 px-6 text-gray-600">{med.freq}</td>
-                     <td className={`py-4 px-6 font-bold ${getMedStatusColor(med.status)}`}>{med.status}</td>
+                     <td className="py-6 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {med.date}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{med.time}</td>
+                     <td className="py-6 px-3 font-semibold text-gray-800 whitespace-nowrap">{med.drug}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{med.dosage}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{med.route}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{med.freq}</td>
+                     <td className={`py-6 px-4 font-bold ${getMedStatusColor(med.status)} whitespace-nowrap`}>{med.status}</td>
                    </tr>
                  ))}
                </tbody>
@@ -683,10 +893,10 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
              </div>
 
           <Pagination2 count={20} currentPage={medsCurrentPage} totalPages={8} setCurrentPage={setMedsCurrentPage} />
-        </>
+        </div>
       ) : showGlucoseRecord ? (
-        <>
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-white rounded-xl border border-gray-100 p-4 lg:p-6 mb-6">
+          <div className="mb-6 flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
             <div className="flex items-center gap-3">
               <button 
                   onClick={() => setShowGlucoseRecord(false)}
@@ -694,32 +904,32 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
               >
                   <ArrowLeft className="w-4 h-4" /> Back to tasks
               </button>
-              <h2 className="text-[16px] font-bold text-gray-800">Patient's glucose chart</h2>
             </div>
           </div>
+          <h2 className="text-[16px] font-bold text-gray-800 mb-6">Patient's glucose chart</h2>
 
           {/* Desktop Table */}
-          <div className="hidden lg:block bg-white border border-gray-200 rounded-2xl overflow-hidden mb-4 overflow-x-auto">
+          <div className="hidden lg:block overflow-x-auto">
              <table className="w-full text-left border-collapse min-w-[700px]">
                <thead>
-                 <tr className="border-b border-gray-200 bg-white">
-                   <th className="py-5 px-6 font-bold text-gray-700 w-[15%]">Date</th>
-                   <th className="py-5 px-6 font-bold text-gray-700 w-[15%]">Due Time</th>
-                   <th className="py-5 px-6 font-bold text-gray-700 w-[20%]">Reading</th>
-                   <th className="py-5 px-6 font-bold text-gray-700 w-[15%]">Context</th>
-                   <th className="py-5 px-6 font-bold text-gray-700 w-[20%]">Insulin status</th>
-                   <th className="py-5 px-6 font-bold text-gray-700 w-[15%]">Status</th>
+                 <tr className="border border-gray-100 rounded-full bg-white text-[13px]">
+                   <th className="py-5 px-4 font-bold text-gray-700 w-[15%] rounded-l-full">Date</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[15%]">Due Time</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[20%]">Reading</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[15%]">Context</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[20%]">Insulin status</th>
+                   <th className="py-5 px-4 font-bold text-gray-700 w-[15%] rounded-r-full">Status</th>
                  </tr>
                </thead>
                <tbody>
                  {demoGlucoseRecords.map((rec) => (
                    <tr key={rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
-                     <td className="py-4 px-6 flex items-center gap-2 text-gray-600"><Calendar className="w-3.5 h-3.5" /> {rec.date}</td>
-                     <td className="py-4 px-6 text-gray-600">{rec.time}</td>
-                     <td className="py-4 px-6 font-semibold text-gray-800">{rec.reading}</td>
-                     <td className="py-4 px-6 text-gray-600">{rec.context}</td>
-                     <td className="py-4 px-6"><span className={getInsulinStatusStyle(rec.insulinStatus)}>{rec.insulinStatus}</span></td>
-                     <td className={`py-4 px-6 font-bold ${getMedStatusColor(rec.status)}`}>{rec.status}</td>
+                     <td className="py-6 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {rec.date}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.time}</td>
+                     <td className="py-6 px-3 font-semibold text-gray-800 whitespace-nowrap">{rec.reading}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.context}</td>
+                     <td className="py-6 px-3 whitespace-nowrap"><span className={getInsulinStatusStyle(rec.insulinStatus)}>{rec.insulinStatus}</span></td>
+                     <td className={`py-6 px-4 font-bold ${getMedStatusColor(rec.status)} whitespace-nowrap`}>{rec.status}</td>
                    </tr>
                  ))}
                </tbody>
@@ -746,10 +956,10 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
              </div>
 
           <Pagination2 count={20} currentPage={glucoseCurrentPage} totalPages={8} setCurrentPage={setGlucoseCurrentPage} />
-        </>
+        </div>
       ) : showIORecord ? (
-        <>
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-white rounded-xl border border-gray-100 p-4 lg:p-6 mb-6">
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
             <div className="flex items-center gap-3">
               <button 
                   onClick={() => setShowIORecord(false)}
@@ -757,7 +967,6 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
               >
                   <ArrowLeft className="w-4 h-4" /> Back to tasks
               </button>
-              <h2 className="text-[16px] font-bold text-gray-800">Intake and Output chart</h2>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mt-4 sm:mt-0">
               <button 
@@ -783,13 +992,14 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
               </button>
             </div>
           </div>
+          <h2 className="text-[16px] font-bold text-gray-800 mb-6">Intake and Output chart</h2>
 
           {/* Desktop Table */}
-          <div className="hidden lg:block bg-white border border-gray-200 rounded-2xl overflow-hidden mb-4 overflow-x-auto">
+          <div className="hidden lg:block overflow-x-auto">
              <table className="w-full text-left border-collapse min-w-[1100px]">
                <thead>
-                 <tr className="border-b border-gray-200 bg-white text-[13px]">
-                   <th className="py-5 px-4 font-bold text-gray-700 w-[12%]">Date</th>
+                 <tr className="border border-gray-100 rounded-full bg-white text-[13px]">
+                   <th className="py-5 px-4 font-bold text-gray-700 w-[12%] rounded-l-full">Date</th>
                    <th className="py-5 px-3 font-bold text-gray-700">Due Time</th>
                    <th className="py-5 px-3 font-bold text-gray-700">Intake source</th>
                    <th className="py-5 px-3 font-bold text-gray-700">Fluid/feed</th>
@@ -801,25 +1011,25 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
                    <th className="py-5 px-3 font-bold text-gray-700">Output volume</th>
                    <th className="py-5 px-3 font-bold text-gray-700">Time rec.</th>
                    <th className="py-5 px-3 font-bold text-gray-700">Time (4hr interval)</th>
-                   <th className="py-5 px-3 font-bold text-gray-700">Status</th>
+                   <th className="py-5 px-4 font-bold text-gray-700 rounded-r-full">Status</th>
                  </tr>
                </thead>
                <tbody>
                  {demoIORecords.map((rec) => (
                    <tr key={rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
-                     <td className="py-4 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {rec.date}</td>
-                     <td className="py-4 px-3 text-gray-600 whitespace-nowrap">{rec.dueTime}</td>
-                     <td className="py-4 px-3 text-gray-600">{rec.intakeSource}</td>
-                     <td className="py-4 px-3 text-gray-600">{rec.fluidFeed}</td>
-                     <td className="py-4 px-3 text-gray-600 whitespace-nowrap">{rec.intakeVolume}</td>
-                     <td className="py-4 px-3 text-gray-600 whitespace-nowrap">{rec.timeRec}</td>
-                     <td className="py-4 px-3 text-gray-600">{rec.intakeRoute}</td>
-                     <td className="py-4 px-3 text-gray-600">{rec.outputType}</td>
-                     <td className="py-4 px-3 text-gray-600">{rec.outputChar}</td>
-                     <td className="py-4 px-3 text-gray-600 whitespace-nowrap">{rec.outputVolume}</td>
-                     <td className="py-4 px-3 text-gray-600 whitespace-nowrap">{rec.outputTimeRec}</td>
-                     <td className="py-4 px-3 text-gray-600 whitespace-nowrap">{rec.timeInterval}</td>
-                     <td className={`py-4 px-3 font-bold ${getMedStatusColor(rec.status)} whitespace-nowrap`}>{rec.status}</td>
+                     <td className="py-6 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {rec.date}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.dueTime}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.intakeSource}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.fluidFeed}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.intakeVolume}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.timeRec}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.intakeRoute}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.outputType}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.outputChar}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.outputVolume}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.outputTimeRec}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.timeInterval}</td>
+                     <td className={`py-6 px-4 font-bold ${getMedStatusColor(rec.status)} whitespace-nowrap`}>{rec.status}</td>
                    </tr>
                  ))}
                </tbody>
@@ -853,7 +1063,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
           </div>
 
           <Pagination2 count={20} currentPage={tasksCurrentPage} totalPages={8} setCurrentPage={setTasksCurrentPage} />
-        </>
+        </div>
       ) : showIOEntry ? (
         <div className="bg-white">
           <div className="mb-8 flex items-center gap-3 border-b border-gray-100 pb-4">
@@ -1003,6 +1213,804 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
               </button>
             </div>
           </div>
+        </div>
+      ) : showVitalsEntry ? (
+        <div className="bg-white pb-10 pt-4">
+          <div className="mb-8 flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
+            <div className="flex items-center gap-3">
+              <button 
+                  onClick={() => setShowVitalsEntry(false)}
+                  className="flex items-center gap-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-3 py-1.5 rounded-md transition-colors font-medium border border-slate-200 bg-white"
+              >
+                  <ArrowLeft className="w-4 h-4" /> Vitals signs entry
+              </button>
+            </div>
+          </div>
+          <div className="border border-slate-200 rounded-xl p-6 mb-6">
+            <p className="font-semibold text-slate-800 text-[15px] mb-6">Vital signs</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="relative">
+                <p className="pb-1.5 text-xs text-slate-500 font-medium">Blood pressure</p>
+                <div className="relative">
+                  <input type="text" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-16 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-300" placeholder="Enter blood pressure" />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">mmHg</span>
+                </div>
+              </div>
+              <div className="relative">
+                <p className="pb-1.5 text-xs text-slate-500 font-medium">Temperature</p>
+                <div className="relative">
+                  <input type="text" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-12 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-300" placeholder="Enter temperature" />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">°C</span>
+                </div>
+              </div>
+              <div className="relative">
+                <p className="pb-1.5 text-xs text-slate-500 font-medium">Respiratory rate</p>
+                <div className="relative">
+                  <input type="text" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-14 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-300" placeholder="Enter respiratory rate" />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">/Min</span>
+                </div>
+              </div>
+              <div className="relative">
+                <p className="pb-1.5 text-xs text-slate-500 font-medium">Height</p>
+                <div className="relative">
+                  <input type="text" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-12 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-300" placeholder="Enter height" />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">Cm</span>
+                </div>
+              </div>
+              <div className="relative">
+                <p className="pb-1.5 text-xs text-slate-500 font-medium">Heart rate</p>
+                <div className="relative">
+                  <input type="text" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-14 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-300" placeholder="Enter heart rate" />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">Bpm</span>
+                </div>
+              </div>
+              <div className="relative">
+                <p className="pb-1.5 text-xs text-slate-500 font-medium">Weight</p>
+                <div className="relative">
+                  <input type="text" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-12 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-300" placeholder="Enter weight" />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">Kg</span>
+                </div>
+              </div>
+              <div className="relative">
+                <p className="pb-1.5 text-xs text-slate-500 font-medium">BMI</p>
+                <div className="relative">
+                  <input type="text" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-12 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-300" placeholder="Enter height" />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">BMI</span>
+                </div>
+              </div>
+              <div className="relative">
+                <p className="pb-1.5 text-xs text-slate-500 font-medium">Pain score</p>
+                <div className="relative">
+                  <select className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg outline-none focus:border-blue-500 transition-colors text-slate-500 appearance-none bg-white">
+                    <option>0-3 (Mild pain)</option>
+                    <option>4-6 (Moderate pain)</option>
+                    <option>7-10 (Severe pain)</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                  </div>
+                </div>
+              </div>
+              <div className="relative">
+                <p className="pb-1.5 text-xs text-slate-500 font-medium">SPO2</p>
+                <div className="relative">
+                  <input type="text" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-10 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-300" placeholder="98" />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="border border-slate-200 rounded-xl p-6 mb-6">
+            <p className="font-semibold text-slate-800 text-[15px] mb-4">Additional note (optional)</p>
+            <textarea className="w-full border border-slate-200 rounded-lg p-4 text-sm outline-none focus:border-blue-500 transition-colors min-h-[120px] resize-none placeholder:text-slate-300" placeholder="Type here..."></textarea>
+          </div>
+          
+          <div className="flex justify-end pt-2">
+            <button 
+              onClick={() => { setShowVitalsEntry(false); setVitalsSubmitSuccessModalOpen(true); }}
+              className="bg-docuhealth-primary text-white font-medium px-10 py-3 rounded-full text-sm"
+            >
+              Update vitals
+            </button>
+          </div>
+        </div>
+      ) : showVitalsRecord ? (
+        <div className="bg-white rounded-xl border border-gray-100 p-4 lg:p-6 mb-6">
+          <div className="mb-6 flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
+            <div className="flex items-center gap-3">
+              <button 
+                  onClick={() => setShowVitalsRecord(false)}
+                  className="flex items-center gap-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-3 py-1.5 rounded-md transition-colors font-medium border border-slate-200 bg-white"
+              >
+                  <ArrowLeft className="w-4 h-4" /> Back to tasks
+              </button>
+            </div>
+          </div>
+          <h2 className="text-[16px] font-bold text-gray-800 mb-6">Patient's vital signs</h2>
+          
+          {/* Desktop View */}
+          <div className="hidden lg:block overflow-x-auto">
+             <table className="w-full text-left border-collapse min-w-[1000px]">
+               <thead>
+                 <tr className="border border-gray-100 rounded-full bg-white text-[13px]">
+                   <th className="py-5 px-4 font-bold text-gray-700 rounded-l-full">Date</th>
+                   <th className="py-5 px-3 font-bold text-gray-700">Due Time</th>
+                   <th className="py-5 px-3 font-bold text-gray-700">Blood Pressure</th>
+                   <th className="py-5 px-3 font-bold text-gray-700">Temperature</th>
+                   <th className="py-5 px-3 font-bold text-gray-700">Respiratory</th>
+                   <th className="py-5 px-3 font-bold text-gray-700">Height</th>
+                   <th className="py-5 px-3 font-bold text-gray-700">Heart rate</th>
+                   <th className="py-5 px-3 font-bold text-gray-700">Weight</th>
+                   <th className="py-5 px-3 font-bold text-gray-700">BMI</th>
+                   <th className="py-5 px-3 font-bold text-gray-700">Pain score</th>
+                   <th className="py-5 px-4 font-bold text-gray-700 rounded-r-full">Status</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 {demoVitalsRecords.map((rec) => (
+                   <tr key={rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
+                     <td className="py-6 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {rec.date}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.dueTime}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.bp}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.temp}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.resp}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.height}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.hr}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.weight}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.bmi}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.pain}</td>
+                     <td className={`py-6 px-4 font-bold ${getMedStatusColor(rec.status)} whitespace-nowrap`}>{rec.status}</td>
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+          </div>
+
+          {/* Mobile View */}
+          <div className="block lg:hidden space-y-4 mb-4">
+            {demoVitalsRecords.map((rec) => (
+              <div key={rec.id} className="bg-white border border-gray-200 rounded-xl p-4 ">
+                <div className="flex justify-between items-start mb-4 pb-3 border-b border-gray-100">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Calendar className="w-4 h-4 text-gray-400" />
+                    <span className="font-medium text-gray-800">{rec.date}</span>
+                    <span className="text-gray-400 ml-1">({rec.dueTime})</span>
+                  </div>
+                  <span className={`text-[12px] font-bold ${getMedStatusColor(rec.status)} bg-slate-50 px-2.5 py-1 rounded-md border border-slate-100`}>
+                    {rec.status}
+                  </span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-[13px]">
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Blood Pressure</p><p className="font-medium text-gray-700">{rec.bp}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Temperature</p><p className="font-medium text-gray-700">{rec.temp}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Respiratory</p><p className="font-medium text-gray-700">{rec.resp}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Heart rate</p><p className="font-medium text-gray-700">{rec.hr}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Height</p><p className="font-medium text-gray-700">{rec.height}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Weight</p><p className="font-medium text-gray-700">{rec.weight}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">BMI</p><p className="font-medium text-gray-700">{rec.bmi}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Pain score</p><p className="font-medium text-gray-700">{rec.pain}</p></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Pagination2 count={20} currentPage={vitalsCurrentPage} totalPages={8} setCurrentPage={setVitalsCurrentPage} />
+        </div>
+      ) : showSeizureEntry ? (
+        <div className="bg-white">
+          <div className="mb-8 flex items-center gap-3 border-b border-gray-100 pb-4">
+            <button 
+                onClick={() => setShowSeizureEntry(false)}
+                className="flex items-center justify-center gap-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-3 py-1.5 rounded-md transition-colors font-medium border border-slate-200 bg-white"
+            >
+                <ArrowLeft className="w-4 h-4" /> Seizure event monitoring
+            </button>
+          </div>
+
+          <div className="space-y-8 pb-10">
+            {/* Seizure characteristics Section */}
+            <section>
+              <h3 className="text-[15px] font-bold text-slate-700 mb-4">Seizure characteristics</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">Motor movement</label>
+                  <div className="relative">
+                    <select className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-all appearance-none bg-white cursor-pointer">
+                      <option>Tonic (Stiffening)</option>
+                      <option>Clonic (Jerking)</option>
+                      <option>Tonic-Clonic</option>
+                      <option>Atonic (Limp)</option>
+                      <option>Absence</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">Physical signs</label>
+                  <div className="relative">
+                    <select className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-all appearance-none bg-white cursor-pointer">
+                      <option>Frothing/Foaming</option>
+                      <option>Tongue Biting</option>
+                      <option>Eye rolling</option>
+                      <option>Incontinence</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">Body parts involved</label>
+                  <div className="relative">
+                    <select className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-all appearance-none bg-white cursor-pointer">
+                      <option>Generalized (Whole Body)</option>
+                      <option>Left side only</option>
+                      <option>Right side only</option>
+                      <option>Left arm</option>
+                      <option>Right arm</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">Level of consciousness</label>
+                  <div className="relative">
+                    <select className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-all appearance-none bg-white cursor-pointer">
+                      <option>Preserved / Alert</option>
+                      <option>Impaired/Confused</option>
+                      <option>Completely unconscious</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Duration Section */}
+            <section>
+              <h3 className="text-[15px] font-bold text-slate-700 mb-4">How long did the seizure last?</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">Minutes</label>
+                  <div className="relative">
+                    <input type="number" placeholder="5" className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-all placeholder:text-gray-400" />
+                    <div className="absolute inset-y-0 right-3 flex items-center text-gray-400 text-xs">
+                      Minute(s)
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">Seconds</label>
+                  <div className="relative">
+                    <input type="number" placeholder="5" className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-all placeholder:text-gray-400" />
+                    <div className="absolute inset-y-0 right-3 flex items-center text-gray-400 text-xs">
+                      second(s)
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Post-Ictal State */}
+            <section>
+              <h3 className="text-[15px] font-bold text-slate-700 mb-4">Post-Ictal State (Immediate Post-Seizure Condition)</h3>
+              <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2 w-full">
+                <label className="text-sm font-semibold text-slate-700">Post seizure reaction</label>
+                <div className="relative">
+                  <select className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-all appearance-none bg-white cursor-pointer">
+                    <option>Somnolent (Sleepy/Lethargic)</option>
+                    <option>Confused/Agitated</option>
+                    <option>Temporarily Weak/Paralyzed</option>
+                    <option>Awake and Alert</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Interventions */}
+            <section>
+              <h3 className="text-[15px] font-bold text-slate-700 mb-4">Interventions Administered</h3>
+              <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2 w-full mb-6">
+                <label className="text-sm font-semibold text-slate-700">Input intervention administered</label>
+                <input type="text" placeholder="Input text" className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-all placeholder:text-gray-400" />
+              </div>
+
+              <label className="flex items-start gap-3 cursor-pointer select-none group">
+                <div className="relative flex items-center justify-center mt-0.5">
+                  <input type="checkbox" className="peer appearance-none w-4 h-4 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-docuhealth-primary/30 checked:bg-docuhealth-primary checked:border-docuhealth-primary transition-colors" defaultChecked />
+                  <svg className="absolute w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 5L4.5 8.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <span className="text-[13px] text-gray-500 font-medium">Escalated? Mark if the seizure lasted longer than 5 minutes (Status Epilepticus) or if the patient did not regain consciousness</span>
+              </label>
+            </section>
+
+            <div className="flex justify-end pt-4">
+              <button 
+                onClick={() => {
+                  setShowSeizureEntry(false);
+                  setSeizureSubmitSuccessModalOpen(true);
+                }}
+                className="bg-docuhealth-primary text-white font-medium px-8 py-2.5 rounded-full hover:opacity-90 transition-opacity"
+              >
+                Update chart
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : showSeizureRecord ? (
+        <div className="bg-white rounded-xl border border-gray-100 p-4 lg:p-6 mb-6">
+          <div className="mb-6 flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
+            <div className="flex items-center gap-3">
+              <button 
+                  onClick={() => setShowSeizureRecord(false)}
+                  className="flex items-center gap-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-3 py-1.5 rounded-md transition-colors font-medium border border-slate-200 bg-white"
+              >
+                  <ArrowLeft className="w-4 h-4" /> Back to tasks
+              </button>
+            </div>
+          </div>
+          <h2 className="text-[16px] font-bold text-gray-800 mb-6">Seizure events</h2>
+          
+          {/* Desktop View */}
+          <div className="hidden lg:block overflow-x-auto">
+             <table className="w-full text-left border-collapse min-w-[700px]">
+               <thead>
+                 <tr className="border border-gray-100 rounded-full bg-white text-[13px]">
+                   <th className="py-5 px-4 font-bold text-gray-700 w-[15%] rounded-l-full">Date</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[15%]">Type</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[20%]">Post-Ictal State</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[15%]">Escalated</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[20%]">Seizure duration</th>
+                   <th className="py-5 px-4 font-bold text-gray-700 w-[15%] rounded-r-full">Status</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 {demoSeizureRecords.map((rec) => (
+                   <tr key={rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
+                     <td className="py-6 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {rec.date}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.type}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.postIctal}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.escalated}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.duration}</td>
+                     <td className={`py-6 px-4 font-bold ${getMedStatusColor(rec.status)} whitespace-nowrap`}>{rec.status}</td>
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+          </div>
+
+          {/* Mobile View */}
+          <div className="block lg:hidden space-y-4 mb-4">
+            {demoSeizureRecords.map((rec) => (
+              <div key={rec.id} className="bg-white border border-gray-200 rounded-xl p-4 ">
+                <div className="flex justify-between items-start mb-4 pb-3 border-b border-gray-100">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Calendar className="w-4 h-4 text-gray-400" />
+                    <span className="font-medium text-gray-800">{rec.date}</span>
+                  </div>
+                  <span className={`text-[12px] font-bold ${getMedStatusColor(rec.status)} bg-slate-50 px-2.5 py-1 rounded-md border border-slate-100`}>
+                    {rec.status}
+                  </span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-[13px]">
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Type</p><p className="font-medium text-gray-700">{rec.type}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Post-Ictal State</p><p className="font-medium text-gray-700">{rec.postIctal}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Escalated</p><p className="font-medium text-gray-700">{rec.escalated}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Seizure duration</p><p className="font-medium text-gray-700">{rec.duration}</p></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Pagination2 count={20} currentPage={seizureCurrentPage} totalPages={8} setCurrentPage={setSeizureCurrentPage} />
+        </div>
+      ) : showProcedureEntry ? (
+        <div className="bg-white">
+          <div className="mb-8 flex items-center gap-3 border-b border-gray-100 pb-4">
+            <button 
+                onClick={() => setShowProcedureEntry(false)}
+                className="flex items-center justify-center gap-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-3 py-1.5 rounded-md transition-colors font-medium border border-slate-200 bg-white"
+            >
+                <ArrowLeft className="w-4 h-4" /> Procedure monitoring
+            </button>
+          </div>
+
+          <div className="space-y-8 pb-10">
+            {/* Procedure verified Section */}
+            <section>
+              <h3 className="text-[15px] font-bold text-slate-700 mb-4">Procedure verified</h3>
+              <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2">
+                <label className="text-sm font-semibold text-slate-700">Name of procedure</label>
+                <input 
+                  type="text" 
+                  placeholder="Lumbar Puncture (Performed by Dr. A. Bello)" 
+                  className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-colors bg-white"
+                />
+              </div>
+            </section>
+
+            {/* Immediate Outcome & Post-Procedure Instructions Section */}
+            <section>
+              <h3 className="text-[15px] font-bold text-slate-700 mb-4">Immediate Outcome & Post-Procedure Instructions</h3>
+              <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2">
+                <label className="text-sm font-semibold text-slate-700">Instruction</label>
+                <input 
+                  type="text" 
+                  placeholder="Keep patient lying flat for 4 hours post-lumbar puncture" 
+                  className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-colors bg-white"
+                />
+              </div>
+            </section>
+
+            {/* Consent verified? Section */}
+            <section>
+              <h3 className="text-[15px] font-bold text-slate-700 mb-4">Consent verified?</h3>
+              <div className="flex flex-col gap-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="consent" className="w-4 h-4 text-docuhealth-primary border-gray-300 focus:ring-docuhealth-primary" defaultChecked />
+                  <span className="text-sm text-gray-600">Yes, Consent given</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="consent" className="w-4 h-4 text-docuhealth-primary border-gray-300 focus:ring-docuhealth-primary" />
+                  <span className="text-sm text-gray-600">Emergency Exemption</span>
+                </label>
+              </div>
+            </section>
+
+            {/* Post-Procedure Assessment Section */}
+            <section>
+              <h3 className="text-[15px] font-bold text-slate-700 mb-4">Post-Procedure Assessment</h3>
+              
+              <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2 mb-4">
+                <label className="text-sm font-semibold text-slate-700">Dressing status</label>
+                <div className="relative">
+                  <select className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-all appearance-none bg-white cursor-pointer">
+                    <option>Clean & Dry</option>
+                    <option>Oozing/Bleeding</option>
+                    <option>Leakage</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2 mb-4">
+                <label className="text-sm font-semibold text-slate-700">Estimated Volume of blood lost (EBL)</label>
+                <div className="relative">
+                  <input 
+                    type="text" 
+                    placeholder="Input volume" 
+                    className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-colors bg-white pr-10"
+                  />
+                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400 text-sm">
+                    ml
+                  </div>
+                </div>
+              </div>
+              
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="drain" className="w-4 h-4 text-docuhealth-primary border-gray-300 focus:ring-docuhealth-primary" />
+                <span className="text-sm text-gray-600">N/A- No drain</span>
+              </label>
+            </section>
+            
+            {/* Patient positioning & safety Section */}
+            <section>
+              <h3 className="text-[15px] font-bold text-slate-700 mb-4">Patient positioning & safety</h3>
+              <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2 mb-4">
+                <label className="text-sm font-semibold text-slate-700">Current position</label>
+                <div className="relative">
+                  <select className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-all appearance-none bg-white cursor-pointer">
+                    <option>Head of bed elevated</option>
+                    <option>Flat supine (flat on the back)</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <div className="pt-6 flex justify-end">
+              <button
+                onClick={() => {
+                  setShowProcedureEntry(false);
+                  setProcedureSubmitSuccessModalOpen(true);
+                }}
+                className="bg-docuhealth-primary text-white font-medium py-2.5 px-6 rounded-full text-[14px]"
+              >
+                Update chart
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : showProcedureRecord ? (
+        <div className="bg-white rounded-xl border border-gray-100 p-4 lg:p-6 mb-6">
+          <div className="mb-6 flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
+            <div className="flex items-center gap-3">
+              <button 
+                  onClick={() => setShowProcedureRecord(false)}
+                  className="flex items-center gap-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-3 py-1.5 rounded-md transition-colors font-medium border border-slate-200 bg-white"
+              >
+                  <ArrowLeft className="w-4 h-4" /> Back to tasks
+              </button>
+            </div>
+          </div>
+          
+          {/* Desktop View */}
+          <div className="hidden lg:block overflow-x-auto mb-6">
+            <h2 className="text-[16px] font-bold text-gray-800 mb-4">Procedure charts</h2>
+             <table className="w-full text-left border-collapse min-w-[900px]">
+               <thead>
+                 <tr className="border border-gray-100 rounded-full bg-white text-[13px]">
+                   <th className="py-5 px-4 font-bold text-gray-700 w-[12%] rounded-l-full">Date</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[16%]">Procedure name</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[15%]">Performing clinician</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[12%]">Dressing status</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[12%]">Surgical drain volume</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[18%]">Positioning and safety</th>
+                   <th className="py-5 px-4 font-bold text-gray-700 w-[15%] rounded-r-full">Status</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 {demoProcedureRecords.map((rec) => (
+                   <tr key={rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
+                     <td className="py-6 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {rec.date}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.procedureName}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.performingClinician}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.dressingStatus}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.surgicalDrainVolume}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.positioningAndSafety}</td>
+                     <td className={`py-6 px-4 font-bold ${getMedStatusColor(rec.status)} whitespace-nowrap`}>{rec.status}</td>
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+          </div>
+
+          {/* Mobile View */}
+          <div className="lg:hidden space-y-4 mb-6">
+            {demoProcedureRecords.map((rec) => (
+              <div key={rec.id} className="border border-gray-200 rounded-xl p-4 bg-white hover:border-blue-300 transition-colors">
+                <div className="flex justify-between items-start mb-3 border-b border-gray-50 pb-3">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Calendar className="w-4 h-4" />
+                    <span className="text-[13px] font-medium">{rec.date}</span>
+                  </div>
+                  <span className={`text-[12px] font-bold ${getMedStatusColor(rec.status)} bg-slate-50 px-2.5 py-1 rounded-md border border-slate-100`}>
+                    {rec.status}
+                  </span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-[13px]">
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Procedure name</p><p className="font-medium text-gray-700">{rec.procedureName}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Performing clinician</p><p className="font-medium text-gray-700">{rec.performingClinician}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Dressing status</p><p className="font-medium text-gray-700">{rec.dressingStatus}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Surgical drain vol</p><p className="font-medium text-gray-700">{rec.surgicalDrainVolume}</p></div>
+                  <div className="col-span-2"><p className="text-gray-400 text-[11px] uppercase mb-1">Positioning and safety</p><p className="font-medium text-gray-700">{rec.positioningAndSafety}</p></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Pagination2 count={20} currentPage={procedureCurrentPage} totalPages={8} setCurrentPage={setProcedureCurrentPage} />
+        </div>
+      ) : showIVFluidEntry ? (
+        <div className="bg-white">
+          <div className="mb-8 flex items-center gap-3 border-b border-gray-100 pb-4">
+            <button 
+                onClick={() => setShowIVFluidEntry(false)}
+                className="flex items-center justify-center gap-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-3 py-1.5 rounded-md transition-colors font-medium border border-slate-200 bg-white"
+            >
+                <ArrowLeft className="w-4 h-4" /> Add new entry
+            </button>
+          </div>
+
+          <div className="space-y-8 pb-10">
+            {/* Preset by doctor Section */}
+            <section>
+              <h3 className="text-[15px] font-bold text-slate-700 mb-4">Preset by doctor</h3>
+              <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2 mb-4">
+                <label className="text-sm font-semibold text-slate-700">Drugs/additives</label>
+                <input 
+                  type="text" 
+                  placeholder="Inj. Pethidine, Inj. Morphine, Inj. Ondansetron, Inj. Pantoprazole," 
+                  className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-colors bg-white"
+                />
+              </div>
+
+              <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2 mb-4">
+                <label className="text-sm font-semibold text-slate-700">Fluid solution type</label>
+                <input 
+                  type="text" 
+                  placeholder="Normal saline" 
+                  className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-colors bg-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">Total plan/number of bags</label>
+                  <input 
+                    type="text" 
+                    placeholder="1 bag only" 
+                    className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-colors bg-white"
+                  />
+                </div>
+                <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">Volume per bag</label>
+                  <input 
+                    type="text" 
+                    placeholder="500 ML" 
+                    className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-colors bg-white"
+                  />
+                </div>
+              </div>
+              
+              <label className="flex items-center gap-3 cursor-pointer select-none group pt-2">
+                <div className="relative flex items-center justify-center mt-0.5">
+                  <input type="checkbox" className="peer appearance-none w-4 h-4 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-docuhealth-primary/30 checked:bg-docuhealth-primary checked:border-docuhealth-primary transition-colors" defaultChecked />
+                  <svg className="absolute w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 5L4.5 8.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <span className="text-[13px] text-gray-500 font-medium">Automatically add to patient's fluid Intake chart</span>
+              </label>
+            </section>
+
+            {/* Nurse input Section */}
+            <section>
+              <h3 className="text-[15px] font-bold text-slate-700 mb-4">Nurse input</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">Select site condition</label>
+                  <div className="relative">
+                    <select className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-all appearance-none bg-white cursor-pointer">
+                      <option>Clean & Intact</option>
+                      <option>Swollen / Leaking</option>
+                      <option>Red / Painful</option>
+                      <option>Line Blocked / Not Flowing</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">Cannula location</label>
+                  <div className="relative">
+                    <select className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-all appearance-none bg-white cursor-pointer">
+                      <option>Left forearm</option>
+                      <option>Right forearm</option>
+                      <option>Left Hand (Back)</option>
+                      <option>Right Hand (Back)</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2">
+                <label className="text-sm font-semibold text-slate-700">Nursing remark</label>
+                <textarea 
+                  placeholder="Type here..." 
+                  className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary transition-colors bg-white min-h-[100px] resize-y"
+                ></textarea>
+              </div>
+            </section>
+
+            <div className="pt-6 flex justify-end">
+              <button
+                onClick={() => {
+                  setShowIVFluidEntry(false);
+                  setIvFluidSubmitSuccessModalOpen(true);
+                }}
+                className="bg-docuhealth-primary text-white font-medium py-2.5 px-6 rounded-full text-[14px]"
+              >
+                Update chart
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : showIVFluidRecord ? (
+        <div className="bg-white rounded-xl border border-gray-100 p-4 lg:p-6 mb-6">
+          <div className="mb-6 flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
+            <div className="flex items-center gap-3">
+              <button 
+                  onClick={() => setShowIVFluidRecord(false)}
+                  className="flex items-center gap-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-3 py-1.5 rounded-md transition-colors font-medium border border-slate-200 bg-white"
+              >
+                  <ArrowLeft className="w-4 h-4" /> Back to tasks
+              </button>
+            </div>
+          </div>
+          
+          {/* Desktop View */}
+          <div className="hidden lg:block overflow-x-auto mb-6">
+            <h2 className="text-[16px] font-bold text-gray-800 mb-4">Intake and Output chart</h2>
+             <table className="w-full text-left border-collapse min-w-[1000px]">
+               <thead>
+                 <tr className="border border-gray-100 rounded-full bg-white text-[13px]">
+                   <th className="py-5 px-4 font-bold text-gray-700 w-[10%] rounded-l-full">Date</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[8%]">Due Time</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[12%]">Drugs/additives</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[10%]">Cannula location</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[12%]">Solution type</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[10%]">Volume per bag</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[10%]">No. of bags</th>
+                   <th className="py-5 px-3 font-bold text-gray-700 w-[12%]">Site condition</th>
+                   <th className="py-5 px-4 font-bold text-gray-700 w-[10%] rounded-r-full">Status</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 {demoIVFluidRecords.map((rec) => (
+                   <tr key={rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
+                     <td className="py-6 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {rec.date}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.dueTime}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.drugs}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.cannulaLocation}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.solutionType}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.volumePerBag}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.noOfBags}</td>
+                     <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.siteCondition}</td>
+                     <td className={`py-6 px-4 font-bold ${getMedStatusColor(rec.status)} whitespace-nowrap`}>{rec.status}</td>
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+          </div>
+
+          {/* Mobile View */}
+          <div className="lg:hidden space-y-4 mb-6">
+            <h2 className="text-[16px] font-bold text-gray-800 mb-4 px-1">Intake and Output chart</h2>
+            {demoIVFluidRecords.map((rec) => (
+              <div key={rec.id} className="border border-gray-200 rounded-xl p-4 bg-white hover:border-blue-300 transition-colors">
+                <div className="flex justify-between items-start mb-3 border-b border-gray-50 pb-3">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Calendar className="w-4 h-4" />
+                    <span className="text-[13px] font-medium">{rec.date}</span>
+                    <span className="text-[13px] text-gray-400 ml-1">({rec.dueTime})</span>
+                  </div>
+                  <span className={`text-[12px] font-bold ${getMedStatusColor(rec.status)} bg-slate-50 px-2.5 py-1 rounded-md border border-slate-100`}>
+                    {rec.status}
+                  </span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-[13px]">
+                  <div className="col-span-2"><p className="text-gray-400 text-[11px] uppercase mb-1">Drugs/additives</p><p className="font-medium text-gray-700">{rec.drugs}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Cannula loc</p><p className="font-medium text-gray-700">{rec.cannulaLocation}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Solution</p><p className="font-medium text-gray-700">{rec.solutionType}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">Vol / bag</p><p className="font-medium text-gray-700">{rec.volumePerBag}</p></div>
+                  <div><p className="text-gray-400 text-[11px] uppercase mb-1">No. of bags</p><p className="font-medium text-gray-700">{rec.noOfBags}</p></div>
+                  <div className="col-span-2"><p className="text-gray-400 text-[11px] uppercase mb-1">Site condition</p><p className="font-medium text-gray-700">{rec.siteCondition}</p></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Pagination2 count={20} currentPage={ivFluidCurrentPage} totalPages={8} setCurrentPage={setIvFluidCurrentPage} />
         </div>
       ) : null}
 
@@ -1290,6 +2298,96 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
         </div>
       </Modal>
 
+      {/* Seizure Success Modal */}
+      <Modal isOpen={seizureSubmitSuccessModalOpen} onClose={() => setSeizureSubmitSuccessModalOpen(false)}>
+        <div className="py-3 text-center max-w-sm mx-auto flex flex-col items-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h2 className="text-lg font-bold text-gray-900 mb-3">Success!</h2>
+          <p className="text-gray-600 text-sm mb-8 leading-relaxed">
+            You have successfully updated the seizure events task!
+          </p>
+          <button
+            onClick={() => setSeizureSubmitSuccessModalOpen(false)}
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 rounded-full transition-colors mb-3"
+          >
+            Go to my tasks
+          </button>
+          <button
+            onClick={() => {
+              setSeizureSubmitSuccessModalOpen(false);
+              if (setAdvanceCheckUp) setAdvanceCheckUp(false);
+            }}
+            className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-3 rounded-full transition-colors"
+          >
+            Go back to patient's management
+          </button>
+        </div>
+      </Modal>
+
+      {/* Procedure Success Modal */}
+      <Modal isOpen={procedureSubmitSuccessModalOpen} onClose={() => setProcedureSubmitSuccessModalOpen(false)}>
+        <div className="py-3 text-center max-w-sm mx-auto flex flex-col items-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h2 className="text-lg font-bold text-gray-900 mb-3">Success!</h2>
+          <p className="text-gray-600 text-sm mb-8 leading-relaxed">
+            You have successfully updated the procedure monitoring task!
+          </p>
+          <button
+            onClick={() => setProcedureSubmitSuccessModalOpen(false)}
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 rounded-full transition-colors mb-3"
+          >
+            Go to my tasks
+          </button>
+          <button
+            onClick={() => {
+              setProcedureSubmitSuccessModalOpen(false);
+              if (setAdvanceCheckUp) setAdvanceCheckUp(false);
+            }}
+            className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-3 rounded-full transition-colors"
+          >
+            Go back to patient's management
+          </button>
+        </div>
+      </Modal>
+
+      {/* IV Fluid Success Modal */}
+      <Modal isOpen={ivFluidSubmitSuccessModalOpen} onClose={() => setIvFluidSubmitSuccessModalOpen(false)}>
+        <div className="py-3 text-center max-w-sm mx-auto flex flex-col items-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h2 className="text-lg font-bold text-gray-900 mb-3">Success!</h2>
+          <p className="text-gray-600 text-sm mb-8 leading-relaxed">
+            You have successfully updated the IV fluid task!
+          </p>
+          <button
+            onClick={() => setIvFluidSubmitSuccessModalOpen(false)}
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 rounded-full transition-colors mb-3"
+          >
+            Go to my tasks
+          </button>
+          <button
+            onClick={() => {
+              setIvFluidSubmitSuccessModalOpen(false);
+              if (setAdvanceCheckUp) setAdvanceCheckUp(false);
+            }}
+            className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-3 rounded-full transition-colors"
+          >
+            Go back to patient's management
+          </button>
+        </div>
+      </Modal>
+
       {/* IO Calculation Modal */}
       <Modal isOpen={ioCalculationModalOpen} onClose={() => setIoCalculationModalOpen(false)}>
         <div className="py- text-center  flex flex-col items-center relative">
@@ -1320,6 +2418,69 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
             className="w-[90%] bg-docuhealth-primary hover:bg-docuhealth-primary/90 text-white font-medium py-3 rounded-full transition-colors mb-2"
           >
             Go to my task
+          </button>
+        </div>
+      </Modal>
+
+      {/* Vitals Info Modal */}
+      <Modal isOpen={vitalsInfoModalOpen} onClose={() => setVitalsInfoModalOpen(false)}>
+        <div className=" text-center max-w-sm mx-auto flex flex-col items-center relative">
+          <button 
+            onClick={() => setVitalsInfoModalOpen(false)}
+            className="absolute top-0 right-0 p-2 text-slate-400 hover:text-slate-600 transition-colors rounded-full hover:bg-slate-100"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+          <div className="w-14 h-14 flex items-center justify-center mb-4 mt-2">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="#1E293B" strokeWidth="1.5" />
+              <path d="M12 16V12M12 8H12.01" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h2 className="text-lg font-bold text-slate-800 mb-4">Additional information</h2>
+          <div className="border border-slate-100 rounded-2xl p-5 mb-6 text-sm text-slate-600 text-left leading-relaxed">
+            Check for the vitals signs of the this patient, make sure she is very much stable and do well to check for the heartbeat rate as well, thanks.
+          </div>
+          <button
+            onClick={() => {
+              setVitalsInfoModalOpen(false);
+              setShowVitalsEntry(true);
+            }}
+            className="w-full bg-docuhealth-primary text-white font-medium py-3.5 rounded-full text-[15px]"
+          >
+            Proceed to making entry
+          </button>
+        </div>
+      </Modal>
+
+      {/* Vitals Success Modal */}
+      <Modal isOpen={vitalsSubmitSuccessModalOpen} onClose={() => setVitalsSubmitSuccessModalOpen(false)}>
+        <div className="py-3 text-center max-w-sm mx-auto flex flex-col items-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h2 className="text-lg font-bold text-gray-900 mb-3">Success!</h2>
+          <p className="text-gray-600 text-sm mb-8 leading-relaxed">
+            You have successfully updated the vitals of this patient
+          </p>
+          <button
+            onClick={() => setVitalsSubmitSuccessModalOpen(false)}
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 rounded-full transition-colors mb-3"
+          >
+            Go to my tasks
+          </button>
+          <button
+            onClick={() => {
+              setVitalsSubmitSuccessModalOpen(false);
+              if (setAdvanceCheckUp) setAdvanceCheckUp(false);
+            }}
+            className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-3 rounded-full transition-colors"
+          >
+            Go back to patient's management
           </button>
         </div>
       </Modal>

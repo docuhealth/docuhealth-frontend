@@ -11,6 +11,9 @@ import VitalSignsHistory from "../../../Components/Dashboard/Hospital_Dashboard_
 import SharedSoapNotes from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SharedSoapNotes";
 import SharedSoapNoteDetail from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SharedSoapNoteDetail";
 import AddNursingAdmissionNote from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddNursingAdmissionNote";
+import SelectHandoverNurseModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SelectHandoverNurseModal";
+import AddHandoverNoteForm from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddHandoverNoteForm";
+import Modal from "../../../Components/ui/Modal";
 import { ChevronDown } from "lucide-react";
 
 const Hospital_Nurses_Patients_Dashboard = () => {
@@ -20,6 +23,9 @@ const Hospital_Nurses_Patients_Dashboard = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  const [isQuickLogDropdownOpen, setIsQuickLogDropdownOpen] = useState(false);
+  const quickLogDropdownRef = useRef(null);
+
   const [newCaseNote, setNewCaseNote] = useState(false);
   const [advanceCheckUp, setAdvanceCheckUp] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -28,11 +34,19 @@ const Hospital_Nurses_Patients_Dashboard = () => {
   const [sharedSoapNoteHistory, setSharedSoapNoteHistory] = useState(false);
   const [sharedSoapNoteDetail, setSharedSoapNoteDetail] = useState(false);
   const [showAdmissionNote, setShowAdmissionNote] = useState(false);
+  
+  const [showHandoverNurseModal, setShowHandoverNurseModal] = useState(false);
+  const [showHandoverNoteForm, setShowHandoverNoteForm] = useState(false);
+  const [selectedHandoverNurse, setSelectedHandoverNurse] = useState(null);
+  const [showHandoverSuccessModal, setShowHandoverSuccessModal] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
+      }
+      if (quickLogDropdownRef.current && !quickLogDropdownRef.current.contains(event.target)) {
+        setIsQuickLogDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -49,6 +63,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
       setNewCaseNote(false);
       setUpdateVitals(false);
       setShowAdmissionNote(false);
+      setShowHandoverNoteForm(false);
     }
   }, [advanceCheckUp]);
 
@@ -127,14 +142,37 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                     )}
                   </div>
 
-                  <button
-                    className="py-2.5 px-10 w-full lg:w-60 rounded-full bg-docuhealth-primary text-white cursor-pointer flex justify-center items-center"
-                    onClick={() => {
-                      console.log("Quick log clicked");
-                    }}
-                  >
-                    Quick log
-                  </button>
+                  <div className="relative w-full lg:w-60" ref={quickLogDropdownRef}>
+                    <button
+                      className="py-2.5 px-10 w-full rounded-full bg-docuhealth-primary text-white cursor-pointer flex justify-center items-center gap-1"
+                      onClick={() => setIsQuickLogDropdownOpen(!isQuickLogDropdownOpen)}
+                    >
+                      <span>Quick log</span>
+                      <ChevronDown className={`w-4 h-4 transition-transform ${isQuickLogDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isQuickLogDropdownOpen && (
+                      <div className="absolute top-full mt-2 left-0 w-full bg-white border border-gray-200 rounded z-10 overflow-hidden p-2 text-sm shadow-lg">
+                        <button
+                          className="w-full text-left px-3 py-2.5 hover:bg-gray-100 text-gray-700 transition-colors"
+                          onClick={() => {
+                            setIsQuickLogDropdownOpen(false);
+                            console.log("Quick log clicked");
+                          }}
+                        >
+                          Quick log
+                        </button>
+                        <button
+                          className="w-full text-left px-3 py-2.5 hover:bg-gray-100 text-gray-700 transition-colors"
+                          onClick={() => {
+                            setIsQuickLogDropdownOpen(false);
+                            setShowHandoverNurseModal(true);
+                          }}
+                        >
+                          Add handover note
+                        </button>
+                      </div>
+                    )}
+                  </div>
                   
                   {!showAdmissionNote && (
                     <button
@@ -199,6 +237,16 @@ const Hospital_Nurses_Patients_Dashboard = () => {
               selected={selected}
               setShowAdmissionNote={setShowAdmissionNote}
             />
+          ) : showHandoverNoteForm ? (
+            <AddHandoverNoteForm
+              handoverNurseName={selectedHandoverNurse ? `${selectedHandoverNurse.firstname} ${selectedHandoverNurse.lastname}` : ""}
+              onBack={() => setShowHandoverNoteForm(false)}
+              onUpload={(noteData) => {
+                console.log("Uploaded note:", noteData);
+                setShowHandoverNoteForm(false);
+                setShowHandoverSuccessModal(true);
+              }}
+            />
           ) : (
             <div className="bg-white my-5 border rounded-lg p-5 text-sm">
               <AdvanceCheckUp
@@ -220,6 +268,48 @@ const Hospital_Nurses_Patients_Dashboard = () => {
             />
           </div>
         </>
+      )}
+
+      {showHandoverNurseModal && (
+        <SelectHandoverNurseModal
+          onClose={() => setShowHandoverNurseModal(false)}
+          onProceed={(nurse) => {
+            setSelectedHandoverNurse(nurse);
+            setShowHandoverNurseModal(false);
+            
+            // Hide other forms
+            setCaseNoteHistory(false);
+            setVitalSignsHistory(false);
+            setSharedSoapNoteHistory(false);
+            setNewCaseNote(false);
+            setUpdateVitals(false);
+            setShowAdmissionNote(false);
+            
+            // Show our new form
+            setShowHandoverNoteForm(true);
+          }}
+        />
+      )}
+
+      {showHandoverSuccessModal && (
+        <Modal isOpen={showHandoverSuccessModal} onClose={() => setShowHandoverSuccessModal(false)}>
+          <div className="py-3 text-center max-w-sm mx-auto flex flex-col items-center">
+           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+            <h3 className="text-[17px] font-semibold text-gray-900 mb-8 leading-snug">
+              You have successfully uploaded your handover note for this patient!
+            </h3>
+            <button
+              onClick={() => setShowHandoverSuccessModal(false)}
+              className="mt-2 w-full py-3 px-4 bg-docuhealth-primary  text-white font-medium rounded-full transition-colors"
+            >
+              Go back to patient info
+            </button>
+          </div>
+        </Modal>
       )}
     </>
   );
