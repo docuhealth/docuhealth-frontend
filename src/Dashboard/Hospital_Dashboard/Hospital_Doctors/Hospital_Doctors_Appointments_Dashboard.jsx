@@ -53,6 +53,10 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
           </div>
           <OtherMedicalServicesFab
             selectedPatientDetails={selectedPatientDetails}
+            // This list is appointments, never admissions, so there's no
+            // admission sqid to scope a care task to — admission-only
+            // quick-services stay disabled here.
+            admissionSqid={null}
             onOrderPharmacy={() => {
               setPrescribeMedication(true);
               setSeePatientDetails(false);

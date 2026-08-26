@@ -8,12 +8,13 @@ import formatRecordDate, {
   formatFullDateTime,
   getAge,
 } from "../../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchTestCategories, fetchLabTests } from "../../../../../../queries/Hospital/lab/requests";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../../../utils/soapNoteHelpers";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import PatientInfoCard from "../../../../../ui/PatientInfoCard";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import ClinicalSummaryCard from "../../../../../ui/ClinicalSummaryCard";
@@ -36,6 +37,7 @@ const DUMMY_PATIENT_INFO = {
 };
 
 const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateOrder, isOutpatient }) => {
+  const queryClient = useQueryClient();
   const [viewDetailMedicalRecord, setViewDetailMedicalRecord] = useState(false);
   const [selectedMedicalRecord, setSelectedMedicalRecord] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -86,10 +88,15 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
     enabled: !!hin,
   });
 
+  // No staleTime override here: the lab test catalog is edited/reseeded
+  // server-side from time to time (sqids get regenerated), so pinning this
+  // to Infinity let a long-lived tab keep offering test ids that no longer
+  // exist server-side, failing with a confusing "Object with sqid=... does
+  // not exist." on submit. Falls back to the app's global 5-minute
+  // staleTime (see lib/queryClient.ts) instead.
   const { data: categoriesData } = useQuery({
     queryKey: ["lab-test-categories"],
     queryFn: fetchTestCategories,
-    staleTime: Infinity,
     enabled: showOrderModal,
   });
   const categories = Array.isArray(categoriesData) ? categoriesData : (categoriesData?.results ?? []);
@@ -98,7 +105,6 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
     queryKey: ["lab-tests", orderForm.category],
     queryFn: fetchLabTests,
     enabled: !!orderForm.category,
-    staleTime: Infinity,
   });
   const fetchedTestTypes = Array.isArray(testTypesData) ? testTypesData : (testTypesData?.results ?? []);
 
@@ -130,7 +136,15 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
       if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {
         setDuplicateWarning(err.response.data.duplicate_warning);
       } else {
-        toast.error(err.response?.data?.message || "Failed to create order.");
+        console.error("Error creating lab order:", err);
+        toast.error(extractApiErrorMessage(err, "Failed to create order."));
+        // Covers stale catalog data (e.g. a selected test/category sqid no
+        // longer exists server-side): refetch both lists and drop the
+        // current test selection so the doctor picks again from what's
+        // actually valid now, instead of resubmitting the same broken ids.
+        queryClient.invalidateQueries({ queryKey: ["lab-test-categories"] });
+        queryClient.invalidateQueries({ queryKey: ["lab-tests", orderForm.category] });
+        setOrderForm((prev) => ({ ...prev, test_type: [] }));
       }
     },
   });

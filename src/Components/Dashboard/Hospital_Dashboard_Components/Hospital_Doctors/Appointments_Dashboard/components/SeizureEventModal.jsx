@@ -7,7 +7,7 @@ const SEIZURE_PROTOCOL_OPTIONS = [
   "High-Risk Seizure Watch (Q30min Neuro Checks)",
   "Continuous EEG Monitoring",
   "Padded Bed Rails / Fall Precautions Only",
-];
+].map((name) => ({ value: name, label: name }));
 
 /**
  * "Seizure events" quick-service flow from OtherMedicalServicesFab.

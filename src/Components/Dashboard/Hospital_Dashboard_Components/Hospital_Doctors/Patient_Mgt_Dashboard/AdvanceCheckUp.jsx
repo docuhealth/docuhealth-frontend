@@ -8,6 +8,7 @@ import getTabs, { PatientSOAPNotes, PatientMedicalRecord } from "./TabDetails2";
 import PatientMedicalRecordDetail from "./PatientMedicalRecordDetail";
 import { DoctorsAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
 import { useQuery } from "@tanstack/react-query";
+import { fetchProgressNotes } from "../../../../../queries/Hospital/doctor/progressNotes";
 
 const AdvanceCheckUp = ({
   selected,
@@ -24,6 +25,7 @@ const AdvanceCheckUp = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [soapCurrentPage, setSoapCurrentPage] = useState(1);
   const [labCurrentPage, setLabCurrentPage] = useState(1);
+  const [progressCurrentPage, setProgressCurrentPage] = useState(1);
 
   const [viewDetailMedicalRecord, setViewDetailMedicalRecord] = useState(false);
   const [selectedMedicalRecord, setSelectedMedicalRecord] = useState(null);
@@ -62,6 +64,12 @@ const AdvanceCheckUp = ({
       );
       return res.data;
     },
+    enabled: !!hin,
+  });
+
+  const { data: progressNotesData, isLoading: progressLoading } = useQuery({
+    queryKey: ["patient-progress-notes", hin, progressCurrentPage, pageSize],
+    queryFn: fetchProgressNotes,
     enabled: !!hin,
   });
 
@@ -205,6 +213,13 @@ const AdvanceCheckUp = ({
                   labCurrentPage,
                   labTotalPages: Math.ceil((labRecordsData?.count || 0) / pageSize),
                   setLabCurrentPage,
+
+                  progressNotesLoading: progressLoading,
+                  patientProgressNotes: progressNotesData?.results || [],
+                  progressCount: progressNotesData?.count || 0,
+                  progressCurrentPage,
+                  progressTotalPages: Math.ceil((progressNotesData?.count || 0) / pageSize),
+                  setProgressCurrentPage,
 
                   setSelectedMedicalRecord,
                   setViewDetailMedicalRecord,

@@ -6,6 +6,7 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { DEFAULT_FREQUENCY } from "../../../../../../utils/careTaskConstants";
 import Input from "../../../../../ui/Input";
 
 const NoteSection = ({
@@ -98,7 +99,7 @@ const PrescribeMedication = ({
       dosage: "",
       dosageUnit: "mg",
       route: "Oral",
-      frequency: "od_qd",
+      frequency: DEFAULT_FREQUENCY,
       duration: "",
       durationUnit: "Day",
     },

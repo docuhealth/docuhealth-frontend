@@ -33,6 +33,8 @@ import ClinicalSummaryCard from "../../../../ui/ClinicalSummaryCard";
 import SoapNoteEntry from "../Appointments_Dashboard/components/SoapNoteEntry";
 import Input from "../../../../ui/Input";
 import PatientHandoverTab from "./PatientHandoverTab";
+import { createProgressNote } from "../../../../../queries/Hospital/doctor/progressNotes";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
 
 export const PatientInfo = ({ patientFullInfo, selected }) => {
   console.log(selected);
@@ -1282,87 +1284,6 @@ const PatientLabRecords = ({
 };
 
 
-// Dummy data only — real patient identity, mocked clinical content, until
-// the progress-note API exists.
-const buildDummyProgressNotes = (patientFullInfo, selected) => {
-  const patientInfo =
-    patientFullInfo?.patient_info || selected?.patient_info || selected?.patient || {};
-  const staffInfo =
-    selected?.staff ||
-    patientFullInfo?.latest_vitals?.staff_info || {
-      firstname: "Raphael",
-      lastname: "Jonnas",
-    };
-  const hospitalInfo = patientFullInfo?.hospital_info || {
-    name: "DocuHealth Hospital",
-  };
-
-  return [
-    {
-      id: "dummy-progress-note-1",
-      created_at: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
-      patient_info: patientInfo,
-      staff_info: staffInfo,
-      hospital_info: hospitalInfo,
-      condition: "Improving",
-      summary:
-        "Patient remains stable overnight, fever has resolved, tolerating oral intake.",
-      vital_signs: {
-        blood_pressure: "118/76",
-        temp: "36.8",
-        weight: "62",
-        resp_rate: "18",
-        heart_rate: "78",
-        height: "1.65",
-        bmi: "22.8",
-        pain_score: "2",
-        sp02: "98",
-      },
-      subjective:
-        "Patient reports significant improvement in abdominal pain since last review, with no further episodes of vomiting overnight.",
-      objective:
-        "Afebrile, tolerating oral intake. Abdomen soft, mildly tender in the right lower quadrant, no rebound or guarding.",
-      assessment_problems:
-        "Post-operative day 2 following appendectomy. Improving as expected, low risk of complications.",
-      plan:
-        "Continue current antibiotic regimen for 48 more hours, then reassess for step-down to oral therapy. Repeat FBC in the morning.",
-    },
-    {
-      id: "dummy-progress-note-2",
-      created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-      patient_info: patientInfo,
-      staff_info: staffInfo,
-      hospital_info: hospitalInfo,
-      condition: "Stable",
-      summary: "No new complaints. Wound site clean and dry, healing as expected.",
-      vital_signs: {
-        blood_pressure: "122/80",
-        temp: "36.6",
-        weight: "62",
-        resp_rate: "17",
-        heart_rate: "74",
-        height: "1.65",
-        bmi: "22.8",
-        pain_score: "1",
-        sp02: "99",
-      },
-      subjective:
-        "No new complaints. Ambulating independently and appetite has returned to normal.",
-      objective:
-        "Vitals stable. Surgical site clean, dry and intact, no signs of infection or discharge.",
-      assessment_problems: "Recovering well post-op, ready for step-down in care.",
-      plan:
-        "Plan for discharge tomorrow if overnight observation remains uneventful. Arrange follow-up clinic appointment in 1 week.",
-    },
-  ];
-};
-
-const PROGRESS_NOTE_CONDITION_STYLES = {
-  Improving: "bg-docuhealth-light-green text-docuhealth-green",
-  Stable: "bg-blue-100/50 text-docuhealth-primary",
-  Deteriorating: "bg-red-100 text-red-600",
-};
-
 const PROGRESS_NOTE_FORM_FIELDS = [
   { key: "subjective", label: "Subjective", placeholder: "Add note" },
   {
@@ -1371,14 +1292,14 @@ const PROGRESS_NOTE_FORM_FIELDS = [
     placeholder: "Enter history of presenting complaint...",
   },
   {
-    key: "assessmentProblems",
+    key: "assessments",
     label: "Assessment/Problems",
     placeholder: "Shortness of breath",
   },
   { key: "plan", label: "Plan", placeholder: "Shortness of breath" },
 ];
 
-const AddProgressNoteForm = ({ formData, setFormData, onBack, onUpload, isFormFilled }) => {
+const AddProgressNoteForm = ({ formData, setFormData, onBack, onUpload, isFormFilled, isSubmitting }) => {
   const updateField = (field) => (e) =>
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
 
@@ -1410,14 +1331,14 @@ const AddProgressNoteForm = ({ formData, setFormData, onBack, onUpload, isFormFi
         <div className="flex justify-end cursor-pointer">
           <button
             className={`py-2.5 text-white rounded-full text-sm px-20 mt-5 w-full lg:w-auto ${
-              isFormFilled
+              isFormFilled && !isSubmitting
                 ? "bg-docuhealth-primary cursor-pointer"
                 : "bg-gray-400 cursor-not-allowed"
             }`}
-            disabled={!isFormFilled}
+            disabled={!isFormFilled || isSubmitting}
             onClick={onUpload}
           >
-            Upload note
+            {isSubmitting ? "Uploading..." : "Upload note"}
           </button>
         </div>
       </div>
@@ -1425,65 +1346,80 @@ const AddProgressNoteForm = ({ formData, setFormData, onBack, onUpload, isFormFi
   );
 };
 
-const ProgressNote = ({ selected, patientFullInfo }) => {
+const ProgressNote = ({
+  selected,
+  patientFullInfo,
+  progressNotesLoading,
+  patientProgressNotes,
+  progressCount,
+  progressCurrentPage,
+  progressTotalPages,
+  setProgressCurrentPage,
+}) => {
   const [seeNoteDetails, setSeeNoteDetails] = useState(false);
   const [showAddNoteForm, setShowAddNoteForm] = useState(false);
   const [selectedNoteId, setSelectedNoteId] = useState(null);
   const [openPopover, setOpenPopover] = useState(null);
-  const [addedNotes, setAddedNotes] = useState([]);
   const [formData, setFormData] = useState({
     subjective: "",
     objective: "",
-    assessmentProblems: "",
+    assessments: "",
     plan: "",
   });
 
-  const baseProgressNotes = buildDummyProgressNotes(patientFullInfo, selected);
-  const dummyProgressNotes = [...addedNotes, ...baseProgressNotes];
-  const selectedNote = dummyProgressNotes.find((note) => note.id === selectedNoteId);
+  const queryClient = useQueryClient();
+  const hin =
+    patientFullInfo?.patient_info?.hin || selected?.patient_info?.hin || selected?.patient?.hin || "";
+  // `selected` here is always an admission record (this tab only renders for
+  // admitted patients — see getTabs below), so its own sqid is the admission
+  // reference the progress-notes API expects.
+  const admissionSqid = selected?.sqid || "";
+
+  const notes = patientProgressNotes || [];
+  const selectedNote = notes.find((note) => note.sqid === selectedNoteId);
 
   const togglePopover = (index) => {
     setOpenPopover(openPopover === index ? null : index);
   };
 
-  const isFormFilled = Object.values(formData).some((value) => value.trim() !== "");
+  // The backend requires subjective/objective/assessments/plan to all be
+  // non-blank (confirmed live — its schema doesn't actually list them as
+  // required, so this isn't visible from the docs alone), so "at least one
+  // field" isn't enough here.
+  const isFormFilled = Object.values(formData).every((value) => value.trim() !== "");
+
+  const { mutate: createNote, isPending: isCreating } = useMutation({
+    mutationFn: createProgressNote,
+    onSuccess: () => {
+      toast.success("Progress note added!");
+      setFormData({ subjective: "", objective: "", assessments: "", plan: "" });
+      setShowAddNoteForm(false);
+      queryClient.invalidateQueries({ queryKey: ["patient-progress-notes", hin] });
+    },
+    onError: (err) => {
+      console.error("Error creating progress note:", err);
+      toast.error(extractApiErrorMessage(err, "Failed to create progress note."));
+    },
+  });
 
   const handleUploadNote = () => {
     if (!isFormFilled) {
-      toast.error("Please fill in at least one field.");
+      toast.error("Please fill in all fields.");
+      return;
+    }
+    if (!admissionSqid) {
+      toast.error("Missing admission reference for this patient.");
       return;
     }
 
-    const patientInfo =
-      patientFullInfo?.patient_info || selected?.patient_info || selected?.patient || {};
-    const staffInfo =
-      selected?.staff ||
-      patientFullInfo?.latest_vitals?.staff_info || {
-        firstname: "Raphael",
-        lastname: "Jonnas",
-      };
-    const hospitalInfo = patientFullInfo?.hospital_info || {
-      name: "DocuHealth Hospital",
-    };
-
-    const newNote = {
-      id: `progress-note-${Date.now()}`,
-      created_at: new Date().toISOString(),
-      patient_info: patientInfo,
-      staff_info: staffInfo,
-      hospital_info: hospitalInfo,
-      condition: "Stable",
-      summary: formData.subjective || formData.objective || "Progress note added.",
-      subjective: formData.subjective || "NIL",
-      objective: formData.objective || "NIL",
-      assessment_problems: formData.assessmentProblems || "NIL",
-      plan: formData.plan || "NIL",
-    };
-
-    setAddedNotes((prev) => [newNote, ...prev]);
-    setFormData({ subjective: "", objective: "", assessmentProblems: "", plan: "" });
-    setShowAddNoteForm(false);
-    toast.success("Progress note added!");
+    createNote({
+      patient: hin,
+      admission: admissionSqid,
+      subjective: formData.subjective || "",
+      objective: formData.objective || "",
+      assessments: formData.assessments || "",
+      plan: formData.plan || "",
+    });
   };
 
   return (
@@ -1495,6 +1431,7 @@ const ProgressNote = ({ selected, patientFullInfo }) => {
           onBack={() => setShowAddNoteForm(false)}
           onUpload={handleUploadNote}
           isFormFilled={isFormFilled}
+          isSubmitting={isCreating}
         />
       ) : seeNoteDetails ? (
         <div className="text-sm">
@@ -1514,6 +1451,7 @@ const ProgressNote = ({ selected, patientFullInfo }) => {
                 fill="var(--color-docuhealth-dark)"
               />
             </svg>
+
             <h2 className="text-sm">Progress Note Overview</h2>
           </div>
 
@@ -1521,26 +1459,6 @@ const ProgressNote = ({ selected, patientFullInfo }) => {
             className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg"
             selectedMedicalRecord={selectedNote}
           />
-
-          <VitalSignsCard
-            className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg"
-            vitalSigns={selectedNote?.vital_signs}
-          />
-
-          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
-            <div className="flex items-center justify-between mb-4">
-              <p className="font-medium text-docuhealth-dark">Patient Condition</p>
-              <span
-                className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase ${
-                  PROGRESS_NOTE_CONDITION_STYLES[selectedNote?.condition] ||
-                  "bg-gray-100 text-gray-500"
-                }`}
-              >
-                {selectedNote?.condition || "NIL"}
-              </span>
-            </div>
-            <p className="text-[12px] text-gray-700">{selectedNote?.summary || "NIL"}</p>
-          </div>
 
           <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
             <p className="font-medium mb-4 text-docuhealth-dark">Subjective</p>
@@ -1559,7 +1477,7 @@ const ProgressNote = ({ selected, patientFullInfo }) => {
           <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
             <p className="font-medium mb-4 text-docuhealth-dark">Assessment/Problems</p>
             <p className="text-[12px] text-gray-700">
-              {selectedNote?.assessment_problems || "NIL"}
+              {selectedNote?.assessments || "NIL"}
             </p>
           </div>
 
@@ -1581,145 +1499,88 @@ const ProgressNote = ({ selected, patientFullInfo }) => {
             </div>
           )}
 
-          <div className="text-[12px] my-4">
-            <div className="hidden lg:block">
-              {dummyProgressNotes.map((note, index) => (
-                <div
-                  key={note.id}
-                  className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gray-100 rounded-md">
-                      <CalendarIcon className="w-4 h-4 text-gray-600" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-gray-500 uppercase font-semibold">
-                        Date uploaded
-                      </p>
-                      <p className="text-sm font-medium">
-                        {formatFullDate(note?.created_at)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gray-100 rounded-md">
-                      <CalendarIcon className="w-4 h-4 text-gray-600" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-gray-500 uppercase font-semibold">
-                        Time uploaded
-                      </p>
-                      <p className="text-sm font-medium">
-                        {formatTime(note?.created_at)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gray-100 rounded-md">
-                      <UserIcon className="w-4 h-4 text-gray-600" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-gray-500 uppercase font-semibold">
-                        Patient
-                      </p>
-                      <p className="text-sm font-medium">
-                        {note?.patient_info?.firstname} {note?.patient_info?.lastname}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between relative flex-1">
+          {progressNotesLoading ? (
+            <div className="flex justify-center items-center h-full text-sm pt-10">
+              Loading...
+            </div>
+          ) : notes.length === 0 ? (
+            <p className="text-center py-10 text-sm text-gray-500">
+              No progress notes found.
+            </p>
+          ) : (
+            <div className="text-[12px] my-4">
+              <div className="hidden lg:block">
+                {notes.map((note, index) => (
+                  <div
+                    key={note.sqid}
+                    className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-gray-100 rounded-md">
-                        <User className="w-4 h-4 text-gray-600" />
+                        <CalendarIcon className="w-4 h-4 text-gray-600" />
                       </div>
                       <div>
                         <p className="text-[10px] text-gray-500 uppercase font-semibold">
-                          Doctor
+                          Date uploaded
                         </p>
                         <p className="text-sm font-medium">
-                          Dr. {note?.staff_info?.firstname} {note?.staff_info?.lastname}
+                          {formatFullDate(note?.created_at)}
                         </p>
                       </div>
                     </div>
 
-                    <div
-                      onClick={() => {
-                        togglePopover(index);
-                        setSelectedNoteId(note.id);
-                      }}
-                      className={` hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer
-        ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
-    `}
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        viewBox="0 0 16 16"
-                      >
-                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-                      </svg>
-                    </div>
-
-                    {openPopover === index && (
-                      <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
-                        <p
-                          className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
-                          onClick={() => {
-                            setSelectedNoteId(note.id);
-                            setSeeNoteDetails(true);
-                            setOpenPopover(null);
-                          }}
-                        >
-                          See full progress note
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gray-100 rounded-md">
+                        <CalendarIcon className="w-4 h-4 text-gray-600" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-gray-500 uppercase font-semibold">
+                          Time uploaded
+                        </p>
+                        <p className="text-sm font-medium">
+                          {formatTime(note?.created_at)}
                         </p>
                       </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="block lg:hidden space-y-4 px-1">
-              {dummyProgressNotes.map((note, index) => (
-                <div
-                  key={note.id}
-                  className="bg-white border border-gray-200 rounded-lg p-4"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-                      <p className="text-[10px] text-slate-400 uppercase font-bold">
-                        Date / Time uploaded
-                      </p>
-                      <p className="text-sm font-medium">
-                        {formatFullDate(note?.created_at)} /{" "}
-                        {formatTime(note?.created_at)}
-                      </p>
                     </div>
-                    <div className="relative">
-                      <button
+
+                    <div className="flex items-center justify-between relative flex-1">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-gray-100 rounded-md">
+                          <UserIcon className="w-4 h-4 text-gray-600" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-semibold">
+                            Patient
+                          </p>
+                          <p className="text-sm font-medium">
+                            {note?.patient_info?.firstname} {note?.patient_info?.lastname}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div
                         onClick={() => {
                           togglePopover(index);
-                          setSelectedNoteId(note.id);
+                          setSelectedNoteId(note.sqid);
                         }}
-                        className={`h-9 w-9 flex items-center justify-center rounded-full ${openPopover === index ? "bg-slate-200" : "bg-gray-50"}`}
+                        className={`hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}`}
                       >
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                          <path
-                            d="M14 8C14 7.45 13.55 7 13 7C12.45 7 12 7.45 12 8C12 8.55 12.45 9 13 9C13.55 9 14 8.55 14 8ZM4 8C4 7.45 3.55 7 3 7C2.45 7 2 7.45 2 8C2 8.55 2.45 9 3 9C3.55 9 4 8.55 4 8ZM9 8C9 7.45 8.55 7 8 7C7.45 7 7 7.45 7 8C7 8.55 7.45 9 8 9C8.55 9 9 8.55 9 8Z"
-                            fill="#1A263E"
-                          />
+                        <svg
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
                         </svg>
-                      </button>
+                      </div>
+
                       {openPopover === index && (
                         <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
                           <p
                             className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                             onClick={() => {
-                              setSelectedNoteId(note.id);
+                              setSelectedNoteId(note.sqid);
                               setSeeNoteDetails(true);
                               setOpenPopover(null);
                             }}
@@ -1730,35 +1591,84 @@ const ProgressNote = ({ selected, patientFullInfo }) => {
                       )}
                     </div>
                   </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs border border-indigo-100">
-                        {note?.patient_info?.firstname?.[0] || "P"}
-                        {note?.patient_info?.lastname?.[0] || "N"}
+                ))}
+              </div>
+
+              <div className="block lg:hidden space-y-4 px-1">
+                {notes.map((note, index) => (
+                  <div
+                    key={note.sqid}
+                    className="bg-white border border-gray-200 rounded-lg p-4"
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                        <p className="text-[10px] text-slate-400 uppercase font-bold">
+                          Date / Time uploaded
+                        </p>
+                        <p className="text-sm font-medium">
+                          {formatFullDate(note?.created_at)} /{" "}
+                          {formatTime(note?.created_at)}
+                        </p>
                       </div>
-                      <div>
-                        <p className="text-[10px] text-slate-400 uppercase font-medium">
-                          Patient
-                        </p>
-                        <p className="text-sm font-semibold text-slate-800">
-                          {note?.patient_info?.firstname} {note?.patient_info?.lastname}
-                        </p>
+                      <div className="relative">
+                        <button
+                          onClick={() => {
+                            togglePopover(index);
+                            setSelectedNoteId(note.sqid);
+                          }}
+                          className={`h-9 w-9 flex items-center justify-center rounded-full ${openPopover === index ? "bg-slate-200" : "bg-gray-50"}`}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path
+                              d="M14 8C14 7.45 13.55 7 13 7C12.45 7 12 7.45 12 8C12 8.55 12.45 9 13 9C13.55 9 14 8.55 14 8ZM4 8C4 7.45 3.55 7 3 7C2.45 7 2 7.45 2 8C2 8.55 2.45 9 3 9C3.55 9 4 8.55 4 8ZM9 8C9 7.45 8.55 7 8 7C7.45 7 7 7.45 7 8C7 8.55 7.45 9 8 9C8.55 9 9 8.55 9 8Z"
+                              fill="#1A263E"
+                            />
+                          </svg>
+                        </button>
+                        {openPopover === index && (
+                          <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
+                            <p
+                              className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                              onClick={() => {
+                                setSelectedNoteId(note.sqid);
+                                setSeeNoteDetails(true);
+                                setOpenPopover(null);
+                              }}
+                            >
+                              See full progress note
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
-
-                    <div className="pt-3 border-t border-slate-50">
-                      <p className="text-[10px] text-slate-400 uppercase font-medium">
-                        Doctor
-                      </p>
-                      <p className="text-[13px] text-slate-600">
-                        Dr. {note?.staff_info?.firstname} {note?.staff_info?.lastname}
-                      </p>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs border border-indigo-100">
+                          {note?.patient_info?.firstname?.[0] || "P"}
+                          {note?.patient_info?.lastname?.[0] || "N"}
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-slate-400 uppercase font-medium">
+                            Patient
+                          </p>
+                          <p className="text-sm font-semibold text-slate-800">
+                            {note?.patient_info?.firstname} {note?.patient_info?.lastname}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+
+              <Pagination2
+                count={progressCount}
+                currentPage={progressCurrentPage}
+                totalPages={progressTotalPages}
+                setCurrentPage={setProgressCurrentPage}
+              />
             </div>
-          </div>
+          )}
         </>
       )}
     </div>
@@ -1790,6 +1700,12 @@ const getTabs = ({
   labCurrentPage,
   labTotalPages,
   setLabCurrentPage,
+  progressNotesLoading,
+  patientProgressNotes,
+  progressCount,
+  progressCurrentPage,
+  progressTotalPages,
+  setProgressCurrentPage,
   advanceCheckUpSource,
 }) => {
   const medRecordsTab = {
@@ -1853,7 +1769,18 @@ const getTabs = ({
     },
     {
       title: "Progress Note",
-      content: <ProgressNote selected={selected} patientFullInfo={patientFullInfo} />,
+      content: (
+        <ProgressNote
+          selected={selected}
+          patientFullInfo={patientFullInfo}
+          progressNotesLoading={progressNotesLoading}
+          patientProgressNotes={patientProgressNotes}
+          progressCount={progressCount}
+          progressCurrentPage={progressCurrentPage}
+          progressTotalPages={progressTotalPages}
+          setProgressCurrentPage={setProgressCurrentPage}
+        />
+      ),
     },
     {
       title: "Handover",

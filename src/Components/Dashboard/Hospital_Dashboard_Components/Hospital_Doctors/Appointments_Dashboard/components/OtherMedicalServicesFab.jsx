@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import OrderLabModal from "./OrderLabModal";
 import RequestVitalsModal from "./RequestVitalsModal";
+import VitalSignsTaskModal from "./VitalSignsTaskModal";
 import FluidIntakeOutputModal from "./FluidIntakeOutputModal";
 import WardProcedureModal from "./WardProcedureModal";
 import GlucoseMonitoringModal from "./GlucoseMonitoringModal";
@@ -11,18 +12,22 @@ import SeizureEventModal from "./SeizureEventModal";
 
 // `action: null` means there's no flow built for that item yet, so it just
 // surfaces a "coming soon" toast instead of opening a modal with nothing
-// to show.
+// to show. `admissionOnly: true` means the item creates a care task via
+// POST /api/inpatients/admissions/<sqid>/tasks, which needs a real
+// admission sqid — it's only usable when this FAB was mounted with one
+// (i.e. from an admitted/inpatient context, not an appointment/check-in).
 const QUICK_SERVICES = [
   { id: "lab", label: "Order lab", action: "lab" },
   { id: "scan", label: "Order scan/X-ray", action: null },
   { id: "pharmacy", label: "Order pharmacy", action: "pharmacy" },
-  { id: "drug-task", label: "Drug task (nurse)", action: "drug-task" },
+  { id: "drug-task", label: "Drug task (nurse)", action: "drug-task", admissionOnly: true },
   { id: "vitals", label: "Vitals", action: "vitals" },
-  { id: "procedure", label: "Procedure", action: "procedure" },
-  { id: "input-output", label: "Input and output", action: "input-output" },
-  { id: "iv-fluid", label: "IV fluid", action: "iv-fluid" },
+  { id: "vitals-task", label: "Vitals monitoring task", action: "vitals-task", admissionOnly: true },
+  { id: "procedure", label: "Procedure", action: "procedure", admissionOnly: true },
+  { id: "input-output", label: "Input and output", action: "input-output", admissionOnly: true },
+  { id: "iv-fluid", label: "IV fluid", action: "iv-fluid", admissionOnly: true },
   { id: "seizure", label: "Seizure events", action: "seizure" },
-  { id: "glucose", label: "Glucose monitoring", action: "glucose" },
+  { id: "glucose", label: "Glucose monitoring", action: "glucose", admissionOnly: true },
 ];
 
 /**
@@ -31,11 +36,12 @@ const QUICK_SERVICES = [
  * medical services" picker in between); "Order pharmacy" has no modal of
  * its own — it hands off to the parent via onOrderPharmacy, which redirects
  * to the Prescribe Medication screen. Unmapped items just show a "coming
- * soon" toast.
+ * soon" toast, and admission-only items do the same when there's no
+ * admission in context.
  */
-const OtherMedicalServicesFab = ({ selectedPatientDetails, onOrderPharmacy }) => {
+const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, onOrderPharmacy }) => {
   const [open, setOpen] = useState(false);
-  const [activeModal, setActiveModal] = useState(null); // "lab" | "vitals" | "input-output" | "procedure" | "glucose" | "drug-task" | "iv-fluid" | "seizure" | null
+  const [activeModal, setActiveModal] = useState(null); // "lab" | "vitals" | "vitals-task" | "input-output" | "procedure" | "glucose" | "drug-task" | "iv-fluid" | "seizure" | null
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -60,12 +66,21 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, onOrderPharmacy }) =>
 
   const handleItemClick = (item) => {
     setOpen(false);
+
+    if (item.admissionOnly && !admissionSqid) {
+      toast.error("Only available for admitted patients.");
+      return;
+    }
+
     switch (item.action) {
       case "lab":
         setActiveModal("lab");
         break;
       case "vitals":
         setActiveModal("vitals");
+        break;
+      case "vitals-task":
+        setActiveModal("vitals-task");
         break;
       case "input-output":
         setActiveModal("input-output");
@@ -139,11 +154,14 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, onOrderPharmacy }) =>
           onClose={() => setActiveModal(null)}
         />
       )}
+      {activeModal === "vitals-task" && (
+        <VitalSignsTaskModal admissionSqid={admissionSqid} onClose={() => setActiveModal(null)} />
+      )}
       {activeModal === "input-output" && (
-        <FluidIntakeOutputModal onClose={() => setActiveModal(null)} />
+        <FluidIntakeOutputModal admissionSqid={admissionSqid} onClose={() => setActiveModal(null)} />
       )}
       {activeModal === "procedure" && (
-        <WardProcedureModal onClose={() => setActiveModal(null)} />
+        <WardProcedureModal admissionSqid={admissionSqid} onClose={() => setActiveModal(null)} />
       )}
       {activeModal === "glucose" && (
         <GlucoseMonitoringModal onClose={() => setActiveModal(null)} />
