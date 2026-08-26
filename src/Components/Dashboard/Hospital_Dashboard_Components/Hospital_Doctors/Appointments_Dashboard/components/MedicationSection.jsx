@@ -3,6 +3,7 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { Plus, X } from "lucide-react";
 import Input from "../../../../../ui/Input";
 import Select from "../../../../../ui/Select";
+import { FREQUENCY_OPTIONS, DEFAULT_FREQUENCY } from "../../../../../../utils/careTaskConstants";
 
 const dosageUnits = [
   "mg",
@@ -30,7 +31,7 @@ const MedicationSection = ({ medications, setMedications }) => {
         dosage: "",
         dosageUnit: "mg",
         route: "Oral",
-        frequency: "od_qd",
+        frequency: DEFAULT_FREQUENCY,
         duration: "",
         durationUnit: "Month",
       },
@@ -247,26 +248,7 @@ const MedicationSection = ({ medications, setMedications }) => {
             <Select
               value={med.frequency}
               onChange={(value) => handleChange(index, "frequency", value)}
-              options={[
-                { value: "stat", label: "stat - Immediately" },
-                { value: "once", label: "once - One-time dose" },
-                { value: "od_qd", label: "od_qd - Once daily" },
-                { value: "bd_bid", label: "bd_bid - Twice daily" },
-                { value: "tds_tid", label: "tds_tid - Three times daily" },
-                { value: "qid", label: "qid - Four times daily" },
-                { value: "q3h", label: "q3h - Every 3 hours" },
-                { value: "q4h", label: "q4h - Every 4 hours" },
-                { value: "q6h", label: "q6h - Every 6 hours" },
-                { value: "q8h", label: "q8h - Every 8 hours" },
-                { value: "q12h", label: "q12h - Every 12 hours" },
-                { value: "q24h", label: "q24h - Every 24 hours" },
-                { value: "prn", label: "prn - As needed" },
-                { value: "mane", label: "mane - Morning" },
-                { value: "nocte", label: "nocte - Night" },
-                { value: "alt_days", label: "alt_days - Alternate days" },
-                { value: "weekly", label: "weekly - Weekly" },
-                { value: "monthly", label: "monthly - Monthly" },
-              ]}
+              options={FREQUENCY_OPTIONS}
             />
           </div>
 

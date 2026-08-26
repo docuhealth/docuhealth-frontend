@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import MedicationSection from "../Hospital_Doctors/Appointments_Dashboard/components/MedicationSection";
 import axiosInstanceHos from "../../../../lib/axios/hospital";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { DEFAULT_FREQUENCY } from "../../../../utils/careTaskConstants";
 
 const NoteSection = ({
   title,
@@ -89,7 +90,7 @@ const PharmacistCreateOrder = ({
       dosage: "",
       dosageUnit: "mg",
       route: "Oral",
-      frequency: "od_qd",
+      frequency: DEFAULT_FREQUENCY,
       duration: "",
       durationUnit: "Day",
     },

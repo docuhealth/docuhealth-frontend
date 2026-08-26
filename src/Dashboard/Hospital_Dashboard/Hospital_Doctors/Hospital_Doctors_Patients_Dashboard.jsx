@@ -137,6 +137,11 @@ const Hospital_Doctors_Patients_Dashboard = () => {
           {!selected.discharge_date && (
             <OtherMedicalServicesFab
               selectedPatientDetails={selected}
+              // Care-task quick-services need a real admission sqid, which
+              // only exists when this is the inpatient list — the
+              // outpatient list's `selected` is a check-in/appointment,
+              // not an admission.
+              admissionSqid={advanceCheckUpSource === "outpatient" ? null : selected?.sqid}
               onOrderPharmacy={() => {
                 setPrescribeMedication(true);
                 setAdvanceCheckUp(false);

@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchTestCategories, fetchLabTests } from "../../../../../../queries/Hospital/lab/requests";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import Select from "../../../../../ui/Select";
 
 /**
@@ -11,6 +12,7 @@ import Select from "../../../../../ui/Select";
  * OtherMedicalServicesFab quick-service menu.
  */
 const OrderLabModal = ({ selectedPatientDetails, onClose }) => {
+  const queryClient = useQueryClient();
   const orderContext = resolveOrderContext(selectedPatientDetails);
   const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
   const [duplicateWarning, setDuplicateWarning] = useState(null);
@@ -22,10 +24,15 @@ const OrderLabModal = ({ selectedPatientDetails, onClose }) => {
     test_type: [],
   });
 
+  // No staleTime override here: the lab test catalog is edited/reseeded
+  // server-side from time to time (sqids get regenerated), so pinning this
+  // to Infinity let a long-lived tab keep offering test ids that no longer
+  // exist server-side, failing with a confusing "Object with sqid=... does
+  // not exist." on submit. Falls back to the app's global 5-minute
+  // staleTime (see lib/queryClient.ts) instead.
   const { data: categoriesData } = useQuery({
     queryKey: ["lab-test-categories"],
     queryFn: fetchTestCategories,
-    staleTime: Infinity,
   });
 
   const categories = Array.isArray(categoriesData)
@@ -36,7 +43,6 @@ const OrderLabModal = ({ selectedPatientDetails, onClose }) => {
     queryKey: ["lab-tests", formData.category],
     queryFn: fetchLabTests,
     enabled: !!formData.category,
-    staleTime: Infinity,
   });
 
   const fetchedTestTypes = Array.isArray(testTypesData)
@@ -70,9 +76,14 @@ const OrderLabModal = ({ selectedPatientDetails, onClose }) => {
         setDuplicateWarning(err.response.data.duplicate_warning);
       } else {
         console.error("Error assigning patient to lab scientist:", err);
-        toast.error(
-          err.response?.data?.message || "Lab test request failed.",
-        );
+        toast.error(extractApiErrorMessage(err, "Lab test request failed."));
+        // Covers stale catalog data (e.g. a selected test/category sqid no
+        // longer exists server-side): refetch both lists and drop the
+        // current test selection so the doctor picks again from what's
+        // actually valid now, instead of resubmitting the same broken ids.
+        queryClient.invalidateQueries({ queryKey: ["lab-test-categories"] });
+        queryClient.invalidateQueries({ queryKey: ["lab-tests", formData.category] });
+        setFormData((prev) => ({ ...prev, test_type: [] }));
       }
     },
   });

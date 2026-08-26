@@ -3,53 +3,46 @@ import { ClipboardList } from "lucide-react";
 import toast from "react-hot-toast";
 import Input from "../../../../../ui/Input";
 import Select from "../../../../../ui/Select";
+import Spinner from "../../../../../ui/Spinner";
+import {
+  FREQUENCY_OPTIONS,
+  PRIORITY_OPTIONS,
+  DURATION_RATE_OPTIONS,
+  REPEAT_UNTIL_OPTIONS,
+  DEFAULT_FREQUENCY,
+  DEFAULT_PRIORITY,
+  DEFAULT_DURATION_RATE,
+  DEFAULT_REPEAT_UNTIL,
+} from "../../../../../../utils/careTaskConstants";
 
-export const DEFAULT_FREQUENCY_OPTIONS = [
-  "Q1H (Every hour)",
-  "Q2H (Every 2 hours)",
-  "Q4H (Every 4 hours)",
-  "Q6H (Every 6 hours)",
-  "Q8H (Every 8 hours)",
-  "Q12H (Every 12 hours)",
-  "Once per shift",
-];
-
-export const DEFAULT_DURATION_OPTIONS = [
-  "8 hours",
-  "12 hours",
-  "24 hours",
-  "48 hours",
-  "72 hours",
-  "Until discontinued",
-];
-
-export const DEFAULT_PRIORITY_OPTIONS = [
-  "Low priority task",
-  "Medium priority task",
-  "High priority task",
-];
-
-const DEFAULT_FREQUENCY = "Q6H (Every 6 hours)";
-const DEFAULT_DURATION = "24 hours";
-const DEFAULT_PRIORITY = "High priority task";
 const DEFAULT_START_TIME = "11:00";
+const DEFAULT_DURATION_VALUE = 24;
+
+const todayDateString = () => new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD in local time
 
 export const FIELD_LABEL_CLASS = "block text-sm font-medium text-docuhealth-primary mb-2";
 export const FIELD_BOX_CLASS = "border border-gray-200 rounded-2xl p-5";
 
 /**
  * Shared "create a task" modal shell for the OtherMedicalServicesFab
- * quick-service items that don't have a backend endpoint yet (I&O,
- * ward procedures, ...). Each caller supplies its own title/primary
- * field; frequency, duration, priority, and the instruction box are the
- * same shape across all of them, so they're centralized here instead of
- * being copy-pasted into every modal.
+ * quick-service items backed by
+ * `POST /api/inpatients/admissions/<sqid>/tasks`. It owns the fields every
+ * task type shares (start date/time, frequency, duration, repeat-until,
+ * priority, instructions) and leaves the type-specific `config` to the
+ * caller.
  *
  * For layouts that don't fit the single "primary select" shape (e.g. a
- * repeatable drug chart), pass `topSection` to render custom content in
- * its place, `isTopSectionValid` to gate the submit button on it, and
- * `showFrequencyDuration={false}` to drop the shared Frequency/Duration
- * row entirely.
+ * repeatable drug chart or IV fluid details), pass `topSection` to render
+ * custom content in its place and `isTopSectionValid` to gate the submit
+ * button on it.
+ *
+ * Callers pass `onSubmit(sharedFields)`, which receives the common fields
+ * already shaped for the API body (`start_time`, `frequency`, `duration`,
+ * `repeat_until`, `priority`, `instructions`, plus whatever the "primary"
+ * select holds) and is expected to merge in `task_type`/`config` and POST
+ * it. If a caller has no endpoint to hit yet, omit `onSubmit` and this
+ * just shows the success screen locally — swap in a real `onSubmit` once
+ * one exists.
  */
 const TaskCreationModal = ({
   title,
@@ -58,30 +51,37 @@ const TaskCreationModal = ({
   topSection,
   isTopSectionValid = true,
   frequencyLabel = "Frequency",
-  frequencyOptions = DEFAULT_FREQUENCY_OPTIONS,
-  durationOptions = DEFAULT_DURATION_OPTIONS,
-  priorityOptions = DEFAULT_PRIORITY_OPTIONS,
+  frequencyOptions = FREQUENCY_OPTIONS,
+  durationRateOptions = DURATION_RATE_OPTIONS,
+  priorityOptions = PRIORITY_OPTIONS,
   defaultFrequency = DEFAULT_FREQUENCY,
-  defaultDuration = DEFAULT_DURATION,
+  defaultDurationValue = DEFAULT_DURATION_VALUE,
+  defaultDurationRate = DEFAULT_DURATION_RATE,
+  defaultRepeatUntil = DEFAULT_REPEAT_UNTIL,
   defaultPriority = DEFAULT_PRIORITY,
   showFrequencyDuration = true,
   successMessage,
+  onSubmit,
   onClose,
 }) => {
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState({
-    primary: primaryOptions?.[0] || "",
-    frequency: frequencyOptions.includes(defaultFrequency)
+    primary: primaryOptions?.[0]?.value ?? "",
+    frequency: frequencyOptions.some((o) => o.value === defaultFrequency)
       ? defaultFrequency
-      : frequencyOptions[0] || "",
-    duration: durationOptions.includes(defaultDuration)
-      ? defaultDuration
-      : durationOptions[0] || "",
-    startTime: DEFAULT_START_TIME,
-    priority: priorityOptions.includes(defaultPriority)
+      : (frequencyOptions[0]?.value ?? ""),
+    repeatUntil: defaultRepeatUntil,
+    durationValue: String(defaultDurationValue),
+    durationRate: durationRateOptions.some((o) => o.value === defaultDurationRate)
+      ? defaultDurationRate
+      : (durationRateOptions[0]?.value ?? ""),
+    date: todayDateString(),
+    time: DEFAULT_START_TIME,
+    priority: priorityOptions.some((o) => o.value === defaultPriority)
       ? defaultPriority
-      : priorityOptions[0] || "",
-    instruction: "",
+      : (priorityOptions[0]?.value ?? ""),
+    instructions: "",
   });
 
   const updateField = (field) => (e) =>
@@ -89,20 +89,56 @@ const TaskCreationModal = ({
   const updateValue = (field) => (value) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
 
+  const isDurationNeeded = showFrequencyDuration && formData.repeatUntil === "duration";
+
   const isFormFilled =
     (topSection ? isTopSectionValid : !!formData.primary) &&
-    (!showFrequencyDuration || (!!formData.frequency && !!formData.duration)) &&
-    !!formData.startTime &&
+    (!showFrequencyDuration ||
+      (!!formData.frequency &&
+        !!formData.repeatUntil &&
+        (!isDurationNeeded || (Number(formData.durationValue) > 0 && !!formData.durationRate)))) &&
+    !!formData.date &&
+    !!formData.time &&
     !!formData.priority;
 
-  const handleCreateTask = () => {
+  const buildSharedPayload = () => {
+    const shared = {
+      start_time: new Date(`${formData.date}T${formData.time}`).toISOString(),
+      priority: formData.priority,
+      instructions: formData.instructions || "",
+      primary: formData.primary,
+    };
+    if (showFrequencyDuration) {
+      shared.frequency = formData.frequency;
+      shared.repeat_until = formData.repeatUntil;
+      if (formData.repeatUntil === "duration") {
+        shared.duration = { value: Number(formData.durationValue), rate: formData.durationRate };
+      }
+    }
+    return shared;
+  };
+
+  const handleCreateTask = async () => {
     if (!isFormFilled) {
       toast.error("Please fill in all required fields.");
       return;
     }
 
-    // TODO: wire up to the real task endpoint once it exists.
-    setShowSuccess(true);
+    if (!onSubmit) {
+      // No backend endpoint wired up for this task type yet.
+      setShowSuccess(true);
+      return;
+    }
+
+    try {
+      setIsCreating(true);
+      await onSubmit(buildSharedPayload());
+      setShowSuccess(true);
+    } catch {
+      // The caller's mutation already surfaces an error toast.
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   if (showSuccess) {
@@ -165,7 +201,7 @@ const TaskCreationModal = ({
               <Select
                 value={formData.primary}
                 onChange={updateValue("primary")}
-                options={primaryOptions.map((option) => ({ value: option, label: option }))}
+                options={primaryOptions}
               />
             </div>
           )}
@@ -177,16 +213,40 @@ const TaskCreationModal = ({
                 <Select
                   value={formData.frequency}
                   onChange={updateValue("frequency")}
-                  options={frequencyOptions.map((option) => ({ value: option, label: option }))}
+                  options={frequencyOptions}
                 />
               </div>
 
               <div className={FIELD_BOX_CLASS}>
-                <label className={FIELD_LABEL_CLASS}>Duration</label>
+                <label className={FIELD_LABEL_CLASS}>Runs until</label>
                 <Select
-                  value={formData.duration}
-                  onChange={updateValue("duration")}
-                  options={durationOptions.map((option) => ({ value: option, label: option }))}
+                  value={formData.repeatUntil}
+                  onChange={updateValue("repeatUntil")}
+                  options={REPEAT_UNTIL_OPTIONS}
+                />
+              </div>
+            </div>
+          )}
+
+          {isDurationNeeded && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className={FIELD_BOX_CLASS}>
+                <label className={FIELD_LABEL_CLASS}>Duration</label>
+                <Input
+                  type="number"
+                  min="1"
+                  placeholder="Enter duration..."
+                  value={formData.durationValue}
+                  onChange={updateField("durationValue")}
+                />
+              </div>
+
+              <div className={FIELD_BOX_CLASS}>
+                <label className={FIELD_LABEL_CLASS}>Duration unit</label>
+                <Select
+                  value={formData.durationRate}
+                  onChange={updateValue("durationRate")}
+                  options={durationRateOptions}
                 />
               </div>
             </div>
@@ -194,22 +254,23 @@ const TaskCreationModal = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div className={FIELD_BOX_CLASS}>
-              <label className={FIELD_LABEL_CLASS}>Task start time</label>
-              <Input
-                type="time"
-                value={formData.startTime}
-                onChange={updateField("startTime")}
-              />
+              <label className={FIELD_LABEL_CLASS}>Task start date</label>
+              <Input type="date" value={formData.date} onChange={updateField("date")} />
             </div>
 
             <div className={FIELD_BOX_CLASS}>
-              <label className={FIELD_LABEL_CLASS}>Level of priority</label>
-              <Select
-                value={formData.priority}
-                onChange={updateValue("priority")}
-                options={priorityOptions.map((option) => ({ value: option, label: option }))}
-              />
+              <label className={FIELD_LABEL_CLASS}>Task start time</label>
+              <Input type="time" value={formData.time} onChange={updateField("time")} />
             </div>
+          </div>
+
+          <div className={FIELD_BOX_CLASS}>
+            <label className={FIELD_LABEL_CLASS}>Level of priority</label>
+            <Select
+              value={formData.priority}
+              onChange={updateValue("priority")}
+              options={priorityOptions}
+            />
           </div>
 
           <div className={FIELD_BOX_CLASS}>
@@ -218,8 +279,8 @@ const TaskCreationModal = ({
               rows={4}
               className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none focus:border-docuhealth-primary resize-none placeholder:text-gray-400"
               placeholder="Add comment..."
-              value={formData.instruction}
-              onChange={updateField("instruction")}
+              value={formData.instructions}
+              onChange={updateField("instructions")}
             />
           </div>
         </div>
@@ -227,14 +288,21 @@ const TaskCreationModal = ({
         <div className="flex justify-end px-6 pb-6">
           <button
             onClick={handleCreateTask}
-            disabled={!isFormFilled}
+            disabled={!isFormFilled || isCreating}
             className={`py-3 px-8 rounded-full text-sm font-medium text-white transition-colors ${
-              isFormFilled
+              isFormFilled && !isCreating
                 ? "bg-docuhealth-primary cursor-pointer hover:bg-docuhealth-dark-primary"
                 : "bg-gray-300 cursor-not-allowed"
             }`}
           >
-            Create this task
+            {isCreating ? (
+              <span className="flex items-center justify-center gap-2">
+                <Spinner className="h-4 w-4 text-white" />
+                Creating task...
+              </span>
+            ) : (
+              "Create this task"
+            )}
           </button>
         </div>
       </div>
