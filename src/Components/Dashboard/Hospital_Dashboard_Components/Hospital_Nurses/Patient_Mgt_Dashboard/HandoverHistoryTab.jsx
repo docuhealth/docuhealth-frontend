@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { User, Bed, Calendar, Stethoscope } from "lucide-react";
+import HandoverNoteDetail from "./HandoverNoteDetail";
 
 const demoHandoverNotes = [
   {
@@ -8,7 +9,7 @@ const demoHandoverNotes = [
     patientName: "Amiefa Obed",
     bed: "Bed 4",
     ward: "Emergency ward",
-    date: "23rd, Dec., 2025/ 3:45 PM",
+    date: "July 15, 2025/12:45 pm",
     timeAgo: "3 minutes ago"
   },
   {
@@ -17,7 +18,7 @@ const demoHandoverNotes = [
     patientName: "Amiefa Obed",
     bed: "Bed 4",
     ward: "Emergency ward",
-    date: "23rd, Dec., 2025/ 3:45 PM",
+    date: "July 15, 2025/12:45 pm",
     timeAgo: "3 minutes ago"
   },
   {
@@ -26,7 +27,7 @@ const demoHandoverNotes = [
     patientName: "Amiefa Obed",
     bed: "Bed 4",
     ward: "Emergency ward",
-    date: "23rd, Dec., 2025/ 3:45 PM",
+    date: "July 15, 2025/12:45 pm",
     timeAgo: "3 minutes ago"
   },
   {
@@ -35,14 +36,20 @@ const demoHandoverNotes = [
     patientName: "John Doe",
     bed: "Bed 2",
     ward: "General ward",
-    date: "23rd, Dec., 2025/ 4:00 PM",
+    date: "July 15, 2025/12:45 pm",
     timeAgo: "1 hour ago"
   },
 ];
 
 const HandoverHistoryTab = ({ type }) => {
+  const [selectedNote, setSelectedNote] = useState(null);
+
   // Filter based on type ('received' or 'sent')
   const displayedNotes = demoHandoverNotes.filter(note => note.type === type);
+
+  if (selectedNote) {
+    return <HandoverNoteDetail note={selectedNote} onBack={() => setSelectedNote(null)} />;
+  }
 
   return (
     <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
@@ -56,10 +63,10 @@ const HandoverHistoryTab = ({ type }) => {
 
           {/* Centered Notebook Icon */}
           <div className="flex justify-center items-center py-10 mt-4">
-            <svg width="72" height="72" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="#4B5563" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="#4B5563" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M4 5h2M4 9h2M4 13h2" stroke="#4B5563" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg width="72" height="72" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="stroke-docuhealth-primary">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M4 5h2M4 9h2M4 13h2" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
 
@@ -85,7 +92,10 @@ const HandoverHistoryTab = ({ type }) => {
             </ul>
 
             <div className="mt-auto pt-6">
-              <button className="w-full border border-docuhealth-primary text-docuhealth-primary hover:bg-blue-50 font-medium py-2.5 rounded-lg transition-colors text-sm">
+              <button 
+                onClick={() => setSelectedNote(note)}
+                className="w-full border border-docuhealth-primary text-docuhealth-primary hover:bg-blue-50 font-medium py-2.5 rounded-full transition-colors text-sm"
+              >
                 Open details
               </button>
             </div>

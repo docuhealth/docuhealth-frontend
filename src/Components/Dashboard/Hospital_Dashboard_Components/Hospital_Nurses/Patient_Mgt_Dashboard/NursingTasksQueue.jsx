@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Calendar, User, FileText, Activity, ArrowLeft } from "lucide-react";
 import Modal from "../../../../ui/Modal";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
+import NursingDischargeSummaryForm from "./NursingDischargeSummaryForm";
 
 const demoTasks = [
   {
@@ -59,6 +60,14 @@ const demoTasks = [
     task: "Administer Normal Saline",
     orderingDoctor: "Dr. Evans",
     type: "iv_fluid_monitoring",
+  },
+  {
+    id: 8,
+    status: "Pending",
+    dateTime: "Aug 24, 2026 / 06:00 PM",
+    task: "Complete Nursing Discharge",
+    orderingDoctor: "Dr. Evans",
+    type: "discharge_summary",
   }
 ];
 
@@ -189,7 +198,7 @@ const outputCharacteristicsMap = {
   ]
 };
 
-const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
+const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) => {
   const [openPopover, setOpenPopover] = useState(null);
   const dropdownRef = useRef(null);
 
@@ -224,6 +233,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
 
   const [showProcedureEntry, setShowProcedureEntry] = useState(false);
   const [showProcedureRecord, setShowProcedureRecord] = useState(false);
+  const [showDischargeSummary, setShowDischargeSummary] = useState(false);
   const [procedureSubmitSuccessModalOpen, setProcedureSubmitSuccessModalOpen] = useState(false);
 
   const [showIVFluidEntry, setShowIVFluidEntry] = useState(false);
@@ -384,7 +394,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
 
   return (
     <div className="text-[12px] my-4 text-left">
-      {!showMedicationRecord && !showGlucoseRecord && !showIOEntry && !showIORecord && !showVitalsEntry && !showVitalsRecord && !showSeizureEntry && !showSeizureRecord && !showProcedureEntry && !showProcedureRecord && !showIVFluidEntry && !showIVFluidRecord ? (
+      {!showMedicationRecord && !showGlucoseRecord && !showIOEntry && !showIORecord && !showVitalsEntry && !showVitalsRecord && !showSeizureEntry && !showSeizureRecord && !showProcedureEntry && !showProcedureRecord && !showIVFluidEntry && !showIVFluidRecord && !showDischargeSummary ? (
         <>
           <div className="flex justify-end mb-4 relative gap-2">
         <div className="relative" ref={filterDropdownRef}>
@@ -632,6 +642,13 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
                             IV Fluid record
                           </button>
                         </>
+                      ) : task.type === 'discharge_summary' ? (
+                        <button 
+                          className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap" 
+                          onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowDischargeSummary(true); }}
+                        >
+                          Add entry
+                        </button>
                       ) : (
                         <button 
                           className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap" 
@@ -773,6 +790,13 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
                             IV Fluid record
                           </button>
                         </>
+                      ) : task.type === 'discharge_summary' ? (
+                        <button 
+                          className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                          onClick={() => { setOpenPopover(null); setShowDischargeSummary(true); }}
+                        >
+                          Add entry
+                        </button>
                       ) : (
                         <button 
                           className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
@@ -828,6 +852,8 @@ const NursingTasksQueue = ({ setAdvanceCheckUp }) => {
 
       <Pagination2 count={20} currentPage={tasksCurrentPage} totalPages={8} setCurrentPage={setTasksCurrentPage} />
         </>
+      ) : showDischargeSummary ? (
+        <NursingDischargeSummaryForm onCancel={() => setShowDischargeSummary(false)} setAdvanceCheckUp={setAdvanceCheckUp} admission={admission} patientFullInfo={patientFullInfo} />
       ) : showMedicationRecord ? (
         <div className="bg-white rounded-xl border border-gray-100 p-4 lg:p-6 mb-6">
           <div className="mb-6 flex items-center justify-between gap-4 border-b border-gray-100 pb-4">

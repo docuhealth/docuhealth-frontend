@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
+import { NursesAdmittedPatientMGTContext } from "../../../context/HospitalContext/Nurses/NursesAdmittedPatientMGTContext";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import TabComponent from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/TabComponent";
 import getTabs from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/TabDetails";
@@ -17,6 +18,7 @@ import Modal from "../../../Components/ui/Modal";
 import { ChevronDown } from "lucide-react";
 
 const Hospital_Nurses_Patients_Dashboard = () => {
+  const { tab } = useContext(NursesAdmittedPatientMGTContext);
   const [updateVitals, setUpdateVitals] = useState(false);
   const [caseNoteHistory, setCaseNoteHistory] = useState(false);
   const [vitalSignsHistory, setVitalSignsHistory] = useState(false);
@@ -91,7 +93,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                     Add New Case Note
                   </button>
                 </>
-              ) : (
+              ) : tab === "inpatient_discharge" ? null : (
                 <>
                   <div className="relative w-full lg:w-60" ref={dropdownRef}>
                     <button

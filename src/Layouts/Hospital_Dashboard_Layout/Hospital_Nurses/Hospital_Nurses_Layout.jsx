@@ -119,6 +119,41 @@ const Hospital_Nurses_Layout = () => {
       ),
     },
     {
+      name: "Handover Note History",
+      path: "/hospital-nurses-handover-history",
+      icon: (isActive) => (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className={`group-hover:stroke-white ${isActive ? "stroke-white" : "stroke-docuhealth-secondary"}`}
+        >
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+    },
+    {
+      name: "My Tasks",
+      path: "/hospital-nurses-my-tasks",
+      icon: (isActive) => (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className={`group-hover:stroke-white ${isActive ? "stroke-white" : "stroke-docuhealth-secondary"}`}
+        >
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M4 5h2M4 9h2M4 13h2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+    },
+    {
       name: "Patient Mgt.",
       path: "/hospital-nurses-patients-dashboard",
       icon: (isActive) => (
@@ -174,24 +209,7 @@ const Hospital_Nurses_Layout = () => {
           />
         </svg>
       ),
-    },
-    {
-      name: "Handover Note History",
-      path: "/hospital-nurses-handover-history",
-      icon: (isActive) => (
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className={`group-hover:stroke-white ${isActive ? "stroke-white" : "stroke-docuhealth-secondary"}`}
-        >
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      ),
-    },
+    }
   ];
 
   const bottomNavItems = [

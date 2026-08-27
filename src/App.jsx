@@ -113,6 +113,7 @@ import Hospital_Nurses_Patients_Dashboard from "./Dashboard/Hospital_Dashboard/H
 import Hospital_Nurses_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Settings_Dashboard";
 import Hospital_Nurses_Nursing_Encounter_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Nursing_Encounter_Dashboard";
 import Hospital_Nurses_Handover_History from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Handover_History";
+import Hospital_Nurses_My_Tasks from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_My_Tasks";
 
 import HospitalPharmacistProviders from "./Providers/Hospital/HospitalPharmacistProviders";
 import Hospital_Pharmacist_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_Pharmacist/Hospital_Pharmacist_Layout";
@@ -151,8 +152,8 @@ function App() {
   const hostname = window.location.hostname;
 
   //Adjust the condition to remove the true value when deploying to production. This is just for testing purposes to always render the hospital routes.
-  // const isHospital = hostname.startsWith("hospital.") || true;
-  const isHospital = hostname.startsWith("hospital.");
+  const isHospital = hostname.startsWith("hospital.") || true;
+  // const isHospital = hostname.startsWith("hospital.");
 
   return (
     <HelmetProvider>
@@ -992,6 +993,26 @@ function App() {
                   <HospitalProtectedRoute>
                     <HospitalNursesProviders>
                       <Hospital_Nurses_Handover_History />
+                    </HospitalNursesProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+
+            <Route
+              path="/hospital-nurses-my-tasks"
+              element={
+                <HospitalNursesProviders>
+                  <Hospital_Nurses_Layout />
+                </HospitalNursesProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalNursesProviders>
+                      <Hospital_Nurses_My_Tasks />
                     </HospitalNursesProviders>
                   </HospitalProtectedRoute>
                 }

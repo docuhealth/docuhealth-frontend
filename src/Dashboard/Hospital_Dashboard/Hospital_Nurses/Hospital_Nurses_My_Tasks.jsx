@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
-import HandoverHistoryTab from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/HandoverHistoryTab";
+import MyTasksTab from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/My_Tasks/MyTasksTab";
 import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 
-const Hospital_Nurses_Handover_History = () => {
-  const [activeTab, setActiveTab] = useState("Received notes");
+const Hospital_Nurses_My_Tasks = () => {
+  const [activeTab, setActiveTab] = useState("My Pending Tasks");
   const [currentPage, setCurrentPage] = useState(1);
 
   const tabs = [
-    { name: "Received notes" },
-    { name: "Sent-out handover notes" }
+    { name: "My Pending Tasks" },
+    { name: "My Completed Tasks" }
   ];
 
   return (
@@ -26,7 +26,10 @@ const Hospital_Nurses_Handover_History = () => {
             return (
               <button
                 key={index}
-                onClick={() => setActiveTab(t.name)}
+                onClick={() => {
+                  setActiveTab(t.name);
+                  setCurrentPage(1); // Reset page on tab change
+                }}
                 className={`text-sm px-4 py-2 font-medium transition-all duration-200 whitespace-nowrap
                   ${isActive 
                     ? "text-docuhealth-primary border-b-2 border-docuhealth-primary font-semibold" 
@@ -40,16 +43,16 @@ const Hospital_Nurses_Handover_History = () => {
 
         {/* Tab Content */}
         <div className="mt-4">
-          {activeTab === "Received notes" && (
-            <HandoverHistoryTab type="received" />
+          {activeTab === "My Pending Tasks" && (
+            <MyTasksTab type="pending" />
           )}
-          {activeTab === "Sent-out handover notes" && (
-            <HandoverHistoryTab type="sent" />
+          {activeTab === "My Completed Tasks" && (
+            <MyTasksTab type="completed" />
           )}
         </div>
 
         {/* Pagination */}
-    
+       
           <Pagination2 
             count={20} 
             currentPage={currentPage} 
@@ -62,4 +65,4 @@ const Hospital_Nurses_Handover_History = () => {
   );
 };
 
-export default Hospital_Nurses_Handover_History;
+export default Hospital_Nurses_My_Tasks;
