@@ -75,7 +75,7 @@ const DoctorEncounterTable = () => {
     };
 
     const vitalsData = encounter.latest_vitals || encounter.vital_signs || encounter.vitals || {};
-    const mockVitals = {
+    const mappedVitals = {
       blood_pressure: vitalsData.blood_pressure || vitalsData.bp || "N/A",
       temp: vitalsData.temp || vitalsData.temperature || "N/A",
       heart_rate: vitalsData.heart_rate || vitalsData.pulse || "N/A",
@@ -84,7 +84,7 @@ const DoctorEncounterTable = () => {
       weight: vitalsData.weight || "N/A",
       bmi: vitalsData.bmi || "N/A",
       pain_score: vitalsData.pain_score || "N/A",
-      sp02: vitalsData.sp02 || vitalsData.oxygen_saturation || "N/A"
+      spo2: vitalsData.spo2 || vitalsData.sp02 || vitalsData.oxygen_saturation || "N/A"
     };
 
     const handleProceedToCall = async () => {
@@ -111,10 +111,10 @@ const DoctorEncounterTable = () => {
         <div 
           className="flex items-center justify-between mb-6"
         >
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setSelectedPatientForWall(null)}>
+          <button type="button" className="flex items-center gap-2 cursor-pointer" onClick={() => setSelectedPatientForWall(null)}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            <h2 className="font-medium text-docuhealth-primary">Patient's Wall</h2>
-          </div>
+            <span className="font-medium text-docuhealth-primary">Patient's Wall</span>
+          </button>
           
           {activeTab === "Pending" && (
             <button 
@@ -127,7 +127,7 @@ const DoctorEncounterTable = () => {
         </div>
         
         <GeneralPatientInfoForm patient={mappedPatient} />
-        <VitalSignsCard vitalSigns={mockVitals} title="Latest vital signs" />
+        <VitalSignsCard vitalSigns={mappedVitals} title="Latest vital signs" />
 
         {/* Claim Confirmation Modal */}
         <Modal

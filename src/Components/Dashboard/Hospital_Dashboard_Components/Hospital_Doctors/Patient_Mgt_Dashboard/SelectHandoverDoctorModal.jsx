@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { User, X } from "lucide-react";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
+import { DoctorAppContext } from "../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 
 /**
  * "Select a doctor you'll handover to" — opened from the Handover tab's
@@ -11,23 +12,30 @@ import axiosInstanceHos from "../../../../../lib/axios/hospital";
  * radio-card grid instead of per-row "Assign" buttons.
  */
 const SelectHandoverDoctorModal = ({ onClose, onProceed }) => {
+  const { profile } = useContext(DoctorAppContext);
   const [loadingDoctors, setLoadingDoctors] = useState(true);
   const [doctors, setDoctors] = useState([]);
-  const [selectedStaffId, setSelectedStaffId] = useState(null);
+  // `sqid` is what POST /api/doctors/handover wants as `to_doctor_id` — the
+  // staff-list responses now carry it (staff_id is not accepted there).
+  const [selectedSqid, setSelectedSqid] = useState(null);
 
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
         const res = await axiosInstanceHos.get("api/receptionists/staff/doctor");
-        const data = res.data;
+        // Drop rows with no sqid and the logged-in doctor — the backend
+        // rejects a self-handover with "Cannot handover to yourself."
+        const list = (res.data || []).filter(
+          (d) => d?.sqid && d.sqid !== profile?.sqid,
+        );
 
-        if (!data || data.length === 0) {
-          toast.error("No doctors currently available.");
+        if (list.length === 0) {
+          toast.error("No other doctors available to hand over to.");
           onClose();
           return;
         }
 
-        setDoctors(data);
+        setDoctors(list);
       } catch (err) {
         console.error("Error fetching doctors:", err);
         toast.error(err.response?.data?.message || "Error fetching medical personnel.");
@@ -41,7 +49,7 @@ const SelectHandoverDoctorModal = ({ onClose, onProceed }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const selectedDoctor = doctors.find((d) => d.staff_id === selectedStaffId);
+  const selectedDoctor = doctors.find((d) => d.sqid === selectedSqid);
 
   const handleProceed = () => {
     if (!selectedDoctor) return;
@@ -69,12 +77,12 @@ const SelectHandoverDoctorModal = ({ onClose, onProceed }) => {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-5">
               {doctors.map((doctor) => {
-                const isSelected = doctor.staff_id === selectedStaffId;
+                const isSelected = doctor.sqid === selectedSqid;
                 return (
                   <button
-                    key={doctor.staff_id}
+                    key={doctor.sqid}
                     type="button"
-                    onClick={() => setSelectedStaffId(doctor.staff_id)}
+                    onClick={() => setSelectedSqid(doctor.sqid)}
                     className={`relative text-left border rounded-xl p-4 flex items-center gap-3 transition-colors ${
                       isSelected ? "border-docuhealth-primary bg-docuhealth-primary/5" : "border-gray-200 hover:border-gray-300"
                     }`}

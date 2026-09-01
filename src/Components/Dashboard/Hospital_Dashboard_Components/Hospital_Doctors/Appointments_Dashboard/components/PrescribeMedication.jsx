@@ -207,18 +207,17 @@ const PrescribeMedication = ({
 
   return (
     <div className="bg-white my-5 rounded-lg border p-4 lg:p-6 text-sm mb-20">
-      <div className="flex items-center gap-2 cursor-pointer border-b pb-4 mb-4">
-        <div
-          onClick={() => {
-            setPrescribeMedication(false);
-            setSeePatientDetails(true);
-          }}
-          className="text-gray-500 hover:text-black transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </div>
-        <p className="font-medium text-gray-800">Prescribe medication</p>
-      </div>
+      <button
+        type="button"
+        onClick={() => {
+          setPrescribeMedication(false);
+          setSeePatientDetails(true);
+        }}
+        className="flex items-center gap-2 cursor-pointer border-b pb-4 mb-4 w-full text-gray-500 hover:text-black transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span className="font-medium text-gray-800">Prescribe medication</span>
+      </button>
 
       <div className="my-5">
         <MedicationSection

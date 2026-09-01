@@ -183,7 +183,11 @@ const OrderLabModal = ({ selectedPatientDetails, onClose }) => {
 
             <div className="mb-4 relative text-[12px]">
               <p className="block font-medium text-gray-700 mb-1">Test type</p>
-              <div
+              <button
+                type="button"
+                aria-haspopup="listbox"
+                aria-expanded={isTestTypeDropdownOpen}
+                disabled={!formData.category}
                 className={`border rounded-lg w-full p-2.5 outline-none focus:border-docuhealth-primary flex justify-between items-center bg-white ${
                   !formData.category ? "opacity-50 cursor-not-allowed bg-gray-50" : "cursor-pointer"
                 }`}
@@ -199,7 +203,7 @@ const OrderLabModal = ({ selectedPatientDetails, onClose }) => {
                       : "Select test type"}
                 </span>
                 <svg className="fill-current h-4 w-4 text-gray-700 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-              </div>
+              </button>
 
               {isTestTypeDropdownOpen && (
                 <div className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-48 overflow-y-auto">

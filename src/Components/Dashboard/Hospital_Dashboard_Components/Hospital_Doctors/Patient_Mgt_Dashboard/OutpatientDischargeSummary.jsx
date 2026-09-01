@@ -138,10 +138,10 @@ const OutpatientDischargeSummary = ({ selectedPatient, onClose }) => {
         
         {/* Header */}
         <div className="py-4 mb-2">
-          <div className="flex items-center gap-2 cursor-pointer w-fit" onClick={onClose}>
+          <button type="button" className="flex items-center gap-2 cursor-pointer w-fit" onClick={onClose}>
             <ArrowLeft className="w-4 h-4 text-docuhealth-primary" />
             <span className="font-medium text-docuhealth-primary">Discharge summary</span>
-          </div>
+          </button>
         </div>
 
         {/* Main Form Content */}

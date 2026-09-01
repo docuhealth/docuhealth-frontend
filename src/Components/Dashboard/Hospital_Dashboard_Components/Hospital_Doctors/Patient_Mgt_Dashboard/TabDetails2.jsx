@@ -349,7 +349,7 @@ export const PatientMedicalRecord = ({
                   </button>
                   <button className="flex justify-center items-center gap-1 py-2 border border-docuhealth-dark rounded-full"
                     onClick={() => {
-                      toast.success("Coming soon !")
+                      toast("Sharing this record isn't available yet.", { icon: "🛠️" })
                     }}
                   >
                     <svg
@@ -443,8 +443,9 @@ export const PatientSOAPNotes = ({
   });
 
   const handleCreateAdditionalNote = () => {
-    if (!noteDescription) {
+    if (!noteDescription.trim()) {
       toast.error('Please enter a note.')
+      return
     }
 
     const payload = {
@@ -558,7 +559,8 @@ export const PatientSOAPNotes = ({
       {seePatientDetails ? (
         <div className="text-sm">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 sm:gap-0  border-b pb-4 w-full">
-            <div
+            <button
+              type="button"
               className="flex justify-start items-center gap-1 cursor-pointer"
               onClick={() => setSeePatientDetails(false)}
             >
@@ -575,10 +577,10 @@ export const PatientSOAPNotes = ({
                 />
               </svg>
 
-              <h2 className=" text-sm">SOAP Note Overview</h2>
-            </div>
+              <span className=" text-sm">SOAP Note Overview</span>
+            </button>
             <div className=" flex flex-col sm:flex-row justify-end items-center gap-3 w-full sm:w-auto">
-              <div className="flex justify-center items-center gap-1 border border-docuhealth-primary py-1.5 px-4 rounded-full w-full sm:w-auto text-docuhealth-primary cursor-pointer" onClick={() => setCreateAdditionalNotes(true)}>
+              <button type="button" className="flex justify-center items-center gap-1 border border-docuhealth-primary py-1.5 px-4 rounded-full w-full sm:w-auto text-docuhealth-primary cursor-pointer" onClick={() => setCreateAdditionalNotes(true)}>
                 <svg
                   width="14"
                   height="14"
@@ -616,8 +618,8 @@ export const PatientSOAPNotes = ({
                   />
                 </svg>
 
-                <p>Create additional notes</p>
-              </div>
+                <span>Create additional notes</span>
+              </button>
             </div>
           </div>
           <PatientInfoCard
@@ -901,7 +903,11 @@ export const PatientSOAPNotes = ({
                           </div>
                         </div>
 
-                        <div
+                        <button
+                          type="button"
+                          aria-label="SOAP note actions"
+                          aria-haspopup="true"
+                          aria-expanded={openPopover === index}
                           onClick={() => {
                             togglePopover(index);
                             setSelectedNoteId(soapNote.id);
@@ -918,12 +924,13 @@ export const PatientSOAPNotes = ({
                           >
                             <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
                           </svg>
-                        </div>
+                        </button>
 
                         {openPopover === index && (
                           <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
-                            <p
-                              className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                            <button
+                              type="button"
+                              className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
                                 setSelectedNoteId(soapNote.id);
                                 setSeePatientDetails(true);
@@ -931,7 +938,7 @@ export const PatientSOAPNotes = ({
                               }}
                             >
                               See full SOAP Note
-                            </p>
+                            </button>
                           </div>
                         )}
                       </div>
@@ -978,8 +985,9 @@ export const PatientSOAPNotes = ({
                         </button>
                         {openPopover === index && (
                           <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
-                            <p
-                              className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                            <button
+                              type="button"
+                              className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
                                 setSelectedNoteId(soapNote.id);
                                 setSeePatientDetails(true);
@@ -987,7 +995,7 @@ export const PatientSOAPNotes = ({
                               }}
                             >
                               See full SOAP Note
-                            </p>
+                            </button>
                           </div>
                         )}
                       </div>
@@ -1305,12 +1313,14 @@ const AddProgressNoteForm = ({ formData, setFormData, onBack, onUpload, isFormFi
 
   return (
     <div className="bg-white rounded-lg border mt-3 px-3 lg:px-5 py-5 text-sm">
-      <div className="flex items-center gap-1 cursor-pointer border-b pb-3">
-        <div onClick={onBack}>
-          <ArrowLeft className="w-4 h-4 text-gray-800" />
-        </div>
-        <p>Progress Note Entry</p>
-      </div>
+      <button
+        type="button"
+        className="flex items-center gap-1 cursor-pointer border-b pb-3 w-full"
+        onClick={onBack}
+      >
+        <ArrowLeft className="w-4 h-4 text-gray-800" />
+        <span>Progress Note Entry</span>
+      </button>
 
       <div className="my-5">
         {PROGRESS_NOTE_FORM_FIELDS.map((field, index) => (
@@ -1435,7 +1445,8 @@ const ProgressNote = ({
         />
       ) : seeNoteDetails ? (
         <div className="text-sm">
-          <div
+          <button
+            type="button"
             className="flex items-center gap-1 cursor-pointer border-b pb-4 w-fit"
             onClick={() => setSeeNoteDetails(false)}
           >
@@ -1452,8 +1463,8 @@ const ProgressNote = ({
               />
             </svg>
 
-            <h2 className="text-sm">Progress Note Overview</h2>
-          </div>
+            <span className="text-sm">Progress Note Overview</span>
+          </button>
 
           <PatientInfoCard
             className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg"
@@ -1558,7 +1569,11 @@ const ProgressNote = ({
                         </div>
                       </div>
 
-                      <div
+                      <button
+                        type="button"
+                        aria-label="Progress note actions"
+                        aria-haspopup="true"
+                        aria-expanded={openPopover === index}
                         onClick={() => {
                           togglePopover(index);
                           setSelectedNoteId(note.sqid);
@@ -1573,12 +1588,13 @@ const ProgressNote = ({
                         >
                           <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
                         </svg>
-                      </div>
+                      </button>
 
                       {openPopover === index && (
                         <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
-                          <p
-                            className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                          <button
+                            type="button"
+                            className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                             onClick={() => {
                               setSelectedNoteId(note.sqid);
                               setSeeNoteDetails(true);
@@ -1586,7 +1602,7 @@ const ProgressNote = ({
                             }}
                           >
                             See full progress note
-                          </p>
+                          </button>
                         </div>
                       )}
                     </div>
@@ -1627,8 +1643,9 @@ const ProgressNote = ({
                         </button>
                         {openPopover === index && (
                           <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
-                            <p
-                              className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                            <button
+                              type="button"
+                              className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
                                 setSelectedNoteId(note.sqid);
                                 setSeeNoteDetails(true);
@@ -1636,7 +1653,7 @@ const ProgressNote = ({
                               }}
                             >
                               See full progress note
-                            </p>
+                            </button>
                           </div>
                         )}
                       </div>

@@ -123,17 +123,19 @@ const MedicationSection = ({ medications, setMedications }) => {
               {activeSearchIndex === index && searchResults.length > 0 && (
                 <ul className="absolute z-10 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto mt-1 top-full">
                   {searchResults.slice((searchPage - 1) * 10, searchPage * 10).map((item, idx) => (
-                    <li
-                      key={idx}
-                      className="p-2.5 text-[12px] hover:bg-docuhealth-primary/10 cursor-pointer text-gray-800 border-b last:border-0"
-                      onClick={() => handleSelectDrug(index, item)}
-                    >
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-[10px] text-gray-500 mt-0.5">
-                        {item.strength && <span>{item.strength}</span>}
-                        {item.strength && item.dose_form && <span className="mx-1">•</span>}
-                        {item.dose_form && <span>{item.dose_form}</span>}
-                      </div>
+                    <li key={idx} className="border-b last:border-0">
+                      <button
+                        type="button"
+                        className="w-full text-left p-2.5 text-[12px] hover:bg-docuhealth-primary/10 cursor-pointer text-gray-800"
+                        onClick={() => handleSelectDrug(index, item)}
+                      >
+                        <span className="block font-medium">{item.name}</span>
+                        <span className="block text-[10px] text-gray-500 mt-0.5">
+                          {item.strength && <span>{item.strength}</span>}
+                          {item.strength && item.dose_form && <span className="mx-1">•</span>}
+                          {item.dose_form && <span>{item.dose_form}</span>}
+                        </span>
+                      </button>
                     </li>
                   ))}
                   {Math.ceil(searchResults.length / 10) > 1 && (

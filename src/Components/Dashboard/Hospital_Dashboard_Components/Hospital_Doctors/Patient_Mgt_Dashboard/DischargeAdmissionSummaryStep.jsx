@@ -39,6 +39,19 @@ const DischargeAdmissionSummaryStep = ({
 
       <div className="border border-gray-200 rounded-xl p-5 lg:p-6">
         <h3 className="font-semibold text-docuhealth-primary mb-3 text-[15px]">
+          Chief complaint
+        </h3>
+        <textarea
+          value={formData.chief_complaint}
+          onChange={(e) => onFieldChange("chief_complaint", e.target.value)}
+          placeholder="What the patient originally presented with..."
+          rows={3}
+          className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary resize-y"
+        ></textarea>
+      </div>
+
+      <div className="border border-gray-200 rounded-xl p-5 lg:p-6">
+        <h3 className="font-semibold text-docuhealth-primary mb-3 text-[15px]">
           Primary diagnosis
         </h3>
         <textarea
@@ -74,6 +87,20 @@ const DischargeAdmissionSummaryStep = ({
           rows={3}
           className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary resize-y"
         ></textarea>
+      </div>
+
+      <div className="border border-gray-200 rounded-xl p-5 lg:p-6">
+        <h3 className="font-semibold text-docuhealth-primary mb-3 text-[15px]">
+          Treatment plan
+        </h3>
+        <textarea
+          value={formData.treatment_plan}
+          onChange={(e) => onFieldChange("treatment_plan", e.target.value)}
+          placeholder="What was done during this admission — one item per line..."
+          rows={4}
+          className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary resize-y"
+        ></textarea>
+        <p className="text-[11px] text-gray-400 mt-1.5">Each line is saved as a separate item.</p>
       </div>
 
       <div className="border border-gray-200 rounded-xl p-5 lg:p-6">

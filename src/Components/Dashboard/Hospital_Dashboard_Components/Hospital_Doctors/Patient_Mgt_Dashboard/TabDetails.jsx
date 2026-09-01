@@ -14,7 +14,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
     count,
     currentPage,
     totalPages,
-    fetchAdmittedPatients,
+    refetch: fetchAdmittedPatients,
     tab,
     searchQuery,
     setSearchQuery,
@@ -158,68 +158,68 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
                   admittedPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
             </div>
-            <div className="flex items-center gap-1 text-gray-600 pt-3">
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 15 15"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M7.50165 9.24984C9.88142 9.24984 11.8452 11.0312 12.1322 13.3332H2.87109C3.15814 11.0312 5.12187 9.24984 7.50165 9.24984ZM6.44401 10.5795C5.60773 10.8447 4.90335 11.4159 4.46914 12.1665H7.50165L6.44401 10.5795ZM8.55953 10.5797L7.50165 12.1665H10.5342C10.1 11.416 9.39574 10.8448 8.55953 10.5797ZM11.0017 1.6665V5.1665C11.0017 7.0995 9.43464 8.6665 7.50165 8.6665C5.56866 8.6665 4.00166 7.0995 4.00166 5.1665V1.6665H11.0017ZM5.16832 5.1665C5.16832 6.45515 6.21299 7.49984 7.50165 7.49984C8.79035 7.49984 9.83499 6.45515 9.83499 5.1665H5.16832ZM9.83499 2.83317H5.16832L5.16826 3.99984H9.83493L9.83499 2.83317Z"
-                  fill="var(--color-docuhealth-dark)"
-                />
-              </svg>
-              <p className="">
-                {" "}
-                {admittedPatient?.staff_info
-                  ? `${admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`
-                  : "NIL"}
-              </p>
-            </div>
-            <div className="flex items-center gap-1 text-gray-600 pt-1 ">
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 14 14"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4.66634 11.666V8.16602H9.33301V11.666H11.083V2.33268H2.91634V11.666H4.66634ZM5.83301 11.666H8.16634V9.33268H5.83301V11.666ZM12.2497 11.666H13.4163V12.8327H0.583008V11.666H1.74967V1.74935C1.74967 1.42719 2.01084 1.16602 2.33301 1.16602H11.6663C11.9885 1.16602 12.2497 1.42719 12.2497 1.74935V11.666ZM6.41634 4.66602V3.49935H7.58301V4.66602H8.74967V5.83268H7.58301V6.99935H6.41634V5.83268H5.24967V4.66602H6.41634Z"
-                  fill="var(--color-docuhealth-dark)"
-                />
-              </svg>
+            {admittedPatient?.staff_info && (
+              <div className="flex items-center gap-1 text-gray-600 pt-3">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 15 15"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M7.50165 9.24984C9.88142 9.24984 11.8452 11.0312 12.1322 13.3332H2.87109C3.15814 11.0312 5.12187 9.24984 7.50165 9.24984ZM6.44401 10.5795C5.60773 10.8447 4.90335 11.4159 4.46914 12.1665H7.50165L6.44401 10.5795ZM8.55953 10.5797L7.50165 12.1665H10.5342C10.1 11.416 9.39574 10.8448 8.55953 10.5797ZM11.0017 1.6665V5.1665C11.0017 7.0995 9.43464 8.6665 7.50165 8.6665C5.56866 8.6665 4.00166 7.0995 4.00166 5.1665V1.6665H11.0017ZM5.16832 5.1665C5.16832 6.45515 6.21299 7.49984 7.50165 7.49984C8.79035 7.49984 9.83499 6.45515 9.83499 5.1665H5.16832ZM9.83499 2.83317H5.16832L5.16826 3.99984H9.83493L9.83499 2.83317Z"
+                    fill="var(--color-docuhealth-dark)"
+                  />
+                </svg>
+                <p className="">
+                  {" "}
+                  {`${admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`}
+                </p>
+              </div>
+            )}
+            {admittedPatient?.ward_info && (
+              <div className="flex items-center gap-1 text-gray-600 pt-1 ">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M4.66634 11.666V8.16602H9.33301V11.666H11.083V2.33268H2.91634V11.666H4.66634ZM5.83301 11.666H8.16634V9.33268H5.83301V11.666ZM12.2497 11.666H13.4163V12.8327H0.583008V11.666H1.74967V1.74935C1.74967 1.42719 2.01084 1.16602 2.33301 1.16602H11.6663C11.9885 1.16602 12.2497 1.42719 12.2497 1.74935V11.666ZM6.41634 4.66602V3.49935H7.58301V4.66602H8.74967V5.83268H7.58301V6.99935H6.41634V5.83268H5.24967V4.66602H6.41634Z"
+                    fill="var(--color-docuhealth-dark)"
+                  />
+                </svg>
 
-              <p className="">
-                admitted to :{" "}
-                {admittedPatient?.ward_info
-                  ? `${admittedPatient.ward_info.name} ward`
-                  : "NIL"}
-              </p>
-            </div>
+                <p className="">
+                  admitted to :{" "}
+                  {`${admittedPatient.ward_info.name} ward`}
+                </p>
+              </div>
+            )}
 
-            <div className="flex items-center gap-1 text-gray-600 pt-1 ">
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 14 14"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12.8337 6.41536V11.6654H11.667V9.91536H2.33366V11.6654H1.16699V2.33203H2.33366V8.16536H7.00033V4.08203H10.5003C11.789 4.08203 12.8337 5.1267 12.8337 6.41536ZM11.667 8.16536V6.41536C11.667 5.77103 11.1447 5.2487 10.5003 5.2487H8.16699V8.16536H11.667ZM4.66699 6.41536C4.98916 6.41536 5.25033 6.15421 5.25033 5.83203C5.25033 5.50987 4.98916 5.2487 4.66699 5.2487C4.34483 5.2487 4.08366 5.50987 4.08366 5.83203C4.08366 6.15421 4.34483 6.41536 4.66699 6.41536ZM4.66699 7.58203C3.7005 7.58203 2.91699 6.79856 2.91699 5.83203C2.91699 4.86554 3.7005 4.08203 4.66699 4.08203C5.63349 4.08203 6.41699 4.86554 6.41699 5.83203C6.41699 6.79856 5.63349 7.58203 4.66699 7.58203Z"
-                  fill="var(--color-docuhealth-dark)"
-                />
-              </svg>
+            {admittedPatient?.bed_info && (
+              <div className="flex items-center gap-1 text-gray-600 pt-1 ">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12.8337 6.41536V11.6654H11.667V9.91536H2.33366V11.6654H1.16699V2.33203H2.33366V8.16536H7.00033V4.08203H10.5003C11.789 4.08203 12.8337 5.1267 12.8337 6.41536ZM11.667 8.16536V6.41536C11.667 5.77103 11.1447 5.2487 10.5003 5.2487H8.16699V8.16536H11.667ZM4.66699 6.41536C4.98916 6.41536 5.25033 6.15421 5.25033 5.83203C5.25033 5.50987 4.98916 5.2487 4.66699 5.2487C4.34483 5.2487 4.08366 5.50987 4.08366 5.83203C4.08366 6.15421 4.34483 6.41536 4.66699 6.41536ZM4.66699 7.58203C3.7005 7.58203 2.91699 6.79856 2.91699 5.83203C2.91699 4.86554 3.7005 4.08203 4.66699 4.08203C5.63349 4.08203 6.41699 4.86554 6.41699 5.83203C6.41699 6.79856 5.63349 7.58203 4.66699 7.58203Z"
+                    fill="var(--color-docuhealth-dark)"
+                  />
+                </svg>
 
-              <p className="">
-                {admittedPatient?.bed_info
-                  ? `Bed ${admittedPatient.bed_info.bed_number}`
-                  : "NIL"}
-              </p>
-            </div>
+                <p className="">
+                  {`Bed ${admittedPatient.bed_info.bed_number}`}
+                </p>
+              </div>
+            )}
             <div className="flex items-center gap-1 text-gray-600 pt-1 pb-3 border-b">
               <svg
                 width="15"
@@ -367,17 +367,17 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
                   outPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
             </div>
-            <div className="flex items-center gap-1 text-gray-600 pt-3">
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7.50165 9.24984C9.88142 9.24984 11.8452 11.0312 12.1322 13.3332H2.87109C3.15814 11.0312 5.12187 9.24984 7.50165 9.24984ZM6.44401 10.5795C5.60773 10.8447 4.90335 11.4159 4.46914 12.1665H7.50165L6.44401 10.5795ZM8.55953 10.5797L7.50165 12.1665H10.5342C10.1 11.416 9.39574 10.8448 8.55953 10.5797ZM11.0017 1.6665V5.1665C11.0017 7.0995 9.43464 8.6665 7.50165 8.6665C5.56866 8.6665 4.00166 7.0995 4.00166 5.1665V1.6665H11.0017ZM5.16832 5.1665C5.16832 6.45515 6.21299 7.49984 7.50165 7.49984C8.79035 7.49984 9.83499 6.45515 9.83499 5.1665H5.16832ZM9.83499 2.83317H5.16832L5.16826 3.99984H9.83493L9.83499 2.83317Z" fill="var(--color-docuhealth-dark)"/>
-              </svg>
-              <p className="">
-                {" "}
-                {outPatient?.staff_info
-                  ? `${'Dr. ' + outPatient.staff_info.firstname} ${outPatient.staff_info.lastname}`
-                  : "NIL"}
-              </p>
-            </div>
+            {outPatient?.staff_info && (
+              <div className="flex items-center gap-1 text-gray-600 pt-3">
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7.50165 9.24984C9.88142 9.24984 11.8452 11.0312 12.1322 13.3332H2.87109C3.15814 11.0312 5.12187 9.24984 7.50165 9.24984ZM6.44401 10.5795C5.60773 10.8447 4.90335 11.4159 4.46914 12.1665H7.50165L6.44401 10.5795ZM8.55953 10.5797L7.50165 12.1665H10.5342C10.1 11.416 9.39574 10.8448 8.55953 10.5797ZM11.0017 1.6665V5.1665C11.0017 7.0995 9.43464 8.6665 7.50165 8.6665C5.56866 8.6665 4.00166 7.0995 4.00166 5.1665V1.6665H11.0017ZM5.16832 5.1665C5.16832 6.45515 6.21299 7.49984 7.50165 7.49984C8.79035 7.49984 9.83499 6.45515 9.83499 5.1665H5.16832ZM9.83499 2.83317H5.16832L5.16826 3.99984H9.83493L9.83499 2.83317Z" fill="var(--color-docuhealth-dark)"/>
+                </svg>
+                <p className="">
+                  {" "}
+                  {`Dr. ${outPatient.staff_info.firstname} ${outPatient.staff_info.lastname}`}
+                </p>
+              </div>
+            )}
             <div className="flex items-center gap-1 text-gray-600 pt-1 ">
               <i className="bx bx-phone text-[15px] text-docuhealth-dark"></i>
               <p className="">
@@ -424,7 +424,7 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
     count,
     currentPage,
     totalPages,
-    fetchAdmittedPatients,
+    refetch: fetchAdmittedPatients,
     tab,
     searchQuery,
     setSearchQuery,
@@ -569,68 +569,68 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
                   admittedPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
             </div>
-            <div className="flex items-center gap-1 text-gray-600 pt-3">
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 15 15"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M7.50165 9.24984C9.88142 9.24984 11.8452 11.0312 12.1322 13.3332H2.87109C3.15814 11.0312 5.12187 9.24984 7.50165 9.24984ZM6.44401 10.5795C5.60773 10.8447 4.90335 11.4159 4.46914 12.1665H7.50165L6.44401 10.5795ZM8.55953 10.5797L7.50165 12.1665H10.5342C10.1 11.416 9.39574 10.8448 8.55953 10.5797ZM11.0017 1.6665V5.1665C11.0017 7.0995 9.43464 8.6665 7.50165 8.6665C5.56866 8.6665 4.00166 7.0995 4.00166 5.1665V1.6665H11.0017ZM5.16832 5.1665C5.16832 6.45515 6.21299 7.49984 7.50165 7.49984C8.79035 7.49984 9.83499 6.45515 9.83499 5.1665H5.16832ZM9.83499 2.83317H5.16832L5.16826 3.99984H9.83493L9.83499 2.83317Z"
-                  fill="var(--color-docuhealth-dark)"
-                />
-              </svg>
-              <p className="">
-                {" "}
-                {admittedPatient?.staff_info
-                  ? `${admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`
-                  : "NIL"}
-              </p>
-            </div>
-            <div className="flex items-center gap-1 text-gray-600 pt-1 ">
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 14 14"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4.66634 11.666V8.16602H9.33301V11.666H11.083V2.33268H2.91634V11.666H4.66634ZM5.83301 11.666H8.16634V9.33268H5.83301V11.666ZM12.2497 11.666H13.4163V12.8327H0.583008V11.666H1.74967V1.74935C1.74967 1.42719 2.01084 1.16602 2.33301 1.16602H11.6663C11.9885 1.16602 12.2497 1.42719 12.2497 1.74935V11.666ZM6.41634 4.66602V3.49935H7.58301V4.66602H8.74967V5.83268H7.58301V6.99935H6.41634V5.83268H5.24967V4.66602H6.41634Z"
-                  fill="var(--color-docuhealth-dark)"
-                />
-              </svg>
+            {admittedPatient?.staff_info && (
+              <div className="flex items-center gap-1 text-gray-600 pt-3">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 15 15"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M7.50165 9.24984C9.88142 9.24984 11.8452 11.0312 12.1322 13.3332H2.87109C3.15814 11.0312 5.12187 9.24984 7.50165 9.24984ZM6.44401 10.5795C5.60773 10.8447 4.90335 11.4159 4.46914 12.1665H7.50165L6.44401 10.5795ZM8.55953 10.5797L7.50165 12.1665H10.5342C10.1 11.416 9.39574 10.8448 8.55953 10.5797ZM11.0017 1.6665V5.1665C11.0017 7.0995 9.43464 8.6665 7.50165 8.6665C5.56866 8.6665 4.00166 7.0995 4.00166 5.1665V1.6665H11.0017ZM5.16832 5.1665C5.16832 6.45515 6.21299 7.49984 7.50165 7.49984C8.79035 7.49984 9.83499 6.45515 9.83499 5.1665H5.16832ZM9.83499 2.83317H5.16832L5.16826 3.99984H9.83493L9.83499 2.83317Z"
+                    fill="var(--color-docuhealth-dark)"
+                  />
+                </svg>
+                <p className="">
+                  {" "}
+                  {`${admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`}
+                </p>
+              </div>
+            )}
+            {admittedPatient?.ward_info && (
+              <div className="flex items-center gap-1 text-gray-600 pt-1 ">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M4.66634 11.666V8.16602H9.33301V11.666H11.083V2.33268H2.91634V11.666H4.66634ZM5.83301 11.666H8.16634V9.33268H5.83301V11.666ZM12.2497 11.666H13.4163V12.8327H0.583008V11.666H1.74967V1.74935C1.74967 1.42719 2.01084 1.16602 2.33301 1.16602H11.6663C11.9885 1.16602 12.2497 1.42719 12.2497 1.74935V11.666ZM6.41634 4.66602V3.49935H7.58301V4.66602H8.74967V5.83268H7.58301V6.99935H6.41634V5.83268H5.24967V4.66602H6.41634Z"
+                    fill="var(--color-docuhealth-dark)"
+                  />
+                </svg>
 
-              <p className="">
-                admitted to :{" "}
-                {admittedPatient?.ward_info
-                  ? `${admittedPatient.ward_info.name} ward`
-                  : "NIL"}
-              </p>
-            </div>
+                <p className="">
+                  admitted to :{" "}
+                  {`${admittedPatient.ward_info.name} ward`}
+                </p>
+              </div>
+            )}
 
-            <div className="flex items-center gap-1 text-gray-600 pt-1 ">
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 14 14"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12.8337 6.41536V11.6654H11.667V9.91536H2.33366V11.6654H1.16699V2.33203H2.33366V8.16536H7.00033V4.08203H10.5003C11.789 4.08203 12.8337 5.1267 12.8337 6.41536ZM11.667 8.16536V6.41536C11.667 5.77103 11.1447 5.2487 10.5003 5.2487H8.16699V8.16536H11.667ZM4.66699 6.41536C4.98916 6.41536 5.25033 6.15421 5.25033 5.83203C5.25033 5.50987 4.98916 5.2487 4.66699 5.2487C4.34483 5.2487 4.08366 5.50987 4.08366 5.83203C4.08366 6.15421 4.34483 6.41536 4.66699 6.41536ZM4.66699 7.58203C3.7005 7.58203 2.91699 6.79856 2.91699 5.83203C2.91699 4.86554 3.7005 4.08203 4.66699 4.08203C5.63349 4.08203 6.41699 4.86554 6.41699 5.83203C6.41699 6.79856 5.63349 7.58203 4.66699 7.58203Z"
-                  fill="var(--color-docuhealth-dark)"
-                />
-              </svg>
+            {admittedPatient?.bed_info && (
+              <div className="flex items-center gap-1 text-gray-600 pt-1 ">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12.8337 6.41536V11.6654H11.667V9.91536H2.33366V11.6654H1.16699V2.33203H2.33366V8.16536H7.00033V4.08203H10.5003C11.789 4.08203 12.8337 5.1267 12.8337 6.41536ZM11.667 8.16536V6.41536C11.667 5.77103 11.1447 5.2487 10.5003 5.2487H8.16699V8.16536H11.667ZM4.66699 6.41536C4.98916 6.41536 5.25033 6.15421 5.25033 5.83203C5.25033 5.50987 4.98916 5.2487 4.66699 5.2487C4.34483 5.2487 4.08366 5.50987 4.08366 5.83203C4.08366 6.15421 4.34483 6.41536 4.66699 6.41536ZM4.66699 7.58203C3.7005 7.58203 2.91699 6.79856 2.91699 5.83203C2.91699 4.86554 3.7005 4.08203 4.66699 4.08203C5.63349 4.08203 6.41699 4.86554 6.41699 5.83203C6.41699 6.79856 5.63349 7.58203 4.66699 7.58203Z"
+                    fill="var(--color-docuhealth-dark)"
+                  />
+                </svg>
 
-              <p className="">
-                {admittedPatient?.bed_info
-                  ? `Bed ${admittedPatient.bed_info.bed_number}`
-                  : "NIL"}
-              </p>
-            </div>
+                <p className="">
+                  {`Bed ${admittedPatient.bed_info.bed_number}`}
+                </p>
+              </div>
+            )}
             <div className="flex items-center gap-1 text-gray-600 pt-1 pb-3 border-b">
               <svg
                 width="15"

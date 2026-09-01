@@ -75,6 +75,14 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
 
   return (
     <Modal isOpen={true} onClose={() => setRequestAdmission(false)} title="">
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={() => setRequestAdmission(false)}
+        className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 cursor-pointer"
+      >
+        <i className="bx bx-x text-2xl"></i>
+      </button>
       <div className="flex flex-col justify-center items-center pb-5 pt-2">
         <p className="pt-0.5 font-medium">Request for patient admission</p>
         <p className="pt-1 text-[12px]">

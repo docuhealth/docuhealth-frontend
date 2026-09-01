@@ -1,128 +1,17 @@
 import React, { useMemo, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { BookOpen, Stethoscope, BedDouble, CalendarClock, UserCheck, Search, ChevronDown, X } from "lucide-react";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
+import { fetchDoctorHandovers, createDoctorHandover } from "../../../../../queries/Hospital/doctor/handover";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import Input from "../../../../ui/Input";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
-import AddHandoverNoteForm from "./AddHandoverNoteForm";
+import AddHandoverNoteForm, { HANDOVER_FIELDS } from "./AddHandoverNoteForm";
 import HandoverNoteDetailPage from "./HandoverNoteDetailPage";
 import SelectHandoverDoctorModal from "./SelectHandoverDoctorModal";
 
 const PAGE_SIZE = 6;
-const HANDOVER_NOTE_KEYS = [
-  "handed_over_to",
-  "working_diagnosis",
-  "current_clinical_status",
-  "critical_events",
-  "outstanding_investigations",
-  "pending_procedures",
-  "pending_consult_reviews",
-  "clinical_concerns",
-  "management_plan",
-];
-
-// Placeholder content only — there's no backend endpoint yet for listing
-// real handover notes (see the component note below), so the list opens
-// pre-populated with dummy entries instead of an empty state.
-const MINUTE = 60 * 1000;
-const HOUR = 60 * MINUTE;
-const DAY = 24 * HOUR;
-const DUMMY_NOTES_DATA = [
-  {
-    handed_over_to: "Dr. Heritech Ruach",
-    working_diagnosis: "Community-acquired pneumonia",
-    current_clinical_status: "Stable, on supplemental oxygen",
-    critical_events: "None",
-    outstanding_investigations: "Repeat chest X-ray",
-    pending_procedures: "None",
-    pending_consult_reviews: "Respiratory medicine",
-    clinical_concerns: "Monitor SpO2 overnight",
-    management_plan: "Continue IV antibiotics, wean oxygen as tolerated",
-  },
-  {
-    handed_over_to: "Dr. Amaka Chukwu",
-    working_diagnosis: "Persistent lower back pain",
-    current_clinical_status: "Lumbar Strain (M54.5)",
-    critical_events: "None",
-    outstanding_investigations: "None",
-    pending_procedures: "Physical therapy, pain management",
-    pending_consult_reviews: "Physiotherapy",
-    clinical_concerns: "Pain management",
-    management_plan: "Physical therapy, pain management",
-  },
-  {
-    handed_over_to: "Dr. Tunde Bakare",
-    working_diagnosis: "Post-op appendectomy recovery",
-    current_clinical_status: "Improving, afebrile",
-    critical_events: "None",
-    outstanding_investigations: "Full blood count",
-    pending_procedures: "Wound dressing change",
-    pending_consult_reviews: "Surgical team",
-    clinical_concerns: "Watch surgical site for infection",
-    management_plan: "Continue analgesia, mobilize as tolerated",
-  },
-  {
-    handed_over_to: "Dr. Heritech Ruach",
-    working_diagnosis: "Hypertension, uncontrolled",
-    current_clinical_status: "BP trending down on current regimen",
-    critical_events: "BP dropped below 100/60 at 2am, notified on-call",
-    outstanding_investigations: "U&E, renal panel",
-    pending_procedures: "None",
-    pending_consult_reviews: "Cardiology",
-    clinical_concerns: "Recheck BP every 2 hours",
-    management_plan: "Hold antihypertensives pending cardiology review",
-  },
-  {
-    handed_over_to: "Dr. Ifeoma Nwosu",
-    working_diagnosis: "Type 2 diabetes, poorly controlled",
-    current_clinical_status: "Blood glucose stabilizing",
-    critical_events: "None",
-    outstanding_investigations: "HbA1c",
-    pending_procedures: "None",
-    pending_consult_reviews: "Endocrinology, dietitian",
-    clinical_concerns: "Continue glucose monitoring 4x daily",
-    management_plan: "Adjust insulin sliding scale per readings",
-  },
-  {
-    handed_over_to: "Dr. Amaka Chukwu",
-    working_diagnosis: "Cellulitis, left leg",
-    current_clinical_status: "Improving, erythema reducing",
-    critical_events: "None",
-    outstanding_investigations: "None",
-    pending_procedures: "Dressing change due tomorrow",
-    pending_consult_reviews: "None",
-    clinical_concerns: "Watch for spreading redness or fever",
-    management_plan: "Continue IV antibiotics, elevate leg",
-  },
-  {
-    handed_over_to: "Dr. Tunde Bakare",
-    working_diagnosis: "Seizure disorder, breakthrough episode",
-    current_clinical_status: "Post-ictal, recovering",
-    critical_events: "One witnessed seizure at 6am, self-resolved",
-    outstanding_investigations: "EEG",
-    pending_procedures: "None",
-    pending_consult_reviews: "Neurology",
-    clinical_concerns: "Fall risk — keep bed rails up",
-    management_plan: "Continue anticonvulsant, neurology to review levels",
-  },
-  {
-    handed_over_to: "Dr. Ifeoma Nwosu",
-    working_diagnosis: "General ward observation",
-    current_clinical_status: "No acute concerns overnight",
-    critical_events: "None",
-    outstanding_investigations: "None",
-    pending_procedures: "None",
-    pending_consult_reviews: "None",
-    clinical_concerns: "None",
-    management_plan: "Continue current management plan",
-  },
-];
-const DUMMY_NOTE_AGES_MS = [3 * MINUTE, 45 * MINUTE, 2 * HOUR, 6 * HOUR, DAY, 1.5 * DAY, 2 * DAY, 3 * DAY];
-const buildDummyNotes = () =>
-  DUMMY_NOTES_DATA.map((fields, i) => ({
-    id: `dummy-note-${i}`,
-    ...fields,
-    created_at: new Date(Date.now() - DUMMY_NOTE_AGES_MS[i]).toISOString(),
-  }));
 
 const formatMinutesAgo = (date) => {
   const diffMs = Date.now() - new Date(date).getTime();
@@ -135,15 +24,32 @@ const formatMinutesAgo = (date) => {
   return `${diffDay} day${diffDay !== 1 ? "s" : ""} ago`;
 };
 
+const doctorName = (info) =>
+  info ? `Dr. ${[info.firstname, info.lastname].filter(Boolean).join(" ")}`.trim() : "—";
+
 /**
- * Per-patient shift handover notes. There's no backend endpoint yet for
- * listing/creating these (the only existing "handover" API is the nurse
- * end-of-shift summary posted on logout, which is a different feature), so
- * notes added here live only in this component's local state for the
- * current session — a working preview of the flow, not persisted yet.
+ * Per-patient doctor-to-doctor handover notes.
+ *
+ * Read side: `GET /api/doctors/handovers` (one combined sent + received list,
+ * filtered here by the patient's HIN). Create side: `POST /api/doctors/handover`
+ * with the 8 structured fields from AddHandoverNoteForm plus the recipient
+ * doctor's SQID and the patient HIN.
  */
 const PatientHandoverTab = ({ selected, patientFullInfo }) => {
-  const [notes, setNotes] = useState(buildDummyNotes);
+  const queryClient = useQueryClient();
+
+  const patientHin =
+    patientFullInfo?.patient_info?.hin ||
+    selected?.patient_info?.hin ||
+    selected?.patient?.hin ||
+    "";
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["doctor-handovers", 1, 100],
+    queryFn: fetchDoctorHandovers,
+    enabled: !!patientHin,
+  });
+
   const [showSelectDoctorModal, setShowSelectDoctorModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [handoverDoctor, setHandoverDoctor] = useState(null);
@@ -168,6 +74,33 @@ const PatientHandoverTab = ({ selected, patientFullInfo }) => {
     ? `Dr. ${handoverDoctor.firstname} ${handoverDoctor.lastname}`
     : null;
 
+  const notes = useMemo(() => {
+    const rows = data?.results || [];
+    return rows
+      .filter((n) => patientHin && n.patient_info?.hin === patientHin)
+      .map((n) => ({
+        id: n.sqid,
+        handed_over_to: doctorName(n.to_doctor_info),
+        handed_over_by: doctorName(n.from_doctor_info),
+        created_at: n.created_at,
+        ...HANDOVER_FIELDS.reduce((acc, f) => ({ ...acc, [f.key]: n[f.key] || "" }), {}),
+      }));
+  }, [data, patientHin]);
+
+  const { mutate: submitHandover, isPending: isSubmittingHandover } = useMutation({
+    mutationFn: createDoctorHandover,
+    onSuccess: (res) => {
+      toast.success(res?.detail || "Handover note sent.");
+      queryClient.invalidateQueries({ queryKey: ["doctor-handovers"] });
+      setShowAddModal(false);
+      setHandoverDoctor(null);
+    },
+    onError: (err) => {
+      console.error("Error creating handover:", err);
+      toast.error(extractApiErrorMessage(err, "Couldn't save the handover note."));
+    },
+  });
+
   const handleDoctorSelected = (doctor) => {
     setHandoverDoctor(doctor);
     setShowSelectDoctorModal(false);
@@ -175,25 +108,30 @@ const PatientHandoverTab = ({ selected, patientFullInfo }) => {
   };
 
   const handleAddNote = (form) => {
-    setNotes((prev) => [
-      {
-        id: `note-${Date.now()}`,
-        ...form,
-        handed_over_to: handoverDoctorName,
-        created_at: new Date().toISOString(),
-      },
-      ...prev,
-    ]);
-    setShowAddModal(false);
-    setHandoverDoctor(null);
-    setCurrentPage(1);
+    if (!handoverDoctor?.sqid) {
+      toast.error("Pick the doctor you're handing over to and try again.");
+      return;
+    }
+    if (!patientHin) {
+      toast.error("This patient is missing a HIN — reopen the record and try again.");
+      return;
+    }
+    submitHandover({
+      to_doctor_id: handoverDoctor.sqid,
+      patient_hin: patientHin,
+      ...form,
+    });
   };
 
   const visibleNotes = useMemo(() => {
     let list = notes;
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
-      list = list.filter((n) => HANDOVER_NOTE_KEYS.some((key) => n[key]?.toLowerCase().includes(q)));
+      list = list.filter((n) =>
+        [n.handed_over_to, n.handed_over_by, ...HANDOVER_FIELDS.map((f) => n[f.key])].some((v) =>
+          v?.toLowerCase().includes(q),
+        ),
+      );
     }
     list = [...list].sort((a, b) => {
       const diff = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
@@ -221,6 +159,7 @@ const PatientHandoverTab = ({ selected, patientFullInfo }) => {
     return (
       <AddHandoverNoteForm
         handoverDoctorName={handoverDoctorName}
+        isSubmitting={isSubmittingHandover}
         onBack={() => {
           setShowAddModal(false);
           setHandoverDoctor(null);
@@ -305,7 +244,19 @@ const PatientHandoverTab = ({ selected, patientFullInfo }) => {
         </div>
       </div>
 
-      {pageNotes.length === 0 ? (
+      {isLoading ? (
+        <div className="flex justify-center items-center py-16">
+          <svg className="animate-spin h-6 w-6 text-docuhealth-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
+        </div>
+      ) : isError ? (
+        <div className="py-16 text-center text-sm text-gray-500">
+          <p className="font-medium">Couldn't load handover notes.</p>
+          <p className="text-[12px] text-gray-400 mt-1">Try again in a moment.</p>
+        </div>
+      ) : pageNotes.length === 0 ? (
         <div className="flex flex-col justify-center items-center text-center py-16">
           <BookOpen className="w-16 h-16 text-gray-300 mb-4" strokeWidth={1.5} />
           <h2 className="font-medium pb-1">
