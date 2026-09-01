@@ -13,12 +13,17 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
   const [loadingStaff, setLoadingStaff] = useState(true);
   const [staffList, setStaffList] = useState([]);
   const [selectedStaffId, setSelectedStaffId] = useState(null);
+  // A "general" request (staff_id omitted) can be claimed by any nurse at the
+  // hospital — the backend made staff_id optional for exactly this.
+  const [generalRequest, setGeneralRequest] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
     staff_id: "",
     patient_hin: "",
     note: "",
   });
+
+  const patientHin = resolveOrderContext(selectedPatientDetails).hin;
 
   useEffect(() => {
     const fetchNurses = async () => {
@@ -50,16 +55,28 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
 
   const handleAssign = (staffId) => {
     setSelectedStaffId(staffId);
+    setGeneralRequest(false);
     setFormData((prev) => ({
       ...prev,
       staff_id: staffId,
-      patient_hin: resolveOrderContext(selectedPatientDetails).hin,
+      patient_hin: patientHin,
     }));
   };
 
+  const handleGeneralRequest = () => {
+    setSelectedStaffId(null);
+    setGeneralRequest(true);
+    setFormData((prev) => ({ ...prev, staff_id: "", patient_hin: patientHin }));
+  };
+
   const { mutate, isPending } = useMutation({
-    mutationFn: (payload) =>
-      axiosInstanceHos.post("api/doctors/vital-signs/request", payload),
+    // staff_id is optional now — omit it entirely for a general request so
+    // any nurse at the hospital can claim it (sending "" would 400).
+    mutationFn: ({ staff_id, ...rest }) =>
+      axiosInstanceHos.post("api/doctors/vital-signs/request", {
+        ...rest,
+        ...(staff_id ? { staff_id } : {}),
+      }),
     onSuccess: () => {
       setShowSuccess(true);
     },
@@ -87,7 +104,9 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
               </div>
             </div>
             <p className="text-base font-semibold text-gray-800 mb-6 leading-snug">
-              You have successfully assigned patient<br />to a nurse for vitals checkup!
+              {generalRequest
+                ? "Vitals request sent — any nurse at your hospital can pick it up."
+                : "You have successfully assigned patient to a nurse for vitals checkup!"}
             </p>
             <button
               onClick={onClose}
@@ -120,7 +139,7 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
             ></path>
           </svg>
         </div>
-      ) : selectedStaffId ? (
+      ) : selectedStaffId || generalRequest ? (
         <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
           <div className="flex justify-end">
             <button
@@ -134,7 +153,9 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
             Request for Vitals
           </h2>
           <p className="text-center text-gray-500 mb-4 text-sm">
-            Assign to a nurse for vitals checkup
+            {generalRequest
+              ? "General request — any nurse at your hospital can pick this up"
+              : "Assign to a nurse for vitals checkup"}
           </p>
           <div className="mb-2 text-[12px]">
             <p className="mb-1 text-gray-700 font-medium">Add note :</p>
@@ -193,6 +214,19 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
                 <i className="bx bx-x text-2xl cursor-pointer"></i>
               </button>
             </div>
+          </div>
+          <div className="flex items-center justify-between gap-3 mt-4 rounded-md bg-docuhealth-light-gray px-3 py-3">
+            <p className="text-[12px] text-gray-600">
+              No preference? Send it as a general request any nurse at your
+              hospital can claim.
+            </p>
+            <button
+              type="button"
+              onClick={handleGeneralRequest}
+              className="whitespace-nowrap rounded-full border border-docuhealth-primary px-4 py-1.5 text-[12px] font-medium text-docuhealth-primary hover:bg-docuhealth-primary/5"
+            >
+              Continue without a nurse
+            </button>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 my-5 text-sm gap-3 w-full">
             {staffList.map((staff, index) => (

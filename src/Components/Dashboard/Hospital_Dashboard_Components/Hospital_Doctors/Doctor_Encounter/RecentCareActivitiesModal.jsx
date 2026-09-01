@@ -1,5 +1,6 @@
 import React from "react";
 import moment from "moment";
+import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { X, User, Phone, Mail, Calendar, CreditCard } from "lucide-react";
 import Modal from "../../../../ui/Modal";
@@ -182,9 +183,11 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
                         <p className="text-sm text-gray-800 mb-3">
                           {getRecordTitle(record.type)} Time of order: {moment(activity.created_at).format("Do MMMM, YYYY")}
                         </p>
-                        <button 
+                        <button
                           className="text-docuhealth-primary font-medium text-sm hover:underline"
-                          onClick={() => console.log(`Viewing record ${record.sqid} of type ${record.type}`)}
+                          onClick={() =>
+                            toast("Opening the full record from here isn't available yet.", { icon: "🛠️" })
+                          }
                         >
                           {getRecordLinkText(record.type)}
                         </button>

@@ -17,7 +17,8 @@ const PatientMedicalRecordDetail = ({
     <>
       <div className="bg-white my-5 border rounded-lg py-5 px-5  text-sm">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 sm:gap-0  border-b pb-4 w-full">
-          <div
+          <button
+            type="button"
             className="flex justify-start items-center gap-1 cursor-pointer"
             onClick={() => setViewDetailMedicalRecord(false)}
           >
@@ -34,8 +35,8 @@ const PatientMedicalRecordDetail = ({
               />
             </svg>
 
-            <h2 className=" text-sm">Medical Record Detail</h2>
-          </div>
+            <span className=" text-sm">Medical Record Detail</span>
+          </button>
         </div>
         <PatientInfoCard
           className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg"

@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 
-const FIELDS = [
+// Shared field list for the doctor-to-doctor handover note: the create form
+// here, the search filter in PatientHandoverTab.jsx, and the read-only render
+// in HandoverNoteDetailPage.jsx all key off this so labels stay in sync with
+// POST/GET /api/doctors/handover(s).
+export const HANDOVER_FIELDS = [
   { key: "working_diagnosis", label: "Working diagnosis", required: true },
   { key: "current_clinical_status", label: "Current Clinical Status", required: true },
   { key: "critical_events", label: "Critical Events" },
@@ -13,40 +17,42 @@ const FIELDS = [
   { key: "management_plan", label: "Management Plan for Next Team" },
 ];
 
-const EMPTY_FORM = FIELDS.reduce((acc, f) => ({ ...acc, [f.key]: "" }), {});
+const EMPTY_FORM = HANDOVER_FIELDS.reduce((acc, f) => ({ ...acc, [f.key]: "" }), {});
 
-// There's no backend endpoint yet for listing/creating per-patient handover
-// notes (only a nurse end-of-shift summary exists, which is a different
-// thing), so this just hands the filled-in note back to the parent — see
-// PatientHandoverTab.jsx. The receiving doctor was already picked in the
-// step before this one (SelectHandoverDoctorModal).
+// Doctor-to-doctor handover note form. The receiving doctor was picked in the
+// step before this (SelectHandoverDoctorModal); on upload the parent
+// (PatientHandoverTab) POSTs the filled fields to /api/doctors/handover. Only
+// `working_diagnosis` and `current_clinical_status` are required; the other
+// six go up as empty strings when left blank.
 //
 // Same "inline page, not a modal" shell as AddProgressNoteForm in
 // TabDetails2.jsx (Progress Note tab).
-const AddHandoverNoteForm = ({ onBack, onUpload, handoverDoctorName }) => {
+const AddHandoverNoteForm = ({ onBack, onUpload, handoverDoctorName, isSubmitting = false }) => {
   const [form, setForm] = useState(EMPTY_FORM);
 
-  const isFormFilled = FIELDS.filter((f) => f.required).every((f) => form[f.key].trim());
+  const isFormFilled = HANDOVER_FIELDS.filter((f) => f.required).every((f) => form[f.key].trim());
 
   const updateField = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
   const handleUpload = () => {
+    if (isSubmitting) return;
     if (!isFormFilled) {
       toast.error("Please fill in the Working diagnosis and Current Clinical Status.");
       return;
     }
     onUpload(form);
-    setForm(EMPTY_FORM);
   };
 
   return (
     <div className="bg-white rounded-lg border mt-3 px-3 lg:px-5 py-5 text-sm">
-      <div className="flex items-center gap-1 cursor-pointer border-b pb-3">
-        <div onClick={onBack}>
-          <ArrowLeft className="w-4 h-4 text-gray-800" />
-        </div>
-        <p>Add handover note</p>
-      </div>
+      <button
+        type="button"
+        className="flex items-center gap-1 cursor-pointer border-b pb-3 w-full"
+        onClick={onBack}
+      >
+        <ArrowLeft className="w-4 h-4 text-gray-800" />
+        <span>Add handover note</span>
+      </button>
 
       <div className="my-5">
         {handoverDoctorName && (
@@ -56,9 +62,12 @@ const AddHandoverNoteForm = ({ onBack, onUpload, handoverDoctorName }) => {
           </div>
         )}
 
-        {FIELDS.map((field) => (
+        {HANDOVER_FIELDS.map((field) => (
           <div key={field.key} className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-            <p className="font-medium">{field.label}</p>
+            <p className="font-medium">
+              {field.label}
+              {field.required && <span className="text-red-500"> *</span>}
+            </p>
             <textarea
               value={form[field.key]}
               onChange={updateField(field.key)}
@@ -71,12 +80,14 @@ const AddHandoverNoteForm = ({ onBack, onUpload, handoverDoctorName }) => {
         <div className="flex justify-end cursor-pointer">
           <button
             className={`py-2.5 text-white rounded-full text-sm px-20 mt-5 w-full lg:w-auto ${
-              isFormFilled ? "bg-docuhealth-primary cursor-pointer" : "bg-gray-400 cursor-not-allowed"
+              isFormFilled && !isSubmitting
+                ? "bg-docuhealth-primary cursor-pointer"
+                : "bg-gray-400 cursor-not-allowed"
             }`}
-            disabled={!isFormFilled}
+            disabled={!isFormFilled || isSubmitting}
             onClick={handleUpload}
           >
-            Upload handover note
+            {isSubmitting ? "Uploading..." : "Upload handover note"}
           </button>
         </div>
       </div>

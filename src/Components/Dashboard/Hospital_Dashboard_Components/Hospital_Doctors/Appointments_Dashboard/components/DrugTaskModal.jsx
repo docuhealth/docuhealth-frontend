@@ -1,137 +1,118 @@
-import React, { useRef, useState } from "react";
-import { Search, Plus } from "lucide-react";
-import TaskCreationModal, { FIELD_BOX_CLASS } from "./TaskCreationModal";
-import Input from "../../../../../ui/Input";
-import Select from "../../../../../ui/Select";
+import React, { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import TaskCreationModal from "./TaskCreationModal";
+import MedicationSection from "./MedicationSection";
+import { createInpatientTask } from "../../../../../../queries/Hospital/doctor/inpatientTasks";
+import { DEFAULT_FREQUENCY } from "../../../../../../utils/careTaskConstants";
 
-const ROUTE_OPTIONS = ["Oral", "IV", "IM", "SC", "Topical", "Sublingual", "Rectal", "Inhalation"];
-
-const DRUG_DURATION_OPTIONS = [
-  "Until discharge",
-  "24 hours",
-  "48 hours",
-  "72 hours",
-  "5 days",
-  "7 days",
-  "Until discontinued",
-];
-
-const DRUG_FREQUENCY_OPTIONS = [
-  "Q4H (4-Hourly)",
-  "Q6H (6-Hourly)",
-  "Q8H (8-Hourly)",
-  "Q12H (12-Hourly)",
-  "OD (Once daily)",
-  "BD (Twice daily)",
-  "TDS (Three times daily)",
-  "PRN (As needed)",
-];
-
-const createEmptyDrugRow = (id) => ({
-  id,
-  drugName: "",
-  duration: DRUG_DURATION_OPTIONS[0],
-  dosage: "",
-  route: ROUTE_OPTIONS[0],
-  frequency: DRUG_FREQUENCY_OPTIONS[0],
-});
-
-const DrugRow = ({ row, onChange }) => {
-  const updateRowField = (field) => (e) => onChange({ ...row, [field]: e.target.value });
-  const updateRowValue = (field) => (value) => onChange({ ...row, [field]: value });
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
-      <Input
-        label="Drug name"
-        leadingIcon={<Search className="w-4 h-4" />}
-        placeholder="enter medication"
-        value={row.drugName}
-        onChange={updateRowField("drugName")}
-      />
-
-      <Select
-        label="Duration"
-        value={row.duration}
-        onChange={updateRowValue("duration")}
-        options={DRUG_DURATION_OPTIONS.map((option) => ({ value: option, label: option }))}
-      />
-
-      <Input
-        label="Dosage"
-        placeholder="Enter dosage..."
-        value={row.dosage}
-        onChange={updateRowField("dosage")}
-      />
-
-      <Select
-        label="Route"
-        value={row.route}
-        onChange={updateRowValue("route")}
-        options={ROUTE_OPTIONS.map((option) => ({ value: option, label: option }))}
-      />
-
-      <Select
-        label="Frequency"
-        value={row.frequency}
-        onChange={updateRowValue("frequency")}
-        options={DRUG_FREQUENCY_OPTIONS.map((option) => ({ value: option, label: option }))}
-      />
-    </div>
-  );
+// MedicationSection expresses duration as a value + a unit label ("Day" /
+// "Week" / "Month"); the medication-task endpoint wants the backend
+// RateEnum (`hours` | `days` | `weeks` | `months`) on `dosage.duration.rate`.
+const DURATION_RATE_BY_UNIT = {
+  Hour: "hours",
+  Day: "days",
+  Week: "weeks",
+  Month: "months",
 };
 
-const MedicationSection = ({ rows, setRows, nextIdRef }) => {
-  const updateRow = (id) => (updatedRow) =>
-    setRows((prev) => prev.map((row) => (row.id === id ? updatedRow : row)));
+const createEmptyMedication = () => ({
+  catalog_drug: null,
+  drug: "",
+  strength: "",
+  doseForm: "",
+  dosage: "",
+  dosageUnit: "mg",
+  route: "Oral",
+  frequency: DEFAULT_FREQUENCY,
+  duration: "",
+  durationUnit: "Day",
+});
 
-  const addRow = () =>
-    setRows((prev) => [...prev, createEmptyDrugRow(`drug-row-${nextIdRef.current++}`)]);
+const isMedicationFilled = (med) =>
+  med.drug.trim() !== "" && String(med.dosage).trim() !== "";
 
-  return (
-    <div className={FIELD_BOX_CLASS}>
-      <p className="font-semibold text-gray-900 mb-4">Medication</p>
-      <div className="space-y-4">
-        {rows.map((row) => (
-          <DrugRow key={row.id} row={row} onChange={updateRow(row.id)} />
-        ))}
-      </div>
-      <button
-        type="button"
-        onClick={addRow}
-        className="flex items-center gap-1 text-docuhealth-primary font-medium text-sm mt-4 cursor-pointer"
-      >
-        <Plus className="w-4 h-4" /> Add more drugs
-      </button>
-    </div>
-  );
+// Shape one MedicationSection row into a `config.drugs[]` entry
+// (MedicationDrugItem): a catalog reference when the doctor picked a
+// catalog drug, otherwise the free-text `manual_drug`. `dosage.duration`
+// is nullable here (unlike the pharmacy order), so an unset duration is
+// sent as null rather than a zeroed object.
+const toDrugPayload = (med) => {
+  const drugRef = med.catalog_drug
+    ? { catalog_drug: med.catalog_drug }
+    : {
+        manual_drug: {
+          name: med.drug.trim(),
+          route: med.route,
+          ...(med.strength ? { strength: med.strength } : {}),
+          ...(med.doseForm ? { dose_form: med.doseForm } : {}),
+        },
+      };
+
+  return {
+    ...drugRef,
+    dosage: {
+      quantity: Number(med.dosage) || 0,
+      unit: med.dosageUnit,
+      frequency: med.frequency,
+      duration: med.duration
+        ? {
+            value: Number(med.duration) || 0,
+            rate: DURATION_RATE_BY_UNIT[med.durationUnit] || "days",
+          }
+        : null,
+    },
+  };
 };
 
 /**
  * "Drug task (nurse)" quick-service flow from OtherMedicalServicesFab.
- * Unlike the other quick-service modals this needs a repeatable drug
- * chart instead of a single dropdown, so it plugs its own top section
- * into the shared TaskCreationModal shell rather than using its default
- * primary field. There's no backend endpoint for this yet, so "Create
- * this task" just confirms locally — swap in a real mutation once the
- * API exists.
+ * Creates a `medication` care task on the patient's admission via
+ * POST /api/inpatients/admissions/<sqid>/tasks — the backend turns this
+ * into one nurse MAR task per drug (with its scheduled occurrences) and
+ * raises the matching pharmacy order in the same call. Because each drug
+ * carries its own frequency/duration, the shared shell's single
+ * frequency/duration row is switched off (`showFrequencyDuration={false}`)
+ * and the drug chart is plugged in as the `topSection`, reusing the same
+ * MedicationSection + careTaskConstants the Prescribe Medication (pharmacy
+ * order) form uses so the two drug forms can't drift apart.
  */
-const DrugTaskModal = ({ onClose }) => {
-  const nextIdRef = useRef(2);
-  const [rows, setRows] = useState(() => [
-    createEmptyDrugRow("drug-row-0"),
-    createEmptyDrugRow("drug-row-1"),
-  ]);
+const DrugTaskModal = ({ admissionSqid, onClose }) => {
+  const [medications, setMedications] = useState(() => [createEmptyMedication()]);
 
-  const isMedicationValid = rows.some((row) => row.drugName.trim() !== "");
+  const { mutateAsync } = useMutation({
+    mutationFn: (payload) => createInpatientTask({ admissionSqid, payload }),
+    onError: (err) => {
+      console.error("Error creating drug task:", err);
+      toast.error(err.response?.data?.message || "Failed to create drug task.");
+    },
+  });
+
+  // eslint-disable-next-line no-unused-vars
+  const handleSubmit = ({ primary, ...shared }) => {
+    const filledMedications = medications.filter(isMedicationFilled);
+    if (filledMedications.length === 0) {
+      toast.error("Add at least one medication with a dosage.");
+      return Promise.reject(new Error("No medication rows filled in."));
+    }
+
+    return mutateAsync({
+      ...shared,
+      task_type: "medication",
+      config: { drugs: filledMedications.map(toDrugPayload) },
+    });
+  };
 
   return (
     <TaskCreationModal
       title="Drug Chart / MAR Orders"
-      topSection={<MedicationSection rows={rows} setRows={setRows} nextIdRef={nextIdRef} />}
-      isTopSectionValid={isMedicationValid}
+      topSection={
+        <MedicationSection medications={medications} setMedications={setMedications} />
+      }
+      isTopSectionValid={medications.some(isMedicationFilled)}
       showFrequencyDuration={false}
       successMessage="Drug chart task created!"
+      onSubmit={handleSubmit}
       onClose={onClose}
     />
   );

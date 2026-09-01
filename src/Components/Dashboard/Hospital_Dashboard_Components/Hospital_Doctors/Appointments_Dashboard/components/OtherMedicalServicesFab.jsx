@@ -164,13 +164,13 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, onOrde
         <WardProcedureModal admissionSqid={admissionSqid} onClose={() => setActiveModal(null)} />
       )}
       {activeModal === "glucose" && (
-        <GlucoseMonitoringModal onClose={() => setActiveModal(null)} />
+        <GlucoseMonitoringModal admissionSqid={admissionSqid} onClose={() => setActiveModal(null)} />
       )}
       {activeModal === "drug-task" && (
-        <DrugTaskModal onClose={() => setActiveModal(null)} />
+        <DrugTaskModal admissionSqid={admissionSqid} onClose={() => setActiveModal(null)} />
       )}
       {activeModal === "iv-fluid" && (
-        <IVFluidModal onClose={() => setActiveModal(null)} />
+        <IVFluidModal admissionSqid={admissionSqid} onClose={() => setActiveModal(null)} />
       )}
       {activeModal === "seizure" && (
         <SeizureEventModal onClose={() => setActiveModal(null)} />

@@ -71,6 +71,20 @@ const DischargeFollowUpStep = ({
 
           <div>
             <label className="block text-[13px] font-medium text-gray-700 mb-2">
+              Care instructions (for the patient)
+            </label>
+            <textarea
+              value={formData.care_instructions}
+              onChange={(e) => onFieldChange("care_instructions", e.target.value)}
+              placeholder="Home care, wound care, activity, diet, warning signs — one item per line..."
+              rows={4}
+              className="w-full border border-gray-200 rounded-lg p-3 text-[13px] text-gray-700 focus:outline-none focus:border-docuhealth-primary resize-y"
+            ></textarea>
+            <p className="text-[11px] text-gray-400 mt-1.5">Each line is saved as a separate item.</p>
+          </div>
+
+          <div>
+            <label className="block text-[13px] font-medium text-gray-700 mb-2">
               Follow-up instruction(s)
             </label>
             <textarea

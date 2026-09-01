@@ -93,7 +93,7 @@ const AdvanceCheckUp = ({
 
   return (
     <>
-      <div className="bg-white my-5 border rounded-2xl pt-8 px-6 text-sm">
+      <div className="bg-white my-5 border rounded-2xl pt-8 px-6 pb-8 text-sm">
       {showingRecordDetail ? (
         <PatientMedicalRecordDetail
           selectedMedicalRecord={selectedMedicalRecord}
@@ -101,13 +101,14 @@ const AdvanceCheckUp = ({
         />
       ) : dischargedView !== "tabs" ? (
         <>
-          <div
-            className="flex items-center gap-1 cursor-pointer border-b pb-3"
+          <button
+            type="button"
+            className="flex items-center gap-1 cursor-pointer border-b pb-3 w-full"
             onClick={() => setDischargedView("tabs")}
           >
             <ArrowLeft className="w-4 h-4 text-gray-800" />
-            <p>{dischargedView === "soap-history" ? "SOAP Note History" : "Discharge Summary"}</p>
-          </div>
+            <span>{dischargedView === "soap-history" ? "SOAP Note History" : "Discharge Summary"}</span>
+          </button>
           <div className="pt-5">
             {dischargedView === "soap-history" ? (
               <PatientSOAPNotes
@@ -135,29 +136,29 @@ const AdvanceCheckUp = ({
         </>
       ) : (
         <>
-          <div className="flex items-center gap-1 cursor-pointer border-b pb-3">
-            <div
-              onClick={() => {
-                setAdvanceCheckUp(false);
-                setTab(advanceCheckUpSource)
-              }}
+          <button
+            type="button"
+            className="flex items-center gap-1 cursor-pointer border-b pb-3 w-full"
+            onClick={() => {
+              setAdvanceCheckUp(false);
+              setTab(advanceCheckUpSource)
+            }}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4.56528 6.41685H11.6654V7.58352H4.56528L7.69426 10.7125L6.86932 11.5374L2.33203 7.00019L6.86932 2.46289L7.69426 3.28785L4.56528 6.41685Z"
-                  fill="var(--color-docuhealth-dark)"
-                />
-              </svg>
-            </div>
+              <path
+                d="M4.56528 6.41685H11.6654V7.58352H4.56528L7.69426 10.7125L6.86932 11.5374L2.33203 7.00019L6.86932 2.46289L7.69426 3.28785L4.56528 6.41685Z"
+                fill="var(--color-docuhealth-dark)"
+              />
+            </svg>
 
-            <p>Patient's Details</p>
-          </div>
+            <span>Patient's Details</span>
+          </button>
           {loadingInfo ? (
             /* Basic Loading State */
             <div className="flex justify-center items-center gap-3 px-2 py-3">

@@ -1,77 +1,97 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import TaskCreationModal, { FIELD_BOX_CLASS, FIELD_LABEL_CLASS } from "./TaskCreationModal";
+import { createInpatientTask } from "../../../../../../queries/Hospital/doctor/inpatientTasks";
+import Input from "../../../../../ui/Input";
 import Select from "../../../../../ui/Select";
 
-const DRUG_ADDITIVE_OPTIONS = [
-  "Potassium Chloride (KCl)",
-  "Multivitamin Infusion",
-  "Insulin (Sliding Scale)",
-  "Magnesium Sulfate",
-  "Sodium Bicarbonate",
-  "Calcium Gluconate",
+// Backend enums for an `iv_fluid` care task's `config` (labels mirror the
+// Swagger descriptions).
+const SOLUTION_TYPE_OPTIONS = [
+  { value: "normal_saline_09", label: "0.9% Normal Saline" },
+  { value: "dextrose_water_5", label: "5% Dextrose Water" },
+  { value: "dextrose_water_10", label: "10% Dextrose Water" },
+  { value: "dextrose_5_in_saline_09", label: "5% Dextrose in 0.9% Normal Saline" },
+  { value: "ringers_lactate", label: "Ringer's Lactate" },
+  { value: "dextrose_43_in_saline_018", label: "4.3% Dextrose in 0.18% Saline" },
+  { value: "haemaccel_gelofusine", label: "Haemaccel / Gelofusine" },
+  { value: "half_normal_saline_045", label: "0.45% Half-Normal Saline" },
 ];
 
-const FLUID_SOLUTION_OPTIONS = [
-  "Normal saline",
-  "Dextrose 5% (D5W)",
-  "Dextrose Saline",
-  "Ringer's Lactate",
-  "Half Normal Saline (0.45% NaCl)",
-  "Dextrose 10%",
+const VOLUME_PER_BAG_OPTIONS = [
+  { value: "50", label: "50 mL" },
+  { value: "100", label: "100 mL" },
+  { value: "250", label: "250 mL" },
+  { value: "500", label: "500 mL" },
+  { value: "1000", label: "1,000 mL" },
 ];
 
-const VOLUME_PER_BAG_OPTIONS = ["100 mL", "250 mL", "500 mL", "1000 mL"];
-
-const TOTAL_PLAN_OPTIONS = ["1 Bag Only", "2 Bags", "3 Bags", "Continuous / Until further notice"];
-
-const INFUSION_DURATION_OPTIONS = [
-  "4 hours",
-  "8 hours",
-  "12 hours",
-  "24 hours",
-  "48 hours",
-  "Until discontinued",
+const ADDITIVE_OPTIONS = [
+  { value: "potassium_chloride", label: "Potassium Chloride" },
+  { value: "magnesium_sulfate", label: "Magnesium Sulfate" },
+  { value: "calcium_gluconate", label: "Calcium Gluconate" },
+  { value: "sodium_bicarbonate", label: "Sodium Bicarbonate" },
+  { value: "multivitamin_infusion", label: "Multivitamin Infusion (MVI)" },
+  { value: "oxytocin", label: "Oxytocin" },
+  { value: "insulin", label: "Insulin (Regular / Actrapid)" },
+  { value: "metronidazole", label: "Metronidazole (Flagyl)" },
+  { value: "ciprofloxacin", label: "Ciprofloxacin" },
+  { value: "amoxicillin_clavulanate", label: "Amoxicillin-Clavulanate (Augmentin)" },
+  { value: "gentamicin", label: "Gentamicin" },
+  { value: "amikacin", label: "Amikacin" },
+  { value: "omeprazole", label: "Omeprazole" },
+  { value: "pantoprazole", label: "Pantoprazole" },
+  { value: "metoclopramide", label: "Metoclopramide (Maxolon)" },
+  { value: "ondansetron", label: "Ondansetron" },
+  { value: "paracetamol", label: "Paracetamol (Perfalgan)" },
+  { value: "tramadol", label: "Tramadol" },
+  { value: "morphine", label: "Morphine" },
+  { value: "pethidine", label: "Pethidine" },
 ];
+
+const additiveLabel = (value) =>
+  ADDITIVE_OPTIONS.find((o) => o.value === value)?.label || value;
 
 const IVFluidTopSection = ({
-  drugsAdditive,
+  additives,
   onAddAdditive,
   onRemoveAdditive,
-  fluidType,
-  setFluidType,
+  solutionType,
+  setSolutionType,
   volumePerBag,
   setVolumePerBag,
   totalPlan,
   setTotalPlan,
-  infusionDuration,
-  setInfusionDuration,
+  infusionRate,
+  setInfusionRate,
 }) => {
-  const availableAdditives = DRUG_ADDITIVE_OPTIONS.filter(
-    (option) => !drugsAdditive.includes(option)
+  const availableAdditives = ADDITIVE_OPTIONS.filter(
+    (option) => !additives.includes(option.value),
   );
 
   return (
     <>
       <div className={FIELD_BOX_CLASS}>
-        <label className={FIELD_LABEL_CLASS}>Drugs/Additive</label>
+        <label className={FIELD_LABEL_CLASS}>Drugs / Additives (optional)</label>
         <Select
           value=""
           onChange={(value) => {
             if (value) onAddAdditive(value);
           }}
-          options={availableAdditives.map((option) => ({ value: option, label: option }))}
-          placeholder="Select drugs/additive"
+          options={availableAdditives}
+          placeholder="Add a drug / additive"
         />
 
-        {drugsAdditive.length > 0 && (
+        {additives.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-4">
-            {drugsAdditive.map((item) => (
+            {additives.map((item) => (
               <span
                 key={item}
                 className="inline-flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full pl-3 pr-2 py-1.5 text-[13px] text-gray-600"
               >
-                {item}
+                {additiveLabel(item)}
                 <button
                   type="button"
                   onClick={() => onRemoveAdditive(item)}
@@ -89,9 +109,10 @@ const IVFluidTopSection = ({
         <div className={FIELD_BOX_CLASS}>
           <label className={FIELD_LABEL_CLASS}>Fluid solution type</label>
           <Select
-            value={fluidType}
-            onChange={setFluidType}
-            options={FLUID_SOLUTION_OPTIONS.map((option) => ({ value: option, label: option }))}
+            value={solutionType}
+            onChange={setSolutionType}
+            options={SOLUTION_TYPE_OPTIONS}
+            placeholder="Select solution type"
           />
         </div>
 
@@ -100,27 +121,32 @@ const IVFluidTopSection = ({
           <Select
             value={volumePerBag}
             onChange={setVolumePerBag}
-            options={VOLUME_PER_BAG_OPTIONS.map((option) => ({ value: option, label: option }))}
+            options={VOLUME_PER_BAG_OPTIONS}
+            placeholder="Select volume"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div className={FIELD_BOX_CLASS}>
-          <label className={FIELD_LABEL_CLASS}>Total Plan / Number of Bags</label>
-          <Select
+          <label className={FIELD_LABEL_CLASS}>Total bags planned</label>
+          <Input
+            type="number"
+            min="1"
+            placeholder="e.g. 3"
             value={totalPlan}
-            onChange={setTotalPlan}
-            options={TOTAL_PLAN_OPTIONS.map((option) => ({ value: option, label: option }))}
+            onChange={(e) => setTotalPlan(e.target.value)}
           />
         </div>
 
         <div className={FIELD_BOX_CLASS}>
-          <label className={FIELD_LABEL_CLASS}>Infusion Rate / Duration</label>
-          <Select
-            value={infusionDuration}
-            onChange={setInfusionDuration}
-            options={INFUSION_DURATION_OPTIONS.map((option) => ({ value: option, label: option }))}
+          <label className={FIELD_LABEL_CLASS}>Infusion rate (mL / hour)</label>
+          <Input
+            type="number"
+            min="1"
+            placeholder="e.g. 125"
+            value={infusionRate}
+            onChange={(e) => setInfusionRate(e.target.value)}
           />
         </div>
       </div>
@@ -129,47 +155,78 @@ const IVFluidTopSection = ({
 };
 
 /**
- * "IV fluid" quick-service flow from OtherMedicalServicesFab. Needs a
- * drugs/additive multi-picker plus its own fluid-specific fields, so it
- * plugs a custom top section into the shared TaskCreationModal shell
- * instead of using the default single primary field. There's no backend
- * endpoint for this yet, so "Create this task" just confirms locally —
- * swap in a real mutation once the API exists.
+ * "IV fluid" quick-service flow from OtherMedicalServicesFab. Creates an
+ * `iv_fluid` care task on the patient's admission via
+ * POST /api/inpatients/admissions/<sqid>/tasks. It needs a
+ * drugs/additive multi-picker plus fluid-specific fields, so it plugs a
+ * custom top section into the shared TaskCreationModal shell; `frequency`
+ * (required by the backend for this task type) and the rest of the shared
+ * fields still come from the shell.
  */
-const IVFluidModal = ({ onClose }) => {
-  const [drugsAdditive, setDrugsAdditive] = useState([]);
-  const [fluidType, setFluidType] = useState(FLUID_SOLUTION_OPTIONS[0]);
-  const [volumePerBag, setVolumePerBag] = useState("500 mL");
-  const [totalPlan, setTotalPlan] = useState(TOTAL_PLAN_OPTIONS[0]);
-  const [infusionDuration, setInfusionDuration] = useState("24 hours");
+const IVFluidModal = ({ admissionSqid, onClose }) => {
+  const [additives, setAdditives] = useState([]);
+  const [solutionType, setSolutionType] = useState(SOLUTION_TYPE_OPTIONS[0].value);
+  const [volumePerBag, setVolumePerBag] = useState("500");
+  const [totalPlan, setTotalPlan] = useState("1");
+  const [infusionRate, setInfusionRate] = useState("");
 
-  const handleAddAdditive = (item) => setDrugsAdditive((prev) => [...prev, item]);
-  const handleRemoveAdditive = (item) =>
-    setDrugsAdditive((prev) => prev.filter((existing) => existing !== item));
+  const addAdditive = (item) => setAdditives((prev) => [...prev, item]);
+  const removeAdditive = (item) =>
+    setAdditives((prev) => prev.filter((existing) => existing !== item));
 
-  const isTopSectionValid = !!fluidType && !!volumePerBag && !!totalPlan && !!infusionDuration;
+  const isTopSectionValid =
+    !!solutionType &&
+    !!volumePerBag &&
+    Number(totalPlan) >= 1 &&
+    Number(infusionRate) >= 1;
+
+  const { mutateAsync } = useMutation({
+    mutationFn: (payload) => createInpatientTask({ admissionSqid, payload }),
+    onError: (err) => {
+      console.error("Error creating IV fluid task:", err);
+      toast.error(err.response?.data?.message || "Failed to create IV fluid task.");
+    },
+  });
+
+  const handleSubmit = (fields) => {
+    // iv_fluid has no shared "primary" select — only the custom topSection.
+    // eslint-disable-next-line no-unused-vars
+    const { primary, ...shared } = fields;
+    return mutateAsync({
+      task_type: "iv_fluid",
+      config: {
+        solution_type: solutionType,
+        volume_per_bag: Number(volumePerBag),
+        total_plan: Number(totalPlan),
+        infusion_rate: Number(infusionRate),
+        ...(additives.length ? { additives } : {}),
+      },
+      ...shared,
+    });
+  };
 
   return (
     <TaskCreationModal
-      title="IV fluid Task"
+      title="IV Fluid Task"
       topSection={
         <IVFluidTopSection
-          drugsAdditive={drugsAdditive}
-          onAddAdditive={handleAddAdditive}
-          onRemoveAdditive={handleRemoveAdditive}
-          fluidType={fluidType}
-          setFluidType={setFluidType}
+          additives={additives}
+          onAddAdditive={addAdditive}
+          onRemoveAdditive={removeAdditive}
+          solutionType={solutionType}
+          setSolutionType={setSolutionType}
           volumePerBag={volumePerBag}
           setVolumePerBag={setVolumePerBag}
           totalPlan={totalPlan}
           setTotalPlan={setTotalPlan}
-          infusionDuration={infusionDuration}
-          setInfusionDuration={setInfusionDuration}
+          infusionRate={infusionRate}
+          setInfusionRate={setInfusionRate}
         />
       }
       isTopSectionValid={isTopSectionValid}
-      showFrequencyDuration={false}
+      frequencyLabel="Frequency / Timing"
       successMessage="IV fluid task created!"
+      onSubmit={handleSubmit}
       onClose={onClose}
     />
   );

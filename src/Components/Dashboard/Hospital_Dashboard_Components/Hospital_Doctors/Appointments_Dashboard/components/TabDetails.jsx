@@ -489,7 +489,8 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
       {seePatientDetails ? (
         <div className="text-sm">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 sm:gap-0  border-b pb-4 w-full">
-            <div
+            <button
+              type="button"
               className="flex justify-start items-center gap-1 cursor-pointer"
               onClick={() => setSeePatientDetails(false)}
             >
@@ -506,10 +507,10 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                 />
               </svg>
 
-              <h2 className=" text-sm">SOAP Note Overview</h2>
-            </div>
+              <span className=" text-sm">SOAP Note Overview</span>
+            </button>
             <div className=" flex flex-col sm:flex-row justify-end items-center gap-3 w-full sm:w-auto">
-              <div className="flex justify-center items-center gap-1 border border-docuhealth-primary py-1.5 px-4 rounded-full w-full sm:w-auto text-docuhealth-primary cursor-pointer" onClick={() => setCreateAdditionalNotes(true)}>
+              <button type="button" className="flex justify-center items-center gap-1 border border-docuhealth-primary py-1.5 px-4 rounded-full w-full sm:w-auto text-docuhealth-primary cursor-pointer" onClick={() => setCreateAdditionalNotes(true)}>
                 <svg
                   width="14"
                   height="14"
@@ -547,8 +548,8 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                   />
                 </svg>
 
-                <p>Create additional notes</p>
-              </div>
+                <span>Create additional notes</span>
+              </button>
             </div>
           </div>
           <PatientInfoCard
@@ -819,7 +820,11 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                           </div>
                         </div>
 
-                        <div
+                        <button
+                          type="button"
+                          aria-label="SOAP note actions"
+                          aria-haspopup="true"
+                          aria-expanded={openPopover === index}
                           onClick={() => {
                             togglePopover(index);
                           setSelectedNoteId(soapNote.id);
@@ -836,12 +841,13 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                           >
                             <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
                           </svg>
-                        </div>
+                        </button>
 
                         {openPopover === index && (
                           <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
-                            <p
-                              className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                            <button
+                              type="button"
+                              className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
                                 setSelectedNoteId(soapNote.id);
                                 setSeePatientDetails(true);
@@ -849,7 +855,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                               }}
                             >
                               See full SOAP Note
-                            </p>
+                            </button>
                           </div>
                         )}
                       </div>
@@ -896,8 +902,9 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                         </button>
                         {openPopover === index && (
                           <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
-                            <p
-                              className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                            <button
+                              type="button"
+                              className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
                           setSelectedNoteId(soapNote.id);
                                 setSeePatientDetails(true);
@@ -905,7 +912,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                               }}
                             >
                               See full SOAP Note
-                            </p>
+                            </button>
                           </div>
                         )}
                       </div>

@@ -6,23 +6,13 @@ import {
   getAge,
 } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { DoctorAppContext } from "../../../../../context/HospitalContext/Doctors/DoctorAppContext";
+import { HANDOVER_FIELDS } from "./AddHandoverNoteForm";
 
 const maskHin = (hin) => {
   if (!hin) return "NIL";
   if (hin.length <= 6) return hin;
   return `${hin.slice(0, 5)}${"*".repeat(Math.max(0, hin.length - 7))}${hin.slice(-2)}`;
 };
-
-const HANDOVER_FIELDS = [
-  { key: "working_diagnosis", label: "Working Diagnosis:" },
-  { key: "current_clinical_status", label: "Current Clinical Status:" },
-  { key: "critical_events", label: "Critical Events:" },
-  { key: "outstanding_investigations", label: "Outstanding Investigations:" },
-  { key: "pending_procedures", label: "Pending Procedures:" },
-  { key: "pending_consult_reviews", label: "Pending Consult Reviews:" },
-  { key: "clinical_concerns", label: "Clinical Concerns:" },
-  { key: "management_plan", label: "Management Plan for Next Team:" },
-];
 
 /**
  * Full-page "Handover note information" view — same shell as the other
@@ -57,7 +47,8 @@ const HandoverNoteDetailPage = ({
   return (
     <div className="bg-white my-5 border rounded-lg pt-5 lg:pt-8 px-4 lg:px-6 pb-8 text-sm">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 border-b pb-4 w-full">
-        <div
+        <button
+          type="button"
           className="flex justify-start items-center gap-1 cursor-pointer"
           onClick={onBack}
         >
@@ -73,8 +64,8 @@ const HandoverNoteDetailPage = ({
               fill="var(--color-docuhealth-dark)"
             />
           </svg>
-          <h2 className="text-sm">Handover note information</h2>
-        </div>
+          <span className="text-sm">Handover note information</span>
+        </button>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <button
@@ -146,15 +137,15 @@ const HandoverNoteDetailPage = ({
         </div>
       </div>
 
-      {/* Handover note fields */}
+      {/* Handover note */}
       <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
         <p className="font-semibold text-docuhealth-dark mb-4">Handover Note</p>
         <div className="space-y-4">
           {HANDOVER_FIELDS.map((field) => (
-            <div key={field.key}>
-              <p className="text-[12px] text-gray-500">{field.label}</p>
-              <p className="font-medium text-docuhealth-dark">
-                {note[field.key]?.trim() || "None"}
+            <div key={field.key} className="text-[13px]">
+              <p className="text-gray-500 mb-1">{field.label}</p>
+              <p className="font-medium text-docuhealth-dark whitespace-pre-wrap">
+                {note[field.key]?.trim() ? note[field.key] : "None"}
               </p>
             </div>
           ))}

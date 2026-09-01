@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
+import { createInpatientDischarge } from "../../../../../queries/Hospital/doctor/discharge";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import DischargeAdmissionSummaryStep from "./DischargeAdmissionSummaryStep";
 import DischargeProceduresMedicationsStep from "./DischargeProceduresMedicationsStep";
@@ -14,17 +15,24 @@ const COMPLETED_LAB_STATUSES = ["completed", "accepted", "result_ready", "approv
 const pageSize = 20;
 
 // In-patient discharge, as a 3-step wizard (Admission Summary → Procedures &
-// Medications → Follow-up). This is a UI shell for now: the read-only summary
-// fields, investigation options, and seeded medications are wired to real
-// data already fetched elsewhere in the doctor's dashboard, but the final
-// "Complete Discharge" step doesn't submit anywhere yet — the existing
-// discharge endpoint doesn't accept most of these fields, so wiring it is a
-// follow-up once the backend supports the new shape.
+// Medications → Follow-up). The read-only summary fields, investigation options,
+// and seeded medications are wired to real data already fetched elsewhere in the
+// doctor's dashboard; "Complete Discharge" submits the wizard to
+// POST /api/medical-records/discharge (see queries/Hospital/doctor/discharge.js
+// for the field mapping and the multipart quirks).
 const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatient }) => {
+  const queryClient = useQueryClient();
+
   const hin =
     selectedDischargePatient?.patient_info?.hin ||
     selectedDischargePatient?.patient?.hin ||
     "";
+
+  // For the in-patient list, the selected row's own sqid IS the admission sqid
+  // (the outpatient list carries a check-in instead — that flow uses a
+  // different discharge endpoint).
+  const admissionSqid =
+    selectedDischargePatient?.admission_sqid || selectedDischargePatient?.sqid || "";
 
   const { data: patientFullInfo } = useQuery({
     queryKey: ["patient-info", hin],
@@ -98,9 +106,11 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
 
   // ---- Editable form state (steps 1 & 3) ----
   const [formData, setFormData] = useState({
+    chief_complaint: "",
     primary_diagnosis: "",
     secondary_diagnosis: "",
     comorbidities: "",
+    treatment_plan: "",
     hospital_course_note: "",
     completed_investigations: [],
     condition_at_discharge: "",
@@ -110,6 +120,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
     follow_up_date: "",
     follow_up_time: "",
     pending_investigations: [],
+    care_instructions: "",
     follow_up_instructions: "",
   });
 
@@ -227,28 +238,137 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 3));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
-  // ---- Complete discharge: confirm → success. No backend call yet — the
-  // existing discharge endpoint doesn't accept this wizard's fields, so
-  // this stays a local-only preview of the flow until that's wired up.
+  // ---- Complete discharge: validate → confirm → POST → success ----
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  const toLines = (value) =>
+    String(value || "")
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+  const buildDischargePayload = () => {
+    const diagnosis = [
+      formData.primary_diagnosis,
+      formData.secondary_diagnosis,
+      formData.comorbidities,
+    ]
+      .map((entry) => entry.trim())
+      .filter(Boolean);
+
+    const seededDrugs = existingMedications
+      .filter((med) => med.status !== "stopped" && med.name)
+      .map((med) => {
+        // Seeded rows carry frequency as a display string ("1 od" or "od").
+        const [lead, ...rest] = String(med.frequency || "").trim().split(" ");
+        const hasNumericLead = rest.length > 0 && !Number.isNaN(Number(lead));
+        return {
+          name: med.name,
+          route: med.route || "Oral",
+          quantity: Number(med.dosage) || 1,
+          unit: med.unit || null,
+          frequency: hasNumericLead
+            ? { value: Number(lead) || 1, rate: rest.join(" ") }
+            : { value: 1, rate: String(med.frequency || "od").trim() || "od" },
+          duration: { value: 1, rate: "days" },
+          allergies: [],
+        };
+      });
+
+    const addedDrugs = newMedications
+      .filter((med) => med.drug && med.drug.trim())
+      .map((med) => ({
+        name: med.drug,
+        route: med.route || "Oral",
+        quantity: Number(med.dosage) || 1,
+        unit: med.dosageUnit || null,
+        frequency: { value: 1, rate: med.frequency },
+        duration: {
+          value: Number(med.duration) || 1,
+          rate: med.durationUnit ? med.durationUnit.toLowerCase() : "days",
+        },
+        allergies: [],
+      }));
+
+    let follow_up_appointment = null;
+    if (formData.follow_up_date && formData.follow_up_time) {
+      follow_up_appointment = {
+        type: "follow_up",
+        note: formData.follow_up_instructions.trim() || "Follow up",
+        scheduled_time: new Date(
+          `${formData.follow_up_date}T${formData.follow_up_time}`,
+        ).toISOString(),
+      };
+    }
+
+    return {
+      admission: admissionSqid,
+      chief_complaint: formData.chief_complaint.trim(),
+      condition_on_discharge: formData.condition_at_discharge.trim(),
+      diagnosis,
+      treatment_plan: toLines(formData.treatment_plan),
+      care_instructions: toLines(formData.care_instructions),
+      drug_records: [...seededDrugs, ...addedDrugs],
+      follow_up_appointment,
+    };
+  };
+
+  const dischargeMutation = useMutation({
+    mutationFn: createInpatientDischarge,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["hospital-patients-doctor"] });
+      setShowConfirmModal(false);
+      setShowSuccessModal(true);
+    },
+    onError: (err) => {
+      setShowConfirmModal(false);
+      const data = err.response?.data;
+      const firstError =
+        data && typeof data === "object" ? Object.values(data).flat()[0] : null;
+      toast.error(
+        (typeof firstError === "string" && firstError) ||
+          data?.detail ||
+          "Could not complete the discharge.",
+      );
+    },
+  });
+
+  const handleValidateAndConfirm = () => {
+    const missing = [];
+    if (!formData.chief_complaint.trim()) missing.push("Chief complaint");
+    if (!formData.primary_diagnosis.trim()) missing.push("Primary diagnosis");
+    if (!formData.treatment_plan.trim()) missing.push("Treatment plan");
+    if (!formData.condition_at_discharge.trim()) missing.push("Condition at discharge");
+    if (!formData.care_instructions.trim()) missing.push("Care instructions");
+
+    if (missing.length > 0) {
+      toast.error(`Please fill in: ${missing.join(", ")}.`);
+      return;
+    }
+    if (!admissionSqid) {
+      toast.error("Missing admission reference for this patient — cannot discharge.");
+      return;
+    }
+    setShowConfirmModal(true);
+  };
+
   const handleConfirmDischarge = () => {
-    setShowConfirmModal(false);
-    setShowSuccessModal(true);
+    dischargeMutation.mutate(buildDischargePayload());
   };
 
   return (
     <>
     <div className="bg-white my-5 border rounded-lg pt-5 lg:pt-8 px-4 lg:px-6 pb-8 text-sm">
       {/* Header */}
-      <div
+      <button
+        type="button"
         className="flex items-center gap-2 cursor-pointer border-b pb-3 mb-6 w-fit"
         onClick={() => setDischargePatient(false)}
       >
         <ArrowLeft size={16} className="text-docuhealth-primary" />
-        <h2 className="font-medium text-docuhealth-primary">Discharge summary</h2>
-      </div>
+        <span className="font-medium text-docuhealth-primary">Discharge summary</span>
+      </button>
 
       {/* Progress bar */}
       <div className="w-full mb-8">
@@ -318,7 +438,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
         ) : (
           <button
             type="button"
-            onClick={() => setShowConfirmModal(true)}
+            onClick={handleValidateAndConfirm}
             className="bg-docuhealth-primary hover:bg-opacity-90 text-white font-medium px-10 py-2.5 rounded-full transition-colors"
           >
             Complete Discharge
@@ -331,7 +451,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       isOpen={showConfirmModal}
       onCancel={() => setShowConfirmModal(false)}
       onConfirm={handleConfirmDischarge}
-      isPending={false}
+      isPending={dischargeMutation.isPending}
     />
 
     <DischargeSuccessModal

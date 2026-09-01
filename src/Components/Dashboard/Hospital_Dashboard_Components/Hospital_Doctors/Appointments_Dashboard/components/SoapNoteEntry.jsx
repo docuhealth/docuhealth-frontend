@@ -466,16 +466,16 @@ useEffect(() => {
   return (
     <>
       <div className="bg-white rounded-lg border mt-3 px-3 lg:px-5 py-5 text-sm">
-        <div className="flex items-center gap-1 cursor-pointer border-b pb-3">
-          <div
-            onClick={() => {
-              setSoapNoteEntry(false);
-            }}
-          >
-            <ArrowLeft className="w-4 h-4 text-gray-800" />
-          </div>
-          <p>SOAP Note Entry</p>
-        </div>
+        <button
+          type="button"
+          className="flex items-center gap-1 cursor-pointer border-b pb-3 w-full"
+          onClick={() => {
+            setSoapNoteEntry(false);
+          }}
+        >
+          <ArrowLeft className="w-4 h-4 text-gray-800" />
+          <span>SOAP Note Entry</span>
+        </button>
         {step === 1 && (
           <div className="my-5">
             <div className="mb-2 font-medium">
@@ -1002,6 +1002,14 @@ useEffect(() => {
         // handleSubmit();
         confirmationModal && (
           <Modal isOpen={true} onClose={() => setConfirmationModal(false)} title="">
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={() => setConfirmationModal(false)}
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 cursor-pointer"
+            >
+              <X size={20} />
+            </button>
             <div className="flex flex-col items-center mb-6 pt-2">
               <svg
                 width="50"
@@ -1049,6 +1057,14 @@ useEffect(() => {
 
       {shareModal && (
         <Modal isOpen={true} onClose={() => setShareModal(false)} title="">
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={() => setShareModal(false)}
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 cursor-pointer"
+          >
+            <X size={20} />
+          </button>
           <div className="flex flex-col items-center mb-6 pt-2">
             <div className="bg-amber-100 p-3 rounded-full mb-3">
               <AlertTriangle className="w-6 h-6 text-docuhealth-amber-600" />

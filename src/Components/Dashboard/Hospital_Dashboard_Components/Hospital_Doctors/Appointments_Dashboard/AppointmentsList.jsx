@@ -8,6 +8,7 @@ import {
 import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
 import SearchBar from "../../../../SearchBar/SearchBar";
 import Input from "../../../../ui/Input";
+import ReferOutModal from "./components/ReferOutModal";
 
 const AppointmentsList = ({
   setSeePatientDetails,
@@ -51,6 +52,8 @@ const AppointmentsList = ({
   const togglePopover = (index) => {
     setOpenPopover(openPopover === index ? null : index);
   };
+
+  const [referOutAppointment, setReferOutAppointment] = useState(null);
 
 
   if (loading) {
@@ -336,7 +339,11 @@ const AppointmentsList = ({
                   </div>
                 </div>
 
-                <div
+                <button
+                  type="button"
+                  aria-label="Appointment actions"
+                  aria-haspopup="true"
+                  aria-expanded={openPopover === index}
                   onClick={() => {
                     togglePopover(index);
                     setSelectedPatientDetails(appointment);
@@ -353,22 +360,30 @@ const AppointmentsList = ({
                   >
                     <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
                   </svg>
-                </div>
+                </button>
 
                 {openPopover === index && (
                   <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
-                    <p
-                      className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                    <button
+                      type="button"
+                      className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                       onClick={() => {
                         setSeePatientDetails(true);
                       }}
                     >
                       See patient's details
-                    </p>
+                    </button>
 
-                    <p className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
+                    <button
+                      type="button"
+                      className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                      onClick={() => {
+                        setReferOutAppointment(appointment);
+                        setOpenPopover(null);
+                      }}
+                    >
                       Refer Out
-                    </p>
+                    </button>
                   </div>
                 )}
               </div>
@@ -410,18 +425,26 @@ const AppointmentsList = ({
                   </button>
                   {openPopover === index && (
                     <div className="absolute top-10 right-0 mt-2 bg-white border shadow-sm rounded-xs p-2 w-52 z-30">
-                      <p
-                        className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                      <button
+                        type="button"
+                        className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                         onClick={() => {
                           setSeePatientDetails(true);
                         }}
                       >
                         See patient's details
-                      </p>
+                      </button>
 
-                      <p className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
+                      <button
+                        type="button"
+                        className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                        onClick={() => {
+                          setReferOutAppointment(appointment);
+                          setOpenPopover(null);
+                        }}
+                      >
                         Refer Out
-                      </p>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -475,6 +498,13 @@ const AppointmentsList = ({
         />
       </div>
       </>)}
+
+      {referOutAppointment && (
+        <ReferOutModal
+          appointment={referOutAppointment}
+          onClose={() => setReferOutAppointment(null)}
+        />
+      )}
     </>
   );
 };

@@ -167,7 +167,8 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
         <>
           <div className="bg-white my-5 border rounded-2xl pt-8 px-6 text-sm ">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 sm:gap-0  border-b pb-4 w-full">
-              <div
+              <button
+                type="button"
                 className="flex justify-start items-center gap-1 cursor-pointer"
                 onClick={() => setViewDetailMedicalRecord(false)}
               >
@@ -184,8 +185,8 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                   />
                 </svg>
 
-                <h2 className=" text-sm">After Visit Summary Overview</h2>
-              </div>
+                <span className=" text-sm">After Visit Summary Overview</span>
+              </button>
               <div className=" flex flex-col sm:flex-row justify-end items-center gap-3 w-full sm:w-auto">
                 <div className="flex justify-center items-center gap-1 border border-docuhealth-primary py-1.5 px-4 rounded-full w-full sm:w-auto text-docuhealth-primary">
                   <svg
@@ -348,13 +349,14 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
         <>
           <div className="bg-white rounded-xl border mt-3 p-5 text-sm">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-3 gap-4 sm:gap-0">
-              <div
+              <button
+                type="button"
                 className="flex items-center gap-1 cursor-pointer"
                 onClick={() => setSeePatientDetails(false)}
               >
                 <ArrowLeft className="w-4 h-4 text-gray-800" />
-                <p>Patient details</p>
-              </div>
+                <span>Patient details</span>
+              </button>
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
                 {/* <p className="text-sm font-medium text-gray-800">
