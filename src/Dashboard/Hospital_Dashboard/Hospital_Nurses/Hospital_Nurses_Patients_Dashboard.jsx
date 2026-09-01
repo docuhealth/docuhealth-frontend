@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
+import { useLocation } from "react-router-dom";
 import { NursesAdmittedPatientMGTContext } from "../../../context/HospitalContext/Nurses/NursesAdmittedPatientMGTContext";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import TabComponent from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/TabComponent";
@@ -13,8 +14,10 @@ import SharedSoapNotes from "../../../Components/Dashboard/Hospital_Dashboard_Co
 import SharedSoapNoteDetail from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SharedSoapNoteDetail";
 import AddNursingAdmissionNote from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddNursingAdmissionNote";
 import SelectHandoverNurseModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SelectHandoverNurseModal";
+import toast from "react-hot-toast";
 import AddHandoverNoteForm from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddHandoverNoteForm";
 import Modal from "../../../Components/ui/Modal";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 import { ChevronDown } from "lucide-react";
 
 const Hospital_Nurses_Patients_Dashboard = () => {
@@ -41,6 +44,18 @@ const Hospital_Nurses_Patients_Dashboard = () => {
   const [showHandoverNoteForm, setShowHandoverNoteForm] = useState(false);
   const [selectedHandoverNurse, setSelectedHandoverNurse] = useState(null);
   const [showHandoverSuccessModal, setShowHandoverSuccessModal] = useState(false);
+  const [isSubmittingHandover, setIsSubmittingHandover] = useState(false);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.selectedPatient) {
+      setSelected(location.state.selectedPatient);
+      setAdvanceCheckUp(true);
+      // Clear the state so refreshing the page doesn't re-trigger it unnecessarily
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -242,11 +257,36 @@ const Hospital_Nurses_Patients_Dashboard = () => {
           ) : showHandoverNoteForm ? (
             <AddHandoverNoteForm
               handoverNurseName={selectedHandoverNurse ? `${selectedHandoverNurse.firstname} ${selectedHandoverNurse.lastname}` : ""}
+              isSubmitting={isSubmittingHandover}
               onBack={() => setShowHandoverNoteForm(false)}
-              onUpload={(noteData) => {
-                console.log("Uploaded note:", noteData);
-                setShowHandoverNoteForm(false);
-                setShowHandoverSuccessModal(true);
+              onUpload={async (noteData) => {
+                try {
+                  setIsSubmittingHandover(true);
+                  const payload = {
+                    to_nurse_id: selectedHandoverNurse?.sqid,
+                    patient_hin: selected?.patient_info?.hin,
+                    ...noteData
+                  };
+                  await axiosInstanceHos.post("/api/nurses/in-patient-handover", payload);
+                  setShowHandoverNoteForm(false);
+                  setShowHandoverSuccessModal(true);
+                } catch (error) {
+                  console.error(error);
+                  let errorMsg = "Failed to submit handover note";
+                  if (error.response?.data) {
+                    const data = error.response.data;
+                    if (data.detail) {
+                      errorMsg = Array.isArray(data.detail) ? data.detail[0] : data.detail;
+                    } else if (typeof data === 'object') {
+                      const firstValue = Object.values(data)[0];
+                      if (Array.isArray(firstValue)) errorMsg = firstValue[0];
+                      else if (typeof firstValue === 'string') errorMsg = firstValue;
+                    }
+                  }
+                  toast.error(errorMsg);
+                } finally {
+                  setIsSubmittingHandover(false);
+                }
               }}
             />
           ) : (

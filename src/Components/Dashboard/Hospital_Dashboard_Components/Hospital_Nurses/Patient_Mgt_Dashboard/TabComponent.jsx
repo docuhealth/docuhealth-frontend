@@ -11,7 +11,7 @@ const TabComponent = ({ tabs }) => {
 
   return (
     <div>
-      <div className="flex border-b border-gray-200 overflow-x-auto">
+      <div className="grid grid-cols-2 gap-2 md:flex md:gap-0 md:border-b border-gray-200 overflow-x-auto">
         {tabs.map((t, index) => {
           const isActive = Array.isArray(t.status) ? t.status.includes(activeStatus) : activeStatus === t.status;
           return (
@@ -20,8 +20,8 @@ const TabComponent = ({ tabs }) => {
               onClick={() => setTab(t.defaultStatus || t.status)}
               className={`text-sm px-4 py-2 font-medium transition-all duration-200 whitespace-nowrap
                 ${isActive 
-                  ? "text-docuhealth-primary border-b-2 border-docuhealth-primary font-semibold" 
-                  : "text-gray-600 hover:text-gray-800"}`}
+                  ? "bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none md:font-semibold" 
+                  : "bg-gray-50 text-gray-600 hover:text-gray-800 rounded-md md:bg-transparent md:rounded-none"}`}
             >
               {t.title}
             </button>

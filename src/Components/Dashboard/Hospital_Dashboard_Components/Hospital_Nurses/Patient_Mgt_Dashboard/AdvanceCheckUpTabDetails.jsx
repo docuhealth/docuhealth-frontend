@@ -182,10 +182,24 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
             )
         },
         {
-            title: "My nursing tasks queue",
+            title: "Nursing tasks",
             status: "tasks",
             content: (
-                <NursingTasksQueue setAdvanceCheckUp={setAdvanceCheckUp} admission={admission} patientFullInfo={patientFullInfo} />
+                <NursingTasksQueue setAdvanceCheckUp={setAdvanceCheckUp} admission={admission} patientFullInfo={patientFullInfo} taskStatus="pending" />
+            )
+        },
+        {
+            title: "In Progress tasks",
+            status: "in_progress_tasks",
+            content: (
+                <NursingTasksQueue setAdvanceCheckUp={setAdvanceCheckUp} admission={admission} patientFullInfo={patientFullInfo} taskStatus="in_progress" />
+            )
+        },
+        {
+            title: "Task history",
+            status: "task_history",
+            content: (
+                <NursingTasksQueue setAdvanceCheckUp={setAdvanceCheckUp} admission={admission} patientFullInfo={patientFullInfo} taskStatus="history" />
             )
         },
         {
@@ -199,18 +213,12 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
                 />
             )
         },
-        {
-            title: "Task history",
-            status: "task_history",
-            content: (
-                <NursingTaskHistory />
-            )
-        },
+    
         {
             title: "Care plan history",
             status: "care_plan_history",
             content: (
-                <CarePlanHistory />
+                <CarePlanHistory patient={patient} patientFullInfo={patientFullInfo} />
             )
         },
         {

@@ -3,18 +3,15 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const FIELDS = [
-  { key: "general_patient_condition", label: "General patient condition" },
-  { key: "significant_events", label: "Significant events" },
-  { key: "medications_due", label: "Medications due" },
-  { key: "outstanding_nursing_tasks", label: "Outstanding Nursing tasks" },
-  { key: "pending_investigations", label: "Pending investigations" },
-  { key: "escalations", label: "Escalations" },
-  { key: "recommendations", label: "Recommendations" },
+  { key: "problem", label: "Problems/Diagnosis" },
+  { key: "goals", label: "Goals/Objective" },
+  { key: "intervention", label: "Intervention" },
+  { key: "evaluation", label: "Evaluation" },
 ];
 
 const EMPTY_FORM = FIELDS.reduce((acc, f) => ({ ...acc, [f.key]: "" }), {});
 
-const AddHandoverNoteForm = ({ onBack, onUpload, handoverNurseName, isSubmitting }) => {
+const AddCarePlanForm = ({ onBack, onUpload, isSubmitting }) => {
   const [form, setForm] = useState(EMPTY_FORM);
 
   const updateField = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }));
@@ -25,7 +22,6 @@ const AddHandoverNoteForm = ({ onBack, onUpload, handoverNurseName, isSubmitting
       return acc;
     }, {});
 
-    // Make sure at least one field is filled out
     const isFormFilled = Object.values(cleanForm).some((v) => v.trim());
     if (!isFormFilled) {
       toast.error("Please fill in at least one field before uploading.");
@@ -35,7 +31,7 @@ const AddHandoverNoteForm = ({ onBack, onUpload, handoverNurseName, isSubmitting
   };
 
   return (
-    <div className="w-full h-full bg-white flex flex-col py-3 mt-5 border rounded-xl">
+    <div className="w-full bg-white flex flex-col py-3 mt-5 border rounded-xl">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 mb-4">
         <button
@@ -45,11 +41,11 @@ const AddHandoverNoteForm = ({ onBack, onUpload, handoverNurseName, isSubmitting
         >
           <ArrowLeft size={20} className="text-gray-700" />
         </button>
-        <h1 className="text-sm text-gray-800">Add handover note</h1>
+        <h1 className="text-sm font-medium text-gray-800">Nursing care plan</h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 md:px-10 ">
-        <div className=" mx-auto space-y-6">
+      <div className="px-4 md:px-10">
+        <div className="mx-auto space-y-6">
           {FIELDS.map((field) => (
             <div key={field.key} className="border border-slate-200 rounded-xl p-4 ">
               <label className="block text-[13px] font-semibold text-gray-800 mb-3">
@@ -70,7 +66,7 @@ const AddHandoverNoteForm = ({ onBack, onUpload, handoverNurseName, isSubmitting
               disabled={isSubmitting}
               className="px-8 py-3 bg-docuhealth-primary text-white text-sm font-medium rounded-full transition-colors flex items-center justify-center min-w-[200px]"
             >
-              {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : "Upload handover note"}
+              {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : "Upload care plan"}
             </button>
           </div>
         </div>
@@ -79,4 +75,4 @@ const AddHandoverNoteForm = ({ onBack, onUpload, handoverNurseName, isSubmitting
   );
 };
 
-export default AddHandoverNoteForm;
+export default AddCarePlanForm;

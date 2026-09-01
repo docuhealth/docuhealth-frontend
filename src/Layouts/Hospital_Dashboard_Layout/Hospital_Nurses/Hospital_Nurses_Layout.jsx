@@ -136,8 +136,8 @@ const Hospital_Nurses_Layout = () => {
       ),
     },
     {
-      name: "My Tasks",
-      path: "/hospital-nurses-my-tasks",
+      name: "Tasks",
+      path: "/hospital-nurses-tasks",
       icon: (isActive) => (
         <svg
           width="20"

@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import HandoverHistoryTab from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/HandoverHistoryTab";
-import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 
 const Hospital_Nurses_Handover_History = () => {
   const [activeTab, setActiveTab] = useState("Received notes");
-  const [currentPage, setCurrentPage] = useState(1);
 
   const tabs = [
     { name: "Received notes" },
@@ -48,15 +46,6 @@ const Hospital_Nurses_Handover_History = () => {
           )}
         </div>
 
-        {/* Pagination */}
-    
-          <Pagination2 
-            count={20} 
-            currentPage={currentPage} 
-            totalPages={8} 
-            setCurrentPage={setCurrentPage} 
-          />
-   
       </div>
     </>
   );

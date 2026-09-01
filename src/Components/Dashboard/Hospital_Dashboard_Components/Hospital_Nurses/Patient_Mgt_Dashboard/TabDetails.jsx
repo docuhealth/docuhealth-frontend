@@ -171,7 +171,7 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
                                     {" "}
                                     {admittedPatient?.staff_info
                                         ? `${'Dr. ' + admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`
-                                        : "NIL"}
+                                        : "Unassigned Doctor"}
                                 </p>
                             </div>
                             <div className="flex items-center gap-1 text-gray-600 pt-1 ">
@@ -183,7 +183,7 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
                                     admitted to : {" "}
                                     {admittedPatient?.ward_info
                                         ? `${admittedPatient.ward_info.name} ward`
-                                        : "NIL"}
+                                        : "Unassigned Ward"}
                                 </p>
                             </div>
 
@@ -198,7 +198,7 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
 
                                     {admittedPatient?.bed_info
                                         ? `Bed ${admittedPatient.bed_info.bed_number}`
-                                        : "NIL"}
+                                        : "Unassigned Bed"}
                                 </p>
                             </div>
                             <div className="flex items-center gap-1 text-gray-600 pt-1 pb-3 border-b">
@@ -432,7 +432,7 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
                                     {" "}
                                     {admittedPatient?.discharged_by
                                         ? `${'Dr. ' + admittedPatient.discharged_by.firstname} ${admittedPatient.discharged_by.lastname}`
-                                        : "NIL"}
+                                        : "Unassigned Doctor"}
                                 </p>
                             </div>
                             <div className="flex items-center gap-1 text-gray-600 pt-1 ">
@@ -444,7 +444,7 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
                                     admitted to : {" "}
                                     {admittedPatient?.ward_info
                                         ? `${admittedPatient.ward_info.name} ward`
-                                        : "NIL"}
+                                        : "Unassigned Ward"}
                                 </p>
                             </div>
 
@@ -459,7 +459,7 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
 
                                     {admittedPatient?.bed_info
                                         ? `Bed ${admittedPatient.bed_info.bed_number}`
-                                        : "NIL"}
+                                        : "Unassigned Bed"}
                                 </p>
                             </div>
                             <div className="flex items-center gap-1 text-gray-600 pt-1 pb-3 border-b">
@@ -596,7 +596,7 @@ const OutPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected }) => {
                                         {" "}
                                         {outPatient?.staff_info
                                             ? `${'Dr. ' + outPatient.staff_info.firstname} ${outPatient.staff_info.lastname}`
-                                            : "NIL"}
+                                            : "Unassigned Doctor"}
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-1 text-gray-600 pt-1 ">

@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Calendar, User, FileText, Activity, ArrowLeft } from "lucide-react";
+import { Calendar, User, FileText, Activity, ArrowLeft, Loader2 } from "lucide-react";
 import Modal from "../../../../ui/Modal";
+import EmptyState from "../../../../ui/EmptyState";
+import toast from "react-hot-toast";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
+import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import NursingDischargeSummaryForm from "./NursingDischargeSummaryForm";
 
-const demoTasks = [
+const tasks = [
   {
     id: 1,
     status: "Pending",
@@ -198,7 +201,7 @@ const outputCharacteristicsMap = {
   ]
 };
 
-const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) => {
+const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, taskStatus }) => {
   const [openPopover, setOpenPopover] = useState(null);
   const dropdownRef = useRef(null);
 
@@ -211,6 +214,8 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
 
   const [openTasksModal, setOpenTasksModal] = useState(false);
   const [modalPopover, setModalPopover] = useState(null);
+  const [isSubmittingTaskAction, setIsSubmittingTaskAction] = useState(null);
+
   const [ioSubmitSuccessModalOpen, setIoSubmitSuccessModalOpen] = useState(false);
   const modalDropdownRef = useRef(null);
 
@@ -245,6 +250,101 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
   const [ioCalculationModalOpen, setIoCalculationModalOpen] = useState(false);
   
   const [tasksCurrentPage, setTasksCurrentPage] = useState(1);
+  const [tasks, setTasks] = useState([]);
+  const [loadingTasks, setLoadingTasks] = useState(false);
+  const [tasksTotalCount, setTasksTotalCount] = useState(0);
+  const handleTaskAction = async (action, sqid, payload = null) => {
+    try {
+      setIsSubmittingTaskAction(sqid);
+      if (action === 'claim') {
+        await axiosInstanceHos.post(`/api/inpatients/task-occurrences/${sqid}/claim`);
+      } else if (action === 'confirm-medication') {
+        await axiosInstanceHos.post(`/api/inpatients/task-occurrences/${sqid}/confirm-medication`);
+      } else if (action === 'mark-missed') {
+        await axiosInstanceHos.post(`/api/inpatients/task-occurrences/${sqid}/mark-missed`);
+      } else if (action === 'escalate') {
+        await axiosInstanceHos.post(`/api/inpatients/task-occurrences/${sqid}/escalate`, { escalation_reason: "Escalated by nurse" });
+      }
+      
+      const admissionSqid = admission?.sqid || patientFullInfo?.sqid;
+      if (admissionSqid) {
+        const res = await axiosInstanceHos.get(`/api/inpatients/patients/${admissionSqid}/task-occurrences?status=${taskStatus}&page=${tasksCurrentPage}&size=8`);
+        setTasks(res.data.results || []);
+        setTasksTotalCount(res.data.count || 0);
+      }
+    } catch (err) {
+      console.error(err);
+      let errorMsg = "Action failed. Please try again.";
+      if (err.response?.data) {
+        const data = err.response.data;
+        if (data.detail) {
+          errorMsg = Array.isArray(data.detail) ? data.detail[0] : data.detail;
+        } else if (typeof data === 'object') {
+          const firstValue = Object.values(data)[0];
+          if (Array.isArray(firstValue)) errorMsg = firstValue[0];
+          else if (typeof firstValue === 'string') errorMsg = firstValue;
+        }
+      }
+      toast.error(errorMsg);
+    } finally {
+      setIsSubmittingTaskAction(null);
+    }
+  };
+
+
+  useEffect(() => {
+    const admissionSqid = admission?.sqid || patientFullInfo?.sqid;
+    if (admissionSqid && admissionSqid !== 'undefined') {
+      const fetchTasks = async () => {
+        setLoadingTasks(true);
+        try {
+          const res = await axiosInstanceHos.get(`/api/inpatients/patients/${admissionSqid}/task-occurrences?status=${taskStatus}&page=${tasksCurrentPage}&size=8`);
+          setTasks(res.data.results || []);
+          setTasksTotalCount(res.data.count || 0);
+        } catch (err) {
+          console.error(err);
+          setTasks([]);
+        } finally {
+          setLoadingTasks(false);
+        }
+      };
+      fetchTasks();
+    }
+  }, [admission?.sqid, patientFullInfo?.sqid, taskStatus, tasksCurrentPage]);
+
+  
+  const [chartData, setChartData] = useState([]);
+  const [loadingChart, setLoadingChart] = useState(false);
+
+  useEffect(() => {
+    let chartType = null;
+    if (showVitalsRecord) chartType = 'vital-signs';
+    else if (showMedicationRecord) chartType = 'medications';
+    else if (showGlucoseRecord) chartType = 'glucose';
+    else if (showIORecord) chartType = 'fluid-balance';
+    else if (showSeizureRecord) chartType = 'seizures';
+    else if (showProcedureRecord) chartType = 'procedures';
+    else if (showIVFluidRecord) chartType = 'iv-fluids';
+
+    if (chartType && admission?.sqid) {
+      const fetchChart = async () => {
+        setLoadingChart(true);
+        try {
+          const res = await axiosInstanceHos.get(`/api/nurses/admissions/${admission.sqid}/charts/?chart_type=${chartType}`);
+          setChartData(res.data.results || []);
+        } catch (err) {
+          console.error(err);
+          setChartData([]);
+        } finally {
+          setLoadingChart(false);
+        }
+      };
+      fetchChart();
+    } else {
+      setChartData([]);
+    }
+  }, [showVitalsRecord, showMedicationRecord, showGlucoseRecord, showIORecord, showSeizureRecord, showProcedureRecord, showIVFluidRecord, admission?.sqid]);
+
   const [medsCurrentPage, setMedsCurrentPage] = useState(1);
   const [glucoseCurrentPage, setGlucoseCurrentPage] = useState(1);
   const [vitalsCurrentPage, setVitalsCurrentPage] = useState(1);
@@ -432,40 +532,23 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
           )}
         </div>
 
-        <div className="relative" ref={globalActionsRef}>
-          <button
-            onClick={() => setGlobalActionsOpen(!globalActionsOpen)}
-            className="flex items-center justify-center h-8 w-9 border border-slate-300 rounded-md text-slate-700 bg-white hover:bg-slate-50 transition-colors"
-          >
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-            </svg>
-          </button>
-
-          {globalActionsOpen && (
-            <div className="absolute right-0 top-10 w-48 bg-white border border-slate-100 shadow-[0px_4px_20px_rgba(0,0,0,0.08)] rounded-lg p-1.5 z-40">
-              <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors" onClick={() => { setGlobalActionsOpen(false); setOpenTasksModal(true); }}>
-                Open tasks
-              </button>
-              <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors" onClick={() => setGlobalActionsOpen(false)}>
-                Mark all as completed
-              </button>
-              <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors" onClick={() => setGlobalActionsOpen(false)}>
-                Mark all as missed
-              </button>
-              <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors" onClick={() => setGlobalActionsOpen(false)}>
-                Mark all as in-progress
-              </button>
-              <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors" onClick={() => setGlobalActionsOpen(false)}>
-                Mark all as escalated
-              </button>
-            </div>
-          )}
-        </div>
       </div>
 
-      <div className="hidden lg:block">
-        {demoTasks.map((task, index) => {
+      {loadingTasks ? (
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="animate-spin h-8 w-8 text-docuhealth-primary" />
+        </div>
+      ) : tasks?.length === 0 ? (
+        <div className="py-10">
+          <EmptyState 
+            title={`No ${taskStatus.replace('_', ' ')} tasks`}
+            description="There are no tasks available in this category for the current patient."
+          />
+        </div>
+      ) : (
+        <>
+          <div className="hidden lg:block">
+        {tasks?.map((task, index) => {
           const colors = getStatusColor(task.status);
           return (
             <div
@@ -497,7 +580,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
                     Date / Time
                   </p>
                   <p className="text-sm font-medium text-gray-800">
-                    {task.dateTime}
+                    {new Date(task.scheduled_for).toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -512,7 +595,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
                     Ordering Doctor
                   </p>
                   <p className="text-sm font-medium text-gray-800">
-                    {task.orderingDoctor}
+                    {(task.instructions || "No instructions")}
                   </p>
                 </div>
               </div>
@@ -528,7 +611,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
                       Task
                     </p>
                     <p className="text-sm font-medium text-gray-800 truncate max-w-[150px]">
-                      {task.task}
+                      {task.task_type.replace(/_/g, " ")}
                     </p>
                   </div>
                 </div>
@@ -540,122 +623,164 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
                       ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
                     `}
                   >
-                    <svg
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-                    </svg>
+                    {isSubmittingTaskAction === task.sqid ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-docuhealth-primary" />
+                    ) : (
+                      <svg
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                      </svg>
+                    )}
                   </div>
 
                   {openPopover === index && (
                     <div className="hidden lg:block lg:absolute top-0 lg:top-10 right-0 mt-2 bg-white border shadow-[0px_4px_20px_rgba(0,0,0,0.08)] rounded-lg p-1.5 w-max z-50">
-                      {task.type === 'glucose_monitoring' ? (
-                        <>
-                          <button 
-                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setGlucoseModalOpen(true); }}
-                          >
-                            Add new entry
-                          </button>
-                          <button 
-                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowGlucoseRecord(true); }}
-                          >
-                            View glucose record
-                          </button>
-                        </>
-                      ) : task.type === 'input_output_monitoring' ? (
-                        <>
-                          <button 
-                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIOEntry(true); }}
-                          >
-                            Add new entry
-                          </button>
-                          <button 
-                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIORecord(true); }}
-                          >
-                            Input and Output record
-                          </button>
-                        </>
-                      ) : task.type === 'vitals_monitoring' ? (
-                        <>
-                          <button 
-                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setVitalsInfoModalOpen(true); }}
-                          >
-                            Add new entry
-                          </button>
-                          <button 
-                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowVitalsRecord(true); }}
-                          >
-                            Vital Signs Record
-                          </button>
-                        </>
-                      ) : task.type === 'seizure_event_monitoring' ? (
-                        <>
-                          <button 
-                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowSeizureEntry(true); }}
-                          >
-                            Add new entry
-                          </button>
-                          <button 
-                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowSeizureRecord(true); }}
-                          >
-                            View seizure records
-                          </button>
-                        </>
-                      ) : task.type === 'procedure_monitoring' ? (
-                        <>
-                          <button 
-                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowProcedureEntry(true); }}
-                          >
-                            Add new entry
-                          </button>
-                          <button 
-                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowProcedureRecord(true); }}
-                          >
-                            Procedure record
-                          </button>
-                        </>
-                      ) : task.type === 'iv_fluid_monitoring' ? (
-                        <>
-                          <button 
-                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIVFluidEntry(true); }}
-                          >
-                            Add new entry
-                          </button>
-                          <button 
-                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIVFluidRecord(true); }}
-                          >
-                            IV Fluid record
-                          </button>
-                        </>
-                      ) : task.type === 'discharge_summary' ? (
+                      {taskStatus === "history" ? null : taskStatus === "pending" ? (
                         <button 
-                          className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap" 
-                          onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowDischargeSummary(true); }}
+                          className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                          onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); handleTaskAction("claim", task.sqid); }}
                         >
-                          Add entry
+                          Claim task
                         </button>
                       ) : (
-                        <button 
-                          className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap" 
-                          onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowMedicationRecord(true); }}
-                        >
-                          View medication record
-                        </button>
+                        <>
+                          {task.task_type === 'glucose_monitoring' ? (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setGlucoseModalOpen(true); }}
+                              >
+                                Add new entry
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowGlucoseRecord(true); }}
+                              >
+                                View glucose chart
+                              </button>
+                            </>
+                          ) : task.task_type === 'input_output_monitoring' ? (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIOEntry(true); }}
+                              >
+                                Add new entry
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIORecord(true); }}
+                              >
+                                Input and Output chart
+                              </button>
+                            </>
+                          ) : task.task_type === 'vitals_monitoring' ? (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setVitalsInfoModalOpen(true); }}
+                              >
+                                Add new entry
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowVitalsRecord(true); }}
+                              >
+                                Vital Signs Chart
+                              </button>
+                            </>
+                          ) : task.task_type === 'seizure_event_monitoring' ? (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowSeizureEntry(true); }}
+                              >
+                                Add new entry
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowSeizureRecord(true); }}
+                              >
+                                View seizure charts
+                              </button>
+                            </>
+                          ) : task.task_type === 'procedure_monitoring' ? (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowProcedureEntry(true); }}
+                              >
+                                Add new entry
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowProcedureRecord(true); }}
+                              >
+                                Procedure chart
+                              </button>
+                            </>
+                          ) : task.task_type === 'iv_fluid_monitoring' ? (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIVFluidEntry(true); }}
+                              >
+                                Add new entry
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIVFluidRecord(true); }}
+                              >
+                                IV Fluid chart
+                              </button>
+                            </>
+                          ) : task.task_type === 'discharge_summary' ? (
+                            <button 
+                              className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap" 
+                              onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowDischargeSummary(true); }}
+                            >
+                              Add entry
+                            </button>
+                          ) : (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap" 
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); handleTaskAction("confirm-medication", task.sqid); }}
+                              >
+                                Confirm medication
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap" 
+                                onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowMedicationRecord(true); }}
+                              >
+                                View medication chart
+                              </button>
+                            </>
+                          )}
+                          
+                          <button 
+                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); handleTaskAction("confirm-medication", task.sqid); }}
+                          >
+                            Mark as completed
+                          </button>
+                          <button 
+                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); handleTaskAction("mark-missed", task.sqid); }}
+                          >
+                            Mark as missed
+                          </button>
+                          <button 
+                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); handleTaskAction("escalate", task.sqid); }}
+                          >
+                            Mark as escalated
+                          </button>
+                        </>
                       )}
                     </div>
                   )}
@@ -667,7 +792,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
       </div>
 
       <div className="block lg:hidden space-y-4 px-1">
-        {demoTasks.map((task, index) => {
+        {tasks?.map((task, index) => {
           const colors = getStatusColor(task.status);
           return (
             <div
@@ -681,7 +806,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
                     Task date/time
                   </p>
                   <p className="text-[13px] font-semibold text-slate-700">
-                    {task.dateTime}
+                    {new Date(task.scheduled_for).toLocaleString()}
                   </p>
                 </div>
 
@@ -690,120 +815,162 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
                     onClick={() => setOpenPopover(openPopover === index ? null : index)}
                     className={`h-9 w-9 flex items-center justify-center rounded-full ${openPopover === index ? "bg-slate-200" : "bg-gray-50"}`}
                   >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path
-                        d="M14 8C14 7.45 13.55 7 13 7C12.45 7 12 7.45 12 8C12 8.55 12.45 9 13 9C13.55 9 14 8.55 14 8ZM4 8C4 7.45 3.55 7 3 7C2.45 7 2 7.45 2 8C2 8.55 2.45 9 3 9C3.55 9 4 8.55 4 8ZM9 8C9 7.45 8.55 7 8 7C7.45 7 7 7.45 7 8C7 8.55 7.45 9 8 9C8.55 9 9 8.55 9 8Z"
-                        fill="#1A263E"
-                      />
-                    </svg>
+                    {isSubmittingTaskAction === task.sqid ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-docuhealth-primary" />
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path
+                          d="M14 8C14 7.45 13.55 7 13 7C12.45 7 12 7.45 12 8C12 8.55 12.45 9 13 9C13.55 9 14 8.55 14 8ZM4 8C4 7.45 3.55 7 3 7C2.45 7 2 7.45 2 8C2 8.55 2.45 9 3 9C3.55 9 4 8.55 4 8ZM9 8C9 7.45 8.55 7 8 7C7.45 7 7 7.45 7 8C7 8.55 7.45 9 8 9C8.55 9 9 8.55 9 8Z"
+                          fill="#1A263E"
+                        />
+                      </svg>
+                    )}
                   </button>
 
                   {openPopover === index && (
                     <div className="absolute right-0 top-10 w-max bg-white border border-slate-100 shadow-[0px_8px_30px_rgba(0,0,0,0.12)] rounded-lg p-1.5 z-50">
-                      {task.type === 'glucose_monitoring' ? (
-                        <>
-                          <button 
-                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                            onClick={() => { setOpenPopover(null); setGlucoseModalOpen(true); }}
-                          >
-                            Add new entry
-                          </button>
-                          <button 
-                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                            onClick={() => { setOpenPopover(null); setShowGlucoseRecord(true); }}
-                          >
-                            View glucose record
-                          </button>
-                        </>
-                      ) : task.type === 'input_output_monitoring' ? (
-                        <>
-                          <button 
-                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                            onClick={() => { setOpenPopover(null); setShowIOEntry(true); }}
-                          >
-                            Add new entry
-                          </button>
-                          <button 
-                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                            onClick={() => { setOpenPopover(null); setShowIORecord(true); }}
-                          >
-                            Input and Output record
-                          </button>
-                        </>
-                      ) : task.type === 'vitals_monitoring' ? (
-                        <>
-                          <button 
-                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                            onClick={() => { setOpenPopover(null); setVitalsInfoModalOpen(true); }}
-                          >
-                            Add new entry
-                          </button>
-                          <button 
-                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                            onClick={() => { setOpenPopover(null); setShowVitalsRecord(true); }}
-                          >
-                            Vital Signs Record
-                          </button>
-                        </>
-                      ) : task.type === 'seizure_event_monitoring' ? (
-                        <>
-                          <button 
-                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                            onClick={() => { setOpenPopover(null); setShowSeizureEntry(true); }}
-                          >
-                            Add new entry
-                          </button>
-                          <button 
-                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                            onClick={() => { setOpenPopover(null); setShowSeizureRecord(true); }}
-                          >
-                            View seizure records
-                          </button>
-                        </>
-                      ) : task.type === 'procedure_monitoring' ? (
-                        <>
-                          <button 
-                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                            onClick={() => { setOpenPopover(null); setShowProcedureEntry(true); }}
-                          >
-                            Add new entry
-                          </button>
-                          <button 
-                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                            onClick={() => { setOpenPopover(null); setShowProcedureRecord(true); }}
-                          >
-                            Procedure record
-                          </button>
-                        </>
-                      ) : task.type === 'iv_fluid_monitoring' ? (
-                        <>
-                          <button 
-                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                            onClick={() => { setOpenPopover(null); setShowIVFluidEntry(true); }}
-                          >
-                            Add new entry
-                          </button>
-                          <button 
-                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                            onClick={() => { setOpenPopover(null); setShowIVFluidRecord(true); }}
-                          >
-                            IV Fluid record
-                          </button>
-                        </>
-                      ) : task.type === 'discharge_summary' ? (
+                      {taskStatus === "history" ? null : taskStatus === "pending" ? (
                         <button 
                           className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                          onClick={() => { setOpenPopover(null); setShowDischargeSummary(true); }}
+                          onClick={() => { setOpenPopover(null); handleTaskAction("claim", task.sqid); }}
                         >
-                          Add entry
+                          Claim task
                         </button>
                       ) : (
-                        <button 
-                          className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                          onClick={() => { setOpenPopover(null); setShowMedicationRecord(true); }}
-                        >
-                          View medication record
-                        </button>
+                        <>
+                          {task.task_type === 'glucose_monitoring' ? (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); setGlucoseModalOpen(true); }}
+                              >
+                                Add new entry
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); setShowGlucoseRecord(true); }}
+                              >
+                                View glucose chart
+                              </button>
+                            </>
+                          ) : task.task_type === 'input_output_monitoring' ? (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); setShowIOEntry(true); }}
+                              >
+                                Add new entry
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); setShowIORecord(true); }}
+                              >
+                                Input and Output chart
+                              </button>
+                            </>
+                          ) : task.task_type === 'vitals_monitoring' ? (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); setVitalsInfoModalOpen(true); }}
+                              >
+                                Add new entry
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); setShowVitalsRecord(true); }}
+                              >
+                                Vital Signs Chart
+                              </button>
+                            </>
+                          ) : task.task_type === 'seizure_event_monitoring' ? (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); setShowSeizureEntry(true); }}
+                              >
+                                Add new entry
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); setShowSeizureRecord(true); }}
+                              >
+                                View seizure charts
+                              </button>
+                            </>
+                          ) : task.task_type === 'procedure_monitoring' ? (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); setShowProcedureEntry(true); }}
+                              >
+                                Add new entry
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); setShowProcedureRecord(true); }}
+                              >
+                                Procedure chart
+                              </button>
+                            </>
+                          ) : task.task_type === 'iv_fluid_monitoring' ? (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); setShowIVFluidEntry(true); }}
+                              >
+                                Add new entry
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); setShowIVFluidRecord(true); }}
+                              >
+                                IV Fluid chart
+                              </button>
+                            </>
+                          ) : task.task_type === 'discharge_summary' ? (
+                            <button 
+                              className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                              onClick={() => { setOpenPopover(null); setShowDischargeSummary(true); }}
+                            >
+                              Add entry
+                            </button>
+                          ) : (
+                            <>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); handleTaskAction("confirm-medication", task.sqid); }}
+                              >
+                                Confirm medication
+                              </button>
+                              <button 
+                                className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                                onClick={() => { setOpenPopover(null); setShowMedicationRecord(true); }}
+                              >
+                                View medication chart
+                              </button>
+                            </>
+                          )}
+                          
+                          <button 
+                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                            onClick={() => { setOpenPopover(null); handleTaskAction("confirm-medication", task.sqid); }}
+                          >
+                            Mark as completed
+                          </button>
+                          <button 
+                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                            onClick={() => { setOpenPopover(null); handleTaskAction("mark-missed", task.sqid); }}
+                          >
+                            Mark as missed
+                          </button>
+                          <button 
+                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                            onClick={() => { setOpenPopover(null); handleTaskAction("escalate", task.sqid); }}
+                          >
+                            Mark as escalated
+                          </button>
+                        </>
                       )}
                     </div>
                   )}
@@ -832,7 +999,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
                       Ordering Doctor
                     </p>
                     <p className="text-[13px] text-slate-600">
-                      {task.orderingDoctor}
+                      {(task.instructions || "No instructions")}
                     </p>
                   </div>
                   <div>
@@ -840,7 +1007,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
                       Task
                     </p>
                     <p className="text-[13px] text-slate-600 truncate italic">
-                      "{task.task}"
+                      "{task.task_type.replace(/_/g, " ")}"
                     </p>
                   </div>
                 </div>
@@ -849,9 +1016,10 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
           );
         })}
       </div>
-
-      <Pagination2 count={20} currentPage={tasksCurrentPage} totalPages={8} setCurrentPage={setTasksCurrentPage} />
-        </>
+      <Pagination2 count={tasksTotalCount} currentPage={tasksCurrentPage} totalPages={Math.ceil(tasksTotalCount / 8) || 1} setCurrentPage={setTasksCurrentPage} />
+      </>
+      )}
+      </>
       ) : showDischargeSummary ? (
         <NursingDischargeSummaryForm onCancel={() => setShowDischargeSummary(false)} setAdvanceCheckUp={setAdvanceCheckUp} admission={admission} patientFullInfo={patientFullInfo} />
       ) : showMedicationRecord ? (
@@ -2058,7 +2226,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
           
           <div className="text-[12px] text-left">
           <div className="hidden lg:block">
-            {demoTasks.map((task, index) => {
+            {tasks?.map((task, index) => {
               const colors = getStatusColor(task.status);
               return (
                 <div key={task.id} className={`mb-4 p-4 border border-slate-200 rounded-xl flex flex-wrap gap-4 lg:gap-10 bg-white relative ${modalPopover === index ? 'z-50' : 'z-10'}`}>
@@ -2078,7 +2246,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
                     </div>
                     <div>
                       <p className="text-[10px] text-gray-500 uppercase font-semibold">Date / Time</p>
-                      <p className="text-sm font-medium text-gray-800">{task.dateTime}</p>
+                      <p className="text-sm font-medium text-gray-800">{new Date(task.scheduled_for).toLocaleString()}</p>
                     </div>
                   </div>
 
@@ -2088,7 +2256,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
                     </div>
                     <div>
                       <p className="text-[10px] text-gray-500 uppercase font-semibold">Ordering Doctor</p>
-                      <p className="text-sm font-medium text-gray-800">{task.orderingDoctor}</p>
+                      <p className="text-sm font-medium text-gray-800">{(task.instructions || "No instructions")}</p>
                     </div>
                   </div>
 
@@ -2099,7 +2267,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
                       </div>
                       <div>
                         <p className="text-[10px] text-gray-500 uppercase font-semibold">Task</p>
-                        <p className="text-sm font-medium text-gray-800 truncate max-w-[150px]">{task.task}</p>
+                        <p className="text-sm font-medium text-gray-800 truncate max-w-[150px]">{task.task_type.replace(/_/g, " ")}</p>
                       </div>
                     </div>
 
@@ -2128,14 +2296,14 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
             })}
           </div>
                 <div className="block lg:hidden space-y-4 px-1">
-            {demoTasks.map((task, index) => {
+            {tasks?.map((task, index) => {
               const colors = getStatusColor(task.status);
               return (
                 <div key={task.id} className={`bg-white border border-gray-200 rounded-lg p-4 relative ${modalPopover === index ? 'z-50' : 'z-10'}`}>
                   <div className="flex justify-between items-start mb-4">
                     <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
                       <p className="text-[10px] text-slate-400 uppercase font-bold">Task date/time</p>
-                      <p className="text-[13px] font-semibold text-slate-700">{task.dateTime}</p>
+                      <p className="text-[13px] font-semibold text-slate-700">{new Date(task.scheduled_for).toLocaleString()}</p>
                     </div>
                     <div className="relative" ref={modalPopover === index ? modalDropdownRef : null}>
                       <button onClick={() => setModalPopover(modalPopover === index ? null : index)} className={`h-9 w-9 flex items-center justify-center rounded-full ${modalPopover === index ? "bg-slate-200" : "bg-gray-50"}`}>
@@ -2164,11 +2332,11 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo }) =>
                     <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-50">
                       <div>
                         <p className="text-[10px] text-slate-400 uppercase font-medium">Ordering Doctor</p>
-                        <p className="text-[13px] text-slate-600">{task.orderingDoctor}</p>
+                        <p className="text-[13px] text-slate-600">{(task.instructions || "No instructions")}</p>
                       </div>
                       <div>
                         <p className="text-[10px] text-slate-400 uppercase font-medium">Task</p>
-                        <p className="text-[13px] text-slate-600 truncate italic">"{task.task}"</p>
+                        <p className="text-[13px] text-slate-600 truncate italic">"{task.task_type.replace(/_/g, " ")}"</p>
                       </div>
                     </div>
                   </div>
