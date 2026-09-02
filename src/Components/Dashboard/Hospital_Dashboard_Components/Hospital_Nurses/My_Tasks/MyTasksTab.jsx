@@ -28,18 +28,20 @@ const PriorityBadge = ({ priority }) => {
 
 const getProgress = (timingState, type) => {
   if (type === "history") return 100;
+  if (type === "in_progress") return 50;
   if (timingState === "upcoming") return 33;
   if (timingState === "due") return 66;
   if (timingState === "overdue") return 100;
-  return 0; // for in_progress where it might be null
+  return 0;
 };
 
 const getProgressColor = (timingState, type) => {
   if (type === "history") return "bg-green-500";
+  if (type === "in_progress") return "bg-blue-500";
   if (timingState === "upcoming") return "bg-blue-500";
   if (timingState === "due") return "bg-orange-500";
   if (timingState === "overdue") return "bg-red-500";
-  return "bg-green-500"; // fallback for completed/in-progress
+  return "bg-green-500"; // fallback
 };
 
 const MyTasksTab = ({ tasks, loading, type }) => {

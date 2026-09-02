@@ -27,7 +27,7 @@ const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInput
                     value={inputs[field]}
                     onChange={(e) => setInputs({ ...inputs, [field]: e.target.value })}
                     placeholder={placeholder}
-                    className="flex-1 border rounded p-2 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none"
+                    className="flex-1 border rounded p-2 text-[12px] outline-none"
                 />
                 <button type="button" onClick={() => handleAddListItem(field)} className="bg-docuhealth-primary text-white px-3 py-1 rounded text-[12px]">Add</button>
                 <button type="button" onClick={() => setActiveInput(null)} className="text-gray-500 text-[12px]">Cancel</button>
@@ -177,7 +177,7 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
  
 
     return (
-        <div className="bg-white my-5 border rounded-lg pt-5 lg:pt-8 px-4 lg:px-6  pb-8 text-sm ">
+        <div className="bg-white my-5 border rounded-lg pt-5 lg:pt-8 px-4 lg:px-6  pb-8 text-sm ">    
             <div className='flex items-center justify-between border-b pb-3'>
                 <div className='flex items-center gap-2 cursor-pointer' onClick={() => setNewCaseNote(false)}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4.56528 6.41685H11.6654V7.58352H4.56528L7.69426 10.7125L6.86932 11.5374L2.33203 7.00019L6.86932 2.46289L7.69426 3.28785L4.56528 6.41685Z" fill="var(--color-docuhealth-dark)" /></svg>

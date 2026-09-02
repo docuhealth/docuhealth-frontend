@@ -275,6 +275,56 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
         return mapping[out] || out?.toLowerCase().replace(/ \/ /g, "_").replace(/ /g, "_");
       };
 
+      const mapOutputCharacteristics = (char) => {
+        if (!char) return undefined;
+        const mapping = {
+          "Clear / Straw-Colored": "clear_straw_colored",
+          "Amber / Concentrated": "amber_concentrated",
+          "Concentrated / Tea-Colored": "concentrated_tea_colored",
+          "Frank Blood / Hematuria": "hematuria",
+          "Cloudy / Turbid": "cloudy_turbid",
+          "Sediment / Mucus Present": "sediment_mucus",
+          "Formed / Soft": "formed_soft",
+          "Loose / Semi-Liquid": "loose_semi_liquid",
+          "Watery / Liquid": "watery_liquid",
+          "Rice-Water": "rice_water",
+          "Melena": "melena",
+          "Bloody / Dysenteric": "bloody_dysenteric",
+          "Bilious": "bilious",
+          "Clear / Gastric Secretions": "clear_gastric_secretions",
+          "Undigested Food Particles": "undigested_food",
+          "Bilious (Dark green/yellow)": "bilious",
+          "Coffee-Ground": "coffee_ground",
+          "Frank Blood / Hematemesis": "hematemesis",
+          "Green / Bilious": "green_bilious",
+          "Brown / Coffee-Ground": "brown_coffee_ground",
+          "Bloody / Sanguineous": "bloody_sanguineous",
+          "Serous": "serous",
+          "Serosanguinous": "serosanguinous",
+          "Sanguineous": "sanguineous",
+          "Purulent": "purulent",
+          "Haemoserous": "haemoserous",
+          "Purulent / Empyema": "purulent_empyema",
+          "Chylous / Milky": "chylous_milky",
+          "Clotted": "clotted",
+          "Straw-Colored / Transudative": "straw_colored_transudative",
+          "Turbid / Cloudy": "turbid_cloudy",
+          "Hemorrhagic / Bloody": "hemorrhagic_bloody",
+          "Chylous": "chylous",
+          "Bile-Stained / Bilious": "bile_stained_bilious",
+          "Mucoid": "mucoid",
+          "Mucopurulent": "mucopurulent",
+          "Hemoptysis / Blood-Stained": "hemoptysis",
+          "Frank Blood": "frank_blood",
+          "Frothy / Pink-Tinged": "frothy_pink_tinged",
+          "Clear / \"Rock Water\"": "rock_water_clear",
+          "Xanthochromic": "xanthochromic",
+          "Sanguineous / Bloody": "sanguineous_bloody",
+          "Sediment / Debris Present": "sediment_debris"
+        };
+        return mapping[char] || char.toLowerCase().replace(/ \/ |"| /g, '_').replace(/-/g, '_').replace(/_+/g, '_');
+      };
+
       const payload = {
         vital_signs: {
           blood_pressure: formData.bloodPressure || undefined,
@@ -309,7 +359,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
         const outType = mapOutputType(formData.outputType);
         payload.output = {
           output_type: outType,
-          characteristics: (outType === 'stool_bowel') ? undefined : (formData.outputCharacteristics || undefined),
+          characteristics: (outType === 'stool_bowel') ? undefined : mapOutputCharacteristics(formData.outputCharacteristics),
           volume_ml: parseFloat(formData.outputVolume),
           recorded_at: formData.outputTime ? new Date(`2026-08-26T${formData.outputTime}`).toISOString() : new Date().toISOString(),
           nursing_remark: formData.nursingRemark || undefined
@@ -456,7 +506,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                   name="mobilityAssessment"
                   value={formData.mobilityAssessment}
                   onChange={handleChange}
-                  className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary appearance-none"
+                  className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary appearance-none"
                 >
                   <option value="" disabled>Select mobility</option>
                   {mobilityOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -468,7 +518,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                   name="nutritionalAssessment"
                   value={formData.nutritionalAssessment}
                   onChange={handleChange}
-                  className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary appearance-none"
+                  className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary appearance-none"
                 >
                   <option value="" disabled>Select nutritional status</option>
                   {nutritionalOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -486,7 +536,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                   onChange={handleChange}
                   placeholder="Type here..."
                   rows={4}
-                  className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary resize-y"
+                  className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary resize-y"
                 ></textarea>
               </div>
             ))}
@@ -505,7 +555,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                     name="intakeSource"
                     value={formData.intakeSource}
                     onChange={handleChange}
-                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary appearance-none"
+                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary appearance-none"
                   >
                     <option value="" disabled>Select source</option>
                     {fluidIntakeSources.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -517,7 +567,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                     name="fluidFeed"
                     value={formData.fluidFeed}
                     onChange={handleChange}
-                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary appearance-none"
+                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary appearance-none"
                   >
                     <option value="" disabled>Select fluid/feed</option>
                     {fluidFeedOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -529,7 +579,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                     name="intakeRoute"
                     value={formData.intakeRoute}
                     onChange={handleChange}
-                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary appearance-none"
+                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary appearance-none"
                   >
                     <option value="" disabled>Select route</option>
                     {routeOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -544,7 +594,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                       value={formData.intakeVolume}
                       onChange={handleChange}
                       placeholder="e.g. 250"
-                      className="w-full bg-white border border-gray-200 rounded-md pl-3 pr-12 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary"
+                      className="w-full bg-white border border-gray-200 rounded-md pl-3 pr-12 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-50 text-docuhealth-primary px-2 py-0.5 rounded text-[11px] font-semibold">
                       ML
@@ -560,7 +610,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                     name="intakeTime"
                     value={formData.intakeTime}
                     onChange={handleChange}
-                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary"
+                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary"
                   />
                   {/* Time input usually has a built in clock icon in browsers, but we can style if needed */}
                 </div>
@@ -577,7 +627,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                     name="outputType"
                     value={formData.outputType}
                     onChange={handleChange}
-                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary appearance-none"
+                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary appearance-none"
                   >
                     <option value="" disabled>Select output type</option>
                     {outputTypes.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -590,7 +640,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                     value={formData.outputCharacteristics}
                     onChange={handleChange}
                     disabled={!formData.outputType}
-                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary appearance-none disabled:bg-gray-50 disabled:text-gray-400"
+                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary appearance-none disabled:bg-gray-50 disabled:text-gray-400"
                   >
                     <option value="" disabled>
                       {formData.outputType ? "Select characteristics" : "Select type first"}
@@ -609,7 +659,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                       value={formData.outputVolume}
                       onChange={handleChange}
                       placeholder="e.g. 250"
-                      className="w-full bg-white border border-gray-200 rounded-md pl-3 pr-12 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary"
+                      className="w-full bg-white border border-gray-200 rounded-md pl-3 pr-12 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-50 text-docuhealth-primary px-2 py-0.5 rounded text-[11px] font-semibold">
                       ML
@@ -625,7 +675,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                     name="outputTime"
                     value={formData.outputTime}
                     onChange={handleChange}
-                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary"
+                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary"
                   />
                 </div>
               </div>
@@ -640,7 +690,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                 onChange={handleChange}
                 placeholder="Type here..."
                 rows={4}
-                className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary resize-y"
+                className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary resize-y"
               ></textarea>
             </div>
           </div>
@@ -656,7 +706,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                 onChange={handleChange}
                 placeholder="Type here..."
                 rows={6}
-                className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary resize-y"
+                className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary resize-y"
               ></textarea>
             </div>
           </div>
