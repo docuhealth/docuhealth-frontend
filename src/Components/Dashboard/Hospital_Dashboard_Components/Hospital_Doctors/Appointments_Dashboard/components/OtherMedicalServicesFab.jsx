@@ -26,7 +26,7 @@ const QUICK_SERVICES = [
   { id: "procedure", label: "Procedure", action: "procedure", admissionOnly: true },
   { id: "input-output", label: "Input and output", action: "input-output", admissionOnly: true },
   { id: "iv-fluid", label: "IV fluid", action: "iv-fluid", admissionOnly: true },
-  { id: "seizure", label: "Seizure events", action: "seizure" },
+  { id: "seizure", label: "Seizure events", action: "seizure", admissionOnly: true },
   { id: "glucose", label: "Glucose monitoring", action: "glucose", admissionOnly: true },
 ];
 
@@ -173,7 +173,7 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, onOrde
         <IVFluidModal admissionSqid={admissionSqid} onClose={() => setActiveModal(null)} />
       )}
       {activeModal === "seizure" && (
-        <SeizureEventModal onClose={() => setActiveModal(null)} />
+        <SeizureEventModal admissionSqid={admissionSqid} onClose={() => setActiveModal(null)} />
       )}
     </>
   );

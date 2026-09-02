@@ -44,8 +44,8 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
 
   const { mutate, isPending } = useMutation({
     mutationFn: transferAdmission,
-    onSuccess: () => {
-      toast.success("Transfer successful");
+    onSuccess: (res) => {
+      toast.success(res?.detail || "Transfer successful");
       if (patientHin) {
         queryClient.invalidateQueries({ queryKey: ["patient-info", patientHin] });
       }
