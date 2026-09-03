@@ -173,7 +173,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
     ) {
       setStep(step + 1);
     } else {
-      toast.error("Please fill add fields");
+      toast.error("Please fill all fields");
     }
   };
 
@@ -188,7 +188,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
     mutationFn: registerPatient,
     onSuccess: (data, variables) => {
       toast.success("Patient Registration Successful");
-      setPatientHIN(data.profile.hin);
+      setPatientHIN(data?.profile?.hin || data?.hin || data?.data?.profile?.hin || "");
       setRegisteredEmail(variables.email);
       setStep(1);
       setOnboardingSuccessful(true);
@@ -343,7 +343,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
           </div>
         </div>
       ) : (
-        <form className="sm:grid sm:grid-cols-2 sm:gap-3 pt-2">
+        <form onSubmit={(e) => e.preventDefault()} className="sm:grid sm:grid-cols-2 sm:gap-3 pt-2">
           {step == 1 && (
             <>
               <div className="mb-2">
@@ -538,7 +538,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                 </div>
               )}
               <div className="col-span-2">
-                <Button fullWidth onClick={handleStepOne}>
+                <Button type="button" fullWidth onClick={handleStepOne}>
                   Move to step 2 / 3
                 </Button>
               </div>
@@ -635,7 +635,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
                 />
               </div>
               <div className="col-span-2">
-                <Button fullWidth onClick={handleStepTwo}>
+                <Button type="button" fullWidth onClick={handleStepTwo}>
                   Move to step 3 / 3
                 </Button>
               </div>
@@ -816,6 +816,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
               </div>
               <div className="col-span-2">
                 <Button
+                  type="button"
                   fullWidth
                   disabled={!isValid || isPending}
                   loading={isPending}
