@@ -3,6 +3,11 @@ import moment from 'moment'
 import GeneralPatientInfoForm from "../../../../../ui/GeneralPatientInfoForm";
 
 const PatientVitalsDetails = ({ selectedPatient, setSelectedPatient }) => {
+    const patient = selectedPatient?.patient || selectedPatient?.patient_info;
+    const staff = selectedPatient?.staff;
+    const staffName = staff
+        ? `${staff?.role === 'doctor' ? 'Dr. ' + (staff.firstname || '') : (staff.firstname || '')} ${staff.lastname || ''}`.trim()
+        : "NIL";
 
     return (
         <div className="bg-white my-5 border rounded-2xl pt-8 px-6 text-sm ">
@@ -29,13 +34,13 @@ const PatientVitalsDetails = ({ selectedPatient, setSelectedPatient }) => {
                 <div className='py-5 border-b'>
                     <div className="flex items-center">
                         <div className="w-14 h-14 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center text-xl font-semibold">
-                            {`${selectedPatient?.patient_info?.firstname?.[0] ?? ''}${selectedPatient?.patient_info?.lastname?.[0] ?? ''}`.toUpperCase()}
+                            {`${patient?.firstname?.[0] ?? ''}${patient?.lastname?.[0] ?? ''}`.toUpperCase()}
 
                         </div>
 
                         <div className="flex flex-col items-start">
                             <p className="ml-2 text-sm font-medium">
-                                {selectedPatient?.patient_info?.firstname} {selectedPatient?.patient_info?.lastname}
+                                {patient?.firstname} {patient?.lastname}
                             </p>
                             <p className="ml-2 text-[12px] text-gray-500">
                                 patient
@@ -43,16 +48,14 @@ const PatientVitalsDetails = ({ selectedPatient, setSelectedPatient }) => {
                         </div>
                     </div>
                 </div>
-                <GeneralPatientInfoForm patient={selectedPatient?.patient}>
+                <GeneralPatientInfoForm patient={patient}>
                     <div className='lg:col-span-2'>
                         <p className="text-sm font-medium text-gray-500 mb-1  ">Assigned staff</p>
                         <input
                             type="text"
                             readOnly
                             className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                            value=   {selectedPatient?.staff
-                                ? `${selectedPatient.staff.firstname} ${selectedPatient.staff.lastname}`
-                                : "NIL"}
+                            value={staffName}
                         />
                     </div>
                 </GeneralPatientInfoForm>

@@ -89,13 +89,13 @@ const NursingEncounterTable = () => {
       vital_signs: {
         ...(encounterFormData.blood_pressure && { blood_pressure: encounterFormData.blood_pressure }),
         ...(encounterFormData.temp && { temp: parseFloat(encounterFormData.temp) }),
-        ...(encounterFormData.heart_rate && { heart_rate: parseInt(encounterFormData.heart_rate) }),
-        ...(encounterFormData.resp_rate && { resp_rate: parseInt(encounterFormData.resp_rate) }),
+        ...(encounterFormData.heart_rate && { heart_rate: parseFloat(encounterFormData.heart_rate) }),
+        ...(encounterFormData.resp_rate && { resp_rate: parseFloat(encounterFormData.resp_rate) }),
         ...(encounterFormData.height && { height: parseFloat(encounterFormData.height) }),
         ...(encounterFormData.weight && { weight: parseFloat(encounterFormData.weight) }),
         ...(encounterFormData.bmi && { bmi: parseFloat(encounterFormData.bmi) }),
-        ...(encounterFormData.pain_score && { pain_score: encounterFormData.pain_score }),
-        ...(encounterFormData.sp02 && { sp02: encounterFormData.sp02 })
+        ...(encounterFormData.pain_score && { pain_score: parseInt(encounterFormData.pain_score.split(" ")[0], 10) }),
+        ...(encounterFormData.sp02 && { spo2: parseInt(encounterFormData.sp02, 10) })
       }
     };
   };
@@ -567,10 +567,10 @@ const NursingEncounterTable = () => {
                 <Input label="Blood pressure" value={encounterFormData.blood_pressure} onChange={(e) => handleInputChange("blood_pressure", e.target.value)} placeholder="Enter blood pressure" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">mmHg</span>} />
                 <Input label="Temperature" value={encounterFormData.temp} onChange={(e) => handleInputChange("temp", e.target.value)} placeholder="Enter temperature" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">°C</span>} />
                 <Input label="Respiratory rate" value={encounterFormData.resp_rate} onChange={(e) => handleInputChange("resp_rate", e.target.value)} placeholder="Enter respiratory rate" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">/Min</span>} />
-                <Input label="Height" value={encounterFormData.height} onChange={(e) => handleInputChange("height", e.target.value)} placeholder="Enter height" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Cm</span>} />
+                <Input label="Height" value={encounterFormData.height} onChange={(e) => handleInputChange("height", e.target.value)} placeholder="Enter height" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">m</span>} />
                 <Input label="Heart rate" value={encounterFormData.heart_rate} onChange={(e) => handleInputChange("heart_rate", e.target.value)} placeholder="Enter heart rate" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Bpm</span>} />
                 <Input label="Weight" value={encounterFormData.weight} onChange={(e) => handleInputChange("weight", e.target.value)} placeholder="Enter weight" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Kg</span>} />
-                <Input label="BMI" value={encounterFormData.bmi} onChange={(e) => handleInputChange("bmi", e.target.value)} placeholder="Enter BMI" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">BMI</span>} />
+                <Input label="BMI" value={encounterFormData.bmi} onChange={(e) => handleInputChange("bmi", e.target.value)} placeholder="Enter BMI" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Kg/m²</span>} />
                 
                 {/* Pain Score */}
                 <div className="w-full">
@@ -582,9 +582,16 @@ const NursingEncounterTable = () => {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-hidden focus:border-docuhealth-primary transition-colors text-gray-600 bg-white appearance-none pr-10"
                     >
                       <option value="0 (No pain)">0 (No pain)</option>
-                      <option value="1–3 (Mild Pain)">1–3 (Mild Pain)</option>
-                      <option value="4–6 (Moderate Pain)">4–6 (Moderate Pain)</option>
-                      <option value="7–10 (Severe Pain)">7–10 (Severe Pain)</option>
+                      <option value="1 (Mild Pain)">1 (Mild Pain)</option>
+                      <option value="2 (Mild Pain)">2 (Mild Pain)</option>
+                      <option value="3 (Mild Pain)">3 (Mild Pain)</option>
+                      <option value="4 (Moderate Pain)">4 (Moderate Pain)</option>
+                      <option value="5 (Moderate Pain)">5 (Moderate Pain)</option>
+                      <option value="6 (Moderate Pain)">6 (Moderate Pain)</option>
+                      <option value="7 (Severe Pain)">7 (Severe Pain)</option>
+                      <option value="8 (Severe Pain)">8 (Severe Pain)</option>
+                      <option value="9 (Severe Pain)">9 (Severe Pain)</option>
+                      <option value="10 (Severe Pain)">10 (Severe Pain)</option>
                     </select>
                     <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-500">
                       <ChevronDown size={16} />

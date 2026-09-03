@@ -147,7 +147,8 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
                                         <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">HR (Bpm)</TableHead>
                                         <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">RR (/Min)</TableHead>
                                         <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">Height (m)</TableHead>
-                                        <TableHead className="py-3 px-4 font-medium text-center">Weight (Kg)</TableHead>
+                                        <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">Weight (Kg)</TableHead>
+                                        <TableHead className="py-3 px-4 font-medium text-center">BMI (Kg/m²)</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -175,7 +176,8 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
                                             <TableCell className="py-3 px-4 text-center border-r last:border-r-0">{record.heart_rate || "—"}</TableCell>
                                             <TableCell className="py-3 px-4 text-center border-r last:border-r-0">{record.resp_rate || "—"}</TableCell>
                                             <TableCell className="py-3 px-4 text-center border-r last:border-r-0">{record.height || "—"}</TableCell>
-                                            <TableCell className="py-3 px-4 text-center">{record.weight || "—"}</TableCell>
+                                            <TableCell className="py-3 px-4 text-center border-r last:border-r-0">{record.weight || "—"}</TableCell>
+                                            <TableCell className="py-3 px-4 text-center">{record.bmi ? `${record.bmi}` : "—"}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -226,6 +228,10 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
                                         <div className="flex flex-col">
                                             <span className="text-[11px] uppercase tracking-wider text-gray-400 font-bold">Height</span>
                                             <span className="text-gray-700 font-medium">{record.height ? `${record.height} m` : "—"}</span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-[11px] uppercase tracking-wider text-gray-400 font-bold">BMI</span>
+                                            <span className="text-gray-700 font-medium">{record.bmi ? `${record.bmi} Kg/m²` : "—"}</span>
                                         </div>
                                     </div>
                                 </div>

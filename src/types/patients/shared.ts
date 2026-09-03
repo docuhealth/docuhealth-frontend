@@ -42,6 +42,10 @@ export interface VitalSignsInfo {
   resp_rate?: string | number;
   heart_rate?: string | number;
   height?: string | number;
+  bmi?: string | number;
+  spo2?: string | number;
+  sp02?: string | number;
+  pain_score?: string | number;
 }
 
 export interface InvestigationDoc {
