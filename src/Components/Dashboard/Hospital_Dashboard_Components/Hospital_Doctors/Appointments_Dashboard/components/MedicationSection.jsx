@@ -112,7 +112,7 @@ const MedicationSection = ({ medications, setMedications }) => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-start mt-4 border-b pb-4 last:border-0 last:pb-0"
         >
           <div className="lg:col-span-3">
-            <label className="block text-[12px] font-medium text-gray-700 pb-1">Drug Name</label>
+            <label className="block text-[12px] font-medium text-gray-700 pb-1">Drug Name<span className="text-red-500"> *</span></label>
             <div className="relative">
               <Input
                 placeholder="Drug name..."
@@ -198,7 +198,7 @@ const MedicationSection = ({ medications, setMedications }) => {
           </div>
 
           <div className="lg:col-span-3">
-            <label className="block text-[12px] font-medium text-gray-700 pb-1">Dosage</label>
+            <label className="block text-[12px] font-medium text-gray-700 pb-1">Dosage<span className="text-red-500"> *</span></label>
             <div className="flex gap-2">
               <Input
                 type="number"
@@ -226,7 +226,7 @@ const MedicationSection = ({ medications, setMedications }) => {
           </div>
 
           <div className="lg:col-span-2">
-            <label className="block text-[12px] font-medium text-gray-700 pb-1">Route</label>
+            <label className="block text-[12px] font-medium text-gray-700 pb-1">Route<span className="text-red-500"> *</span></label>
             <Select
               value={med.route}
               disabled={!!med.catalog_drug}
@@ -246,7 +246,7 @@ const MedicationSection = ({ medications, setMedications }) => {
           </div>
 
           <div className="lg:col-span-2">
-            <label className="block text-[12px] font-medium text-gray-700 pb-1">Frequency</label>
+            <label className="block text-[12px] font-medium text-gray-700 pb-1">Frequency<span className="text-red-500"> *</span></label>
             <Select
               value={med.frequency}
               onChange={(value) => handleChange(index, "frequency", value)}
@@ -256,7 +256,7 @@ const MedicationSection = ({ medications, setMedications }) => {
 
           <div className="lg:col-span-2 flex gap-2 relative">
             <div className="flex-1">
-              <label className="block text-[12px] font-medium text-gray-700 pb-1">Duration</label>
+              <label className="block text-[12px] font-medium text-gray-700 pb-1">Duration<span className="text-red-500"> *</span></label>
               <Input
                 type="number"
                 placeholder="duration..."

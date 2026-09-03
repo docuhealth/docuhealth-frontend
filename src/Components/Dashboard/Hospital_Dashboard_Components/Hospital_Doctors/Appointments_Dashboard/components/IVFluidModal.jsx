@@ -107,7 +107,7 @@ const IVFluidTopSection = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div className={FIELD_BOX_CLASS}>
-          <label className={FIELD_LABEL_CLASS}>Fluid solution type</label>
+          <label className={FIELD_LABEL_CLASS}>Fluid solution type<span className="text-red-500"> *</span></label>
           <Select
             value={solutionType}
             onChange={setSolutionType}
@@ -117,7 +117,7 @@ const IVFluidTopSection = ({
         </div>
 
         <div className={FIELD_BOX_CLASS}>
-          <label className={FIELD_LABEL_CLASS}>Volume per bag</label>
+          <label className={FIELD_LABEL_CLASS}>Volume per bag<span className="text-red-500"> *</span></label>
           <Select
             value={volumePerBag}
             onChange={setVolumePerBag}
@@ -129,7 +129,7 @@ const IVFluidTopSection = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div className={FIELD_BOX_CLASS}>
-          <label className={FIELD_LABEL_CLASS}>Total bags planned</label>
+          <label className={FIELD_LABEL_CLASS}>Total bags planned<span className="text-red-500"> *</span></label>
           <Input
             type="number"
             min="1"
@@ -140,7 +140,7 @@ const IVFluidTopSection = ({
         </div>
 
         <div className={FIELD_BOX_CLASS}>
-          <label className={FIELD_LABEL_CLASS}>Infusion rate (mL / hour)</label>
+          <label className={FIELD_LABEL_CLASS}>Infusion rate (mL / hour)<span className="text-red-500"> *</span></label>
           <Input
             type="number"
             min="1"

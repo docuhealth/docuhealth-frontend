@@ -466,6 +466,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
             {/* Category */}
             <Select
               label="Category"
+              required
               value={orderForm.category}
               onChange={(value) => setOrderForm({ ...orderForm, category: value, test_type: [] })}
               options={categories.map((cat) => ({ value: String(cat.sqid || cat.id), label: cat.name }))}
@@ -474,7 +475,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
 
             {/* Test Type */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm text-docuhealth-dark font-medium">Test type</label>
+              <label className="text-sm text-docuhealth-dark font-medium">Test type<span className="text-red-500"> *</span></label>
               <div className="relative">
                 <button
                   type="button"

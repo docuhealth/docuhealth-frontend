@@ -1328,7 +1328,10 @@ const AddProgressNoteForm = ({ formData, setFormData, onBack, onUpload, isFormFi
             key={field.key}
             className={`border rounded-md px-3 lg:px-5 py-4 lg:py-5 ${index === 0 ? "" : "mt-3"}`}
           >
-            <p className="font-medium">{field.label}</p>
+            <p className="font-medium">
+              {field.label}
+              <span className="text-red-500"> *</span>
+            </p>
             <textarea
               value={formData[field.key]}
               onChange={updateField(field.key)}

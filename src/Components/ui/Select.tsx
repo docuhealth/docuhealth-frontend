@@ -13,6 +13,8 @@ export interface SelectProps {
   options: SelectOption[];
   placeholder?: string;
   label?: string;
+  /** Shows a red "*" after the label. Visual only. */
+  required?: boolean;
   error?: string;
   disabled?: boolean;
   className?: string;
@@ -27,6 +29,7 @@ const Select = ({
   options,
   placeholder = "Select an option",
   label,
+  required = false,
   error,
   disabled = false,
   className = "",
@@ -48,7 +51,12 @@ const Select = ({
 
   return (
     <div className={`relative w-full ${className}`} ref={ref}>
-      {label && <p className="font-semibold pb-1 whitespace-nowrap">{label}</p>}
+      {label && (
+        <p className="font-semibold pb-1 whitespace-nowrap">
+          {label}
+          {required && <span className="text-red-500"> *</span>}
+        </p>
+      )}
 
       <button
         type="button"

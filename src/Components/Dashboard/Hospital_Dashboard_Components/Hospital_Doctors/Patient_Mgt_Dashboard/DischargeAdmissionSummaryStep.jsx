@@ -39,7 +39,7 @@ const DischargeAdmissionSummaryStep = ({
 
       <div className="border border-gray-200 rounded-xl p-5 lg:p-6">
         <h3 className="font-semibold text-docuhealth-primary mb-3 text-[15px]">
-          Chief complaint
+          Chief complaint<span className="text-red-500"> *</span>
         </h3>
         <textarea
           value={formData.chief_complaint}
@@ -52,7 +52,7 @@ const DischargeAdmissionSummaryStep = ({
 
       <div className="border border-gray-200 rounded-xl p-5 lg:p-6">
         <h3 className="font-semibold text-docuhealth-primary mb-3 text-[15px]">
-          Primary diagnosis
+          Primary diagnosis<span className="text-red-500"> *</span>
         </h3>
         <textarea
           value={formData.primary_diagnosis}
@@ -65,7 +65,7 @@ const DischargeAdmissionSummaryStep = ({
 
       <div className="border border-gray-200 rounded-xl p-5 lg:p-6">
         <h3 className="font-semibold text-docuhealth-primary mb-3 text-[15px]">
-          Secondary diagnosis
+          Secondary diagnosis<span className="text-red-500"> *</span>
         </h3>
         <textarea
           value={formData.secondary_diagnosis}
@@ -78,7 +78,7 @@ const DischargeAdmissionSummaryStep = ({
 
       <div className="border border-gray-200 rounded-xl p-5 lg:p-6">
         <h3 className="font-semibold text-docuhealth-primary mb-3 text-[15px]">
-          Comorbidities
+          Comorbidities<span className="text-red-500"> *</span>
         </h3>
         <textarea
           value={formData.comorbidities}
@@ -91,7 +91,7 @@ const DischargeAdmissionSummaryStep = ({
 
       <div className="border border-gray-200 rounded-xl p-5 lg:p-6">
         <h3 className="font-semibold text-docuhealth-primary mb-3 text-[15px]">
-          Treatment plan
+          Treatment plan<span className="text-red-500"> *</span>
         </h3>
         <textarea
           value={formData.treatment_plan}
@@ -100,14 +100,13 @@ const DischargeAdmissionSummaryStep = ({
           rows={4}
           className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary resize-y"
         ></textarea>
-        <p className="text-[11px] text-gray-400 mt-1.5">Each line is saved as a separate item.</p>
       </div>
 
       <div className="border border-gray-200 rounded-xl p-5 lg:p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
           <h3 className="font-semibold text-docuhealth-primary text-[15px] flex items-center gap-1.5">
             <Sparkles size={15} />
-            Hospital course note (A.I generated summary)
+            Hospital course note (A.I generated summary)<span className="text-red-500"> *</span>
           </h3>
           <button
             type="button"

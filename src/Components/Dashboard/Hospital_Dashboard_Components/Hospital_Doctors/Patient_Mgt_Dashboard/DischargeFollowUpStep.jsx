@@ -18,21 +18,13 @@ const DischargeFollowUpStep = ({
         <div className="space-y-6">
           <div>
             <div className="flex flex-col gap-3 md:w-1/2">
-              {!formData.will_continue_followup ? (
-                <Input
-                  label="Follow-up clinic selection"
-                  value={formData.referral}
-                  onChange={(e) => onFieldChange("referral", e.target.value)}
-                  placeholder="Enter Referral Hospital HIN"
-                />
-              ) : (
-                <Input
-                  label="Follow-up clinic selection"
-                  value={formData.follow_up_clinic}
-                  onChange={(e) => onFieldChange("follow_up_clinic", e.target.value)}
-                  placeholder="e.g. Medical Outpatient Clinic"
-                />
-              )}
+              <Input
+                label="Follow-up clinic"
+                required
+                value={formData.follow_up_clinic}
+                onChange={(e) => onFieldChange("follow_up_clinic", e.target.value)}
+                placeholder="e.g. Medical Outpatient Clinic"
+              />
               <label className="flex items-center gap-2 text-[12px] text-gray-600 font-medium cursor-pointer w-fit">
                 <input
                   type="checkbox"
@@ -40,13 +32,15 @@ const DischargeFollowUpStep = ({
                   onChange={(e) => onFieldChange("will_continue_followup", e.target.checked)}
                   className="w-4 h-4 text-docuhealth-primary rounded border-gray-300 focus:ring-docuhealth-primary cursor-pointer accent-blue-700"
                 />
-                Patient will continue here
+                Patient will continue follow-up at this hospital
               </label>
             </div>
           </div>
 
           <div>
-            <p className="text-[13px] font-semibold pb-1">Follow-up date/time</p>
+            <p className="text-[13px] font-semibold pb-1">
+              Follow-up date/time<span className="text-red-500"> *</span>
+            </p>
             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-1/2">
               <Input
                 type="date"
@@ -71,7 +65,7 @@ const DischargeFollowUpStep = ({
 
           <div>
             <label className="block text-[13px] font-medium text-gray-700 mb-2">
-              Care instructions (for the patient)
+              Care instructions (for the patient)<span className="text-red-500"> *</span>
             </label>
             <textarea
               value={formData.care_instructions}
@@ -80,12 +74,11 @@ const DischargeFollowUpStep = ({
               rows={4}
               className="w-full border border-gray-200 rounded-lg p-3 text-[13px] text-gray-700 focus:outline-none focus:border-docuhealth-primary resize-y"
             ></textarea>
-            <p className="text-[11px] text-gray-400 mt-1.5">Each line is saved as a separate item.</p>
           </div>
 
           <div>
             <label className="block text-[13px] font-medium text-gray-700 mb-2">
-              Follow-up instruction(s)
+              Follow-up instruction(s)<span className="text-red-500"> *</span>
             </label>
             <textarea
               value={formData.follow_up_instructions}

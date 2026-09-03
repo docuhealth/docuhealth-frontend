@@ -2,6 +2,9 @@ import React, { InputHTMLAttributes, ReactNode } from "react";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
+  /** Shows a red "*" after the label. Visual only (not spread to the input,
+   *  so it doesn't trigger the browser's native required popup). */
+  required?: boolean;
   leadingIcon?: ReactNode;
   trailingIcon?: ReactNode;
   onTrailingIconClick?: () => void;
@@ -13,6 +16,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     {
       label,
+      required = false,
       leadingIcon,
       trailingIcon,
       onTrailingIconClick,
@@ -25,7 +29,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ) => {
     return (
       <div className={`w-full ${containerClassName}`}>
-        {label && <p className="font-semibold pb-1 whitespace-nowrap">{label}</p>}
+        {label && (
+          <p className="font-semibold pb-1 whitespace-nowrap">
+            {label}
+            {required && <span className="text-red-500"> *</span>}
+          </p>
+        )}
         <div className="relative">
           {leadingIcon && (
             <div className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400">

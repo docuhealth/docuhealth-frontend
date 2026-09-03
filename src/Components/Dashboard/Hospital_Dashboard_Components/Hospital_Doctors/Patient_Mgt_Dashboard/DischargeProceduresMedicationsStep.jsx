@@ -36,7 +36,7 @@ const DischargeProceduresMedicationsStep = ({
 
       <div className="border border-gray-200 rounded-xl p-5 lg:p-6">
         <h3 className="font-semibold text-docuhealth-primary mb-3 text-[15px]">
-          Condition at discharge
+          Condition at discharge<span className="text-red-500"> *</span>
         </h3>
         <Select
           value={formData.condition_at_discharge}

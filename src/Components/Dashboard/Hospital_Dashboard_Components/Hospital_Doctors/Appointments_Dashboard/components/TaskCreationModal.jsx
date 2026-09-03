@@ -197,7 +197,7 @@ const TaskCreationModal = ({
             topSection
           ) : (
             <div className={FIELD_BOX_CLASS}>
-              <label className={FIELD_LABEL_CLASS}>{primaryLabel}</label>
+              <label className={FIELD_LABEL_CLASS}>{primaryLabel}<span className="text-red-500"> *</span></label>
               <Select
                 value={formData.primary}
                 onChange={updateValue("primary")}
@@ -209,7 +209,7 @@ const TaskCreationModal = ({
           {showFrequencyDuration && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className={FIELD_BOX_CLASS}>
-                <label className={FIELD_LABEL_CLASS}>{frequencyLabel}</label>
+                <label className={FIELD_LABEL_CLASS}>{frequencyLabel}<span className="text-red-500"> *</span></label>
                 <Select
                   value={formData.frequency}
                   onChange={updateValue("frequency")}
@@ -231,7 +231,7 @@ const TaskCreationModal = ({
           {isDurationNeeded && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className={FIELD_BOX_CLASS}>
-                <label className={FIELD_LABEL_CLASS}>Duration</label>
+                <label className={FIELD_LABEL_CLASS}>Duration<span className="text-red-500"> *</span></label>
                 <Input
                   type="number"
                   min="1"
@@ -242,7 +242,7 @@ const TaskCreationModal = ({
               </div>
 
               <div className={FIELD_BOX_CLASS}>
-                <label className={FIELD_LABEL_CLASS}>Duration unit</label>
+                <label className={FIELD_LABEL_CLASS}>Duration unit<span className="text-red-500"> *</span></label>
                 <Select
                   value={formData.durationRate}
                   onChange={updateValue("durationRate")}
@@ -254,12 +254,12 @@ const TaskCreationModal = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div className={FIELD_BOX_CLASS}>
-              <label className={FIELD_LABEL_CLASS}>Task start date</label>
+              <label className={FIELD_LABEL_CLASS}>Task start date<span className="text-red-500"> *</span></label>
               <Input type="date" value={formData.date} onChange={updateField("date")} />
             </div>
 
             <div className={FIELD_BOX_CLASS}>
-              <label className={FIELD_LABEL_CLASS}>Task start time</label>
+              <label className={FIELD_LABEL_CLASS}>Task start time<span className="text-red-500"> *</span></label>
               <Input type="time" value={formData.time} onChange={updateField("time")} />
             </div>
           </div>

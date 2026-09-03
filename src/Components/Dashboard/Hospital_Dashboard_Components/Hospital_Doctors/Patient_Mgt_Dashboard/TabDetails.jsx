@@ -569,7 +569,7 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
                   admittedPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
             </div>
-            {admittedPatient?.staff_info && (
+            {admittedPatient?.discharged_by && (
               <div className="flex items-center gap-1 text-gray-600 pt-3">
                 <svg
                   width="15"
@@ -584,8 +584,8 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
                   />
                 </svg>
                 <p className="">
-                  {" "}
-                  {`${admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`}
+                  Discharged by Dr. {admittedPatient.discharged_by.firstname}{" "}
+                  {admittedPatient.discharged_by.lastname}
                 </p>
               </div>
             )}

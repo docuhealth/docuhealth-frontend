@@ -91,6 +91,8 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
       </div>
 
       <Select
+        label="Ward"
+        required
         value={form.ward}
         onChange={(value) => handleChange("ward", value)}
         options={wardOptions.map((w) => ({ value: String(w.sqid || w.id), label: `${w.name} ward` }))}
@@ -99,6 +101,8 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
 
       {form.ward && (
         <Select
+          label="Bed"
+          required
           value={form.bed}
           onChange={(value) => handleChange("bed", value)}
           options={availableBeds.map((b) => ({ value: String(b.sqid || b.id), label: `Bed ${b.bed_number}` }))}

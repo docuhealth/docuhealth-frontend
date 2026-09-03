@@ -149,36 +149,36 @@ const OutpatientDischargeSummary = ({ selectedPatient, onClose }) => {
           
           {/* Chief Complaint */}
           <div className="border border-gray-200 rounded-xl p-5">
-            <p className="font-semibold text-gray-700 mb-3">Chief complaint (compulsory)</p>
+            <p className="font-semibold text-gray-700 mb-3">Chief complaint<span className="text-red-500"> *</span></p>
             <textarea
               name="chief_complaint"
               value={formData.chief_complaint}
               onChange={handleTextChange}
-              className="w-full rounded-md focus:outline-none focus:ring-0 p-0 text-sm text-gray-600 resize-none h-24 border-none"
+              className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary resize-y h-24"
               placeholder="Enter chief complaint..."
             ></textarea>
           </div>
 
           {/* Diagnosis */}
           <div className="border border-gray-200 rounded-xl p-5">
-            <p className="font-semibold text-gray-700 mb-3">Diagnosis (compulsory)</p>
+            <p className="font-semibold text-gray-700 mb-3">Diagnosis<span className="text-red-500"> *</span></p>
             <textarea
               name="diagnosis"
               value={formData.diagnosis}
               onChange={handleTextChange}
-              className="w-full rounded-md focus:outline-none focus:ring-0 p-0 text-sm text-gray-600 resize-none h-24 border-none"
+              className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary resize-y h-24"
               placeholder="Enter investigation/Diagnosis (separate with a comma)..."
             ></textarea>
           </div>
 
           {/* Treatment Plan */}
           <div className="border border-gray-200 rounded-xl p-5">
-            <p className="font-semibold text-gray-700 mb-3">Treatment plan (compulsory)</p>
+            <p className="font-semibold text-gray-700 mb-3">Treatment plan<span className="text-red-500"> *</span></p>
             <textarea
               name="treatment_plan"
               value={formData.treatment_plan}
               onChange={handleTextChange}
-              className="w-full rounded-md focus:outline-none focus:ring-0 p-0 text-sm text-gray-600 resize-none h-24 border-none"
+              className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary resize-y h-24"
               placeholder="Enter treatment plan (separate with a comma)..."
             ></textarea>
           </div>
@@ -191,12 +191,12 @@ const OutpatientDischargeSummary = ({ selectedPatient, onClose }) => {
 
           {/* Condition at discharge */}
           <div className="border border-gray-200 rounded-xl p-5">
-            <p className="font-semibold text-gray-700 mb-3">Condition at discharge (compulsory)</p>
+            <p className="font-semibold text-gray-700 mb-3">Condition at discharge<span className="text-red-500"> *</span></p>
             <textarea
               name="condition_at_checkout"
               value={formData.condition_at_checkout}
               onChange={handleTextChange}
-              className="w-full rounded-md focus:outline-none focus:ring-0 p-0 text-sm text-gray-600 resize-none h-24 border-none"
+              className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary resize-y h-24"
               placeholder="Enter the patient's condition at discharge..."
             ></textarea>
           </div>
@@ -274,7 +274,7 @@ const OutpatientDischargeSummary = ({ selectedPatient, onClose }) => {
                     name="follow_up_instructions"
                     value={formData.follow_up_instructions}
                     onChange={handleTextChange}
-                    className="w-full focus:outline-none focus:ring-0 p-0 text-sm text-gray-600 resize-none h-20 border-none"
+                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary resize-y h-20"
                     placeholder="Enter follow up instructions..."
                   ></textarea>
                 </div>

@@ -172,6 +172,7 @@ const OrderLabModal = ({ selectedPatientDetails, onClose }) => {
             <div className="mb-4 text-[12px]">
               <Select
                 label="Category"
+                required
                 value={formData.category}
                 onChange={(value) => {
                   setFormData({ ...formData, category: value, test_type: [] });
@@ -182,7 +183,7 @@ const OrderLabModal = ({ selectedPatientDetails, onClose }) => {
             </div>
 
             <div className="mb-4 relative text-[12px]">
-              <p className="block font-medium text-gray-700 mb-1">Test type</p>
+              <p className="block font-medium text-gray-700 mb-1">Test type<span className="text-red-500"> *</span></p>
               <button
                 type="button"
                 aria-haspopup="listbox"

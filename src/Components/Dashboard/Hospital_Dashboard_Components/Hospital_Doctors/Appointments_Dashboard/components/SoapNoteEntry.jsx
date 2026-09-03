@@ -300,22 +300,13 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => 
   });
 
   const handleSubmit = async () => {
-    if (
-      soapNoteData.care_instructions.length === 0 ||
-      soapNoteData.treatment_plan.length === 0
-    ) {
-      toast.error("Care Instructions and Treatment Plan is required");
+    // Only care_instructions is required by POST /api/medical-records/soap-note
+    // (alongside patient / chief_complaint / primary_diagnosis, already gated in
+    // the step flow). treatment_plan and the follow-up appointment are optional.
+    if (soapNoteData.care_instructions.length === 0) {
+      toast.error("Care Instructions is required");
       return;
     }
-
-    if (!note?.trim()) {
-      toast.error("Follow up / Next appointment note is compulsory");
-      return;
-    }
-
-    const selectedDate = new Date(
-      `${selectedDay} ${selectedMonth} ${selectedYear} ${selectedTime}`,
-    );
 
     const payload = {
       staff: profile?.staff_id || "",
@@ -366,12 +357,6 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => 
       }
     });
 
-    const appointment = {
-      scheduled_time: selectedDate.toISOString(),
-      note,
-      type: "consultation",
-    };
-
     formData.append("patient", patientHin);
     formData.append("chief_complaint", soapNoteData.chief_complaint);
     formData.append("primary_diagnosis", soapNoteData.primary_diagnosis);
@@ -398,7 +383,22 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => 
       formData.append(key, JSON.stringify(soapNoteData[key] || []));
     });
 
-    formData.append("next_appointment", JSON.stringify(appointment));
+    // Follow-up appointment is optional — only send it when a date was picked.
+    if (selectedDay && selectedMonth && selectedYear && selectedTime) {
+      const selectedDate = new Date(
+        `${selectedDay} ${selectedMonth} ${selectedYear} ${selectedTime}`,
+      );
+      if (!Number.isNaN(selectedDate.getTime())) {
+        formData.append(
+          "next_appointment",
+          JSON.stringify({
+            scheduled_time: selectedDate.toISOString(),
+            note: note || "",
+            type: "consultation",
+          }),
+        );
+      }
+    }
 
     if (source !== "appointments" && selectedPatientDetails?.sqid) {
       formData.append("check_in", selectedPatientDetails.sqid);
@@ -482,7 +482,7 @@ useEffect(() => {
               <p>Subjective</p>
             </div>
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5">
-              <p className="font-medium">Chief complaint (compulsory)</p>
+              <p className="font-medium">Chief complaint<span className="text-red-500"> *</span></p>
               <textarea
                 name="chief_complaint"
                 value={soapNoteData.chief_complaint}
@@ -742,7 +742,7 @@ useEffect(() => {
             </div>
 
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5">
-              <p className="font-medium text-docuhealth-dark">Primary diagnosis (compulsory)</p>
+              <p className="font-medium text-docuhealth-dark">Primary diagnosis<span className="text-red-500"> *</span></p>
               <textarea
                 name="primary_diagnosis"
                 value={soapNoteData.primary_diagnosis}
@@ -810,7 +810,7 @@ useEffect(() => {
             </div>
 
             <NoteSection
-              title="Treatment Plan (compulsory)"
+              title="Treatment Plan"
               field="treatment_plan"
               placeholder="e.g. Patient to take prescribed medication"
               soapNoteData={soapNoteData}
@@ -823,7 +823,7 @@ useEffect(() => {
             />
 
             <NoteSection
-              title="Care Instructions (compulsory)"
+              title="Care Instructions *"
               field="care_instructions"
               placeholder="e.g. Patient to take prescribed medication"
               soapNoteData={soapNoteData}
@@ -836,7 +836,7 @@ useEffect(() => {
             />
 
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium text-docuhealth-dark">Follow up / Next appointment (compulsory)</p>
+              <p className="font-medium text-docuhealth-dark">Follow up / Next appointment</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mt-3 gap-3">
                 <Select
                   label="Day"

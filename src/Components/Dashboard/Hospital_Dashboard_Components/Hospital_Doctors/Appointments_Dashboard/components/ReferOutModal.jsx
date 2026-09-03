@@ -105,7 +105,7 @@ const ReferOutModal = ({ appointment, onClose }) => {
             </p>
 
             <div className="mb-4 text-[12px]">
-              <p className="mb-1 text-gray-700 font-medium">Destination hospital</p>
+              <p className="mb-1 text-gray-700 font-medium">Destination hospital<span className="text-red-500"> *</span></p>
               <SearchableSelect
                 value={hospitalTo?.value}
                 onChange={(_value, option) => setHospitalTo(option)}
@@ -116,7 +116,7 @@ const ReferOutModal = ({ appointment, onClose }) => {
             </div>
 
             <div className="mb-2 text-[12px]">
-              <p className="mb-1 text-gray-700 font-medium">Reason</p>
+              <p className="mb-1 text-gray-700 font-medium">Reason<span className="text-red-500"> *</span></p>
               <textarea
                 className="border rounded-lg w-full h-[100px] p-3 text-[12px] outline-none focus:border-docuhealth-primary"
                 value={reason}

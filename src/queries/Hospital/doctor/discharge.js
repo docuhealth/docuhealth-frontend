@@ -1,43 +1,39 @@
 import axiosInstanceHos from "../../../lib/axios/hospital";
 
-// In-patient discharge.
+// Doctor in-patient discharge.
 //
-// POST /api/medical-records/discharge is multipart/form-data ONLY (a JSON body
-// gets a 415), and the list/object fields have to go in as JSON-encoded strings
-// — the serializer parses them back out of the multipart body on the way in.
+// POST /api/inpatients/admissions/<admission_sqid>/doc-discharge-form (JSON).
+// Creates the doctor's discharge summary/note AND a `nurse_in_patient_discharge`
+// task. The patient is only actually discharged — bed freed, admission marked
+// `discharged` — once a nurse executes that task
+// (`POST /api/inpatients/task-occurrences/<sqid>/execute`).
 //
-// payload:
-//   admission               - admission sqid (string, required)
-//   chief_complaint         - string, required
-//   condition_on_discharge  - string, required
-//   diagnosis               - string[], required (non-empty)
-//   treatment_plan          - string[], required (non-empty)
-//   care_instructions       - string[], required (non-empty)
-//   drug_records            - DrugRecord[], key required (may be [])
-//   follow_up_appointment   - { type, note, scheduled_time } | null (key required)
-//   investigation_docs      - File[] (optional)
-export const createInpatientDischarge = async ({
-  admission,
-  chief_complaint,
-  condition_on_discharge,
-  diagnosis = [],
-  treatment_plan = [],
-  care_instructions = [],
-  drug_records = [],
-  follow_up_appointment = null,
-  investigation_docs = [],
-}) => {
-  const fd = new FormData();
-  fd.append("admission", admission);
-  fd.append("chief_complaint", chief_complaint);
-  fd.append("condition_on_discharge", condition_on_discharge);
-  fd.append("diagnosis", JSON.stringify(diagnosis));
-  fd.append("treatment_plan", JSON.stringify(treatment_plan));
-  fd.append("care_instructions", JSON.stringify(care_instructions));
-  fd.append("drug_records", JSON.stringify(drug_records));
-  fd.append("follow_up_appointment", JSON.stringify(follow_up_appointment));
-  investigation_docs.forEach((file) => fd.append("investigation_docs", file));
-
-  const res = await axiosInstanceHos.post("api/medical-records/discharge", fd);
+// Body (all required except the three arrays):
+//   patient                 - patient HIN
+//   chief_complaint         - string
+//   primary_diagnosis       - string
+//   secondary_diagnosis     - string
+//   comorbidities           - string
+//   treatment_plan          - string
+//   hospital_course_note    - string
+//   care_instructions       - string
+//   will_continue_followup  - boolean
+//   follow_up_clinic        - string
+//   follow_up_date          - "YYYY-MM-DD"
+//   follow_up_time          - "HH:MM" (seconds optional)
+//   follow_up_instructions  - string
+//   completed_investigations / pending_investigations
+//                           - [{ sqid: <lab test order item sqid>, type: "lab_test_order" }]
+//   discharge_medications   - [{ name, route, quantity, frequency:{value,rate},
+//                               duration:{value,rate}, allergies:[], unit }]
+//
+// Errors: 400 field-required; 400 { doctor: ["Doctor has already discharged this
+// patient"] } on a repeat discharge.
+// Success: 201 { detail: "Doctor Discharge form created for in-patient successfully." }
+export const createDoctorInpatientDischarge = async ({ admissionSqid, ...body }) => {
+  const res = await axiosInstanceHos.post(
+    `api/inpatients/admissions/${admissionSqid}/doc-discharge-form`,
+    body,
+  );
   return res.data;
 };

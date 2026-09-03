@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
@@ -6,7 +6,6 @@ import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_D
 import TabComponent2 from "./TabComponent2";
 import getTabs, { PatientSOAPNotes, PatientMedicalRecord } from "./TabDetails2";
 import PatientMedicalRecordDetail from "./PatientMedicalRecordDetail";
-import { DoctorsAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProgressNotes } from "../../../../../queries/Hospital/doctor/progressNotes";
 
@@ -17,7 +16,6 @@ const AdvanceCheckUp = ({
   dischargedView = "tabs",
   setDischargedView,
 }) => {
-  const { setTab } = useContext(DoctorsAdmittedPatientMGTContext);
 
   const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
   const pageSize = 6;
@@ -140,8 +138,12 @@ const AdvanceCheckUp = ({
             type="button"
             className="flex items-center gap-1 cursor-pointer border-b pb-3 w-full"
             onClick={() => {
+              // Just leave the detail view — the list keeps whatever tab
+              // (inpatient / outpatient / inpatient_discharge / ...) it was on.
+              // Don't setTab(advanceCheckUpSource) here: the source values
+              // ("active", "discharged") are NOT valid API statuses and 400 the
+              // patients query.
               setAdvanceCheckUp(false);
-              setTab(advanceCheckUpSource)
             }}
           >
             <svg

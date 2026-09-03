@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
-import { createInpatientDischarge } from "../../../../../queries/Hospital/doctor/discharge";
+import { createDoctorInpatientDischarge } from "../../../../../queries/Hospital/doctor/discharge";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import DischargeAdmissionSummaryStep from "./DischargeAdmissionSummaryStep";
 import DischargeProceduresMedicationsStep from "./DischargeProceduresMedicationsStep";
@@ -18,8 +18,10 @@ const pageSize = 20;
 // Medications → Follow-up). The read-only summary fields, investigation options,
 // and seeded medications are wired to real data already fetched elsewhere in the
 // doctor's dashboard; "Complete Discharge" submits the wizard to
-// POST /api/medical-records/discharge (see queries/Hospital/doctor/discharge.js
-// for the field mapping and the multipart quirks).
+// POST /api/inpatients/admissions/<sqid>/doc-discharge-form
+// (createDoctorInpatientDischarge). That records the doctor's discharge summary
+// and raises a nurse discharge task — the bed is only freed once a nurse
+// completes that task.
 const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatient }) => {
   const queryClient = useQueryClient();
 
@@ -163,15 +165,17 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
     }, []);
   }, [labRecordsData]);
 
-  const toInvestigationOption = (item, idx) => ({
-    value: `${item.id ?? item.test_info?.id ?? item.test_info?.name ?? "investigation"}-${idx}`,
+  // `value` must be the lab-test-order item's own sqid — the discharge endpoint
+  // takes investigation refs as { sqid, type: "lab_test_order" }.
+  const toInvestigationOption = (item) => ({
+    value: item.sqid,
     label: item.test_info?.name || "Investigation",
   });
 
   const completedInvestigationOptions = useMemo(
     () =>
       flatLabItems
-        .filter((item) => COMPLETED_LAB_STATUSES.includes(item.status))
+        .filter((item) => item.sqid && COMPLETED_LAB_STATUSES.includes(item.status))
         .map(toInvestigationOption),
     [flatLabItems],
   );
@@ -179,7 +183,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
   const pendingInvestigationOptions = useMemo(
     () =>
       flatLabItems
-        .filter((item) => !COMPLETED_LAB_STATUSES.includes(item.status))
+        .filter((item) => item.sqid && !COMPLETED_LAB_STATUSES.includes(item.status))
         .map(toInvestigationOption),
     [flatLabItems],
   );
@@ -242,80 +246,81 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const toLines = (value) =>
-    String(value || "")
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean);
-
-  const buildDischargePayload = () => {
-    const diagnosis = [
-      formData.primary_diagnosis,
-      formData.secondary_diagnosis,
-      formData.comorbidities,
-    ]
-      .map((entry) => entry.trim())
-      .filter(Boolean);
-
-    const seededDrugs = existingMedications
-      .filter((med) => med.status !== "stopped" && med.name)
-      .map((med) => {
-        // Seeded rows carry frequency as a display string ("1 od" or "od").
-        const [lead, ...rest] = String(med.frequency || "").trim().split(" ");
-        const hasNumericLead = rest.length > 0 && !Number.isNaN(Number(lead));
-        return {
-          name: med.name,
-          route: med.route || "Oral",
-          quantity: Number(med.dosage) || 1,
-          unit: med.unit || null,
-          frequency: hasNumericLead
-            ? { value: Number(lead) || 1, rate: rest.join(" ") }
-            : { value: 1, rate: String(med.frequency || "od").trim() || "od" },
-          duration: { value: 1, rate: "days" },
-          allergies: [],
-        };
-      });
-
-    const addedDrugs = newMedications
-      .filter((med) => med.drug && med.drug.trim())
-      .map((med) => ({
-        name: med.drug,
+  const buildDischargeMedication = (med, { seeded }) => {
+    if (seeded) {
+      // Seeded rows carry frequency as a display string ("1 od" or "od").
+      const [lead, ...rest] = String(med.frequency || "").trim().split(" ");
+      const hasNumericLead = rest.length > 0 && !Number.isNaN(Number(lead));
+      return {
+        name: med.name,
         route: med.route || "Oral",
         quantity: Number(med.dosage) || 1,
-        unit: med.dosageUnit || null,
-        frequency: { value: 1, rate: med.frequency },
-        duration: {
-          value: Number(med.duration) || 1,
-          rate: med.durationUnit ? med.durationUnit.toLowerCase() : "days",
-        },
+        unit: med.unit || null,
+        frequency: hasNumericLead
+          ? { value: Number(lead) || 1, rate: rest.join(" ") }
+          : { value: 1, rate: String(med.frequency || "od").trim() || "od" },
+        duration: { value: 1, rate: "days" },
         allergies: [],
-      }));
-
-    let follow_up_appointment = null;
-    if (formData.follow_up_date && formData.follow_up_time) {
-      follow_up_appointment = {
-        type: "follow_up",
-        note: formData.follow_up_instructions.trim() || "Follow up",
-        scheduled_time: new Date(
-          `${formData.follow_up_date}T${formData.follow_up_time}`,
-        ).toISOString(),
       };
     }
+    return {
+      name: med.drug,
+      route: med.route || "Oral",
+      quantity: Number(med.dosage) || 1,
+      unit: med.dosageUnit || null,
+      frequency: { value: 1, rate: med.frequency },
+      duration: {
+        value: Number(med.duration) || 1,
+        rate: med.durationUnit ? med.durationUnit.toLowerCase() : "days",
+      },
+      allergies: [],
+    };
+  };
+
+  const toInvestigationRefs = (list) =>
+    list
+      .map((opt) => opt.value)
+      .filter(Boolean)
+      .map((sqid) => ({ sqid, type: "lab_test_order" }));
+
+  const buildDischargePayload = () => {
+    const discharge_medications = [
+      ...existingMedications
+        .filter((med) => med.status !== "stopped" && med.name)
+        .map((med) => buildDischargeMedication(med, { seeded: true })),
+      ...newMedications
+        .filter((med) => med.drug && med.drug.trim())
+        .map((med) => buildDischargeMedication(med, { seeded: false })),
+    ];
 
     return {
-      admission: admissionSqid,
+      admissionSqid,
+      patient: hin,
       chief_complaint: formData.chief_complaint.trim(),
-      condition_on_discharge: formData.condition_at_discharge.trim(),
-      diagnosis,
-      treatment_plan: toLines(formData.treatment_plan),
-      care_instructions: toLines(formData.care_instructions),
-      drug_records: [...seededDrugs, ...addedDrugs],
-      follow_up_appointment,
+      primary_diagnosis: formData.primary_diagnosis.trim(),
+      secondary_diagnosis: formData.secondary_diagnosis.trim(),
+      comorbidities: formData.comorbidities.trim(),
+      treatment_plan: formData.treatment_plan.trim(),
+      hospital_course_note: formData.hospital_course_note.trim(),
+      care_instructions: formData.care_instructions.trim(),
+      condition_at_discharge: formData.condition_at_discharge,
+      will_continue_followup: !!formData.will_continue_followup,
+      follow_up_clinic: formData.follow_up_clinic.trim(),
+      follow_up_date: formData.follow_up_date,
+      follow_up_time: formData.follow_up_time,
+      follow_up_instructions: formData.follow_up_instructions.trim(),
+      ...(formData.completed_investigations.length
+        ? { completed_investigations: toInvestigationRefs(formData.completed_investigations) }
+        : {}),
+      ...(formData.pending_investigations.length
+        ? { pending_investigations: toInvestigationRefs(formData.pending_investigations) }
+        : {}),
+      ...(discharge_medications.length ? { discharge_medications } : {}),
     };
   };
 
   const dischargeMutation = useMutation({
-    mutationFn: createInpatientDischarge,
+    mutationFn: createDoctorInpatientDischarge,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["hospital-patients-doctor"] });
       setShowConfirmModal(false);
@@ -334,13 +339,21 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
     },
   });
 
+  // Every field the endpoint requires is required in the form too.
   const handleValidateAndConfirm = () => {
     const missing = [];
     if (!formData.chief_complaint.trim()) missing.push("Chief complaint");
     if (!formData.primary_diagnosis.trim()) missing.push("Primary diagnosis");
+    if (!formData.secondary_diagnosis.trim()) missing.push("Secondary diagnosis");
+    if (!formData.comorbidities.trim()) missing.push("Comorbidities");
     if (!formData.treatment_plan.trim()) missing.push("Treatment plan");
-    if (!formData.condition_at_discharge.trim()) missing.push("Condition at discharge");
+    if (!formData.hospital_course_note.trim()) missing.push("Hospital course note");
     if (!formData.care_instructions.trim()) missing.push("Care instructions");
+    if (!formData.condition_at_discharge) missing.push("Condition at discharge");
+    if (!formData.follow_up_clinic.trim()) missing.push("Follow-up clinic");
+    if (!formData.follow_up_date) missing.push("Follow-up date");
+    if (!formData.follow_up_time) missing.push("Follow-up time");
+    if (!formData.follow_up_instructions.trim()) missing.push("Follow-up instructions");
 
     if (missing.length > 0) {
       toast.error(`Please fill in: ${missing.join(", ")}.`);
@@ -456,6 +469,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
 
     <DischargeSuccessModal
       isOpen={showSuccessModal}
+      message="The discharge summary has been recorded. A nurse will complete the discharge and free the bed."
       onDone={() => {
         setShowSuccessModal(false);
         setDischargePatient(false);

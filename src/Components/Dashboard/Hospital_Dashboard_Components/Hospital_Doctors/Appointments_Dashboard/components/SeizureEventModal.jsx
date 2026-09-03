@@ -36,7 +36,7 @@ const SeizureTopSection = ({
     </p>
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
       <div className={FIELD_BOX_CLASS}>
-        <label className={FIELD_LABEL_CLASS}>Seizure type (motor movement)</label>
+        <label className={FIELD_LABEL_CLASS}>Seizure type (motor movement)<span className="text-red-500"> *</span></label>
         <Select
           value={characteristics}
           onChange={setCharacteristics}
@@ -45,7 +45,7 @@ const SeizureTopSection = ({
         />
       </div>
       <div className={FIELD_BOX_CLASS}>
-        <label className={FIELD_LABEL_CLASS}>Emergency standing order</label>
+        <label className={FIELD_LABEL_CLASS}>Emergency standing order<span className="text-red-500"> *</span></label>
         <Select
           value={standingOrder}
           onChange={setStandingOrder}

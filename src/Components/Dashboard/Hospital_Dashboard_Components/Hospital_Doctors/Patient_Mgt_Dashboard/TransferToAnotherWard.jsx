@@ -92,6 +92,8 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
       </div>
 
       <Select
+        label="Ward"
+        required
         value={form.new_ward}
         onChange={(value) => handleChange("new_ward", value)}
         options={wardOptions.map((w) => ({ value: String(w.sqid), label: `${w.name} ward` }))}
@@ -100,6 +102,8 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
 
       {form.new_ward && (
         <Select
+          label="Bed"
+          required
           value={form.new_bed}
           onChange={(value) => handleChange("new_bed", value)}
           options={availableBeds.map((b) => ({ value: String(b.sqid), label: `Bed ${b.bed_number}` }))}
