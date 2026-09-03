@@ -162,6 +162,7 @@ const initialFormData = {
   bmi: "",
   painScore: "",
   spo2: "",
+  vitalsNotes: "",
   mobilityAssessment: "",
   nutritionalAssessment: "",
   allergies: "",
@@ -191,6 +192,16 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
 
   // Form State
   const [formData, setFormData] = useState(initialFormData);
+
+  const calculateAdmissionBmi = (w, h) => {
+    const weightNum = parseFloat(w);
+    let heightNum = parseFloat(h);
+    if (!weightNum || !heightNum || heightNum <= 0) return "";
+    if (heightNum > 3) heightNum = heightNum / 100;
+    const val = (weightNum / (heightNum * heightNum)).toFixed(1);
+    return isNaN(val) ? "" : val;
+  };
+  const calculatedBmi = calculateAdmissionBmi(formData.weight, formData.height);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -333,9 +344,10 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
           height: formData.height ? parseFloat(formData.height) : undefined,
           heart_rate: formData.heartRate ? parseInt(formData.heartRate, 10) : undefined,
           weight: formData.weight ? parseFloat(formData.weight) : undefined,
+          bmi: calculatedBmi ? parseFloat(calculatedBmi) : undefined,
           pain_score: formData.painScore ? parseInt(formData.painScore.split(" ")[0], 10) : undefined,
           spo2: formData.spo2 ? parseInt(formData.spo2, 10) : undefined,
-          notes: "Admission Note Vitals" // Optional
+          notes: formData.vitalsNotes || "Admission Note Vitals"
         },
         allergies: formData.allergies ? [formData.allergies] : [],
         mobility_assessment: formData.mobilityAssessment ? formData.mobilityAssessment.toLowerCase().replace(/ \/ /g, "_").replace(/ /g, "_") : undefined,
@@ -448,7 +460,6 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                   { label: "Height", name: "height", adornment: "Cm", placeholder: "Enter height" },
                   { label: "Heart rate", name: "heartRate", adornment: "Bpm", placeholder: "Enter heart rate" },
                   { label: "Weight", name: "weight", adornment: "Kg", placeholder: "Enter weight" },
-                  { label: "BMI", name: "bmi", adornment: "BMI", placeholder: "Enter BMI" },
                 ].map((field) => (
                   <div key={field.name} className="flex flex-col gap-1.5">
                     <label className="text-[13px] font-medium text-gray-700">{field.label}</label>
@@ -468,6 +479,24 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                   </div>
                 ))}
                 
+                {/* BMI (Read-only, Auto-calculated) */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[13px] font-medium text-gray-700">BMI</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="bmi"
+                      readOnly
+                      value={calculatedBmi ? `${calculatedBmi}` : ""}
+                      placeholder="Auto-calculated"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-md pl-3 pr-12 py-2.5 text-[13px] text-gray-700 focus:outline-none cursor-not-allowed"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-gray-400 font-medium">
+                      BMI
+                    </span>
+                  </div>
+                </div>
+
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[13px] font-medium text-gray-700">Pain score</label>
                   <div className="relative"><select
@@ -494,6 +523,18 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-gray-400 font-medium">%</span>
                   </div>
+                </div>
+
+                <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col gap-1.5 mt-2">
+                  <label className="text-[13px] font-medium text-gray-700">Additional vitals note (optional)</label>
+                  <textarea
+                    name="vitalsNotes"
+                    value={formData.vitalsNotes}
+                    onChange={handleChange}
+                    placeholder="Type additional vitals notes here..."
+                    rows={2}
+                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary resize-y"
+                  ></textarea>
                 </div>
               </div>
             </div>

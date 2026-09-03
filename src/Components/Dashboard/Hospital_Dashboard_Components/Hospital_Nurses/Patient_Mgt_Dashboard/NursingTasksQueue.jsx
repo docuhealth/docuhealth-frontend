@@ -368,7 +368,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
   const [escalationReason, setEscalationReason] = useState("");
 
   // Form states for execution
-  const [vitalSignsForm, setVitalSignsForm] = useState({ blood_pressure: "", temp: "", resp_rate: "", heart_rate: "", spo2: "", height: "", weight: "" });
+  const [vitalSignsForm, setVitalSignsForm] = useState({ blood_pressure: "", temp: "", resp_rate: "", heart_rate: "", spo2: "", height: "", weight: "", pain_score: "0 (No pain)", notes: "" });
   const [glucoseForm, setGlucoseForm] = useState({ value: "", unit: "mg_dl", context: "fasting", insulin_administered: false });
   const [ivFluidForm, setIvFluidForm] = useState({ add_to_patient_fluid_chart: true, site_condition: "clean", cannula_location: "left_forearm", nursing_remark: "" });
   const [procedureForm, setProcedureForm] = useState({ consent: "given", post_procedure_status: "clean_dry", estimated_blood_volume_ml: "", current_position: "flat_supine" });
@@ -385,11 +385,33 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
     if (taskType === 'vital_signs') {
       const allowedParams = activeTask.summary?.parameters || [];
       const data = {};
+      const calculateInpatientBmiLocal = (w, h) => {
+        const weightNum = parseFloat(w);
+        let heightNum = parseFloat(h);
+        if (!weightNum || !heightNum || heightNum <= 0) return "";
+        if (heightNum > 3) heightNum = heightNum / 100;
+        const val = (weightNum / (heightNum * heightNum)).toFixed(1);
+        return isNaN(val) ? "" : val;
+      };
+      const computedBmi = calculateInpatientBmiLocal(vitalSignsForm.weight, vitalSignsForm.height);
+
       Object.keys(vitalSignsForm).forEach(key => {
-        if (allowedParams.includes(key) && vitalSignsForm[key]) {
+        if (key === 'notes' || key === 'pain_score') return;
+        if ((allowedParams.length === 0 || allowedParams.includes(key)) && vitalSignsForm[key]) {
           data[key] = key === 'temp' || key === 'resp_rate' || key === 'heart_rate' || key === 'spo2' || key === 'height' || key === 'weight' ? Number(vitalSignsForm[key]) : vitalSignsForm[key];
         }
       });
+
+      if (computedBmi && (allowedParams.length === 0 || allowedParams.includes('bmi'))) {
+        data.bmi = Number(computedBmi);
+      }
+      if (vitalSignsForm.pain_score && (allowedParams.length === 0 || allowedParams.includes('pain_score'))) {
+        data.pain_score = vitalSignsForm.pain_score;
+      }
+      if (vitalSignsForm.notes) {
+        data.notes = vitalSignsForm.notes;
+      }
+
       if (Object.keys(data).length === 0) { toast.error("At least one vital sign must be entered"); return false; }
       payload = data;
     } else if (taskType === 'glucose') {
@@ -435,7 +457,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
       setIsSubmittingTaskAction(activeTask.sqid);
       await axiosInstanceHos.post(`/api/inpatients/task-occurrences/${activeTask.sqid}/execute`, payload);
       toast.success("Task executed successfully");
-      if (taskType === 'vital_signs') setVitalSignsForm({ blood_pressure: "", temp: "", resp_rate: "", heart_rate: "", spo2: "", height: "", weight: "" });
+      if (taskType === 'vital_signs') setVitalSignsForm({ blood_pressure: "", temp: "", resp_rate: "", heart_rate: "", spo2: "", height: "", weight: "", pain_score: "0 (No pain)", notes: "" });
       else if (taskType === 'glucose') setGlucoseForm({ value: "", unit: "mg_dl", context: "fasting", insulin_administered: false });
       else if (taskType === 'procedure') setProcedureForm({ consent: "given", post_procedure_status: "clean_dry", estimated_blood_volume_ml: "", current_position: "flat_supine" });
       else if (taskType === 'iv_fluid') setIvFluidForm({ add_to_patient_fluid_chart: true, site_condition: "clean", cannula_location: "left_forearm", nursing_remark: "" });
@@ -1681,26 +1703,35 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
               <div className="relative">
                 <p className="pb-1.5 text-xs text-slate-500 font-medium">BMI</p>
                 <div className="relative">
-                  <input type="number" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-12 outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary transition-colors placeholder:text-slate-300" value={vitalSignsForm.height} onChange={(e) => setVitalSignsForm({...vitalSignsForm, height: e.target.value})} placeholder="Enter height" />
+                  <input
+                    type="text"
+                    readOnly
+                    className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-12 outline-none bg-slate-50 text-slate-700 cursor-not-allowed placeholder:text-slate-400"
+                    value={(() => {
+                      const weightNum = parseFloat(vitalSignsForm.weight);
+                      let heightNum = parseFloat(vitalSignsForm.height);
+                      if (!weightNum || !heightNum || heightNum <= 0) return "";
+                      if (heightNum > 3) heightNum = heightNum / 100;
+                      const val = (weightNum / (heightNum * heightNum)).toFixed(1);
+                      return isNaN(val) ? "" : val;
+                    })()}
+                    placeholder="Auto-calculated"
+                  />
                   <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">BMI</span>
                 </div>
               </div>
               <div className="relative">
                 <p className="pb-1.5 text-xs text-slate-500 font-medium">Pain score</p>
                 <div className="relative">
-                  <select value={vitalSignsForm.pain_score} onChange={(e) => setVitalSignsForm({...vitalSignsForm, pain_score: e.target.value})} className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary transition-colors text-slate-500 appearance-none bg-white">
-                    <option value="">Select...</option>
-                    <option value="0">0 (No pain)</option>
-                    <option value="1">1 (Mild Pain)</option>
-                    <option value="2">2 (Mild Pain)</option>
-                    <option value="3">3 (Mild Pain)</option>
-                    <option value="4">4 (Moderate Pain)</option>
-                    <option value="5">5 (Moderate Pain)</option>
-                    <option value="6">6 (Moderate Pain)</option>
-                    <option value="7">7 (Severe Pain)</option>
-                    <option value="8">8 (Severe Pain)</option>
-                    <option value="9">9 (Severe Pain)</option>
-                    <option value="10">10 (Severe Pain)</option>
+                  <select
+                    value={vitalSignsForm.pain_score}
+                    onChange={(e) => setVitalSignsForm({...vitalSignsForm, pain_score: e.target.value})}
+                    className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary transition-colors text-slate-600 appearance-none bg-white"
+                  >
+                    <option value="0 (No pain)">0 (No pain)</option>
+                    <option value="1-3 (Mild Pain)">1-3 (Mild Pain)</option>
+                    <option value="4-6 (Moderate Pain)">4-6 (Moderate Pain)</option>
+                    <option value="7-10 (Severe Pain)">7-10 (Severe Pain)</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
@@ -1719,7 +1750,12 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
           
           <div className="border border-slate-200 rounded-xl p-6 mb-6">
             <p className="font-semibold text-slate-800 text-[15px] mb-4">Additional note (optional)</p>
-            <textarea className="w-full border border-slate-200 rounded-lg p-4 text-sm outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary transition-colors min-h-[120px] resize-none placeholder:text-slate-300" placeholder="Type here..."></textarea>
+            <textarea
+              value={vitalSignsForm.notes}
+              onChange={(e) => setVitalSignsForm({...vitalSignsForm, notes: e.target.value})}
+              className="w-full border border-slate-200 rounded-lg p-4 text-sm outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary transition-colors min-h-[120px] resize-none placeholder:text-slate-300"
+              placeholder="Type here..."
+            ></textarea>
           </div>
           
           <div className="flex justify-end pt-2">
