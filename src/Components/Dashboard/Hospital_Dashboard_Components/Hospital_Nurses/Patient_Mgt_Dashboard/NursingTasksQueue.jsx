@@ -406,7 +406,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
         data.bmi = Number(computedBmi);
       }
       if (vitalSignsForm.pain_score && (allowedParams.length === 0 || allowedParams.includes('pain_score'))) {
-        data.pain_score = vitalSignsForm.pain_score;
+        data.pain_score = parseInt(vitalSignsForm.pain_score.split(" ")[0], 10);
       }
       if (vitalSignsForm.notes) {
         data.notes = vitalSignsForm.notes;
@@ -1729,9 +1729,16 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                     className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary transition-colors text-slate-600 appearance-none bg-white"
                   >
                     <option value="0 (No pain)">0 (No pain)</option>
-                    <option value="1-3 (Mild Pain)">1-3 (Mild Pain)</option>
-                    <option value="4-6 (Moderate Pain)">4-6 (Moderate Pain)</option>
-                    <option value="7-10 (Severe Pain)">7-10 (Severe Pain)</option>
+                    <option value="1 (Mild Pain)">1 (Mild Pain)</option>
+                    <option value="2 (Mild Pain)">2 (Mild Pain)</option>
+                    <option value="3 (Mild Pain)">3 (Mild Pain)</option>
+                    <option value="4 (Moderate Pain)">4 (Moderate Pain)</option>
+                    <option value="5 (Moderate Pain)">5 (Moderate Pain)</option>
+                    <option value="6 (Moderate Pain)">6 (Moderate Pain)</option>
+                    <option value="7 (Severe Pain)">7 (Severe Pain)</option>
+                    <option value="8 (Severe Pain)">8 (Severe Pain)</option>
+                    <option value="9 (Severe Pain)">9 (Severe Pain)</option>
+                    <option value="10 (Severe Pain)">10 (Severe Pain)</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>

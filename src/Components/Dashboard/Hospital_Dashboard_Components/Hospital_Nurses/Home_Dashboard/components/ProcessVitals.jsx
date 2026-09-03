@@ -6,9 +6,16 @@ import { ChevronDown } from "lucide-react";
 
 const painScoreOptions = [
   "0 (No pain)",
-  "1-3 (Mild Pain)",
-  "4-6 (Moderate Pain)",
-  "7-10 (Severe Pain)",
+  "1 (Mild Pain)",
+  "2 (Mild Pain)",
+  "3 (Mild Pain)",
+  "4 (Moderate Pain)",
+  "5 (Moderate Pain)",
+  "6 (Moderate Pain)",
+  "7 (Severe Pain)",
+  "8 (Severe Pain)",
+  "9 (Severe Pain)",
+  "10 (Severe Pain)",
 ];
 
 const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
@@ -72,15 +79,15 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
   const handleSubmit = () => {
     const payload = {
       request: selectedPatient.id,
-      blood_pressure: bloodPressure,
-      temp: temperature,
-      resp_rate: respRate,
-      weight: weight,
-      heart_rate: heartRate,
-      ...(height && { height }),
-      ...(bmi && { bmi }),
-      ...(spo2 && { spo2 }),
-      ...(painScore && { pain_score: painScore }),
+      blood_pressure: bloodPressure || undefined,
+      temp: temperature ? parseFloat(temperature) : undefined,
+      resp_rate: respRate ? parseFloat(respRate) : undefined,
+      weight: weight ? parseFloat(weight) : undefined,
+      heart_rate: heartRate ? parseFloat(heartRate) : undefined,
+      ...(height && { height: parseFloat(height) }),
+      ...(bmi && { bmi: parseFloat(bmi) }),
+      ...(spo2 && { spo2: parseInt(spo2, 10) }),
+      ...(painScore && { pain_score: parseInt(painScore.split(" ")[0], 10) }),
       ...(notes && { notes }),
     };
 

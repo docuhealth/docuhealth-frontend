@@ -89,13 +89,13 @@ const NursingEncounterTable = () => {
       vital_signs: {
         ...(encounterFormData.blood_pressure && { blood_pressure: encounterFormData.blood_pressure }),
         ...(encounterFormData.temp && { temp: parseFloat(encounterFormData.temp) }),
-        ...(encounterFormData.heart_rate && { heart_rate: parseInt(encounterFormData.heart_rate) }),
-        ...(encounterFormData.resp_rate && { resp_rate: parseInt(encounterFormData.resp_rate) }),
+        ...(encounterFormData.heart_rate && { heart_rate: parseFloat(encounterFormData.heart_rate) }),
+        ...(encounterFormData.resp_rate && { resp_rate: parseFloat(encounterFormData.resp_rate) }),
         ...(encounterFormData.height && { height: parseFloat(encounterFormData.height) }),
         ...(encounterFormData.weight && { weight: parseFloat(encounterFormData.weight) }),
         ...(encounterFormData.bmi && { bmi: parseFloat(encounterFormData.bmi) }),
-        ...(encounterFormData.pain_score && { pain_score: encounterFormData.pain_score }),
-        ...(encounterFormData.sp02 && { sp02: encounterFormData.sp02 })
+        ...(encounterFormData.pain_score && { pain_score: parseInt(encounterFormData.pain_score.split(" ")[0], 10) }),
+        ...(encounterFormData.sp02 && { spo2: parseInt(encounterFormData.sp02, 10) })
       }
     };
   };
@@ -582,9 +582,16 @@ const NursingEncounterTable = () => {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-hidden focus:border-docuhealth-primary transition-colors text-gray-600 bg-white appearance-none pr-10"
                     >
                       <option value="0 (No pain)">0 (No pain)</option>
-                      <option value="1–3 (Mild Pain)">1–3 (Mild Pain)</option>
-                      <option value="4–6 (Moderate Pain)">4–6 (Moderate Pain)</option>
-                      <option value="7–10 (Severe Pain)">7–10 (Severe Pain)</option>
+                      <option value="1 (Mild Pain)">1 (Mild Pain)</option>
+                      <option value="2 (Mild Pain)">2 (Mild Pain)</option>
+                      <option value="3 (Mild Pain)">3 (Mild Pain)</option>
+                      <option value="4 (Moderate Pain)">4 (Moderate Pain)</option>
+                      <option value="5 (Moderate Pain)">5 (Moderate Pain)</option>
+                      <option value="6 (Moderate Pain)">6 (Moderate Pain)</option>
+                      <option value="7 (Severe Pain)">7 (Severe Pain)</option>
+                      <option value="8 (Severe Pain)">8 (Severe Pain)</option>
+                      <option value="9 (Severe Pain)">9 (Severe Pain)</option>
+                      <option value="10 (Severe Pain)">10 (Severe Pain)</option>
                     </select>
                     <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-500">
                       <ChevronDown size={16} />

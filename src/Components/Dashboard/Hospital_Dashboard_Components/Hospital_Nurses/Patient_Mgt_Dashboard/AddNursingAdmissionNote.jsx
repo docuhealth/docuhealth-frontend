@@ -7,9 +7,16 @@ import toast from "react-hot-toast";
 // --- Options Data ---
 const painScoreOptions = [
   "0 (No pain)",
-  "1-3 (Mild Pain)",
-  "4-6 (Moderate Pain)",
-  "7-10 (Severe Pain)",
+  "1 (Mild Pain)",
+  "2 (Mild Pain)",
+  "3 (Mild Pain)",
+  "4 (Moderate Pain)",
+  "5 (Moderate Pain)",
+  "6 (Moderate Pain)",
+  "7 (Severe Pain)",
+  "8 (Severe Pain)",
+  "9 (Severe Pain)",
+  "10 (Severe Pain)",
 ];
 
 const mobilityOptions = [

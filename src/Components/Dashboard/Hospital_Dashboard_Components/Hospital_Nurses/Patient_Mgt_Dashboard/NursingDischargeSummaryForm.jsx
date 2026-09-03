@@ -117,6 +117,11 @@ const NursingDischargeSummaryForm = ({ admission, patientFullInfo, activeTask, t
       return;
     }
 
+    if (!formData.education_given.trim() || !formData.follow_up_instructions.trim()) {
+      toast.error("Please fill in both 'Education given' and 'Follow up instructions'.");
+      return;
+    }
+
     const payload = {
       admission_id: admissionSqid,
       patient: patientHin,
@@ -126,7 +131,10 @@ const NursingDischargeSummaryForm = ({ admission, patientFullInfo, activeTask, t
         resp_rate: Number(formData.final_vital_signs.resp_rate) || 0,
         height: Number(formData.final_vital_signs.height) || 0,
         weight: Number(formData.final_vital_signs.weight) || 0,
-        heart_rate: Number(formData.final_vital_signs.heart_rate) || 0
+        heart_rate: Number(formData.final_vital_signs.heart_rate) || 0,
+        bmi: Number(formData.final_vital_signs.bmi) || 0,
+        spo2: Number(formData.final_vital_signs.spo2) || 0,
+        pain_score: formData.final_vital_signs.pain_score ? parseInt(formData.final_vital_signs.pain_score, 10) : null
       },
       peripheral_iv_cannula_removed: Boolean(formData.peripheral_iv_cannula_removed),
       surgical_dressing_clean: Boolean(formData.surgical_dressing_clean),
