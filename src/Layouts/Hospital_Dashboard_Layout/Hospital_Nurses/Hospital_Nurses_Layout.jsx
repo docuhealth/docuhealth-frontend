@@ -1,82 +1,15 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../Components/ui/DashboardLayout";
 import { NursesAppContext } from "../../../context/HospitalContext/Nurses/NursesAppContext";
-import LogOutModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/LogOut/components/LogOutModal";
-import axiosInstanceHos from "../../../lib/axios/hospital";
-import toast from "react-hot-toast";
 
 const Hospital_Nurses_Layout = () => {
   const { profile, hospitalLogo, hospitalName } = useContext(NursesAppContext);
   const navigate = useNavigate();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selected, setSelected] = useState('nurse');
-  const [handoverData, setHandoverData] = useState(null);
-  const [staffList, setStaffList] = useState(null);
-  const [isFetching, setIsFetching] = useState(false);
-  const [processingId, setProcessingId] = useState(null);
-
   const handleLogout = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleLogoutLogic = async (handoverSelection) => {
-    // If user clicked "Just Logout" (handoverSelection is null)
-    if (!handoverSelection) {
-      sessionStorage.clear();
-      navigate("/login");
-      return;
-    }
-
-    // If they clicked "Proceed to assign"
-    setHandoverData(handoverSelection);
-    setIsFetching(true);
-
-    try {
-      const data = await axiosInstanceHos.get('/api/receptionists/staff/nurse');
-      setStaffList(data.data);
-    } catch (error) {
-      console.error("Error fetching staff:", error);
-      toast.error("Failed to load staff list. Please try again.");
-    } finally {
-      setIsFetching(false);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setStaffList(null); // Reset data so it starts from the checkbox view next time
-    setHandoverData(null);
-  };
-
-  const handleFinalRequest = async (staff_id) => {
-    const { patientManagement: handover_appointments_state, myAppointments: handover_patients_state } = handoverData;
-
-    if (profile.staff_id === staff_id) {
-      toast.error('You cannot assign to yourself!');
-      return;
-    }
-
-    const payload = {
-      to_nurse: staff_id,
-      handover_appointments: handover_appointments_state,
-      handover_patients: handover_patients_state
-    };
-
-    setProcessingId(staff_id);
-
-    try {
-      await axiosInstanceHos.post('/api/nurses/handover', payload);
-      toast.success('Handover successful. Logging out...');
-      sessionStorage.clear();
-      navigate("/login");
-    } catch (error) {
-      console.error("Handover failed:", error);
-      toast.error(error.response?.data?.message || "Handover failed. Please try again.");
-    } finally {
-      setProcessingId(null);
-    }
+    sessionStorage.clear();
+    navigate("/login");
   };
 
   const navItems = [
@@ -245,18 +178,6 @@ const Hospital_Nurses_Layout = () => {
       handleLogout={handleLogout}
     >
       <Outlet />
-      
-      <LogOutModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onLogout={handleLogoutLogic}
-        staffList={staffList}
-        setStaffList={setStaffList}
-        selected={selected}
-        handleFinalRequest={handleFinalRequest}
-        processingId={processingId}
-        isFetching={isFetching}
-      />
     </DashboardLayout>
   );
 };

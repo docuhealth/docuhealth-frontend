@@ -277,7 +277,37 @@ const MedicalRecordsDetail = ({
                 Height
               </p>
               <p className="font-medium">
-                {selectedMedicalRecord?.vital_signs_info?.height} m
+                {selectedMedicalRecord?.vital_signs_info?.height ? `${selectedMedicalRecord.vital_signs_info.height} m` : "NIL"}
+              </p>
+            </div>
+            {/* Body mass index */}
+            <div className=" bg-white border rounded-md p-3">
+              <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.3333 1.33203C13.7015 1.33203 14 1.63051 14 1.9987V13.9987C14 14.3669 13.7015 14.6654 13.3333 14.6654H4C3.63181 14.6654 3.33333 14.3669 3.33333 13.9987V12.6654H2V11.332H3.33333V9.9987H2V8.66536H3.33333V7.33203H2V5.9987H3.33333V4.66536H2V3.33203H3.33333V1.9987C3.33333 1.63051 3.63181 1.33203 4 1.33203H13.3333ZM12.6667 2.66536H4.66667V13.332H12.6667V2.66536ZM9.33333 5.33203V7.33203H11.3333V8.66536H9.33267L9.33333 10.6654H8L7.99933 8.66536H6V7.33203H8V5.33203H9.33333Z" fill="var(--color-docuhealth-primary)"/></svg>
+                Body mass index
+              </p>
+              <p className="font-medium">
+                {selectedMedicalRecord?.vital_signs_info?.bmi ? `${selectedMedicalRecord.vital_signs_info.bmi} Kg/m²` : "NIL"}
+              </p>
+            </div>
+            {/* Pain score */}
+            <div className=" bg-white border rounded-md p-3">
+              <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.3333 1.33203C13.7015 1.33203 14 1.63051 14 1.9987V13.9987C14 14.3669 13.7015 14.6654 13.3333 14.6654H4C3.63181 14.6654 3.33333 14.3669 3.33333 13.9987V12.6654H2V11.332H3.33333V9.9987H2V8.66536H3.33333V7.33203H2V5.9987H3.33333V4.66536H2V3.33203H3.33333V1.9987C3.33333 1.63051 3.63181 1.33203 4 1.33203H13.3333ZM12.6667 2.66536H4.66667V13.332H12.6667V2.66536ZM9.33333 5.33203V7.33203H11.3333V8.66536H9.33267L9.33333 10.6654H8L7.99933 8.66536H6V7.33203H8V5.33203H9.33333Z" fill="var(--color-docuhealth-primary)"/></svg>
+                Pain score
+              </p>
+              <p className="font-medium">
+                {selectedMedicalRecord?.vital_signs_info?.pain_score || "NIL"}
+              </p>
+            </div>
+            {/* SpO2 */}
+            <div className=" bg-white border rounded-md p-3">
+              <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.3333 1.33203C13.7015 1.33203 14 1.63051 14 1.9987V13.9987C14 14.3669 13.7015 14.6654 13.3333 14.6654H4C3.63181 14.6654 3.33333 14.3669 3.33333 13.9987V12.6654H2V11.332H3.33333V9.9987H2V8.66536H3.33333V7.33203H2V5.9987H3.33333V4.66536H2V3.33203H3.33333V1.9987C3.33333 1.63051 3.63181 1.33203 4 1.33203H13.3333ZM12.6667 2.66536H4.66667V13.332H12.6667V2.66536ZM9.33333 5.33203V7.33203H11.3333V8.66536H9.33267L9.33333 10.6654H8L7.99933 8.66536H6V7.33203H8V5.33203H9.33333Z" fill="var(--color-docuhealth-primary)"/></svg>
+                SpO2
+              </p>
+              <p className="font-medium">
+                {selectedMedicalRecord?.vital_signs_info?.spo2 ?? selectedMedicalRecord?.vital_signs_info?.sp02 ? `${selectedMedicalRecord?.vital_signs_info?.spo2 ?? selectedMedicalRecord?.vital_signs_info?.sp02} %` : "NIL"}
               </p>
             </div>
           </div>

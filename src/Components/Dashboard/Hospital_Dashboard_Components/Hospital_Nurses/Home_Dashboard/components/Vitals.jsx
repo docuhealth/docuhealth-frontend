@@ -124,52 +124,63 @@ const Vitals = ({ setVitals, setSelectedPatient }) => {
         ) : (
           <>
             <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {assignedVitals.map((vital, index) => (
-                <div key={index} className="border p-3 rounded-xl">
-                  <div className="flex justify-between items-center">
-                    <p className="font-medium">
-                      {vital.patient.firstname} {vital.patient.lastname}{" "}
-                    </p>
-                    <div className="bg-docuhealth-light-green px-2 rounded-full">
-                      <p className="text-docuhealth-green">{formatRecordDate(vital.created_at)}</p>
+              {assignedVitals.map((vital, index) => {
+                const patient = vital?.patient || vital?.patient_info;
+                const hin = patient?.hin || "";
+                const maskedHin = hin
+                  ? (hin.length >= 6
+                      ? `${hin.slice(0, 4)}••••••${hin.slice(-2)}`
+                      : hin)
+                  : "N/A";
+                const staff = vital?.staff;
+                const staffName = staff
+                  ? `${staff?.role === "doctor" ? "Dr. " + (staff.firstname || "") : (staff.firstname || "")} ${staff.lastname || ""}`.trim()
+                  : "NIL";
+
+                return (
+                  <div key={vital?.id || index} className="border p-3 rounded-xl">
+                    <div className="flex justify-between items-center">
+                      <p className="font-medium">
+                        {patient?.firstname} {patient?.lastname}{" "}
+                      </p>
+                      <div className="bg-docuhealth-light-green px-2 rounded-full">
+                        <p className="text-docuhealth-green">{formatRecordDate(vital?.created_at)}</p>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="border-b py-2">
-                    <p className="text-gray-600">
-                      HIN:{" "}
-                      {vital.patient_info.hin.slice(0, 4) + "••••••" + vital.patient_info.hin.slice(-2)}
-                    </p>
-                  </div>
+                    <div className="border-b py-2">
+                      <p className="text-gray-600">
+                        HIN: {maskedHin}
+                      </p>
+                    </div>
 
-                  <div className="flex items-center gap-1 text-gray-600 pt-3">
-                    <p className="">{vital.patient.gender}</p>
-                  </div>
-                  <div className="flex items-center gap-1 text-gray-600 pt-1">
-                    <p className="">
-                      {vital?.staff
-                        ? `${vital?.staff?.role === 'doctor' ? 'Dr. ' + vital.staff.firstname : vital.staff.firstname} ${vital.staff.lastname}`
-                        : "NIL"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1 text-gray-600 pt-1">
-                    <p className="">{formatFullDateTime(vital.created_at)}</p>
-                  </div>
-                  <div className="pt-1 pb-3 border-b">
-                    <p className="text-gray-600">
-                      Status:{" "}
-                      <span className="text-amber-600">{vital.status}</span>
-                    </p>
-                  </div>
+                    <div className="flex items-center gap-1 text-gray-600 pt-3">
+                      <p className="">{patient?.gender || "NIL"}</p>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-600 pt-1">
+                      <p className="">
+                        {staffName}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-600 pt-1">
+                      <p className="">{formatFullDateTime(vital?.created_at)}</p>
+                    </div>
+                    <div className="pt-1 pb-3 border-b">
+                      <p className="text-gray-600">
+                        Status:{" "}
+                        <span className="text-amber-600">{vital?.status}</span>
+                      </p>
+                    </div>
 
-                  <button
-                    className="text-center mt-3 py-2 border border-docuhealth-dark text-docuhealth-dark w-full rounded-full cursor-pointer"
-                    onClick={() => setSelectedPatient(vital)}
-                  >
-                    Open
-                  </button>
-                </div>
-              ))}
+                    <button
+                      className="text-center mt-3 py-2 border border-docuhealth-dark text-docuhealth-dark w-full rounded-full cursor-pointer"
+                      onClick={() => setSelectedPatient(vital)}
+                    >
+                      Open
+                    </button>
+                  </div>
+                );
+              })}
             </div>
             <Pagination2
               count={count}

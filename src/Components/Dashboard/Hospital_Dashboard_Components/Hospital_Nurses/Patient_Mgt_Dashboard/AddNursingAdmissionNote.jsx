@@ -464,7 +464,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                   { label: "Blood pressure", name: "bloodPressure", adornment: "mmHg", placeholder: "Enter blood pressure" },
                   { label: "Temperature", name: "temperature", adornment: "°C", placeholder: "Enter temperature" },
                   { label: "Respiratory rate", name: "respiratoryRate", adornment: "/Min", placeholder: "Enter respiratory rate" },
-                  { label: "Height", name: "height", adornment: "Cm", placeholder: "Enter height" },
+                  { label: "Height", name: "height", adornment: "m", placeholder: "Enter height" },
                   { label: "Heart rate", name: "heartRate", adornment: "Bpm", placeholder: "Enter heart rate" },
                   { label: "Weight", name: "weight", adornment: "Kg", placeholder: "Enter weight" },
                 ].map((field) => (
@@ -499,7 +499,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                       className="w-full bg-gray-50 border border-gray-200 rounded-md pl-3 pr-12 py-2.5 text-[13px] text-gray-700 focus:outline-none cursor-not-allowed"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-gray-400 font-medium">
-                      BMI
+                      Kg/m²
                     </span>
                   </div>
                 </div>

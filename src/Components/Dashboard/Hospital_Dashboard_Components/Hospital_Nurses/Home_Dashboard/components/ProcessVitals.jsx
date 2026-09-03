@@ -223,12 +223,12 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
                 type="text"
                 id="bmi"
                 readOnly
-                className="w-full text-sm border px-3 py-2 rounded-sm pr-10 focus:outline-none bg-gray-50 text-gray-700 cursor-not-allowed"
+                className="w-full text-sm border px-3 py-2 rounded-sm pr-14 focus:outline-none bg-gray-50 text-gray-700 cursor-not-allowed"
                 placeholder="Auto-calculated"
                 value={bmi ? `${bmi}` : ""}
               />
               <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-[12px]">
-                BMI
+                Kg/m²
               </span>
             </div>
           </div>

@@ -567,10 +567,10 @@ const NursingEncounterTable = () => {
                 <Input label="Blood pressure" value={encounterFormData.blood_pressure} onChange={(e) => handleInputChange("blood_pressure", e.target.value)} placeholder="Enter blood pressure" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">mmHg</span>} />
                 <Input label="Temperature" value={encounterFormData.temp} onChange={(e) => handleInputChange("temp", e.target.value)} placeholder="Enter temperature" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">°C</span>} />
                 <Input label="Respiratory rate" value={encounterFormData.resp_rate} onChange={(e) => handleInputChange("resp_rate", e.target.value)} placeholder="Enter respiratory rate" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">/Min</span>} />
-                <Input label="Height" value={encounterFormData.height} onChange={(e) => handleInputChange("height", e.target.value)} placeholder="Enter height" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Cm</span>} />
+                <Input label="Height" value={encounterFormData.height} onChange={(e) => handleInputChange("height", e.target.value)} placeholder="Enter height" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">m</span>} />
                 <Input label="Heart rate" value={encounterFormData.heart_rate} onChange={(e) => handleInputChange("heart_rate", e.target.value)} placeholder="Enter heart rate" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Bpm</span>} />
                 <Input label="Weight" value={encounterFormData.weight} onChange={(e) => handleInputChange("weight", e.target.value)} placeholder="Enter weight" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Kg</span>} />
-                <Input label="BMI" value={encounterFormData.bmi} onChange={(e) => handleInputChange("bmi", e.target.value)} placeholder="Enter BMI" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">BMI</span>} />
+                <Input label="BMI" value={encounterFormData.bmi} onChange={(e) => handleInputChange("bmi", e.target.value)} placeholder="Enter BMI" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Kg/m²</span>} />
                 
                 {/* Pain Score */}
                 <div className="w-full">

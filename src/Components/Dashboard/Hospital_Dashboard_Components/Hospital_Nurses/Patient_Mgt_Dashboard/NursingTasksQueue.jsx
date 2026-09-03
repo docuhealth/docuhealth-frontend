@@ -562,14 +562,14 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
   ];
 
   const demoVitalsRecords = [
-    { id: 1, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 2, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 3, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 4, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 5, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 6, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 7, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 8, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "65 cm", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 BMI", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 1, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 2, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 3, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 4, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 5, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 6, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 7, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
+    { id: 8, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
   ];
 
   const demoSeizureRecords = [
@@ -1682,8 +1682,8 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
               <div className="relative">
                 <p className="pb-1.5 text-xs text-slate-500 font-medium">Height</p>
                 <div className="relative">
-                  <input type="number" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-12 outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary transition-colors placeholder:text-slate-300" value={vitalSignsForm.height} onChange={(e) => setVitalSignsForm({...vitalSignsForm, height: e.target.value})} placeholder="Enter height" />
-                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">Cm</span>
+                  <input type="number" step="0.01" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-12 outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary transition-colors placeholder:text-slate-300" value={vitalSignsForm.height} onChange={(e) => setVitalSignsForm({...vitalSignsForm, height: e.target.value})} placeholder="Enter height" />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">m</span>
                 </div>
               </div>
               <div className="relative">
@@ -1706,7 +1706,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                   <input
                     type="text"
                     readOnly
-                    className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-12 outline-none bg-slate-50 text-slate-700 cursor-not-allowed placeholder:text-slate-400"
+                    className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-14 outline-none bg-slate-50 text-slate-700 cursor-not-allowed placeholder:text-slate-400"
                     value={(() => {
                       const weightNum = parseFloat(vitalSignsForm.weight);
                       let heightNum = parseFloat(vitalSignsForm.height);
@@ -1717,7 +1717,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                     })()}
                     placeholder="Auto-calculated"
                   />
-                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">BMI</span>
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">Kg/m²</span>
                 </div>
               </div>
               <div className="relative">
@@ -1802,10 +1802,10 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                    <th className="py-5 px-3 font-bold text-gray-700">Blood Pressure</th>
                    <th className="py-5 px-3 font-bold text-gray-700">Temperature</th>
                    <th className="py-5 px-3 font-bold text-gray-700">Respiratory</th>
-                   <th className="py-5 px-3 font-bold text-gray-700">Height</th>
+                   <th className="py-5 px-3 font-bold text-gray-700">Height (m)</th>
                    <th className="py-5 px-3 font-bold text-gray-700">Heart rate</th>
-                   <th className="py-5 px-3 font-bold text-gray-700">Weight</th>
-                   <th className="py-5 px-3 font-bold text-gray-700">BMI</th>
+                   <th className="py-5 px-3 font-bold text-gray-700">Weight (Kg)</th>
+                   <th className="py-5 px-3 font-bold text-gray-700">BMI (Kg/m²)</th>
                    <th className="py-5 px-3 font-bold text-gray-700">Pain score</th>
                    <th className="py-5 px-4 font-bold text-gray-700 rounded-r-full">Status</th>
                  </tr>

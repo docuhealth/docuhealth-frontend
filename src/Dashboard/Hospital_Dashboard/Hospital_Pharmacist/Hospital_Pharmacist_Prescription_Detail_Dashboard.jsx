@@ -450,7 +450,7 @@ const Hospital_Pharmacist_Prescription_Detail_Dashboard = ({ sqid, onBack, isSet
                   Height
                 </p>
                 <p className="font-medium text-[13px] text-gray-800">
-                  {order.latest_vitals?.height ? `${order.latest_vitals.height} cm` : "—"}
+                  {order.latest_vitals?.height ? `${order.latest_vitals.height} m` : "—"}
                 </p>
              </div>
 
@@ -461,6 +461,16 @@ const Hospital_Pharmacist_Prescription_Detail_Dashboard = ({ sqid, onBack, isSet
                 </p>
                 <p className="font-medium text-[13px] text-gray-800">
                   {order.latest_vitals?.weight ? `${order.latest_vitals.weight} Kg` : "—"}
+                </p>
+             </div>
+             
+             <div className="bg-white border border-gray-200 rounded-md p-3">
+                <p className="text-[12px] text-gray-400 flex items-center gap-1 pb-2">
+                  <Activity size={16} className="text-docuhealth-primary" />
+                  BMI
+                </p>
+                <p className="font-medium text-[13px] text-gray-800">
+                  {order.latest_vitals?.bmi ? `${order.latest_vitals.bmi} Kg/m²` : "—"}
                 </p>
              </div>
           </div>

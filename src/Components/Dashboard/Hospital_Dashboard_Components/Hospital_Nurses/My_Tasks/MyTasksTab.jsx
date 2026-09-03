@@ -66,12 +66,12 @@ const MyTasksTab = ({ tasks, loading, type }) => {
   };
 
   const handleViewPatient = (task) => {
-    const patientSqid = task.patient_info?.sqid;
-    if (patientSqid) {
+    const patientHin = task.patient_info?.hin;
+    if (patientHin) {
       navigate("/hospital-nurses-patients-dashboard", {
         state: { selectedPatient: task }
       });
-    } else {
+    } else {   
       toast.error("Patient information is missing.");
     }
   };

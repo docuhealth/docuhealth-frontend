@@ -286,12 +286,13 @@ const NursingDischargeSummaryForm = ({ admission, patientFullInfo, activeTask, t
                 <div className="relative">
                   <input 
                     type="number" 
+                    step="0.01"
                     value={formData.final_vital_signs.height}
                     onChange={(e) => updateVitals('height', e.target.value)}
-                    placeholder="170" 
+                    placeholder="1.70" 
                     className="w-full border border-gray-200 rounded-md pl-3 pr-8 py-2 text-xs text-gray-700 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary" 
                   />
-                  <span className="absolute right-3 top-2 text-xs text-gray-400">Cm</span>
+                  <span className="absolute right-3 top-2 text-xs text-gray-400">m</span>
                 </div>
               </div>
               <div>
@@ -328,9 +329,9 @@ const NursingDischargeSummaryForm = ({ admission, patientFullInfo, activeTask, t
                     value={formData.final_vital_signs.bmi}
                     onChange={(e) => updateVitals('bmi', e.target.value)}
                     placeholder="24.2" 
-                    className="w-full border border-gray-200 rounded-md pl-3 pr-10 py-2 text-xs text-gray-700 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary" 
+                    className="w-full border border-gray-200 rounded-md pl-3 pr-14 py-2 text-xs text-gray-700 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary" 
                   />
-                  <span className="absolute right-3 top-2 text-xs text-gray-400">BMI</span>
+                  <span className="absolute right-3 top-2 text-xs text-gray-400">Kg/m²</span>
                 </div>
               </div>
               <div>
