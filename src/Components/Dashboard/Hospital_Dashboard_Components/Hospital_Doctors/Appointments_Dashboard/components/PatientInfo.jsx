@@ -375,7 +375,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                 )}
                 <button
                   onClick={() => setShowDischargeModal(true)}
-                  className="w-full sm:w-auto border border-docuhealth-primary bg-docuhealth-primary text-white text-sm rounded-full px-6 py-2 transition-colors cursor-pointer"
+                  className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary text-sm rounded-full px-6 py-2 hover:bg-blue-50 transition-colors cursor-pointer"
                 >
                   Discharge Patient
                 </button>

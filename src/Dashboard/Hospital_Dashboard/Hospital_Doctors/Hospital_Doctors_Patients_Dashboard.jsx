@@ -118,16 +118,27 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                     >
                       Transfer to another ward
                     </button>
-                    <button
-                      className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
-                      onClick={() => {
-                        setDischargePatient(true);
-                        setSelectedDischargePatient(selected);
-                        //   setSeePatientDetails(false);
-                      }}
-                    >
-                      Discharge Patient
-                    </button>
+                    {selected?.status === "awaiting_nurse_discharge" ? (
+                      <button
+                        type="button"
+                        disabled
+                        title="A doctor discharge has already been recorded. A nurse will complete the discharge and free the bed."
+                        className="py-2.5 px-10 rounded-full bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed w-full lg:w-auto"
+                      >
+                        Awaiting nurse discharge
+                      </button>
+                    ) : (
+                      <button
+                        className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
+                        onClick={() => {
+                          setDischargePatient(true);
+                          setSelectedDischargePatient(selected);
+                          //   setSeePatientDetails(false);
+                        }}
+                      >
+                        Discharge Patient
+                      </button>
+                    )}
                   </>
                 )}
               </div>

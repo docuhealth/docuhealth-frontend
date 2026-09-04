@@ -33,6 +33,7 @@ import ClinicalSummaryCard from "../../../../ui/ClinicalSummaryCard";
 import SoapNoteEntry from "../Appointments_Dashboard/components/SoapNoteEntry";
 import Input from "../../../../ui/Input";
 import PatientHandoverTab from "./PatientHandoverTab";
+import DoctorIssuedTasksHistory from "./DoctorIssuedTasksHistory";
 import { createProgressNote } from "../../../../../queries/Hospital/doctor/progressNotes";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 
@@ -1805,6 +1806,10 @@ const getTabs = ({
     {
       title: "Handover",
       content: <PatientHandoverTab selected={selected} patientFullInfo={patientFullInfo} />,
+    },
+    {
+      title: "Task history",
+      content: <DoctorIssuedTasksHistory />,
     },
     // {
     //   title: "Lab Results",

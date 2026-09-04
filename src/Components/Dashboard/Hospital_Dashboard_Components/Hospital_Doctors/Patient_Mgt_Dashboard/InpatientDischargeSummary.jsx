@@ -303,7 +303,10 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       treatment_plan: formData.treatment_plan.trim(),
       hospital_course_note: formData.hospital_course_note.trim(),
       care_instructions: formData.care_instructions.trim(),
-      condition_at_discharge: formData.condition_at_discharge,
+      // Required free-string field on the endpoint (no enum). The Select carries
+      // capitalized labels ("Improved", ...); send them lowercased to match the
+      // GET /api/inpatients/discharged-patients response convention.
+      condition_at_discharge: formData.condition_at_discharge.toLowerCase(),
       will_continue_followup: !!formData.will_continue_followup,
       follow_up_clinic: formData.follow_up_clinic.trim(),
       follow_up_date: formData.follow_up_date,

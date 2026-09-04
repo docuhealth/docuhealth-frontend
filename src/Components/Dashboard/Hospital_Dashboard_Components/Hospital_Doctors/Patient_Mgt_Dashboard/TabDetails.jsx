@@ -150,6 +150,13 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
                 </p>
               </div>
             </div>
+            {admittedPatient?.status === "awaiting_nurse_discharge" && (
+              <div className="mt-2">
+                <span className="inline-block text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                  Discharge initiated · awaiting nurse
+                </span>
+              </div>
+            )}
             <div className="border-b py-2">
               <p className="text-gray-600">
                 HIN :{" "}
@@ -249,12 +256,23 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
             >
               View patient's details
             </button>
-            <button
-              className="text-center mt-3 py-2 border border-docuhealth-dark text-docuhealth-dark w-full rounded-full cursor-pointer"
-              onClick={() => onDischargePatient(admittedPatient)}
-            >
-              Discharge Patient
-            </button>
+            {admittedPatient?.status === "awaiting_nurse_discharge" ? (
+              <button
+                type="button"
+                disabled
+                title="A doctor discharge has already been recorded. A nurse will complete the discharge and free the bed."
+                className="text-center mt-3 py-2 border border-gray-200 text-gray-400 w-full rounded-full cursor-not-allowed"
+              >
+                Awaiting nurse discharge
+              </button>
+            ) : (
+              <button
+                className="text-center mt-3 py-2 border border-docuhealth-dark text-docuhealth-dark w-full rounded-full cursor-pointer"
+                onClick={() => onDischargePatient(admittedPatient)}
+              >
+                Discharge Patient
+              </button>
+            )}
           </div>
         ))}
       </div>

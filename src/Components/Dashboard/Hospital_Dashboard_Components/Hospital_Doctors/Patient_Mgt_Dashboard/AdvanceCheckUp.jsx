@@ -4,8 +4,9 @@ import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import TabComponent2 from "./TabComponent2";
-import getTabs, { PatientSOAPNotes, PatientMedicalRecord } from "./TabDetails2";
+import getTabs, { PatientSOAPNotes } from "./TabDetails2";
 import PatientMedicalRecordDetail from "./PatientMedicalRecordDetail";
+import DoctorDischargeSummaryView from "./DoctorDischargeSummaryView";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProgressNotes } from "../../../../../queries/Hospital/doctor/progressNotes";
 
@@ -119,15 +120,9 @@ const AdvanceCheckUp = ({
                 selected={selected}
               />
             ) : (
-              <PatientMedicalRecord
-                medloading={medLoading}
-                patientMedRecords={medRecordsData?.results || []}
-                count={medRecordsData?.count || 0}
-                currentPage={currentPage}
-                totalPages={Math.ceil((medRecordsData?.count || 0) / pageSize)}
-                setCurrentPage={setCurrentPage}
-                setSelectedMedicalRecord={setSelectedMedicalRecord}
-                setViewDetailMedicalRecord={setViewDetailMedicalRecord}
+              <DoctorDischargeSummaryView
+                admissionSqid={selected?.admission_sqid || selected?.sqid}
+                fallbackPatient={selected}
               />
             )}
           </div>
@@ -184,6 +179,11 @@ const AdvanceCheckUp = ({
                       {(selected?.patient_info?.payment_provider?.type || patientFullInfo?.patient_info?.payment_provider?.type) && (
                         <span className="text-[10px] font-bold uppercase bg-docuhealth-light-green text-docuhealth-green px-2 py-0.5 rounded-full">
                           {selected?.patient_info?.payment_provider?.type || patientFullInfo.patient_info.payment_provider.type}
+                        </span>
+                      )}
+                      {selected?.status === "awaiting_nurse_discharge" && (
+                        <span className="text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                          Awaiting nurse discharge
                         </span>
                       )}
                     </div>
