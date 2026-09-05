@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import toast from "react-hot-toast";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
@@ -732,17 +732,6 @@ const OutPatientsTab = () => {
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-1 text-gray-600 pt-3">
-                                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M7.50165 9.24984C9.88142 9.24984 11.8452 11.0312 12.1322 13.3332H2.87109C3.15814 11.0312 5.12187 9.24984 7.50165 9.24984ZM6.44401 10.5795C5.60773 10.8447 4.90335 11.4159 4.46914 12.1665H7.50165L6.44401 10.5795ZM8.55953 10.5797L7.50165 12.1665H10.5342C10.1 11.416 9.39574 10.8448 8.55953 10.5797ZM11.0017 1.6665V5.1665C11.0017 7.0995 9.43464 8.6665 7.50165 8.6665C5.56866 8.6665 4.00166 7.0995 4.00166 5.1665V1.6665H11.0017ZM5.16832 5.1665C5.16832 6.45515 6.21299 7.49984 7.50165 7.49984C8.79035 7.49984 9.83499 6.45515 9.83499 5.1665H5.16832ZM9.83499 2.83317H5.16832L5.16826 3.99984H9.83493L9.83499 2.83317Z" fill="var(--color-docuhealth-dark)"/>
-                                    </svg>
-                                    <p className="">
-                                        {" "}
-                                        {outPatient?.staff_info
-                                            ? `${'Dr. ' + outPatient.staff_info.firstname} ${outPatient.staff_info.lastname}`
-                                            : "NIL"}
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-1 text-gray-600 pt-1 ">
                                     <i className="bx bx-phone text-[15px] text-docuhealth-dark"></i>
                                     <p className="">
                                         {outPatient?.patient_info?.phone_num || "No phone number"}

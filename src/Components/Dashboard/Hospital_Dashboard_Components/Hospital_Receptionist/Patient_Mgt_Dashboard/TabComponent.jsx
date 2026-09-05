@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { ReceptionistAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Receptionist/ReceptionistAdmittedPatientMGTContext";
 
 const TabComponent = ({ tabs }) => {
+  const { tab: activeStatus, setTab } = useContext(ReceptionistAdmittedPatientMGTContext);
 
   const activeTabData = tabs.find((t) => (Array.isArray(t.status) ? t.status.includes(activeStatus) : t.status === activeStatus)) || tabs[0];
 
