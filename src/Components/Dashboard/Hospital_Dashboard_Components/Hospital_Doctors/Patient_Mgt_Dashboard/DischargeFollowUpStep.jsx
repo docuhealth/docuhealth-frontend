@@ -1,6 +1,7 @@
 import React from "react";
 import DischargeInvestigationPicker from "./DischargeInvestigationPicker";
 import Input from "../../../../ui/Input";
+import TimeInput from "../../../../ui/TimeInput";
 
 const DischargeFollowUpStep = ({
   formData,
@@ -47,8 +48,7 @@ const DischargeFollowUpStep = ({
                 value={formData.follow_up_date}
                 onChange={(e) => onFieldChange("follow_up_date", e.target.value)}
               />
-              <Input
-                type="time"
+              <TimeInput
                 value={formData.follow_up_time}
                 onChange={(e) => onFieldChange("follow_up_time", e.target.value)}
               />

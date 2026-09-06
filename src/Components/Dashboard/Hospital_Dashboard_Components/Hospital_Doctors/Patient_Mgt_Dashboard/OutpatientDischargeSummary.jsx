@@ -5,6 +5,7 @@ import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import MedicationSection from "../Appointments_Dashboard/components/MedicationSection";
 import Input from "../../../../ui/Input";
+import TimeInput from "../../../../ui/TimeInput";
 import Select from "../../../../ui/Select";
 import ConfirmDischargeModal from "./ConfirmDischargeModal";
 import DischargeSuccessModal from "./DischargeSuccessModal";
@@ -248,8 +249,7 @@ const OutpatientDischargeSummary = ({ selectedPatient, onClose }) => {
                     onChange={(e) => setFollowUpDate(e.target.value)}
                     containerClassName="flex-1"
                   />
-                  <Input
-                    type="time"
+                  <TimeInput
                     value={followUpTime}
                     onChange={(e) => setFollowUpTime(e.target.value)}
                     containerClassName="flex-1"

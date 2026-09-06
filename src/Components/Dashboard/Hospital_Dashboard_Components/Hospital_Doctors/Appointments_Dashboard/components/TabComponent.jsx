@@ -1,8 +1,19 @@
 import React, { useState } from "react";
 
-// The component now accepts tabs as a prop
-const TabComponent = ({ tabs }) => {
-  const [activeTab, setActiveTab] = useState(0);
+// The component now accepts tabs as a prop.
+// `initialActiveIndex` lets a caller open the panel on a specific tab
+// (e.g. jump straight to "SOAP Notes" after a note is created). It only
+// seeds the first render — this component owns the active tab afterwards,
+// so callers that need it to re-seed should remount (a changing `key` or
+// an unmount/remount between views both work).
+const TabComponent = ({ tabs, initialActiveIndex = 0 }) => {
+  const [activeTab, setActiveTab] = useState(
+    Number.isInteger(initialActiveIndex) &&
+      initialActiveIndex >= 0 &&
+      initialActiveIndex < tabs.length
+      ? initialActiveIndex
+      : 0,
+  );
 
 
   return (

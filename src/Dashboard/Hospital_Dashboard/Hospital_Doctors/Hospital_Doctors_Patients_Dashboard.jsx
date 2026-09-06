@@ -30,7 +30,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
       setSelected(location.state.openOutpatient);
       setAdvanceCheckUpSource("outpatient");
       setTab("outpatient");
-      
+
       // Clear the state so it doesn't re-trigger on refresh
       navigate(location.pathname, { replace: true });
     }
@@ -50,8 +50,15 @@ const Hospital_Doctors_Patients_Dashboard = () => {
   // patient's details page is showing. Reset whenever a different patient
   // is opened so it doesn't carry over between patients.
   const [dischargedView, setDischargedView] = useState("tabs");
+
+  // Tab title the outpatient details view should open on. Set to "SOAP Notes"
+  // right after a SOAP note is created so the doctor lands on their new note;
+  // cleared whenever a different patient is opened.
+  const [outpatientDetailsTab, setOutpatientDetailsTab] = useState(null);
+
   useEffect(() => {
     setDischargedView("tabs");
+    setOutpatientDetailsTab(null);
   }, [selected]);
 
   return (
@@ -87,61 +94,61 @@ const Hospital_Doctors_Patients_Dashboard = () => {
               </div>
             ) : (
               !selected.discharge_date && (
-              <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
-                {advanceCheckUpSource === "outpatient" ? (
-                  <>
-                    <button
-                      className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
-                      onClick={() => {
-                        setRequestAdmission(true);
-                      }}
-                    >
-                      Request for admission
-                    </button>
-                    <button
-                      className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
-                      onClick={() => {
-                        setSoapNoteEntry(true);
-                        setAdvanceCheckUp(false);
-                      }}
-                    >
-                      + Add new SOAP Note
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
-                      onClick={() => {
-                        setTransferRequest(true);
-                      }}
-                    >
-                      Transfer to another ward
-                    </button>
-                    {selected?.status === "awaiting_nurse_discharge" ? (
+                <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
+                  {advanceCheckUpSource === "outpatient" ? (
+                    <>
                       <button
-                        type="button"
-                        disabled
-                        title="A doctor discharge has already been recorded. A nurse will complete the discharge and free the bed."
-                        className="py-2.5 px-10 rounded-full bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed w-full lg:w-auto"
+                        className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                        onClick={() => {
+                          setRequestAdmission(true);
+                        }}
                       >
-                        Awaiting nurse discharge
+                        Request for admission
                       </button>
-                    ) : (
                       <button
                         className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
                         onClick={() => {
-                          setDischargePatient(true);
-                          setSelectedDischargePatient(selected);
-                          //   setSeePatientDetails(false);
+                          setSoapNoteEntry(true);
+                          setAdvanceCheckUp(false);
                         }}
                       >
-                        Discharge Patient
+                        Add new SOAP Note
                       </button>
-                    )}
-                  </>
-                )}
-              </div>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                        onClick={() => {
+                          setTransferRequest(true);
+                        }}
+                      >
+                        Transfer to another ward
+                      </button>
+                      {selected?.status === "awaiting_nurse_discharge" ? (
+                        <button
+                          type="button"
+                          disabled
+                          title="A doctor discharge has already been recorded. A nurse will complete the discharge and free the bed."
+                          className="py-2.5 px-10 rounded-full bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed w-full lg:w-auto"
+                        >
+                          Awaiting nurse discharge
+                        </button>
+                      ) : (
+                        <button
+                          className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
+                          onClick={() => {
+                            setDischargePatient(true);
+                            setSelectedDischargePatient(selected);
+                            //   setSeePatientDetails(false);
+                          }}
+                        >
+                          Discharge Patient
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
               )
             )}
           </div>
@@ -152,7 +159,9 @@ const Hospital_Doctors_Patients_Dashboard = () => {
               // only exists when this is the inpatient list — the
               // outpatient list's `selected` is a check-in/appointment,
               // not an admission.
-              admissionSqid={advanceCheckUpSource === "outpatient" ? null : selected?.sqid}
+              admissionSqid={
+                advanceCheckUpSource === "outpatient" ? null : selected?.sqid
+              }
               onOrderPharmacy={() => {
                 setPrescribeMedication(true);
                 setAdvanceCheckUp(false);
@@ -165,6 +174,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                 setSeePatientDetails={setAdvanceCheckUp}
                 selectedPatientDetails={selected}
                 isOutpatient={true}
+                initialTabTitle={outpatientDetailsTab}
               />
             ) : (
               <AdvanceCheckUp
@@ -184,9 +194,9 @@ const Hospital_Doctors_Patients_Dashboard = () => {
           )}
 
           {requestAdmission && advanceCheckUpSource === "outpatient" && (
-            <RequestAdmission 
-              setRequestAdmission={setRequestAdmission} 
-              selectedPatientDetails={selected} 
+            <RequestAdmission
+              setRequestAdmission={setRequestAdmission}
+              selectedPatientDetails={selected}
             />
           )}
         </>
@@ -195,6 +205,19 @@ const Hospital_Doctors_Patients_Dashboard = () => {
           <SoapNoteEntry
             setSoapNoteEntry={setSoapNoteEntry}
             selectedPatientDetails={selected}
+            onBack={() => {
+              // Return to the patient-details view this form was opened
+              // from, not the patient list.
+              setSoapNoteEntry(false);
+              setAdvanceCheckUp(true);
+            }}
+            onSubmitted={() => {
+              // After creating the note, reopen the patient-details view
+              // on the SOAP Notes tab so the doctor sees their new note.
+              setSoapNoteEntry(false);
+              setAdvanceCheckUp(true);
+              setOutpatientDetailsTab("SOAP Notes");
+            }}
           />
         </>
       ) : prescribeMedication ? (

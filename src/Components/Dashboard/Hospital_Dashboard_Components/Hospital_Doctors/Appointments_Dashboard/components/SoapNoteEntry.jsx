@@ -10,6 +10,7 @@ import Button from "../../../../../ui/Button";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import Input from "../../../../../ui/Input";
 import Select from "../../../../../ui/Select";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 
 
 const NoteSection = ({
@@ -82,7 +83,7 @@ const NoteSection = ({
   </div>
 );
 
-const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => {
+const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBack, onSubmitted }) => {
   const { profile, hospitals } = useContext(DoctorAppContext);
 
   // Different dashboards pass the selected patient under different keys
@@ -245,7 +246,6 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => 
       const hin = patientHin
 
       sessionStorage.removeItem(`soap_draft_${patientHin}`);
-      setSoapNoteEntry(false);
       queryClient.invalidateQueries({
         queryKey: ["patient-med-records", hin],
       });
@@ -257,7 +257,14 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => 
       });
 
       setStep(1);
-      setSoapNoteEntry(false);
+      // `onSubmitted` lets the parent decide where to land (e.g. reopen the
+      // patient-details view on the "SOAP Notes" tab). Fall back to just
+      // closing the form when no handler is passed.
+      if (onSubmitted) {
+        onSubmitted();
+      } else {
+        setSoapNoteEntry(false);
+      }
       setSoapNoteData({
         chief_complaint: "",
         history_of_presenting_complain: "",
@@ -293,9 +300,11 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source }) => 
     },
     onError: (error) => {
       console.error("Upload error:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to upload soap note",
-      );
+      // The API rejects with DRF field-keyed errors, not `{ message }` —
+      // e.g. `{ check_in: ["Check-in must be in doctor_active status to
+      // create a SOAP note."] }` when the encounter hasn't been claimed.
+      // Surface that instead of a generic "Failed to upload" string.
+      toast.error(extractApiErrorMessage(error, "Failed to upload soap note"));
     },
   });
 
@@ -470,7 +479,15 @@ useEffect(() => {
           type="button"
           className="flex items-center gap-1 cursor-pointer border-b pb-3 w-full"
           onClick={() => {
-            setSoapNoteEntry(false);
+            // `onBack` lets the parent restore the screen the doctor came
+            // from (e.g. the patient-details view). Without it, callers that
+            // hid another view when opening this form would fall through to
+            // their default list view instead of the previous screen.
+            if (onBack) {
+              onBack();
+            } else {
+              setSoapNoteEntry(false);
+            }
           }}
         >
           <ArrowLeft className="w-4 h-4 text-gray-800" />

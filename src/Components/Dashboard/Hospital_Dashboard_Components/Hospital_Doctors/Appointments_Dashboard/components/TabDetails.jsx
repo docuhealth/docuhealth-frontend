@@ -349,8 +349,6 @@ const PatientSOAPNotes = ({
   soapTotalPages,
   setSoapCurrentPage
 }) => {
-  console.log(patientSoapNotes);
-
   if (soapNotesLoading) {
     return (
       <div className="flex justify-center items-center h-full text-sm pt-10">
