@@ -26,15 +26,17 @@ export const DoctorEncounterProvider = ({ children }) => {
     setCurrentPage(1);
   }, [activeTab]);
 
-  const fetchEncounters = async () => {
-    setLoading(true);
+  // `silent` skips the loading flag and the error toast — used by the
+  // 60s background poll so the list doesn't flash a spinner every minute.
+  const fetchEncounters = async ({ silent = false } = {}) => {
+    if (!silent) setLoading(true);
     try {
       const status = TAB_STATUS_MAP[activeTab];
       let url = `api/doctors/check-ins?status=${status}&page=${currentPage}`;
 
       const response = await axiosInstanceHos.get(url);
       const data = response.data;
-      
+
       if (data?.results) {
         setEncounters(data.results);
         setCount(data.count || 0);
@@ -46,17 +48,30 @@ export const DoctorEncounterProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Error fetching doctor encounters:", error);
-      toast.error("Failed to fetch encounters.");
-      setEncounters([]);
-      setCount(0);
-      setTotalPages(1);
+      if (!silent) {
+        toast.error("Failed to fetch encounters.");
+        setEncounters([]);
+        setCount(0);
+        setTotalPages(1);
+      }
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchEncounters();
+  }, [activeTab, currentPage]);
+
+  // The pending queue fills as nurses finish triage — actions this doctor
+  // never triggers, so nothing invalidates it. This list isn't on React
+  // Query, so poll it by hand: every 60s while the tab is visible.
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") fetchEncounters({ silent: true });
+    }, 60 * 1000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, currentPage]);
 
   const claimPatient = async (sqid) => {

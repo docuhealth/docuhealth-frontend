@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ClipboardList } from "lucide-react";
 import toast from "react-hot-toast";
 import Input from "../../../../../ui/Input";
+import TimeInput from "../../../../../ui/TimeInput";
 import Select from "../../../../../ui/Select";
 import Spinner from "../../../../../ui/Spinner";
 import {
@@ -260,7 +261,7 @@ const TaskCreationModal = ({
 
             <div className={FIELD_BOX_CLASS}>
               <label className={FIELD_LABEL_CLASS}>Task start time<span className="text-red-500"> *</span></label>
-              <Input type="time" value={formData.time} onChange={updateField("time")} />
+              <TimeInput value={formData.time} onChange={updateField("time")} />
             </div>
           </div>
 

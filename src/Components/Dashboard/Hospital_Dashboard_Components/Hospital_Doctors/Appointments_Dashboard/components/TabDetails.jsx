@@ -48,7 +48,7 @@ const PatientInfo = ({ patientFullInfo }) => {
         <h2 className="font-medium">
           Ongoing Medication ({patientFullInfo?.ongoing_drugs?.length || 0})
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[12px] mt-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 text-[12px] mt-5">
           {patientFullInfo?.ongoing_drugs?.map((drug, index) => (
             <div key={index} className="border p-4 rounded-md bg-white">
               <div className="flex justify-between items-center">
@@ -204,7 +204,7 @@ const PatientMedicalRecord = ({
     <>
       {Array.isArray(patientMedRecords) && patientMedRecords.length > 0 ? (
         <>
-          <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {patientMedRecords.map((record) => (
               <div
                 key={record.id}
@@ -349,8 +349,6 @@ const PatientSOAPNotes = ({
   soapTotalPages,
   setSoapCurrentPage
 }) => {
-  console.log(patientSoapNotes);
-
   if (soapNotesLoading) {
     return (
       <div className="flex justify-center items-center h-full text-sm pt-10">

@@ -36,7 +36,7 @@ const DUMMY_PATIENT_INFO = {
   },
 };
 
-const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateOrder, isOutpatient }) => {
+const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateOrder, isOutpatient, initialTabTitle }) => {
   const queryClient = useQueryClient();
   const [viewDetailMedicalRecord, setViewDetailMedicalRecord] = useState(false);
   const [selectedMedicalRecord, setSelectedMedicalRecord] = useState(null);
@@ -131,6 +131,10 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
       setOrderForm({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });
       setDuplicateWarning(null);
       setShowSuccessModal(true);
+      // Surface the new order without a reload — in the patient's Lab
+      // Records tab and on the doctor's Lab Results page.
+      queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor-lab-records"] });
     },
     onError: (err) => {
       if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {
@@ -416,13 +420,19 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                   </div>
                 </div>
 
-                <TabComponent
-                  tabs={getTabs({
+                {(() => {
+                  const tabs = getTabs({
                     patientFullInfo,
-                    medRecordsData: medRecordsData?.results || [],
-                    soapNotesData: soapNotesData?.results || [],
-                    medLoading,
-                    soapLoading,
+                    // getTabs (./TabDetails) destructures these exact keys —
+                    // patientMedRecords / patientSoapNotes / medloading /
+                    // soapNotesLoading. Passing medRecordsData / soapNotesData
+                    // / medLoading / soapLoading left the Med Records and SOAP
+                    // Notes tabs permanently on their empty state even when the
+                    // API returned records.
+                    patientMedRecords: medRecordsData?.results || [],
+                    patientSoapNotes: soapNotesData?.results || [],
+                    medloading: medLoading,
+                    soapNotesLoading: soapLoading,
                     count: medRecordsData?.count || 0,
                     currentPage,
                     totalPages: Math.ceil((medRecordsData?.count || 0) / pageSize),
@@ -436,8 +446,17 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     setViewDetailMedicalRecord,
                     viewDetailMedicalRecord,
                     selectedMedicalRecord,
-                  })}
-                />
+                  });
+                  const initialIndex = initialTabTitle
+                    ? tabs.findIndex((t) => t.title === initialTabTitle)
+                    : 0;
+                  return (
+                    <TabComponent
+                      tabs={tabs}
+                      initialActiveIndex={initialIndex < 0 ? 0 : initialIndex}
+                    />
+                  );
+                })()}
               </>
             )}
           </div>
@@ -630,6 +649,11 @@ PatientInfo.propTypes = {
     }),
   }),
   setSeePatientDetails: PropTypes.func,
+  hideCreateOrder: PropTypes.bool,
+  isOutpatient: PropTypes.bool,
+  // Tab title to open on for the first render (e.g. "SOAP Notes" after a
+  // note is created). Matched against getTabs() titles.
+  initialTabTitle: PropTypes.string,
 };
 
 export default PatientInfo;

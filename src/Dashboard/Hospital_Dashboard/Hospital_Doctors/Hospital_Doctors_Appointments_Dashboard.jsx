@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import AppointmentsList from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/AppointmentsList";
 import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PatientInfo";
@@ -14,6 +14,14 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
   const [soapNoteEntry, setSoapNoteEntry] = useState(false);
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
+  // Tab title the patient-details view should open on. Set to "SOAP Notes"
+  // right after a SOAP note is created; cleared when a different patient is
+  // selected so it doesn't carry over.
+  const [detailsTab, setDetailsTab] = useState(null);
+  useEffect(() => {
+    setDetailsTab(null);
+  }, [selectedPatientDetails]);
+
   const [prescribeMedication, setPrescribeMedication] = useState(false);
 
   const [requestAdmission, setRequestAdmission] = useState(false);
@@ -27,9 +35,10 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
           <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
             <DynamicDate />
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-              <button className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+              <button
+                className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
                 onClick={() => {
-                  setRequestAdmission(true)
+                  setRequestAdmission(true);
                 }}
               >
                 Request for admission
@@ -41,7 +50,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
                   setSeePatientDetails(false);
                 }}
               >
-                + Add new SOAP Note
+                Add new SOAP Note
               </button>
             </div>
           </div>
@@ -49,6 +58,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
             <PatientInfo
               setSeePatientDetails={setSeePatientDetails}
               selectedPatientDetails={selectedPatientDetails}
+              initialTabTitle={detailsTab}
             />
           </div>
           <OtherMedicalServicesFab
@@ -62,11 +72,12 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
               setSeePatientDetails(false);
             }}
           />
-          {
-            requestAdmission && (
-              <RequestAdmission setRequestAdmission={setRequestAdmission} selectedPatientDetails={selectedPatientDetails} />
-            )
-          }
+          {requestAdmission && (
+            <RequestAdmission
+              setRequestAdmission={setRequestAdmission}
+              selectedPatientDetails={selectedPatientDetails}
+            />
+          )}
         </>
       ) : soapNoteEntry ? (
         <>
@@ -77,6 +88,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
                 className="py-2.5 px-10 rounded-full bg-docuhealth-primary text-white cursor-pointer"
                 onClick={() => {
                   setSoapNoteEntry(false);
+                  setSeePatientDetails(true);
                 }}
               >
                 + close SOAP Note
@@ -88,6 +100,19 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
               setSoapNoteEntry={setSoapNoteEntry}
               selectedPatientDetails={selectedPatientDetails}
               source="appointments"
+              onBack={() => {
+                // Return to the patient-details view this form was opened
+                // from, not the appointments list.
+                setSoapNoteEntry(false);
+                setSeePatientDetails(true);
+              }}
+              onSubmitted={() => {
+                // After creating the note, reopen patient details on the
+                // SOAP Notes tab so the doctor sees their new note.
+                setSoapNoteEntry(false);
+                setSeePatientDetails(true);
+                setDetailsTab("SOAP Notes");
+              }}
             />
           </div>
         </>

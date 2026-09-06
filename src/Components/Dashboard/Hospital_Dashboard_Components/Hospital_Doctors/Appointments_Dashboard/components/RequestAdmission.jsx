@@ -3,15 +3,24 @@ import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doct
 import { HosWardContext } from "../../../../../../context/HospitalContext/HosWardContext";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { toast } from "react-hot-toast";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Modal from "../../../../../ui/Modal";
 import Button from "../../../../../ui/Button";
 import Select from "../../../../../ui/Select";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 
-const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
+const RequestAdmission = ({
+  setRequestAdmission,
+  selectedPatientDetails,
+  // Called after a request is accepted so the caller can flip its own
+  // "Request for admission" affordance to "Admission requested" without
+  // waiting for the outpatient list to refetch and be re-opened.
+  onRequested,
+}) => {
   const { profile } = useContext(DoctorAppContext);
   const { wards } = useContext(HosWardContext);
+  const queryClient = useQueryClient();
 
   const [wardOptions, setWardOptions] = useState([]);
   const [availableBeds, setAvailableBeds] = useState([]);
@@ -51,20 +60,24 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
   };
 
     const { mutate, isPending } = useMutation({
-    mutationFn: (post) => {
-      return axiosInstanceHos.post("api/doctors/admissions/request", form);;
+    mutationFn: () => {
+      return axiosInstanceHos.post("api/doctors/admissions/request", form);
     },
     onSuccess: () => {
       toast.success("Admission request successful");
+      // The outpatient row now carries `admission_request_status: "pending"`
+      // server-side; refetch so a later list render / re-open reflects it.
+      queryClient.invalidateQueries({ queryKey: ["hospital-patients-doctor"] });
+      onRequested?.();
       setRequestAdmission(false);
     },
     onError: (err) => {
-      console.error(
-        "Error assigning patient to nurse for vitals checkup:",
-        err,
-      );
+      console.error("Error submitting admission request:", err);
+      // The API returns the reason as `{ detail: ["Patient already has a
+      // pending admission request"] }` (array), not `{ message }`, so read
+      // through the shared extractor or the toast is just the generic fallback.
       toast.error(
-        err.response?.data?.message || "Error submitting admission request.",
+        extractApiErrorMessage(err, "Error submitting admission request."),
       );
     },
   });

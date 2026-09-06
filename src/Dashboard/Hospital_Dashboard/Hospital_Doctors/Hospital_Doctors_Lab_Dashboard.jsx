@@ -25,6 +25,11 @@ const Hospital_Doctors_Lab_Dashboard = () => {
       return res.data;
     },
     keepPreviousData: true,
+    // Results come back from the lab scientist — poll so the doctor sees
+    // "completed" without reloading. Pauses while the tab is backgrounded.
+    staleTime: 30 * 1000,
+    refetchInterval: 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const patientLabRecords = labRecordsData?.results || [];
@@ -104,7 +109,7 @@ const Hospital_Doctors_Lab_Dashboard = () => {
             </div>
           ) : (
             <>
-              <div className="text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                 {patientLabRecords.map((record) => (
                   <div key={record.sqid || record.id} className="bg-white border rounded-xl p-4">
                     <div className="flex justify-between items-center mb-1">

@@ -90,7 +90,7 @@ export const PatientInfo = ({ patientFullInfo, selected }) => {
         <h2 className="font-medium">
           Ongoing Medication ({patientFullInfo?.ongoing_drugs?.length})
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[12px] mt-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 text-[12px] mt-5">
           {patientFullInfo?.ongoing_drugs?.map((drug, index) => (
             <div key={index} className="border p-4 rounded-md bg-white">
               <div className="flex justify-between items-center">
@@ -250,7 +250,7 @@ export const PatientMedicalRecord = ({
     <>
       {Array.isArray(patientMedRecords) && patientMedRecords.length > 0 ? (
         <>
-          <div className=" -4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className=" -4 text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {patientMedRecords.map((record) => (
               <div key={record.id} className="bg-docuhealth-bg-light border rounded-lg p-4">
                 <div className="flex justify-between items-center ">
@@ -1217,7 +1217,7 @@ const PatientLabRecords = ({
     <>
       {Array.isArray(patientLabRecords) && patientLabRecords.length > 0 ? (
         <>
-          <div className=" text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className=" text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {patientLabRecords.map((record) => (
               <div key={record.sqid || record.id} className="bg-white border rounded-xl p-4">
                 <div className="flex justify-between items-center mb-1">
