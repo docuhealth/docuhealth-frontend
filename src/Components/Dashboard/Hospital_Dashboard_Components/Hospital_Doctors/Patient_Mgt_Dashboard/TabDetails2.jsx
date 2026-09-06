@@ -1809,7 +1809,10 @@ const getTabs = ({
     },
     {
       title: "Task history",
-      content: <DoctorIssuedTasksHistory />,
+      // `selected` is always an admission record here (this tab set only
+      // renders for admitted patients), so its own sqid is the admission
+      // reference GET /api/inpatients/tasks/<admission_sqid> expects.
+      content: <DoctorIssuedTasksHistory admissionSqid={selected?.sqid} />,
     },
     // {
     //   title: "Lab Results",

@@ -53,3 +53,26 @@ export const REPEAT_UNTIL_OPTIONS = [
   { value: "discharge", label: "Run until discharge" },
 ];
 export const DEFAULT_REPEAT_UNTIL = "duration";
+
+/**
+ * Human labels for the backend's inpatient care-task `task_type` enum
+ * (see GET /api/inpatients/tasks/<admission_sqid>). Kept here so the
+ * doctor's Task history tab and any future task list read from one place
+ * instead of re-deriving prettified names from the raw enum.
+ */
+export const TASK_TYPE_LABELS = {
+  vital_signs: "Vital Signs Monitoring",
+  medication: "Medication Administration",
+  input_output: "Fluid Intake / Output Monitoring",
+  procedure: "Ward Procedure",
+  glucose: "Glucose Monitoring",
+  iv_fluid: "IV Fluid Administration",
+  seizure_event: "Seizure Event Monitoring",
+  nurse_in_patient_discharge: "Nurse Discharge Review",
+};
+
+export const taskTypeLabel = (taskType) =>
+  TASK_TYPE_LABELS[taskType] ||
+  (taskType
+    ? taskType.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+    : "Care task");
