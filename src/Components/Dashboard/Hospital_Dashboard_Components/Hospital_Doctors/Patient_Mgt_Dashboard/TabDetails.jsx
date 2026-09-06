@@ -112,7 +112,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search patient's name, HIN, or ward name..."
+          placeholder="Search patient's name..."
         />
         {isRefreshing && (
           <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
@@ -339,7 +339,7 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search patient's name or HIN..."
+          placeholder="Search patient's name..."
         />
         {isRefreshing && (
           <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
@@ -541,7 +541,7 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search patient's name, HIN, or ward name..."
+          placeholder="Search patient's name..."
         />
         {isRefreshing && (
           <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">

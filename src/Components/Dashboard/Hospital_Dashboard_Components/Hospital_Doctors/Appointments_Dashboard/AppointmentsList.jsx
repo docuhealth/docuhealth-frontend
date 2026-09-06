@@ -227,7 +227,7 @@ const AppointmentsList = ({
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search patient's name, doctor's name, or notes..."
+          placeholder="Search patient's name..."
         />
         <div className="flex flex-wrap gap-3">
           <div className="flex items-center gap-2">
