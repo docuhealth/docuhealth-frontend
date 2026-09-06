@@ -114,7 +114,7 @@ const DoctorDischargeSummaryView = ({ admissionSqid, fallbackPatient }) => {
     <div className="mb-4">
       {/* Patient banner */}
       <div className="bg-gray-50 rounded-xl border border-gray-100 p-5 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           <div>
             <h3 className="font-semibold text-gray-900 mb-1">{patientName}</h3>
             <p className="text-xs text-gray-500 mb-1">

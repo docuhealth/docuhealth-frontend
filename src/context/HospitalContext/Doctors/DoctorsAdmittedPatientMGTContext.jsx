@@ -31,6 +31,13 @@ const DoctorsAdmittedPatientMGTProvider = ({ children }) => {
     },
     enabled: isUserLoggedIn,
     placeholderData: (previousData) => previousData,
+    // These lists move because the receptionist confirms/rejects admissions
+    // and the nurse completes discharges — actions the doctor's own mutation
+    // invalidations can't catch. Poll while the tab is open; pause when it's
+    // backgrounded so we don't hammer the API.
+    staleTime: 30 * 1000,
+    refetchInterval: 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const handleTabChange = (newTab) => {

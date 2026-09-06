@@ -131,6 +131,10 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
       setOrderForm({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });
       setDuplicateWarning(null);
       setShowSuccessModal(true);
+      // Surface the new order without a reload — in the patient's Lab
+      // Records tab and on the doctor's Lab Results page.
+      queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor-lab-records"] });
     },
     onError: (err) => {
       if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {

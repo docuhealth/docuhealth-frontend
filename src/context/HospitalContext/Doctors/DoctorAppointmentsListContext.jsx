@@ -26,6 +26,12 @@ const DoctorAppointmentsListProvider = (props) => {
     queryFn: fetchAppointments,
     enabled: isUserLoggedIn,
     placeholderData: keepPreviousData,
+    // The receptionist books/reschedules appointments and check-ins escalate
+    // into this list — refresh in the background so the doctor doesn't have
+    // to reload. Paused automatically while the tab is backgrounded.
+    staleTime: 30 * 1000,
+    refetchInterval: 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   // Reset page when switching types or changing search/filters

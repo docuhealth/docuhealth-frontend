@@ -129,7 +129,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
         </div>
       ) : (
       <>
-      <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {sortedAdmittedPatients.map((admittedPatient, index) => (
           <div key={index} className="border p-3 rounded-xl">
             <div className="flex justify-between items-center">
@@ -356,7 +356,7 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
         </div>
       ) : (
       <>
-      <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {sortedOutPatients.map((outPatient, index) => (
           <div key={index} className="border p-3 rounded-xl">
             <div className="flex justify-between items-center">
@@ -558,7 +558,7 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
         </div>
       ) : (
       <>
-      <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {sortedAdmittedPatients.map((admittedPatient, index) => (
           <div key={index} className="border p-3 rounded-xl">
             <div className="flex justify-between items-center">

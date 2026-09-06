@@ -70,6 +70,10 @@ const OrderLabModal = ({ selectedPatientDetails, onClose }) => {
     onSuccess: () => {
       setDuplicateWarning(null);
       setShowSuccess(true);
+      // Surface the new order without a reload — in the patient's Lab
+      // Records tab and on the doctor's Lab Results page.
+      queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor-lab-records"] });
     },
     onError: (err) => {
       if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {

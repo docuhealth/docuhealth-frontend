@@ -97,14 +97,25 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                 <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
                   {advanceCheckUpSource === "outpatient" ? (
                     <>
-                      <button
-                        className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
-                        onClick={() => {
-                          setRequestAdmission(true);
-                        }}
-                      >
-                        Request for admission
-                      </button>
+                      {selected?.admission_request_status === "pending" ||
+                      selected?.admission_request_status === "confirmed" ? (
+                        <span
+                          className="inline-flex items-center justify-center gap-1.5 py-2.5 px-10 rounded-full text-gray-400 border border-gray-200 bg-gray-50 cursor-not-allowed select-none w-full lg:w-auto"
+                          title="An admission request for this patient is already in progress. The receptionist will confirm it."
+                        >
+                          <i className="bx bx-check-circle text-base"></i>
+                          Admission requested
+                        </span>
+                      ) : (
+                        <button
+                          className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                          onClick={() => {
+                            setRequestAdmission(true);
+                          }}
+                        >
+                          Request for admission
+                        </button>
+                      )}
                       <button
                         className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
                         onClick={() => {
@@ -197,6 +208,11 @@ const Hospital_Doctors_Patients_Dashboard = () => {
             <RequestAdmission
               setRequestAdmission={setRequestAdmission}
               selectedPatientDetails={selected}
+              onRequested={() =>
+                setSelected((prev) =>
+                  prev ? { ...prev, admission_request_status: "pending" } : prev,
+                )
+              }
             />
           )}
         </>

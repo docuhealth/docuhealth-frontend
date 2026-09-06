@@ -48,6 +48,11 @@ const PatientHandoverTab = ({ selected, patientFullInfo }) => {
     queryKey: ["doctor-handovers", 1, 100],
     queryFn: fetchDoctorHandovers,
     enabled: !!patientHin,
+    // Another doctor can hand this patient over to us while this tab is
+    // open — poll so the incoming note shows without a reload.
+    staleTime: 30 * 1000,
+    refetchInterval: 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const [showSelectDoctorModal, setShowSelectDoctorModal] = useState(false);
@@ -269,7 +274,7 @@ const PatientHandoverTab = ({ selected, patientFullInfo }) => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {pageNotes.map((note) => (
             <div key={note.id} className="border rounded-2xl p-5">
               <div className="flex justify-end mb-2">

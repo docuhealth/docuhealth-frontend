@@ -255,6 +255,12 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       queryClient.invalidateQueries({
         queryKey: ["doctor-appointments"],
       });
+      // A note from the outpatient flow can move the check-in
+      // doctor_idle -> doctor_active, which changes its row in the
+      // Patient Mgt "Out Patients" list.
+      queryClient.invalidateQueries({
+        queryKey: ["hospital-patients-doctor"],
+      });
 
       setStep(1);
       // `onSubmitted` lets the parent decide where to land (e.g. reopen the
@@ -693,7 +699,7 @@ useEffect(() => {
 
               {/* Preview Section */}
               {attachments.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 mt-3">
                   {attachments.map((doc, index) => (
                     <div
                       key={index}
@@ -854,7 +860,7 @@ useEffect(() => {
 
             <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
               <p className="font-medium text-docuhealth-dark">Follow up / Next appointment</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mt-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 mt-3 gap-3">
                 <Select
                   label="Day"
                   value={String(selectedDay)}
