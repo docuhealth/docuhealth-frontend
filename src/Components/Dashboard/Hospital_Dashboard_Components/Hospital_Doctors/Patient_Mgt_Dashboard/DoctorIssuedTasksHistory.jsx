@@ -1,45 +1,56 @@
-import React, { useMemo, useRef, useState, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { CalendarClock, ClipboardList, User } from "lucide-react";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import EmptyState from "../../../../ui/EmptyState";
+import Spinner from "../../../../ui/Spinner";
+import { fetchInpatientTasks } from "../../../../../queries/Hospital/doctor/inpatientTasks";
+import { taskTypeLabel } from "../../../../../utils/careTaskConstants";
+import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 
-// TODO: placeholder data only — the backend doesn't expose a task-level
-// (as opposed to task-occurrence) list endpoint yet, so this tab can't be
-// wired to real data until that contract exists. Swap `demoIssuedTasks` for
-// a real fetch once it does; the status keys ("active" / "duration_complete")
-// and field names here are guesses meant to match the design, not a verified
-// API shape.
-const demoIssuedTasks = [
-  { id: 1, status: "active", startAt: "August 21, 2025 / 10:00 PM", completion: "August 21, 2025 / 10:00 PM", task: "Seizure event Monitoring", orderingDoctor: "Dr Obed" },
-  { id: 2, status: "active", startAt: "August 21, 2025 / 10:00 PM", completion: "August 21, 2025 / 10:00 PM", task: "Seizure event Monitoring", orderingDoctor: "Dr Obed" },
-  { id: 3, status: "duration_complete", startAt: "August 21, 2025 / 10:00 PM", completion: "August 21, 2025 / 10:00 PM", task: "Seizure event Monitoring", orderingDoctor: "Dr Obed" },
-  { id: 4, status: "duration_complete", startAt: "August 20, 2025 / 09:00 AM", completion: "August 20, 2025 / 05:00 PM", task: "Glucose Monitoring", orderingDoctor: "Dr Obed" },
-  { id: 5, status: "duration_complete", startAt: "August 19, 2025 / 08:00 AM", completion: "August 19, 2025 / 08:00 PM", task: "Vital Signs Monitoring", orderingDoctor: "Dr Adeyemi" },
-  { id: 6, status: "active", startAt: "August 19, 2025 / 07:30 AM", completion: "August 22, 2025 / 07:30 AM", task: "IV Fluid Administration", orderingDoctor: "Dr Obed" },
-  { id: 7, status: "duration_complete", startAt: "August 18, 2025 / 06:00 PM", completion: "August 19, 2025 / 06:00 AM", task: "Fluid Intake / Output Monitoring", orderingDoctor: "Dr Bello" },
-  { id: 8, status: "duration_complete", startAt: "August 17, 2025 / 11:00 AM", completion: "August 17, 2025 / 01:00 PM", task: "Ward Procedure", orderingDoctor: "Dr Obed" },
-  { id: 9, status: "duration_complete", startAt: "August 16, 2025 / 09:15 AM", completion: "August 16, 2025 / 09:45 AM", task: "Glucose Monitoring", orderingDoctor: "Dr Adeyemi" },
-  { id: 10, status: "active", startAt: "August 15, 2025 / 07:00 PM", completion: "August 18, 2025 / 07:00 PM", task: "Seizure event Monitoring", orderingDoctor: "Dr Obed" },
-];
-
+// Reads the doctor-issued care tasks for the current admission via
+// GET /api/inpatients/tasks/<admission_sqid> (task definitions, not the
+// per-schedule occurrences the nurse queue shows). The endpoint has no
+// filter params, so — matching the Handover tab's approach — we pull one
+// large page (size 100 covers every realistic per-admission task count)
+// and filter + paginate client-side off `effective_status`.
 const STATUS_STYLES = {
   active: { label: "Active", dot: "bg-amber-400", text: "text-amber-600" },
-  duration_complete: { label: "Duration complete", dot: "bg-emerald-400", text: "text-emerald-600" },
+  duration_completed: { label: "Duration complete", dot: "bg-emerald-400", text: "text-emerald-600" },
+  completed: { label: "Completed", dot: "bg-slate-400", text: "text-slate-600" },
 };
 
 const FILTER_OPTIONS = [
   { value: "all", label: "All tasks" },
   { value: "active", label: "Active" },
-  { value: "duration_complete", label: "Duration complete" },
+  { value: "duration_completed", label: "Duration complete" },
+  { value: "completed", label: "Completed" },
 ];
 
 const PAGE_SIZE = 5;
 
-const DoctorIssuedTasksHistory = () => {
+const orderingDoctorName = (info) => {
+  if (!info) return "—";
+  const name = [info.firstname, info.lastname].filter(Boolean).join(" ").trim();
+  return name ? `Dr ${name}` : "—";
+};
+
+const DoctorIssuedTasksHistory = ({ admissionSqid }) => {
   const [filter, setFilter] = useState("all");
   const [filterOpen, setFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const filterRef = useRef(null);
+
+  const { data, isLoading, isError, refetch, isFetching } = useQuery({
+    queryKey: ["inpatient-tasks", admissionSqid],
+    queryFn: () => fetchInpatientTasks({ admissionSqid, page: 1, size: 100 }),
+    enabled: !!admissionSqid,
+    // A co-managing doctor (or this doctor, from the quick-services FAB on
+    // the same page) can add a task while this tab is open — keep it fresh
+    // without a reload.
+    staleTime: 15 * 1000,
+    refetchOnWindowFocus: true,
+  });
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -51,12 +62,31 @@ const DoctorIssuedTasksHistory = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const tasks = useMemo(() => {
+    return (data?.results || []).map((task) => ({
+      id: task.sqid,
+      status: task.effective_status || task.status || "active",
+      startAt: formatFullDateTime(task.start_time) || "—",
+      completion: task.completion_time
+        ? formatFullDateTime(task.completion_time)
+        : "Runs until discharge",
+      task: taskTypeLabel(task.task_type),
+      orderingDoctor: orderingDoctorName(task.created_by_info),
+    }));
+  }, [data]);
+
   const filteredTasks = useMemo(() => {
-    if (filter === "all") return demoIssuedTasks;
-    return demoIssuedTasks.filter((task) => task.status === filter);
-  }, [filter]);
+    if (filter === "all") return tasks;
+    return tasks.filter((task) => task.status === filter);
+  }, [filter, tasks]);
 
   const totalPages = Math.max(1, Math.ceil(filteredTasks.length / PAGE_SIZE));
+
+  // Keep the current page in range when the filter (or the data) shrinks the list.
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
+
   const pagedTasks = filteredTasks.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE,
@@ -70,6 +100,31 @@ const DoctorIssuedTasksHistory = () => {
 
   const activeFilterLabel = FILTER_OPTIONS.find((option) => option.value === filter)?.label;
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-16">
+        <Spinner className="h-6 w-6 text-docuhealth-primary" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="py-12 flex flex-col items-center gap-3 text-center">
+        <p className="text-[13px] text-gray-500">
+          Couldn&apos;t load the task history for this admission.
+        </p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="px-4 py-1.5 text-sm rounded-md border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 transition-colors"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="text-[12px] my-4 text-left">
       <div className="flex justify-end mb-4 relative">
@@ -80,6 +135,7 @@ const DoctorIssuedTasksHistory = () => {
             className="flex items-center gap-2 px-3 py-1.5 border border-slate-300 rounded-md text-sm text-slate-700 bg-white hover:bg-slate-50 transition-colors h-8"
           >
             <span>Filter: {activeFilterLabel}</span>
+            {isFetching && <Spinner className="h-3 w-3 text-slate-400" />}
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -106,7 +162,11 @@ const DoctorIssuedTasksHistory = () => {
         <div className="py-10">
           <EmptyState
             title="No issued tasks"
-            description="There are no issued tasks available in this category for the current patient."
+            description={
+              filter === "all"
+                ? "No care tasks have been issued for this admission yet."
+                : "There are no issued tasks in this category for the current admission."
+            }
           />
         </div>
       ) : (
