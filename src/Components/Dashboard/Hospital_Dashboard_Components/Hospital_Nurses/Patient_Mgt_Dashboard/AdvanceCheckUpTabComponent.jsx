@@ -4,7 +4,7 @@ const AdvanceCheckUpTabComponent = ({ tabs, activeTab, setActiveTab }) => {
     return (
         <div>
             {/* Mobile/Tablet Tabs (Grid Layout) */}
-            <div className="grid grid-cols-2 gap-3 mb-8 lg:hidden">
+            <div className="grid grid-cols-2 gap-3 mb-8 lg:grid-cols-3 xl:hidden">
                 {tabs.map((t, index) => (
                     <button
                         key={`mobile-${index}`}
@@ -21,7 +21,7 @@ const AdvanceCheckUpTabComponent = ({ tabs, activeTab, setActiveTab }) => {
             </div>
 
             {/* Desktop Tabs (Underline Layout) */}
-            <div className="hidden lg:flex gap-6 border-b border-gray-200 mb-6">
+            <div className="hidden xl:flex gap-6 border-b border-gray-200 mb-6">
                 {tabs.map((t, index) => (
                     <button
                         key={`desktop-${index}`}

@@ -121,7 +121,7 @@ const AdmittedPatientsTab = () => {
       <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
-        placeholder="Search patient's name, HIN, or ward name..."
+        placeholder="Search patient's name..."
       />
       <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {processedAdmittedPatients.map((admittedPatient, index) => (
@@ -469,7 +469,7 @@ const DischargedPatientsTab = () => {
     <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
-        placeholder="Search patient's name, HIN, or ward name..."
+        placeholder="Search patient's name..."
       />
       <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {processedAdmittedPatients.map((admittedPatient, index) => (
@@ -750,7 +750,7 @@ const OutPatientsTab = () => {
                 <SearchBar
                     value={searchQuery}
                     onChange={setSearchQuery}
-                    placeholder="Search patient's name, HIN, or ward name..."
+                    placeholder="Search patient's name..."
                 />
                 {isRefreshing && (
                     <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">

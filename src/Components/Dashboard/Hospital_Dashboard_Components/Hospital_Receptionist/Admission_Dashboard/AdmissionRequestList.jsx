@@ -155,7 +155,7 @@ const AdmissionRequestList = () => {
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search patient name, HIN..."
+          placeholder="Search patient name"
         />
         {isRefreshing && (
           <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
@@ -172,7 +172,7 @@ const AdmissionRequestList = () => {
         </div>
       ) : (
       <>
-      <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="my-4 text-[12px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {admissionRequests.map((admissionRequest, index) => {
           const isMutatingThis =
             admissionMutation.isPending &&

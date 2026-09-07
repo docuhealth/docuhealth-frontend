@@ -286,13 +286,13 @@ const NursingDischargeSummaryForm = ({ admission, patientFullInfo, activeTask, t
                 <div className="relative">
                   <input 
                     type="number" 
-                    step="0.01"
+                    step="0.1"
                     value={formData.final_vital_signs.height}
                     onChange={(e) => updateVitals('height', e.target.value)}
-                    placeholder="1.70" 
+                    placeholder="170" 
                     className="w-full border border-gray-200 rounded-md pl-3 pr-8 py-2 text-xs text-gray-700 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary" 
                   />
-                  <span className="absolute right-3 top-2 text-xs text-gray-400">m</span>
+                  <span className="absolute right-3 top-2 text-xs text-gray-400">cm</span>
                 </div>
               </div>
               <div>

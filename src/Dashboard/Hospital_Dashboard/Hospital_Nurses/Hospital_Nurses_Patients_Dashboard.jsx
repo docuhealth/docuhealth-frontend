@@ -46,14 +46,88 @@ const Hospital_Nurses_Patients_Dashboard = () => {
   const [showHandoverSuccessModal, setShowHandoverSuccessModal] = useState(false);
   const [isSubmittingHandover, setIsSubmittingHandover] = useState(false);
 
+  const [loadingSelectedPatient, setLoadingSelectedPatient] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
-    if (location.state?.selectedPatient) {
-      setSelected(location.state.selectedPatient);
-      setAdvanceCheckUp(true);
-      // Clear the state so refreshing the page doesn't re-trigger it unnecessarily
-      window.history.replaceState({}, document.title);
+    const navState = location.state;
+    if (navState?.selectedPatient || navState?.patientHin) {
+      const initialPatient = navState.selectedPatient;
+      const hin = navState.patientHin || initialPatient?.patient_info?.hin || initialPatient?.patient?.hin;
+
+      // If it already has full admission properties (ward_info, admission_date, staff_info)
+      if (initialPatient && initialPatient.ward_info && initialPatient.admission_date && initialPatient.staff_info) {
+        setSelected(initialPatient);
+        setAdvanceCheckUp(true);
+        window.history.replaceState({}, document.title);
+        return;
+      }
+
+      // Navigated from tasks or partial data: set initial object and fetch full patient admission record
+      if (hin) {
+        setLoadingSelectedPatient(true);
+        setAdvanceCheckUp(true);
+        setSelected(initialPatient || { patient_info: { hin } });
+
+        const fetchFullAdmission = async () => {
+          try {
+            const searchName = initialPatient?.patient_info?.firstname || initialPatient?.patient_info?.lastname || "";
+
+            // 1. Check active inpatient admissions first (search by name, or size=50)
+            let response = await axiosInstanceHos.get(
+              `api/hospitals/patients?status=inpatient${searchName ? `&search=${encodeURIComponent(searchName)}` : "&size=50"}`
+            );
+            let match = (response.data?.results || []).find(
+              (p) => (p?.patient_info?.hin || p?.patient?.hin) === hin
+            );
+
+            // If not found with name search, fetch recent inpatients list
+            if (!match && searchName) {
+              response = await axiosInstanceHos.get(`api/hospitals/patients?status=inpatient&size=50`);
+              match = (response.data?.results || []).find(
+                (p) => (p?.patient_info?.hin || p?.patient?.hin) === hin
+              );
+            }
+
+            // 2. If not found in inpatient, check discharged inpatients
+            if (!match) {
+              response = await axiosInstanceHos.get(
+                `api/hospitals/patients?status=inpatient_discharge${searchName ? `&search=${encodeURIComponent(searchName)}` : "&size=50"}`
+              );
+              match = (response.data?.results || []).find(
+                (p) => (p?.patient_info?.hin || p?.patient?.hin) === hin
+              );
+            }
+
+            // 3. If not found, check outpatients
+            if (!match) {
+              response = await axiosInstanceHos.get(
+                `api/hospitals/patients?status=outpatient${searchName ? `&search=${encodeURIComponent(searchName)}` : "&size=50"}`
+              );
+              match = (response.data?.results || []).find(
+                (p) => (p?.patient_info?.hin || p?.patient?.hin) === hin
+              );
+            }
+
+            if (match) {
+              setSelected(match);
+            }
+          } catch (error) {
+            console.error("Failed to fetch full patient admission data:", error);
+          } finally {
+            setLoadingSelectedPatient(false);
+            window.history.replaceState({}, document.title);
+          }
+        };
+
+        fetchFullAdmission();
+      } else {
+        if (initialPatient) {
+          setSelected(initialPatient);
+          setAdvanceCheckUp(true);
+        }
+        window.history.replaceState({}, document.title);
+      }
     }
   }, [location.state]);
 
@@ -295,6 +369,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                 selected={selected}
                 setAdvanceCheckUp={setAdvanceCheckUp}
                 setSharedSoapNoteDetail={setSharedSoapNoteDetail}
+                loadingAdmission={loadingSelectedPatient}
               />
             </div>
           )}

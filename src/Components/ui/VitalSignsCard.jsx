@@ -132,7 +132,7 @@ const VitalSignsCard = ({ vitalSigns, title = "Vital Signs", className = "p-5 my
             Height
           </p>
           <p className="font-medium">
-            {vitalSigns?.height || "NIL"} m
+            {vitalSigns?.height || "NIL"} cm
           </p>
         </div>
         {/* Body mass index */}

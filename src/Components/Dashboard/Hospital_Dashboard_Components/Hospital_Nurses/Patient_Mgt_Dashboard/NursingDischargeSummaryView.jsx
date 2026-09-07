@@ -29,7 +29,7 @@ const NursingDischargeSummaryView = ({ patient, admission, patientFullInfo, onCa
     blood_pressure: "120/80",
     temp: "37.0",
     weight: "160",
-    height: "1.68",
+    height: "168",
     heart_rate: "72",
     bmi: "24.5",
     pain_score: "2",

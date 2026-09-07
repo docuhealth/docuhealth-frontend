@@ -66,10 +66,15 @@ const MyTasksTab = ({ tasks, loading, type }) => {
   };
 
   const handleViewPatient = (task) => {
-    const patientHin = task.patient_info?.hin;
+    const patientHin = task.patient_info?.hin || task.patient_hin;
     if (patientHin) {
       navigate("/hospital-nurses-patients-dashboard", {
-        state: { selectedPatient: task }
+        state: { 
+          selectedPatient: task,
+          patientHin: patientHin,
+          admissionSqid: task.admission_info?.sqid || task.admission?.sqid || task.admission_sqid,
+          task
+        }
       });
     } else {   
       toast.error("Patient information is missing.");
@@ -85,7 +90,7 @@ const MyTasksTab = ({ tasks, loading, type }) => {
   }
 
   return (
-    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-6">
+    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2  xl:grid-cols-3 gap-6 pb-6">
       {tasks?.map((task) => {
         const scheduledDate = new Date(task.scheduled_for);
         const formattedDate = scheduledDate.toLocaleDateString();

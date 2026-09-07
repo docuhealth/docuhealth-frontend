@@ -8,10 +8,10 @@ import { NursesAdmittedPatientMGTContext } from "../../../../../context/Hospital
 import Modal from "../../../../ui/Modal";
 import NursingDischargeSummaryView from "./NursingDischargeSummaryView";
 
-const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail }) => {
+const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, loadingAdmission }) => {
   const context = useContext(NursesAdmittedPatientMGTContext);
   const isOutPatient = context?.tab === "outpatient" || context?.tab === "outpatient_discharge";
-  const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
+  const hin = (selected?.patient_info?.hin || selected?.patient?.hin || selected?.patient_hin);
   const [activeTab, setActiveTab] = useState("info");
   const [showDischargeSummaryModal, setShowDischargeSummaryModal] = useState(false);
 
@@ -29,7 +29,11 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail }
     toast.error("Failed to load patient information");
   }
 
-  const patient = selected?.patient_info || patientFullInfo?.patient_info || {};
+  const patient = {
+    ...(selected?.patient_info || {}),
+    ...(selected?.patient || {}),
+    ...(patientFullInfo?.patient_info || {}),
+  };
   const admission = selected || {};
   
   // Format date helper
@@ -124,7 +128,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail }
         </div>
       </div>
 
-      {isLoading ? (
+      {isLoading || loadingAdmission ? (
         <div className="flex justify-center items-center py-20">
           <p className="text-sm text-gray-500">Loading patient data...</p>
         </div>

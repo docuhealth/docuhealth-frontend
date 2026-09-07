@@ -25,8 +25,8 @@ export const NursingEncounterProvider = ({ children }) => {
     setCurrentPage(1);
   }, [activeTab]);
 
-  const fetchEncounters = async () => {
-    setLoading(true);
+  const fetchEncounters = async ({ silent = false } = {}) => {
+    if (!silent) setLoading(true);
     try {
       const status = TAB_STATUS_MAP[activeTab];
       
@@ -47,12 +47,14 @@ export const NursingEncounterProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Error fetching nursing encounters:", error);
-      toast.error("Failed to fetch nursing encounters.");
-      setEncounters([]);
-      setCount(0);
-      setTotalPages(1);
+      if (!silent) {
+        toast.error("Failed to fetch nursing encounters.");
+        setEncounters([]);
+        setCount(0);
+        setTotalPages(1);
+      }
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -60,52 +62,51 @@ export const NursingEncounterProvider = ({ children }) => {
     fetchEncounters();
   }, [activeTab, currentPage]);
 
-  const startEncounter = async (sqid) => {
+  // Background polling to keep queue reservation state in sync across nurses
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") fetchEncounters({ silent: true });
+    }, 30 * 1000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, currentPage]);
+
+  const claimEncounter = async (sqid) => {
     try {
-      const localInProgress = JSON.parse(localStorage.getItem("reservedEncounters") || "[]");
-      const encounter = encounters.find((enc) => enc.sqid === sqid);
+      const response = await axiosInstanceHos.post(`/api/nurses/check-ins/${sqid}/reserve`, {});
+      toast.success("Check-in claimed successfully!");
 
-      // If already reserved by this nurse, just return true to open the modal without hitting the API again
-      if (localInProgress.includes(sqid) && encounter?.status === "nursing_active") {
-        return true;
+      // 1. Update state immediately with response data
+      if (response.data && response.data.sqid) {
+        setEncounters((prev) =>
+          prev.map((enc) => (enc.sqid === sqid ? { ...enc, ...response.data } : enc))
+        );
       }
 
-      await axiosInstanceHos.post(`/api/nurses/check-ins/${sqid}/reserve`, {});
-      
-      // Save to localStorage so we know this nurse reserved it
-      const updatedLocalInProgress = JSON.parse(localStorage.getItem("reservedEncounters") || "[]");
-      if (!updatedLocalInProgress.includes(sqid)) {
-        updatedLocalInProgress.push(sqid);
-        localStorage.setItem("reservedEncounters", JSON.stringify(updatedLocalInProgress));
-      }
-
-      // Update local state immediately
-      setEncounters((prev) =>
-        prev.map((enc) => (enc.sqid === sqid ? { ...enc, status: "nursing_active" } : enc))
-      );
+      // 2. Refetch queue immediately so button and reserved_by update in real-time
+      await fetchEncounters({ silent: true });
       
       return true;
     } catch (error) {
-      toast.error(error.response?.data?.check_in?.[0] || error.response?.data?.check_in || "Failed to reserve encounter.");
+      console.error("Error reserving encounter:", error);
+      toast.error(error.response?.data?.check_in?.[0] || error.response?.data?.check_in || error.response?.data?.message || "Failed to claim check-in.");
       return false;
     }
   };
+
+  const startEncounter = claimEncounter;
 
   const submitAssessment = async (sqid, payload, escalate = false) => {
     try {
       const finalPayload = { ...payload, escalate };
       await axiosInstanceHos.post(`/api/nurses/check-ins/${sqid}/nursing-assessment`, finalPayload);
-      
-      // Remove from localStorage
-      const localInProgress = JSON.parse(localStorage.getItem("reservedEncounters") || "[]");
-      const updatedLocal = localInProgress.filter((id) => id !== sqid);
-      localStorage.setItem("reservedEncounters", JSON.stringify(updatedLocal));
 
       toast.success(escalate ? "Patient sent to doctor's queue!" : "Encounter recorded successfully!");
-      fetchEncounters(); // Invalidate queries/refetch
+      fetchEncounters(); // Invalidate / refetch
       return true;
     } catch (error) {
-      toast.error(error.response?.data?.check_in?.[0] || error.response?.data?.check_in || "Failed to submit assessment.");
+      console.error("Error submitting assessment:", error);
+      toast.error(error.response?.data?.check_in?.[0] || error.response?.data?.check_in || error.response?.data?.message || "Failed to submit assessment.");
       return false;
     }
   };
@@ -122,6 +123,7 @@ export const NursingEncounterProvider = ({ children }) => {
         totalPages,
         count,
         fetchEncounters,
+        claimEncounter,
         startEncounter,
         submitAssessment
       }}

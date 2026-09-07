@@ -47,7 +47,7 @@ const RecentVitalSigns = ({ vitalSigns, setViewRecentVitals, currentPage, setCur
                     <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">Temp (°C)</TableHead>
                     <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">HR (Bpm)</TableHead>
                     <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">RR (/Min)</TableHead>
-                    <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">Height (m)</TableHead>
+                    <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">Height (cm)</TableHead>
                     <TableHead className="py-3 px-4 font-medium text-center border-r last:border-r-0">Weight (Kg)</TableHead>
                     <TableHead className="py-3 px-4 font-medium text-center">BMI (Kg/m²)</TableHead>
                   </TableRow>
@@ -127,7 +127,7 @@ const RecentVitalSigns = ({ vitalSigns, setViewRecentVitals, currentPage, setCur
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[11px] uppercase tracking-wider text-gray-400 font-bold">Height</span>
-                      <span className="text-gray-700 font-medium">{record.height ? `${record.height} m` : "—"}</span>
+                      <span className="text-gray-700 font-medium">{record.height ? `${record.height} cm` : "—"}</span>
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[11px] uppercase tracking-wider text-gray-400 font-bold">BMI</span>

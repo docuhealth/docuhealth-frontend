@@ -178,7 +178,7 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
                 onChange={(e) => setHeight(e.target.value)}
               />
               <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-[12px]">
-                m
+                cm
               </span>
             </div>
           </div>

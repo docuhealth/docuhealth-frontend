@@ -52,7 +52,7 @@ const Hospital_Nurses_Tasks = () => {
 
       <div className="bg-white my-5 border rounded-lg p-5">
         {/* Tab Navigation & Legend */}
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center border-b border-gray-200">
+        <div className="flex flex-col lg:flex-row md:justify-between lg:items-center border-b border-gray-200 gap-5">
           <div className="grid grid-cols-2 gap-2 md:flex md:gap-0 overflow-x-auto mb-3 md:mb-0">
             {tabs.map((t, index) => {
               const isActive = activeTab === t.name;
@@ -75,14 +75,14 @@ const Hospital_Nurses_Tasks = () => {
           </div>
           
           {/* Status Color Legend */}
-          <div className="flex items-center flex-wrap gap-4 text-xs font-medium text-gray-500 pb-2 md:pb-0 md:pr-4">
+          <div className="flex items-center flex-wrap gap-4 text-xs font-medium text-gray-500 pb-5 md:pr-4">
             <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>Upcoming</div>
             <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-orange-500"></div>Due</div>
             <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>Overdue</div>
             <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>Completed</div>
           </div>
         </div>
-
+ 
         {/* Tab Content */}
         <div className="mt-4">
           <MyTasksTab tasks={tasks} loading={loading} type={getStatus(activeTab)} />

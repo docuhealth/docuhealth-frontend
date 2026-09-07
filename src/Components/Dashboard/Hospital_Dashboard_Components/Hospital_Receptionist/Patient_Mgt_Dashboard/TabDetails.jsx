@@ -108,7 +108,7 @@ const AdmittedPatientsTab = () => {
               <SearchBar
                 value={searchQuery}
                 onChange={setSearchQuery}
-                placeholder="Search patient's name, HIN, or ward name..."
+                placeholder="Search patient's name..."
               />
               {isRefreshing && (
                 <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
@@ -423,7 +423,7 @@ const DischargedPatientsTab = () => {
               <SearchBar
                 value={searchQuery}
                 onChange={setSearchQuery}
-                placeholder="Search patient's name, HIN, or ward name..."
+                placeholder="Search patient's name..."
               />
               {isRefreshing && (
                 <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
@@ -685,7 +685,7 @@ const OutPatientsTab = () => {
                 <SearchBar
                     value={searchQuery}
                     onChange={setSearchQuery}
-                    placeholder="Search patient's name, HIN, or ward name..."
+                    placeholder="Search patient's name..."
                 />
                 {isRefreshing && (
                     <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">

@@ -114,7 +114,7 @@ const RecentPatients = () => {
       <SearchBar 
                     value={searchQuery} 
                     onChange={setSearchQuery} 
-                    placeholder="Search by name, HIN, or assigned staff..."
+                    placeholder="Search by name or assigned staff..."
                 />
                 {isRefreshing && (
                     <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">

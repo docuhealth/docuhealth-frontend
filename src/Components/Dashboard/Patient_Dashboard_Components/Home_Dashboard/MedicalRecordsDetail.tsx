@@ -277,7 +277,7 @@ const MedicalRecordsDetail = ({
                 Height
               </p>
               <p className="font-medium">
-                {selectedMedicalRecord?.vital_signs_info?.height ? `${selectedMedicalRecord.vital_signs_info.height} m` : "NIL"}
+                {selectedMedicalRecord?.vital_signs_info?.height ? `${selectedMedicalRecord.vital_signs_info.height} cm` : "NIL"}
               </p>
             </div>
             {/* Body mass index */}

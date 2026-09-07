@@ -1,78 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Calendar, User, FileText, Activity, ArrowLeft, Loader2 } from "lucide-react";
 import Modal from "../../../../ui/Modal";
+import TimeInput from "../../../../ui/TimeInput";
 import EmptyState from "../../../../ui/EmptyState";
 import toast from "react-hot-toast";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import NursingDischargeSummaryForm from "./NursingDischargeSummaryForm";
 
-const tasks = [
-  {
-    id: 1,
-    status: "Pending",
-    dateTime: "Aug 24, 2026 / 10:00 AM",
-    task: "Administer 500mg Paracetamol",
-    orderingDoctor: "Dr. Smith",
-    type: "medication_administration",
-  },
-  {
-    id: 2,
-    status: "Pending",
-    dateTime: "Aug 24, 2026 / 08:30 AM",
-    task: "Check Blood Pressure",
-    orderingDoctor: "Dr. Adams",
-    type: "vital_signs",
-  },
-  {
-    id: 3,
-    status: "Pending",
-    dateTime: "Aug 24, 2026 / 11:15 AM",
-    task: "Check blood sugar level",
-    orderingDoctor: "Dr. Clark",
-    type: "glucose",
-  },
-  {
-    id: 4,
-    status: "Pending",
-    dateTime: "Aug 24, 2026 / 12:00 PM",
-    task: "Monitor urine output",
-    orderingDoctor: "Dr. Clark",
-    type: "input_output",
-  },
-  {
-    id: 5,
-    status: "Pending",
-    dateTime: "Aug 24, 2026 / 02:00 PM",
-    task: "Monitor for seizure events",
-    orderingDoctor: "Dr. Evans",
-    type: "seizure",
-  },
-  {
-    id: 6,
-    status: "Pending",
-    dateTime: "Aug 24, 2026 / 04:30 PM",
-    task: "Lumbar Puncture",
-    orderingDoctor: "Dr. Bello",
-    type: "procedure",
-  },
-  {
-    id: 7,
-    status: "Pending",
-    dateTime: "Aug 24, 2026 / 06:00 PM",
-    task: "Administer Normal Saline",
-    orderingDoctor: "Dr. Evans",
-    type: "iv_fluid",
-  },
-  {
-    id: 8,
-    status: "Pending",
-    dateTime: "Aug 24, 2026 / 06:00 PM",
-    task: "Complete Nursing Discharge",
-    orderingDoctor: "Dr. Evans",
-    type: "discharge_summary",
-  }
-];
 
 const intakeSources = [
   { value: "oral_free_fluids", label: "Oral / Free Fluids" },
@@ -196,15 +131,8 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const filterDropdownRef = useRef(null);
 
-  const [globalActionsOpen, setGlobalActionsOpen] = useState(false);
-  const globalActionsRef = useRef(null);
-
-  const [openTasksModal, setOpenTasksModal] = useState(false);
-  const [modalPopover, setModalPopover] = useState(null);
   const [isSubmittingTaskAction, setIsSubmittingTaskAction] = useState(null);
-
   const [ioSubmitSuccessModalOpen, setIoSubmitSuccessModalOpen] = useState(false);
-  const modalDropdownRef = useRef(null);
 
   const [glucoseModalOpen, setGlucoseModalOpen] = useState(false);
   const [glucoseSubmitSuccessModalOpen, setGlucoseSubmitSuccessModalOpen] = useState(false);
@@ -268,14 +196,19 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
       setIsSubmittingTaskAction(sqid);
       if (action === 'claim') {
         await axiosInstanceHos.post(`/api/inpatients/task-occurrences/${sqid}/claim`);
+        toast.success("Task claimed successfully");
       } else if (action === 'confirm-medication') {
         await axiosInstanceHos.post(`/api/inpatients/task-occurrences/${sqid}/confirm-medication`);
+        toast.success("Medication confirmed successfully");
       } else if (action === 'release') {
         await axiosInstanceHos.post(`/api/inpatients/task-occurrences/${sqid}/release`);
+        toast.success("Task released successfully");
       } else if (action === 'mark-missed') {
         await axiosInstanceHos.post(`/api/inpatients/task-occurrences/${sqid}/mark-missed`);
+        toast.success("Task marked as missed");
       } else if (action === 'escalate') {
         await axiosInstanceHos.post(`/api/inpatients/task-occurrences/${sqid}/escalate`, { escalation_reason: payload || "Escalated by nurse" });
+        toast.success("Task escalated successfully");
       }
       
       const admissionSqid = admission?.sqid;
@@ -528,83 +461,6 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
   }, [showVitalsRecord, showMedicationRecord, showGlucoseRecord, showIORecord, showSeizureRecord, showProcedureRecord, showIVFluidRecord, admission?.sqid, vitalsCurrentPage, medsCurrentPage, glucoseCurrentPage, ioCurrentPage, seizureCurrentPage, procedureCurrentPage, ivFluidCurrentPage]);
 
 
-  const demoGlucoseRecords = [
-    { id: 1, date: "14/03/2026", time: "12 PM", reading: "12.2 mg/gl", context: "Post-meal", insulinStatus: "Not Given", status: "Pending" },
-    { id: 2, date: "14/03/2026", time: "12 PM", reading: "12.2 mg/gl", context: "Post-meal", insulinStatus: "Given", status: "Completed" },
-    { id: 3, date: "14/03/2026", time: "12 PM", reading: "12.2 mg/gl", context: "Post-meal", insulinStatus: "Not Given", status: "Completed" },
-    { id: 4, date: "14/03/2026", time: "12 PM", reading: "12.2 mg/gl", context: "Post-meal", insulinStatus: "Not Given", status: "Completed" },
-    { id: 5, date: "14/03/2026", time: "12 PM", reading: "12.2 mg/gl", context: "Post-meal", insulinStatus: "Not Given", status: "Completed" },
-    { id: 6, date: "14/03/2026", time: "12 PM", reading: "12.2 mg/gl", context: "Post-meal", insulinStatus: "Given", status: "Completed" },
-    { id: 7, date: "14/03/2026", time: "12 PM", reading: "12.2 mg/gl", context: "Post-meal", insulinStatus: "Given", status: "Completed" },
-    { id: 8, date: "14/03/2026", time: "12 PM", reading: "12.2 mg/gl", context: "Post-meal", insulinStatus: "Given", status: "Completed" },
-  ];
-
-  const demoMedRecords = [
-    { id: 1, date: "14/03/2026", time: "12 PM", drug: "Paracetamol", dosage: "10 MG", route: "Oral", freq: "3 times daily", status: "Missed" },
-    { id: 2, date: "14/03/2026", time: "12 PM", drug: "Paracetamol", dosage: "10 MG", route: "Oral", freq: "3 times daily", status: "Pending" },
-    { id: 3, date: "14/03/2026", time: "12 PM", drug: "Paracetamol", dosage: "10 MG", route: "Oral", freq: "3 times daily", status: "Completed" },
-    { id: 4, date: "14/03/2026", time: "12 PM", drug: "Paracetamol", dosage: "10 MG", route: "Oral", freq: "3 times daily", status: "Completed" },
-    { id: 5, date: "14/03/2026", time: "12 PM", drug: "Paracetamol", dosage: "10 MG", route: "Oral", freq: "3 times daily", status: "Completed" },
-    { id: 6, date: "14/03/2026", time: "12 PM", drug: "Paracetamol", dosage: "10 MG", route: "Oral", freq: "3 times daily", status: "Completed" },
-    { id: 7, date: "14/03/2026", time: "12 PM", drug: "Paracetamol", dosage: "10 MG", route: "Oral", freq: "3 times daily", status: "Completed" },
-    { id: 8, date: "14/03/2026", time: "12 PM", drug: "Paracetamol", dosage: "10 MG", route: "Oral", freq: "3 times daily", status: "Completed" },
-  ];
-
-  const demoIORecords = [
-    { id: 1, date: "14/03/2026", dueTime: "12 PM", intakeSource: "Oral", fluidFeed: "Water", intakeVolume: "250 ml", timeRec: "11:45 AM", intakeRoute: "Oral", outputType: "Urine", outputChar: "Clear yellow", outputVolume: "250ml", outputTimeRec: "11:40 AM", timeInterval: "0-4 hours", status: "Missed" },
-    { id: 2, date: "14/03/2026", dueTime: "12 PM", intakeSource: "Oral", fluidFeed: "Water", intakeVolume: "250 ml", timeRec: "11:45 AM", intakeRoute: "Oral", outputType: "Urine", outputChar: "Clear yellow", outputVolume: "250ml", outputTimeRec: "11:40 AM", timeInterval: "0-4 hours", status: "Pending" },
-    { id: 3, date: "14/03/2026", dueTime: "12 PM", intakeSource: "Oral", fluidFeed: "Water", intakeVolume: "250 ml", timeRec: "11:45 AM", intakeRoute: "Oral", outputType: "Urine", outputChar: "Clear yellow", outputVolume: "250ml", outputTimeRec: "11:40 AM", timeInterval: "0-4 hours", status: "Completed" },
-    { id: 4, date: "14/03/2026", dueTime: "12 PM", intakeSource: "Oral", fluidFeed: "Water", intakeVolume: "250 ml", timeRec: "11:45 AM", intakeRoute: "Oral", outputType: "Urine", outputChar: "Clear yellow", outputVolume: "250ml", outputTimeRec: "11:40 AM", timeInterval: "0-4 hours", status: "Completed" },
-    { id: 5, date: "14/03/2026", dueTime: "12 PM", intakeSource: "Oral", fluidFeed: "Water", intakeVolume: "250 ml", timeRec: "11:45 AM", intakeRoute: "Oral", outputType: "Urine", outputChar: "Clear yellow", outputVolume: "250ml", outputTimeRec: "11:40 AM", timeInterval: "0-4 hours", status: "Completed" },
-    { id: 6, date: "14/03/2026", dueTime: "12 PM", intakeSource: "Oral", fluidFeed: "Water", intakeVolume: "250 ml", timeRec: "11:45 AM", intakeRoute: "Oral", outputType: "Urine", outputChar: "Clear yellow", outputVolume: "250ml", outputTimeRec: "11:40 AM", timeInterval: "0-4 hours", status: "Completed" },
-    { id: 7, date: "14/03/2026", dueTime: "12 PM", intakeSource: "Oral", fluidFeed: "Water", intakeVolume: "250 ml", timeRec: "11:45 AM", intakeRoute: "Oral", outputType: "Urine", outputChar: "Clear yellow", outputVolume: "250ml", outputTimeRec: "11:40 AM", timeInterval: "0-4 hours", status: "Completed" },
-    { id: 8, date: "14/03/2026", dueTime: "12 PM", intakeSource: "Oral", fluidFeed: "Water", intakeVolume: "250 ml", timeRec: "11:45 AM", intakeRoute: "Oral", outputType: "Urine", outputChar: "Clear yellow", outputVolume: "250ml", outputTimeRec: "11:40 AM", timeInterval: "0-4 hours", status: "Completed" },
-  ];
-
-  const demoVitalsRecords = [
-    { id: 1, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 2, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 3, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 4, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 5, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 6, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 7, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
-    { id: 8, date: "14/03/2026", dueTime: "12 PM", bp: "120 mmHg", temp: "51°C", resp: "5/min", height: "1.65 m", hr: "8 Bpm", weight: "76 KG", bmi: "16.4 Kg/m²", pain: "0-3 (Mild pain)", status: "Completed" },
-  ];
-
-  const demoSeizureRecords = [
-    { id: 1, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
-    { id: 2, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
-    { id: 3, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
-    { id: 4, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
-    { id: 5, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
-    { id: 6, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
-    { id: 7, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
-    { id: 8, date: "14/03/2026", type: "Tonic", postIctal: "Somnolent", escalated: "Yes", duration: "7 min/5 sec", status: "Completed" },
-  ];
-
-  const demoProcedureRecords = [
-    { id: 1, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
-    { id: 2, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
-    { id: 3, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
-    { id: 4, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
-    { id: 5, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
-    { id: 6, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
-    { id: 7, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
-    { id: 8, date: "14/03/2026", procedureName: "Lumbar puncture", performingClinician: "Dr. Obed", dressingStatus: "Clean and dry", surgicalDrainVolume: "67ml", positioningAndSafety: "Flat supine", status: "Completed" },
-  ];
-
-  const demoIVFluidRecords = [
-    { id: 1, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
-    { id: 2, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
-    { id: 3, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
-    { id: 4, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
-    { id: 5, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
-    { id: 6, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
-    { id: 7, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
-    { id: 8, date: "14/03/2026", dueTime: "12 PM", drugs: "Inj. Morphine", cannulaLocation: "Left forearm", solutionType: "Normal saline", volumePerBag: "500 ml", noOfBags: "1 bag only", siteCondition: "Clean and dry", status: "Completed" },
-  ];
-
   const getMedStatusColor = (status) => {
     const s = String(status || '').toLowerCase();
     if (s === 'completed' || s === 'given') return "text-[#10B981]";
@@ -626,12 +482,6 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
       }
       if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
         setFilterDropdownOpen(false);
-      }
-      if (globalActionsRef.current && !globalActionsRef.current.contains(event.target)) {
-        setGlobalActionsOpen(false);
-      }
-      if (modalDropdownRef.current && !modalDropdownRef.current.contains(event.target)) {
-        setModalPopover(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -1523,18 +1373,11 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                 </div>
 
                 <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2 md:col-span-2">
-                  <label className="text-sm font-semibold text-slate-700">Time recorded</label>
-                  <div className="relative flex items-center">
-                    <input 
-                      type="time" 
-                      className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary transition-all [&::-webkit-calendar-picker-indicator]:hidden" 
-                      value={ioIntake.recorded_at}
-                      onChange={(e) => setIoIntake({...ioIntake, recorded_at: e.target.value})}
-                    />
-                    <div className="absolute right-3 text-docuhealth-primary pointer-events-none">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                    </div>
-                  </div>
+                  <TimeInput
+                    label="Time recorded"
+                    value={ioIntake.recorded_at}
+                    onChange={(e) => setIoIntake({...ioIntake, recorded_at: e.target.value})}
+                  />
                 </div>
               </div>
             </section>
@@ -1594,18 +1437,11 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                 </div>
 
                 <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2 md:col-span-2">
-                  <label className="text-sm font-semibold text-slate-700">Time recorded</label>
-                  <div className="relative flex items-center">
-                    <input 
-                      type="time" 
-                      className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary transition-all [&::-webkit-calendar-picker-indicator]:hidden" 
-                      value={ioOutput.recorded_at}
-                      onChange={(e) => setIoOutput({...ioOutput, recorded_at: e.target.value})}
-                    />
-                    <div className="absolute right-3 text-docuhealth-primary pointer-events-none">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                    </div>
-                  </div>
+                  <TimeInput
+                    label="Time recorded"
+                    value={ioOutput.recorded_at}
+                    onChange={(e) => setIoOutput({...ioOutput, recorded_at: e.target.value})}
+                  />
                 </div>
 
                 <div className="border border-slate-200 rounded-md p-4 flex flex-col gap-2 md:col-span-2">
@@ -1682,8 +1518,8 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
               <div className="relative">
                 <p className="pb-1.5 text-xs text-slate-500 font-medium">Height</p>
                 <div className="relative">
-                  <input type="number" step="0.01" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-12 outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary transition-colors placeholder:text-slate-300" value={vitalSignsForm.height} onChange={(e) => setVitalSignsForm({...vitalSignsForm, height: e.target.value})} placeholder="Enter height" />
-                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">m</span>
+                  <input type="number" step="0.1" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-12 outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary transition-colors placeholder:text-slate-300" value={vitalSignsForm.height} onChange={(e) => setVitalSignsForm({...vitalSignsForm, height: e.target.value})} placeholder="Enter height" />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">cm</span>
                 </div>
               </div>
               <div className="relative">
@@ -1802,7 +1638,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                    <th className="py-5 px-3 font-bold text-gray-700">Blood Pressure</th>
                    <th className="py-5 px-3 font-bold text-gray-700">Temperature</th>
                    <th className="py-5 px-3 font-bold text-gray-700">Respiratory</th>
-                   <th className="py-5 px-3 font-bold text-gray-700">Height (m)</th>
+                   <th className="py-5 px-3 font-bold text-gray-700">Height (cm)</th>
                    <th className="py-5 px-3 font-bold text-gray-700">Heart rate</th>
                    <th className="py-5 px-3 font-bold text-gray-700">Weight (Kg)</th>
                    <th className="py-5 px-3 font-bold text-gray-700">BMI (Kg/m²)</th>
@@ -2449,245 +2285,6 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
         </div>
       ) : null}
 
-      <Modal isOpen={openTasksModal} onClose={() => setOpenTasksModal(false)} maxWidth="7xl">
-        <div className="relative py-10 px-2">
-          <button 
-            onClick={() => setOpenTasksModal(false)}
-            className="absolute top-0 right-0  p-2 text-slate-400 hover:text-slate-600 transition-colors rounded-full hover:bg-slate-100"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
-
-          <div className="text-center mb-10">
-            <h3 className="text-xl font-bold text-slate-800">Task details</h3>
-            <p className="text-sm text-slate-500 mt-1">Below are details of the task issued</p>
-          </div>
-          
-          <div className="text-[12px] text-left">
-          <div className="hidden lg:block">
-            {tasks?.map((task, index) => {
-              const colors = getStatusColor(task.status);
-              return (
-                <div key={task.id} className={`mb-4 p-4 border border-slate-200 rounded-xl flex flex-wrap gap-4 lg:gap-10 bg-white relative ${modalPopover === index ? 'z-50' : 'z-10'}`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-md ${colors.bg}`}>
-                      <Activity className={`w-4 h-4 ${colors.text}`} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-gray-500 uppercase font-semibold">Status</p>
-                      <p className={`text-sm font-medium ${colors.text}`}>{task.status}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gray-100 rounded-md">
-                      <Calendar className="w-4 h-4 text-gray-600" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-gray-500 uppercase font-semibold">Date / Time</p>
-                      <p className="text-sm font-medium text-gray-800">{new Date(task.scheduled_for).toLocaleString()}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gray-100 rounded-md">
-                      <User className="w-4 h-4 text-gray-600" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-gray-500 uppercase font-semibold">Ordering Doctor</p>
-                      <p className="text-sm font-medium text-gray-800">{(task.instructions || "No instructions")}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between relative flex-1">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gray-100 rounded-md">
-                        <FileText className="w-4 h-4 text-gray-600" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-gray-500 uppercase font-semibold">Task</p>
-                        <p className="text-sm font-medium text-gray-800 truncate max-w-[150px]">{task.task_type.replace(/_/g, " ")}</p>
-                      </div>
-                    </div>
-
-                    <div className="relative" ref={modalPopover === index ? modalDropdownRef : null}>
-                      <div
-                        onClick={() => setModalPopover(modalPopover === index ? null : index)}
-                        className={`hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer ${modalPopover === index ? "bg-slate-200" : "hover:bg-slate-100"}`}
-                      >
-                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                          <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-                        </svg>
-                      </div>
-
-                      {modalPopover === index && (
-                        <div className="hidden lg:block lg:absolute top-0 lg:top-10 right-0 mt-2 bg-white border shadow-[0px_4px_20px_rgba(0,0,0,0.08)] rounded-lg p-1.5 w-56 z-40">
-                          {taskStatus === "history" ? null : taskStatus === "pending" ? (
-                            <button 
-                              className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap"
-                              onClick={() => { setModalPopover(null); handleTaskAction("claim", task.sqid); }}
-                            >
-                              Claim task
-                            </button>
-                          ) : (
-                            <>
-                              {task.task_type === 'glucose' ? (
-                                <>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setGlucoseModalOpen(true); }}>Add new entry</button>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowGlucoseRecord(true); }}>View glucose chart</button>
-                                </>
-                              ) : task.task_type === 'input_output' ? (
-                                <>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setShowIOEntry(true); }}>Add new entry</button>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowIORecord(true); }}>Input and Output chart</button>
-                                </>
-                              ) : task.task_type === 'vital_signs' ? (
-                                <>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setVitalsInfoModalOpen(true); }}>Add new entry</button>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowVitalsRecord(true); }}>Vital Signs Chart</button>
-                                </>
-                              ) : (task.task_type === 'seizure' || task.task_type === 'seizure_event') ? (
-                                <>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setShowSeizureEntry(true); }}>Add new entry</button>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowSeizureRecord(true); }}>View seizure charts</button>
-                                </>
-                              ) : task.task_type === 'procedure' ? (
-                                <>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setShowProcedureEntry(true); }}>Add new entry</button>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowProcedureRecord(true); }}>Procedure chart</button>
-                                </>
-                              ) : task.task_type === 'iv_fluid' ? (
-                                <>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setShowIVFluidEntry(true); }}>Add new entry</button>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowIVFluidRecord(true); }}>IV Fluid chart</button>
-                                </>
-                              ) : (task.task_type === 'discharge_summary' || task.task_type === 'nurse_in_patient_discharge') ? (
-                                <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setShowDischargeSummary(true); }}>Add entry</button>
-                              ) : (
-                                <>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); handleTaskAction("confirm-medication", task.sqid); }}>Confirm medication</button>
-                                  <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowMedicationRecord(true); }}>View medication chart</button>
-                                </>
-                              )}
-                              
-                              <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); handleTaskAction("release", task.sqid); }}>Release task</button>
-                              <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); handleTaskAction("mark-missed", task.sqid); }}>Mark as missed</button>
-                              <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => setModalPopover(null)}>Mark as in-progress</button>
-                              <button className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); handleTaskAction("escalate", task.sqid); }}>Mark as escalated</button>
-                            </>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-                <div className="block lg:hidden space-y-4 px-1">
-            {tasks?.map((task, index) => {
-              const colors = getStatusColor(task.status);
-              return (
-                <div key={task.id} className={`bg-white border border-gray-200 rounded-lg p-4 relative ${modalPopover === index ? 'z-50' : 'z-10'}`}>
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-                      <p className="text-[10px] text-slate-400 uppercase font-bold">Task date/time</p>
-                      <p className="text-[13px] font-semibold text-slate-700">{new Date(task.scheduled_for).toLocaleString()}</p>
-                    </div>
-                    <div className="relative" ref={modalPopover === index ? modalDropdownRef : null}>
-                      <button onClick={() => setModalPopover(modalPopover === index ? null : index)} className={`h-9 w-9 flex items-center justify-center rounded-full ${modalPopover === index ? "bg-slate-200" : "bg-gray-50"}`}>
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14 8C14 7.45 13.55 7 13 7C12.45 7 12 7.45 12 8C12 8.55 12.45 9 13 9C13.55 9 14 8.55 14 8ZM4 8C4 7.45 3.55 7 3 7C2.45 7 2 7.45 2 8C2 8.55 2.45 9 3 9C3.55 9 4 8.55 4 8ZM9 8C9 7.45 8.55 7 8 7C7.45 7 7 7.45 7 8C7 8.55 7.45 9 8 9C8.55 9 9 8.55 9 8Z" fill="#1A263E"/></svg>
-                      </button>
-                      {modalPopover === index && (
-                        <div className="absolute right-0 top-10 w-56 bg-white border border-slate-100 shadow-[0px_8px_30px_rgba(0,0,0,0.12)] rounded-lg p-1.5 z-50">
-                          {taskStatus === "history" ? null : taskStatus === "pending" ? (
-                            <button 
-                              className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
-                              onClick={() => { setModalPopover(null); handleTaskAction("claim", task.sqid); }}
-                            >
-                              Claim task
-                            </button>
-                          ) : (
-                            <>
-                              {task.task_type === 'glucose' ? (
-                                <>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setGlucoseModalOpen(true); }}>Add new entry</button>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowGlucoseRecord(true); }}>View glucose chart</button>
-                                </>
-                              ) : task.task_type === 'input_output' ? (
-                                <>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setShowIOEntry(true); }}>Add new entry</button>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowIORecord(true); }}>Input and Output chart</button>
-                                </>
-                              ) : task.task_type === 'vital_signs' ? (
-                                <>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setVitalsInfoModalOpen(true); }}>Add new entry</button>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowVitalsRecord(true); }}>Vital Signs Chart</button>
-                                </>
-                              ) : (task.task_type === 'seizure' || task.task_type === 'seizure_event') ? (
-                                <>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setShowSeizureEntry(true); }}>Add new entry</button>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowSeizureRecord(true); }}>View seizure charts</button>
-                                </>
-                              ) : task.task_type === 'procedure' ? (
-                                <>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setShowProcedureEntry(true); }}>Add new entry</button>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowProcedureRecord(true); }}>Procedure chart</button>
-                                </>
-                              ) : task.task_type === 'iv_fluid' ? (
-                                <>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setShowIVFluidEntry(true); }}>Add new entry</button>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowIVFluidRecord(true); }}>IV Fluid chart</button>
-                                </>
-                              ) : (task.task_type === 'discharge_summary' || task.task_type === 'nurse_in_patient_discharge') ? (
-                                <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setActiveTask(task); setShowDischargeSummary(true); }}>Add entry</button>
-                              ) : (
-                                <>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); handleTaskAction("confirm-medication", task.sqid); }}>Confirm medication</button>
-                                  <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); setShowMedicationRecord(true); }}>View medication chart</button>
-                                </>
-                              )}
-                              
-                              <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); handleTaskAction("release", task.sqid); }}>Release task</button>
-                              <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); handleTaskAction("mark-missed", task.sqid); }}>Mark as missed</button>
-                              <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => setModalPopover(null)}>Mark as in-progress</button>
-                              <button className="w-full text-left font-medium text-sm text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" onClick={() => { setModalPopover(null); handleTaskAction("escalate", task.sqid); }}>Mark as escalated</button>
-                            </>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold text-xs border ${colors.border} ${colors.bg}`}>
-                        <Activity className={`w-5 h-5 ${colors.text}`} />
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-slate-400 uppercase font-medium">Status</p>
-                        <p className={`text-sm font-semibold ${colors.text}`}>{task.status}</p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-50">
-                      <div>
-                        <p className="text-[10px] text-slate-400 uppercase font-medium">Ordering Doctor</p>
-                        <p className="text-[13px] text-slate-600">{(task.instructions || "No instructions")}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-slate-400 uppercase font-medium">Task</p>
-                        <p className="text-[13px] text-slate-600 truncate italic">"{task.task_type.replace(/_/g, " ")}"</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        </div>
-      </Modal>
       <Modal isOpen={glucoseModalOpen} onClose={() => setGlucoseModalOpen(false)} maxWidth="xl">
         <div className="relative p-6">
           <button 

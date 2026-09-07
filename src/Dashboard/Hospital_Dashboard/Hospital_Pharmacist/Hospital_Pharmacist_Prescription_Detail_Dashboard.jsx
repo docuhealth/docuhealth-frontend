@@ -450,7 +450,7 @@ const Hospital_Pharmacist_Prescription_Detail_Dashboard = ({ sqid, onBack, isSet
                   Height
                 </p>
                 <p className="font-medium text-[13px] text-gray-800">
-                  {order.latest_vitals?.height ? `${order.latest_vitals.height} m` : "—"}
+                  {order.latest_vitals?.height ? `${order.latest_vitals.height} cm` : "—"}
                 </p>
              </div>
 

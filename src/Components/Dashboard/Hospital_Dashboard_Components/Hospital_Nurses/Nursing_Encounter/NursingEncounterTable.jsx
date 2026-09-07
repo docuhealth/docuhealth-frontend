@@ -1,9 +1,10 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import moment from "moment";
 import { User, X, ClipboardList, ChevronDown } from "lucide-react";
 import { NursingEncounterContext } from "../../../../../context/HospitalContext/Nurses/NursingEncounterContext";
+import { NursesAppContext } from "../../../../../context/HospitalContext/Nurses/NursesAppContext";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../../ui/Table";
 import EmptyState from "../../../../ui/EmptyState";
 import Spinner from "../../../../ui/Spinner";
@@ -56,8 +57,36 @@ const getCallUpStatus = (status) => {
   return { text: "Awaiting", style: "bg-amber-50 text-amber-500" };
 };
 
+const checkIsReservedByMe = (encounter, profile) => {
+  if (!encounter?.reserved_by || !profile) return false;
+  if (encounter.reserved_by.staff_id && profile.staff_id) {
+    return encounter.reserved_by.staff_id === profile.staff_id;
+  }
+  if (encounter.reserved_by.id && profile.id) {
+    return encounter.reserved_by.id === profile.id;
+  }
+  if (encounter.reserved_by.firstname && profile.firstname) {
+    return (
+      encounter.reserved_by.firstname.toLowerCase() === profile.firstname.toLowerCase() &&
+      (encounter.reserved_by.lastname || "").toLowerCase() === (profile.lastname || "").toLowerCase()
+    );
+  }
+  return false;
+};
+
+const calculateBmi = (w, h) => {
+  const weightNum = parseFloat(w);
+  let heightNum = parseFloat(h);
+  if (!weightNum || !heightNum || heightNum <= 0) return "";
+  if (heightNum > 3) heightNum = heightNum / 100;
+  const val = (weightNum / (heightNum * heightNum)).toFixed(1);
+  return isNaN(val) ? "" : val;
+};
+
 const NursingEncounterTable = () => {
-  const { encounters, loading, activeTab, startEncounter, submitAssessment } = useContext(NursingEncounterContext);
+  const { encounters, loading, activeTab, claimEncounter, submitAssessment } = useContext(NursingEncounterContext);
+  const { profile } = useContext(NursesAppContext);
+
   const [selectedPatientForDetails, setSelectedPatientForDetails] = useState(null);
   const [selectedPatientForEncounter, setSelectedPatientForEncounter] = useState(null);
   const [viewEncounterDetails, setViewEncounterDetails] = useState(null);
@@ -77,9 +106,43 @@ const NursingEncounterTable = () => {
   });
   const [submittingEncounter, setSubmittingEncounter] = useState(false);
   const [escalating, setEscalating] = useState(false);
+  const [claimingSqid, setClaimingSqid] = useState(null);
+
+  useEffect(() => {
+    if (selectedPatientForEncounter) {
+      const vitals =
+        selectedPatientForEncounter.latest_vitals ||
+        selectedPatientForEncounter.vital_signs ||
+        selectedPatientForEncounter.vitals ||
+        {};
+      const w = vitals.weight ? String(vitals.weight) : "";
+      const h = vitals.height ? String(vitals.height) : "";
+      setEncounterFormData({
+        blood_pressure: vitals.blood_pressure || vitals.bp || "",
+        temp: vitals.temp ? String(vitals.temp) : vitals.temperature ? String(vitals.temperature) : "",
+        heart_rate: vitals.heart_rate ? String(vitals.heart_rate) : vitals.pulse ? String(vitals.pulse) : "",
+        resp_rate: vitals.resp_rate ? String(vitals.resp_rate) : vitals.respiratory_rate ? String(vitals.respiratory_rate) : "",
+        height: h,
+        weight: w,
+        bmi: vitals.bmi ? String(vitals.bmi) : calculateBmi(w, h),
+        pain_score: vitals.pain_score !== undefined && vitals.pain_score !== null ? `${vitals.pain_score} (${vitals.pain_score === 0 ? "No pain" : "Pain"})` : "0 (No pain)",
+        sp02: vitals.spo2 ? String(vitals.spo2) : vitals.sp02 ? String(vitals.sp02) : "",
+        triage_priority: selectedPatientForEncounter.triage_priority || "routine",
+        notes: selectedPatientForEncounter.notes || ""
+      });
+    }
+  }, [selectedPatientForEncounter]);
 
   const handleInputChange = (field, value) => {
-    setEncounterFormData(prev => ({ ...prev, [field]: value }));
+    setEncounterFormData(prev => {
+      const updated = { ...prev, [field]: value };
+      if (field === "height" || field === "weight") {
+        const h = field === "height" ? value : prev.height;
+        const w = field === "weight" ? value : prev.weight;
+        updated.bmi = calculateBmi(w, h);
+      }
+      return updated;
+    });
   };
 
   const getAssessmentPayload = () => {
@@ -93,7 +156,7 @@ const NursingEncounterTable = () => {
         ...(encounterFormData.resp_rate && { resp_rate: parseFloat(encounterFormData.resp_rate) }),
         ...(encounterFormData.height && { height: parseFloat(encounterFormData.height) }),
         ...(encounterFormData.weight && { weight: parseFloat(encounterFormData.weight) }),
-        ...(encounterFormData.bmi && { bmi: parseFloat(encounterFormData.bmi) }),
+        // Note: BMI is auto-calculated by the backend from height and weight. Do not send bmi.
         ...(encounterFormData.pain_score && { pain_score: parseInt(encounterFormData.pain_score.split(" ")[0], 10) }),
         ...(encounterFormData.sp02 && { spo2: parseInt(encounterFormData.sp02, 10) })
       }
@@ -124,6 +187,18 @@ const NursingEncounterTable = () => {
     }
   };
 
+  const handleClaim = async (sqid, autoOpenEncounter = false, encounterObj = null) => {
+    setClaimingSqid(sqid);
+    try {
+      const success = await claimEncounter(sqid);
+      if (success && autoOpenEncounter && encounterObj) {
+        setSelectedPatientForEncounter(encounterObj);
+      }
+    } finally {
+      setClaimingSqid(null);
+    }
+  };
+
   if (viewEncounterDetails) {
     const patientData = viewEncounterDetails.patient_info || {};
     const mappedPatient = {
@@ -148,7 +223,7 @@ const NursingEncounterTable = () => {
       weight: vitalsData.weight || "N/A",
       bmi: vitalsData.bmi || "N/A",
       pain_score: vitalsData.pain_score || "N/A",
-      sp02: vitalsData.sp02 || vitalsData.oxygen_saturation || "N/A"
+      sp02: vitalsData.sp02 || vitalsData.spo2 || vitalsData.oxygen_saturation || "N/A"
     };
 
     return (
@@ -223,6 +298,11 @@ const NursingEncounterTable = () => {
             ? `${Math.floor(waitTime / 60)} hrs ${waitTime % 60} mins` 
             : `${waitTime} mins`;
 
+          const isReserved = Boolean(encounter.reserved_by);
+          const isReservedByMe = checkIsReservedByMe(encounter, profile);
+          const isReservedByOther = isReserved && !isReservedByMe;
+          const isClaiming = claimingSqid === encounter.sqid;
+
           return (
             <TableRow key={encounter.sqid || encounter.id} className="hover:bg-gray-50">
               <TableCell className="border-b border-gray-200 pl-10">
@@ -249,7 +329,20 @@ const NursingEncounterTable = () => {
                     </span>
                   </TableCell>
                   <TableCell className="text-gray-600 border-b border-gray-200">
-                    {encounter.claimed_by ? `Dr. ${encounter.claimed_by.firstname || ''} ${encounter.claimed_by.lastname || ''}`.trim() : "N/A"}
+                    {encounter.claimed_by ? (
+                      <div>
+                        <div className="font-medium text-gray-800">
+                          {`Dr. ${encounter.claimed_by.firstname || ''} ${encounter.claimed_by.lastname || ''}`.trim()}
+                        </div>
+                        {encounter.claimed_by.claimed_at && (
+                          <span className="text-xs text-gray-400">
+                            Claimed at {moment(encounter.claimed_by.claimed_at).format("hh:mm A")}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      "N/A"
+                    )}
                   </TableCell>
                   <TableCell className="border-b border-gray-200">
                     <button 
@@ -280,38 +373,65 @@ const NursingEncounterTable = () => {
                         {encounter.triage_priority || "Routine"}
                       </span>
                     ) : (
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getBadgeStyle(encounter.status)}`}>
-                        {formatStatus(encounter.status)}
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getBadgeStyle(isReserved ? "nursing_active" : encounter.status)}`}>
+                        {isReservedByMe 
+                          ? "In Progress" 
+                          : isReservedByOther 
+                          ? `Reserved (${encounter.reserved_by.firstname || "Nurse"})` 
+                          : formatStatus(encounter.status)}
                       </span>
                     )}
                   </TableCell>
                   <TableCell className="border-b border-gray-200">
                     <div className="flex items-center gap-2">
-                         <button 
-                        onClick={async () => {
-                          const success = await startEncounter(encounter.sqid);
-                          if (success) {
-                            setSelectedPatientForEncounter(encounter);
-                          }
-                        }}
-                        disabled={encounter.status === "nursing_active" && !(JSON.parse(localStorage.getItem("reservedEncounters") || "[]").includes(encounter.sqid))}
-                        className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Start clinical encounter
-                      </button>
-                      <button 
-                        onClick={() => {
-                          if (activeTab === "Closed") {
-                            setViewEncounterDetails(encounter);
-                          } else {
-                            setSelectedPatientForDetails(encounter);
-                          }
-                        }}
-                        className="bg-blue-50 text-docuhealth-primary hover:bg-blue-100 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors"
-                      >
-                        {activeTab === "Closed" ? "Encounter details" : "View patient details"}
-                      </button>
-                   
+                      {activeTab === "Closed" ? (
+                        <>
+                          <button 
+                            onClick={() => setSelectedPatientForEncounter(encounter)}
+                            className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors"
+                          >
+                            Reopen clinical encounter
+                          </button>
+                          <button 
+                            onClick={() => setViewEncounterDetails(encounter)}
+                            className="bg-blue-50 text-docuhealth-primary hover:bg-blue-100 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors"
+                          >
+                            Encounter details
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          {!isReserved ? (
+                            <button 
+                              onClick={() => handleClaim(encounter.sqid)}
+                              disabled={isClaiming}
+                              className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors disabled:opacity-50"
+                            >
+                              {isClaiming ? "Claiming..." : "Claim check in"}
+                            </button>
+                          ) : isReservedByMe ? (
+                            <button 
+                              onClick={() => setSelectedPatientForEncounter(encounter)}
+                              className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors"
+                            >
+                              Continue clinical encounter
+                            </button>
+                          ) : (
+                            <button 
+                              disabled
+                              className="bg-gray-100 text-gray-500 border border-gray-200 px-4 py-3 rounded-full font-medium text-xs whitespace-nowrap cursor-not-allowed"
+                            >
+                              Reserved by Nurse {encounter.reserved_by?.firstname || ""} {encounter.reserved_by?.lastname || ""}
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => setSelectedPatientForDetails(encounter)}
+                            className="bg-blue-50 text-docuhealth-primary hover:bg-blue-100 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors"
+                          >
+                            View patient details
+                          </button>
+                        </>
+                      )}
                     </div>
                   </TableCell>
                 </>
@@ -334,6 +454,11 @@ const NursingEncounterTable = () => {
           const formattedWaitTime = waitTime > 60 
             ? `${Math.floor(waitTime / 60)} hrs ${waitTime % 60} mins` 
             : `${waitTime} mins`;
+
+          const isReserved = Boolean(encounter.reserved_by);
+          const isReservedByMe = checkIsReservedByMe(encounter, profile);
+          const isReservedByOther = isReserved && !isReservedByMe;
+          const isClaiming = claimingSqid === encounter.sqid;
 
           return (
             <div key={encounter.sqid || encounter.id} className="bg-white border border-gray-200 rounded-xl p-5 flex flex-col gap-4 shadow-xs">
@@ -364,8 +489,12 @@ const NursingEncounterTable = () => {
                     {encounter.triage_priority || "Routine"}
                   </span>
                 ) : (
-                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-medium capitalize border ${getBadgeStyle(encounter.status)}`}>
-                    {formatStatus(encounter.status)}
+                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-medium capitalize border ${getBadgeStyle(isReserved ? "nursing_active" : encounter.status)}`}>
+                    {isReservedByMe 
+                      ? "In Progress" 
+                      : isReservedByOther 
+                      ? `Reserved (${encounter.reserved_by.firstname || "Nurse"})` 
+                      : formatStatus(encounter.status)}
                   </span>
                 )}
               </div>
@@ -384,17 +513,24 @@ const NursingEncounterTable = () => {
                       <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Doctor Involved</span>
                       <span className="text-xs font-bold text-gray-700">
                         {encounter.claimed_by ? `Dr. ${encounter.claimed_by.firstname || ''} ${encounter.claimed_by.lastname || ''}`.trim() : "N/A"}
+                        {encounter.claimed_by?.claimed_at && (
+                          <span className="block text-[10px] font-normal text-gray-400">
+                            Claimed at {moment(encounter.claimed_by.claimed_at).format("hh:mm A")}
+                          </span>
+                        )}
                       </span>
                     </div>
                   </>
                 ) : (
                   <div className="flex justify-between items-center bg-gray-50 rounded-lg p-3 border border-gray-100 col-span-2">
                     <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
-                      {activeTab === "Closed" ? "Nurse Encountered" : "Wait Time"}
+                      {activeTab === "Closed" ? "Nurse Encountered" : isReserved ? "Reserved By" : "Wait Time"}
                     </span>
                     <span className="text-sm font-bold text-gray-700">
                       {activeTab === "Closed"
                         ? encounter.claimed_by_info ? `Nurse ${encounter.claimed_by_info.firstname || encounter.claimed_by_info.first_name || ""} ${encounter.claimed_by_info.lastname || encounter.claimed_by_info.last_name || ""}` : "Unknown"
+                        : isReserved
+                        ? isReservedByMe ? "You" : `Nurse ${encounter.reserved_by?.firstname || ""} ${encounter.reserved_by?.lastname || ""}`
                         : formattedWaitTime}
                     </span>
                   </div>
@@ -410,31 +546,51 @@ const NursingEncounterTable = () => {
                   >
                     View patient details
                   </button>
-                ) : (
+                ) : activeTab === "Closed" ? (
                   <>
                     <button 
-                      onClick={async () => {
-                        const success = await startEncounter(encounter.sqid);
-                        if (success) {
-                          setSelectedPatientForEncounter(encounter);
-                        }
-                      }}
-                      disabled={encounter.status === "nursing_active" && !(JSON.parse(localStorage.getItem("reservedEncounters") || "[]").includes(encounter.sqid))}
-                      className="w-full bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 py-2.5 rounded-full font-medium text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => setSelectedPatientForEncounter(encounter)}
+                      className="w-full bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 py-2.5 rounded-full font-medium text-xs transition-colors"
                     >
-                      Start clinical encounter
+                      Reopen clinical encounter
                     </button>
                     <button 
-                      onClick={() => {
-                        if (activeTab === "Closed") {
-                          setViewEncounterDetails(encounter);
-                        } else {
-                          setSelectedPatientForDetails(encounter);
-                        }
-                      }}
+                      onClick={() => setViewEncounterDetails(encounter)}
                       className="w-full bg-blue-50 text-docuhealth-primary hover:bg-blue-100 py-2.5 rounded-full font-medium text-xs transition-colors"
                     >
-                      {activeTab === "Closed" ? "Encounter details" : "View patient details"}
+                      Encounter details
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {!isReserved ? (
+                      <button 
+                        onClick={() => handleClaim(encounter.sqid)}
+                        disabled={isClaiming}
+                        className="w-full bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 py-2.5 rounded-full font-medium text-xs transition-colors disabled:opacity-50"
+                      >
+                        {isClaiming ? "Claiming..." : "Claim check in"}
+                      </button>
+                    ) : isReservedByMe ? (
+                      <button 
+                        onClick={() => setSelectedPatientForEncounter(encounter)}
+                        className="w-full bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 py-2.5 rounded-full font-medium text-xs transition-colors"
+                      >
+                        Continue clinical encounter
+                      </button>
+                    ) : (
+                      <button 
+                        disabled
+                        className="w-full bg-gray-100 text-gray-500 border border-gray-200 py-2.5 rounded-full font-medium text-xs transition-colors cursor-not-allowed text-center"
+                      >
+                        Reserved by Nurse {encounter.reserved_by?.firstname || ""} {encounter.reserved_by?.lastname || ""}
+                      </button>
+                    )}
+                    <button 
+                      onClick={() => setSelectedPatientForDetails(encounter)}
+                      className="w-full bg-blue-50 text-docuhealth-primary hover:bg-blue-100 py-2.5 rounded-full font-medium text-xs transition-colors"
+                    >
+                      View patient details
                     </button>
                   </>
                 )}
@@ -451,87 +607,127 @@ const NursingEncounterTable = () => {
         onClose={() => setSelectedPatientForDetails(null)}
         maxWidth="5xl"
       >
-        {selectedPatientForDetails && (
-          <div className="flex flex-col items-center relative">
-            <button
-              onClick={() => setSelectedPatientForDetails(null)}
-              className="absolute top-0 right-0 text-gray-400 hover:text-gray-500 transition-colors"
-            >
-              <X size={20} />
-            </button>
-            
-            {/* Header Icon */}
-            <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-docuhealth-primary mb-4">
-              <User size={28} />
-            </div>
-            
-            {/* Titles */}
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Patient's full details</h2>
-            <p className="text-sm text-gray-500 mb-8">Below are the general details of this patient!</p>
+        {selectedPatientForDetails && (() => {
+          const isDetailsReserved = Boolean(selectedPatientForDetails.reserved_by);
+          const isDetailsReservedByMe = checkIsReservedByMe(selectedPatientForDetails, profile);
+          const isDetailsClaiming = claimingSqid === selectedPatientForDetails.sqid;
 
-            {/* Form Fields */}
-            <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 p-5 border rounded-md">
-              <Input
-                label="First Name"
-                value={selectedPatientForDetails.patient_info?.firstname || selectedPatientForDetails.patient_info?.first_name || ""}
-                readOnly
-                className="bg-gray-50 text-gray-500 border-gray-200"
-              />
-              <Input
-                label="Last name"
-                value={selectedPatientForDetails.patient_info?.lastname || selectedPatientForDetails.patient_info?.last_name || ""}
-                readOnly
-                className="bg-gray-50 text-gray-500 border-gray-200"
-              />
-              <Input
-                label="Date of birth"
-                value={selectedPatientForDetails.patient_info?.dob || "N/A"}
-                readOnly
-                className="bg-gray-50 text-gray-500 border-gray-200"
-              />
-              <Input
-                label="Email address"
-                value={selectedPatientForDetails.patient_info?.email || "N/A"}
-                readOnly
-                className="bg-gray-50 text-gray-500 border-gray-200"
-              />
-              <Input
-                label="Phone number"
-                value={selectedPatientForDetails.patient_info?.phone_number || selectedPatientForDetails.patient_info?.phone_num || "N/A"}
-                readOnly
-                className="bg-gray-50 text-gray-500 border-gray-200"
-              />
-              <Input
-                label="Home address"
-                value={[
-                  selectedPatientForDetails.patient_info?.street,
-                  selectedPatientForDetails.patient_info?.city,
-                  selectedPatientForDetails.patient_info?.state,
-                  selectedPatientForDetails.patient_info?.country
-                ].filter(Boolean).join(", ") || "N/A"}
-                readOnly
-                className="bg-gray-50 text-gray-500 border-gray-200"
-              />
-            </div>
-
-            {/* Action Button */}
-            <div className="w-full flex justify-end mt-8">
-              <button 
-                onClick={async () => {
-                  const success = await startEncounter(selectedPatientForDetails.sqid);
-                  if (success) {
-                    setSelectedPatientForDetails(null);
-                    setSelectedPatientForEncounter(selectedPatientForDetails);
-                  }
-                }}
-                disabled={selectedPatientForDetails.status === "nursing_active" && !(JSON.parse(localStorage.getItem("reservedEncounters") || "[]").includes(selectedPatientForDetails.sqid))}
-                className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-8 py-3 rounded-full font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          return (
+            <div className="flex flex-col items-center relative">
+              <button
+                onClick={() => setSelectedPatientForDetails(null)}
+                className="absolute top-0 right-0 text-gray-400 hover:text-gray-500 transition-colors"
               >
-                Start clinical encounter
+                <X size={20} />
               </button>
+              
+              {/* Header Icon */}
+              <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-docuhealth-primary mb-4">
+                <User size={28} />
+              </div>
+              
+              {/* Titles */}
+              <h2 className="text-xl font-bold text-gray-900 mb-1">Patient's full details</h2>
+              <p className="text-sm text-gray-500 mb-8">Below are the general details of this patient!</p>
+
+              {/* Form Fields */}
+              <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 p-5 border rounded-md">
+                <Input
+                  label="First Name"
+                  value={selectedPatientForDetails.patient_info?.firstname || selectedPatientForDetails.patient_info?.first_name || ""}
+                  readOnly
+                  className="bg-gray-50 text-gray-500 border-gray-200"
+                />
+                <Input
+                  label="Last name"
+                  value={selectedPatientForDetails.patient_info?.lastname || selectedPatientForDetails.patient_info?.last_name || ""}
+                  readOnly
+                  className="bg-gray-50 text-gray-500 border-gray-200"
+                />
+                <Input
+                  label="Date of birth"
+                  value={selectedPatientForDetails.patient_info?.dob || "N/A"}
+                  readOnly
+                  className="bg-gray-50 text-gray-500 border-gray-200"
+                />
+                <Input
+                  label="Email address"
+                  value={selectedPatientForDetails.patient_info?.email || "N/A"}
+                  readOnly
+                  className="bg-gray-50 text-gray-500 border-gray-200"
+                />
+                <Input
+                  label="Phone number"
+                  value={selectedPatientForDetails.patient_info?.phone_number || selectedPatientForDetails.patient_info?.phone_num || "N/A"}
+                  readOnly
+                  className="bg-gray-50 text-gray-500 border-gray-200"
+                />
+                <Input
+                  label="Home address"
+                  value={[
+                    selectedPatientForDetails.patient_info?.street,
+                    selectedPatientForDetails.patient_info?.city,
+                    selectedPatientForDetails.patient_info?.state,
+                    selectedPatientForDetails.patient_info?.country
+                  ].filter(Boolean).join(", ") || "N/A"}
+                  readOnly
+                  className="bg-gray-50 text-gray-500 border-gray-200"
+                />
+              </div>
+
+              {/* Action Button */}
+              {activeTab !== "Doctor’s call-up/consultation" && (
+                <div className="w-full flex justify-end mt-8">
+                  {activeTab === "Closed" ? (
+                    <button 
+                      onClick={() => {
+                        const patient = selectedPatientForDetails;
+                        setSelectedPatientForDetails(null);
+                        setSelectedPatientForEncounter(patient);
+                      }}
+                      className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-8 py-3 rounded-full font-medium text-sm transition-colors"
+                    >
+                      Reopen clinical encounter
+                    </button>
+                  ) : !isDetailsReserved ? (
+                    <button 
+                      onClick={async () => {
+                        const success = await claimEncounter(selectedPatientForDetails.sqid);
+                        if (success) {
+                          const patient = selectedPatientForDetails;
+                          setSelectedPatientForDetails(null);
+                          setSelectedPatientForEncounter(patient);
+                        }
+                      }}
+                      disabled={isDetailsClaiming}
+                      className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-8 py-3 rounded-full font-medium text-sm transition-colors disabled:opacity-50"
+                    >
+                      {isDetailsClaiming ? "Claiming..." : "Claim check in"}
+                    </button>
+                  ) : isDetailsReservedByMe ? (
+                    <button 
+                      onClick={() => {
+                        const patient = selectedPatientForDetails;
+                        setSelectedPatientForDetails(null);
+                        setSelectedPatientForEncounter(patient);
+                      }}
+                      className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-8 py-3 rounded-full font-medium text-sm transition-colors"
+                    >
+                      Continue clinical encounter
+                    </button>
+                  ) : (
+                    <button 
+                      disabled
+                      className="bg-gray-100 text-gray-500 border border-gray-200 px-8 py-3 rounded-full font-medium text-sm cursor-not-allowed"
+                    >
+                      Reserved by Nurse {selectedPatientForDetails.reserved_by?.firstname || ""} {selectedPatientForDetails.reserved_by?.lastname || ""}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })()}
       </Modal>
 
       {/* Clinical Encounter Modal */}
@@ -563,14 +759,14 @@ const NursingEncounterTable = () => {
             {/* Vital Signs Section */}
             <div className="w-full mb-6 p-5 border rounded-md">
               <h3 className="font-semibold text-gray-800 mb-5">Vital signs</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
                 <Input label="Blood pressure" value={encounterFormData.blood_pressure} onChange={(e) => handleInputChange("blood_pressure", e.target.value)} placeholder="Enter blood pressure" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">mmHg</span>} />
                 <Input label="Temperature" value={encounterFormData.temp} onChange={(e) => handleInputChange("temp", e.target.value)} placeholder="Enter temperature" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">°C</span>} />
                 <Input label="Respiratory rate" value={encounterFormData.resp_rate} onChange={(e) => handleInputChange("resp_rate", e.target.value)} placeholder="Enter respiratory rate" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">/Min</span>} />
-                <Input label="Height" value={encounterFormData.height} onChange={(e) => handleInputChange("height", e.target.value)} placeholder="Enter height" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">m</span>} />
+                <Input label="Height" value={encounterFormData.height} onChange={(e) => handleInputChange("height", e.target.value)} placeholder="Enter height" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">cm</span>} />
                 <Input label="Heart rate" value={encounterFormData.heart_rate} onChange={(e) => handleInputChange("heart_rate", e.target.value)} placeholder="Enter heart rate" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Bpm</span>} />
                 <Input label="Weight" value={encounterFormData.weight} onChange={(e) => handleInputChange("weight", e.target.value)} placeholder="Enter weight" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Kg</span>} />
-                <Input label="BMI" value={encounterFormData.bmi} onChange={(e) => handleInputChange("bmi", e.target.value)} placeholder="Enter BMI" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Kg/m²</span>} />
+                <Input label="BMI (Auto-calculated)" value={encounterFormData.bmi} readOnly placeholder="Auto-calculated" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Kg/m²</span>} />
                 
                 {/* Pain Score */}
                 <div className="w-full">

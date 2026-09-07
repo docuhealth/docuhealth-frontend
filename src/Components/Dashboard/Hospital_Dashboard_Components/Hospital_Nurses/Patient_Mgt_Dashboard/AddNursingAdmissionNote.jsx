@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, Clock, ChevronDown, Loader2 } from "lucide-react";
 import Modal from "../../../../ui/Modal";
+import TimeInput from "../../../../ui/TimeInput";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 
@@ -364,13 +365,21 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
         initial_nursing_concern: formData.nursingConcerns || undefined
       };
 
+      const formatTimeToISO = (timeStr) => {
+        if (!timeStr) return new Date().toISOString();
+        const [h, m] = timeStr.split(":");
+        const d = new Date();
+        d.setHours(parseInt(h, 10) || 0, parseInt(m, 10) || 0, 0, 0);
+        return d.toISOString();
+      };
+
       if (formData.intakeSource && formData.intakeVolume) {
         payload.intake = {
           source: mapSource(formData.intakeSource),
           fluid_feed: mapFluidFeed(formData.fluidFeed),
           route: mapRoute(formData.intakeRoute),
           volume_ml: parseFloat(formData.intakeVolume),
-          recorded_at: formData.intakeTime ? new Date(`2026-08-26T${formData.intakeTime}`).toISOString() : new Date().toISOString()
+          recorded_at: formatTimeToISO(formData.intakeTime)
         };
       }
 
@@ -380,7 +389,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
           output_type: outType,
           characteristics: (outType === 'stool_bowel') ? undefined : mapOutputCharacteristics(formData.outputCharacteristics),
           volume_ml: parseFloat(formData.outputVolume),
-          recorded_at: formData.outputTime ? new Date(`2026-08-26T${formData.outputTime}`).toISOString() : new Date().toISOString(),
+          recorded_at: formatTimeToISO(formData.outputTime),
           nursing_remark: formData.nursingRemark || undefined
         };
       }
@@ -464,7 +473,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                   { label: "Blood pressure", name: "bloodPressure", adornment: "mmHg", placeholder: "Enter blood pressure" },
                   { label: "Temperature", name: "temperature", adornment: "°C", placeholder: "Enter temperature" },
                   { label: "Respiratory rate", name: "respiratoryRate", adornment: "/Min", placeholder: "Enter respiratory rate" },
-                  { label: "Height", name: "height", adornment: "m", placeholder: "Enter height" },
+                  { label: "Height", name: "height", adornment: "cm", placeholder: "Enter height" },
                   { label: "Heart rate", name: "heartRate", adornment: "Bpm", placeholder: "Enter heart rate" },
                   { label: "Weight", name: "weight", adornment: "Kg", placeholder: "Enter weight" },
                 ].map((field) => (
@@ -651,17 +660,12 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                 </div>
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-medium text-gray-700">Time recorded</label>
-                <div className="relative">
-                  <input
-                    type="time"
-                    name="intakeTime"
-                    value={formData.intakeTime}
-                    onChange={handleChange}
-                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary"
-                  />
-                  {/* Time input usually has a built in clock icon in browsers, but we can style if needed */}
-                </div>
+                <TimeInput
+                  label="Time recorded"
+                  name="intakeTime"
+                  value={formData.intakeTime}
+                  onChange={handleChange}
+                />
               </div>
             </div>
 
@@ -716,16 +720,12 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                 </div>
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-medium text-gray-700">Time recorded</label>
-                <div className="relative">
-                  <input
-                    type="time"
-                    name="outputTime"
-                    value={formData.outputTime}
-                    onChange={handleChange}
-                    className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary"
-                  />
-                </div>
+                <TimeInput
+                  label="Time recorded"
+                  name="outputTime"
+                  value={formData.outputTime}
+                  onChange={handleChange}
+                />
               </div>
             </div>
 
