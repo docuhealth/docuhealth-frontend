@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useMemo, useRef, useEffect, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
+import { DoctorAppContext } from "../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import { createDoctorInpatientDischarge } from "../../../../../queries/Hospital/doctor/discharge";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import DischargeAdmissionSummaryStep from "./DischargeAdmissionSummaryStep";
@@ -24,6 +25,7 @@ const pageSize = 20;
 // completes that task.
 const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatient }) => {
   const queryClient = useQueryClient();
+  const { hospitalName } = useContext(DoctorAppContext);
 
   const hin =
     selectedDischargePatient?.patient_info?.hin ||
@@ -100,6 +102,13 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
   }, [patientFullInfo, selectedDischargePatient]);
 
   // ---- Editable form state (steps 1 & 3) ----
+  // `follow_up_plan` drives the whole follow-up section and how it's serialized:
+  //   "this_hospital" -> continue_followup_at_curr_hospital: true, server fills
+  //                      follow_up_clinic; date + time required.
+  //   "external"      -> continue_followup_at_curr_hospital: false + a
+  //                      follow_up_clinic name; date + time required.
+  //   "none"          -> continue_followup_at_curr_hospital: false, no follow-up
+  //                      fields sent (bar the follow_up_clinic: null workaround).
   const [formData, setFormData] = useState({
     chief_complaint: "",
     primary_diagnosis: "",
@@ -109,9 +118,8 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
     hospital_course_note: "",
     completed_investigations: [],
     condition_at_discharge: "",
-    will_continue_followup: true,
+    follow_up_plan: "this_hospital",
     follow_up_clinic: "",
-    referral: "",
     follow_up_date: "",
     follow_up_time: "",
     pending_investigations: [],
@@ -251,6 +259,43 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       .filter(Boolean)
       .map((sqid) => ({ sqid, type: "lab_test_order" }));
 
+  // Follow-up section, serialized per the endpoint's cross-field rules
+  // (DOCTOR-INPATIENT-DISCHARGE-FOLLOW-UP.md, verified live 2026-09-08).
+  const buildFollowUpPayload = () => {
+    const instructions = formData.follow_up_instructions.trim();
+
+    if (formData.follow_up_plan === "this_hospital") {
+      return {
+        continue_followup_at_curr_hospital: true,
+        // Must be null — the server fills follow_up_clinic with this hospital's
+        // own name; any non-null value here is a 400.
+        follow_up_clinic: null,
+        follow_up_date: formData.follow_up_date,
+        follow_up_time: formData.follow_up_time,
+        // "" is rejected as blank; null is accepted when a follow-up is set.
+        follow_up_instructions: instructions || null,
+      };
+    }
+
+    if (formData.follow_up_plan === "external") {
+      return {
+        continue_followup_at_curr_hospital: false,
+        follow_up_clinic: formData.follow_up_clinic.trim(),
+        follow_up_date: formData.follow_up_date,
+        follow_up_time: formData.follow_up_time,
+        follow_up_instructions: instructions || null,
+      };
+    }
+
+    // "none" — no follow-up. Send follow_up_clinic: null (works around a backend
+    // KeyError 500 on the no-follow-up path) and omit date / time / instructions
+    // entirely: any value on those is rejected with a `follow_up` 400.
+    return {
+      continue_followup_at_curr_hospital: false,
+      follow_up_clinic: null,
+    };
+  };
+
   const buildDischargePayload = () => {
     const discharge_medications = [
       ...existingMedications
@@ -275,11 +320,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       // capitalized labels ("Improved", ...); send them lowercased to match the
       // GET /api/inpatients/discharged-patients response convention.
       condition_at_discharge: formData.condition_at_discharge.toLowerCase(),
-      will_continue_followup: !!formData.will_continue_followup,
-      follow_up_clinic: formData.follow_up_clinic.trim(),
-      follow_up_date: formData.follow_up_date,
-      follow_up_time: formData.follow_up_time,
-      follow_up_instructions: formData.follow_up_instructions.trim(),
+      ...buildFollowUpPayload(),
       ...(formData.completed_investigations.length
         ? { completed_investigations: toInvestigationRefs(formData.completed_investigations) }
         : {}),
@@ -321,10 +362,17 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
     if (!formData.hospital_course_note.trim()) missing.push("Hospital course note");
     if (!formData.care_instructions.trim()) missing.push("Care instructions");
     if (!formData.condition_at_discharge) missing.push("Condition at discharge");
-    if (!formData.follow_up_clinic.trim()) missing.push("Follow-up clinic");
-    if (!formData.follow_up_date) missing.push("Follow-up date");
-    if (!formData.follow_up_time) missing.push("Follow-up time");
-    if (!formData.follow_up_instructions.trim()) missing.push("Follow-up instructions");
+
+    // Follow-up requirements depend on the chosen plan. "none" needs nothing;
+    // both follow-up plans need a date and a time; "external" also needs a
+    // clinic name. Follow-up instructions are optional in every case.
+    if (formData.follow_up_plan === "external" && !formData.follow_up_clinic.trim()) {
+      missing.push("Follow-up clinic");
+    }
+    if (formData.follow_up_plan !== "none") {
+      if (!formData.follow_up_date) missing.push("Follow-up date");
+      if (!formData.follow_up_time) missing.push("Follow-up time");
+    }
 
     if (missing.length > 0) {
       toast.error(`Please fill in: ${missing.join(", ")}.`);
@@ -394,6 +442,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
         <DischargeFollowUpStep
           formData={formData}
           onFieldChange={handleFieldChange}
+          hospitalName={hospitalName}
           pendingInvestigationOptions={pendingInvestigationOptions}
           onTogglePendingInvestigation={toggleSelection("pending_investigations")}
         />

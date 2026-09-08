@@ -1,7 +1,7 @@
 import React, { useState, useContext, useMemo } from "react";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
-import Pagination from "../../../Patient_Dashboard_Components/Pagination/Pagination";
+import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { DoctorsAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
@@ -14,8 +14,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
     count,
     currentPage,
     totalPages,
-    refetch: fetchAdmittedPatients,
-    tab,
+    setCurrentPage,
     searchQuery,
     setSearchQuery,
     isRefreshing,
@@ -278,12 +277,11 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
       </div>
       </>)}
 
-      <Pagination
+      <Pagination2
         count={count}
         currentPage={currentPage}
         totalPages={totalPages}
-        fetchData={fetchAdmittedPatients}
-        tab={tab}
+        setCurrentPage={setCurrentPage}
       />
     </>
   );
@@ -296,8 +294,7 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
     count,
     currentPage,
     totalPages,
-    refetch: fetchOutPatients,
-    tab,
+    setCurrentPage,
     searchQuery,
     setSearchQuery,
     isRefreshing,
@@ -424,12 +421,11 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
       </div>
       </>)}
 
-      <Pagination
+      <Pagination2
         count={count}
         currentPage={currentPage}
         totalPages={totalPages}
-        fetchData={fetchOutPatients}
-        tab={tab}
+        setCurrentPage={setCurrentPage}
       />
     </>
   );
@@ -442,8 +438,7 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
     count,
     currentPage,
     totalPages,
-    refetch: fetchAdmittedPatients,
-    tab,
+    setCurrentPage,
     searchQuery,
     setSearchQuery,
     isRefreshing,
@@ -688,12 +683,11 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
       </div>
       </>)}
 
-      <Pagination
+      <Pagination2
         count={count}
         currentPage={currentPage}
         totalPages={totalPages}
-        fetchData={fetchAdmittedPatients}
-        tab={tab}
+        setCurrentPage={setCurrentPage}
       />
     </>
   );

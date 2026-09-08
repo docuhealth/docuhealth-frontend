@@ -275,16 +275,25 @@ const DoctorDischargeSummaryView = ({ admissionSqid, dischargeRow, fallbackPatie
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
                 Follow-up
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <Field label="Clinic" value={doc.follow_up_clinic} />
-                <Field label="Date" value={doc.follow_up_date} />
-                <Field label="Time" value={trimSeconds(doc.follow_up_time)} />
-              </div>
-              <Field
-                label="Instructions"
-                value={doc.follow_up_instructions}
-                className="mt-4"
-              />
+              {!doc.follow_up_clinic &&
+              !doc.follow_up_date &&
+              !doc.follow_up_time &&
+              !doc.follow_up_instructions ? (
+                <p className="text-sm text-gray-500">No follow-up scheduled.</p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <Field label="Clinic" value={doc.follow_up_clinic} />
+                    <Field label="Date" value={doc.follow_up_date} />
+                    <Field label="Time" value={trimSeconds(doc.follow_up_time)} />
+                  </div>
+                  <Field
+                    label="Instructions"
+                    value={doc.follow_up_instructions}
+                    className="mt-4"
+                  />
+                </>
+              )}
             </div>
           </div>
         )}
