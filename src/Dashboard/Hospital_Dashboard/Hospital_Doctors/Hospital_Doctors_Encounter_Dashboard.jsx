@@ -44,9 +44,10 @@ const Hospital_Doctors_Encounter_Dashboard = () => {
         {count > 0 && totalPages > 1 && (
           <div className="mt-6">
             <Pagination2
+              count={count}
               currentPage={currentPage}
               totalPages={totalPages}
-              onPageChange={(page) => setCurrentPage(page)}
+              setCurrentPage={setCurrentPage}
             />
           </div>
         )}
