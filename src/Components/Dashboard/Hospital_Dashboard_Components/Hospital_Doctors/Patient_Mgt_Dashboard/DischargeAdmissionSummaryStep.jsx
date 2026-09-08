@@ -1,5 +1,4 @@
 import React from "react";
-import { Sparkles } from "lucide-react";
 import Input from "../../../../ui/Input";
 
 const SummaryField = ({ label, value }) => (
@@ -15,8 +14,6 @@ const DischargeAdmissionSummaryStep = ({
   admissionSummary,
   formData,
   onFieldChange,
-  onGenerateSummary,
-  isGeneratingSummary,
 }) => {
   return (
     <div className="animate-in fade-in duration-300 space-y-6">
@@ -103,25 +100,13 @@ const DischargeAdmissionSummaryStep = ({
       </div>
 
       <div className="border border-gray-200 rounded-xl p-5 lg:p-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
-          <h3 className="font-semibold text-docuhealth-primary text-[15px] flex items-center gap-1.5">
-            <Sparkles size={15} />
-            Hospital course note (A.I generated summary)<span className="text-red-500"> *</span>
-          </h3>
-          <button
-            type="button"
-            onClick={onGenerateSummary}
-            disabled={isGeneratingSummary}
-            className="flex items-center gap-1.5 border border-docuhealth-primary text-docuhealth-primary rounded-full px-4 py-1.5 text-[12px] font-medium hover:bg-docuhealth-primary/5 disabled:opacity-60 whitespace-nowrap"
-          >
-            <Sparkles size={13} />
-            {isGeneratingSummary ? "Loading progress note..." : "Generate summary from progress note"}
-          </button>
-        </div>
+        <h3 className="font-semibold text-docuhealth-primary mb-3 text-[15px]">
+          Hospital course note<span className="text-red-500"> *</span>
+        </h3>
         <textarea
           value={formData.hospital_course_note}
           onChange={(e) => onFieldChange("hospital_course_note", e.target.value)}
-          placeholder="Click “Generate summary from progress note” to pull in the patient's latest progress note, or type a summary here..."
+          placeholder="Summarize the patient's clinical course during this admission..."
           rows={5}
           className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary resize-y"
         ></textarea>

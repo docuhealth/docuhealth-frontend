@@ -23,17 +23,21 @@ const DischargeFollowUpStep = ({
                 label="Follow-up clinic"
                 required
                 value={formData.follow_up_clinic}
-                onChange={(e) => onFieldChange("follow_up_clinic", e.target.value)}
+                onChange={(e) =>
+                  onFieldChange("follow_up_clinic", e.target.value)
+                }
                 placeholder="e.g. Medical Outpatient Clinic"
               />
               <label className="flex items-center gap-2 text-[12px] text-gray-600 font-medium cursor-pointer w-fit">
                 <input
                   type="checkbox"
                   checked={formData.will_continue_followup}
-                  onChange={(e) => onFieldChange("will_continue_followup", e.target.checked)}
+                  onChange={(e) =>
+                    onFieldChange("will_continue_followup", e.target.checked)
+                  }
                   className="w-4 h-4 text-docuhealth-primary rounded border-gray-300 focus:ring-docuhealth-primary cursor-pointer accent-blue-700"
                 />
-                Patient will continue follow-up at this hospital
+                Patient will continue here
               </label>
             </div>
           </div>
@@ -46,11 +50,15 @@ const DischargeFollowUpStep = ({
               <Input
                 type="date"
                 value={formData.follow_up_date}
-                onChange={(e) => onFieldChange("follow_up_date", e.target.value)}
+                onChange={(e) =>
+                  onFieldChange("follow_up_date", e.target.value)
+                }
               />
               <TimeInput
                 value={formData.follow_up_time}
-                onChange={(e) => onFieldChange("follow_up_time", e.target.value)}
+                onChange={(e) =>
+                  onFieldChange("follow_up_time", e.target.value)
+                }
               />
             </div>
           </div>
@@ -65,11 +73,14 @@ const DischargeFollowUpStep = ({
 
           <div>
             <label className="block text-[13px] font-medium text-gray-700 mb-2">
-              Care instructions (for the patient)<span className="text-red-500"> *</span>
+              Care instructions (for the patient)
+              <span className="text-red-500"> *</span>
             </label>
             <textarea
               value={formData.care_instructions}
-              onChange={(e) => onFieldChange("care_instructions", e.target.value)}
+              onChange={(e) =>
+                onFieldChange("care_instructions", e.target.value)
+              }
               placeholder="Home care, wound care, activity, diet, warning signs — one item per line..."
               rows={4}
               className="w-full border border-gray-200 rounded-lg p-3 text-[13px] text-gray-700 focus:outline-none focus:border-docuhealth-primary resize-y"
@@ -82,7 +93,9 @@ const DischargeFollowUpStep = ({
             </label>
             <textarea
               value={formData.follow_up_instructions}
-              onChange={(e) => onFieldChange("follow_up_instructions", e.target.value)}
+              onChange={(e) =>
+                onFieldChange("follow_up_instructions", e.target.value)
+              }
               placeholder="Enter follow up instructions..."
               rows={4}
               className="w-full border border-gray-200 rounded-lg p-3 text-[13px] text-gray-700 focus:outline-none focus:border-docuhealth-primary resize-y"

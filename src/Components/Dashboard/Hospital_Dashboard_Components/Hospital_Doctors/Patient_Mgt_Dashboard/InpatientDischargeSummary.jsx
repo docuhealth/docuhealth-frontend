@@ -49,13 +49,6 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
     enabled: !!hin,
   });
 
-  const { data: soapNotesData, isFetching: soapNotesLoading } = useQuery({
-    queryKey: ["patient-soap-notes", hin, 1],
-    queryFn: async () =>
-      (await axiosInstanceHos.get(`api/medical-records/soap-note/${hin}?page=1&size=6`)).data,
-    enabled: !!hin,
-  });
-
   const { data: labRecordsData } = useQuery({
     queryKey: ["patient-lab-records", hin, 1],
     queryFn: async () =>
@@ -128,31 +121,6 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
 
   const handleFieldChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // ---- Generate hospital course note from the latest real progress note ----
-  const handleGenerateSummary = () => {
-    const notes = soapNotesData?.results || [];
-    if (notes.length === 0) {
-      toast.error("No progress notes found for this patient yet.");
-      return;
-    }
-    const latest = [...notes].sort(
-      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-    )[0];
-
-    const lines = [
-      latest.chief_complaint && `Chief complaint: ${latest.chief_complaint}`,
-      latest.primary_diagnosis && `Assessment: ${latest.primary_diagnosis}`,
-      latest.additional_notes && `Notes: ${latest.additional_notes}`,
-    ].filter(Boolean);
-
-    handleFieldChange(
-      "hospital_course_note",
-      lines.length > 0
-        ? lines.join("\n")
-        : "No further detail was recorded on the latest progress note.",
-    );
   };
 
   // ---- Step 2: investigations (from real lab test orders) ----
@@ -404,8 +372,6 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
           admissionSummary={admissionSummary}
           formData={formData}
           onFieldChange={handleFieldChange}
-          onGenerateSummary={handleGenerateSummary}
-          isGeneratingSummary={soapNotesLoading}
         />
       )}
 
