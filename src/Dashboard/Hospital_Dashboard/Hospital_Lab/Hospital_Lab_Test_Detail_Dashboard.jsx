@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { ArrowLeft, X } from "lucide-react";
-import PatientInfoCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/PatientInfoCard";
 import RejectModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/RejectModal";
 import toast from "react-hot-toast";
 import {
@@ -27,6 +26,18 @@ const STATUS_STYLES = {
   accepted:         { label: "Accepted",    color: "text-green-600" },
 };
 
+const calcAge = (dob) => {
+  if (!dob) return null;
+  const years = Math.floor((Date.now() - new Date(dob).getTime()) / (1000 * 60 * 60 * 24 * 365.25));
+  return isNaN(years) ? null : `${years} yrs`;
+};
+
+// Show only the first 4 and last 2 digits of the HIN; mask everything between.
+const maskHin = (hin) => {
+  const s = String(hin ?? "");
+  return s.length > 6 ? `${s.slice(0, 4)}${"•".repeat(s.length - 6)}${s.slice(-2)}` : s;
+};
+
 const getRefRange = (p) => {
   if (p.ref_text) return p.ref_text;
   if (p.ref_low != null && p.ref_high != null) return `${p.ref_low} – ${p.ref_high}`;
@@ -47,8 +58,8 @@ const normalizeOrder = (raw, tab) => ({
   name:                  raw.name || [raw.patient_info?.firstname, raw.patient_info?.lastname].filter(Boolean).join(" ") || (raw.test_info ? raw.test_info.name : "Unknown"),
   hin:                   raw.patient_info?.hin || raw.hin || "—",
   hospital:              raw.hospital_info?.name || raw.hospital || "—",
-  datetime:              raw.created_at
-    ? new Date(raw.created_at).toLocaleString("en-US", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+  datetime:              (raw.created_at || raw.result_info?.created_at)
+    ? new Date(raw.created_at || raw.result_info?.created_at).toLocaleString("en-US", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
     : raw.datetime || "—",
   tab,
   requestedBy:           raw.ordered_by
@@ -551,12 +562,39 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
         </button>
       </div>
 
-      {/* <PatientInfoCard
-        order={order}
-        isCompleted={order.aggregate_status === "result_ready" || order.aggregate_status === "completed"}
-        isRejected={order.aggregate_status === "rejected"}
-        isInProgress={order.aggregate_status === "in_progress" || order.aggregate_status === "sample_collected"}
-      /> */}
+      {order.hin && order.hin !== "—" && (
+        <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-gray-400">Patient</p>
+              <p className="text-sm font-bold text-docuhealth-dark">{order.name || "—"}</p>
+              <p className="text-xs text-gray-500">HIN: {maskHin(order.hin)}</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-gray-400">Age / Gender</p>
+              <p className="text-sm font-semibold text-docuhealth-dark capitalize">
+                {[calcAge(order.dob), order.gender].filter(Boolean).join(" · ") || "—"}
+              </p>
+            </div>
+            {order.requestedBy && (
+              <div className="flex flex-col gap-1">
+                <p className="text-xs text-gray-400">
+                  {isDoctorView ? "Result submitted by" : "Requested by"}
+                </p>
+                <p className="text-sm font-semibold text-docuhealth-dark">{order.requestedBy}</p>
+              </div>
+            )}
+            {order.datetime && order.datetime !== "—" && (
+              <div className="flex flex-col gap-1">
+                <p className="text-xs text-gray-400">
+                  {isDoctorView ? "Result date" : "Requested"}
+                </p>
+                <p className="text-sm font-semibold text-docuhealth-dark">{order.datetime}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="mt-6">
         <h2 className="text-lg font-bold text-gray-800 mb-2">Test Items</h2>

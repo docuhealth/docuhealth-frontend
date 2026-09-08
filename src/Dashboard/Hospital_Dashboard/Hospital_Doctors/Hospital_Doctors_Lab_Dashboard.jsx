@@ -17,7 +17,7 @@ const Hospital_Doctors_Lab_Dashboard = () => {
   const { data: labRecordsData, isLoading: labLoading } = useQuery({
     queryKey: ["doctor-lab-records", currentPage, debouncedSearch],
     queryFn: async () => {
-      let url = `api/lab/test-orders/appointments?page=${currentPage}&size=${pageSize}`;
+      let url = `api/lab/test-orders/results-for-review?page=${currentPage}&size=${pageSize}`;
       if (debouncedSearch) {
         url += `&search=${encodeURIComponent(debouncedSearch)}`;
       }
@@ -122,6 +122,21 @@ const Hospital_Doctors_Lab_Dashboard = () => {
                         </p>
                       </div>
                     </div>
+
+                    {record?.patient_info && (
+                      <p className="text-xs mb-2 flex items-center gap-1.5 flex-wrap">
+                        <span className="font-medium text-gray-800 capitalize">
+                          {`${record.patient_info.firstname ?? ""} ${record.patient_info.lastname ?? ""}`.trim() || "Unknown patient"}
+                        </span>
+                        {record.patient_info.hin && (
+                          <span className="text-gray-400">
+                            · {record.patient_info.hin.length >= 6
+                              ? `${record.patient_info.hin.slice(0, 4)}••••${record.patient_info.hin.slice(-2)}`
+                              : record.patient_info.hin}
+                          </span>
+                        )}
+                      </p>
+                    )}
 
                     <div className="flex flex-col gap-1.5 mb-3">
                       <div className="flex items-center gap-1">

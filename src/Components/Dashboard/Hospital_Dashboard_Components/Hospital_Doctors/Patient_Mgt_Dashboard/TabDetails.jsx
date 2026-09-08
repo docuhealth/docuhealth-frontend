@@ -586,6 +586,11 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
                   "••••••" +
                   admittedPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
+              {admittedPatient?.admission_date && (
+                <p className="text-gray-600 pt-1">
+                  Admitted : {formatRecordDate(admittedPatient.admission_date)}
+                </p>
+              )}
             </div>
             {admittedPatient?.discharged_by && (
               <div className="flex items-center gap-1 text-gray-600 pt-3">

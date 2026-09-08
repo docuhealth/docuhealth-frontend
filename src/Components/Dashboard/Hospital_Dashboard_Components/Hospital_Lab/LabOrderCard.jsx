@@ -7,7 +7,12 @@ const getPatientName = (order) => {
   return "Unknown";
 };
 
-const getHIN = (order) => order.patient_info?.hin || "—";
+// Show only the first 4 and last 2 digits of the HIN; mask everything between.
+const getHIN = (order) => {
+  const s = String(order.patient_info?.hin ?? "");
+  if (!s) return "—";
+  return s.length > 6 ? `${s.slice(0, 4)}${"•".repeat(s.length - 6)}${s.slice(-2)}` : s;
+};
 
 const getTestName = (order) => {
   const items = order.items_info || order.items;
