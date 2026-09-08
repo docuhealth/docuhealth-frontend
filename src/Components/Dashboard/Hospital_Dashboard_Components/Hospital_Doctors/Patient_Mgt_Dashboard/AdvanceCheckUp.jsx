@@ -122,6 +122,7 @@ const AdvanceCheckUp = ({
             ) : (
               <DoctorDischargeSummaryView
                 admissionSqid={selected?.admission_sqid || selected?.sqid}
+                dischargeRow={selected}
                 fallbackPatient={selected}
               />
             )}

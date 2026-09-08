@@ -7,6 +7,13 @@ const calcAge = (dob) => {
   return isNaN(years) ? null : `${years} years`;
 };
 
+// Show only the first 4 and last 2 digits of the HIN; mask everything between.
+const maskHin = (hin) => {
+  const s = String(hin ?? "");
+  if (!s) return "—";
+  return s.length > 6 ? `${s.slice(0, 4)}${"•".repeat(s.length - 6)}${s.slice(-2)}` : s;
+};
+
 const PatientInfoCard = ({
   order,
   isCompleted,
@@ -28,11 +35,14 @@ const PatientInfoCard = ({
 
   const showSampleCol = isInProgress || isCompleted;
   const colCount = (showSampleCol ? 1 : 0) + (hideRequestedBy ? 0 : 1) + 3;
+  // At the lg breakpoint the content column is only ~720px (256px sidebar +
+  // padding), so 4-5 tracks get cramped — hold those back to xl and let lg
+  // sit at 3 columns.
   const gridCols =
     colCount === 5
-      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-5"
+      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
       : colCount === 4
-        ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+        ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
         : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
 
   return (
@@ -40,7 +50,7 @@ const PatientInfoCard = ({
       <div className={`grid ${gridCols} gap-4 sm:gap-6`}>
         <div className="flex flex-col gap-1">
           <p className="text-sm font-bold text-docuhealth-dark">{order.name}</p>
-          <p className="text-xs text-gray-500">Patient HIN: {order.hin}</p>
+          <p className="text-xs text-gray-500">Patient HIN: {maskHin(order.hin)}</p>
           <p className="text-xs text-gray-500">Age: {ageDisplay}</p>
           <p className="text-xs text-gray-500">Gender: {gender}</p>
           {(order.payment_provider?.type || order.payment_category) && (
