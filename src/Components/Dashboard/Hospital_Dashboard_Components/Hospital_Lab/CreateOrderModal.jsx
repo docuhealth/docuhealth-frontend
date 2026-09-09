@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { fetchTestCategories, fetchLabTests, createLabTestOrder } from "../../../../queries/Hospital/lab/requests";
+import { extractApiErrorMessage } from "../../../../utils/apiError";
 import axiosInstanceHos from "../../../../lib/axios/hospital";
 import Button from "../../../ui/Button";
 import Modal from "../../../ui/Modal";
@@ -34,7 +35,11 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin }) => {
     mutationFn: (payload) => {
       const requestPayload = {
         patient: patientHin,
-        items_data: payload.test_type.map((testSqid) => ({
+        // `POST api/lab/test-orders/create` requires `order_source` and the
+        // line-items key is `items` (not `items_data`). This modal is opened
+        // from a lab appointment row, so the order is fulfilling that request.
+        order_source: "staff_appointment_order",
+        items: payload.test_type.map((testSqid) => ({
           test: testSqid,
           note: payload.note,
         })),
@@ -56,7 +61,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin }) => {
       if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {
         setDuplicateWarning(err.response.data.duplicate_warning);
       } else {
-        toast.error(err.response?.data?.message || "Failed to create order.");
+        toast.error(extractApiErrorMessage(err, "Failed to create order."));
       }
     },
   });

@@ -1,11 +1,12 @@
-import { X, Info, AlertTriangle } from "lucide-react";
+import { Info, AlertTriangle } from "lucide-react";
 import Modal from "../../../ui/Modal";
 import Button from "../../../ui/Button";
 
-const DoctorReviewModal = ({ isOpen, onClose, onConfirm, isPending, type }) => {
+const DoctorReviewModal = ({ isOpen, onClose, onConfirm, isPending, type, reason = "", onReasonChange }) => {
   if (!isOpen) return null;
 
   const isApprove = type === "approve";
+  const reasonMissing = !isApprove && !reason.trim();
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="">
@@ -24,15 +25,30 @@ const DoctorReviewModal = ({ isOpen, onClose, onConfirm, isPending, type }) => {
 
         <div className="border border-gray-200 rounded-md p-4 mb-6 w-full">
           <p className="text-[13px] text-gray-600 leading-relaxed text-left">
-            {isApprove 
+            {isApprove
               ? "By Accepting this test result, you approve that you have checked and validated the result. by proceeding, you agree that the result be added to your SOAP note and patient's AVS!"
               : "By rejecting this test result, you indicate that the result is invalid or requires a re-test. This action cannot be undone."}
           </p>
         </div>
 
+        {!isApprove && (
+          <div className="w-full mb-6 text-left">
+            <label className="text-xs text-gray-500">
+              Reason for rejection <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              rows={3}
+              placeholder="Explain why the result is being sent back (visible to the lab scientist)..."
+              value={reason}
+              onChange={(e) => onReasonChange?.(e.target.value)}
+              className="mt-1 w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-700 outline-none focus:border-red-400 resize-none transition-colors"
+            />
+          </div>
+        )}
+
         <Button
           onClick={onConfirm}
-          disabled={isPending}
+          disabled={isPending || reasonMissing}
           loading={isPending}
           loadingText={isApprove ? "Approving..." : "Rejecting..."}
           variant={isApprove ? "primary" : "danger"}

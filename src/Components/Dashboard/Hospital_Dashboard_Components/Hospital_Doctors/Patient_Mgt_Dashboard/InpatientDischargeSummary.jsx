@@ -15,14 +15,10 @@ import DischargeSuccessModal from "./DischargeSuccessModal";
 const COMPLETED_LAB_STATUSES = ["completed", "accepted", "result_ready", "approved"];
 const pageSize = 20;
 
-// In-patient discharge, as a 3-step wizard (Admission Summary → Procedures &
-// Medications → Follow-up). The read-only summary fields, investigation options,
-// and seeded medications are wired to real data already fetched elsewhere in the
-// doctor's dashboard; "Complete Discharge" submits the wizard to
-// POST /api/inpatients/admissions/<sqid>/doc-discharge-form
-// (createDoctorInpatientDischarge). That records the doctor's discharge summary
-// and raises a nurse discharge task — the bed is only freed once a nurse
-// completes that task.
+// In-patient discharge as a 3-step wizard (Admission Summary → Procedures &
+// Medications → Follow-up). "Complete Discharge" submits to createDoctorInpatientDischarge,
+// which records the discharge summary and raises a nurse discharge task; the bed is
+// only freed once a nurse completes that task.
 const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatient }) => {
   const queryClient = useQueryClient();
   const { hospitalName } = useContext(DoctorAppContext);
@@ -32,9 +28,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
     selectedDischargePatient?.patient?.hin ||
     "";
 
-  // For the in-patient list, the selected row's own sqid IS the admission sqid
-  // (the outpatient list carries a check-in instead — that flow uses a
-  // different discharge endpoint).
+  // For the in-patient list, the selected row's own sqid IS the admission sqid.
   const admissionSqid =
     selectedDischargePatient?.admission_sqid || selectedDischargePatient?.sqid || "";
 
