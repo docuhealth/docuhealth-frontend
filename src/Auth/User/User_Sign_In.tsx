@@ -6,6 +6,8 @@ import AuthRightSide from "../AuthRightSide";
 import { Link, useNavigate } from "react-router-dom";
 import { login, setToken } from "../../services/authService";
 import toast from "react-hot-toast";
+import Input from "../../Components/ui/Input";
+import Button from "../../Components/ui/Button";
 
 const USI = () => {
   const [email, setEmail] = useState("");
@@ -138,48 +140,33 @@ const USI = () => {
 
                 <form onSubmit={handleSubmit} className="text-sm">
                   {/* Email Input */}
-                  <div className="relative pb-3">
-                    <p className="font-semibold pb-1">Email :</p>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
-                        value={inputValue}
-                        onChange={handleInputChange}
-                        onInput={handleInputChange}
-                        autoComplete="email"
-                        required
-                      />
-                      <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    </div>
+                  <div className="pb-3">
+                    <Input
+                      label="Email :"
+                      type="text"
+                      value={inputValue}
+                      onChange={handleInputChange}
+                      onInput={handleInputChange}
+                      autoComplete="email"
+                      required
+                      leadingIcon={<FaEnvelope />}
+                    />
                   </div>
 
                   {/* Password Input */}
-                  <div className="relative pb-5">
-                    <p className="font-semibold pb-1">Password:</p>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        onInput={(e) => setPassword((e.target as HTMLInputElement).value)}
-                        autoComplete="current-password"
-                        required
-                      />
-                      <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute top-1/2 right-3 transform -translate-y-1/2"
-                      >
-                        {showPassword ? (
-                          <FaEyeSlash className="h-4 w-4 text-gray-400" />
-                        ) : (
-                          <FaEye className="h-4 w-4 text-gray-400" />
-                        )}
-                      </button>
-                    </div>
+                  <div className="pb-5">
+                    <Input
+                      label="Password:"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onInput={(e) => setPassword((e.target as HTMLInputElement).value)}
+                      autoComplete="current-password"
+                      required
+                      leadingIcon={<FaLock />}
+                      trailingIcon={showPassword ? <FaEyeSlash /> : <FaEye />}
+                      onTrailingIconClick={() => setShowPassword(!showPassword)}
+                    />
                   </div>
 
                   {/* Remember Me Checkbox */}
@@ -201,25 +188,16 @@ const USI = () => {
                   </div>
 
                   {/* Submit Button */}
-                  <button
+                  <Button
                     type="submit"
-                    className={`w-full py-3 rounded-full ${
-                      isFormValid && !isSubmitting
-                        ? "bg-docuhealth-primary text-white"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
+                    fullWidth
+                    loading={isSubmitting}
+                    loadingText="Logging In..."
+                    disabled={!isFormValid}
                     onClick={handleSubmit}
-                    disabled={!isFormValid || isSubmitting}
                   >
-                    {isSubmitting ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Logging In...
-                      </div>
-                    ) : (
-                      "Next"
-                    )}
-                  </button>
+                    Next
+                  </Button>
                 </form>
 
                 {/* Sign-Up Prompt */}
@@ -257,44 +235,29 @@ const USI = () => {
 
           <form onSubmit={handleSubmit} className="text-sm">
             {/* Email Input */}
-            <div className="relative pb-3">
-              <p className="font-semibold pb-1">Email :</p>
-              <div className="relative">
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  required
-                />
-                <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              </div>
+            <div className="pb-3">
+              <Input
+                label="Email :"
+                type="text"
+                value={inputValue}
+                onChange={handleInputChange}
+                required
+                leadingIcon={<FaEnvelope />}
+              />
             </div>
 
             {/* Password Input */}
-            <div className="relative pb-5">
-              <p className="font-semibold pb-1">Password:</p>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute top-1/2 right-3 transform -translate-y-1/2"
-                >
-                  {showPassword ? (
-                    <FaEyeSlash className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <FaEye className="h-4 w-4 text-gray-400" />
-                  )}
-                </button>
-              </div>
+            <div className="pb-5">
+              <Input
+                label="Password:"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                leadingIcon={<FaLock />}
+                trailingIcon={showPassword ? <FaEyeSlash /> : <FaEye />}
+                onTrailingIconClick={() => setShowPassword(!showPassword)}
+              />
             </div>
 
             {/* Remember Me Checkbox */}
@@ -316,25 +279,16 @@ const USI = () => {
             </div>
 
             {/* Submit Button */}
-            <button
+            <Button
               type="submit"
-              className={`w-full py-3 rounded-full ${
-                isFormValid && !isSubmitting
-                  ? "bg-docuhealth-primary text-white "
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
+              fullWidth
+              loading={isSubmitting}
+              loadingText="Logging In..."
+              disabled={!isFormValid}
               onClick={handleSubmit}
-              disabled={!isFormValid || isSubmitting}
             >
-              {isSubmitting ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Logging In...
-                </div>
-              ) : (
-                "Next"
-              )}
-            </button>
+              Next
+            </Button>
           </form>
 
           {/* Sign-Up Prompt */}

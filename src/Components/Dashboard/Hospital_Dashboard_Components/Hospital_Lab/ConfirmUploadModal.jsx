@@ -1,18 +1,13 @@
 import { X, Info } from "lucide-react";
+import Modal from "../../../ui/Modal";
+import Button from "../../../ui/Button";
 
 const ConfirmUploadModal = ({ isOpen, onClose, onConfirm, isPending }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-auto px-10 py-10 relative flex flex-col items-center text-center">
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          <X size={24} />
-        </button>
-
+    <Modal isOpen={isOpen} onClose={onClose} title="">
+      <div className="flex flex-col items-center text-center py-2">
         <div className="w-12 h-12 rounded-full border-2 border-gray-800 flex items-center justify-center mb-4">
           <Info size={22} className="text-gray-800" />
         </div>
@@ -23,17 +18,17 @@ const ConfirmUploadModal = ({ isOpen, onClose, onConfirm, isPending }) => {
           By proceeding you confirm that you have carried out the requested test and you are certain of the results/finding. Once uploaded, result will be shared to both doctor and patient!
         </p>
 
-        <button
+        <Button
           onClick={onConfirm}
           disabled={isPending}
-          className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3 rounded-full hover:bg-docuhealth-dark-primary transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+          loading={isPending}
+          loadingText="Uploading..."
+          fullWidth
         >
-          {isPending ? (
-            <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Uploading...</>
-          ) : "Confirm upload"}
-        </button>
+          Confirm upload
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 };
 

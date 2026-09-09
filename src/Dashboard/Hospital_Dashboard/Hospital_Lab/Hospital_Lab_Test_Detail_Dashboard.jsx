@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { ArrowLeft, X } from "lucide-react";
-import PatientInfoCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/PatientInfoCard";
 import RejectModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/RejectModal";
 import toast from "react-hot-toast";
 import {
@@ -15,6 +14,7 @@ import {
   rejectLabTestResult,
 } from "../../../queries/Hospital/lab/requests";
 import DoctorReviewModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/DoctorReviewModal";
+import { extractApiErrorMessage } from "../../../utils/apiError";
 
 const STATUS_STYLES = {
   pending:          { label: "Pending",     color: "text-green-600" },
@@ -25,6 +25,18 @@ const STATUS_STYLES = {
   rejected:         { label: "Rejected",    color: "text-red-500"   },
   approved:         { label: "Approved",    color: "text-green-600" },
   accepted:         { label: "Accepted",    color: "text-green-600" },
+};
+
+const calcAge = (dob) => {
+  if (!dob) return null;
+  const years = Math.floor((Date.now() - new Date(dob).getTime()) / (1000 * 60 * 60 * 24 * 365.25));
+  return isNaN(years) ? null : `${years} yrs`;
+};
+
+// Show only the first 4 and last 2 digits of the HIN; mask everything between.
+const maskHin = (hin) => {
+  const s = String(hin ?? "");
+  return s.length > 6 ? `${s.slice(0, 4)}${"•".repeat(s.length - 6)}${s.slice(-2)}` : s;
 };
 
 const getRefRange = (p) => {
@@ -47,8 +59,8 @@ const normalizeOrder = (raw, tab) => ({
   name:                  raw.name || [raw.patient_info?.firstname, raw.patient_info?.lastname].filter(Boolean).join(" ") || (raw.test_info ? raw.test_info.name : "Unknown"),
   hin:                   raw.patient_info?.hin || raw.hin || "—",
   hospital:              raw.hospital_info?.name || raw.hospital || "—",
-  datetime:              raw.created_at
-    ? new Date(raw.created_at).toLocaleString("en-US", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+  datetime:              (raw.created_at || raw.result_info?.created_at)
+    ? new Date(raw.created_at || raw.result_info?.created_at).toLocaleString("en-US", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
     : raw.datetime || "—",
   tab,
   requestedBy:           raw.ordered_by
@@ -79,6 +91,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   const [sampleDate, setSampleDate] = useState("");
   const [sampleTime, setSampleTime] = useState("");
   const [rejectReason, setRejectReason] = useState("");
+  const [doctorReviewReason, setDoctorReviewReason] = useState("");
 
   const displayStatus = isDoctorView && item.result_info?.status ? item.result_info.status : item.status;
   const statusStyle  = STATUS_STYLES[displayStatus] ?? STATUS_STYLES.pending;
@@ -88,6 +101,13 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   const isInProgress = item.status === "in_progress";
   const isResultReady  = item.status === "result_ready" || item.status === "completed";
   const isRejected   = item.status === "rejected";
+
+  // On the doctor's "Reviewed" tab an already-actioned result comes back with
+  // `item.status` bumped off `result_ready` (approve keeps it, reject drops it
+  // to `in_progress`). Still render its result table + outcome, read-only.
+  const reviewedResultStatus = isDoctorView ? item.result_info?.status : null;
+  const isReviewedResult = ["accepted", "approved", "rejected"].includes(reviewedResultStatus);
+  const showResultBody = isResultReady || isReviewedResult;
 
   const specimens    = item.test_info?.specimens ?? [];
   const preferredSpecimen = specimens.find((s) => s.is_preferred) ?? specimens[0];
@@ -103,16 +123,16 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
 
   const actualItemSqid = item.sqid;
 
-  const acceptMutation = useMutation({ 
+  const acceptMutation = useMutation({
     mutationFn: () => acceptLabRequest({ order_sqid: order.id, item_sqid: actualItemSqid }),
     onSuccess: () => {
-      toast.success("Request accepted — moved to Sample Collected");
+      toast.success("Request accepted — moved to In Progress");
       setShowAcceptModal(false);
       queryClient.invalidateQueries(["labRequests"]);
       queryClient.invalidateQueries(["lab-order", order.id]);
     },
     onError: (err) => {
-      toast.error(err?.response?.data?.message || "Failed to accept request");
+      toast.error(extractApiErrorMessage(err, "Failed to accept request"));
     },
   });
 
@@ -125,7 +145,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
       queryClient.invalidateQueries(["labRequests"]);
     },
     onError: (err) => {
-      toast.error(err?.response?.data?.message || "Failed to reject request");
+      toast.error(extractApiErrorMessage(err, "Failed to reject request"));
     },
   });
 
@@ -141,23 +161,28 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
       queryClient.invalidateQueries(["patient-lab-records"]);
       queryClient.invalidateQueries(["lab-order", order.id]);
       queryClient.invalidateQueries(["labRequests"]);
+      // Approve/reject bumps the item off `result_ready`, so it should drop out
+      // of the doctor's "Lab Results Approvals" list on the next fetch.
+      queryClient.invalidateQueries(["doctor-lab-records"]);
     },
     onError: (err) => {
-      toast.error(err?.response?.data?.message || "Failed to approve result");
+      toast.error(extractApiErrorMessage(err, "Failed to approve result"));
     },
   });
 
   const rejectDoctorMutation = useMutation({
-    mutationFn: () => rejectLabTestResult({ item_sqid: actualItemSqid }),
+    mutationFn: () => rejectLabTestResult({ item_sqid: actualItemSqid, rejection_reason: doctorReviewReason.trim() }),
     onSuccess: () => {
       toast.success("Result rejected successfully!");
       setIsDoctorReviewModalOpen(false);
+      setDoctorReviewReason("");
       queryClient.invalidateQueries(["patient-lab-records"]);
       queryClient.invalidateQueries(["lab-order", order.id]);
       queryClient.invalidateQueries(["labRequests"]);
+      queryClient.invalidateQueries(["doctor-lab-records"]);
     },
     onError: (err) => {
-      toast.error(err?.response?.data?.message || "Failed to reject result");
+      toast.error(extractApiErrorMessage(err, "Failed to reject result"));
     },
   });
 
@@ -230,7 +255,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
           {isResultReady && isDoctorView && (
             <>
               <button
-                onClick={() => { setDoctorReviewType("reject"); setIsDoctorReviewModalOpen(true); }}
+                onClick={() => { setDoctorReviewType("reject"); setDoctorReviewReason(""); setIsDoctorReviewModalOpen(true); }}
                 disabled={displayStatus === "rejected" || displayStatus === "accepted" || displayStatus === "approved"}
                 className={`w-full sm:w-auto border text-xs font-medium px-4 py-2 rounded-full transition-colors ${
                   displayStatus === "rejected" || displayStatus === "accepted" || displayStatus === "approved"
@@ -240,7 +265,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
                 Reject result
               </button>
               <button
-                onClick={() => { setDoctorReviewType("approve"); setIsDoctorReviewModalOpen(true); }}
+                onClick={() => { setDoctorReviewType("approve"); setDoctorReviewReason(""); setIsDoctorReviewModalOpen(true); }}
                 disabled={displayStatus === "rejected" || displayStatus === "accepted" || displayStatus === "approved"}
                 className={`w-full sm:w-auto text-xs font-medium px-4 py-2 rounded-full transition-colors ${
                   displayStatus === "rejected" || displayStatus === "accepted" || displayStatus === "approved"
@@ -255,7 +280,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
       </div>
 
       <div className="bg-white px-4 sm:px-6 py-5 flex flex-col gap-4">
-        {(isPending || isSampleCollected || isInProgress) && (
+        {(isPending || isSampleCollected || isInProgress) && !isReviewedResult && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="text-xs text-gray-500 mb-1">Specimen needed:</p>
@@ -276,8 +301,22 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
           </div>
         )}
 
-        {isResultReady && (
+        {showResultBody && (
           <div className="flex flex-col gap-5">
+            {isReviewedResult && (
+              <div className={`p-3 rounded-lg border text-sm ${
+                reviewedResultStatus === "rejected"
+                  ? "bg-red-50 border-red-100 text-red-800"
+                  : "bg-green-50 border-green-100 text-green-800"
+              }`}>
+                <span className="font-semibold capitalize">
+                  {reviewedResultStatus === "rejected" ? "Rejected" : "Approved"}
+                </span>
+                {reviewedResultStatus === "rejected" && item.rejection_reason
+                  ? ` — ${item.rejection_reason}`
+                  : ""}
+              </div>
+            )}
             {resultParams.length > 0 && (
               <div>
                 <p className="text-sm font-bold text-gray-800 mb-4">Results</p>
@@ -490,8 +529,10 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
 
       <DoctorReviewModal
         isOpen={isDoctorReviewModalOpen}
-        onClose={() => setIsDoctorReviewModalOpen(false)}
+        onClose={() => { setIsDoctorReviewModalOpen(false); setDoctorReviewReason(""); }}
         type={doctorReviewType}
+        reason={doctorReviewReason}
+        onReasonChange={setDoctorReviewReason}
         isPending={approveMutation.isPending || rejectDoctorMutation.isPending}
         onConfirm={() => {
           if (doctorReviewType === "approve") {
@@ -551,12 +592,42 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
         </button>
       </div>
 
-      {/* <PatientInfoCard
-        order={order}
-        isCompleted={order.aggregate_status === "result_ready" || order.aggregate_status === "completed"}
-        isRejected={order.aggregate_status === "rejected"}
-        isInProgress={order.aggregate_status === "in_progress" || order.aggregate_status === "sample_collected"}
-      /> */}
+      {order.hin && order.hin !== "—" && (
+        <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
+          {/* At lg the content column is only ~720px (256px sidebar + padding),
+              so 4 tracks get cramped — hold the 4th back to xl, matching
+              PatientInfoCard. */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-gray-400">Patient</p>
+              <p className="text-sm font-bold text-docuhealth-dark">{order.name || "—"}</p>
+              <p className="text-xs text-gray-500">HIN: {maskHin(order.hin)}</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-gray-400">Age / Gender</p>
+              <p className="text-sm font-semibold text-docuhealth-dark capitalize">
+                {[calcAge(order.dob), order.gender].filter(Boolean).join(" · ") || "—"}
+              </p>
+            </div>
+            {order.requestedBy && (
+              <div className="flex flex-col gap-1">
+                <p className="text-xs text-gray-400">
+                  {isDoctorView ? "Result submitted by" : "Requested by"}
+                </p>
+                <p className="text-sm font-semibold text-docuhealth-dark">{order.requestedBy}</p>
+              </div>
+            )}
+            {order.datetime && order.datetime !== "—" && (
+              <div className="flex flex-col gap-1">
+                <p className="text-xs text-gray-400">
+                  {isDoctorView ? "Result date" : "Requested"}
+                </p>
+                <p className="text-sm font-semibold text-docuhealth-dark">{order.datetime}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="mt-6">
         <h2 className="text-lg font-bold text-gray-800 mb-2">Test Items</h2>

@@ -1,11 +1,13 @@
 import { Check } from "lucide-react";
+import Modal from "../../../ui/Modal";
+import Button from "../../../ui/Button";
 
 const SuccessModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-auto p-6 sm:p-8 flex flex-col items-center text-center">
+    <Modal isOpen={isOpen} onClose={onClose} title="">
+      <div className="flex flex-col items-center text-center py-4">
         <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
           <div className="w-14 h-14 rounded-full bg-green-700 flex items-center justify-center">
             <Check size={28} className="text-white" strokeWidth={3} />
@@ -16,14 +18,14 @@ const SuccessModal = ({ isOpen, onClose }) => {
           You have successfully uploaded a<br />completed test result!
         </p>
 
-        <button
+        <Button
           onClick={onClose}
-          className="w-full bg-green-700 text-white text-sm font-semibold py-3 rounded-full hover:bg-green-800 transition-colors"
+          fullWidth
         >
           Done
-        </button>
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 };
 

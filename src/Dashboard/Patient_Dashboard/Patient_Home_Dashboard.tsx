@@ -10,11 +10,12 @@ import NoticeDisplay from "../../Components/Dashboard/Patient_Dashboard_Componen
 import MedicalRecords from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/MedicalRecords";
 import MedicalRecordsDetail from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/MedicalRecordsDetail";
 import Id_Card from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/IdCard/Id_Card";
-import { fetchSubscriptionStatus } from "../../services/authService";
+import { useHasActiveSubscription } from "../../hooks/patients/useHasActiveSubscription";
 import { usePatientVitalSigns } from "../../hooks/patients/usePatientVitalSigns";
 import RecentVitalSigns from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/RecentVitalSigns";
 import DrugRecordsOnHome from "../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/DrugRecordsOnHome";
 import { MedicalRecord } from "../../types/patients/home";
+import Button from "../../Components/ui/Button";
 
 const Patient_Home_Dashboard = () => {
     const navigate = useNavigate();
@@ -44,10 +45,16 @@ const Patient_Home_Dashboard = () => {
     selectedProfile,
   } = useIdCardStore();
   const { mutate: handleIDCardCreation, isPending: isCreatingID } = useCreateIdCard();
+  const hasSubscription = useHasActiveSubscription();
 
   const { data: vitalSigns, isPending: loadingVitals } = usePatientVitalSigns(vitalPage);
 
 useEffect(() => {
+    // Don't nag users who already have their HIN / Identity Card.
+    if (!profile || profile.id_card_generated) {
+      return;
+    }
+
     // 1. Delay the initial appearance by 3 seconds (3000ms)
     const initialDelay = setTimeout(() => {
       setNoticeDisplay(true);
@@ -62,7 +69,7 @@ useEffect(() => {
       clearTimeout(initialDelay);
       clearInterval(interval);
     };
-  }, []);
+  }, [profile]);
 
   const handleSelect = (option: string) => {
     setSelected(option);
@@ -116,9 +123,10 @@ useEffect(() => {
             </p>
           </div>
           <div className="relative">
-            <button
+            <Button
+              variant="outline"
               onClick={() => setIsOpen(!isOpen)}
-              className="flex items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary font-medium rounded-full hover:bg-blue-50 transition"
+              className="flex items-center gap-2 hover:bg-blue-50"
             >
               Sort by: {selected}
               <ChevronDown
@@ -126,7 +134,7 @@ useEffect(() => {
                   isOpen ? "rotate-180" : ""
                 }`}
               />
-            </button>
+            </Button>
             {isOpen && (
               <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-xs shadow-lg z-10">
                 {options.map((option) => (
@@ -142,11 +150,11 @@ useEffect(() => {
             )}
           </div>
           <div>
-            <button
-              className="flex items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary  font-medium rounded-full transition cursor-pointer"
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
               onClick={() => {
                 if (profile) {
-                  const hasSubscription = fetchSubscriptionStatus();
                   if (!hasSubscription) {
                     toast.error("Please subscribe to access feature");
                     navigate("/user-subscriptions-dashboard");
@@ -162,23 +170,22 @@ useEffect(() => {
               }}
             >
               View Recent Vitals
-            </button>
+            </Button>
           </div>
           <div>
-            <button
-              className="flex items-center gap-2 px-6 py-2.5 bg-docuhealth-primary text-white font-medium rounded-full transition cursor-pointer"
+            <Button
+              variant="primary"
+              className="flex items-center gap-2"
               onClick={() => {
                 if (profile) {
-                  const hasSubscription = fetchSubscriptionStatus();
                   if (!hasSubscription) {
                     toast.error("Please subscribe to access feature");
                     navigate("/user-subscriptions-dashboard");
                     return;
                   }
-                  if(profile.id_card_generated){
-                      toast.error("ID Card is already generated !");
-                      toast.success('Visit the settings page to view it.')
-                      return
+                  if (profile.id_card_generated) {
+                    navigate("/user-settings-dashboard?tab=id-card");
+                    return;
                   }
                   handleSelection(profile);
                 } else {
@@ -187,8 +194,8 @@ useEffect(() => {
                 }
               }}
             >
-              Get Identity Card
-            </button>
+              {profile?.id_card_generated ? "View Identity Card" : "Get Identity Card"}
+            </Button>
           </div>
         </div>
       </div>
@@ -235,9 +242,11 @@ useEffect(() => {
             </p>
           </div>
           <div className="relative">
-            <button
+            <Button
+              variant="outline"
+              fullWidth
               onClick={() => setIsOpen(!isOpen)}
-              className="flex justify-center items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary font-medium rounded-full hover:bg-blue-50 transition w-full"
+              className="flex justify-center items-center gap-2 hover:bg-blue-50"
             >
               Sort by: {selected}
               <ChevronDown
@@ -245,7 +254,7 @@ useEffect(() => {
                   isOpen ? "rotate-180" : ""
                 }`}
               />
-            </button>
+            </Button>
             {isOpen && (
               <div className="absolute right-0 mt-2 w-full bg-white border border-gray-200 rounded-xs shadow-lg z-10">
                 {options.map((option) => (
@@ -261,11 +270,12 @@ useEffect(() => {
             )}
           </div>
           <div>
-            <button
-              className="flex justify-center items-center gap-2 px-6 py-2 border border-docuhealth-primary text-docuhealth-primary font-medium rounded-full transition w-full cursor-pointer"
+            <Button
+              variant="outline"
+              fullWidth
+              className="flex justify-center items-center gap-2"
                onClick={() => {
                 if (profile) {
-                  const hasSubscription = fetchSubscriptionStatus();
                   if (!hasSubscription) {
                     toast.error("Please subscribe to access feature");
                     navigate("/user-subscriptions-dashboard");
@@ -284,23 +294,23 @@ useEffect(() => {
               }}
             >
               View Recent Vitals
-            </button>
+            </Button>
           </div>
           <div>
-            <button
-              className="flex justify-center items-center gap-2 px-6 py-2 bg-docuhealth-primary text-white font-medium rounded-full transition w-full cursor-pointer"
+            <Button
+              variant="primary"
+              fullWidth
+              className="flex justify-center items-center gap-2"
                onClick={() => {
                 if (profile) {
-                  const hasSubscription = fetchSubscriptionStatus();
                   if (!hasSubscription) {
                     toast.error("Please subscribe to access feature");
                     navigate("/user-subscriptions-dashboard");
                     return;
                   }
-                  if(profile.id_card_generated){
-                      toast.error("ID Card is already generated !");
-                      toast.success('Visit the settings page to view it.')
-                      return
+                  if (profile.id_card_generated) {
+                    navigate("/user-settings-dashboard?tab=id-card");
+                    return;
                   }
                   handleSelection(profile);
                 } else {
@@ -309,8 +319,8 @@ useEffect(() => {
                 }
               }}
             >
-              Get Identity Card
-            </button>
+              {profile?.id_card_generated ? "View Identity Card" : "Get Identity Card"}
+            </Button>
           </div>
         </div>
       </div>

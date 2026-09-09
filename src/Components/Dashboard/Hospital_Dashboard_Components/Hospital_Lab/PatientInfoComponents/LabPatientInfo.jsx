@@ -10,6 +10,7 @@ import formatRecordDate, {
 } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { fetchTestCategories, fetchLabTests, createLabTestOrder } from "../../../../../queries/Hospital/lab/requests";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 
@@ -42,9 +43,10 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const { mutate: createOrder, isPending: isOrderPending } = useMutation({
     mutationFn: (payload) => {
       const requestPayload = {
-        patient: selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin,
+        patient: (selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin) || selectedPatientDetails?.patient_hin,
         order_source: "walk_in",
-        items_data: payload.test_type.map((testSqid) => ({
+        // `POST api/lab/test-orders/create` expects `items`, not `items_data`.
+        items: payload.test_type.map((testSqid) => ({
           test: testSqid,
           note: payload.note,
         })),
@@ -64,7 +66,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
       if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {
         setDuplicateWarning(err.response.data.duplicate_warning);
       } else {
-        toast.error(err.response?.data?.message || "Failed to create order.");
+        toast.error(extractApiErrorMessage(err, "Failed to create order."));
       }
     },
   });
@@ -122,10 +124,13 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     {p?.firstname}{" "}
                     {p?.lastname}
                   </p>
-                  <p className="text-[14px] text-gray-500">
-                    {p?.plan_type
-                      ? `${p.plan_type} patient`
-                      : "patient"}
+                  <p className="text-[14px] text-gray-500 mt-0.5 flex items-center gap-1">
+                    {(p?.payment_provider?.type || p?.plan_type) && (
+                      <span className="text-[10px] text-green-700 font-bold bg-green-100 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                        {p?.payment_provider?.type || p?.plan_type}
+                      </span>
+                    )}
+                    patient
                   </p>
                 </div>
               </div>

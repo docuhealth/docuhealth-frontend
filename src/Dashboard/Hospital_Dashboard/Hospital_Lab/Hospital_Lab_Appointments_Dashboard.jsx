@@ -18,6 +18,11 @@ const getPatientName = (appt) =>
 
 const getTestName = (appt) => appt.test_name || appt.test || "Test request";
 
+// `api/appointments/staff` nests the HIN under `patient.hin`; keep the older
+// flat shapes as fallbacks.
+const getPatientHin = (appt) =>
+  appt.patient?.hin || appt.patient_hin || appt.patient_info?.hin || appt.hin || null;
+
 const Hospital_Lab_Appointments_Dashboard = () => {
   const navigate = useNavigate();
   const [seePatientDetails, setSeePatientDetails] = useState(false);
@@ -61,7 +66,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
         appt: {
           id:          appt.id,
           name:        getPatientName(appt),
-          hin:         appt.patient_hin || appt.patient?.hin || appt.hin || "—",
+          hin:         getPatientHin(appt) || "—",
           test:        getTestName(appt),
           hospital:    appt.hospital_name || appt.hospital || "—",
           scheduledAt: appt.scheduled_time || appt.scheduled_at || appt.datetime || null,
@@ -86,7 +91,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
   };
 
   const handleCreateOrder = (appt) => {
-    setOrderPatientHin(appt.patient_hin || appt.patient?.hin || appt.hin || null);
+    setOrderPatientHin(getPatientHin(appt));
     setShowOrderModal(true);
   };
 

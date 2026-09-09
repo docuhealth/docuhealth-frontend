@@ -73,7 +73,7 @@ const Hospital_Lab_Requests_Dashboard = () => {
 
       <div className="mt-4 bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
         {/* Tabs */}
-        <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-0 border-b-0 sm:border-b border-gray-200 mb-5">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-0 sm:overflow-x-auto border-b-0 sm:border-b border-gray-200 mb-5">
           {tabs.map((tab) => (
             <button
               key={tab}
@@ -142,7 +142,7 @@ const Hospital_Lab_Requests_Dashboard = () => {
             <p className="text-sm">No test orders found</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             {requests.map((order) => (
               <LabOrderCard
                 key={order.sqid}

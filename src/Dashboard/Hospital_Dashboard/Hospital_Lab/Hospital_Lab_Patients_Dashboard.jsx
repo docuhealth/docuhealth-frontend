@@ -1,6 +1,7 @@
 import { useState } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { Search } from "lucide-react";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../Components/ui/Table";
 
 const allPatients = [
   { id: "PAT-1021", name: "Amara Okafor", tests: 3, lastVisit: "2026-05-30", status: "Active" },
@@ -54,32 +55,32 @@ const Hospital_Lab_Patients_Dashboard = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead>
-              <tr className="border-b border-gray-100 text-gray-400 uppercase tracking-wider">
-                <th className="pb-3 pr-4 font-semibold">Name</th>
-                <th className="pb-3 pr-4 font-semibold">Patient ID</th>
-                <th className="pb-3 pr-4 font-semibold">Tests Requested</th>
-                <th className="pb-3 pr-4 font-semibold">Last Visit</th>
-                <th className="pb-3 font-semibold">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
+          <Table>
+            <TableHeader>
+              <TableRow className="text-[12px] text-gray-400">
+                <TableHead className="pb-3 pr-4 font-semibold">Name</TableHead>
+                <TableHead className="pb-3 pr-4 font-semibold">Patient ID</TableHead>
+                <TableHead className="pb-3 pr-4 font-semibold">Tests Requested</TableHead>
+                <TableHead className="pb-3 pr-4 font-semibold">Last Visit</TableHead>
+                <TableHead className="pb-3 font-semibold">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {filtered.map((p) => (
-                <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-3 pr-4 font-medium text-docuhealth-dark">{p.name}</td>
-                  <td className="py-3 pr-4 text-gray-400 font-mono">{p.id}</td>
-                  <td className="py-3 pr-4 text-gray-500">{p.tests} test{p.tests !== 1 ? "s" : ""}</td>
-                  <td className="py-3 pr-4 text-gray-400">{p.lastVisit}</td>
-                  <td className="py-3">
+                <TableRow key={p.id}>
+                  <TableCell className="py-3 pr-4 font-medium text-docuhealth-dark">{p.name}</TableCell>
+                  <TableCell className="py-3 pr-4 text-gray-400 font-mono">{p.id}</TableCell>
+                  <TableCell className="py-3 pr-4 text-gray-500">{p.tests} test{p.tests !== 1 ? "s" : ""}</TableCell>
+                  <TableCell className="py-3 pr-4 text-gray-400">{p.lastVisit}</TableCell>
+                  <TableCell className="py-3">
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusColors[p.status]}`}>
                       {p.status}
                     </span>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
     </>

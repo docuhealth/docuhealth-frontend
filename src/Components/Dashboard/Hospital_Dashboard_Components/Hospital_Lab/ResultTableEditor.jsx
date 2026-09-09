@@ -1,4 +1,5 @@
 import { Plus, X } from "lucide-react";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../../ui/Table";
 
 const ResultTableEditor = ({
   tables,
@@ -29,20 +30,20 @@ const ResultTableEditor = ({
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-xs min-w-[480px]">
-            <thead>
-              <tr className="border-b border-gray-100 text-gray-400 uppercase tracking-wider">
-                <th className="pb-2 pr-3 font-semibold text-left min-w-[120px]">Test</th>
-                <th className="pb-2 pr-3 font-semibold text-left min-w-[100px]">Result</th>
-                <th className="pb-2 pr-3 font-semibold text-left min-w-[120px]">Reference range</th>
-                <th className="pb-2 pr-3 font-semibold text-left min-w-[100px]">Status</th>
-                <th className="pb-2 font-semibold w-6"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
+          <Table className="min-w-[480px]">
+            <TableHeader>
+              <TableRow className="text-[12px] text-gray-400">
+                <TableHead className="pb-2 pr-3 font-semibold text-left min-w-[120px]">Test</TableHead>
+                <TableHead className="pb-2 pr-3 font-semibold text-left min-w-[100px]">Result</TableHead>
+                <TableHead className="pb-2 pr-3 font-semibold text-left min-w-[120px]">Reference range</TableHead>
+                <TableHead className="pb-2 pr-3 font-semibold text-left min-w-[100px]">Status</TableHead>
+                <TableHead className="pb-2 font-semibold w-6"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {table.rows.map((row) => (
-                <tr key={row.id}>
-                  <td className="py-2 pr-3">
+                <TableRow key={row.id}>
+                  <TableCell className="py-2 pr-3">
                     <input
                       type="text"
                       placeholder="Test name"
@@ -50,8 +51,8 @@ const ResultTableEditor = ({
                       onChange={(e) => updateRow(table.id, row.id, "test", e.target.value)}
                       className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-docuhealth-primary"
                     />
-                  </td>
-                  <td className="py-2 pr-3">
+                  </TableCell>
+                  <TableCell className="py-2 pr-3">
                     <input
                       type="text"
                       placeholder="e.g. 1:80"
@@ -59,8 +60,8 @@ const ResultTableEditor = ({
                       onChange={(e) => updateRow(table.id, row.id, "result", e.target.value)}
                       className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-docuhealth-primary"
                     />
-                  </td>
-                  <td className="py-2 pr-3">
+                  </TableCell>
+                  <TableCell className="py-2 pr-3">
                     <input
                       type="text"
                       placeholder="e.g. <1:160"
@@ -68,8 +69,8 @@ const ResultTableEditor = ({
                       onChange={(e) => updateRow(table.id, row.id, "reference", e.target.value)}
                       className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-docuhealth-primary"
                     />
-                  </td>
-                  <td className="py-2 pr-3">
+                  </TableCell>
+                  <TableCell className="py-2 pr-3">
                     <select
                       value={row.status}
                       onChange={(e) => updateRow(table.id, row.id, "status", e.target.value)}
@@ -80,19 +81,19 @@ const ResultTableEditor = ({
                       <option>Normal</option>
                       <option>Abnormal</option>
                     </select>
-                  </td>
-                  <td className="py-2">
+                  </TableCell>
+                  <TableCell className="py-2">
                     <button
                       onClick={() => removeRow(table.id, row.id)}
                       className="text-gray-300 hover:text-red-400 transition-colors"
                     >
                       <X size={13} />
                     </button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         <button

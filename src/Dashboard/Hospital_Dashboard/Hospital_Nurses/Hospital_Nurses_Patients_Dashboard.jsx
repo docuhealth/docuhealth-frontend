@@ -1,4 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
+import { useLocation } from "react-router-dom";
+import { NursesAdmittedPatientMGTContext } from "../../../context/HospitalContext/Nurses/NursesAdmittedPatientMGTContext";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import TabComponent from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/TabComponent";
 import getTabs from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/TabDetails";
@@ -10,14 +12,24 @@ import CaseNoteDetail from "../../../Components/Dashboard/Hospital_Dashboard_Com
 import VitalSignsHistory from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/VitalSignsHistory";
 import SharedSoapNotes from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SharedSoapNotes";
 import SharedSoapNoteDetail from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SharedSoapNoteDetail";
+import AddNursingAdmissionNote from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddNursingAdmissionNote";
+import SelectHandoverNurseModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/SelectHandoverNurseModal";
+import toast from "react-hot-toast";
+import AddHandoverNoteForm from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddHandoverNoteForm";
+import Modal from "../../../Components/ui/Modal";
+import axiosInstanceHos from "../../../lib/axios/hospital";
 import { ChevronDown } from "lucide-react";
 
 const Hospital_Nurses_Patients_Dashboard = () => {
+  const { tab } = useContext(NursesAdmittedPatientMGTContext);
   const [updateVitals, setUpdateVitals] = useState(false);
   const [caseNoteHistory, setCaseNoteHistory] = useState(false);
   const [vitalSignsHistory, setVitalSignsHistory] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const [isQuickLogDropdownOpen, setIsQuickLogDropdownOpen] = useState(false);
+  const quickLogDropdownRef = useRef(null);
 
   const [newCaseNote, setNewCaseNote] = useState(false);
   const [advanceCheckUp, setAdvanceCheckUp] = useState(false);
@@ -26,11 +38,106 @@ const Hospital_Nurses_Patients_Dashboard = () => {
   const [caseNoteDetail, setCaseNoteDetail] = useState(false);
   const [sharedSoapNoteHistory, setSharedSoapNoteHistory] = useState(false);
   const [sharedSoapNoteDetail, setSharedSoapNoteDetail] = useState(false);
+  const [showAdmissionNote, setShowAdmissionNote] = useState(false);
+  
+  const [showHandoverNurseModal, setShowHandoverNurseModal] = useState(false);
+  const [showHandoverNoteForm, setShowHandoverNoteForm] = useState(false);
+  const [selectedHandoverNurse, setSelectedHandoverNurse] = useState(null);
+  const [showHandoverSuccessModal, setShowHandoverSuccessModal] = useState(false);
+  const [isSubmittingHandover, setIsSubmittingHandover] = useState(false);
+
+  const [loadingSelectedPatient, setLoadingSelectedPatient] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const navState = location.state;
+    if (navState?.selectedPatient || navState?.patientHin) {
+      const initialPatient = navState.selectedPatient;
+      const hin = navState.patientHin || initialPatient?.patient_info?.hin || initialPatient?.patient?.hin;
+
+      // If it already has full admission properties (ward_info, admission_date, staff_info)
+      if (initialPatient && initialPatient.ward_info && initialPatient.admission_date && initialPatient.staff_info) {
+        setSelected(initialPatient);
+        setAdvanceCheckUp(true);
+        window.history.replaceState({}, document.title);
+        return;
+      }
+
+      // Navigated from tasks or partial data: set initial object and fetch full patient admission record
+      if (hin) {
+        setLoadingSelectedPatient(true);
+        setAdvanceCheckUp(true);
+        setSelected(initialPatient || { patient_info: { hin } });
+
+        const fetchFullAdmission = async () => {
+          try {
+            const searchName = initialPatient?.patient_info?.firstname || initialPatient?.patient_info?.lastname || "";
+
+            // 1. Check active inpatient admissions first (search by name, or size=50)
+            let response = await axiosInstanceHos.get(
+              `api/hospitals/patients?status=inpatient${searchName ? `&search=${encodeURIComponent(searchName)}` : "&size=50"}`
+            );
+            let match = (response.data?.results || []).find(
+              (p) => (p?.patient_info?.hin || p?.patient?.hin) === hin
+            );
+
+            // If not found with name search, fetch recent inpatients list
+            if (!match && searchName) {
+              response = await axiosInstanceHos.get(`api/hospitals/patients?status=inpatient&size=50`);
+              match = (response.data?.results || []).find(
+                (p) => (p?.patient_info?.hin || p?.patient?.hin) === hin
+              );
+            }
+
+            // 2. If not found in inpatient, check discharged inpatients
+            if (!match) {
+              response = await axiosInstanceHos.get(
+                `api/hospitals/patients?status=inpatient_discharge${searchName ? `&search=${encodeURIComponent(searchName)}` : "&size=50"}`
+              );
+              match = (response.data?.results || []).find(
+                (p) => (p?.patient_info?.hin || p?.patient?.hin) === hin
+              );
+            }
+
+            // 3. If not found, check outpatients
+            if (!match) {
+              response = await axiosInstanceHos.get(
+                `api/hospitals/patients?status=outpatient${searchName ? `&search=${encodeURIComponent(searchName)}` : "&size=50"}`
+              );
+              match = (response.data?.results || []).find(
+                (p) => (p?.patient_info?.hin || p?.patient?.hin) === hin
+              );
+            }
+
+            if (match) {
+              setSelected(match);
+            }
+          } catch (error) {
+            console.error("Failed to fetch full patient admission data:", error);
+          } finally {
+            setLoadingSelectedPatient(false);
+            window.history.replaceState({}, document.title);
+          }
+        };
+
+        fetchFullAdmission();
+      } else {
+        if (initialPatient) {
+          setSelected(initialPatient);
+          setAdvanceCheckUp(true);
+        }
+        window.history.replaceState({}, document.title);
+      }
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
+      }
+      if (quickLogDropdownRef.current && !quickLogDropdownRef.current.contains(event.target)) {
+        setIsQuickLogDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -46,6 +153,8 @@ const Hospital_Nurses_Patients_Dashboard = () => {
       setCaseNoteDetail(false);
       setNewCaseNote(false);
       setUpdateVitals(false);
+      setShowAdmissionNote(false);
+      setShowHandoverNoteForm(false);
     }
   }, [advanceCheckUp]);
 
@@ -66,13 +175,14 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                       setCaseNoteHistory(false);
                       setVitalSignsHistory(false);
                       setSharedSoapNoteHistory(false);
+                      setShowAdmissionNote(false);
                       setNewCaseNote(true);
                     }}
                   >
                     Add New Case Note
                   </button>
                 </>
-              ) : (
+              ) : (tab === "inpatient_discharge" || tab === "outpatient_discharge") ? null : (
                 <>
                   <div className="relative w-full lg:w-60" ref={dropdownRef}>
                     <button
@@ -110,26 +220,69 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                         <button
                           className="w-full text-left px-3  py-2.5 hover:bg-gray-100 text-gray-700 transition-colors"
                           onClick={() => {
-                            setSharedSoapNoteHistory(true);
+                            setUpdateVitals(true);
                             setVitalSignsHistory(false);
                             setCaseNoteHistory(false);
+                            setSharedSoapNoteHistory(false);
                             setIsDropdownOpen(false);
                           }}
                         >
-                          View Shared SOAP Notes
+                          Update Vitals
                         </button>
                       </div>
                     )}
                   </div>
 
-                  <button
-                    className="py-2.5 px-10 w-full lg:w-60 rounded-full bg-docuhealth-primary text-white cursor-pointer"
-                    onClick={() => {
-                      setUpdateVitals(true);
-                    }}
-                  >
-                    Update Vitals
-                  </button>
+                  <div className="relative w-full lg:w-60" ref={quickLogDropdownRef}>
+                    <button
+                      className="py-2.5 px-10 w-full rounded-full bg-docuhealth-primary text-white cursor-pointer flex justify-center items-center gap-1"
+                      onClick={() => setIsQuickLogDropdownOpen(!isQuickLogDropdownOpen)}
+                    >
+                      <span>Quick log</span>
+                      <ChevronDown className={`w-4 h-4 transition-transform ${isQuickLogDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isQuickLogDropdownOpen && (
+                      <div className="absolute top-full mt-2 left-0 w-full bg-white border border-gray-200 rounded z-10 overflow-hidden p-2 text-sm shadow-lg">
+                        <button
+                          className="w-full text-left px-3 py-2.5 hover:bg-gray-100 text-gray-700 transition-colors"
+                          onClick={() => {
+                            setIsQuickLogDropdownOpen(false);
+                            console.log("Quick log clicked");
+                          }}
+                        >
+                          Quick log
+                        </button>
+                        <button
+                          className="w-full text-left px-3 py-2.5 hover:bg-gray-100 text-gray-700 transition-colors"
+                          onClick={() => {
+                            setIsQuickLogDropdownOpen(false);
+                            setShowHandoverNurseModal(true);
+                          }}
+                        >
+                          Add handover note
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {!showAdmissionNote && (
+                    <button
+                      className="py-2.5 px-6 w-full lg:w-auto rounded-full bg-docuhealth-primary text-white cursor-pointer flex items-center justify-center gap-2 font-medium transition-colors"
+                      onClick={() => {
+                        setCaseNoteHistory(false);
+                        setVitalSignsHistory(false);
+                        setSharedSoapNoteHistory(false);
+                        setNewCaseNote(false);
+                        setUpdateVitals(false);
+                        setShowAdmissionNote(true);
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 1V13M1 7H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      Add nursing admission note
+                    </button>
+                  )}
                 </>
               )}
             </div>
@@ -170,11 +323,53 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                 setNewCaseNote={setNewCaseNote}
               />
             </>
+          ) : showAdmissionNote ? (
+            <AddNursingAdmissionNote
+              selected={selected}
+              setShowAdmissionNote={setShowAdmissionNote}
+            />
+          ) : showHandoverNoteForm ? (
+            <AddHandoverNoteForm
+              handoverNurseName={selectedHandoverNurse ? `${selectedHandoverNurse.firstname} ${selectedHandoverNurse.lastname}` : ""}
+              isSubmitting={isSubmittingHandover}
+              onBack={() => setShowHandoverNoteForm(false)}
+              onUpload={async (noteData) => {
+                try {
+                  setIsSubmittingHandover(true);
+                  const payload = {
+                    to_nurse_id: selectedHandoverNurse?.sqid,
+                    patient_hin: selected?.patient_info?.hin,
+                    ...noteData
+                  };
+                  await axiosInstanceHos.post("/api/nurses/in-patient-handover", payload);
+                  setShowHandoverNoteForm(false);
+                  setShowHandoverSuccessModal(true);
+                } catch (error) {
+                  console.error(error);
+                  let errorMsg = "Failed to submit handover note";
+                  if (error.response?.data) {
+                    const data = error.response.data;
+                    if (data.detail) {
+                      errorMsg = Array.isArray(data.detail) ? data.detail[0] : data.detail;
+                    } else if (typeof data === 'object') {
+                      const firstValue = Object.values(data)[0];
+                      if (Array.isArray(firstValue)) errorMsg = firstValue[0];
+                      else if (typeof firstValue === 'string') errorMsg = firstValue;
+                    }
+                  }
+                  toast.error(errorMsg);
+                } finally {
+                  setIsSubmittingHandover(false);
+                }
+              }}
+            />
           ) : (
             <div className="bg-white my-5 border rounded-lg p-5 text-sm">
               <AdvanceCheckUp
                 selected={selected}
                 setAdvanceCheckUp={setAdvanceCheckUp}
+                setSharedSoapNoteDetail={setSharedSoapNoteDetail}
+                loadingAdmission={loadingSelectedPatient}
               />
             </div>
           )}
@@ -190,6 +385,48 @@ const Hospital_Nurses_Patients_Dashboard = () => {
             />
           </div>
         </>
+      )}
+
+      {showHandoverNurseModal && (
+        <SelectHandoverNurseModal
+          onClose={() => setShowHandoverNurseModal(false)}
+          onProceed={(nurse) => {
+            setSelectedHandoverNurse(nurse);
+            setShowHandoverNurseModal(false);
+            
+            // Hide other forms
+            setCaseNoteHistory(false);
+            setVitalSignsHistory(false);
+            setSharedSoapNoteHistory(false);
+            setNewCaseNote(false);
+            setUpdateVitals(false);
+            setShowAdmissionNote(false);
+            
+            // Show our new form
+            setShowHandoverNoteForm(true);
+          }}
+        />
+      )}
+
+      {showHandoverSuccessModal && (
+        <Modal isOpen={showHandoverSuccessModal} onClose={() => setShowHandoverSuccessModal(false)}>
+          <div className="py-3 text-center max-w-sm mx-auto flex flex-col items-center">
+           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+            <h3 className="text-[17px] font-semibold text-gray-900 mb-8 leading-snug">
+              You have successfully uploaded your handover note for this patient!
+            </h3>
+            <button
+              onClick={() => setShowHandoverSuccessModal(false)}
+              className="mt-2 w-full py-3 px-4 bg-docuhealth-primary  text-white font-medium rounded-full transition-colors"
+            >
+              Go back to patient info
+            </button>
+          </div>
+        </Modal>
       )}
     </>
   );

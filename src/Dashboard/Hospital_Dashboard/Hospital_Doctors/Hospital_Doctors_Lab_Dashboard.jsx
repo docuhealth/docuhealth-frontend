@@ -5,6 +5,7 @@ import axiosInstanceHos from "../../../lib/axios/hospital";
 import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 import Hospital_Lab_Test_Detail_Dashboard from "../Hospital_Lab/Hospital_Lab_Test_Detail_Dashboard";
 import useDebounce from "../../../hooks/useDebounce";
+import Input from "../../../Components/ui/Input";
 
 const Hospital_Doctors_Lab_Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,7 +17,7 @@ const Hospital_Doctors_Lab_Dashboard = () => {
   const { data: labRecordsData, isLoading: labLoading } = useQuery({
     queryKey: ["doctor-lab-records", currentPage, debouncedSearch],
     queryFn: async () => {
-      let url = `api/lab/test-orders/appointments?page=${currentPage}&size=${pageSize}`;
+      let url = `api/lab/test-orders/results-for-review?page=${currentPage}&size=${pageSize}`;
       if (debouncedSearch) {
         url += `&search=${encodeURIComponent(debouncedSearch)}`;
       }
@@ -24,6 +25,11 @@ const Hospital_Doctors_Lab_Dashboard = () => {
       return res.data;
     },
     keepPreviousData: true,
+    // Results come back from the lab scientist — poll so the doctor sees
+    // "completed" without reloading. Pauses while the tab is backgrounded.
+    staleTime: 30 * 1000,
+    refetchInterval: 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const patientLabRecords = labRecordsData?.results || [];
@@ -55,23 +61,21 @@ const Hospital_Doctors_Lab_Dashboard = () => {
             <h2 className="font-medium capitalize">
               Lab Results Approvals
             </h2>
-            <div className="relative w-full sm:w-64">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+            <Input
+              placeholder="Search name or ID..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              leadingIcon={
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-              </span>
-              <input
-                type="text"
-                placeholder="Search name or ID..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-docuhealth-primary"
-              />
-            </div>
+              }
+              containerClassName="w-full sm:w-64"
+              className="text-sm"
+            />
           </div>
 
           {labLoading ? (
@@ -105,7 +109,7 @@ const Hospital_Doctors_Lab_Dashboard = () => {
             </div>
           ) : (
             <>
-              <div className="text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                 {patientLabRecords.map((record) => (
                   <div key={record.sqid || record.id} className="bg-white border rounded-xl p-4">
                     <div className="flex justify-between items-center mb-1">
@@ -118,6 +122,21 @@ const Hospital_Doctors_Lab_Dashboard = () => {
                         </p>
                       </div>
                     </div>
+
+                    {record?.patient_info && (
+                      <p className="text-xs mb-2 flex items-center gap-1.5 flex-wrap">
+                        <span className="font-medium text-gray-800 capitalize">
+                          {`${record.patient_info.firstname ?? ""} ${record.patient_info.lastname ?? ""}`.trim() || "Unknown patient"}
+                        </span>
+                        {record.patient_info.hin && (
+                          <span className="text-gray-400">
+                            · {record.patient_info.hin.length >= 6
+                              ? `${record.patient_info.hin.slice(0, 4)}••••${record.patient_info.hin.slice(-2)}`
+                              : record.patient_info.hin}
+                          </span>
+                        )}
+                      </p>
+                    )}
 
                     <div className="flex flex-col gap-1.5 mb-3">
                       <div className="flex items-center gap-1">

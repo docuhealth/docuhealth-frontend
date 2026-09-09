@@ -7,6 +7,7 @@ import ReceptionistAdmittedPatientMGTProvider from "../../context/HospitalContex
 import HosWardProvider from "../../context/HospitalContext/HosWardContext";
 import HosStaffsProvider from "../../context/HospitalContext/HosStaffsContext";
 
+
 const HospitalReceptionistProviders = ({ children }) => (
   <HosWardProvider>
     <HosStaffsProvider>

@@ -7,11 +7,12 @@ interface Tab {
 
 interface TabComponentProps {
   tabs: Tab[];
+  initialTab?: number;
 }
 
 // The component now accepts tabs as a prop
-const TabComponent = ({ tabs }: TabComponentProps) => {
-  const [activeTab, setActiveTab] = useState(0);
+const TabComponent = ({ tabs, initialTab = 0 }: TabComponentProps) => {
+  const [activeTab, setActiveTab] = useState(initialTab);
 
 
   return (

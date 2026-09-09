@@ -3,6 +3,11 @@ import { ArrowLeft } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HosAppContext } from "../../../../../../context/HospitalContext/Admin/HosAppContext";
 import { HosWardContext } from "../../../../../../context/HospitalContext/HosWardContext";
+import Modal from "../../../../../ui/Modal";
+import Button from "../../../../../ui/Button";
+import Input from "../../../../../ui/Input";
+import Select from "../../../../../ui/Select";
+import SearchableSelect from "../../../../../ui/SearchableSelect";
 
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
@@ -51,73 +56,82 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({ strength: 0 });
 
-  const personnelOptions = ["doctor", "nurse", "receptionist", "lab_scientist", "pharmacist"];
+  const personnelOptions = [
+    "doctor",
+    "nurse",
+    "receptionist",
+    "lab_scientist",
+    "pharmacist",
+  ];
 
   // Personnel types that are not assigned to a ward during staff creation.
   const noWardRoles = ["receptionist", "lab_scientist", "pharmacist"];
 
   const doctorSpecializations = [
-    "Surgeon",
-    "General Dentist",
-    "Gynecologist",
-    "Obstetrician",
-    "Pediatrician",
-    "Cardiologist",
-    "Endocrinologist",
-    "General Practitioner",
-    "Neurologist",
-    "Dermatologist",
-    "Orthopedic",
-    "Radiologist",
     "Anesthesiologist",
-    "Histopathologist",
-    "Oncopathologist",
-    "Interventional Pathologist",
-    "Surgical Pathologist",
+    "Cardiologist",
+    "Dermatologist",
+    "Endocrinologist",
+    "Family Physician",
     "Forensic Pathologist",
     "Gastrointestinal (GIT) Pathologist",
-    "Family Physician",
+    "General Dentist",
+    "General Practitioner",
+    "Gynecologist",
+    "Histopathologist",
+    "Interventional Pathologist",
+    "Neurologist",
+    "Obstetrician",
+    "Oncopathologist",
+    "Optician",
+    "Orthopedic",
+    "Pediatrician",
+    "Radiologist",
+    "Surgeon",
+    "Surgical Pathologist",
   ];
 
   const nurseSpecializations = [
-    "General Nurse / Registered Nurse (RN)",
-    "Pediatric Nurse",
-    "Geriatric Nurse",
-    "Neonatal Nurse",
-    "Obstetric / Midwife Nurse",
-    "Mental Health / Psychiatric Nurse",
-    "Oncology Nurse",
     "Cardiac / Critical Care Nurse",
-    "Emergency / Trauma Nurse",
     "Community Health Nurse",
+    "Emergency / Trauma Nurse",
+    "General Nurse / Registered Nurse (RN)",
+    "Geriatric Nurse",
     "Home Health Nurse",
-    "Surgical / Operating Room (OR) Nurse",
+    "Hospice / Palliative Care Nurse",
+    "Infection Control Nurse",
+    "Mental Health / Psychiatric Nurse",
+    "Neonatal Nurse",
     "Nurse Anesthetist",
     "Nurse Educator",
     "Nurse Researcher",
-    "Infection Control Nurse",
-    "Hospice / Palliative Care Nurse",
+    "Obstetric / Midwife Nurse",
+    "Oncology Nurse",
+    "Pediatric Nurse",
+    "Surgical / Operating Room (OR) Nurse",
   ];
 
+  // "N/A" stays pinned first — it's a "no specialization" option, not part
+  // of the alphabetized list below it.
   const labScientistSpecializations = [
     "N/A",
-    "Hematology and Blood Transfusion",
     "Chemical Pathology",
-    "Medical Microbiology",
-    "Immunology and Immunochemistry",
-    "Histopathology and Cytopathology",
-    "Molecular Diagnostics",
     "Forensic Laboratory Science",
+    "Hematology and Blood Transfusion",
+    "Histopathology and Cytopathology",
+    "Immunology and Immunochemistry",
+    "Medical Microbiology",
+    "Molecular Diagnostics",
   ];
 
   const pharmacistSpecializations = [
     "N/A",
-    "General Pharmacist",
     "Clinical Pharmacist",
+    "General Pharmacist",
+    "Informatics Pharmacist",
+    "Nuclear Pharmacist",
     "Oncology Pharmacist",
     "Pediatric Pharmacist",
-    "Nuclear Pharmacist",
-    "Informatics Pharmacist",
   ];
 
   const specializationOptions =
@@ -300,8 +314,12 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-3">
-      <div className="bg-white rounded-md shadow-lg p-6 max-w-xl w-full relative">
+    <Modal
+      isOpen={true}
+      onClose={() => setCreateNewStaff(false)}
+      title="Add a new team member"
+    >
+      <div className="p-2">
         <div className="mb-5">
           <p className="text-sm">Step {step} of 2</p>
           {/* Progress Bar */}
@@ -313,131 +331,89 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
           </div>
         </div>
         {step === 1 && (
-          <div className="mx-1 sm:mx-5">
-            <div className="flex items-center justify-between mb-3 ">
-              <h2 className=" text-sm font-medium">Add a new team member</h2>
-              <i
-                onClick={() => {
-                  setCreateNewStaff(false);
-                }}
-                className="bx bx-x text-xl cursor-pointer bg-gray-100 rounded-full"
-              ></i>
-            </div>
+          <div className="">
             <div className="grid grid-cols-2 gap-4">
-              <input
+              <Input
                 placeholder="First name"
                 value={form.firstname}
                 onChange={(e) => handleChange("firstname", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm focus:border-docuhealth-primary"
+                className="text-sm"
               />
-              <input
+              <Input
                 placeholder="Last name"
                 value={form.lastname}
                 onChange={(e) => handleChange("lastname", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm focus:border-docuhealth-primary"
+                className="text-sm"
               />
 
-              <input
+              <Input
                 placeholder="Phone number"
                 type="number"
                 value={form.phone}
                 onChange={(e) => handleChange("phone", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm focus:border-docuhealth-primary"
+                className="text-sm"
               />
 
-              <select
+              <Select
                 value={form.gender}
-                onChange={(e) => handleChange("gender", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm  focus:border-docuhealth-primary"
-              >
-                <option value="">Gender</option>
-                {gender.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => handleChange("gender", value)}
+                options={gender.map((p) => ({ value: p, label: p }))}
+                placeholder="Gender"
+              />
 
               {/* Personnel Dropdown */}
-              <select
+              <Select
                 value={form.personnel}
-                onChange={(e) => handleChange("personnel", e.target.value)}
-                className="border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-docuhealth-primary"
-              >
-                <option value="">Healthcare personnel</option>
-                {personnelOptions.map((p) => (
-                  <option key={p} value={p}>
-                    {p.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => handleChange("personnel", value)}
+                options={personnelOptions.map((p) => ({
+                  value: p,
+                  label: p.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+                }))}
+                placeholder="Healthcare personnel"
+                className="col-span-2"
+              />
 
-              {/* Specialization dropdown */}
-              <select
+              {/* Specialization dropdown — searchable since some of these
+                  lists (doctor, nurse) run over a dozen options deep. */}
+              <SearchableSelect
                 disabled={form.personnel === "receptionist" || !form.personnel}
                 value={form.specialization}
-                onChange={(e) => handleChange("specialization", e.target.value)}
-                className={`border p-2 rounded-lg outline-none text-sm col-span-2 ${
-                  form.personnel === "receptionist" ? "bg-gray-100" : ""
-                }`}
-              >
-                <option value="">Area of specialization</option>
-                {specializationOptions.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => handleChange("specialization", value)}
+                options={specializationOptions.map((s) => ({ value: s, label: s }))}
+                placeholder="Area of specialization"
+                className="col-span-2"
+              />
 
               {/* Ward dropdown */}
-              <select
+              <Select
                 disabled={noWardRoles.includes(form.personnel)}
                 value={form.ward}
-                onChange={(e) => handleChange("ward", e.target.value)}
-                className={`border p-2 rounded-lg outline-none text-sm col-span-2 focus:border-docuhealth-primary ${
-                  noWardRoles.includes(form.personnel) ? "bg-gray-100" : ""
-                }`}
-              >
-                <option value="">Assign to ward</option>
-                {wardOptions.map((w) => (
-                  <option key={w.id} value={w.id}>
-                    {w.name + " ward"}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => handleChange("ward", value)}
+                options={wardOptions.map((w) => ({
+                  value: w.id,
+                  label: w.name.charAt(0).toUpperCase() + w.name.slice(1) + " ward",
+                }))}
+                placeholder="Assign to ward"
+                className="col-span-2"
+              />
             </div>
 
-            <button
-              onClick={() => handleNextStep()}
-              className="mt-5 bg-docuhealth-primary text-white px-4 py-2 rounded-full text-sm w-full cursor-pointer"
-            >
-              Proceed
-            </button>
+            <div className="mt-5">
+              <Button onClick={() => handleNextStep()} fullWidth>
+                Proceed
+              </Button>
+            </div>
           </div>
         )}
 
         {step === 2 && (
-          <div className="mx-1 sm:mx-5">
-            <div className="flex items-center justify-between mb-3 ">
-              <div className="flex items-center gap-3">
-                <div
-                  onClick={() => {
-                    setStep(step - 1);
-                  }}
-                  className="cursor-pointer"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                </div>
-
-                <h2 className=" text-sm font-medium">Add a new team member</h2>
-              </div>
-
-              <i
-                onClick={() => {
-                  setCreateNewStaff(false);
-                }}
-                class="bx bx-x text-xl cursor-pointer bg-gray-100 rounded-full"
-              ></i>
+          <div className="">
+            <div
+              className="flex items-center gap-2 mb-3 cursor-pointer text-docuhealth-primary font-medium"
+              onClick={() => setStep(step - 1)}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-sm">Back</span>
             </div>
 
             <label className="font-medium text-sm">Invitation message</label>
@@ -447,40 +423,32 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
               readOnly
             />
 
-            <input
+            <Input
               placeholder="Enter email address"
               value={form.email}
               onChange={(e) => handleChange("email", e.target.value)}
-              className="border p-2 text-sm rounded-lg w-full mt-4 outline-none focus:border-docuhealth-primary"
+              className="text-sm mt-4"
             />
 
             <div className="mt-4">
               <label className="font-medium text-sm">Generated password</label>
-              <input
-                value={form.password}
-                readOnly
-                className="border p-2 rounded-lg focus:border-docuhealth-primary w-full mt-2 text-sm outline-none"
-              />
+              <Input value={form.password} readOnly className="mt-2 text-sm" />
             </div>
 
-            <button
-              className={`mt-5 ${createStaffMutation.isPending ? "bg-gray-400 cursor-not-allowed" : "bg-docuhealth-primary cursor-pointer"}  text-white px-4 py-2 rounded-full w-full text-sm `}
-              disabled={createStaffMutation.isPending}
-              onClick={handleSubmit}
-            >
-              {createStaffMutation.isPending ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Adding to team...
-                </div>
-              ) : (
-                "Add to team"
-              )}
-            </button>
+            <div className="mt-5">
+              <Button
+                loading={createStaffMutation.isPending}
+                loadingText="Adding to team..."
+                onClick={handleSubmit}
+                fullWidth
+              >
+                Add to team
+              </Button>
+            </div>
           </div>
         )}
       </div>
-    </div>
+    </Modal>
   );
 };
 

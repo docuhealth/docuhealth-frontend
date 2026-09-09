@@ -141,7 +141,7 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search by name, staff ID, role, phone number, or email..."
+          placeholder="Search by name or email..."
         />
         {isRefreshing && (
           <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">

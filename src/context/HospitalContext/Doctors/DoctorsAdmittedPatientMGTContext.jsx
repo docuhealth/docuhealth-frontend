@@ -8,7 +8,7 @@ export const DoctorsAdmittedPatientMGTContext = createContext();
 
 const DoctorsAdmittedPatientMGTProvider = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [tab, setTab] = useState("active");
+  const [tab, setTab] = useState("inpatient");
   const [searchQuery, setSearchQuery] = useState("");
   const pageSize = 6;
   const isUserLoggedIn = !!getHospitalToken();
@@ -25,12 +25,19 @@ const DoctorsAdmittedPatientMGTProvider = ({ children }) => {
     queryFn: async () => {
       const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : '';
       const res = await axiosInstanceHos.get(
-        `api/hospitals/admissions/${tab}?page=${currentPage}&size=${pageSize}${searchParam}`
+        `api/hospitals/patients?status=${tab}&page=${currentPage}&size=${pageSize}${searchParam}`
       );
       return res.data;
     },
     enabled: isUserLoggedIn,
     placeholderData: (previousData) => previousData,
+    // These lists move because the receptionist confirms/rejects admissions
+    // and the nurse completes discharges — actions the doctor's own mutation
+    // invalidations can't catch. Poll while the tab is open; pause when it's
+    // backgrounded so we don't hammer the API.
+    staleTime: 30 * 1000,
+    refetchInterval: 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const handleTabChange = (newTab) => {

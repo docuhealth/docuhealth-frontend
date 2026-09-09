@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { Plus, X } from "lucide-react";
+import Input from "../../../../../ui/Input";
+import Select from "../../../../../ui/Select";
+import { FREQUENCY_OPTIONS, DEFAULT_FREQUENCY } from "../../../../../../utils/careTaskConstants";
 
 const dosageUnits = [
   "mg",
@@ -28,7 +31,7 @@ const MedicationSection = ({ medications, setMedications }) => {
         dosage: "",
         dosageUnit: "mg",
         route: "Oral",
-        frequency: "od_qd",
+        frequency: DEFAULT_FREQUENCY,
         duration: "",
         durationUnit: "Month",
       },
@@ -109,29 +112,30 @@ const MedicationSection = ({ medications, setMedications }) => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-start mt-4 border-b pb-4 last:border-0 last:pb-0"
         >
           <div className="lg:col-span-3">
-            <label className="block text-[12px] font-medium text-gray-700 pb-1">Drug Name</label>
+            <label className="block text-[12px] font-medium text-gray-700 pb-1">Drug Name<span className="text-red-500"> *</span></label>
             <div className="relative">
-              <input
-                type="text"
+              <Input
                 placeholder="Drug name..."
                 value={med.drug}
                 onChange={(e) => handleDrugSearch(index, e.target.value)}
-                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all mb-4"
+                className="text-[12px] mb-4"
               />
               {activeSearchIndex === index && searchResults.length > 0 && (
                 <ul className="absolute z-10 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto mt-1 top-full">
                   {searchResults.slice((searchPage - 1) * 10, searchPage * 10).map((item, idx) => (
-                    <li
-                      key={idx}
-                      className="p-2.5 text-[12px] hover:bg-docuhealth-primary/10 cursor-pointer text-gray-800 border-b last:border-0"
-                      onClick={() => handleSelectDrug(index, item)}
-                    >
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-[10px] text-gray-500 mt-0.5">
-                        {item.strength && <span>{item.strength}</span>}
-                        {item.strength && item.dose_form && <span className="mx-1">•</span>}
-                        {item.dose_form && <span>{item.dose_form}</span>}
-                      </div>
+                    <li key={idx} className="border-b last:border-0">
+                      <button
+                        type="button"
+                        className="w-full text-left p-2.5 text-[12px] hover:bg-docuhealth-primary/10 cursor-pointer text-gray-800"
+                        onClick={() => handleSelectDrug(index, item)}
+                      >
+                        <span className="block font-medium">{item.name}</span>
+                        <span className="block text-[10px] text-gray-500 mt-0.5">
+                          {item.strength && <span>{item.strength}</span>}
+                          {item.strength && item.dose_form && <span className="mx-1">•</span>}
+                          {item.dose_form && <span>{item.dose_form}</span>}
+                        </span>
+                      </button>
                     </li>
                   ))}
                   {Math.ceil(searchResults.length / 10) > 1 && (
@@ -169,65 +173,48 @@ const MedicationSection = ({ medications, setMedications }) => {
             <div className="flex gap-2">
               <div className="w-1/2">
                 <label className="block text-[12px] font-medium text-gray-700 pb-1">Strength <span className="text-gray-400 font-normal">(not compulsory)</span></label>
-                <input
-                  type="text"
+                <Input
                   placeholder="Strength..."
                   value={med.strength}
                   disabled={!!med.catalog_drug}
                   onChange={(e) => handleChange(index, "strength", e.target.value)}
-                  className={`w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all ${med.catalog_drug ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+                  className={`text-[12px] ${med.catalog_drug ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                 />
               </div>
               <div className="w-1/2">
                 <label className="block text-[12px] font-medium text-gray-700 pb-1">Dose Form <span className="text-gray-400 font-normal">(not compulsory)</span></label>
-                <div className="relative">
-                  <select
-                    value={med.doseForm}
-                    disabled={!!med.catalog_drug}
-                    onChange={(e) => handleChange(index, "doseForm", e.target.value)}
-                    className={`w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none appearance-none pr-8 transition-all ${med.catalog_drug ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white'}`}
-                  >
-                    <option value="" disabled>Form...</option>
-                    <option value="Tablet">Tablet</option>
-                    <option value="Capsule">Capsule</option>
-                    <option value="Syrup">Syrup</option>
-                    <option value="Suspension">Suspension</option>
-                    <option value="Injection">Injection</option>
-                    <option value="Ointment">Ointment</option>
-                    <option value="Cream">Cream</option>
-                    <option value="Drops">Drops</option>
-                    <option value="Inhaler">Inhaler</option>
-                    <option value="Suppository">Suppository</option>
-                    <option value="Patch">Patch</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
+                <Select
+                  value={med.doseForm}
+                  disabled={!!med.catalog_drug}
+                  onChange={(value) => handleChange(index, "doseForm", value)}
+                  options={[
+                    "Tablet", "Capsule", "Syrup", "Suspension", "Injection",
+                    "Ointment", "Cream", "Drops", "Inhaler", "Suppository", "Patch",
+                  ].map((form) => ({ value: form, label: form }))}
+                  placeholder="Form..."
+                />
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-3">
-            <label className="block text-[12px] font-medium text-gray-700 pb-1">Dosage</label>
+            <label className="block text-[12px] font-medium text-gray-700 pb-1">Dosage<span className="text-red-500"> *</span></label>
             <div className="flex gap-2">
-              <input
+              <Input
                 type="number"
                 placeholder="Enter dosage..."
                 value={med.dosage}
                 onChange={(e) => handleChange(index, "dosage", e.target.value)}
-                className="w-1/2 border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
+                containerClassName="w-1/2"
+                className="text-[12px]"
               />
-              <div className="w-1/2 relative">
-                <input
-                  type="text"
+              <div className="w-1/2">
+                <Input
                   list={`dosage-units-${index}`}
                   placeholder="Unit..."
                   value={med.dosageUnit}
                   onChange={(e) => handleChange(index, "dosageUnit", e.target.value)}
-                  className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
+                  className="text-[12px]"
                 />
                 <datalist id={`dosage-units-${index}`}>
                   {dosageUnits.map((unit) => (
@@ -238,98 +225,58 @@ const MedicationSection = ({ medications, setMedications }) => {
             </div>
           </div>
 
-          <div className="lg:col-span-2 relative">
-            <label className="block text-[12px] font-medium text-gray-700 pb-1">Route</label>
-            <div className="relative">
-              <select
-                value={med.route}
-                disabled={!!med.catalog_drug}
-                onChange={(e) => handleChange(index, "route", e.target.value)}
-                className={`w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none appearance-none pr-8 transition-all ${med.catalog_drug ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white'}`}
-              >
-                <option value="Oral">Oral</option>
-                <option value="IV">IV = Intravenous</option>
-                <option value="IM">IM = Intramuscular</option>
-                <option value="SC">SC = Subcutaneous Injection</option>
-                <option value="PV">PV = Per Vagina (Vaginal route)</option>
-                <option value="IT">IT = Intrathecal</option>
-                <option value="PR">PR = Per rectal</option>
-                <option value="SL">SL = Sublingual</option>
-                <option value="Topical">Topical</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
+          <div className="lg:col-span-2">
+            <label className="block text-[12px] font-medium text-gray-700 pb-1">Route<span className="text-red-500"> *</span></label>
+            <Select
+              value={med.route}
+              disabled={!!med.catalog_drug}
+              onChange={(value) => handleChange(index, "route", value)}
+              options={[
+                { value: "Oral", label: "Oral" },
+                { value: "IV", label: "IV = Intravenous" },
+                { value: "IM", label: "IM = Intramuscular" },
+                { value: "SC", label: "SC = Subcutaneous Injection" },
+                { value: "PV", label: "PV = Per Vagina (Vaginal route)" },
+                { value: "IT", label: "IT = Intrathecal" },
+                { value: "PR", label: "PR = Per rectal" },
+                { value: "SL", label: "SL = Sublingual" },
+                { value: "Topical", label: "Topical" },
+              ]}
+            />
           </div>
 
-          <div className="lg:col-span-2 relative">
-            <label className="block text-[12px] font-medium text-gray-700 pb-1">Frequency</label>
-            <div className="relative">
-              <select
-                value={med.frequency}
-                onChange={(e) => handleChange(index, "frequency", e.target.value)}
-                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none appearance-none bg-white pr-8 transition-all"
-              >
-                <option value="stat">stat - Immediately</option>
-                <option value="once">once - One-time dose</option>
-                <option value="od_qd">od_qd - Once daily</option>
-                <option value="bd_bid">bd_bid - Twice daily</option>
-                <option value="tds_tid">tds_tid - Three times daily</option>
-                <option value="qid">qid - Four times daily</option>
-                <option value="q3h">q3h - Every 3 hours</option>
-                <option value="q4h">q4h - Every 4 hours</option>
-                <option value="q6h">q6h - Every 6 hours</option>
-                <option value="q8h">q8h - Every 8 hours</option>
-                <option value="q12h">q12h - Every 12 hours</option>
-                <option value="q24h">q24h - Every 24 hours</option>
-                <option value="prn">prn - As needed</option>
-                <option value="mane">mane - Morning</option>
-                <option value="nocte">nocte - Night</option>
-                <option value="alt_days">alt_days - Alternate days</option>
-                <option value="weekly">weekly - Weekly</option>
-                <option value="monthly">monthly - Monthly</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
+          <div className="lg:col-span-2">
+            <label className="block text-[12px] font-medium text-gray-700 pb-1">Frequency<span className="text-red-500"> *</span></label>
+            <Select
+              value={med.frequency}
+              onChange={(value) => handleChange(index, "frequency", value)}
+              options={FREQUENCY_OPTIONS}
+            />
           </div>
 
           <div className="lg:col-span-2 flex gap-2 relative">
             <div className="flex-1">
-              <label className="block text-[12px] font-medium text-gray-700 pb-1">Duration</label>
-              <input
+              <label className="block text-[12px] font-medium text-gray-700 pb-1">Duration<span className="text-red-500"> *</span></label>
+              <Input
                 type="number"
                 placeholder="duration..."
                 value={med.duration}
                 onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
                 onChange={(e) => handleChange(index, "duration", e.target.value)}
-                className="w-full border rounded-md p-2.5 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all"
+                className="text-[12px]"
               />
             </div>
             <div className="flex-1">
               <label className="block text-[12px] pb-1">&nbsp;</label>
-              <div className="relative">
-                <select
-                  value={med.durationUnit}
-                  onChange={(e) => handleChange(index, "durationUnit", e.target.value)}
-                  className="w-full border rounded-md p-2.5 pr-8 text-[12px] appearance-none focus:ring-1 focus:ring-docuhealth-primary outline-none transition-all bg-white"
-                >
-                  <option value="Month">Month (s)</option>
-                  <option value="Week">Week (s)</option>
-                  <option value="Day">Day (s)</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
+              <Select
+                value={med.durationUnit}
+                onChange={(value) => handleChange(index, "durationUnit", value)}
+                options={[
+                  { value: "Month", label: "Month (s)" },
+                  { value: "Week", label: "Week (s)" },
+                  { value: "Day", label: "Day (s)" },
+                ]}
+              />
             </div>
             {medications.length > 1 && (
               <button

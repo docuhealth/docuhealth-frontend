@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { usePatientProfile } from "../../../../../../hooks/patients/usePatientProfile";
-import { fetchSubscriptionStatus } from "../../../../../../services/authService";
+import { useHasActiveSubscription } from "../../../../../../hooks/patients/useHasActiveSubscription";
 
 interface NoticeDisplayProps {
   noticeDisplay: boolean;
@@ -18,6 +18,7 @@ const NoticeDisplay = ({
 }: NoticeDisplayProps) => {
   const navigate = useNavigate();
   const { data: profile } = usePatientProfile();
+  const hasSubscription = useHasActiveSubscription();
 
   const noticeMessage = [
     {
@@ -61,7 +62,6 @@ const NoticeDisplay = ({
                   className=" bg-docuhealth-primary  text-center text-white rounded-full py-2 cursor-pointer"
                   onClick={() => {
                     if (profile) {
-                      const hasSubscription = fetchSubscriptionStatus();
                       if (!hasSubscription) {
                         toast.error("Please subscribe to access feature");
                         navigate("/user-subscriptions-dashboard");

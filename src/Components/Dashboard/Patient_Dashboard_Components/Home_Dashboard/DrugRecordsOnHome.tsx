@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchPatientDrugRecords } from "../../../../services/patientDashboardService";
 import Pagination2 from "../Pagination/Pagination2";
 import EmptyState from "../../../../Components/ui/EmptyState";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../../Components/ui/Table";
 
 const DrugRecordsOnHome = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,41 +45,38 @@ const DrugRecordsOnHome = () => {
           <h2 className="mb-4 pb-2 border-b font-medium">My Drug Records</h2>
           <div className="overflow-x-auto">
             {drugRecords?.length > 0 ? (
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="text-[12px] text-gray-400 border-b">
-                    <th className="pb-2 font-normal">Drug Name</th>
-                    <th className="pb-2 font-normal">Route</th>
-                    <th className="pb-2 font-normal">Qty</th>
-                    <th className="pb-2 font-normal">Frequency</th>
-                    <th className="pb-2 font-normal">Duration</th>
-                  </tr>
-                </thead>
-                <tbody className="text-[12px]">
+              <Table>
+                <TableHeader>
+                  <TableRow className="text-[12px] text-gray-400">
+                    <TableHead className="pb-2 font-normal">Drug Name</TableHead>
+                    <TableHead className="pb-2 font-normal">Route</TableHead>
+                    <TableHead className="pb-2 font-normal">Qty</TableHead>
+                    <TableHead className="pb-2 font-normal">Frequency</TableHead>
+                    <TableHead className="pb-2 font-normal">Duration</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="text-[12px]">
                   {drugRecords.map((drug, index) => (
-                    <tr
-                      key={index}
-                      className="border-b last:border-0 hover:bg-gray-50/50 transition-colors"
-                    >
-                      <td className="py-3 font-medium text-docuhealth-primary">
+                    <TableRow key={index}>
+                      <TableCell className="py-3 font-medium text-docuhealth-primary">
                         {drug.name}
-                      </td>
-                      <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
-                      <td className="py-3 text-gray-600">{drug.quantity}</td>
-                      <td className="py-3 text-gray-600">
+                      </TableCell>
+                      <TableCell className="py-3 text-gray-600">{drug.route || "Oral"}</TableCell>
+                      <TableCell className="py-3 text-gray-600">{drug.quantity}</TableCell>
+                      <TableCell className="py-3 text-gray-600">
                         {typeof drug.frequency === "object"
                           ? `${drug.frequency.value || ""} ( ${drug.frequency.rate || ""} )`
                           : drug.frequency || "N/A"}
-                      </td>
-                      <td className="py-3 text-gray-600">
+                      </TableCell>
+                      <TableCell className="py-3 text-gray-600">
                         {typeof drug.duration === "object"
                           ? `${drug.duration.value || ""} ( ${drug.duration.rate || ""} )`
                           : drug.duration || "N/A"}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             ) : (
               <p className="text-[12px] text-gray-500 italic">
                 No medication records available.

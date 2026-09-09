@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, X, ChevronDown } from "lucide-react";
+import GeneralPatientInfoForm from "../../../Components/ui/GeneralPatientInfoForm";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import template from "../../../assets/img/template.png";
 import OnboardNewPatient from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home_Dashboard/components/OnboardNewPatient";
@@ -10,7 +11,13 @@ import AppointmentsList from "../../../Components/Dashboard/Hospital_Dashboard_C
 import RecentPatients from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home_Dashboard/components/RecentPatients";
 import { HosWardContext } from "../../../context/HospitalContext/HosWardContext";
 import { ReceptionistAppContext } from "../../../context/HospitalContext/Receptionist/ReceptionistAppContext";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Modal from "../../../Components/ui/Modal";
+import SearchableSelect from "../../../Components/ui/SearchableSelect";
+import {
+  fetchPaymentProviders,
+  savePatientPaymentCategory,
+} from "../../../queries/Hospital/receptionist/paymentCategory";
 
 const Hospital_Receptionist_Home_Dashboard = () => {
   const queryClient = useQueryClient();
@@ -21,11 +28,65 @@ const Hospital_Receptionist_Home_Dashboard = () => {
   // const [patientEmail, setPatientEmail] = useState('')
   const [bookAppointment, setBookAppointment] = useState(false);
 
+  const [checkPatientIn, setCheckPatientIn] = useState(false);
+  const [showPaymentCategoryModal, setShowPaymentCategoryModal] = useState(false);
+  // Display casing ("Private" | "HMO" | "Company"); lowercased when sent to the API.
+  // Backend default for a patient with nothing saved is "private".
+  const [paymentCategory, setPaymentCategory] = useState("Private");
+  const [showHmoProviderModal, setShowHmoProviderModal] = useState(false);
+  const [hmoProvider, setHmoProvider] = useState(null); // full provider object { sqid, name, ... }
+  const [hmoIdNumber, setHmoIdNumber] = useState("");
+  const [showCompanyPartnerModal, setShowCompanyPartnerModal] = useState(false);
+  const [companyPartner, setCompanyPartner] = useState(null); // full provider object
+  const [staffIdNumber, setStaffIdNumber] = useState("");
+  const [showPaymentCategorySuccessModal, setShowPaymentCategorySuccessModal] = useState(false);
+
+  const { data: hmoProvidersData, isLoading: isLoadingHmoProviders } = useQuery({
+    queryKey: ["payment-providers", "hmo"],
+    queryFn: fetchPaymentProviders,
+    enabled: showHmoProviderModal,
+    staleTime: 5 * 60 * 1000,
+  });
+  const hmoProviderOptions = (hmoProvidersData || []).map((provider) => ({
+    value: provider.sqid,
+    label: provider.name,
+    provider,
+  }));
+
+  const { data: companyPartnersData, isLoading: isLoadingCompanyPartners } = useQuery({
+    queryKey: ["payment-providers", "company"],
+    queryFn: fetchPaymentProviders,
+    enabled: showCompanyPartnerModal,
+    staleTime: 5 * 60 * 1000,
+  });
+  const companyPartnerOptions = (companyPartnersData || []).map((provider) => ({
+    value: provider.sqid,
+    label: provider.name,
+    provider,
+  }));
+
+  const savePaymentCategoryMutation = useMutation({
+    mutationFn: savePatientPaymentCategory,
+    onSuccess: (data) => {
+      setPatientDetails((prev) => ({ ...prev, payment_provider: data.payment_provider }));
+      setShowPaymentCategoryModal(false);
+      setShowHmoProviderModal(false);
+      setShowCompanyPartnerModal(false);
+      setShowPaymentCategorySuccessModal(true);
+    },
+    onError: (err) => {
+      const data = err.response?.data;
+      toast.error(
+        data?.type?.[0] || data?.provider?.[0] || data?.message ||
+          "Failed to save payment category.",
+      );
+    },
+  });
+
   const { wards } = useContext(HosWardContext);
   const { hospitalName, backgroundImage } = useContext(ReceptionistAppContext);
 
-    const backgroundImageUrl = backgroundImage || template
-  
+  const backgroundImageUrl = backgroundImage || template;
 
   const totalBeds = wards?.reduce((sum, w) => sum + w.total_beds, 0) || 0;
   const availableBeds =
@@ -70,20 +131,115 @@ const Hospital_Receptionist_Home_Dashboard = () => {
     }
   };
 
+  const checkInPatientApi = async (payload) => {
+    const res = await axiosInstanceHos.post(
+      "api/receptionists/check-in",
+      payload,
+    );
+    return res.data;
+  };
+
+  const checkInMutation = useMutation({
+    mutationFn: checkInPatientApi,
+    onSuccess: () => {
+      setCheckPatientIn(true);
+      queryClient.invalidateQueries(["receptionist-recent-patients"]);
+    },
+    onError: (err) => {
+      const errorMsg =
+        err.response?.data?.patient?.[0] ||
+        err.response?.data?.message ||
+        "Check-In failed!";
+      toast.error(errorMsg);
+    },
+  });
+
+  const handleCheckIn = () => {
+    if (!patientDetails?.hin) return toast.error("Patient details not found.");
+    checkInMutation.mutate({ patient: patientDetails.hin });
+  };
+
+  // Pre-fill from whatever's already saved for this patient (payment_provider
+  // comes embedded on the patient-details response) rather than always
+  // defaulting the modal to blank/HMO.
+  const handleChoosePaymentCategory = () => {
+    const existing = patientDetails.payment_provider;
+    const type = existing?.type;
+
+    setPaymentCategory(type === "hmo" ? "HMO" : type === "company" ? "Company" : "Private");
+    setHmoProvider(type === "hmo" ? existing.provider || null : null);
+    setHmoIdNumber(type === "hmo" ? existing.member_id || "" : "");
+    setCompanyPartner(type === "company" ? existing.provider || null : null);
+    setStaffIdNumber(type === "company" ? existing.member_id || "" : "");
+
+    setShowPaymentCategoryModal(true);
+  };
+
+  const handleProceedPaymentCategory = () => {
+    if (paymentCategory === "HMO") {
+      setShowPaymentCategoryModal(false);
+      setShowHmoProviderModal(true);
+      return;
+    }
+    if (paymentCategory === "Company") {
+      setShowPaymentCategoryModal(false);
+      setShowCompanyPartnerModal(true);
+      return;
+    }
+    savePaymentCategoryMutation.mutate({
+      hin: patientDetails.hin,
+      payload: { type: "private" },
+    });
+  };
+
+  const handleProceedHmoProvider = () => {
+    if (!hmoProvider || !hmoIdNumber.trim()) return;
+    savePaymentCategoryMutation.mutate({
+      hin: patientDetails.hin,
+      payload: { type: "hmo", provider: hmoProvider.sqid, member_id: hmoIdNumber.trim() },
+    });
+  };
+
+  const handleProceedCompanyPartner = () => {
+    if (!companyPartner || !staffIdNumber.trim()) return;
+    savePaymentCategoryMutation.mutate({
+      hin: patientDetails.hin,
+      payload: { type: "company", provider: companyPartner.sqid, member_id: staffIdNumber.trim() },
+    });
+  };
+
   return (
     <>
       {checkHIN ? (
         <>
           <div className="py-2 text-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 w-full sm:w-auto">
             <DynamicDate />
-            <div className="w-full sm:w-auto">
+            <div className="w-full flex flex-col sm:flex-row gap-2 sm:w-auto">
               <button
-                className="bg-docuhealth-primary py-2.5 px-8 w-full sm:w-auto rounded-full text-white cursor-pointer"
+                className="border border-docuhealth-primary text-docuhealth-primary py-2 px-8 w-full sm:w-auto rounded-full cursor-pointer"
                 onClick={() => {
                   setBookAppointment(!bookAppointment);
                 }}
               >
                 Book an appointment
+              </button>
+              <button
+                className="border border-docuhealth-primary text-docuhealth-primary py-2 px-8 w-full sm:w-auto rounded-full cursor-pointer"
+                onClick={handleChoosePaymentCategory}
+              >
+                Choose patient payment category
+              </button>
+              <button
+                className="bg-docuhealth-primary py-2.5 px-8 w-full sm:w-auto rounded-full text-white cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
+                onClick={handleCheckIn}
+                disabled={checkInMutation.isPending}
+              >
+                {checkInMutation.isPending && (
+                  <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                )}
+                {checkInMutation.isPending
+                  ? "Checking In..."
+                  : "Check Patient In"}
               </button>
             </div>
           </div>
@@ -101,142 +257,90 @@ const Hospital_Receptionist_Home_Dashboard = () => {
             <div className="py-5 border-b">
               <div className="flex items-center">
                 <div className="w-14 h-14 rounded-full bg-gray-300 overflow-hidden flex justify-center items-center text-xl font-semibold">
-                  {`${patientDetails.firstname[0]}${patientDetails.lastname[0]}`.toUpperCase()}
+                  {`${patientDetails.firstname?.[0] || ""}${patientDetails.lastname?.[0] || ""}`.toUpperCase()}
                 </div>
 
-                <div className="flex flex-col items-start">
-                  <p className="ml-2 text-sm font-medium">
+                <div className="flex flex-col items-start ml-2">
+                  <p className="text-sm font-medium">
                     {patientDetails.firstname} {patientDetails.lastname}
                   </p>
-                  <p className="ml-2 text-[12px] text-gray-500">patient</p>
+                  <p className="text-[12px] text-gray-500 mt-0.5 flex items-center gap-1">
+                    {(patientDetails?.payment_provider?.type || patientDetails?.plan_type) && (
+                      <span className="text-[10px] text-green-700 font-bold bg-green-100 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                        {patientDetails?.payment_provider?.type || patientDetails?.plan_type}
+                      </span>
+                    )}
+                    patient
+                  </p>
                 </div>
               </div>
             </div>
-            <div className="my-5 bg-docuhealth-light-gray rounded-xl border p-4">
-              <h2 className="font-medium">General Information</h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    First Name
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value={patientDetails.firstname}
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    Last Name
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value={patientDetails.lastname}
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    Date of birth
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value={patientDetails.dob}
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    Email address
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value={patientDetails.email || "NIL"}
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    Phone number
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value={patientDetails.phone_num}
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">
-                    Home address
-                  </p>
-
-                  <textarea
-                    readOnly
-                    rows={3}
-                    className="w-full text-gray-500 rounded-lg text-sm bg-white border px-3 py-2 resize-none"
-                    value={
-                      patientDetails?.street
-                        ? `${patientDetails.street}, ${patientDetails.city}, ${patientDetails.state}, ${patientDetails.country}`
-                        : "NIL"
-                    }
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    Assigned doctor
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value="NIL"
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1 ">
-                    Date of last visit
-                  </p>
-                  <input
-                    type="text"
-                    readOnly
-                    className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
-                    value="NIL"
-                  />
-                </div>
+            <GeneralPatientInfoForm patient={patientDetails}>
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1 ">
+                  Assigned doctor
+                </p>
+                <input
+                  type="text"
+                  readOnly
+                  className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
+                  value={patientDetails.assignedDoctor || "NIL"}
+                />
               </div>
-            </div>
+
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1 ">
+                  Date of last visit
+                </p>
+                <input
+                  type="text"
+                  readOnly
+                  className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
+                  value={patientDetails.lastVisit || "NIL"}
+                />
+              </div>
+
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1 ">
+                  Payment Category
+                </p>
+                <input
+                  type="text"
+                  readOnly
+                  className="w-full py-2 text-gray-500 rounded-lg text-sm bg-white border px-3"
+                  value={(() => {
+                    const pc = patientDetails.payment_provider;
+                    if (!pc) return "N/A";
+                    if (pc.type === "private") return "Private";
+                    const label = pc.type === "hmo" ? "HMO" : "Company";
+                    return pc.provider?.name ? `${label} - ${pc.provider.name}` : label;
+                  })()}
+                />
+              </div>
+            </GeneralPatientInfoForm>
           </div>
         </>
       ) : (
         <>
           <div className="py-2">
             <DynamicDate />
-             <div
-          className="relative mt-4 w-full h-[300px] rounded-xl bg-cover bg-center flex flex-col items-center justify-center border border-gray-300"
-          style={{
-            backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${backgroundImageUrl})`
-          }}
-        >
-          {/* Watermark / Helper Text */}
-          <div className="text-white text-center mb-4">
-            <p className="text-xl font-semibold opacity-90 uppercase tracking-widest">
-              {hospitalName ? (hospitalName.toUpperCase().endsWith('HOSPITAL') ? hospitalName : `${hospitalName} Hospital`) : "NIL Hospital"}
-            </p>
-          </div>
-        </div>
+            <div
+              className="relative mt-4 w-full h-[300px] rounded-xl bg-cover bg-center flex flex-col items-center justify-center border border-gray-300"
+              style={{
+                backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${backgroundImageUrl})`,
+              }}
+            >
+              {/* Watermark / Helper Text */}
+              <div className="text-white text-center mb-4">
+                <p className="text-xl font-semibold opacity-90 uppercase tracking-widest">
+                  {hospitalName
+                    ? hospitalName.toUpperCase().endsWith("HOSPITAL")
+                      ? hospitalName
+                      : `${hospitalName} Hospital`
+                    : "NIL Hospital"}
+                </p>
+              </div>
+            </div>
 
             <div className="text-sm grid grid-cols-1 lg:flex lg:justify-end lg:items-center gap-2 lg:gap-5 mt-5">
               <button
@@ -372,6 +476,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                 </div>
               </div>
             </div>
+
             <div className="bg-white rounded-lg my-5 ">
               <div className=" border rounded-lg p-4 lg:p-6">
                 <h2 className=" mb-4 pb-2 border-b font-medium">
@@ -394,6 +499,267 @@ const Hospital_Receptionist_Home_Dashboard = () => {
           patientDetails={patientDetails}
         />
       )}
+
+      <Modal
+        isOpen={checkPatientIn}
+        onClose={() => setCheckPatientIn(false)}
+        title=""
+        maxWidth="md"
+      >
+        <div className="flex flex-col justify-center items-center text-sm pt-4 px-2 text-center pb-2">
+          <div className="bg-[#E7F8ED] p-3 rounded-full mb-4 inline-flex items-center justify-center">
+            <div className="bg-[#32CC54] rounded-full flex items-center justify-center h-16 w-16 shadow-[0px_0px_0px_8px_rgba(50,204,84,0.15)]">
+              <svg
+                width="24"
+                height="18"
+                viewBox="0 0 24 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 9L9 16L22 2"
+                  stroke="white"
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+          <p className="font-semibold text-gray-800 mb-6 text-base">
+            Patient has been successfully checked-in and moved to the nursing
+            queue!
+          </p>
+          <button
+            className="w-full bg-[#32CC54] hover:bg-[#28A745] text-white py-3 rounded-full font-medium transition-colors cursor-pointer"
+            onClick={() => setCheckPatientIn(false)}
+          >
+            Done
+          </button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showPaymentCategorySuccessModal}
+        onClose={() => setShowPaymentCategorySuccessModal(false)}
+        title=""
+        maxWidth="md"
+      >
+        <div className="flex flex-col justify-center items-center text-sm pt-4 px-2 text-center pb-2">
+          <div className="bg-[#E7F8ED] p-3 rounded-full mb-4 inline-flex items-center justify-center">
+            <div className="bg-[#32CC54] rounded-full flex items-center justify-center h-16 w-16 shadow-[0px_0px_0px_8px_rgba(50,204,84,0.15)]">
+              <svg
+                width="24"
+                height="18"
+                viewBox="0 0 24 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 9L9 16L22 2"
+                  stroke="white"
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+          <p className="font-semibold text-gray-800 mb-6 text-base">
+            You have successfully selected the payment category for this
+            patient!
+          </p>
+          <button
+            className="w-full bg-[#32CC54] hover:bg-[#28A745] text-white py-3 rounded-full font-medium transition-colors cursor-pointer"
+            onClick={() => setShowPaymentCategorySuccessModal(false)}
+          >
+            Done
+          </button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showPaymentCategoryModal}
+        onClose={() => setShowPaymentCategoryModal(false)}
+        title=""
+        maxWidth="md"
+      >
+        <div className="flex flex-col text-sm">
+          <div className="flex justify-end -mt-2 -mr-2 mb-1">
+            <button
+              onClick={() => setShowPaymentCategoryModal(false)}
+              className="text-gray-400 hover:text-gray-600 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="text-center mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Patient's Payment Category
+            </h3>
+            <p className="text-gray-500 mt-1">
+              Kindly select a category to proceed!
+            </p>
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Category
+            </label>
+            <div className="relative">
+              <select
+                value={paymentCategory}
+                onChange={(e) => setPaymentCategory(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer text-sm"
+              >
+                <option value="Private">Private</option>
+                <option value="HMO">HMO</option>
+                <option value="Company">Company</option>
+              </select>
+              <ChevronDown className="w-4 h-4 text-gray-400 absolute top-1/2 -translate-y-1/2 right-3 pointer-events-none" />
+            </div>
+          </div>
+
+          <button
+            onClick={handleProceedPaymentCategory}
+            disabled={savePaymentCategoryMutation.isPending}
+            className="w-full bg-docuhealth-primary text-white py-3 rounded-full font-medium hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:opacity-40"
+          >
+            {savePaymentCategoryMutation.isPending && paymentCategory === "Private"
+              ? "Saving..."
+              : "Proceed"}
+          </button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showHmoProviderModal}
+        onClose={() => setShowHmoProviderModal(false)}
+        title=""
+        maxWidth="md"
+      >
+        <div className="flex flex-col text-sm">
+          <div className="flex justify-end -mt-2 -mr-2 mb-1">
+            <button
+              onClick={() => setShowHmoProviderModal(false)}
+              className="text-gray-400 hover:text-gray-600 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="text-center mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Fill up HMO information
+            </h3>
+            <p className="text-gray-500 mt-1">
+              Kindly fill in the required information to proceed!
+            </p>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Select HMO provider
+            </label>
+            <SearchableSelect
+              value={hmoProvider?.sqid}
+              onChange={(_, option) => setHmoProvider(option.provider)}
+              options={hmoProviderOptions}
+              placeholder="Select a provider"
+              isLoading={isLoadingHmoProviders}
+              emptyText="No HMO providers found."
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Input ID number
+            </label>
+            <input
+              type="text"
+              value={hmoIdNumber}
+              onChange={(e) => setHmoIdNumber(e.target.value)}
+              placeholder="Enter HMO ID number"
+              className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:outline-hidden focus:border-docuhealth-primary text-sm"
+            />
+          </div>
+
+          <button
+            onClick={handleProceedHmoProvider}
+            disabled={
+              !hmoProvider || !hmoIdNumber.trim() || savePaymentCategoryMutation.isPending
+            }
+            className="w-full bg-docuhealth-primary text-white py-3 rounded-full font-medium hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:opacity-40"
+          >
+            {savePaymentCategoryMutation.isPending ? "Saving..." : "Proceed"}
+          </button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showCompanyPartnerModal}
+        onClose={() => setShowCompanyPartnerModal(false)}
+        title=""
+        maxWidth="md"
+      >
+        <div className="flex flex-col text-sm">
+          <div className="flex justify-end -mt-2 -mr-2 mb-1">
+            <button
+              onClick={() => setShowCompanyPartnerModal(false)}
+              className="text-gray-400 hover:text-gray-600 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="text-center mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Fill up company partner information
+            </h3>
+            <p className="text-gray-500 mt-1">
+              Kindly fill in the required information to proceed!
+            </p>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Select company partner
+            </label>
+            <SearchableSelect
+              value={companyPartner?.sqid}
+              onChange={(_, option) => setCompanyPartner(option.provider)}
+              options={companyPartnerOptions}
+              placeholder="Select a partner"
+              isLoading={isLoadingCompanyPartners}
+              emptyText="No company partners found."
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Input staff ID number
+            </label>
+            <input
+              type="text"
+              value={staffIdNumber}
+              onChange={(e) => setStaffIdNumber(e.target.value)}
+              placeholder="Enter staff ID number"
+              className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:outline-hidden focus:border-docuhealth-primary text-sm"
+            />
+          </div>
+
+          <button
+            onClick={handleProceedCompanyPartner}
+            disabled={
+              !companyPartner || !staffIdNumber.trim() || savePaymentCategoryMutation.isPending
+            }
+            className="w-full bg-docuhealth-primary text-white py-3 rounded-full font-medium hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:opacity-40"
+          >
+            {savePaymentCategoryMutation.isPending ? "Saving..." : "Proceed"}
+          </button>
+        </div>
+      </Modal>
     </>
   );
 };

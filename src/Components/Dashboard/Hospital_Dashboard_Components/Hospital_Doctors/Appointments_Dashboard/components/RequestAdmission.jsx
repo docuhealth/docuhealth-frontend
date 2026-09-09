@@ -3,22 +3,38 @@ import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doct
 import { HosWardContext } from "../../../../../../context/HospitalContext/HosWardContext";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { toast } from "react-hot-toast";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Modal from "../../../../../ui/Modal";
+import Button from "../../../../../ui/Button";
+import Select from "../../../../../ui/Select";
+import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 
-const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
+const RequestAdmission = ({
+  setRequestAdmission,
+  selectedPatientDetails,
+  // Called after a request is accepted so the caller can flip its own
+  // "Request for admission" affordance to "Admission requested" without
+  // waiting for the outpatient list to refetch and be re-opened.
+  onRequested,
+}) => {
   const { profile } = useContext(DoctorAppContext);
   const { wards } = useContext(HosWardContext);
+  const queryClient = useQueryClient();
 
   const [wardOptions, setWardOptions] = useState([]);
   const [availableBeds, setAvailableBeds] = useState([]);
 
+  const admissionContext = resolveOrderContext(selectedPatientDetails);
+
   const [form, setForm] = useState({
     ward: "",
     bed: "",
-    patient_hin: selectedPatientDetails
-      ? selectedPatientDetails?.patient?.hin
-      : "",
-    staff_id: profile ? profile.staff_id : "",
+    patient: admissionContext.hin,
+    // Only a genuinely open check-in should be linked here — sending an
+    // appointment's sqid (or an empty string) as `check_in` gets rejected
+    // as "Check-in not found at this hospital."
+    ...(admissionContext.checkIn ? { check_in: admissionContext.checkIn } : {}),
   });
 
   useEffect(() => {
@@ -32,7 +48,7 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
     setForm((prev) => ({ ...prev, [field]: value }));
 
     if (field === "ward") {
-      const selected = wardOptions.find((w) => w.id === Number(value));
+      const selected = wardOptions.find((w) => w.sqid === value || w.id === Number(value));
 
       if (selected) {
         const beds = selected.beds.filter((b) => b.status === "available");
@@ -44,20 +60,24 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
   };
 
     const { mutate, isPending } = useMutation({
-    mutationFn: (post) => {
-      return axiosInstanceHos.post("api/doctors/admissions/request", form);;
+    mutationFn: () => {
+      return axiosInstanceHos.post("api/doctors/admissions/request", form);
     },
     onSuccess: () => {
       toast.success("Admission request successful");
+      // The outpatient row now carries `admission_request_status: "pending"`
+      // server-side; refetch so a later list render / re-open reflects it.
+      queryClient.invalidateQueries({ queryKey: ["hospital-patients-doctor"] });
+      onRequested?.();
       setRequestAdmission(false);
     },
     onError: (err) => {
-      console.error(
-        "Error assigning patient to nurse for vitals checkup:",
-        err,
-      );
+      console.error("Error submitting admission request:", err);
+      // The API returns the reason as `{ detail: ["Patient already has a
+      // pending admission request"] }` (array), not `{ message }`, so read
+      // through the shared extractor or the toast is just the generic fallback.
       toast.error(
-        err.response?.data?.message || "Error submitting admission request.",
+        extractApiErrorMessage(err, "Error submitting admission request."),
       );
     },
   });
@@ -67,77 +87,56 @@ const RequestAdmission = ({ setRequestAdmission, selectedPatientDetails }) => {
   };
 
   return (
-    <>
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-3 text-sm">
-        <div className="bg-white rounded-md shadow-lg p-6 max-w-md w-full relative">
-          <div className="flex justify-end">
-            <button
-              onClick={() => setRequestAdmission(false)}
-              className="text-gray-500 hover:text-black  "
-            >
-              <i className="bx bx-x text-2xl cursor-pointer"></i>
-            </button>
-          </div>
-          <div className="flex flex-col justify-center items-center pb-5">
-            <p className="pt-0.5 font-medium ">Request for patient admission</p>
-            <p className="pt-1 text-[12px]">
-              Select the most suitable ward for the patient
-            </p>
-          </div>
-
-          <select
-            value={form.ward}
-            onChange={(e) => handleChange("ward", e.target.value)}
-            className="border p-2 rounded-lg outline-none text-sm w-full"
-          >
-            <option value="">Assign to ward</option>
-            {wardOptions.map((w) => (
-              <option key={w.id} value={w.id}>
-                {w.name} ward
-              </option>
-            ))}
-          </select>
-
-          {form.ward && (
-            <select
-              value={form.bed}
-              onChange={(e) => handleChange("bed", e.target.value)}
-              className="border p-2 rounded-lg outline-none text-sm w-full mt-3"
-            >
-              <option value="">Select available bed</option>
-              {availableBeds.length > 0 ? (
-                availableBeds.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    Bed {b.bed_number}
-                  </option>
-                ))
-              ) : (
-                <option disabled>No available beds</option>
-              )}
-            </select>
-          )}
-
-          <button className={`py-2  text-white  ${
-                  isPending
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-docuhealth-primary cursor-pointer"
-                } rounded-full mt-4  w-full`} 
-          disabled={isPending || !form.ward || !form.bed}
-          onClick={()=> {
-            handleSubmit()
-          }}>
-               {isPending ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Requesting admission...
-                  </div>
-                ) : (
-                  "Proceed"
-                )}
-          </button>
-        </div>
+    <Modal isOpen={true} onClose={() => setRequestAdmission(false)} title="">
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={() => setRequestAdmission(false)}
+        className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 cursor-pointer"
+      >
+        <i className="bx bx-x text-2xl"></i>
+      </button>
+      <div className="flex flex-col justify-center items-center pb-5 pt-2">
+        <p className="pt-0.5 font-medium">Request for patient admission</p>
+        <p className="pt-1 text-[12px]">
+          Select the most suitable ward for the patient
+        </p>
       </div>
-    </>
+
+      <Select
+        label="Ward"
+        required
+        value={form.ward}
+        onChange={(value) => handleChange("ward", value)}
+        options={wardOptions.map((w) => ({ value: String(w.sqid || w.id), label: `${w.name} ward` }))}
+        placeholder="Assign to ward"
+      />
+
+      {form.ward && (
+        <Select
+          label="Bed"
+          required
+          value={form.bed}
+          onChange={(value) => handleChange("bed", value)}
+          options={availableBeds.map((b) => ({ value: String(b.sqid || b.id), label: `Bed ${b.bed_number}` }))}
+          placeholder={availableBeds.length > 0 ? "Select available bed" : "No available beds"}
+          disabled={availableBeds.length === 0}
+          className="mt-3"
+        />
+      )}
+
+      <div className="mt-6">
+        <Button
+          onClick={handleSubmit}
+          disabled={isPending || !form.ward || !form.bed}
+          loading={isPending}
+          loadingText="Requesting admission..."
+          fullWidth
+        >
+          Proceed
+        </Button>
+      </div>
+    </Modal>
   );
 };
 

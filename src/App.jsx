@@ -82,6 +82,7 @@ import Hospital_Admin_Subscriptions_Dashboard from "./Dashboard/Hospital_Dashboa
 
 import Hospital_Doctors_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_Doctors/Hospital_Doctors_Layout";
 import Hospital_Doctors_Home_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Home_Dashboard";
+import Hospital_Doctors_Encounter_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Encounter_Dashboard";
 import Hospital_Doctors_Appointments_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Appointments_Dashboard";
 import Hospital_Doctors_Patients_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Patients_Dashboard";
 import Hospital_Doctors_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Messages_Dashboard";
@@ -110,6 +111,9 @@ import Hospital_Nurses_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dash
 import Hospital_Nurses_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Messages_Dashboard";
 import Hospital_Nurses_Patients_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Patients_Dashboard";
 import Hospital_Nurses_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Settings_Dashboard";
+import Hospital_Nurses_Nursing_Encounter_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Nursing_Encounter_Dashboard";
+import Hospital_Nurses_Handover_History from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Handover_History";
+import Hospital_Nurses_Tasks from "./Dashboard/Hospital_Dashboard/Hospital_Nurses/Hospital_Nurses_Tasks";
 
 import HospitalPharmacistProviders from "./Providers/Hospital/HospitalPharmacistProviders";
 import Hospital_Pharmacist_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_Pharmacist/Hospital_Pharmacist_Layout";
@@ -149,7 +153,6 @@ function App() {
 
   //Adjust the condition to remove the true value when deploying to production. This is just for testing purposes to always render the hospital routes.
   const isHospital = hostname.startsWith("hospital.");
-  // const isHospital = true || hostname.startsWith("hospital.");
 
   return (
     <HelmetProvider>
@@ -367,6 +370,25 @@ function App() {
                   <HospitalProtectedRoute>
                     <HospitalDoctorProviders>
                       <Hospital_Doctors_Home_Dashboard />
+                    </HospitalDoctorProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-doctors-encounter-dashboard"
+              element={
+                <HospitalDoctorProviders>
+                  <Hospital_Doctors_Layout />
+                </HospitalDoctorProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalDoctorProviders>
+                      <Hospital_Doctors_Encounter_Dashboard />
                     </HospitalDoctorProviders>
                   </HospitalProtectedRoute>
                 }
@@ -795,6 +817,7 @@ function App() {
                 }
               />
             </Route>
+
             <Route
               path="/hospital-receptionist-admission-dashboard"
               element={
@@ -896,6 +919,26 @@ function App() {
             </Route>
 
             <Route
+              path="/hospital-nurses-nursing-encounter"
+              element={
+                <HospitalNursesProviders>
+                  <Hospital_Nurses_Layout />
+                </HospitalNursesProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalNursesProviders>
+                      <Hospital_Nurses_Nursing_Encounter_Dashboard />
+                    </HospitalNursesProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+
+            <Route
               path="/hospital-nurses-appointments-dashboard"
               element={
                 <HospitalNursesProviders>
@@ -935,6 +978,46 @@ function App() {
               />
             </Route>
 
+            <Route
+              path="/hospital-nurses-handover-history"
+              element={
+                <HospitalNursesProviders>
+                  <Hospital_Nurses_Layout />
+                </HospitalNursesProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalNursesProviders>
+                      <Hospital_Nurses_Handover_History />
+                    </HospitalNursesProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+
+            <Route
+              path="/hospital-nurses-tasks"
+              element={
+                <HospitalNursesProviders>
+                  <Hospital_Nurses_Layout />
+                </HospitalNursesProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalNursesProviders>
+                      <Hospital_Nurses_Tasks />
+                    </HospitalNursesProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+
             {/* Hospital Pharmacist Routes */}
             <Route
               path="/hospital-pharmacist-home-dashboard"
@@ -955,7 +1038,7 @@ function App() {
                 }
               />
             </Route>
-            
+
             <Route
               path="/hospital-pharmacist-prescriptions-dashboard"
               element={
@@ -975,7 +1058,7 @@ function App() {
                 }
               />
             </Route>
-            
+
             <Route
               path="/hospital-pharmacist-prescription-detail"
               element={

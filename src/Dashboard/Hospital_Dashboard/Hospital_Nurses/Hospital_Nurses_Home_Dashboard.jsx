@@ -90,7 +90,7 @@ const Hospital_Nurses_Home_Dashboard = () => {
                             </div>
                             <div className='border rounded-lg w-full  min-h-[100px] p-3 text-[12px] outline-none mt-3
                             '>
-                              {selectedPatient.note}
+                              {selectedPatient?.note || "No additional notes provided."}
                             </div>
                             <button className='w-full rounded-full text-center mt-3 py-2 bg-docuhealth-primary cursor-pointer text-white ' onClick={() => setCheckAdditionalNote(false)}>
                               Done

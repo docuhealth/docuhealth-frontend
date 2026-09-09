@@ -3,10 +3,13 @@ import { ArrowRight, Bed, Users } from "lucide-react";
 import { HosAppContext } from "../../../../../context/HospitalContext/Admin/HosAppContext";
 import { HosWardContext } from "../../../../../context/HospitalContext/HosWardContext"
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
+import ManageWardModal from "./ManageWardModal";
 
 const Wards = () => {
   const { wards, count, currentPage, totalPages, setCurrentPage, loading } =
     useContext(HosWardContext);
+  const [selectedWard, setSelectedWard] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
 
       if (loading) {
@@ -101,7 +104,7 @@ const Wards = () => {
           const percentage = totalBeds > 0 ? (occupiedCount / totalBeds) * 100 : 0;
 
           return (
-            <div key={ward.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col">
+            <div key={ward.sqid || ward.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col">
               {/* Card Top */}
               <div className="p-5">
                 <div className="flex justify-between items-start mb-4">
@@ -111,7 +114,7 @@ const Wards = () => {
                   </div>
                   <div>
                       <h3 className=" font-semibold text-gray-900 truncate">{ward.name || "General Ward"}</h3>
-                <p className="text-xs text-gray-400 mt-">Ref ID: {ward.id}</p>
+                <p className="text-xs text-gray-400 mt-">Ref ID: {ward.sqid || ward.id}</p>
                   </div>
                     </div>
                
@@ -155,8 +158,8 @@ const Wards = () => {
 
               {/* Action Button */}
               <button 
-                className="w-full py-4 bg-white border-t border-gray-100 text-docuhealth-primary text-xs font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 mt-auto"
-                onClick={() => console.log(`Managing Ward ${ward.id}`)}
+                className="w-full py-4 bg-white border-t border-gray-100 text-docuhealth-primary text-xs font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 mt-auto cursor-pointer"
+                onClick={() => { setSelectedWard(ward); setIsModalOpen(true); }}
               >
                 MANAGE WARD <ArrowRight className="w-3.5 h-3.5" />
               </button>
@@ -169,6 +172,11 @@ const Wards = () => {
         currentPage={currentPage}
         totalPages={totalPages}
         setCurrentPage={setCurrentPage}
+      />
+      <ManageWardModal 
+        isOpen={isModalOpen} 
+        onClose={() => { setIsModalOpen(false); setSelectedWard(null); }} 
+        ward={selectedWard} 
       />
     </>
   );

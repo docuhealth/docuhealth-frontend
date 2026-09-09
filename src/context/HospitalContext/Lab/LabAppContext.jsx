@@ -22,11 +22,13 @@ const LabProfileProvider = (props) => {
         backgroundImage: data?.theme?.bg_image ?? null,
         hospitalName:    data?.theme?.name ?? null,
         hospitalLogo:    data?.theme?.profile_image ?? null,
+        // `api/lab/dashboard` summary shape:
+        // { total_items, pending, in_progress, result_ready, result_ready_change }
         stats: data?.summary ? {
           total_requests:       data.summary.total_items ?? data.summary.total_orders,
           total_requests_trend: data.summary.total_items_change ?? data.summary.total_orders_change,
-          pending_tests:        data.summary.pending_items ?? data.summary.pending_orders,
-          pending_tests_trend:  data.summary.pending_items_change ?? data.summary.pending_orders_change,
+          pending_tests:        data.summary.pending ?? data.summary.pending_items ?? data.summary.pending_orders,
+          pending_tests_trend:  data.summary.pending_change ?? data.summary.pending_items_change ?? data.summary.pending_orders_change,
           completed_tests:      data.summary.result_ready ?? data.summary.completed_items ?? data.summary.completed_orders,
           completed_tests_trend: data.summary.result_ready_change ?? data.summary.completed_items_change ?? data.summary.completed_orders_change,
         } : null,

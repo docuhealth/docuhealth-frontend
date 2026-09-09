@@ -5,6 +5,9 @@ import MedicationSection from "./MedicationSection";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { DEFAULT_FREQUENCY } from "../../../../../../utils/careTaskConstants";
+import Input from "../../../../../ui/Input";
 
 const NoteSection = ({
   title,
@@ -41,13 +44,13 @@ const NoteSection = ({
 
     {activeInput === field ? (
       <div className="flex gap-2 mt-4">
-        <input
+        <Input
           autoFocus
-          type="text"
           value={inputs[field]}
           onChange={(e) => setInputs({ ...inputs, [field]: e.target.value })}
           placeholder={placeholder}
-          className="flex-1 border rounded p-2 text-[12px] focus:ring-1 focus:ring-docuhealth-primary outline-none"
+          containerClassName="flex-1"
+          className="text-[12px]"
         />
         <button
           type="button"
@@ -82,10 +85,10 @@ const PrescribeMedication = ({
   setPrescribeMedication,
   selectedPatientDetails,
   setSeePatientDetails,
-  isFromPatientMgt = false,
 }) => {
   const { profile } = useContext(DoctorAppContext);
   const queryClient = useQueryClient();
+  const orderContext = resolveOrderContext(selectedPatientDetails);
 
   const [medications, setMedications] = useState([
     {
@@ -96,7 +99,7 @@ const PrescribeMedication = ({
       dosage: "",
       dosageUnit: "mg",
       route: "Oral",
-      frequency: "od_qd",
+      frequency: DEFAULT_FREQUENCY,
       duration: "",
       durationUnit: "Day",
     },
@@ -163,8 +166,8 @@ const PrescribeMedication = ({
     }
 
     const payload = {
-      patient: selectedPatientDetails?.patient?.hin,
-      order_source: isFromPatientMgt ? "staff_admission_order" : "staff_appointment_order",
+      patient: orderContext.hin,
+      order_source: orderContext.orderSource,
       drugs: validMedications.map(med => {
         let drugData = {};
         if (med.catalog_drug) {
@@ -195,8 +198,8 @@ const PrescribeMedication = ({
       })
     };
 
-    if (!isFromPatientMgt && selectedPatientDetails?.sqid) {
-      payload.appointment = selectedPatientDetails.sqid;
+    if (orderContext.checkIn) {
+      payload.check_in = orderContext.checkIn;
     }
 
     mutate(payload);
@@ -204,18 +207,17 @@ const PrescribeMedication = ({
 
   return (
     <div className="bg-white my-5 rounded-lg border p-4 lg:p-6 text-sm mb-20">
-      <div className="flex items-center gap-2 cursor-pointer border-b pb-4 mb-4">
-        <div
-          onClick={() => {
-            setPrescribeMedication(false);
-            setSeePatientDetails(true);
-          }}
-          className="text-gray-500 hover:text-black transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </div>
-        <p className="font-medium text-gray-800">Prescribe medication</p>
-      </div>
+      <button
+        type="button"
+        onClick={() => {
+          setPrescribeMedication(false);
+          setSeePatientDetails(true);
+        }}
+        className="flex items-center gap-2 cursor-pointer border-b pb-4 mb-4 w-full text-gray-500 hover:text-black transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span className="font-medium text-gray-800">Prescribe medication</span>
+      </button>
 
       <div className="my-5">
         <MedicationSection
