@@ -182,7 +182,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                     Add New Case Note
                   </button>
                 </>
-              ) : tab === "inpatient_discharge" ? null : (
+              ) : (tab === "inpatient_discharge" || tab === "outpatient_discharge") ? null : (
                 <>
                   <div className="relative w-full lg:w-60" ref={dropdownRef}>
                     <button

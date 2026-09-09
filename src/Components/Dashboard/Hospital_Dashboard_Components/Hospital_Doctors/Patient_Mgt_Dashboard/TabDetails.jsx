@@ -320,10 +320,10 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
   if (outPatients.length === 0 && !searchQuery) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
-        <h2 className="font-medium pb-1 mt-4">No out patients!</h2>
+        <h2 className="font-medium pb-1 mt-4">No outpatients!</h2>
         <div className="max-w-md text-center">
           <p className="text-[12px] text-gray-500">
-            You currently don’t have any out patients.
+            You currently don’t have any outpatients.
           </p>
         </div>
       </div>
@@ -717,7 +717,7 @@ const DischargedPatientsWrapper = (props) => {
           }`}
           onClick={() => setTab("outpatient_discharge")}
         >
-          Outpatient Discharges
+          Outpatient Encounter
         </button>
       </div>
       <DischargedPatientsTab {...props} />
@@ -741,7 +741,7 @@ const getTabs = (advanceCheckUp, setAdvanceCheckUp, setSelected, setAdvanceCheck
   },
 
   {
-    title: "Out Patients",
+    title: "OutPatients",
     status: "outpatient",
     content: (
       <OutPatientsTab

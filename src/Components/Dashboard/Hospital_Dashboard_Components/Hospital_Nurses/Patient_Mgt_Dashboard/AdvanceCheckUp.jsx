@@ -96,37 +96,43 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
       ) : (
         <>
           <div className="mb-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div
-                className="flex items-center gap-2 cursor-pointer text-gray-800 hover:text-black font-semibold text-[17px]"
+                className="flex items-center gap-2 cursor-pointer text-gray-800 hover:text-black font-semibold text-[17px] shrink-0 whitespace-nowrap"
                 onClick={() => {
                   setAdvanceCheckUp(false);
                 }}
               >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M4.56528 6.41685H11.6654V7.58352H4.56528L7.69426 10.7125L6.86932 11.5374L2.33203 7.00019L6.86932 2.46289L7.69426 3.28785L4.56528 6.41685Z"
-                fill="currentColor"
-              />
-            </svg>
-            <p>Patient's details</p>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M4.56528 6.41685H11.6654V7.58352H4.56528L7.69426 10.7125L6.86932 11.5374L2.33203 7.00019L6.86932 2.46289L7.69426 3.28785L4.56528 6.41685Z"
+                    fill="currentColor"
+                  />
+                </svg>
+                <p>Patient's details</p>
+              </div>
+              {(context?.tab === "inpatient_discharge" ||
+                context?.tab === "outpatient_discharge" ||
+                selected?.discharge_date ||
+                selected?.closed_at ||
+                selected?.status === "inpatient_discharge" ||
+                selected?.status === "outpatient_discharge" ||
+                selected?.discharge_form) && (
+                <button 
+                    onClick={() => setShowDischargeSummaryModal(true)}
+                    className="w-full sm:w-auto text-center bg-white border border-docuhealth-primary text-docuhealth-primary text-sm font-medium px-5 py-2.5 rounded-full hover:bg-gray-50 transition-colors cursor-pointer shrink-0"
+                >
+                    View discharge patient note summary
+                </button>
+              )}
+            </div>
           </div>
-          {context?.tab === "inpatient_discharge" && (
-            <button 
-                onClick={() => setShowDischargeSummaryModal(true)}
-                className="bg-white border border-docuhealth-primary text-docuhealth-primary text-sm font-medium px-5 py-2.5 rounded-full hover:bg-gray-50 transition-colors"
-            >
-                View discharge patient note summary
-            </button>
-          )}
-        </div>
-      </div>
 
       {isLoading || loadingAdmission ? (
         <div className="flex justify-center items-center py-20">

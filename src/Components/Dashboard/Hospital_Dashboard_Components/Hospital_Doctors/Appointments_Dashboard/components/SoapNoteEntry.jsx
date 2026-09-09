@@ -257,7 +257,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       });
       // A note from the outpatient flow can move the check-in
       // doctor_idle -> doctor_active, which changes its row in the
-      // Patient Mgt "Out Patients" list.
+      // Patient Mgt "OutPatients" list.
       queryClient.invalidateQueries({
         queryKey: ["hospital-patients-doctor"],
       });

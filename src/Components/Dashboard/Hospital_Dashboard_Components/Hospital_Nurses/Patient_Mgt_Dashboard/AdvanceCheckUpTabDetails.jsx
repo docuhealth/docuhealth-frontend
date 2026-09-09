@@ -7,7 +7,7 @@ import PatientVitalsAndMeds from "./PatientVitalsAndMeds";
 import CarePlanHistory from "./CarePlanHistory";
 
 const PatientInfoContent = ({ patient, admission, patientFullInfo, formatDate, formatDateTime, isOutPatient }) => {
-    const isDischargedInpatient = !isOutPatient && admission?.discharge_date;
+    const isDischargedInpatient = !isOutPatient && (Boolean(admission?.discharge_date) || admission?.status === "inpatient_discharge");
 
     return (
         <div className="space-y-6">
@@ -234,7 +234,7 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
         return tabs.filter(t => t.status === "info" || t.status === "soap");
     }
 
-    const isDischargedInpatient = !isOutPatient && admission?.discharge_date;
+    const isDischargedInpatient = !isOutPatient && (Boolean(admission?.discharge_date) || admission?.status === "inpatient_discharge");
     if (isDischargedInpatient) {
         return tabs.filter(t => t.status === "info");
     }

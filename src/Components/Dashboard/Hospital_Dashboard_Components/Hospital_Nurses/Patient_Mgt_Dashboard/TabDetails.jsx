@@ -413,7 +413,12 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
                                 </div>
                             </div>
                             <div className='border-b py-2'>
-                                <p className='text-gray-600'>HIN : {(admittedPatient?.patient_info?.hin || admittedPatient?.patient?.hin) ? admittedPatient.patient_info.hin.slice(0, 4) + "••••••" + admittedPatient.patient_info.hin.slice(-2) : 'N/A'}</p>
+                                <p className='text-gray-600'>HIN : {(admittedPatient?.patient_info?.hin || admittedPatient?.patient?.hin) ? (admittedPatient.patient_info?.hin || admittedPatient.patient?.hin).slice(0, 4) + "••••••" + (admittedPatient.patient_info?.hin || admittedPatient.patient?.hin).slice(-2) : 'N/A'}</p>
+                                {admittedPatient?.admission_date && (
+                                    <p className="text-gray-600 pt-1">
+                                        Admitted : {formatRecordDate(admittedPatient.admission_date)}
+                                    </p>
+                                )}
                             </div>
                             <div className="flex items-center gap-1 text-gray-600 pt-3">
                                 <svg
@@ -429,10 +434,11 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
                                     />
                                 </svg>
                                 <p className="">
-                                    {" "}
                                     {admittedPatient?.discharged_by
-                                        ? `${'Dr. ' + admittedPatient.discharged_by.firstname} ${admittedPatient.discharged_by.lastname}`
-                                        : "Unassigned Doctor"}
+                                        ? `Discharged by ${admittedPatient.discharged_by.role === "doctor" ? "Dr. " : ""}${admittedPatient.discharged_by.firstname} ${admittedPatient.discharged_by.lastname}`
+                                        : admittedPatient?.staff_info
+                                            ? `Dr. ${admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`
+                                            : "Unassigned Staff"}
                                 </p>
                             </div>
                             <div className="flex items-center gap-1 text-gray-600 pt-1 ">
@@ -468,7 +474,7 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
                                 </svg>
 
 
-                                <p className="">{formatFullDateTime(admittedPatient.discharge_date) || 'Pending'}</p>
+                                <p className="">{formatFullDateTime(admittedPatient.discharge_date || admittedPatient.closed_at) || 'Pending'}</p>
                             </div>
                             <button className="text-center mt-3 py-2 border border-docuhealth-dark w-full rounded-full cursor-pointer"
                                 onClick={() => {
@@ -526,10 +532,10 @@ const OutPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected }) => {
     if (outPatients.length === 0 && !searchQuery) {
         return (
             <div className="flex flex-col justify-center items-center text-center  h-full">
-                <h2 className="font-medium pb-1 mt-4">No out patients!</h2>
+                <h2 className="font-medium pb-1 mt-4">No outpatients!</h2>
                 <div className="max-w-md text-center">
                     <p className="text-[12px] text-gray-500">
-                        You currently don’t have any out patients.
+                        You currently don’t have any outpatients.
                     </p>
                 </div>
             </div>
@@ -647,7 +653,7 @@ const DischargedPatientsWrapper = (props) => {
           }`}
           onClick={() => setTab("outpatient_discharge")}
         >
-          Outpatient Discharges
+          Outpatient Encounter
         </button>
       </div>
       <DischargedPatientsTab {...props} />
@@ -663,7 +669,7 @@ const getTabs = (advanceCheckUp, setAdvanceCheckUp, setSelected) => [
             setAdvanceCheckUp={setAdvanceCheckUp} setSelected={setSelected} />
     },
     {
-        title: "Out Patients",
+        title: "OutPatients",
         status: "outpatient",
         content: <OutPatientsTab advanceCheckUp={advanceCheckUp}
             setAdvanceCheckUp={setAdvanceCheckUp} setSelected={setSelected} />
