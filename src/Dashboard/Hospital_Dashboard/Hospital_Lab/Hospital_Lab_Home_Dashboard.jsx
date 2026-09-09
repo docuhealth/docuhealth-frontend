@@ -111,7 +111,10 @@ const Hospital_Lab_Home_Dashboard = () => {
           ) : (
             <>
               {/* Desktop grid */}
-              <div className="hidden lg:flex lg:flex-col">
+              {/* overflow-x-auto + min-w keeps the 7-track grid readable at lg,
+                  where the sidebar leaves the content column only ~720px wide. */}
+              <div className="hidden lg:block overflow-x-auto">
+                <div className="flex flex-col min-w-[720px]">
                 <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
                   <div className="col-span-2 w-full pl-5 flex items-center gap-2">
                     <p>Patient's Name</p>
@@ -142,6 +145,7 @@ const Hospital_Lab_Home_Dashboard = () => {
                     </div>
                   </div>
                 ))}
+                </div>
               </div>
 
               {/* Mobile cards */}

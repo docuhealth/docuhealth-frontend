@@ -1,12 +1,7 @@
 import axiosInstanceHos from "../../../lib/axios/hospital";
 
 // GET /api/receptionists/payment-providers?category=hmo|company&search=...
-// queryKey: ["payment-providers", category, search?]
-//
-// Docs say this returns a plain array, but in practice the response comes
-// back wrapped (matching every other list endpoint in this codebase, e.g.
-// recentPatients/admissionRequest use `{ results: [...] }`) — normalize
-// here so callers can always treat the result as an array.
+// Response comes back wrapped despite the docs; normalized to a plain array here.
 export const fetchPaymentProviders = async ({ queryKey }) => {
   const [_key, category, search] = queryKey;
   const params = new URLSearchParams();

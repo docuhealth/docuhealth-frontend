@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 
-// Shared field list for the doctor-to-doctor handover note: the create form
-// here, the search filter in PatientHandoverTab.jsx, and the read-only render
-// in HandoverNoteDetailPage.jsx all key off this so labels stay in sync with
-// POST/GET /api/doctors/handover(s).
+// Shared field list for the doctor-to-doctor handover note — the create form here,
+// the search filter in PatientHandoverTab.jsx, and the read-only render in
+// HandoverNoteDetailPage.jsx all key off this to stay in sync.
 export const HANDOVER_FIELDS = [
   { key: "working_diagnosis", label: "Working diagnosis", required: true },
   { key: "current_clinical_status", label: "Current Clinical Status", required: true },
@@ -19,14 +18,9 @@ export const HANDOVER_FIELDS = [
 
 const EMPTY_FORM = HANDOVER_FIELDS.reduce((acc, f) => ({ ...acc, [f.key]: "" }), {});
 
-// Doctor-to-doctor handover note form. The receiving doctor was picked in the
-// step before this (SelectHandoverDoctorModal); on upload the parent
-// (PatientHandoverTab) POSTs the filled fields to /api/doctors/handover. Only
-// `working_diagnosis` and `current_clinical_status` are required; the other
-// six go up as empty strings when left blank.
-//
-// Same "inline page, not a modal" shell as AddProgressNoteForm in
-// TabDetails2.jsx (Progress Note tab).
+// Doctor-to-doctor handover note form. The receiving doctor is picked in the previous
+// step; the parent (PatientHandoverTab) POSTs these fields to /api/doctors/handover.
+// Only working_diagnosis and current_clinical_status are required; the rest go up as "".
 const AddHandoverNoteForm = ({ onBack, onUpload, handoverDoctorName, isSubmitting = false }) => {
   const [form, setForm] = useState(EMPTY_FORM);
 
