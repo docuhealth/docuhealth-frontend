@@ -10,6 +10,7 @@ import formatRecordDate, {
 } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { fetchTestCategories, fetchLabTests, createLabTestOrder } from "../../../../../queries/Hospital/lab/requests";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 
@@ -44,7 +45,8 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
       const requestPayload = {
         patient: (selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin) || selectedPatientDetails?.patient_hin,
         order_source: "walk_in",
-        items_data: payload.test_type.map((testSqid) => ({
+        // `POST api/lab/test-orders/create` expects `items`, not `items_data`.
+        items: payload.test_type.map((testSqid) => ({
           test: testSqid,
           note: payload.note,
         })),
@@ -64,7 +66,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
       if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {
         setDuplicateWarning(err.response.data.duplicate_warning);
       } else {
-        toast.error(err.response?.data?.message || "Failed to create order.");
+        toast.error(extractApiErrorMessage(err, "Failed to create order."));
       }
     },
   });

@@ -4,7 +4,7 @@ import axiosInstanceHos from "../../../lib/axios/hospital";
 export const fetchLabRequests = async ({ queryKey }) => {
   const [_key, status, page, search, category, ordering] = queryKey;
   const pageSize = 6;
-  let url = `api/lab/test-orders?item_status=${status}&page=${page}&size=${pageSize}`;
+  let url = `api/lab/test-orders?status=${status}&page=${page}&size=${pageSize}`;
   if (search)   url += `&search=${search}`;
   if (category) url += `&category=${category}`;
   if (ordering) url += `&ordering=${ordering}`;
@@ -19,8 +19,11 @@ export const fetchTestCategories = async () => {
 
 export const fetchLabTests = async ({ queryKey }) => {
   const [_key, category] = queryKey;
-  let url = "api/lab/lab-tests";
-  if (category) url += `?category=${category}`;
+  // `api/lab/lab-tests` paginates at 10/page; these results only ever feed a
+  // "select a test" dropdown, so pull a full page or categories with >10 tests
+  // (Microbiology, Biochemistry, Endocrinology) silently lose entries.
+  let url = "api/lab/lab-tests?size=100";
+  if (category) url += `&category=${category}`;
   const res = await axiosInstanceHos.get(url);
   return res.data;
 };
@@ -55,8 +58,10 @@ export const approveLabTestResult = async ({ item_sqid }) => {
   return res.data;
 };
 
-export const rejectLabTestResult = async ({ item_sqid }) => {
-  const res = await axiosInstanceHos.patch(`api/lab/test-orders/items/${item_sqid}/result/reject`);
+// `.../result/reject` now requires a non-empty `rejection_reason` in the body;
+// it 400s without one. The lab scientist sees this reason on the bounced item.
+export const rejectLabTestResult = async ({ item_sqid, rejection_reason }) => {
+  const res = await axiosInstanceHos.patch(`api/lab/test-orders/items/${item_sqid}/result/reject`, { rejection_reason });
   return res.data;
 };
 

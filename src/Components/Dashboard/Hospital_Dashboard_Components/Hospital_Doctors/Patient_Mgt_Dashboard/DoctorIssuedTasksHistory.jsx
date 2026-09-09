@@ -8,12 +8,9 @@ import { fetchInpatientTasks } from "../../../../../queries/Hospital/doctor/inpa
 import { taskTypeLabel } from "../../../../../utils/careTaskConstants";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 
-// Reads the doctor-issued care tasks for the current admission via
-// GET /api/inpatients/tasks/<admission_sqid> (task definitions, not the
-// per-schedule occurrences the nurse queue shows). The endpoint has no
-// filter params, so — matching the Handover tab's approach — we pull one
-// large page (size 100 covers every realistic per-admission task count)
-// and filter + paginate client-side off `effective_status`.
+// Reads the doctor-issued care task definitions for the admission via
+// GET /api/inpatients/tasks/<admission_sqid>. The endpoint has no filter params, so we
+// pull one large page and filter + paginate client-side off `effective_status`.
 const STATUS_STYLES = {
   active: { label: "Active", dot: "bg-amber-400", text: "text-amber-600" },
   duration_completed: { label: "Duration complete", dot: "bg-emerald-400", text: "text-emerald-600" },
