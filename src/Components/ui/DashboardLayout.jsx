@@ -77,7 +77,7 @@ const DashboardLayout = ({
         </header>
 
         {/* Page content */}
-        <main className="flex-1 min-h-0 p-4 lg:p-6 pb-34 lg:pb-6 overflow-y-auto bg-docuhealth-gray-lightest">
+        <main className="flex-1 min-h-0 p-4 lg:p-6 pb-8 lg:pb-6 overflow-y-auto bg-docuhealth-gray-lightest">
           {children}
         </main>
       </div>
