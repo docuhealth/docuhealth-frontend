@@ -275,6 +275,8 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
     if (!form.email) return toast.error("Enter an email address");
 
+    const wardPk = form.ward ? Number(form.ward) : null;
+
     const payload = {
       email: form.email,
       password: form.password,
@@ -285,7 +287,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
         role: form.personnel,
         gender: form.gender,
         ...(form.specialization && { specialization: form.specialization }),
-        ...(form.ward && { ward: form.ward }),
+        ...(wardPk && { ward: wardPk }),
       },
       login_url: "https://hospital.docuhealthservices.net/login",
       invitation_message: invitationHTML,
@@ -371,7 +373,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                 value={form.ward}
                 onChange={(value) => handleChange("ward", value)}
                 options={wardOptions.map((w) => ({
-                  value: String(w.sqid),
+                  value: String(w.id),
                   label:
                     (w?.name ? w.name.charAt(0).toUpperCase() + w.name.slice(1) : "") +
                     " ward",
