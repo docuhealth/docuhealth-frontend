@@ -17,7 +17,7 @@ const HandoverHistoryTab = ({ type }) => {
       setLoading(true);
       try {
         const endpoint = type === 'received' 
-          ? `/api/nurses/in-patient-handovers-recvd?page=${currentPage}&size=10`
+          ? `/api/nurses/in-patient-handovers-received?page=${currentPage}&size=10`
           : `/api/nurses/in-patient-handovers-sent?page=${currentPage}&size=10`;
           
         const response = await axiosInstanceHos.get(endpoint);
