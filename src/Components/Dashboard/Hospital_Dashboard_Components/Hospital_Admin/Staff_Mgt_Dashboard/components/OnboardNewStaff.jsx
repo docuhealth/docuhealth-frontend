@@ -286,8 +286,6 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
         phone_num: form.phone,
         role: form.personnel,
         gender: form.gender,
-        staff_id: "NIG_101", // Consider generating this dynamically if needed
-        email: form.email,
         ...(form.specialization && { specialization: form.specialization }),
         ...(wardPk && { ward: wardPk }),
       },
