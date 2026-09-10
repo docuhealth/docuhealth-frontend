@@ -11,24 +11,7 @@ import SearchableSelect from "../../../../../ui/SearchableSelect";
 
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
-
-// Backend error responses show up in a few different shapes:
-// - { detail: "..." } (FastAPI)
-// - { message: "..." } (some newer endpoints)
-// - { field_name: ["..."] } (DRF-style field validation errors)
-const getErrorMessage = (error) => {
-  const data = error.response?.data;
-  if (!data) return "Something went wrong.";
-  if (typeof data.detail === "string") return data.detail;
-  if (typeof data.message === "string") return data.message;
-
-  const firstFieldError = Object.values(data).find(
-    (value) => Array.isArray(value) && typeof value[0] === "string",
-  );
-  if (firstFieldError) return firstFieldError[0];
-
-  return "Something went wrong.";
-};
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 
 const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const [step, setStep] = useState(1);
@@ -243,13 +226,13 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     const isNoWardRole = noWardRoles.includes(form.personnel.toLowerCase());
 
     // Specialization required for anyone with a specialization list (i.e. not receptionist)
-    if (!isReceptionist && !form.specialization.trim()) {
+    if (!isReceptionist && !form.specialization?.trim()) {
       toast.error("Please select an area of specialization.");
       return;
     }
 
-    // Ward required only for roles that are assigned to a ward
-    if (!isNoWardRole && !form.ward.trim()) {
+    // Ward required only for roles that are assigned to a ward (e.g. doctor and nurse)
+    if (!isNoWardRole && !String(form.ward || "").trim()) {
       toast.error("Please assign a ward.");
       return;
     }
@@ -283,7 +266,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
       setCreateNewStaff(false);
     },
     onError: (error) => {
-      toast.error(getErrorMessage(error));
+      toast.error(extractApiErrorMessage(error, "Failed to add team member"));
     },
   });
 
@@ -291,6 +274,8 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     e.preventDefault();
 
     if (!form.email) return toast.error("Enter an email address");
+
+    const wardPk = form.ward ? Number(form.ward) : null;
 
     const payload = {
       email: form.email,
@@ -304,7 +289,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
         staff_id: "NIG_101", // Consider generating this dynamically if needed
         email: form.email,
         ...(form.specialization && { specialization: form.specialization }),
-        ...(form.ward && { ward: form.ward }),
+        ...(wardPk && { ward: wardPk }),
       },
       login_url: "https://hospital.docuhealthservices.net/login",
       invitation_message: invitationHTML,
@@ -390,8 +375,10 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
                 value={form.ward}
                 onChange={(value) => handleChange("ward", value)}
                 options={wardOptions.map((w) => ({
-                  value: w.id,
-                  label: w.name.charAt(0).toUpperCase() + w.name.slice(1) + " ward",
+                  value: String(w.id),
+                  label:
+                    (w?.name ? w.name.charAt(0).toUpperCase() + w.name.slice(1) : "") +
+                    " ward",
                 }))}
                 placeholder="Assign to ward"
                 className="col-span-2"
