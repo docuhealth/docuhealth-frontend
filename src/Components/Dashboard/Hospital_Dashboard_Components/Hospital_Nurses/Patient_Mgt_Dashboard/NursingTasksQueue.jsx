@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Calendar, User, FileText, Activity, ArrowLeft, Loader2 } from "lucide-react";
+import { Calendar, User, FileText, Activity, ArrowLeft, Loader2, X, ClipboardList } from "lucide-react";
 import Modal from "../../../../ui/Modal";
 import TimeInput from "../../../../ui/TimeInput";
 import EmptyState from "../../../../ui/EmptyState";
@@ -164,10 +164,193 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
   const [isCalculatingIO, setIsCalculatingIO] = useState(false);
   const [ioCalculationModalOpen, setIoCalculationModalOpen] = useState(false);
   const [fluidBalanceData, setFluidBalanceData] = useState(null);
+  const [taskDetailsModalOpen, setTaskDetailsModalOpen] = useState(false);
+  const [selectedTaskForDetails, setSelectedTaskForDetails] = useState(null);
 
   const formatLabel = (str) => {
     if (!str) return '-';
     return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  const getTaskDetailsInfo = (task) => {
+    if (!task) return { label: "Task Details", value: "—", instructions: "No instructions provided" };
+
+    const taskType = task.task_type || "";
+    const config = task.config || task.summary || task.care_task?.config || {};
+    const instructions = task.instructions || task.instruction || task.notes || task.care_task?.instructions || "No instructions provided";
+
+    if (taskType === "seizure" || taskType === "seizure_event") {
+      const rawChar = config.characteristics || task.characteristics || task.seizure_characteristics || "";
+      const charMap = {
+        tonic: "Tonic (stiffening)",
+        clonic: "Clonic (jerking)",
+        tonic_clonic: "Tonic-Clonic",
+        atonic: "Atonic (limp)",
+      };
+      const formattedChar = charMap[rawChar] || (rawChar ? formatLabel(rawChar) : "Tonic-Clonic");
+      let val = formattedChar;
+      const standingOrder = config.emergency_standing_order || task.emergency_standing_order;
+      if (standingOrder && standingOrder !== "none") {
+        const standingMap = {
+          administer_supplemental_o2: "Administer supplemental O₂",
+          iv_diazepam: "IV Diazepam",
+          iv_midazolam: "IV Midazolam",
+          pr_diazepam_suppository: "PR Diazepam suppository",
+          iv_magnesium_sulfate_4g: "IV Magnesium Sulfate 4g",
+        };
+        const formattedStanding = standingMap[standingOrder] || formatLabel(standingOrder);
+        val += ` • Standing order: ${formattedStanding}`;
+      }
+      return {
+        label: "Seizure Characteristics to chart",
+        value: val,
+        instructions: instructions,
+      };
+    }
+
+    if (taskType === "glucose") {
+      const rawSchedule = config.schedule || task.schedule || "";
+      const scheduleMap = {
+        four_point_rbs: "4-Point RBS",
+        six_point_rbs: "6-Point RBS",
+        eight_point_rbs: "8-Point RBS",
+        fasting_early_morning: "Fasting Blood Sugar - Early Morning",
+        q1h_rbs: "Q1H RBS",
+        q2h_rbs: "Q2H RBS",
+        q4h_rbs: "Q4H RBS",
+        q6h_rbs: "Q6H RBS",
+        q8h_rbs: "Q8H RBS",
+        post_prandial_2_hours: "2 Hours Post-Prandial",
+      };
+      return {
+        label: "Glucose Monitoring Protocol",
+        value: scheduleMap[rawSchedule] || (rawSchedule ? formatLabel(rawSchedule) : "Blood Glucose Monitoring"),
+        instructions: instructions,
+      };
+    }
+
+    if (taskType === "input_output") {
+      const rawMode = config.tracking_mode || task.tracking_mode || "";
+      const modeMap = {
+        strict_24_hour_fluid_balance: "Strict 24-Hour Fluid Balance (Intake + Output)",
+        intake_only: "Intake Only Monitoring",
+        output_only: "Output Only Monitoring",
+      };
+      return {
+        label: "Fluid Intake & Output Protocol",
+        value: modeMap[rawMode] || (rawMode ? formatLabel(rawMode) : "Strict 24-Hour Fluid Balance"),
+        instructions: instructions,
+      };
+    }
+
+    if (taskType === "vital_signs") {
+      const params = config.parameters || task.parameters;
+      let val = "Temperature, Blood Pressure, Pulse, Respiration Rate, SpO₂";
+      if (Array.isArray(params) && params.length > 0) {
+        val = params.map(p => formatLabel(p)).join(", ");
+      }
+      return {
+        label: "Vital Signs Parameters to chart",
+        value: val,
+        instructions: instructions,
+      };
+    }
+
+    if (taskType === "procedure") {
+      const procName = config.procedure_name || task.procedure_name || task.name || "Ward Procedure";
+      return {
+        label: "Procedure to perform",
+        value: procName,
+        instructions: instructions,
+      };
+    }
+
+    if (taskType === "iv_fluid") {
+      const solutionMap = {
+        normal_saline_09: "0.9% Normal Saline",
+        dextrose_water_5: "5% Dextrose Water",
+        dextrose_water_10: "10% Dextrose Water",
+        dextrose_5_in_saline_09: "5% Dextrose in 0.9% Normal Saline",
+        ringers_lactate: "Ringer's Lactate",
+        dextrose_43_in_saline_018: "4.3% Dextrose in 0.18% Saline",
+        haemaccel_gelofusine: "Haemaccel / Gelofusine",
+        half_normal_saline_045: "0.45% Half-Normal Saline",
+      };
+      const rawSolution = config.solution_type || task.solution_type;
+      const sol = solutionMap[rawSolution] || (rawSolution ? formatLabel(rawSolution) : "IV Infusion");
+      const vol = config.volume_per_bag || task.volume_per_bag ? `${config.volume_per_bag || task.volume_per_bag} mL` : "";
+      const additives = Array.isArray(config.additives) && config.additives.length > 0
+        ? ` + ${config.additives.map(a => formatLabel(a)).join(", ")}`
+        : "";
+      return {
+        label: "IV Fluid Solution Details",
+        value: `${sol}${vol ? ` (${vol})` : ""}${additives}`,
+        instructions: instructions,
+      };
+    }
+
+    if (taskType === "medication") {
+      let medDetails = "Medication Administration";
+      if (task.summary?.drug_name) {
+        const qty = task.summary.quantity ? `${task.summary.quantity} ${task.summary.unit || ""}` : "";
+        const freq = task.summary.frequency ? ` • Frequency: ${task.summary.frequency}` : "";
+        medDetails = `${task.summary.drug_name}${qty ? ` (${qty.trim()})` : ""}${freq}`;
+      } else if (task.drug_name) {
+        medDetails = `${task.drug_name}${task.dosage ? ` - ${task.dosage}` : ""}${task.route ? ` (${task.route})` : ""}`;
+      } else if (Array.isArray(config.drugs) && config.drugs.length > 0) {
+        medDetails = config.drugs.map(d => {
+          const name = d.manual_drug?.name || d.drug || "Medication";
+          const dosage = d.dosage?.quantity ? `${d.dosage.quantity} ${d.dosage.unit || ""}` : "";
+          const route = d.manual_drug?.route || d.route || "";
+          return `${name}${dosage ? ` - ${dosage}` : ""}${route ? ` (${route})` : ""}`;
+        }).join("; ");
+      }
+      return {
+        label: "Medication Details",
+        value: medDetails,
+        instructions: instructions,
+      };
+    }
+
+    if (taskType === "discharge_summary" || taskType === "nurse_in_patient_discharge") {
+      return {
+        label: "Discharge Review",
+        value: "Nurse Inpatient Discharge Assessment",
+        instructions: instructions,
+      };
+    }
+
+    return {
+      label: formatLabel(taskType) || "Task Details",
+      value: formatLabel(taskType) || "Care Task",
+      instructions: instructions,
+    };
+  };
+
+  const getTaskDisplayTitle = (task) => {
+    if (!task) return "";
+    const baseType = (task.task_type || "").replace(/_/g, " ");
+
+    if (task.task_type === "medication") {
+      let drugDetails = "";
+      if (task.summary?.drug_name) {
+        const qty = task.summary.quantity ? `${task.summary.quantity}${task.summary.unit ? ` ${task.summary.unit}` : ""}` : "";
+        drugDetails = `${task.summary.drug_name}${qty ? ` (${qty.trim()})` : ""}`;
+      } else if (task.drug_name) {
+        drugDetails = task.drug_name + (task.dosage ? ` (${task.dosage})` : "");
+      } else if (Array.isArray(task.config?.drugs) && task.config.drugs.length > 0) {
+        const firstDrug = task.config.drugs[0];
+        const name = firstDrug.manual_drug?.name || firstDrug.drug || "";
+        const qty = firstDrug.dosage?.quantity ? `${firstDrug.dosage.quantity}${firstDrug.dosage.unit ? ` ${firstDrug.dosage.unit}` : ""}` : "";
+        drugDetails = `${name}${qty ? ` (${qty.trim()})` : ""}`;
+      }
+
+      if (drugDetails) {
+        return `${baseType}: ${drugDetails}`;
+      }
+    }
+
+    return baseType;
   };
 
   
@@ -612,14 +795,14 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                 </div>
               </div>
 
-              {/* Ordering Doctor */}
+              {/* Ordering Instruction */}
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-gray-100 rounded-md">
-                  <User className="w-4 h-4 text-gray-600" />
+                  <ClipboardList className="w-4 h-4 text-gray-600" />
                 </div>
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase font-semibold">
-                    Ordering Doctor
+                    Ordering Instruction
                   </p>
                   <p className="text-sm font-medium text-gray-800">
                     {(task.instructions || "No instructions")}
@@ -628,17 +811,17 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
               </div>
 
               {/* Task & Action */}
-              <div className="flex items-center justify-between relative flex-1">
+              <div className="flex items-center justify-between relative flex-1 min-w-[200px]">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gray-100 rounded-md">
+                  <div className="p-2 bg-gray-100 rounded-md shrink-0">
                     <FileText className="w-4 h-4 text-gray-600" />
                   </div>
                   <div>
                     <p className="text-[10px] text-gray-500 uppercase font-semibold">
                       Task
                     </p>
-                    <p className="text-sm font-medium text-gray-800 truncate max-w-[150px]">
-                      {task.task_type.replace(/_/g, " ")}
+                    <p className="text-sm font-medium text-gray-800 max-w-[240px] xl:max-w-[340px] truncate capitalize" title={getTaskDisplayTitle(task)}>
+                      {getTaskDisplayTitle(task)}
                     </p>
                   </div>
                 </div>
@@ -789,6 +972,12 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                             </>
                           )}
                           
+                          <button 
+                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setSelectedTaskForDetails(task); setTaskDetailsModalOpen(true); }}
+                          >
+                            View task details
+                          </button>
                           <button 
                             className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
                             onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); handleTaskAction("release", task.sqid); }}
@@ -981,6 +1170,12 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                           
                           <button 
                             className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                            onClick={() => { setOpenPopover(null); setSelectedTaskForDetails(task); setTaskDetailsModalOpen(true); }}
+                          >
+                            View task details
+                          </button>
+                          <button 
+                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
                             onClick={() => { setOpenPopover(null); handleTaskAction("release", task.sqid); }}
                           >
                             Release task
@@ -1023,7 +1218,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                 <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-50">
                   <div>
                     <p className="text-[10px] text-slate-400 uppercase font-medium">
-                      Ordering Doctor
+                      Ordering Instruction
                     </p>
                     <p className="text-[13px] text-slate-600">
                       {(task.instructions || "No instructions")}
@@ -1033,8 +1228,8 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                     <p className="text-[10px] text-slate-400 uppercase font-medium">
                       Task
                     </p>
-                    <p className="text-[13px] text-slate-600 truncate italic">
-                      "{task.task_type.replace(/_/g, " ")}"
+                    <p className="text-[13px] text-slate-600 truncate italic capitalize" title={getTaskDisplayTitle(task)}>
+                      "{getTaskDisplayTitle(task)}"
                     </p>
                   </div>
                 </div>
@@ -2614,6 +2809,43 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
             Go back to patient's management
           </button>
         </div>
+      </Modal>
+      {/* Task Details Modal */}
+      <Modal isOpen={taskDetailsModalOpen} onClose={() => setTaskDetailsModalOpen(false)} maxWidth="xl">
+        {(() => {
+          const detailsInfo = getTaskDetailsInfo(selectedTaskForDetails);
+          return (
+            <div className="relative">
+              {/* Header */}
+              <div className="relative pb-4 mb-5 border-b border-gray-100 text-center">
+                <button
+                  onClick={() => setTaskDetailsModalOpen(false)}
+                  className="absolute right-0 top-0 text-slate-400 hover:text-slate-600 transition-colors p-1"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <h2 className="text-lg font-bold text-slate-900">Task details</h2>
+                <p className="text-sm text-slate-500 mt-0.5">Below are details of the task issued</p>
+              </div>
+
+              {/* Task Characteristic / Type Card */}
+              <div className="border border-slate-200/90 rounded-lg p-3 sm:p-4 bg-white mb-4 ">
+                <h3 className="text-sm font-bold text-slate-700 mb-3">{detailsInfo.label}</h3>
+                <div className="bg-slate-50/70 border border-slate-200/70 rounded-xl p-3.5 text-sm text-slate-700 font-medium">
+                  {detailsInfo.value}
+                </div>
+              </div>
+
+              {/* Task Instruction Card */}
+              <div className="border border-slate-200/90 rounded-lg p-3 sm:p-4 bg-white">
+                <h3 className="text-sm font-bold text-slate-700 mb-3">Task Instruction</h3>
+                <div className="bg-slate-50/70 border border-slate-200/70 rounded-xl p-4 text-sm text-slate-600 leading-relaxed min-h-[100px] whitespace-pre-wrap">
+                  {detailsInfo.instructions}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </Modal>
     </div>
   );

@@ -44,6 +44,32 @@ const getProgressColor = (timingState, type) => {
   return "bg-green-500"; // fallback
 };
 
+const getTaskDisplayTitle = (task) => {
+  if (!task) return "";
+  const baseType = (task.task_type || "").replace(/_/g, " ");
+
+  if (task.task_type === "medication") {
+    let drugDetails = "";
+    if (task.summary?.drug_name) {
+      const qty = task.summary.quantity ? `${task.summary.quantity}${task.summary.unit ? ` ${task.summary.unit}` : ""}` : "";
+      drugDetails = `${task.summary.drug_name}${qty ? ` (${qty.trim()})` : ""}`;
+    } else if (task.drug_name) {
+      drugDetails = task.drug_name + (task.dosage ? ` (${task.dosage})` : "");
+    } else if (Array.isArray(task.config?.drugs) && task.config.drugs.length > 0) {
+      const firstDrug = task.config.drugs[0];
+      const name = firstDrug.manual_drug?.name || firstDrug.drug || "";
+      const qty = firstDrug.dosage?.quantity ? `${firstDrug.dosage.quantity}${firstDrug.dosage.unit ? ` ${firstDrug.dosage.unit}` : ""}` : "";
+      drugDetails = `${name}${qty ? ` (${qty.trim()})` : ""}`;
+    }
+
+    if (drugDetails) {
+      return `${baseType}: ${drugDetails}`;
+    }
+  }
+
+  return baseType;
+};
+
 const MyTasksTab = ({ tasks, loading, type }) => {
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const dropdownRef = useRef(null);
@@ -140,8 +166,8 @@ const MyTasksTab = ({ tasks, loading, type }) => {
 
             {/* Details Section */}
             <div className="flex flex-col flex-grow text-sm text-gray-500 space-y-2.5">
-              <div className="font-semibold text-gray-800 text-[15px] border-b border-gray-100 pb-3 mb-2 capitalize">
-                Tasks: {task.task_type.replace(/_/g, ' ')}
+              <div className="font-semibold text-gray-800 text-[15px] border-b border-gray-100 pb-3 mb-2 capitalize truncate" title={getTaskDisplayTitle(task)}>
+                Tasks: {getTaskDisplayTitle(task)}
               </div>
               
               <div>

@@ -108,7 +108,7 @@ const PatientVitalsAndMeds = ({ patientFullInfo, formatDateTime }) => {
       />
 
       {/* Vital signs trend */}
-      <div className="bg-white rounded-xl border p-6">
+      {/* <div className="bg-white rounded-xl border p-6">
         <h3 className="font-semibold text-gray-800 mb-6">Vital signs trend</h3>
         
         <div className="flex justify-between items-center mb-8">
@@ -150,7 +150,7 @@ const PatientVitalsAndMeds = ({ patientFullInfo, formatDateTime }) => {
         <div className="h-[250px] w-full">
           <ReactECharts option={option} style={{ height: "100%", width: "100%" }} />
         </div>
-      </div>
+      </div> */}
 
       {/* Ongoing Medication */}
       <div className="bg-white rounded-xl border p-6">

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Calendar, User, FileText, Activity } from "lucide-react";
+import { Calendar, User, FileText, Activity, ClipboardList } from "lucide-react";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 
 const demoTasks = [
@@ -87,14 +87,14 @@ const NursingTaskHistory = () => {
                 </div>
               </div>
 
-              {/* Ordering Doctor */}
+              {/* Ordering Instruction */}
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-gray-100 rounded-md">
-                  <User className="w-4 h-4 text-gray-600" />
+                  <ClipboardList className="w-4 h-4 text-gray-600" />
                 </div>
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase font-semibold">
-                    Ordering Doctor
+                    Ordering Instruction
                   </p>
                   <p className="text-sm font-medium text-gray-800">
                     {task.orderingDoctor}
@@ -165,7 +165,7 @@ const NursingTaskHistory = () => {
 
                 <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-50">
                   <div>
-                    <p className="text-[10px] text-slate-400 uppercase font-medium">Ordering Doctor</p>
+                    <p className="text-[10px] text-slate-400 uppercase font-medium">Ordering Instruction</p>
                     <p className="text-[13px] text-slate-600">{task.orderingDoctor}</p>
                   </div>
                   <div>
