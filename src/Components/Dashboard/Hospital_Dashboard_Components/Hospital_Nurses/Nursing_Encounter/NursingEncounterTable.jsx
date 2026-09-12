@@ -91,7 +91,7 @@ const NursingEncounterTable = () => {
   const [selectedPatientForEncounter, setSelectedPatientForEncounter] = useState(null);
   const [viewEncounterDetails, setViewEncounterDetails] = useState(null);
 
-  const [encounterFormData, setEncounterFormData] = useState({
+  const initialEncounterFormData = {
     blood_pressure: "",
     temp: "",
     heart_rate: "",
@@ -103,33 +103,16 @@ const NursingEncounterTable = () => {
     sp02: "",
     triage_priority: "routine",
     notes: ""
-  });
+  };
+
+  const [encounterFormData, setEncounterFormData] = useState(initialEncounterFormData);
   const [submittingEncounter, setSubmittingEncounter] = useState(false);
   const [escalating, setEscalating] = useState(false);
   const [claimingSqid, setClaimingSqid] = useState(null);
 
   useEffect(() => {
     if (selectedPatientForEncounter) {
-      const vitals =
-        selectedPatientForEncounter.latest_vitals ||
-        selectedPatientForEncounter.vital_signs ||
-        selectedPatientForEncounter.vitals ||
-        {};
-      const w = vitals.weight ? String(vitals.weight) : "";
-      const h = vitals.height ? String(vitals.height) : "";
-      setEncounterFormData({
-        blood_pressure: vitals.blood_pressure || vitals.bp || "",
-        temp: vitals.temp ? String(vitals.temp) : vitals.temperature ? String(vitals.temperature) : "",
-        heart_rate: vitals.heart_rate ? String(vitals.heart_rate) : vitals.pulse ? String(vitals.pulse) : "",
-        resp_rate: vitals.resp_rate ? String(vitals.resp_rate) : vitals.respiratory_rate ? String(vitals.respiratory_rate) : "",
-        height: h,
-        weight: w,
-        bmi: vitals.bmi ? String(vitals.bmi) : calculateBmi(w, h),
-        pain_score: vitals.pain_score !== undefined && vitals.pain_score !== null ? `${vitals.pain_score} (${vitals.pain_score === 0 ? "No pain" : "Pain"})` : "0 (No pain)",
-        sp02: vitals.spo2 ? String(vitals.spo2) : vitals.sp02 ? String(vitals.sp02) : "",
-        triage_priority: selectedPatientForEncounter.triage_priority || "routine",
-        notes: selectedPatientForEncounter.notes || ""
-      });
+      setEncounterFormData(initialEncounterFormData);
     }
   }, [selectedPatientForEncounter]);
 
