@@ -849,7 +849,66 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
 
                   {openPopover === index && (
                     <div className="hidden lg:block lg:absolute top-0 lg:top-10 right-0 mt-2 bg-white border shadow-[0px_4px_20px_rgba(0,0,0,0.08)] rounded-lg p-1.5 w-56 z-50">
-                      {taskStatus === "history" ? null : taskStatus === "pending" ? (
+                      {taskStatus === "history" ? (
+                        <>
+                          <button 
+                            className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                            onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setSelectedTaskForDetails(task); setTaskDetailsModalOpen(true); }}
+                          >
+                            View task details
+                          </button>
+                          {task.task_type === 'glucose' ? (
+                            <button 
+                              className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                              onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowGlucoseRecord(true); }}
+                            >
+                              View glucose chart
+                            </button>
+                          ) : task.task_type === 'input_output' ? (
+                            <button 
+                              className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                              onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIORecord(true); }}
+                            >
+                              Input and Output chart
+                            </button>
+                          ) : task.task_type === 'vital_signs' ? (
+                            <button 
+                              className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                              onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowVitalsRecord(true); }}
+                            >
+                              Vital Signs Chart
+                            </button>
+                          ) : (task.task_type === 'seizure' || task.task_type === 'seizure_event') ? (
+                            <button 
+                              className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                              onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowSeizureRecord(true); }}
+                            >
+                              View seizure charts
+                            </button>
+                          ) : task.task_type === 'procedure' ? (
+                            <button 
+                              className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                              onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowProcedureRecord(true); }}
+                            >
+                              Procedure chart
+                            </button>
+                          ) : task.task_type === 'iv_fluid' ? (
+                            <button 
+                              className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                              onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIVFluidRecord(true); }}
+                            >
+                              IV Fluid chart
+                            </button>
+                          ) : (task.task_type === 'discharge_summary' || task.task_type === 'nurse_in_patient_discharge') ? null : (
+                            <button 
+                              className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap" 
+                              onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowMedicationRecord(true); }}
+                            >
+                              View medication chart
+                            </button>
+                          )}
+                        </>
+                      ) : taskStatus === "pending" ? (
                         <button 
                           className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
                           onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); handleTaskAction("claim", task.sqid); }}
@@ -1045,7 +1104,66 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
 
                   {openPopover === index && (
                     <div className="absolute right-0 top-10 w-56 bg-white border border-slate-100 shadow-[0px_8px_30px_rgba(0,0,0,0.12)] rounded-lg p-1.5 z-50">
-                      {taskStatus === "history" ? null : taskStatus === "pending" ? (
+                      {taskStatus === "history" ? (
+                        <>
+                          <button 
+                            className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                            onClick={() => { setOpenPopover(null); setSelectedTaskForDetails(task); setTaskDetailsModalOpen(true); }}
+                          >
+                            View task details
+                          </button>
+                          {task.task_type === 'glucose' ? (
+                            <button 
+                              className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                              onClick={() => { setOpenPopover(null); setShowGlucoseRecord(true); }}
+                            >
+                              View glucose chart
+                            </button>
+                          ) : task.task_type === 'input_output' ? (
+                            <button 
+                              className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                              onClick={() => { setOpenPopover(null); setShowIORecord(true); }}
+                            >
+                              Input and Output chart
+                            </button>
+                          ) : task.task_type === 'vital_signs' ? (
+                            <button 
+                              className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                              onClick={() => { setOpenPopover(null); setShowVitalsRecord(true); }}
+                            >
+                              Vital Signs Chart
+                            </button>
+                          ) : (task.task_type === 'seizure' || task.task_type === 'seizure_event') ? (
+                            <button 
+                              className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                              onClick={() => { setOpenPopover(null); setShowSeizureRecord(true); }}
+                            >
+                              View seizure charts
+                            </button>
+                          ) : task.task_type === 'procedure' ? (
+                            <button 
+                              className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                              onClick={() => { setOpenPopover(null); setShowProcedureRecord(true); }}
+                            >
+                              Procedure chart
+                            </button>
+                          ) : task.task_type === 'iv_fluid' ? (
+                            <button 
+                              className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
+                              onClick={() => { setOpenPopover(null); setShowIVFluidRecord(true); }}
+                            >
+                              IV Fluid chart
+                            </button>
+                          ) : (task.task_type === 'discharge_summary' || task.task_type === 'nurse_in_patient_discharge') ? null : (
+                            <button 
+                              className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap" 
+                              onClick={() => { setOpenPopover(null); setShowMedicationRecord(true); }}
+                            >
+                              View medication chart
+                            </button>
+                          )}
+                        </>
+                      ) : taskStatus === "pending" ? (
                         <button 
                           className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
                           onClick={() => { setOpenPopover(null); handleTaskAction("claim", task.sqid); }}
