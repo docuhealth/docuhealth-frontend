@@ -26,7 +26,7 @@ import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../
 import PatientInfoCard from "../../../../../ui/PatientInfoCard";
 import GeneralPatientInfoForm from "../../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
-import ClinicalSummaryCard from "../../../../../ui/ClinicalSummaryCard";
+import SoapClinicalDetailsCard from "../../../../../ui/SoapClinicalDetailsCard";
 import Input from "../../../../../ui/Input";
 
 const PatientInfo = ({ patientFullInfo }) => {
@@ -561,7 +561,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
           />
 
           {/* Clinical Summary */}
-          <ClinicalSummaryCard
+          <SoapClinicalDetailsCard
             historyOfComplaint={selectedPatientDetails?.history_of_complain}
             pastMedHistory={selectedPatientDetails?.past_med_history}
             familyHistory={selectedPatientDetails?.family_history}
