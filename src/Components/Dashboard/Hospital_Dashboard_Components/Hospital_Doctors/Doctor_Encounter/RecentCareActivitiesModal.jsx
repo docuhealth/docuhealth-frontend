@@ -1,11 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import moment from "moment";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
-import { X, User, Phone, Mail, Calendar, CreditCard } from "lucide-react";
+import { X, User, Phone, Mail, Calendar, CreditCard, ArrowLeft } from "lucide-react";
 import Modal from "../../../../ui/Modal";
 import Spinner from "../../../../ui/Spinner";
-import { fetchRecentCareActivities } from "../../../../../queries/Hospital/doctor/activities";
+import SoapNoteDetailView from "../../../../ui/SoapNoteDetailView";
+import VitalSignsCard from "../../../../ui/VitalSignsCard";
+import NursingAssessmentDetailView from "../../../../ui/NursingAssessmentDetailView";
+import {
+  fetchRecentCareActivities,
+  fetchMedicalRecordDetail,
+} from "../../../../../queries/Hospital/doctor/activities";
 
 const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
   const patientData = encounter?.patient_info || {};
@@ -18,6 +24,42 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
   });
 
   const activities = activitiesData?.results || [];
+
+  // "View SOAP note", "View Vital signs" and "View NursingAssessment" open
+  // the full record inline instead of the "not available yet" toast —
+  // everything else still falls back to that toast until it has a real
+  // destination view.
+  const [viewingSoapSqid, setViewingSoapSqid] = useState(null);
+  const [viewingVitalSqid, setViewingVitalSqid] = useState(null);
+  const [viewingNursingSqid, setViewingNursingSqid] = useState(null);
+
+  // This modal is a single long-lived instance the parent just toggles
+  // `isOpen`/`encounter` on, rather than mounting fresh per patient — so
+  // reset back to the timeline on close (and defensively on patient change)
+  // or the next patient opened would inherit the previous one's detail view.
+  useEffect(() => {
+    setViewingSoapSqid(null);
+    setViewingVitalSqid(null);
+    setViewingNursingSqid(null);
+  }, [isOpen, hin]);
+
+  const { data: viewingSoapNote, isLoading: isLoadingSoapNotes } = useQuery({
+    queryKey: ["medical-record-detail", "SoapNote", hin, viewingSoapSqid],
+    queryFn: fetchMedicalRecordDetail,
+    enabled: !!hin && isOpen && !!viewingSoapSqid,
+  });
+
+  const { data: viewingVitalSigns, isLoading: isLoadingVitalSigns } = useQuery({
+    queryKey: ["medical-record-detail", "VitalSigns", hin, viewingVitalSqid],
+    queryFn: fetchMedicalRecordDetail,
+    enabled: !!hin && isOpen && !!viewingVitalSqid,
+  });
+
+  const { data: viewingNursingAssessment, isLoading: isLoadingNursingAssessment } = useQuery({
+    queryKey: ["medical-record-detail", "NursingAssessment", hin, viewingNursingSqid],
+    queryFn: fetchMedicalRecordDetail,
+    enabled: !!hin && isOpen && !!viewingNursingSqid,
+  });
 
   const patientName = `${patientData.firstname || patientData.first_name || ""} ${patientData.lastname || patientData.last_name || ""}`.trim() || "N/A";
   
@@ -151,9 +193,81 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
           </div>
         </div>
 
-        {/* Right Sidebar: Timeline */}
+        {/* Right Sidebar: Timeline (or the SOAP note detail, once opened) */}
         <div className="w-full md:w-[70%] p-6 overflow-y-auto bg-white">
-          {isLoading ? (
+          {viewingSoapSqid ? (
+            <div>
+              <button
+                type="button"
+                onClick={() => setViewingSoapSqid(null)}
+                className="flex items-center gap-1 text-sm text-gray-600 hover:text-docuhealth-primary mb-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to timeline
+              </button>
+
+              {isLoadingSoapNotes ? (
+                <div className="flex justify-center items-center h-64">
+                  <Spinner className="w-8 h-8 text-docuhealth-primary" />
+                </div>
+              ) : viewingSoapNote ? (
+                <SoapNoteDetailView soapNote={viewingSoapNote} />
+              ) : (
+                <div className="flex flex-col items-center justify-center h-64 text-center">
+                  <p className="text-gray-500">Can&apos;t find this SOAP note.</p>
+                </div>
+              )}
+            </div>
+          ) : viewingVitalSqid ? (
+            <div>
+              <button
+                type="button"
+                onClick={() => setViewingVitalSqid(null)}
+                className="flex items-center gap-1 text-sm text-gray-600 hover:text-docuhealth-primary mb-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to timeline
+              </button>
+
+              {isLoadingVitalSigns ? (
+                <div className="flex justify-center items-center h-64">
+                  <Spinner className="w-8 h-8 text-docuhealth-primary" />
+                </div>
+              ) : viewingVitalSigns ? (
+                <VitalSignsCard
+                  vitalSigns={viewingVitalSigns}
+                  title={`Vital signs — recorded ${moment(viewingVitalSigns.created_at).format("Do MMMM, YYYY, h:mmA")}`}
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center h-64 text-center">
+                  <p className="text-gray-500">Can&apos;t find this vital signs reading.</p>
+                </div>
+              )}
+            </div>
+          ) : viewingNursingSqid ? (
+            <div>
+              <button
+                type="button"
+                onClick={() => setViewingNursingSqid(null)}
+                className="flex items-center gap-1 text-sm text-gray-600 hover:text-docuhealth-primary mb-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to timeline
+              </button>
+
+              {isLoadingNursingAssessment ? (
+                <div className="flex justify-center items-center h-64">
+                  <Spinner className="w-8 h-8 text-docuhealth-primary" />
+                </div>
+              ) : viewingNursingAssessment ? (
+                <NursingAssessmentDetailView nursingAssessment={viewingNursingAssessment} />
+              ) : (
+                <div className="flex flex-col items-center justify-center h-64 text-center">
+                  <p className="text-gray-500">Can&apos;t find this nursing assessment.</p>
+                </div>
+              )}
+            </div>
+          ) : isLoading ? (
             <div className="flex justify-center items-center h-full">
               <Spinner className="w-8 h-8 text-docuhealth-primary" />
             </div>
@@ -185,9 +299,17 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
                         </p>
                         <button
                           className="text-docuhealth-primary font-medium text-sm hover:underline"
-                          onClick={() =>
-                            toast("Opening the full record from here isn't available yet.", { icon: "🛠️" })
-                          }
+                          onClick={() => {
+                            if (record.type === "SoapNote" && record.sqid) {
+                              setViewingSoapSqid(record.sqid);
+                            } else if (record.type === "VitalSigns" && record.sqid) {
+                              setViewingVitalSqid(record.sqid);
+                            } else if (record.type === "NursingAssessment" && record.sqid) {
+                              setViewingNursingSqid(record.sqid);
+                            } else {
+                              toast("Opening the full record from here isn't available yet.", { icon: "🛠️" });
+                            }
+                          }}
                         >
                           {getRecordLinkText(record.type)}
                         </button>
