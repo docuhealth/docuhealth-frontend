@@ -7,28 +7,19 @@ export const fetchRecentCareActivities = async ({ queryKey }) => {
   return res.data;
 };
 
-// GET /api/medical-records/<segment>/<hin>/<sqid> — resolves one activity
-// feed record (`record.type` + `record.sqid` from fetchRecentCareActivities)
-// to its full detail. Confirmed live 2026-09-15, see
-// RECENT_ACTIVITIES_HANDOFF_VERIFICATION.md. Segment names mostly match the
-// record type lowercase-hyphenated, EXCEPT `progress-note` — the backend's
-// list/create routes are plural (`progress-notes`), but this detail route is
-// singular; confirmed live, not a typo (`progress-notes/<hin>/<sqid>` 404s).
-// Only the types the doctor dashboard's Recent Care Activities feed actually
-// emits are wired up here; the rest of `DOC-GET-MEDICAL-RECORD-DETAIL.md`'s
-// endpoints follow the same `<segment>/<hin>/<sqid>` shape and can be added
-// the same way once the feed emits them (e.g. `ProgressNotes: "progress-note"`,
-// not `"progress-notes"`).
-const RECORD_DETAIL_SEGMENT = {
-  VitalSigns: "vital-signs",
-  NursingAssessment: "nursing-assessment",
-  SoapNote: "soap-note",
-};
-
+// GET /api/medical-records/events/<event_sqid> — resolves one activity feed
+// row to its full record detail, whatever the record type. Replaces the old
+// per-type `<segment>/<hin>/<sqid>` routes (all removed server-side as of
+// 2026-09-16 — see `unified-event-detail.md`). Confirmed live for SoapNote,
+// VitalSigns, NursingAssessment, LabTestOrder and Admission (the last two
+// aren't even listed in that handoff's type table, but work).
+//
+// IMPORTANT: `<event_sqid>` is the activity's own top-level `sqid` from
+// `fetchRecentCareActivities` (i.e. `activity.sqid`) — NOT `record.sqid`.
+// Passing the record's sqid 404s.
 export const fetchMedicalRecordDetail = async ({ queryKey }) => {
-  const [_key, recordType, hin, sqid] = queryKey;
-  const segment = RECORD_DETAIL_SEGMENT[recordType];
-  if (!segment || !hin || !sqid) return null;
-  const res = await axiosInstanceHos.get(`api/medical-records/${segment}/${hin}/${sqid}`);
+  const [_key, _recordType, eventSqid] = queryKey;
+  if (!eventSqid) return null;
+  const res = await axiosInstanceHos.get(`api/medical-records/events/${eventSqid}`);
   return res.data;
 };
