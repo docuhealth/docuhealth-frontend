@@ -8,7 +8,7 @@ import { renderListOrString } from "../../utils/soapNoteHelpers";
 // plan and referral, which the callers render separately.
 //
 // This mirrors the shape the SOAP note API actually returns (see
-// api/medical-records/soap-note/{hin}), unlike ClinicalSummaryCard, which
+// api/medical-records/all or api/medical-records/events/<event_sqid>), unlike ClinicalSummaryCard, which
 // expects a generic `selectedMedicalRecord` object shaped for the
 // patient-facing summary (history/diagnosis/physical_exam) and was being
 // passed these same granular props by mistake — causing it to silently
