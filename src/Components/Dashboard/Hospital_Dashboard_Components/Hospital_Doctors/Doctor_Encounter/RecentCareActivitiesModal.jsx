@@ -16,10 +16,22 @@ import Spinner from "../../../../ui/Spinner";
 import SoapNoteDetailView from "../../../../ui/SoapNoteDetailView";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 import NursingAssessmentDetailView from "../../../../ui/NursingAssessmentDetailView";
+import AdmissionDetailView from "../../../../ui/AdmissionDetailView";
+import LabOrderDetailView from "../../../../ui/LabOrderDetailView";
 import {
   fetchRecentCareActivities,
   fetchMedicalRecordDetail,
 } from "../../../../../queries/Hospital/doctor/activities";
+
+// Record types with a real detail view wired up — everything else still
+// falls back to the "not available yet" toast.
+const VIEWABLE_RECORD_TYPES = new Set([
+  "SoapNote",
+  "VitalSigns",
+  "NursingAssessment",
+  "Admission",
+  "LabTestOrder",
+]);
 
 const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
   const patientData = encounter?.patient_info || {};
@@ -33,48 +45,28 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
 
   const activities = activitiesData?.results || [];
 
-  // "View SOAP note", "View Vital signs" and "View Nursing Assessment" open
-  // the full record inline instead of the "not available yet" toast —
-  // everything else still falls back to that toast until it has a real
-  // destination view.
-  const [viewingSoapSqid, setViewingSoapSqid] = useState(null);
-  const [viewingVitalSqid, setViewingVitalSqid] = useState(null);
-  const [viewingNursingSqid, setViewingNursingSqid] = useState(null);
+  // Set when a viewable record's "View X" link is clicked — opens the full
+  // record inline instead of the "not available yet" toast. `eventSqid` is
+  // the activity's own top-level sqid (see fetchMedicalRecordDetail), not
+  // the record's sqid.
+  const [viewingRecord, setViewingRecord] = useState(null); // { type, eventSqid } | null
 
   // This modal is a single long-lived instance the parent just toggles
   // `isOpen`/`encounter` on, rather than mounting fresh per patient — so
   // reset back to the timeline on close (and defensively on patient change)
   // or the next patient opened would inherit the previous one's detail view.
   useEffect(() => {
-    setViewingSoapSqid(null);
-    setViewingVitalSqid(null);
-    setViewingNursingSqid(null);
+    setViewingRecord(null);
   }, [isOpen, hin]);
 
-  const { data: viewingSoapNote, isLoading: isLoadingSoapNotes } = useQuery({
-    queryKey: ["medical-record-detail", "SoapNote", hin, viewingSoapSqid],
-    queryFn: fetchMedicalRecordDetail,
-    enabled: !!hin && isOpen && !!viewingSoapSqid,
-  });
-
-  const { data: viewingVitalSigns, isLoading: isLoadingVitalSigns } = useQuery({
-    queryKey: ["medical-record-detail", "VitalSigns", hin, viewingVitalSqid],
-    queryFn: fetchMedicalRecordDetail,
-    enabled: !!hin && isOpen && !!viewingVitalSqid,
-  });
-
-  const {
-    data: viewingNursingAssessment,
-    isLoading: isLoadingNursingAssessment,
-  } = useQuery({
+  const { data: viewingRecordData, isLoading: isLoadingRecordDetail } = useQuery({
     queryKey: [
       "medical-record-detail",
-      "NursingAssessment",
-      hin,
-      viewingNursingSqid,
+      viewingRecord?.type,
+      viewingRecord?.eventSqid,
     ],
     queryFn: fetchMedicalRecordDetail,
-    enabled: !!hin && isOpen && !!viewingNursingSqid,
+    enabled: !!hin && isOpen && !!viewingRecord?.eventSqid,
   });
 
   const patientName =
@@ -102,7 +94,7 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
     </div>
   );
 
-  const getRecordTitle = (type) => {
+  const getRecordTitle = (type, action) => {
     switch (type) {
       case "LabTestOrder":
         return "Lab test ordered for this patient!";
@@ -111,7 +103,11 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
       case "CheckIn":
         return "Patient checked in!";
       case "Admission":
-        return "Patient admitted!";
+        // Requesting an admission doesn't admit the patient — the
+        // receptionist still has to confirm it before a bed is assigned.
+        return action === "requested"
+          ? "Admission requested for this patient!"
+          : "Patient admitted!";
       case "Appointment":
         return "Appointment scheduled!";
       case "EncounterCard":
@@ -125,7 +121,7 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
     }
   };
 
-  const getRecordLinkText = (type) => {
+  const getRecordLinkText = (type, action) => {
     switch (type) {
       case "LabTestOrder":
         return "View Lab order";
@@ -134,7 +130,7 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
       case "CheckIn":
         return "View Check-in";
       case "Admission":
-        return "View Admission";
+        return action === "requested" ? "View Admission request" : "View Admission";
       case "Appointment":
         return "View Appointment";
       case "EncounterCard":
@@ -162,7 +158,9 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
     } else if (recordType === "CheckIn") {
       actionText = "checked in the patient";
     } else if (recordType === "Admission") {
-      actionText = "admitted the patient";
+      // "requested" means the doctor asked for an admission; the patient
+      // isn't actually admitted until the receptionist confirms it.
+      actionText = action === "requested" ? "requested to admit the patient" : "admitted the patient";
     } else if (recordType === "Appointment") {
       actionText = "scheduled an appointment";
     } else if (recordType === "EncounterCard") {
@@ -245,87 +243,43 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
           </div>
         </div>
 
-        {/* Right Sidebar: Timeline (or the SOAP note detail, once opened) */}
+        {/* Right Sidebar: Timeline (or the record detail, once opened) */}
         <div className="w-full md:w-[70%] p-6 overflow-y-auto bg-white">
-          {viewingSoapSqid ? (
+          {viewingRecord ? (
             <div>
               <button
                 type="button"
-                onClick={() => setViewingSoapSqid(null)}
+                onClick={() => setViewingRecord(null)}
                 className="flex items-center gap-1 text-sm text-gray-600 hover:text-docuhealth-primary mb-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to timeline
               </button>
 
-              {isLoadingSoapNotes ? (
+              {isLoadingRecordDetail ? (
                 <div className="flex justify-center items-center h-64">
                   <Spinner className="w-8 h-8 text-docuhealth-primary" />
                 </div>
-              ) : viewingSoapNote ? (
-                <SoapNoteDetailView soapNote={viewingSoapNote} />
-              ) : (
+              ) : !viewingRecordData ? (
                 <div className="flex flex-col items-center justify-center h-64 text-center">
-                  <p className="text-gray-500">
-                    Can&apos;t find this SOAP note.
-                  </p>
+                  <p className="text-gray-500">Can&apos;t find this record.</p>
                 </div>
-              )}
-            </div>
-          ) : viewingVitalSqid ? (
-            <div>
-              <button
-                type="button"
-                onClick={() => setViewingVitalSqid(null)}
-                className="flex items-center gap-1 text-sm text-gray-600 hover:text-docuhealth-primary mb-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to timeline
-              </button>
-
-              {isLoadingVitalSigns ? (
-                <div className="flex justify-center items-center h-64">
-                  <Spinner className="w-8 h-8 text-docuhealth-primary" />
-                </div>
-              ) : viewingVitalSigns ? (
+              ) : viewingRecord.type === "SoapNote" ? (
+                <SoapNoteDetailView soapNote={viewingRecordData} />
+              ) : viewingRecord.type === "VitalSigns" ? (
                 <VitalSignsCard
-                  vitalSigns={viewingVitalSigns}
-                  title={`Vital signs — recorded ${moment(viewingVitalSigns.created_at).format("Do MMMM, YYYY, h:mmA")}`}
+                  vitalSigns={viewingRecordData}
+                  title={`Vital signs — recorded ${moment(viewingRecordData.created_at).format("Do MMMM, YYYY, h:mmA")}`}
                 />
-              ) : (
-                <div className="flex flex-col items-center justify-center h-64 text-center">
-                  <p className="text-gray-500">
-                    Can&apos;t find this vital signs reading.
-                  </p>
-                </div>
-              )}
-            </div>
-          ) : viewingNursingSqid ? (
-            <div>
-              <button
-                type="button"
-                onClick={() => setViewingNursingSqid(null)}
-                className="flex items-center gap-1 text-sm text-gray-600 hover:text-docuhealth-primary mb-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to timeline
-              </button>
-
-              {isLoadingNursingAssessment ? (
-                <div className="flex justify-center items-center h-64">
-                  <Spinner className="w-8 h-8 text-docuhealth-primary" />
-                </div>
-              ) : viewingNursingAssessment ? (
+              ) : viewingRecord.type === "NursingAssessment" ? (
                 <NursingAssessmentDetailView
-                  nursingAssessment={viewingNursingAssessment}
+                  nursingAssessment={viewingRecordData}
                 />
-              ) : (
-                <div className="flex flex-col items-center justify-center h-64 text-center">
-                  <p className="text-gray-500">
-                    Can&apos;t find this nursing assessment.
-                  </p>
-                </div>
-              )}
+              ) : viewingRecord.type === "Admission" ? (
+                <AdmissionDetailView admission={viewingRecordData} />
+              ) : viewingRecord.type === "LabTestOrder" ? (
+                <LabOrderDetailView labOrder={viewingRecordData} />
+              ) : null}
             </div>
           ) : isLoading ? (
             <div className="flex justify-center items-center h-full">
@@ -362,7 +316,7 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
 
                       <div className="bg-gray-50 border border-gray-100 rounded-lg p-4">
                         <p className="text-sm text-gray-800 mb-3">
-                          {getRecordTitle(record.type)} Time of order:{" "}
+                          {getRecordTitle(record.type, activity.action)} Time of order:{" "}
                           {moment(activity.created_at).format(
                             "Do MMMM, YYYY [at] h:mm A",
                           )}
@@ -370,18 +324,14 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
                         <button
                           className="text-docuhealth-primary font-medium text-sm hover:underline"
                           onClick={() => {
-                            if (record.type === "SoapNote" && record.sqid) {
-                              setViewingSoapSqid(record.sqid);
-                            } else if (
-                              record.type === "VitalSigns" &&
-                              record.sqid
+                            if (
+                              VIEWABLE_RECORD_TYPES.has(record.type) &&
+                              activity.sqid
                             ) {
-                              setViewingVitalSqid(record.sqid);
-                            } else if (
-                              record.type === "NursingAssessment" &&
-                              record.sqid
-                            ) {
-                              setViewingNursingSqid(record.sqid);
+                              setViewingRecord({
+                                type: record.type,
+                                eventSqid: activity.sqid,
+                              });
                             } else {
                               toast(
                                 "Opening the full record from here isn't available yet.",
@@ -390,7 +340,7 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
                             }
                           }}
                         >
-                          {getRecordLinkText(record.type)}
+                          {getRecordLinkText(record.type, activity.action)}
                         </button>
                       </div>
                     </div>

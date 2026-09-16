@@ -11,11 +11,8 @@ const TRIAGE_STYLES = {
 
 // Full read-only rendering of one nursing assessment (triage note + the
 // vitals recorded alongside it) — same pattern as SoapNoteDetailView, for
-// "View NursingAssessment" from Recent Care Activities. There is no backend
-// endpoint yet to fetch a real NursingAssessment by sqid (see
-// BACKEND_RECENT_ACTIVITIES_REQUESTS.md) — callers currently pass preview
-// data so the layout can be reviewed; swap in the real record once that
-// endpoint ships.
+// "View Nursing Assessment" from Recent Care Activities
+// (GET /api/medical-records/events/<event_sqid>).
 const NursingAssessmentDetailView = ({ nursingAssessment }) => {
   if (!nursingAssessment) return null;
 
