@@ -551,7 +551,7 @@ const handleRequestEmailOTP = (e) => {
         </div>
         {showOtpModal && (
           <div className="fixed inset-0 bg-black/50  backdrop-blur-md flex items-center justify-center z-50 px-3">
-            <div className="bg-white rounded-lg py-6 px-3.5 lg:px-6 w-full max-w-sm relative">
+            <div className="bg-white rounded-lg py-6 px-3.5 lg:px-6 w-full max-w-md relative">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="text-sm font-medium text-docuhealth-primary ">
                   Verify Email
@@ -581,7 +581,7 @@ const handleRequestEmailOTP = (e) => {
                 onClick={handleVerifyEmail}
                 // Disable if loading OR if OTP field is empty (assumes 4-6 characters usually)
                 disabled={verifyOtpMutation.isPending || !formData.otp.trim()}
-                className="w-full py-2 bg-docuhealth-primary text-white rounded-full text-[12px] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-docuhealth-primary text-white rounded-full text-[12px] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
                 {verifyOtpMutation.isPending ? (
                   <>

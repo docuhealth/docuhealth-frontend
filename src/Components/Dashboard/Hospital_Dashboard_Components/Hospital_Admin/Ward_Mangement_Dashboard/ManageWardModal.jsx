@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import Modal from "../../../../ui/Modal";
 import Button from "../../../../ui/Button";
 import Input from "../../../../ui/Input";
-import { fetchWardBeds, updateWard } from "../../../../../queries/Hospital/fetchWards";
+import { fetchWardBeds, updateWard, deleteWard } from "../../../../../queries/Hospital/fetchWards";
 import { Bed } from "lucide-react";
 
 const ManageWardModal = ({ ward, isOpen, onClose }) => {
@@ -20,6 +20,7 @@ const ManageWardModal = ({ ward, isOpen, onClose }) => {
     total_beds: totalBedsInitial.toString(),
   });
   const [validationError, setValidationError] = useState("");
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
   useEffect(() => {
     if (ward) {
@@ -28,6 +29,7 @@ const ManageWardModal = ({ ward, isOpen, onClose }) => {
         total_beds: (ward.beds?.length || 0).toString(),
       });
       setValidationError("");
+      setIsConfirmingDelete(false);
     }
   }, [ward]);
 
@@ -48,6 +50,20 @@ const ManageWardModal = ({ ward, isOpen, onClose }) => {
     onError: (err) => {
       console.error("Error updating ward:", err);
       toast.error(err.response?.data?.message || "Failed to update ward");
+    },
+  });
+
+  const deleteWardMutation = useMutation({
+    mutationFn: () => deleteWard(wardSqid),
+    onSuccess: () => {
+      toast.success("Ward deleted successfully!");
+      queryClient.invalidateQueries(["hospital-wards"]);
+      setIsConfirmingDelete(false);
+      onClose();
+    },
+    onError: (err) => {
+      console.error("Error deleting ward:", err);
+      toast.error(err.response?.data?.message || "Failed to delete ward");
     },
   });
 
@@ -116,6 +132,42 @@ const ManageWardModal = ({ ward, isOpen, onClose }) => {
               </Button>
             </div>
           </form>
+
+          <div className="pt-4 mt-4 border-t border-gray-100">
+            {isConfirmingDelete ? (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs space-y-2">
+                <p className="font-semibold text-red-700">Delete this ward?</p>
+                <p className="text-red-600">This action cannot be undone.</p>
+                <div className="flex gap-2 pt-1">
+                  <Button
+                    type="button"
+                    variant="danger"
+                    loading={deleteWardMutation.isPending}
+                    loadingText="Deleting..."
+                    onClick={() => deleteWardMutation.mutate()}
+                  >
+                    Confirm Delete
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={deleteWardMutation.isPending}
+                    onClick={() => setIsConfirmingDelete(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="danger"
+                onClick={() => setIsConfirmingDelete(true)}
+              >
+                Delete Ward
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Right Side: Bed Listing */}
@@ -132,7 +184,7 @@ const ManageWardModal = ({ ward, isOpen, onClose }) => {
               <div className="text-center py-6 text-sm text-gray-500">Loading beds...</div>
             ) : bedsData && bedsData.length > 0 ? (
               bedsData.map((bed) => (
-                <div key={bed.sqid || bed.id} className="bg-white p-3 rounded-md border flex items-center justify-between shadow-sm">
+                <div key={bed.sqid || bed.id} className="bg-white p-3 rounded-md border flex items-center justify-between ">
                   <div className="flex items-center gap-3">
                     <div className="bg-indigo-50 p-2 rounded-md">
                       <Bed className="w-4 h-4 text-docuhealth-primary" />

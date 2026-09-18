@@ -141,6 +141,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
         return staffs;
     }
   }, [staffs, filterType]);
+  
 
   const { mutate: removeStaff, isPending: isRemoving } = useMutation({
     mutationFn: (ids) =>
@@ -157,6 +158,8 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       toast.error(err.response?.data?.message || "Failed to remove staff");
     },
   });
+
+
   const { mutate: deactivateStaff, isPending: isDeactivating } = useMutation({
     mutationFn: (ids) =>
       axiosInstanceHos.post("/api/hospitals/team-members/deactivate", {

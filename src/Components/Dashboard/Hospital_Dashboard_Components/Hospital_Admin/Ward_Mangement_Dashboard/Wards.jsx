@@ -1,7 +1,10 @@
 import React, { useState, useContext } from "react";
-import { ArrowRight, Bed, Users } from "lucide-react";
+import { ArrowRight, Bed, Users, Trash2, AlertTriangle } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
 import { HosAppContext } from "../../../../../context/HospitalContext/Admin/HosAppContext";
-import { HosWardContext } from "../../../../../context/HospitalContext/HosWardContext"
+import { HosWardContext } from "../../../../../context/HospitalContext/HosWardContext";
+import { deleteWard } from "../../../../../queries/Hospital/fetchWards";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import ManageWardModal from "./ManageWardModal";
 
@@ -10,9 +13,24 @@ const Wards = () => {
     useContext(HosWardContext);
   const [selectedWard, setSelectedWard] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [wardToDelete, setWardToDelete] = useState(null);
 
+  const queryClient = useQueryClient();
 
-      if (loading) {
+  const deleteWardMutation = useMutation({
+    mutationFn: (wardSqid) => deleteWard(wardSqid),
+    onSuccess: () => {
+      toast.success("Ward deleted successfully!");
+      queryClient.invalidateQueries(["hospital-wards"]);
+      setWardToDelete(null);
+    },
+    onError: (err) => {
+      console.error("Error deleting ward:", err);
+      toast.error(err.response?.data?.message || "Failed to delete ward");
+    },
+  });
+
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-full text-sm">
         Loading...
@@ -20,7 +38,7 @@ const Wards = () => {
     );
   }
 
-   if (wards.length === 0) {
+  if (wards.length === 0) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
@@ -88,15 +106,14 @@ const Wards = () => {
     );
   }
 
-
   return (
     <>
-    <div className="flex justify-end items-center mb-6">
+      <div className="flex justify-end items-center mb-6">
         <span className="bg-indigo-100 text-docuhealth-primary text-xs font-semibold px-3 py-1 rounded-full">
           Total: {count}
         </span>
       </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {wards.map((ward) => {
           const totalBeds = ward.beds?.length || 0;
           const freeBeds = ward.available_beds;
@@ -108,24 +125,32 @@ const Wards = () => {
               {/* Card Top */}
               <div className="p-5">
                 <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center gap-2">
-   <div className="p-2 bg-indigo-50 rounded border">
-                    <Bed className="w-5 h-5 text-docuhealth-primary" />
-                  </div>
-                  <div>
-                      <h3 className=" font-semibold text-gray-900 truncate">{ward.name || "General Ward"}</h3>
-                <p className="text-xs text-gray-400 mt-">Ref ID: {ward.sqid || ward.id}</p>
-                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-indigo-50 rounded border">
+                      <Bed className="w-5 h-5 text-docuhealth-primary" />
                     </div>
-               
-                  <span className={`text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wide ${
-                    freeBeds > 0 ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
-                  }`}>
-                    {freeBeds > 0 ? "Active" : "Full"}
-                  </span>
-                </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 truncate">{ward.name || "General Ward"}</h3>
+                      <p className="text-xs text-gray-400">Ref ID: {ward.sqid || ward.id}</p>
+                    </div>
+                  </div>
 
-              
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wide ${
+                      freeBeds > 0 ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
+                    }`}>
+                      {freeBeds > 0 ? "Active" : "Full"}
+                    </span>
+                    <button
+                      type="button"
+                      title="Delete Ward"
+                      onClick={() => setWardToDelete(ward)}
+                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
 
                 {/* Metrics */}
                 <div className="mt-6 flex justify-between items-end">
@@ -178,6 +203,40 @@ const Wards = () => {
         onClose={() => { setIsModalOpen(false); setSelectedWard(null); }} 
         ward={selectedWard} 
       />
+
+      {/* Delete Confirmation Modal */}
+      {wardToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-md rounded-lg shadow-xl p-6 text-center space-y-4 animate-in fade-in zoom-in duration-200">
+            <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Delete Ward</h3>
+              <p className="text-xs text-gray-500 mt-1">
+                Are you sure you want to delete <span className="font-semibold text-gray-800">{wardToDelete.name || "this ward"}</span>? This action cannot be undone.
+              </p>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setWardToDelete(null)}
+                className="flex-1 py-2 px-4 border border-gray-200 rounded-full text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleteWardMutation.isPending}
+                onClick={() => deleteWardMutation.mutate(wardToDelete.sqid || wardToDelete.id)}
+                className="flex-1 py-2 px-4 bg-red-600 text-white rounded-full text-xs font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                {deleteWardMutation.isPending ? "Deleting..." : "Delete Ward"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
