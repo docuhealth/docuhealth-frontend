@@ -145,7 +145,9 @@ const SubscribedUserRow = ({ sub }) => {
       <p className="truncate text-[13px] text-gray-700">{sub.plan_name || sub.plan || "—"}</p>
 
       {/* Status */}
-      <StatusBadge status={sub.status} />
+      <div>
+        <StatusBadge sub={sub} />
+      </div>
 
       {/* Start date */}
       <p className="text-[13px] text-gray-600">{formatDate(sub.start_date)}</p>
@@ -170,7 +172,7 @@ const SubscribedUserCard = ({ sub }) => {
           <p className="text-xs text-gray-500">{sub.plan_name || sub.plan || "—"}</p>
         </div>
         <div className="ml-auto">
-          <StatusBadge status={sub.status} />
+          <StatusBadge sub={sub} />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
@@ -199,13 +201,34 @@ const UserAvatar = ({ name, src, size = "sm" }) => {
   );
 };
 
-const StatusBadge = ({ status }) => {
-  const isActive = status === "active";
+const StatusBadge = ({ sub, status }) => {
+  let isActive = false;
+  
+  if (sub) {
+    if (typeof sub.is_active === "boolean") {
+      isActive = sub.is_active;
+    } else if (typeof sub.status === "boolean") {
+      isActive = sub.status;
+    } else if (typeof sub.status === "string") {
+      isActive = sub.status.toLowerCase() === "active";
+    }
+  } else if (status !== undefined) {
+    if (typeof status === "boolean") {
+      isActive = status;
+    } else if (typeof status === "string") {
+      isActive = status.toLowerCase() === "active";
+    }
+  }
+
   return (
     <span
-      className={`text-xs font-semibold capitalize ${isActive ? "text-green-600" : "text-gray-500"}`}
+      className={`inline-flex items-center justify-center w-fit px-3 py-1 rounded-full text-[11px] font-semibold uppercase ${
+        isActive
+          ? "bg-green-100 text-green-700"
+          : "bg-red-100 text-red-700"
+      }`}
     >
-      {status || "—"}
+      {isActive ? "ACTIVE" : "NOT ACTIVE"}
     </span>
   );
 };

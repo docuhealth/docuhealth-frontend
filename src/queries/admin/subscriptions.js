@@ -21,13 +21,11 @@ export const updateSubscriptionPlan = async ({ planSqid, payload }) => {
   return res.data;
 };
 
-// Fetch subscribed users (paginated, with optional role filter and search)
 export const fetchSubscribedUsers = async ({ queryKey }) => {
   const [_key, { role, page, pageSize, search }] = queryKey;
+  const userRole = role || "patient";
   const params = { page, size: pageSize };
-  if (role) params.role = role;
   if (search) params.search = search;
-  // This endpoint is not correct, the correct endpoint hasn't been implemented yet
-  const res = await axiosInstanceAdmin.get("api/admin/users/patient", { params });
+  const res = await axiosInstanceAdmin.get(`api/admin/users/${userRole}`, { params });
   return res.data;
 };

@@ -36,6 +36,7 @@ const ULP = () => {
   const [country, setCountry] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const [countries, setCountries] = useState<ICountry[]>([]);
   const [states, setStates] = useState<IState[]>([]);
@@ -739,26 +740,43 @@ const ULP = () => {
                       </div>
                     </div>
 
-                    <p className="text-sm text-gray-600 pb-6">
-                      By Signing up, you agree to our{" "}
-                      <Link
-                        to="/privacy-policy"
-                        className="text-docuhealth-primary hover:underline"
-                      >
-                        Privacy Policy
-                      </Link>
-                      .
-                    </p>
+                    <div className="flex items-start gap-3 pb-6">
+                      <input
+                        type="checkbox"
+                        id="agreeTermsStep1"
+                        checked={agreedToTerms}
+                        onChange={(e) => setAgreedToTerms(e.target.checked)}
+                        className="mt-1 w-4 h-4 accent-docuhealth-primary rounded cursor-pointer shrink-0"
+                      />
+                      <label htmlFor="agreeTermsStep1" className="text-sm text-gray-700 cursor-pointer select-none">
+                        By Signing up, you agree to our{" "}
+                        <Link
+                          to="/terms-and-conditions"
+                          className="text-docuhealth-primary font-bold underline"
+                        >
+                          Terms &amp; Conditions
+                        </Link>{" "}
+                        and{" "}
+                        <Link
+                          to="/privacy-policy"
+                          className="text-docuhealth-primary font-bold underline"
+                        >
+                          Privacy Policy
+                        </Link>
+                        .
+                      </label>
+                    </div>
                     <button
                       type="button"
                       onClick={handleSubmit}
-                      className={`w-full transition-colors py-3 rounded-full ${country &&
+                      className={`w-full transition-colors py-3 rounded-full font-medium ${country &&
                           state &&
                           city &&
                           street &&
                           houseNO &&
+                          agreedToTerms &&
                           !isSubmitting
-                          ? "bg-docuhealth-primary text-white "
+                          ? "bg-docuhealth-primary text-white cursor-pointer hover:bg-opacity-90"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         } `}
                       disabled={
@@ -767,6 +785,7 @@ const ULP = () => {
                         !city ||
                         !street ||
                         !houseNO ||
+                        !agreedToTerms ||
                         isSubmitting
                       }
                     >
@@ -1270,26 +1289,43 @@ const ULP = () => {
                     </div>
                   </div>
 
-                  <p className="text-sm text-gray-600 pb-6">
-                    By Signing up, you agree to our{" "}
-                    <Link
-                      to="/privacy-policy"
-                      className="text-docuhealth-primary hover:underline"
-                    >
-                      Privacy Policy
-                    </Link>
-                    .
-                  </p>
+                  <div className="flex items-start gap-3 pb-6">
+                    <input
+                      type="checkbox"
+                      id="agreeTerms"
+                      checked={agreedToTerms}
+                      onChange={(e) => setAgreedToTerms(e.target.checked)}
+                      className="mt-1 w-4 h-4 accent-docuhealth-primary rounded cursor-pointer shrink-0"
+                    />
+                    <label htmlFor="agreeTerms" className="text-sm text-gray-700 cursor-pointer select-none">
+                      By Signing up, you agree to our{" "}
+                      <Link
+                        to="/terms-and-conditions"
+                        className="text-docuhealth-primary font-bold hover:underline"
+                      >
+                        Terms &amp; Conditions
+                      </Link>{" "}
+                      and{" "}
+                      <Link
+                        to="/privacy-policy"
+                        className="text-docuhealth-primary font-bold hover:underline"
+                      >
+                        Privacy Policy
+                      </Link>
+                      .
+                    </label>
+                  </div>
                   <button
                     type="button"
                     onClick={handleSubmit}
-                    className={`w-full transition-colors py-3 rounded-full ${country &&
+                    className={`w-full transition-colors py-3 rounded-full font-medium ${country &&
                         state &&
                         city &&
                         street &&
                         houseNO &&
+                        agreedToTerms &&
                         !isSubmitting
-                        ? "bg-docuhealth-primary text-white "
+                        ? "bg-docuhealth-primary text-white cursor-pointer hover:bg-opacity-90"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       } `}
                     disabled={
@@ -1298,6 +1334,7 @@ const ULP = () => {
                       !city ||
                       !street ||
                       !houseNO ||
+                      !agreedToTerms ||
                       isSubmitting
                     }
                   >
