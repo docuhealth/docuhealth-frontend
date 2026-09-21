@@ -92,3 +92,15 @@ export async function subscribeToPlan(planId: string): Promise<any> {
   const res = await axiosInstance.post("api/subscriptions/subscribe", { plan: planId });
   return res.data;
 }
+
+export async function fetchPatientMedicalSummaries(
+  hin: string,
+  page: number = 1,
+  pageSize: number = 10,
+  ordering?: string
+): Promise<PaginatedResponse<any>> {
+  let url = `api/medical-records/summaries/${hin}?page=${page}&size=${pageSize}`;
+  if (ordering) url += `&ordering=${ordering}`;
+  const res = await axiosInstance.get(url);
+  return res.data;
+}
