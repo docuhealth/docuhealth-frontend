@@ -81,7 +81,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
     queryKey: ["patient-soap-notes", hin, soapCurrentPage],
     queryFn: async () => {
       const res = await axiosInstanceHos.get(
-        `api/medical-records/all?patient=${hin}&page=${soapCurrentPage}&size=${pageSize}`
+        `api/doctors/patient/records/${hin}?page=${soapCurrentPage}&size=${pageSize}`
       );
       return res.data;
     },
