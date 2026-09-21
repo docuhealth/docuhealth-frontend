@@ -36,25 +36,43 @@ export const resolveOrderContext = (
     "";
 
   if (!details) {
-    return { hin, orderSource: fallbackOrderSource, checkIn: null };
+    return {
+      hin,
+      orderSource: fallbackOrderSource,
+      checkIn: null,
+      admission: null,
+      appointment: null,
+    };
   }
 
   // Admission (ward) context.
   if (details.ward_info || details.bed_info || details.admission_date) {
-    return { hin, orderSource: "staff_admission_order", checkIn: null };
-  }
-
-  // CheckIn context: has patient_info but no ward/bed/admission info.
-  if (details.patient_info) {
     return {
       hin,
-      orderSource: "staff_check_in_order",
-      checkIn: details.sqid || null,
+      orderSource: "staff_admission_order",
+      checkIn: null,
+      admission: details.sqid || details.id || null,
+      appointment: null,
     };
   }
 
-  // Appointment (legacy) context — the `appointment` field itself no
-  // longer exists on any order serializer, so there's nothing to link;
-  // callers should not send a check_in/appointment field here.
-  return { hin, orderSource: fallbackOrderSource, checkIn: null };
+  // CheckIn context: has patient_info but no ward/bed/admission info.
+  if (details.patient_info && !details.scheduled_time) {
+    return {
+      hin,
+      orderSource: "staff_check_in_order",
+      checkIn: details.sqid || details.id || null,
+      admission: null,
+      appointment: null,
+    };
+  }
+
+  // Appointment (legacy/standard) context
+  return {
+    hin,
+    orderSource: fallbackOrderSource,
+    checkIn: null,
+    admission: null,
+    appointment: details.sqid || details.id || null,
+  };
 };
