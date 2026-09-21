@@ -47,7 +47,7 @@ const AdvanceCheckUp = ({
     queryKey: ["patient-med-records", hin, currentPage],
     queryFn: async () => {
       const res = await axiosInstanceHos.get(
-        `api/doctors/patient/records/${hin}?page=${currentPage}&size=${pageSize}`,
+        `api/medical-records/all?patient=${hin}&page=${currentPage}&size=${pageSize}`,
       );
       return res.data;
     },
@@ -59,7 +59,7 @@ const AdvanceCheckUp = ({
     queryKey: ["patient-soap-notes", hin, soapCurrentPage],
     queryFn: async () => {
       const res = await axiosInstanceHos.get(
-        `api/medical-records/all?patient=${hin}&page=${soapCurrentPage}&size=${pageSize}`,
+        `api/doctors/patient/records/${hin}?page=${soapCurrentPage}&size=${pageSize}`,
       );
       return res.data;
     },
