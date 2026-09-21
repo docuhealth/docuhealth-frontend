@@ -1773,7 +1773,7 @@ const getTabs = ({
         <PatientInfo patientFullInfo={patientFullInfo} selected={selected} />
       ),
     },
-    { ...medRecordsTab, title: "Med Records" },
+    // { ...medRecordsTab, title: "Med Records" },
     {
       title: "SOAP Notes",
       content: (

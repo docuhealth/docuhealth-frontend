@@ -16,6 +16,11 @@ export const updateWard = async ({ ward_sqid, name, total_beds }) => {
   return res.data;
 };
 
+export const deleteWard = async (ward_sqid) => {
+  const res = await axiosInstanceHos.delete(`api/hospitals/wards/${ward_sqid}`);
+  return res.data;
+};
+
 export const fetchWardBeds = async ({ queryKey }) => {
   const [_key, ward_sqid] = queryKey;
   const res = await axiosInstanceHos.get(`api/hospitals/wards/${ward_sqid}/beds`);

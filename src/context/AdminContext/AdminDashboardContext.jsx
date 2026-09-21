@@ -21,9 +21,8 @@ const AdminDashboardProvider = ({ children }) => {
     queryKey: ["admin-dashboard"],
     queryFn: fetchAdminDashboardData,
     enabled: isEnabled,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
-    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
   });
 
   console.log(dashboardData)

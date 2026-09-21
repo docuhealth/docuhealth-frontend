@@ -7,8 +7,9 @@ import { Link } from "react-router-dom";
 import { authAPI } from "../../utils/authAPI";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Country, State, City } from "country-state-city";
-import type { ICountry, IState, ICity } from "country-state-city";
+import { getAllCountries, getStatesForCountry, getLgasOrCities, isNigeria } from "../../utils/locationHelper";
+import type { LocationOption } from "../../utils/locationHelper";
+import type { ICountry } from "country-state-city";
 import { getPasswordRequirements, isPasswordValid as checkPasswordValid } from "../../utils/passwordStrength";
 import PasswordStrengthMeter from "../../Components/ui/PasswordStrengthMeter";
 
@@ -36,10 +37,11 @@ const ULP = () => {
   const [country, setCountry] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const [countries, setCountries] = useState<ICountry[]>([]);
-  const [states, setStates] = useState<IState[]>([]);
-  const [cities, setCities] = useState<ICity[]>([]);
+  const [states, setStates] = useState<LocationOption[]>([]);
+  const [cities, setCities] = useState<LocationOption[]>([]);
 
   const [countryCode, setCountryCode] = useState("");
   const [stateCode, setStateCode] = useState("");
@@ -59,50 +61,55 @@ const ULP = () => {
     return () => clearTimeout(timer); // Cleanup timeout on unmount
   }, [showToast]);
 
-  // Fetch all countries + states
+  // Fetch all countries
   useEffect(() => {
     // Load all countries on mount
-    const allCountries = Country.getAllCountries();
+    const allCountries = getAllCountries();
     setCountries(allCountries);
   }, []);
 
   useEffect(() => {
     if (country) {
       const selectedCountry = countries.find(c => c.name === country);
-      if (selectedCountry) {
-        const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
-        setStates(countryStates);
+      const countryStates = getStatesForCountry(country, selectedCountry?.isoCode || countryCode);
+      setStates(countryStates);
 
-        const stateExistsInCountry = countryStates.find(s => s.name === state);
-        if (!stateExistsInCountry && state !== "") {
-          setState("");
-          setCities([]);
-          setCity("");
-        }
+      const stateExistsInCountry = countryStates.find(s => s.name === state);
+      if (!stateExistsInCountry && state !== "") {
+        setState("");
+        setCities([]);
+        setCity("");
       }
+    } else {
+      setStates([]);
+      setState("");
+      setCities([]);
+      setCity("");
     }
-  }, [country, countries]);
+  }, [country, countries, countryCode]);
 
   useEffect(() => {
     if (country && state && states.length > 0) {
       const selectedCountry = countries.find(c => c.name === country);
       const selectedState = states.find(s => s.name === state);
 
-      if (selectedCountry && selectedState) {
-        const stateCities = City.getCitiesOfState(
-          selectedCountry.isoCode,
-          selectedState.isoCode
-        );
-        setCities(stateCities || []);
+      const locs = getLgasOrCities(
+        country,
+        state,
+        selectedCountry?.isoCode || countryCode,
+        selectedState?.isoCode || stateCode
+      );
+      setCities(locs || []);
 
-        // FIX: Only reset city if the current city isn't in the new state's list
-        const cityExistsInState = stateCities?.find(c => c.name === city);
-        if (!cityExistsInState && city !== "") {
-          setCity("");
-        }
+      // FIX: Only reset city if the current city isn't in the new state's list
+      const cityExistsInState = locs?.find(c => c.name === city);
+      if (!cityExistsInState && city !== "") {
+        setCity("");
       }
+    } else {
+      setCities([]);
     }
-  }, [state, country, countries, states]);
+  }, [state, country, countries, states, countryCode, stateCode]);
 
   useEffect(() => {
     const savedData = sessionStorage.getItem("signup_draft");
@@ -662,16 +669,17 @@ const ULP = () => {
                       </div>
                     </div>
                     <div className="relative pb-3">
-                      <p className="font-semibold pb-1">City :</p>
+                      <p className="font-semibold pb-1">{isNigeria(country, countryCode) ? "LGA :" : "City :"}</p>
                       <div className="relative w-full">
                         <select
                           className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border- outline-hidden appearance-none pr-10"
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
+                          disabled={!cities.length}
                           required
                         >
                           <option value="" selected>
-                            -- Select City --
+                            {isNigeria(country, countryCode) ? "-- Select LGA --" : "-- Select City --"}
                           </option>
                           {cities.map((c) => (
                             <option key={c.name} value={c.name}>
@@ -739,26 +747,43 @@ const ULP = () => {
                       </div>
                     </div>
 
-                    <p className="text-sm text-gray-600 pb-6">
-                      By Signing up, you agree to our{" "}
-                      <Link
-                        to="/privacy-policy"
-                        className="text-docuhealth-primary hover:underline"
-                      >
-                        Privacy Policy
-                      </Link>
-                      .
-                    </p>
+                    <div className="flex items-start gap-3 pb-6">
+                      <input
+                        type="checkbox"
+                        id="agreeTermsStep1"
+                        checked={agreedToTerms}
+                        onChange={(e) => setAgreedToTerms(e.target.checked)}
+                        className="mt-1 w-4 h-4 accent-docuhealth-primary rounded cursor-pointer shrink-0"
+                      />
+                      <label htmlFor="agreeTermsStep1" className="text-sm text-gray-700 cursor-pointer select-none">
+                        By Signing up, you agree to our{" "}
+                        <Link
+                          to="/terms-and-conditions"
+                          className="text-docuhealth-primary font-bold underline"
+                        >
+                          Terms &amp; Conditions
+                        </Link>{" "}
+                        and{" "}
+                        <Link
+                          to="/privacy-policy"
+                          className="text-docuhealth-primary font-bold underline"
+                        >
+                          Privacy Policy
+                        </Link>
+                        .
+                      </label>
+                    </div>
                     <button
                       type="button"
                       onClick={handleSubmit}
-                      className={`w-full transition-colors py-3 rounded-full ${country &&
+                      className={`w-full transition-colors py-3 rounded-full font-medium ${country &&
                           state &&
                           city &&
                           street &&
                           houseNO &&
+                          agreedToTerms &&
                           !isSubmitting
-                          ? "bg-docuhealth-primary text-white "
+                          ? "bg-docuhealth-primary text-white cursor-pointer hover:bg-opacity-90"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         } `}
                       disabled={
@@ -767,6 +792,7 @@ const ULP = () => {
                         !city ||
                         !street ||
                         !houseNO ||
+                        !agreedToTerms ||
                         isSubmitting
                       }
                     >
@@ -1194,16 +1220,17 @@ const ULP = () => {
                     </div>
                   </div>
                   <div className="relative pb-3">
-                    <p className="font-semibold pb-1">City :</p>
+                    <p className="font-semibold pb-1">{isNigeria(country, countryCode) ? "LGA :" : "City :"}</p>
                     <div className="relative w-full">
                       <select
                         className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-docuhealth-primary outline-hidden appearance-none pr-10"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
+                        disabled={!cities.length}
                         required
                       >
                         <option value="" selected>
-                          -- Select City --
+                          {isNigeria(country, countryCode) ? "-- Select LGA --" : "-- Select City --"}
                         </option>
                         {cities.map((c) => (
                           <option key={c.name} value={c.name}>
@@ -1270,26 +1297,43 @@ const ULP = () => {
                     </div>
                   </div>
 
-                  <p className="text-sm text-gray-600 pb-6">
-                    By Signing up, you agree to our{" "}
-                    <Link
-                      to="/privacy-policy"
-                      className="text-docuhealth-primary hover:underline"
-                    >
-                      Privacy Policy
-                    </Link>
-                    .
-                  </p>
+                  <div className="flex items-start gap-3 pb-6">
+                    <input
+                      type="checkbox"
+                      id="agreeTerms"
+                      checked={agreedToTerms}
+                      onChange={(e) => setAgreedToTerms(e.target.checked)}
+                      className="mt-1 w-4 h-4 accent-docuhealth-primary rounded cursor-pointer shrink-0"
+                    />
+                    <label htmlFor="agreeTerms" className="text-sm text-gray-700 cursor-pointer select-none">
+                      By Signing up, you agree to our{" "}
+                      <Link
+                        to="/terms-and-conditions"
+                        className="text-docuhealth-primary font-bold hover:underline"
+                      >
+                        Terms &amp; Conditions
+                      </Link>{" "}
+                      and{" "}
+                      <Link
+                        to="/privacy-policy"
+                        className="text-docuhealth-primary font-bold hover:underline"
+                      >
+                        Privacy Policy
+                      </Link>
+                      .
+                    </label>
+                  </div>
                   <button
                     type="button"
                     onClick={handleSubmit}
-                    className={`w-full transition-colors py-3 rounded-full ${country &&
+                    className={`w-full transition-colors py-3 rounded-full font-medium ${country &&
                         state &&
                         city &&
                         street &&
                         houseNO &&
+                        agreedToTerms &&
                         !isSubmitting
-                        ? "bg-docuhealth-primary text-white "
+                        ? "bg-docuhealth-primary text-white cursor-pointer hover:bg-opacity-90"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       } `}
                     disabled={
@@ -1298,6 +1342,7 @@ const ULP = () => {
                       !city ||
                       !street ||
                       !houseNO ||
+                      !agreedToTerms ||
                       isSubmitting
                     }
                   >

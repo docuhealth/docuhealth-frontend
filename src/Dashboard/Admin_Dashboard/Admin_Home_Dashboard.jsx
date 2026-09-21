@@ -9,7 +9,13 @@ import SubAccountChart from "../../Components/Dashboard/Admin_Dashboard_Componen
 import TopSellingStatesChart from "../../Components/Dashboard/Admin_Dashboard_Components/Home_Dashboard/TopSellingStatesChart";
 import { useQuery } from "@tanstack/react-query";
 import { getToken, getRole } from "../../services/authService";
-import { fetchAdminDashboardData } from "../../queries/admin/dashboard";
+import {
+  fetchAdminDashboardData,
+  fetchAdminDashboardStates,
+  fetchAdminDashboardSubAccounts,
+  fetchAdminDashboardSubscriptions,
+  fetchAdminDashboardUsers,
+} from "../../queries/admin/dashboard";
 import { getDatesForFilter } from "../../utils/dateFilterHelper";
 
 const ChartLoadingPlaceholder = ({ title }) => (
@@ -36,47 +42,58 @@ const Admin_Home_Dashboard = () => {
   const [revenueFilter, setRevenueFilter] = useState("Monthly");
   const [registeredFilter, setRegisteredFilter] = useState("Monthly");
   const [subscribedFilter, setSubscribedFilter] = useState("Monthly");
+  const [subAccountFilter, setSubAccountFilter] = useState("Monthly");
   const [statesFilter, setStatesFilter] = useState("Monthly");
 
   const revenueRange = useMemo(() => getDatesForFilter(revenueFilter), [revenueFilter]);
   const registeredRange = useMemo(() => getDatesForFilter(registeredFilter), [registeredFilter]);
   const subscribedRange = useMemo(() => getDatesForFilter(subscribedFilter), [subscribedFilter]);
+  const subAccountRange = useMemo(() => getDatesForFilter(subAccountFilter), [subAccountFilter]);
   const statesRange = useMemo(() => getDatesForFilter(statesFilter), [statesFilter]);
 
   const { data: revenueData, isPending: revenueLoading } = useQuery({
-    queryKey: ["admin-dashboard", revenueRange],
+    queryKey: ["admin-dashboard-revenue", revenueRange],
     queryFn: fetchAdminDashboardData,
     enabled: isEnabled,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
-    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+    placeholderData: (prev) => prev,
   });
 
   const { data: registeredData, isPending: registeredLoading } = useQuery({
-    queryKey: ["admin-dashboard", registeredRange],
-    queryFn: fetchAdminDashboardData,
+    queryKey: ["admin-dashboard-users", registeredRange, registeredFilter],
+    queryFn: fetchAdminDashboardUsers,
     enabled: isEnabled,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
-    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+    placeholderData: (prev) => prev,
   });
 
   const { data: subscribedData, isPending: subscribedLoading } = useQuery({
-    queryKey: ["admin-dashboard", subscribedRange],
-    queryFn: fetchAdminDashboardData,
+    queryKey: ["admin-dashboard-subscriptions", subscribedRange, subscribedFilter],
+    queryFn: fetchAdminDashboardSubscriptions,
     enabled: isEnabled,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
-    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+    placeholderData: (prev) => prev,
+  });
+
+  const { data: subAccountData, isPending: subAccountLoading } = useQuery({
+    queryKey: ["admin-dashboard-subaccounts", subAccountRange],
+    queryFn: fetchAdminDashboardSubAccounts,
+    enabled: isEnabled,
+    staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+    placeholderData: (prev) => prev,
   });
 
   const { data: statesData, isPending: statesLoading } = useQuery({
-    queryKey: ["admin-dashboard", statesRange],
-    queryFn: fetchAdminDashboardData,
+    queryKey: ["admin-dashboard-states", statesRange],
+    queryFn: fetchAdminDashboardStates,
     enabled: isEnabled,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
-    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+    placeholderData: (prev) => prev,
   });
 
   if (loading) {
@@ -177,7 +194,7 @@ const Admin_Home_Dashboard = () => {
           <ChartLoadingPlaceholder title="Revenue generated overview" />
         ) : (
           <RevenueChart
-            data={revenueData?.charts?.revenue_overview || undefined}
+            data={revenueData?.charts?.revenue_overview || revenueData?.data || (Array.isArray(revenueData) ? revenueData : undefined)}
             filter={revenueFilter}
             onFilterChange={setRevenueFilter}
           />
@@ -186,7 +203,7 @@ const Admin_Home_Dashboard = () => {
           <ChartLoadingPlaceholder title="Registered Users Overview" />
         ) : (
           <RegisteredUsersChart
-            data={registeredData?.charts?.registered_users || undefined}
+            data={registeredData?.charts?.registered_users || registeredData?.data || (Array.isArray(registeredData) ? registeredData : undefined)}
             filter={registeredFilter}
             onFilterChange={setRegisteredFilter}
           />
@@ -195,12 +212,20 @@ const Admin_Home_Dashboard = () => {
           <ChartLoadingPlaceholder title="Subscribed Users Overview" />
         ) : (
           <SubscribedUsersChart
-            data={subscribedData?.charts?.subscribed_users || undefined}
+            data={subscribedData?.charts?.subscribed_users || subscribedData?.data || (Array.isArray(subscribedData) ? subscribedData : undefined)}
             filter={subscribedFilter}
             onFilterChange={setSubscribedFilter}
           />
         )}
-        <SubAccountChart data={dashboardData?.charts?.sub_account_stats || undefined} />
+        {subAccountLoading ? (
+          <ChartLoadingPlaceholder title="Users with sub account" />
+        ) : (
+          <SubAccountChart
+            data={subAccountData?.charts?.sub_account_stats || subAccountData?.data || (Array.isArray(subAccountData) ? subAccountData : dashboardData?.charts?.sub_account_stats)}
+            filter={subAccountFilter}
+            onFilterChange={setSubAccountFilter}
+          />
+        )}
       </div>
 
       <div className="w-full mt-6">
@@ -208,7 +233,7 @@ const Admin_Home_Dashboard = () => {
           <ChartLoadingPlaceholder title="Top Selling States" />
         ) : (
           <TopSellingStatesChart
-            data={statesData?.charts?.states || undefined}
+            data={statesData?.charts?.states || statesData?.data || (Array.isArray(statesData) ? statesData : undefined)}
             filter={statesFilter}
             onFilterChange={setStatesFilter}
           />

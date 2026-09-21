@@ -11,6 +11,7 @@ import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import Input from "../../../../../ui/Input";
 import Select from "../../../../../ui/Select";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
+import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 
 
 const NoteSection = ({
@@ -415,8 +416,20 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       }
     }
 
-    if (source !== "appointments" && selectedPatientDetails?.sqid) {
-      formData.append("check_in", selectedPatientDetails.sqid);
+    const orderContext = resolveOrderContext(selectedPatientDetails, {
+      fallbackOrderSource:
+        source === "appointments" ? "staff_appointment_order" : undefined,
+    });
+
+    if (source === "appointments" || orderContext.appointment) {
+      const apptSqid = orderContext.appointment || selectedPatientDetails?.sqid;
+      if (apptSqid) {
+        formData.append("appointment", apptSqid);
+      }
+    } else if (orderContext.admission) {
+      formData.append("admission", orderContext.admission);
+    } else if (orderContext.checkIn) {
+      formData.append("check_in", orderContext.checkIn);
     }
 
     attachments.forEach((fileObj) => {

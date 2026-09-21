@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
-import { Country, State, City } from 'country-state-city';
-import type { ICountry, IState, ICity } from 'country-state-city';
+import { getAllCountries, getStatesForCountry, getLgasOrCities, isNigeria } from "../../../../utils/locationHelper";
+import type { LocationOption } from "../../../../utils/locationHelper";
+import type { ICountry } from 'country-state-city';
 import PasswordStrengthMeter from "../../../ui/PasswordStrengthMeter";
 import Spinner from "../../../ui/Spinner";
 import Modal from "../../../ui/Modal";
@@ -58,57 +59,57 @@ const UserSubAcctUpgradeModal = ({
   isValid,
 }: UserSubAcctUpgradeModalProps) => {
   const [countries, setCountries] = useState<ICountry[]>([]);
-  const [states, setStates] = useState<IState[]>([]);
-  const [cities, setCities] = useState<ICity[]>([]);
+  const [states, setStates] = useState<LocationOption[]>([]);
+  const [cities, setCities] = useState<LocationOption[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
 
   useEffect(() => {
     // Load all countries on mount
-    const allCountries = Country.getAllCountries();
+    const allCountries = getAllCountries();
     setCountries(allCountries);
   }, []);
-
-
 
   // Update states when country changes
   useEffect(() => {
     if (subAcctUpgradeData.child_country) {
       const selectedCountry = countries.find(c => c.name === subAcctUpgradeData.child_country);
-      if (selectedCountry) {
-        const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
-        setStates(countryStates);
-      } else {
-        setStates([]);
-      }
+      const countryStates = getStatesForCountry(
+        subAcctUpgradeData.child_country,
+        selectedCountry?.isoCode || subAcctUpgradeData.child_countryCode
+      );
+      setStates(countryStates);
       setSubAcctUpgradeData((prevData) => ({
         ...prevData,
         child_state: "",
-      }));
-      setCities([]); // reset cities
-      setSubAcctUpgradeData((prevData) => ({
-        ...prevData,
+        child_stateCode: "",
         child_city: "",
       }));
+      setCities([]);
+    } else {
+      setStates([]);
+      setCities([]);
     }
-  }, [subAcctUpgradeData.child_country, countries]);
+  }, [subAcctUpgradeData.child_country, subAcctUpgradeData.child_countryCode, countries]);
 
-  // Fetch cities when state changes
-
-
-  // Fetch cities when state changes
+  // Fetch cities/LGAs when state changes
   useEffect(() => {
-    if (subAcctUpgradeData.child_countryCode && subAcctUpgradeData.child_stateCode) {
-      const citiesOfState = City.getCitiesOfState(
-        subAcctUpgradeData.child_countryCode,
-        subAcctUpgradeData.child_stateCode
+    if (subAcctUpgradeData.child_country && subAcctUpgradeData.child_state) {
+      const selectedCountry = countries.find(c => c.name === subAcctUpgradeData.child_country);
+      const selectedState = states.find(s => s.name === subAcctUpgradeData.child_state);
+
+      const locs = getLgasOrCities(
+        subAcctUpgradeData.child_country,
+        subAcctUpgradeData.child_state,
+        selectedCountry?.isoCode || subAcctUpgradeData.child_countryCode,
+        selectedState?.isoCode || subAcctUpgradeData.child_stateCode
       );
 
-      setCities(citiesOfState);
+      setCities(locs || []);
     } else {
       setCities([]);
     }
-  }, [subAcctUpgradeData.child_stateCode, subAcctUpgradeData.child_countryCode, countries]);
+  }, [subAcctUpgradeData.child_state, subAcctUpgradeData.child_stateCode, subAcctUpgradeData.child_country, subAcctUpgradeData.child_countryCode, countries, states]);
   return (
     <>
       <div>
@@ -319,7 +320,7 @@ const UserSubAcctUpgradeModal = ({
                           setSubAcctUpgradeData((prev) => ({
                             ...prev,
                             child_state: selected.name,
-                            child_stateCode: selected.isoCode,  // needed for city fetching
+                            child_stateCode: selected.isoCode || "",  // needed for city fetching
                             child_city: ""
                           }));
                         }}
@@ -357,17 +358,22 @@ const UserSubAcctUpgradeModal = ({
                     </div>
                     <div className="mb-4 relative">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Child's City of Residence
+                        {isNigeria(subAcctUpgradeData.child_country, subAcctUpgradeData.child_countryCode)
+                          ? "Child's LGA of Residence"
+                          : "Child's City of Residence"}
                       </label>
                       <select
                         name="child_city"
                         value={subAcctUpgradeData.child_city}
                         onChange={handleSubAcctUpgradeDataChange}
+                        disabled={!cities.length}
                         className="w-full border border-gray-300 rounded-lg px-2 py-2  focus:outline-hidden focus:border-docuhealth-primary appearance-none"
                         required
                       >
                         <option value="">
-                          -- Select City --
+                          {isNigeria(subAcctUpgradeData.child_country, subAcctUpgradeData.child_countryCode)
+                            ? "-- Select LGA --"
+                            : "-- Select City --"}
                         </option>
                         {cities.map((c) => (
                           <option key={c.name} value={c.name}>

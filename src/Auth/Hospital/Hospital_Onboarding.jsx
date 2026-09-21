@@ -8,8 +8,7 @@ import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import axiosInstance from "../../lib/axios";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { authAPI } from "../../utils/authAPI";
-import { Country, State, City } from 'country-state-city';
+import { getAllCountries, getStatesForCountry, getLgasOrCities, isNigeria } from "../../utils/locationHelper";
 
 const Hospital_Onboarding = () => {
     const navigate = useNavigate();
@@ -79,10 +78,10 @@ const Hospital_Onboarding = () => {
         return () => clearTimeout(timer); // Cleanup timeout on unmount
     }, [showToast]);
 
-    // Fetch all countries + states
+    // Fetch all countries
     useEffect(() => {
         // Load all countries on mount
-        const allCountries = Country.getAllCountries();
+        const allCountries = getAllCountries();
         setCountries(allCountries);
     }, []);
 
@@ -90,44 +89,37 @@ const Hospital_Onboarding = () => {
     useEffect(() => {
         if (country) {
             const selectedCountry = countries.find(c => c.name === country);
-            if (selectedCountry) {
-                const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
-                setStates(countryStates);
-            } else {
-                setStates([]);
-            }
+            const countryStates = getStatesForCountry(country, selectedCountry?.isoCode || countryCode);
+            setStates(countryStates);
             setState("");  // reset state
             setCities([]); // reset cities
             setCity("");   // reset city
+        } else {
+            setStates([]);
+            setState("");
+            setCities([]);
+            setCity("");
         }
-    }, [country, countries]);
+    }, [country, countries, countryCode]);
 
-    // Fetch cities when state changes
+    // Fetch cities/LGAs when state changes
     useEffect(() => {
         if (country && state) {
-          const selectedCountry = countries.find(c => c.name === country);
-          if (!selectedCountry) return;
-      
-          // Find the state object using its NAME
-          const selectedState = states.find(s => s.name === state);
-      
-          if (!selectedState) {
-            setCities([]);
-            return;
-          }
-      
-          // Use ISO codes for city lookup
-          const stateCities = City.getCitiesOfState(
-            selectedCountry.isoCode,
-            selectedState.isoCode // <= this is the correct fix
-          );
-      
-          setCities(stateCities || []);
-          setCity("");
+            const selectedCountry = countries.find(c => c.name === country);
+            const selectedState = states.find(s => s.name === state);
+
+            const locs = getLgasOrCities(
+                country,
+                state,
+                selectedCountry?.isoCode || countryCode,
+                selectedState?.isoCode || stateCode
+            );
+            setCities(locs || []);
+            setCity("");
         } else {
-          setCities([]);
+            setCities([]);
         }
-      }, [state, country, countries, states]);
+    }, [state, country, countries, states, countryCode, stateCode]);
 
     // Password validation function
     const validatePassword = (password) => {
@@ -603,16 +595,17 @@ const Hospital_Onboarding = () => {
                                             </div>
                                         </div>
                                         <div className="relative pb-3">
-                                            <p className="font-semibold pb-1">City :</p>
+                                            <p className="font-semibold pb-1">{isNigeria(country, countryCode) ? "LGA :" : "City :"}</p>
                                             <div className="relative w-full">
                                                 <select
                                                     className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border- outline-hidden appearance-none pr-10"
                                                     value={city}
                                                     onChange={(e) => setCity(e.target.value)}
+                                                    disabled={!cities.length}
                                                     required
                                                 >
                                                     <option value="" selected>
-                                                        -- Select City --
+                                                        {isNigeria(country, countryCode) ? "-- Select LGA --" : "-- Select City --"}
                                                     </option>
                                                     {cities.map((c) => (
                                                         <option key={c.name} value={c.name}>
@@ -1050,16 +1043,17 @@ const Hospital_Onboarding = () => {
                                         </div>
                                     </div>
                                     <div className="relative pb-3">
-                                        <p className="font-semibold pb-1">City :</p>
+                                        <p className="font-semibold pb-1">{isNigeria(country, countryCode) ? "LGA :" : "City :"}</p>
                                         <div className="relative w-full">
                                             <select
                                                 className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border- outline-hidden appearance-none pr-10"
                                                 value={city}
                                                 onChange={(e) => setCity(e.target.value)}
+                                                disabled={!cities.length}
                                                 required
                                             >
                                                 <option value="" selected>
-                                                    -- Select City --
+                                                    {isNigeria(country, countryCode) ? "-- Select LGA --" : "-- Select City --"}
                                                 </option>
                                                 {cities.map((c) => (
                                                     <option key={c.name} value={c.name}>
