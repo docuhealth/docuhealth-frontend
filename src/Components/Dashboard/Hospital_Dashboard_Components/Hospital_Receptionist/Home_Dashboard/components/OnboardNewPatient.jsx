@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
-import { Country, State, City } from "country-state-city";
+import { getAllCountries, getStatesForCountry, getLgasOrCities, isNigeria } from "../../../../../../utils/locationHelper";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Modal from "../../../../../ui/Modal";
 import Button from "../../../../../ui/Button";
@@ -109,7 +109,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
 
   useEffect(() => {
     // Load all countries on mount
-    const allCountries = Country.getAllCountries();
+    const allCountries = getAllCountries();
     setCountries(allCountries);
   }, []);
 
@@ -118,33 +118,46 @@ const OnboardNewPatient = ({ setNewPatient }) => {
       const selectedCountry = countries.find(
         (c) => c.name === patientData.country,
       );
-      if (selectedCountry) {
-        const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
-        setStates(countryStates);
-      } else {
-        setStates([]);
-      }
+      const countryStates = getStatesForCountry(
+        patientData.country,
+        selectedCountry?.isoCode || patientData.countryCode
+      );
+      setStates(countryStates);
 
       setPatientData((prev) => ({
         ...prev,
         state: "",
+        stateCode: "",
+        city: "",
       }));
       setCities([]);
+    } else {
+      setStates([]);
+      setCities([]);
     }
-  }, [patientData.country, countries]);
+  }, [patientData.country, countries, patientData.countryCode]);
 
   useEffect(() => {
-    if (patientData.countryCode && patientData.stateCode) {
-      const citiesOfState = City.getCitiesOfState(
-        patientData.countryCode,
-        patientData.stateCode,
+    if (patientData.country && patientData.state) {
+      const selectedCountry = countries.find(
+        (c) => c.name === patientData.country,
+      );
+      const selectedState = states.find(
+        (s) => s.name === patientData.state,
       );
 
-      setCities(citiesOfState);
+      const locs = getLgasOrCities(
+        patientData.country,
+        patientData.state,
+        selectedCountry?.isoCode || patientData.countryCode,
+        selectedState?.isoCode || patientData.stateCode
+      );
+
+      setCities(locs || []);
     } else {
       setCities([]);
     }
-  }, [patientData.countryCode, patientData.stateCode, countries]);
+  }, [patientData.country, patientData.state, patientData.countryCode, patientData.stateCode, countries, states]);
 
   console.log(cities);
 
@@ -754,16 +767,23 @@ const OnboardNewPatient = ({ setNewPatient }) => {
               </div>
               <div className="mb-2 relative">
                 <label className="block text-sm font-semibold mb-1">
-                  Patient's City of Residence
+                  {isNigeria(patientData.country, patientData.countryCode)
+                    ? "Patient's LGA of Residence"
+                    : "Patient's City of Residence"}
                 </label>
                 <select
                   name="city"
                   value={patientData.city}
                   onChange={handlePatientDataChange}
+                  disabled={!cities.length}
                   className="w-full border border-gray-300 rounded-lg px-2 py-3 focus:outline-hidden focus:border-docuhealth-primary appearance-none text-sm"
                   required
                 >
-                  <option value="">-- Select City --</option>
+                  <option value="">
+                    {isNigeria(patientData.country, patientData.countryCode)
+                      ? "-- Select LGA --"
+                      : "-- Select City --"}
+                  </option>
                   {cities.map((c) => (
                     <option key={c.name} value={c.name}>
                       {c.name}

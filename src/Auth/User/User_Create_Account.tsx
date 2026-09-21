@@ -7,8 +7,9 @@ import { Link } from "react-router-dom";
 import { authAPI } from "../../utils/authAPI";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Country, State, City } from "country-state-city";
-import type { ICountry, IState, ICity } from "country-state-city";
+import { getAllCountries, getStatesForCountry, getLgasOrCities, isNigeria } from "../../utils/locationHelper";
+import type { LocationOption } from "../../utils/locationHelper";
+import type { ICountry } from "country-state-city";
 import { getPasswordRequirements, isPasswordValid as checkPasswordValid } from "../../utils/passwordStrength";
 import PasswordStrengthMeter from "../../Components/ui/PasswordStrengthMeter";
 
@@ -39,8 +40,8 @@ const ULP = () => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const [countries, setCountries] = useState<ICountry[]>([]);
-  const [states, setStates] = useState<IState[]>([]);
-  const [cities, setCities] = useState<ICity[]>([]);
+  const [states, setStates] = useState<LocationOption[]>([]);
+  const [cities, setCities] = useState<LocationOption[]>([]);
 
   const [countryCode, setCountryCode] = useState("");
   const [stateCode, setStateCode] = useState("");
@@ -60,50 +61,55 @@ const ULP = () => {
     return () => clearTimeout(timer); // Cleanup timeout on unmount
   }, [showToast]);
 
-  // Fetch all countries + states
+  // Fetch all countries
   useEffect(() => {
     // Load all countries on mount
-    const allCountries = Country.getAllCountries();
+    const allCountries = getAllCountries();
     setCountries(allCountries);
   }, []);
 
   useEffect(() => {
     if (country) {
       const selectedCountry = countries.find(c => c.name === country);
-      if (selectedCountry) {
-        const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
-        setStates(countryStates);
+      const countryStates = getStatesForCountry(country, selectedCountry?.isoCode || countryCode);
+      setStates(countryStates);
 
-        const stateExistsInCountry = countryStates.find(s => s.name === state);
-        if (!stateExistsInCountry && state !== "") {
-          setState("");
-          setCities([]);
-          setCity("");
-        }
+      const stateExistsInCountry = countryStates.find(s => s.name === state);
+      if (!stateExistsInCountry && state !== "") {
+        setState("");
+        setCities([]);
+        setCity("");
       }
+    } else {
+      setStates([]);
+      setState("");
+      setCities([]);
+      setCity("");
     }
-  }, [country, countries]);
+  }, [country, countries, countryCode]);
 
   useEffect(() => {
     if (country && state && states.length > 0) {
       const selectedCountry = countries.find(c => c.name === country);
       const selectedState = states.find(s => s.name === state);
 
-      if (selectedCountry && selectedState) {
-        const stateCities = City.getCitiesOfState(
-          selectedCountry.isoCode,
-          selectedState.isoCode
-        );
-        setCities(stateCities || []);
+      const locs = getLgasOrCities(
+        country,
+        state,
+        selectedCountry?.isoCode || countryCode,
+        selectedState?.isoCode || stateCode
+      );
+      setCities(locs || []);
 
-        // FIX: Only reset city if the current city isn't in the new state's list
-        const cityExistsInState = stateCities?.find(c => c.name === city);
-        if (!cityExistsInState && city !== "") {
-          setCity("");
-        }
+      // FIX: Only reset city if the current city isn't in the new state's list
+      const cityExistsInState = locs?.find(c => c.name === city);
+      if (!cityExistsInState && city !== "") {
+        setCity("");
       }
+    } else {
+      setCities([]);
     }
-  }, [state, country, countries, states]);
+  }, [state, country, countries, states, countryCode, stateCode]);
 
   useEffect(() => {
     const savedData = sessionStorage.getItem("signup_draft");
@@ -663,16 +669,17 @@ const ULP = () => {
                       </div>
                     </div>
                     <div className="relative pb-3">
-                      <p className="font-semibold pb-1">City :</p>
+                      <p className="font-semibold pb-1">{isNigeria(country, countryCode) ? "LGA :" : "City :"}</p>
                       <div className="relative w-full">
                         <select
                           className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border- outline-hidden appearance-none pr-10"
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
+                          disabled={!cities.length}
                           required
                         >
                           <option value="" selected>
-                            -- Select City --
+                            {isNigeria(country, countryCode) ? "-- Select LGA --" : "-- Select City --"}
                           </option>
                           {cities.map((c) => (
                             <option key={c.name} value={c.name}>
@@ -1213,16 +1220,17 @@ const ULP = () => {
                     </div>
                   </div>
                   <div className="relative pb-3">
-                    <p className="font-semibold pb-1">City :</p>
+                    <p className="font-semibold pb-1">{isNigeria(country, countryCode) ? "LGA :" : "City :"}</p>
                     <div className="relative w-full">
                       <select
                         className="border border-gray-300 px-4 py-3 rounded-lg w-full focus:border-docuhealth-primary outline-hidden appearance-none pr-10"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
+                        disabled={!cities.length}
                         required
                       >
                         <option value="" selected>
-                          -- Select City --
+                          {isNigeria(country, countryCode) ? "-- Select LGA --" : "-- Select City --"}
                         </option>
                         {cities.map((c) => (
                           <option key={c.name} value={c.name}>

@@ -18,7 +18,7 @@ const nigeriaLgas: Record<string, string[]> = nigeriaLgasData as Record<string, 
 export const isNigeria = (countryName?: string, countryCode?: string): boolean => {
   const name = (countryName || "").trim().toLowerCase();
   const code = (countryCode || "").trim().toUpperCase();
-  return name === "nigeria" || code === "ng";
+  return name === "nigeria" || code === "ng" || code === "nga";
 };
 
 /**
@@ -79,8 +79,17 @@ export const getLgasOrCities = (
       }));
     }
 
+    const trimmedState = stateName.trim().toLowerCase();
+    if (trimmedState === "fct" || trimmedState === "abuja") {
+      const fctLgas = nigeriaLgas["Federal Capital Territory"] || [];
+      return fctLgas.map((lga) => ({
+        name: lga,
+        isoCode: lga,
+      }));
+    }
+
     const stateKey = Object.keys(nigeriaLgas).find(
-      (k) => k.toLowerCase() === stateName.trim().toLowerCase()
+      (k) => k.toLowerCase() === trimmedState
     );
     if (stateKey && nigeriaLgas[stateKey]) {
       return nigeriaLgas[stateKey].map((lga) => ({
@@ -112,3 +121,4 @@ export const getLgasOrCities = (
   if (!cCode || !sCode) return [];
   return City.getCitiesOfState(cCode, sCode);
 };
+
