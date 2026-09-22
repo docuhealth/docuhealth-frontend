@@ -89,6 +89,7 @@ import Hospital_Doctors_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/
 import Hospital_Doctors_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Settings_Dashboard";
 import Hospital_Doctors_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_HealthPersonnel_Dashboard";
 import Hospital_Doctors_Lab_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Lab_Dashboard";
+import Hospital_Doctors_Handover_History from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Handover_History";
 
 import Hospital_Receptionist_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_Receptionist/Hospital_Receptionist_Layout";
 import Hospital_Receptionist_Home_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Receptionist/Hospital_Receptionist_Home_Dashboard";
@@ -503,6 +504,25 @@ function App() {
                   <HospitalProtectedRoute>
                     <HospitalDoctorProviders>
                       <Hospital_Doctors_Lab_Dashboard />
+                    </HospitalDoctorProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-doctors-handover-history"
+              element={
+                <HospitalDoctorProviders>
+                  <Hospital_Doctors_Layout />
+                </HospitalDoctorProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalDoctorProviders>
+                      <Hospital_Doctors_Handover_History />
                     </HospitalDoctorProviders>
                   </HospitalProtectedRoute>
                 }

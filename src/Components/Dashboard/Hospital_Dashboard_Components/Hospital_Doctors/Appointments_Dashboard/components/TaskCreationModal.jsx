@@ -148,7 +148,7 @@ const TaskCreationModal = ({
         <div className="bg-white rounded-2xl shadow-lg max-w-md w-full relative text-sm p-6">
           <div className="flex flex-col items-center text-center py-4">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
-              <div className="w-14 h-14 rounded-full bg-green-700 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M5 13l4 4L19 7"
@@ -165,7 +165,7 @@ const TaskCreationModal = ({
             </p>
             <button
               onClick={onClose}
-              className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3 rounded-full hover:opacity-90 transition-colors cursor-pointer"
+              className="w-full bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-3 rounded-full transition-colors cursor-pointer"
             >
               Done
             </button>
@@ -177,7 +177,7 @@ const TaskCreationModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-3">
-      <div className="bg-white rounded-2xl shadow-lg max-w-5xl w-full relative text-sm max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-lg max-w-7xl w-full relative text-sm max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 cursor-pointer"

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 
 /**
@@ -69,6 +69,7 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
     setFormData((prev) => ({ ...prev, staff_id: "", patient_hin: patientHin }));
   };
 
+  const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
     // staff_id is optional now — omit it entirely for a general request so
     // any nurse at the hospital can claim it (sending "" would 400).
@@ -78,6 +79,8 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
         ...(staff_id ? { staff_id } : {}),
       }),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inpatient-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor-vitals-requests"] });
       setShowSuccess(true);
     },
     onError: (err) => {
@@ -97,7 +100,7 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
         <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
           <div className="flex flex-col items-center text-center py-4">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
-              <div className="w-14 h-14 rounded-full bg-green-700 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                   <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -110,7 +113,7 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
             </p>
             <button
               onClick={onClose}
-              className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3 rounded-full hover:opacity-90 transition-colors cursor-pointer"
+              className="w-full bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-3 rounded-full transition-colors cursor-pointer"
             >
               Done
             </button>
@@ -140,7 +143,7 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
           </svg>
         </div>
       ) : selectedStaffId || generalRequest ? (
-        <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
+        <div className="bg-white rounded-lg shadow-lg p-5 max-w-md w-full relative text-sm">
           <div className="flex justify-end">
             <button
               onClick={onClose}
@@ -149,10 +152,10 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
               <i className="bx bx-x text-2xl cursor-pointer"></i>
             </button>
           </div>
-          <h2 className="text-center font-semibold text-lg text-gray-800">
-            Request for Vitals
+          <h2 className="text-center font-semibold text-lg text-gray-800 mb-3">
+            Quick Vitals Request
           </h2>
-          <p className="text-center text-gray-500 mb-4 text-sm">
+          <p className="text-center text-gray-500 mb-6 text-sm leading-relaxed px-2">
             {generalRequest
               ? "General request — any nurse at your hospital can pick this up"
               : "Assign to a nurse for vitals checkup"}

@@ -869,7 +869,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                               className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
                               onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIORecord(true); }}
                             >
-                              Input and Output chart
+                              Fluid Input and Output chart
                             </button>
                           ) : task.task_type === 'vital_signs' ? (
                             <button 
@@ -944,7 +944,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                                 className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
                                 onMouseDown={(e) => { e.preventDefault(); setOpenPopover(null); setShowIORecord(true); }}
                               >
-                                Input and Output chart
+                                Fluid Input and Output chart
                               </button>
                             </>
                           ) : task.task_type === 'vital_signs' ? (
@@ -1124,7 +1124,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                               className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
                               onClick={() => { setOpenPopover(null); setShowIORecord(true); }}
                             >
-                              Input and Output chart
+                              Fluid Input and Output chart
                             </button>
                           ) : task.task_type === 'vital_signs' ? (
                             <button 
@@ -1199,7 +1199,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                                 className="w-full text-left text-sm font-medium text-slate-700 hover:bg-slate-50 p-3 rounded-lg transition-colors whitespace-nowrap"
                                 onClick={() => { setOpenPopover(null); setShowIORecord(true); }}
                               >
-                                Input and Output chart
+                                Fluid Input and Output chart
                               </button>
                             </>
                           ) : task.task_type === 'vital_signs' ? (

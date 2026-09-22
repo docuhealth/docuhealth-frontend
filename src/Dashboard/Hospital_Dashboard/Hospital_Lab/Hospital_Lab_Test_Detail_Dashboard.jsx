@@ -442,7 +442,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
       </div>
 
       {showAcceptModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
           <div className="bg-white rounded-md shadow-xl w-full max-w-md p-6 flex flex-col items-center gap-4">
             <button onClick={() => setShowAcceptModal(false)} className="self-end -mt-2 -mr-2 text-gray-400 hover:text-gray-600">
               <X size={20} />
@@ -474,7 +474,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
       )}
 
       {showSampleModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
           <div className="bg-white rounded-md shadow-xl w-full max-w-md p-6 flex flex-col gap-5">
             <div className="relative flex items-start justify-center">
               <div className="text-center">

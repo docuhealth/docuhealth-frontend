@@ -92,13 +92,15 @@ const RequestAdmission = ({
         type="button"
         aria-label="Close"
         onClick={() => setRequestAdmission(false)}
-        className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 cursor-pointer"
+        className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 cursor-pointer"
       >
         <i className="bx bx-x text-2xl"></i>
       </button>
-      <div className="flex flex-col justify-center items-center pb-5 pt-2">
-        <p className="pt-0.5 font-medium">Request for patient admission</p>
-        <p className="pt-1 text-[12px]">
+      <div className="flex flex-col justify-center items-center pb-6 pt-6 text-center">
+        <h2 className="text-base font-semibold text-gray-800 mb-1.5">
+          Request for patient admission
+        </h2>
+        <p className="text-[13px] text-gray-500">
           Select the most suitable ward for the patient
         </p>
       </div>

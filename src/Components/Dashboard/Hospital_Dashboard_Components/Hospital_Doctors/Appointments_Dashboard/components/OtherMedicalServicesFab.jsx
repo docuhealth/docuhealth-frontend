@@ -18,13 +18,13 @@ import SeizureEventModal from "./SeizureEventModal";
 // (i.e. from an admitted/inpatient context, not an appointment/check-in).
 const QUICK_SERVICES = [
   { id: "lab", label: "Order lab", action: "lab" },
-  { id: "scan", label: "Order scan/X-ray", action: null },
+  { id: "scan", label: "Order Scan or X-ray", action: null },
   { id: "pharmacy", label: "Order pharmacy", action: "pharmacy" },
-  { id: "drug-task", label: "Drug task (nurse)", action: "drug-task", admissionOnly: true },
-  { id: "vitals", label: "Vitals", action: "vitals" },
+  { id: "drug-task", label: "Drug task (nurse)", action: "drug-task" },
+  { id: "vitals", label: "Quick Vitals request", action: "vitals" },
   { id: "vitals-task", label: "Vitals monitoring task", action: "vitals-task", admissionOnly: true },
   { id: "procedure", label: "Procedure", action: "procedure", admissionOnly: true },
-  { id: "input-output", label: "Input and output", action: "input-output", admissionOnly: true },
+  { id: "input-output", label: "Fluid Input and Output", action: "input-output", admissionOnly: true },
   { id: "iv-fluid", label: "IV fluid", action: "iv-fluid", admissionOnly: true },
   { id: "seizure", label: "Seizure events", action: "seizure", admissionOnly: true },
   { id: "glucose", label: "Glucose monitoring", action: "glucose", admissionOnly: true },
@@ -167,7 +167,11 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, onOrde
         <GlucoseMonitoringModal admissionSqid={admissionSqid} onClose={() => setActiveModal(null)} />
       )}
       {activeModal === "drug-task" && (
-        <DrugTaskModal admissionSqid={admissionSqid} onClose={() => setActiveModal(null)} />
+        <DrugTaskModal
+          selectedPatientDetails={selectedPatientDetails}
+          admissionSqid={admissionSqid}
+          onClose={() => setActiveModal(null)}
+        />
       )}
       {activeModal === "iv-fluid" && (
         <IVFluidModal admissionSqid={admissionSqid} onClose={() => setActiveModal(null)} />

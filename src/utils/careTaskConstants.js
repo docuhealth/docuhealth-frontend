@@ -63,7 +63,7 @@ export const DEFAULT_REPEAT_UNTIL = "duration";
 export const TASK_TYPE_LABELS = {
   vital_signs: "Vital Signs Monitoring",
   medication: "Medication Administration",
-  input_output: "Fluid Intake / Output Monitoring",
+  input_output: "Fluid Input / Output Monitoring",
   procedure: "Ward Procedure",
   glucose: "Glucose Monitoring",
   iv_fluid: "IV Fluid Administration",

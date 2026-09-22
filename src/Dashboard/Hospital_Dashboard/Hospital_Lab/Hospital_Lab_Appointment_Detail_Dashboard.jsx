@@ -367,7 +367,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
 
       {/* ── Accept confirmation modal ── */}
       {showAcceptModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
           <div className="bg-white rounded-md shadow-xl w-full max-w-md p-6 flex flex-col items-center gap-4">
             <button
               onClick={() => setShowAcceptModal(false)}
@@ -405,7 +405,7 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
 
       {/* ── Patient's Lab test Request modal ── */}
       {showSampleModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
           <div className="bg-white border rounded-lg shadow-xl w-full max-w-md p-6 flex flex-col gap-5">
 
             {/* Header */}

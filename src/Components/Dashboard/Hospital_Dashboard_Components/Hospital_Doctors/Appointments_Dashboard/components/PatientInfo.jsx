@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, Check, ChevronDown, Image, FileText, Eye, ArrowDownToLine } from "lucide-react";
 import TabComponent from "./TabComponent";
 import getTabs from "./TabDetails";
-import { Image, FileText, Eye, ArrowDownToLine } from "lucide-react";
+import OrderLabModal from "./OrderLabModal";
 import formatRecordDate, {
   formatFullDateTime,
   getAge,
@@ -20,6 +20,7 @@ import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import ClinicalSummaryCard from "../../../../../ui/ClinicalSummaryCard";
 import OutpatientDischargeSummary from "../../Patient_Mgt_Dashboard/OutpatientDischargeSummary";
 import Select from "../../../../../ui/Select";
+import Modal from "../../../../../ui/Modal";
 
 const DUMMY_PATIENT_INFO = {
   patient_info: {
@@ -42,14 +43,26 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const [selectedMedicalRecord, setSelectedMedicalRecord] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [soapCurrentPage, setSoapCurrentPage] = useState(1);
+  const [labCurrentPage, setLabCurrentPage] = useState(1);
 
   const [showOrderModal, setShowOrderModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
-  const [orderForm, setOrderForm] = useState({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });
-  const [duplicateWarning, setDuplicateWarning] = useState(null);
-  
   const [showDischargeModal, setShowDischargeModal] = useState(false);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [showCheckoutSuccessModal, setShowCheckoutSuccessModal] = useState(false);
+
+  const handleConfirmCheckout = () => {
+    setShowCheckoutModal(false);
+    setShowCheckoutSuccessModal(true);
+  };
+
+  const handleDoneCheckout = () => {
+    setShowCheckoutSuccessModal(false);
+    queryClient.invalidateQueries({ queryKey: ["doctor-appointments"] });
+    queryClient.invalidateQueries({ queryKey: ["hospital-patients-doctor"] });
+    if (setSeePatientDetails) {
+      setSeePatientDetails(false);
+    }
+  };
 
   const orderContext = resolveOrderContext(selectedPatientDetails);
   const hin = orderContext.hin;
@@ -88,82 +101,18 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
     enabled: !!hin,
   });
 
-  // No staleTime override here: the lab test catalog is edited/reseeded
-  // server-side from time to time (sqids get regenerated), so pinning this
-  // to Infinity let a long-lived tab keep offering test ids that no longer
-  // exist server-side, failing with a confusing "Object with sqid=... does
-  // not exist." on submit. Falls back to the app's global 5-minute
-  // staleTime (see lib/queryClient.ts) instead.
-  const { data: categoriesData } = useQuery({
-    queryKey: ["lab-test-categories"],
-    queryFn: fetchTestCategories,
-    enabled: showOrderModal,
-  });
-  const categories = Array.isArray(categoriesData) ? categoriesData : (categoriesData?.results ?? []);
-
-  const { data: testTypesData, isLoading: isTestTypesLoading } = useQuery({
-    queryKey: ["lab-tests", orderForm.category],
-    queryFn: fetchLabTests,
-    enabled: !!orderForm.category,
-  });
-  const fetchedTestTypes = Array.isArray(testTypesData) ? testTypesData : (testTypesData?.results ?? []);
-
-  const { mutate: createOrder, isPending: isOrderPending } = useMutation({
-    mutationFn: (payload) => {
-      const requestPayload = {
-        patient: orderContext.hin,
-        order_source: orderContext.orderSource,
-        items: payload.test_type.map((testSqid) => ({
-          test: testSqid,
-          note: payload.note,
-        })),
-      };
-      if (orderContext.checkIn) {
-        requestPayload.check_in = orderContext.checkIn;
-      }
-      if (payload.ignore_duplicate_warning) {
-        requestPayload.ignore_duplicate_warning = true;
-      }
-      return axiosInstanceHos.post("api/lab/test-orders/create", requestPayload);
+  const { data: labRecordsData, isLoading: labLoading } = useQuery({
+    queryKey: ["patient-lab-records", hin, labCurrentPage],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get(
+        `api/lab/test-orders/patient/${hin}?page=${labCurrentPage}&size=${pageSize}`
+      );
+      return res.data;
     },
-    onSuccess: () => {
-      setShowOrderModal(false);
-      setOrderForm({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });
-      setDuplicateWarning(null);
-      setShowSuccessModal(true);
-      // Surface the new order without a reload — in the patient's Lab
-      // Records tab and on the doctor's Lab Results page.
-      queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
-      queryClient.invalidateQueries({ queryKey: ["doctor-lab-records"] });
-    },
-    onError: (err) => {
-      if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {
-        setDuplicateWarning(err.response.data.duplicate_warning);
-      } else {
-        console.error("Error creating lab order:", err);
-        toast.error(extractApiErrorMessage(err, "Failed to create order."));
-        // Covers stale catalog data (e.g. a selected test/category sqid no
-        // longer exists server-side): refetch both lists and drop the
-        // current test selection so the doctor picks again from what's
-        // actually valid now, instead of resubmitting the same broken ids.
-        queryClient.invalidateQueries({ queryKey: ["lab-test-categories"] });
-        queryClient.invalidateQueries({ queryKey: ["lab-tests", orderForm.category] });
-        setOrderForm((prev) => ({ ...prev, test_type: [] }));
-      }
-    },
+    enabled: !!hin,
+    keepPreviousData: true,
   });
 
-  const handleCreateOrder = () => {
-    if (!orderForm.category || orderForm.test_type.length === 0) {
-      toast.error("Please select a category and at least one test type.");
-      return;
-    }
-    createOrder({ ...orderForm, ignore_duplicate_warning: false });
-  };
-
-  const handleOverrideSubmit = () => {
-    createOrder({ ...orderForm, ignore_duplicate_warning: true });
-  };
 
   return (
     <>
@@ -383,6 +332,12 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                 >
                   Discharge Patient
                 </button>
+                <button
+                  onClick={() => setShowCheckoutModal(true)}
+                  className="w-full sm:w-auto border bg-docuhealth-primary border-docuhealth-primary text-white text-sm rounded-full px-6 py-2 hover:bg-opacity-90 transition-colors cursor-pointer"
+                >
+                  Check out patient
+                </button>
               </div>
             </div>
 
@@ -441,6 +396,12 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     soapCurrentPage,
                     soapTotalPages: Math.ceil((soapNotesData?.count || 0) / pageSize),
                     setSoapCurrentPage,
+                    labloading: labLoading,
+                    patientLabRecords: labRecordsData?.results || [],
+                    labCount: labRecordsData?.count || 0,
+                    labCurrentPage,
+                    labTotalPages: Math.ceil((labRecordsData?.count || 0) / pageSize),
+                    setLabCurrentPage,
                     selectedPatientDetails,
                     setSelectedMedicalRecord,
                     setViewDetailMedicalRecord,
@@ -463,169 +424,95 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
         </>
       )}
 
-      {/* ── Create an Order Modal ── */}
+      {/* ── Order Lab Modal ── */}
       {showOrderModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 flex flex-col gap-6">
+        <OrderLabModal
+          selectedPatientDetails={selectedPatientDetails}
+          onClose={() => setShowOrderModal(false)}
+        />
+      )}
+      {/* ── Checkout Confirmation Modal ── */}
+      <Modal
+        isOpen={showCheckoutModal}
+        onClose={() => setShowCheckoutModal(false)}
+        maxWidth="md"
+      >
+        <div className="relative flex flex-col items-center text-center py-2 px-1">
+          {/* Close button */}
+          <button
+            type="button"
+            onClick={() => setShowCheckoutModal(false)}
+            className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-colors cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
 
-            {/* Header */}
-            <div className="relative flex items-start justify-center">
-              <div className="text-center">
-                <h3 className="text-[20px] font-semibold text-docuhealth-dark">Order Lab test</h3>
-                <p className="text-sm text-gray-500 mt-1">Kindly order a lab test</p>
-              </div>
-              <button
-                onClick={() => { setShowOrderModal(false); setOrderForm({ category: "", test_type: [], note: "", ignore_duplicate_warning: false }); setIsTestTypeDropdownOpen(false); setDuplicateWarning(null); }}
-                className="absolute right-0 top-0 text-gray-800 hover:text-black transition-colors"
-              >
-                <X size={20} strokeWidth={2.5} />
-              </button>
-            </div>
-
-            {/* Category */}
-            <Select
-              label="Category"
-              required
-              value={orderForm.category}
-              onChange={(value) => setOrderForm({ ...orderForm, category: value, test_type: [] })}
-              options={categories.map((cat) => ({ value: String(cat.sqid || cat.id), label: cat.name }))}
-              placeholder="Select category"
-            />
-
-            {/* Test Type */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm text-docuhealth-dark font-medium">Test type<span className="text-red-500"> *</span></label>
-              <div className="relative">
-                <button
-                  type="button"
-                  disabled={!orderForm.category}
-                  onClick={() => setIsTestTypeDropdownOpen((v) => !v)}
-                  className={`w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-left flex justify-between items-center transition-colors ${!orderForm.category ? "opacity-60 cursor-not-allowed bg-gray-50" : "bg-white focus:border-docuhealth-primary"}`}
-                >
-                  <span className="truncate text-gray-700">
-                    {isTestTypesLoading
-                      ? "Loading..."
-                      : orderForm.test_type.length > 0
-                        ? orderForm.test_type.map((id) => fetchedTestTypes.find((t) => (t.sqid || t.name) === id)?.name || id).join(", ")
-                        : "Select test type"}
-                  </span>
-                  <svg className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${isTestTypeDropdownOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                </button>
-                {isTestTypeDropdownOpen && fetchedTestTypes.length > 0 && (
-                  <div className="absolute top-full mt-2 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto overflow-x-hidden">
-                    {fetchedTestTypes.map((test, index) => {
-                      const id = test.sqid || test.name;
-                      const checked = orderForm.test_type.includes(id);
-                      return (
-                        <label key={id} className={`flex items-center gap-4 px-4 py-3 hover:bg-gray-50 cursor-pointer text-sm text-docuhealth-dark ${index !== fetchedTestTypes.length - 1 ? 'border-b border-gray-100' : ''}`}>
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={() => {
-                              setOrderForm((prev) => ({
-                                ...prev,
-                                test_type: checked
-                                  ? prev.test_type.filter((t) => t !== id)
-                                  : [...prev.test_type, id],
-                              }));
-                            }}
-                            className="w-4 h-4 accent-blue-600 rounded border-gray-300"
-                          />
-                          {test.name}
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Add note */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm text-docuhealth-dark font-medium">Add note:</label>
-              <textarea
-                value={orderForm.note}
-                onChange={(e) => setOrderForm({ ...orderForm, note: e.target.value })}
-                placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
-                className="border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-500 bg-white outline-none focus:border-docuhealth-primary transition-colors resize-none h-28"
+          {/* Info Icon */}
+          <div className="flex items-center justify-center text-gray-900 mt-2 mb-3">
+            <svg
+              width="44"
+              height="44"
+              viewBox="0 0 40 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.0026 36.6654C10.7979 36.6654 3.33594 29.2034 3.33594 19.9987C3.33594 10.7939 10.7979 3.33203 20.0026 3.33203C29.2073 3.33203 36.6693 10.7939 36.6693 19.9987C36.6693 29.2034 29.2073 36.6654 20.0026 36.6654ZM20.0026 33.332C27.3664 33.332 33.3359 27.3625 33.3359 19.9987C33.3359 12.6349 27.3664 6.66536 20.0026 6.66536C12.6388 6.66536 6.66927 12.6349 6.66927 19.9987C6.66927 27.3625 12.6388 33.332 20.0026 33.332ZM21.6693 17.4987V24.9987H23.3359V28.332H16.6693V24.9987H18.3359V20.832H16.6693V17.4987H21.6693ZM22.5026 13.332C22.5026 14.7127 21.3833 15.832 20.0026 15.832C18.6219 15.832 17.5026 14.7127 17.5026 13.332C17.5026 11.9513 18.6219 10.832 20.0026 10.832C21.3833 10.832 22.5026 11.9513 22.5026 13.332Z"
+                fill="#1B2B40"
               />
-            </div>
-
-            {/* Submit */}
-            <button
-              onClick={handleCreateOrder}
-              disabled={isOrderPending}
-              className="w-full bg-docuhealth-primary text-white text-sm font-medium py-2.5 rounded-full transition-colors disabled:opacity-50 hover:bg-docuhealth-primary-variant"
-            >
-              {isOrderPending ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Creating...
-                </span>
-              ) : "Proceed"}
-            </button>
+            </svg>
           </div>
-        </div>
-      )}
 
-      {/* ── Duplicate Warning Modal ── */}
-      {duplicateWarning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 flex flex-col gap-6">
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Duplicate Order Detected</h3>
-              <p className="text-sm text-gray-600 mb-4 whitespace-pre-wrap text-left bg-orange-50 p-3 rounded-md">
-                {duplicateWarning}
-              </p>
-              <p className="text-sm text-gray-600 font-medium">Are you sure you want to proceed?</p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setDuplicateWarning(null)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleOverrideSubmit}
-                disabled={isOrderPending}
-                className="flex-1 px-4 py-2 bg-docuhealth-primary text-white rounded-lg hover:bg-docuhealth-dark-primary transition-colors disabled:opacity-50"
-              >
-                {isOrderPending ? "Proceeding..." : "Proceed Anyway"}
-              </button>
+          {/* Title */}
+          <h3 className="text-lg font-semibold text-gray-900 mb-5 text-center">
+            Checkout patient
+          </h3>
+
+          {/* Notice Box */}
+          <div className="w-full border border-gray-200/80 rounded-2xl p-5 mb-6 text-gray-700 text-sm leading-relaxed shadow-[0px_2px_12px_rgba(0,0,0,0.03)] text-left">
+            Are you sure this patient is clear for checkout? by proceeding you agree that this patient is good to go and should not appear on the doctor’s encounter pool!
+          </div>
+
+          {/* Action Button (DocuHealth Primary Color) */}
+          <button
+            type="button"
+            onClick={handleConfirmCheckout}
+            className="w-full py-3.5 rounded-full bg-docuhealth-primary hover:bg-opacity-95 text-white font-medium text-sm transition-colors cursor-pointer"
+          >
+            Confirm checkout
+          </button>
+        </div>
+      </Modal>
+
+      {/* ── Checkout Success Modal ── */}
+      <Modal
+        isOpen={showCheckoutSuccessModal}
+        onClose={handleDoneCheckout}
+        maxWidth="md"
+      >
+        <div className="flex flex-col items-center text-center py-4 px-2">
+          {/* Green Check Icon */}
+          <div className="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center mb-6">
+            <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center">
+              <Check size={32} className="text-white" strokeWidth={3} />
             </div>
           </div>
-        </div>
-      )}
 
-      {/* ── Success Modal ── */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-auto p-8 flex flex-col items-center text-center">
-            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
-              <div className="w-14 h-14 rounded-full bg-green-700 flex items-center justify-center">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                  <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-            </div>
-            <p className="text-base font-semibold text-gray-800 mb-6 leading-snug">
-              You have successfully created/<br />accepted a patient&apos;s test request!
-            </p>
-            <button
-              onClick={() => setShowSuccessModal(false)}
-              className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3 rounded-full hover:opacity-90 transition-colors"
-            >
-              Done
-            </button>
-          </div>
+          {/* Success Message */}
+          <p className="text-base font-semibold text-gray-800 mb-8 max-w-xs text-center leading-relaxed">
+            You have successfully checked this patient out from the doctor’s encounter pool!
+          </p>
+
+          {/* Done Button */}
+          <button
+            type="button"
+            onClick={handleDoneCheckout}
+            className="w-full py-3.5 rounded-full bg-green-500 hover:bg-green-600 text-white font-medium text-sm transition-colors cursor-pointer"
+          >
+            Done
+          </button>
         </div>
-      )}
+      </Modal>
 
     </>
   );

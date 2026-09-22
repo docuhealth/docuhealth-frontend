@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import TaskCreationModal, { FIELD_BOX_CLASS, FIELD_LABEL_CLASS } from "./TaskCreationModal";
 import { createInpatientTask } from "../../../../../../queries/Hospital/doctor/inpatientTasks";
@@ -180,8 +180,12 @@ const IVFluidModal = ({ admissionSqid, onClose }) => {
     Number(totalPlan) >= 1 &&
     Number(infusionRate) >= 1;
 
+  const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
     mutationFn: (payload) => createInpatientTask({ admissionSqid, payload }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inpatient-tasks"] });
+    },
     onError: (err) => {
       console.error("Error creating IV fluid task:", err);
       toast.error(err.response?.data?.message || "Failed to create IV fluid task.");

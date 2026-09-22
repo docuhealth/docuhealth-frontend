@@ -145,7 +145,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
 
       {/* ── Create an Order Modal ── */}
       {showOrderModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 flex flex-col gap-6">
 
             {/* Header */}
@@ -260,7 +260,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
 
       {/* ── Duplicate Warning Modal ── */}
       {duplicateWarning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 flex flex-col gap-6">
             <div className="text-center">
               <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
@@ -277,14 +277,14 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
             <div className="flex gap-3">
               <button
                 onClick={() => setDuplicateWarning(null)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleOverrideSubmit}
                 disabled={isOrderPending}
-                className="flex-1 px-4 py-2 bg-docuhealth-primary text-white rounded-lg hover:bg-docuhealth-dark-primary transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 bg-docuhealth-primary text-white rounded-full hover:bg-docuhealth-dark-primary transition-colors disabled:opacity-50 cursor-pointer"
               >
                 {isOrderPending ? "Proceeding..." : "Proceed Anyway"}
               </button>
@@ -295,10 +295,10 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
 
       {/* ── Success Modal ── */}
       {showSuccessModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-auto p-8 flex flex-col items-center text-center">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
-              <div className="w-14 h-14 rounded-full bg-green-700 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                   <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -309,7 +309,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
             </p>
             <button
               onClick={() => setShowSuccessModal(false)}
-              className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3 rounded-full hover:bg-docuhealth-dark-primary transition-colors"
+              className="w-full bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-3 rounded-full transition-colors cursor-pointer"
             >
               Done
             </button>
