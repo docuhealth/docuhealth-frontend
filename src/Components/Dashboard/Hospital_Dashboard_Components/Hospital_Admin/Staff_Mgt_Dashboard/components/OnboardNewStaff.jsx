@@ -45,10 +45,11 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     "receptionist",
     "lab_scientist",
     "pharmacist",
+    "radiologist",
   ];
 
   // Personnel types that are not assigned to a ward during staff creation.
-  const noWardRoles = ["receptionist", "lab_scientist", "pharmacist"];
+  const noWardRoles = ["receptionist", "lab_scientist", "pharmacist", "radiologist"];
 
   const doctorSpecializations = [
     "Anesthesiologist",
@@ -117,6 +118,18 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     "Pediatric Pharmacist",
   ];
 
+  const radiologistSpecializations = [
+    "N/A",
+    "CT Technologist",
+    "Diagnostic Radiographer",
+    "Interventional Radiography",
+    "Mammography",
+    "MRI Technologist",
+    "Nuclear Medicine Technologist",
+    "Radiation Therapist",
+    "Ultrasound / Sonography",
+  ];
+
   const specializationOptions =
     form.personnel === "doctor"
       ? doctorSpecializations
@@ -126,7 +139,9 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
           ? labScientistSpecializations
           : form.personnel === "pharmacist"
             ? pharmacistSpecializations
-            : [];
+            : form.personnel === "radiologist"
+              ? radiologistSpecializations
+              : [];
 
   const gender = ["male", "female"];
 

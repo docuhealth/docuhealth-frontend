@@ -80,6 +80,8 @@ const Hospital_Sign_In = () => {
             window.location.href = "/hospital-lab-home-dashboard";
           } else if (staffRole === "pharmacist") {
             window.location.href = "/hospital-pharmacist-home-dashboard";
+          } else if (staffRole === "radiologist") {
+            window.location.href = "/hospital-radiology-home-dashboard";
           } else {
             // default for now
             window.location.href = " ";

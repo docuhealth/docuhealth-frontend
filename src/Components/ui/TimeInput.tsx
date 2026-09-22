@@ -22,6 +22,8 @@ export interface TimeInputProps {
   id?: string;
   containerClassName?: string;
   className?: string;
+  /** Classes for the clock icon. Defaults to a muted grey. */
+  iconClassName?: string;
 }
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -60,6 +62,7 @@ const TimeInput = ({
   id,
   containerClassName = "",
   className = "",
+  iconClassName = "text-gray-400",
 }: TimeInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -151,7 +154,7 @@ const TimeInput = ({
         } ${className}`}
       >
         <span className={parsed ? "" : "text-gray-400"}>{displayText}</span>
-        <Clock className="w-4 h-4 text-gray-400 shrink-0" />
+        <Clock className={`w-4 h-4 shrink-0 ${iconClassName}`} />
       </button>
 
       {isOpen && !disabled && (

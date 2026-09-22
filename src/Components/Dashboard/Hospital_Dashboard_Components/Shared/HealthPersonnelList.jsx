@@ -10,7 +10,12 @@ const ROLE_TABS = [
   { label: "Receptionists", value: "receptionist" },
   { label: "Pharmacists",   value: "pharmacist" },
   { label: "Lab Scientists",value: "lab_scientist" },
+  { label: "Radiologists",  value: "radiologist" },
 ];
+
+// Reuses the tab labels above so a row reads "Lab Scientists", not "Lab_scientist".
+const ROLE_LABELS = Object.fromEntries(ROLE_TABS.filter((t) => t.value).map((t) => [t.value, t.label]));
+const roleLabel = (role) => ROLE_LABELS[role] || role || "—";
 
 const displayName = (staff) =>
   staff.role === "doctor"
@@ -68,7 +73,7 @@ const MobileCard = ({ staff, isAdmin }) => (
           <h3 className="font-bold text-gray-900 text-[15px] truncate">{displayName(staff)}</h3>
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] bg-docuhealth-primary text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
-              {staff.role || "Staff"}
+              {roleLabel(staff.role)}
             </span>
             <span className="text-[10px] text-gray-400 font-mono">#{staff.staff_id || "N/A"}</span>
           </div>
@@ -193,7 +198,7 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
                   <p>{displayName(staff)}</p>
                 </div>
                 <p>{staff.staff_id || "—"}</p>
-                <p className="capitalize">{staff.role || "—"}</p>
+                <p>{roleLabel(staff.role)}</p>
                 <p>{staff.phone_num || "—"}</p>
                 <p className="truncate max-w-[120px]">{staff.email || "—"}</p>
                 <p>{staff.gender || "—"}</p>
