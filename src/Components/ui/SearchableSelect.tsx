@@ -16,6 +16,7 @@ export interface SearchableSelectProps {
   emptyText?: string;
   disabled?: boolean;
   className?: string;
+  onSearchChange?: (search: string) => void;
 }
 
 // Dropdown with an in-panel search box, used anywhere a select needs to be
@@ -24,6 +25,10 @@ export interface SearchableSelectProps {
 // parent unmounts it. `options` is [{ value, label, ...anythingElse }];
 // `onChange(value, option)` hands back the whole option so callers can keep
 // the full record (e.g. sqid + name), not just the value.
+// For a catalog too big to load up front, pass `onSearchChange`: it fires on
+// every keystroke (and with "" after a pick) and `options` is then shown as
+// given, so the parent can search server-side. The last picked option is kept
+// so the trigger still shows its label once the parent clears those results.
 const SearchableSelect = ({
   value,
   onChange,
@@ -33,9 +38,11 @@ const SearchableSelect = ({
   emptyText = "No options found.",
   disabled = false,
   className = "",
+  onSearchChange,
 }: SearchableSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [pickedOption, setPickedOption] = useState<SearchableSelectOption | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,10 +55,19 @@ const SearchableSelect = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredOptions = options.filter((option) =>
-    option.label.toLowerCase().includes(search.toLowerCase())
-  );
-  const selectedLabel = options.find((option) => option.value === value)?.label;
+  const updateSearch = (next: string) => {
+    setSearch(next);
+    onSearchChange?.(next);
+  };
+
+  const filteredOptions = onSearchChange
+    ? options
+    : options.filter((option) =>
+        option.label.toLowerCase().includes(search.toLowerCase())
+      );
+  const selectedLabel =
+    options.find((option) => option.value === value)?.label ??
+    (pickedOption && pickedOption.value === value ? pickedOption.label : undefined);
 
   return (
     <div className={`relative w-full ${className}`} ref={ref}>
@@ -83,7 +99,7 @@ const SearchableSelect = ({
               type="text"
               autoFocus
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => updateSearch(e.target.value)}
               placeholder="Search..."
               className="w-full pl-8 pr-2 py-2 text-sm border border-gray-200 rounded-md focus:outline-hidden focus:border-docuhealth-primary"
             />
@@ -98,8 +114,9 @@ const SearchableSelect = ({
                   type="button"
                   onClick={() => {
                     onChange(option.value, option);
+                    setPickedOption(option);
                     setIsOpen(false);
-                    setSearch("");
+                    updateSearch("");
                   }}
                   className={`w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer ${
                     option.value === value
