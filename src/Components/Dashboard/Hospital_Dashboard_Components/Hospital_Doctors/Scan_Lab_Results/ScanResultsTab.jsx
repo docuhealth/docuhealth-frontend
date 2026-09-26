@@ -1,34 +1,35 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { ArrowLeft, ScanLine, X, Info } from "lucide-react";
-import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
-import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
-import ScanResultReport from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Radiology/Scan_Requests/ScanResultReport";
-import { formatFullDateTime } from "../../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
-import { fetchPendingScanResults, acceptScanResult, rejectScanResult } from "../../../queries/Hospital/radiology/scan_results";
-import { extractApiErrorMessage } from "../../../utils/apiError";
+import DynamicDate from "../../../../DynamicDate/DynamicDate";
+import ScanResultReport from "../../Hospital_Radiology/Scan_Requests/ScanResultReport";
+import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
+import { fetchPendingScanResults, acceptScanResult, rejectScanResult } from "../../../../../queries/Hospital/radiology/scan_results";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
+import ScanLabResultsShell from "./ScanLabResultsShell";
+import ScanLabResultCard from "./ScanLabResultCard";
+import { maskHIN } from "./scanLabResults";
 
 const PAGE_SIZE = 9;
+// The pending endpoint only takes page/size (no search or ordering), so pull the whole queue and search, sort and page it here.
+const FETCH_ALL_SIZE = 100;
 
 const patientName = (order) => `${order.patient_info?.firstname || ""} ${order.patient_info?.lastname || ""}`.trim() || "Unknown patient";
 
-const maskHIN = (hin) => {
-  if (!hin) return "—";
-  return hin.length >= 6 ? `${hin.slice(0, 4)}••••${hin.slice(-2)}` : hin;
-};
-
 // Doctors approve or reject the radiologist's result for scans they ordered; walk-in orders never show up here.
-const Hospital_Doctors_Radiology_Dashboard = () => {
+const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [ordering, setOrdering] = useState("-created_at");
   const [selected, setSelected] = useState(null);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["radiology-pending-results", currentPage, PAGE_SIZE],
+    queryKey: ["radiology-pending-results", 1, FETCH_ALL_SIZE],
     queryFn: fetchPendingScanResults,
     // Results arrive from the radiologist, so poll to show new ones without a reload. Pauses while the tab is backgrounded.
     staleTime: 30 * 1000,
@@ -36,9 +37,22 @@ const Hospital_Doctors_Radiology_Dashboard = () => {
     refetchOnWindowFocus: true,
   });
 
-  const rows = data?.results || [];
-  const count = data?.count || 0;
+  const filteredRows = useMemo(() => {
+    const term = searchQuery.trim().toLowerCase();
+    const matching = (data?.results || []).filter(
+      (row) =>
+        !term ||
+        [patientName(row), row.patient_info?.hin, row.scan_type].some((field) => field?.toLowerCase().includes(term))
+    );
+    const direction = ordering === "created_at" ? 1 : -1;
+    return matching.sort((a, b) => direction * (new Date(a.created_at) - new Date(b.created_at)));
+  }, [data, searchQuery, ordering]);
+
+  const count = filteredRows.length;
   const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
+  // A decision can shrink the queue below the page being viewed.
+  const page = Math.min(currentPage, totalPages);
+  const rows = filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const closeDetail = () => {
     setSelected(null);
@@ -193,74 +207,51 @@ const Hospital_Doctors_Radiology_Dashboard = () => {
   }
 
   return (
-    <>
-      <div className="py-2 text-sm flex justify-between items-center">
-        <DynamicDate />
-      </div>
-      <div className="bg-white my-5 rounded-lg">
-        <div className="border rounded-lg p-4 lg:p-6">
-          <div className="mb-4 pb-2 border-b">
-            <h2 className="font-medium capitalize">Radiology Results Approvals</h2>
-          </div>
-
-          {isLoading ? (
-            <div className="flex justify-center items-center h-40 text-sm">Loading...</div>
-          ) : rows.length === 0 ? (
-            <div className="flex flex-col justify-center items-center text-center py-10 text-gray-400">
-              <ScanLine size={40} className="opacity-25 mb-2" />
-              <h2 className="font-medium pb-1 text-gray-800">No radiology results!</h2>
-              <p className="text-[12px] text-gray-500 max-w-md">There are no radiology results to approve at the moment.</p>
-            </div>
-          ) : (
-            <>
-              <div className="text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {rows.map((row) => (
-                  <div key={row.result_sqid} className="bg-white border rounded-xl p-4">
-                    <div className="flex justify-between items-center mb-1 gap-2">
-                      <p className="font-bold text-docuhealth-dark text-[15px]">{row.scan_type}</p>
-                      <div className="bg-docuhealth-primary-muted px-3 py-1 rounded-full shrink-0">
-                        <p className="text-docuhealth-primary text-[11px] font-medium">Radiology result</p>
-                      </div>
-                    </div>
-
-                    <p className="text-xs mb-2 flex items-center gap-1.5 flex-wrap">
-                      <span className="font-medium text-gray-800 capitalize">{patientName(row)}</span>
-                      <span className="text-gray-400">· {maskHIN(row.patient_info?.hin)}</span>
-                    </p>
-
-                    <div className="flex items-center gap-1 mb-3">
-                      <p className="text-gray-400 text-xs">Approval Status: </p>
-                      <p className="text-xs font-semibold text-amber-500">Pending</p>
-                    </div>
-
-                    <div className="border-t border-gray-100 my-3"></div>
-
-                    <div className="flex flex-col gap-1.5 mb-3 text-gray-500 text-[12px]">
-                      <p>Reported by: {row.report?.reporter || "N/A"}</p>
-                      <p>{formatFullDateTime(row.report?.reported_at) || "N/A"}</p>
-                    </div>
-
-                    <div className="border-t border-gray-100 my-3"></div>
-
-                    <button
-                      onClick={() => setSelected(row)}
-                      className="w-full bg-docuhealth-primary hover:bg-docuhealth-dark-primary text-white text-[12px] font-medium py-2 rounded-full transition-colors cursor-pointer"
-                    >
-                      Open
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4">
-                <Pagination2 count={count} currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
-              </div>
-            </>
-          )}
+    <ScanLabResultsShell
+      activeTab={activeTab}
+      onTabChange={onTabChange}
+      searchQuery={searchQuery}
+      onSearchChange={(value) => {
+        setSearchQuery(value);
+        setCurrentPage(1);
+      }}
+      searchPlaceholder="Search patient, HIN or scan..."
+      ordering={ordering}
+      onOrderingChange={(value) => {
+        setOrdering(value);
+        setCurrentPage(1);
+      }}
+      count={count}
+      currentPage={page}
+      totalPages={totalPages}
+      setCurrentPage={setCurrentPage}
+    >
+      {isLoading ? (
+        <div className="flex justify-center items-center h-40 text-sm">Loading...</div>
+      ) : rows.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+          <ScanLine size={36} className="opacity-25 mb-2" />
+          <h2 className="font-medium pb-1 text-gray-800">No scan results!</h2>
+          <p className="text-[12px] text-gray-500 max-w-md text-center">There are no scan results to approve at the moment.</p>
         </div>
-      </div>
-    </>
+      ) : (
+        <div className="text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          {rows.map((row) => (
+            <ScanLabResultCard
+              key={row.result_sqid}
+              title={row.scan_type}
+              badge="Imaging result"
+              patient={{ name: patientName(row), hin: row.patient_info?.hin }}
+              statusRows={[{ label: "Approval Status", value: "Pending", className: "text-amber-500" }]}
+              reporter={row.report?.reporter || "N/A"}
+              dateTime={formatFullDateTime(row.report?.reported_at) || "N/A"}
+              onOpen={() => setSelected(row)}
+            />
+          ))}
+        </div>
+      )}
+    </ScanLabResultsShell>
   );
 };
 
-export default Hospital_Doctors_Radiology_Dashboard;
+export default Hospital_Doctors_Scan_Results_Tab;
