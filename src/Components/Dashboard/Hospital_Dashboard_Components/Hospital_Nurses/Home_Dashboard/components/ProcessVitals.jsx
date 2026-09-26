@@ -48,6 +48,12 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
     onSuccess: () => {
       toast.success("Vitals processed successfully!");
       queryClient.invalidateQueries({ queryKey: ["assigned-for-vitals"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-info"] });
+      queryClient.invalidateQueries({ queryKey: ["hospital-patients-nurse"] });
+      queryClient.invalidateQueries({ queryKey: ["vitals-history"] });
+      queryClient.invalidateQueries({ queryKey: ["nurse-patient-vitals-history"] });
+      queryClient.invalidateQueries({ queryKey: ["inpatient-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor-vitals-requests"] });
       resetForm();
       setProcessVitals(false);
     },
@@ -73,7 +79,6 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
     !bloodPressure ||
     !temperature ||
     !respRate ||
-    !weight ||
     !heartRate;
 
   const handleSubmit = () => {

@@ -56,31 +56,21 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
   const handleAssign = (staffId) => {
     setSelectedStaffId(staffId);
     setGeneralRequest(false);
-    setFormData((prev) => ({
-      ...prev,
-      staff_id: staffId,
-      patient_hin: patientHin,
-    }));
   };
 
   const handleGeneralRequest = () => {
     setSelectedStaffId(null);
     setGeneralRequest(true);
-    setFormData((prev) => ({ ...prev, staff_id: "", patient_hin: patientHin }));
   };
 
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
-    // staff_id is optional now — omit it entirely for a general request so
-    // any nurse at the hospital can claim it (sending "" would 400).
-    mutationFn: ({ staff_id, ...rest }) =>
-      axiosInstanceHos.post("api/doctors/vital-signs/request", {
-        ...rest,
-        ...(staff_id ? { staff_id } : {}),
-      }),
+    mutationFn: (payload) =>
+      axiosInstanceHos.post("api/doctors/vital-signs/request", payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inpatient-tasks"] });
       queryClient.invalidateQueries({ queryKey: ["doctor-vitals-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["assigned-for-vitals"] });
       setShowSuccess(true);
     },
     onError: (err) => {
@@ -88,11 +78,50 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
         "Error assigning patient to nurse for vitals checkup:",
         err,
       );
-      toast.error(
-        err.response?.data?.message || "Nurse vitals checkUp failed.",
-      );
+      const data = err.response?.data;
+      let errorMsg = "Nurse vitals checkUp failed.";
+      if (data) {
+        if (data.detail && typeof data.detail === "string") {
+          errorMsg = data.detail;
+        } else if (data.message && typeof data.message === "string") {
+          errorMsg = data.message;
+        } else if (typeof data === "object") {
+          const firstKey = Object.keys(data)[0];
+          if (firstKey) {
+            const firstVal = data[firstKey];
+            errorMsg = Array.isArray(firstVal) ? `${firstKey}: ${firstVal[0]}` : `${firstKey}: ${firstVal}`;
+          }
+        }
+      }
+      toast.error(errorMsg);
     },
   });
+
+  const handleSubmitRequest = () => {
+    const orderCtx = resolveOrderContext(selectedPatientDetails);
+    const hin = orderCtx.hin || selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin;
+    const checkInSqid = orderCtx.checkIn || selectedPatientDetails?.check_in_sqid || selectedPatientDetails?.check_in;
+    const appointmentSqid = (!checkInSqid ? (orderCtx.appointment || selectedPatientDetails?.appointment_sqid || selectedPatientDetails?.appointment) : null);
+
+    const payload = {
+      patient_hin: hin,
+      note: formData.note?.trim(),
+      ...(selectedStaffId ? { staff: selectedStaffId } : {}),
+      ...(checkInSqid ? { check_in: checkInSqid } : (appointmentSqid ? { appointment: appointmentSqid } : {})),
+    };
+
+    if (!payload.patient_hin) {
+      toast.error("Could not resolve patient HIN.");
+      return;
+    }
+
+    if (!payload.check_in && !payload.appointment) {
+      toast.error("Could not resolve check-in or appointment for this patient.");
+      return;
+    }
+
+    mutate(payload);
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-3">
@@ -174,7 +203,7 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
           <button
             disabled={isPending || !formData.note}
             className={`mt-6 w-full cursor-pointer bg-docuhealth-primary text-white py-2 rounded-full disabled:bg-docuhealth-primary/60 ${isPending ? "bg-docuhealth-primary/60 cursor-not-allowed" : ""}} text-sm `}
-            onClick={() => mutate(formData)}
+            onClick={handleSubmitRequest}
           >
             {isPending ? (
               <span className="flex items-center justify-center gap-2">

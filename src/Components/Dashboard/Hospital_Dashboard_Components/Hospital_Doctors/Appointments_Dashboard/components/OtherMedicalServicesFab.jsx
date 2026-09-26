@@ -99,13 +99,27 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, onOrde
     }
   };
 
+  const isAdmitted = Boolean(
+    admissionSqid ||
+    selectedPatientDetails?.ward_info ||
+    selectedPatientDetails?.bed_info ||
+    selectedPatientDetails?.admission_date
+  );
+
+  const availableServices = QUICK_SERVICES.filter((item) => {
+    if (isAdmitted && item.id === "vitals") {
+      return false;
+    }
+    return true;
+  });
+
   return (
     <>
       <div ref={containerRef} className="fixed bottom-16 right-8 z-40">
         {open && (
           <div className="absolute bottom-[72px] right-0 w-68 max-w-[75vw] rounded-3xl bg-white p-4 shadow-2xl">
             <ul>
-              {QUICK_SERVICES.map((item) => (
+              {availableServices.map((item) => (
                 <li key={item.id}>
                   <button
                     type="button"

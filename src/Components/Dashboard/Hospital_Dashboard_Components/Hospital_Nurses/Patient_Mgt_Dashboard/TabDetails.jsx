@@ -209,10 +209,20 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
 
                                 <p className="">{formatFullDateTime(admittedPatient.admission_date)}</p>
                             </div>
-                            <button className="text-center mt-3 py-2 border border-docuhealth-dark text-docuhealth-dark w-full rounded-full cursor-pointer  font-medium text-sm"
+                            <button className="text-center mt-3 py-2 border border-docuhealth-dark text-docuhealth-dark w-full rounded-full cursor-pointer font-medium text-sm hover:bg-gray-50 transition-colors"
                                 onClick={() => {
-                                    setPatientToAdmit(admittedPatient);
-                                    setIsAdmissionModalOpen(true);
+                                    const hasAdmissionNote = Boolean(
+                                        admittedPatient?.admission_note_info &&
+                                        typeof admittedPatient.admission_note_info === "object" &&
+                                        Object.keys(admittedPatient.admission_note_info).length > 0
+                                    );
+                                    if (!hasAdmissionNote) {
+                                        setPatientToAdmit(admittedPatient);
+                                        setIsAdmissionModalOpen(true);
+                                    } else {
+                                        setSelected(admittedPatient);
+                                        setAdvanceCheckUp(true);
+                                    }
                                 }}
                             >
                                 Open details

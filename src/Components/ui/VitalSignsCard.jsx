@@ -159,6 +159,23 @@ const VitalSignsCard = ({ vitalSigns, title = "Vital Signs", className = "p-5 my
           </p>
           <p className="font-medium">{vitalSigns?.spo2 ?? vitalSigns?.sp02 ?? "NIL"} %</p>
         </div>
+
+        {/* Notes */}
+        <div className="col-span-1 sm:col-span-2 lg:col-span-3 bg-white border rounded-md p-3">
+          <p className="text-[12px] text-gray-400 flex items-center gap-1.5 pb-1.5 font-medium">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-docuhealth-primary">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            Notes
+          </p>
+          <p className={`text-[13px] leading-relaxed whitespace-pre-wrap ${vitalSigns?.notes || vitalSigns?.note ? "text-gray-700 font-normal" : "text-gray-400 italic"}`}>
+            {vitalSigns?.notes || vitalSigns?.note || "No note added"}
+          </p>
+        </div>
       </div>
     </div>
   );
