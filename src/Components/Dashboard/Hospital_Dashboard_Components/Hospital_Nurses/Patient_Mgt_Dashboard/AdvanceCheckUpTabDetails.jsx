@@ -230,7 +230,7 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
             )
         },
         {
-            title: "View latest vitals / others",
+            title: "View latest facility vitals / others",
             status: "latest_vitals",
             content: (
                 <PatientVitalsAndMeds patientFullInfo={patientFullInfo} formatDateTime={formatDateTime} />

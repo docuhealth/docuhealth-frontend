@@ -100,10 +100,10 @@ const PatientVitalsAndMeds = ({ patientFullInfo, formatDateTime }) => {
 
   return (
     <div className="space-y-6">
-      {/* Latest Vital Signs */}
+      {/* Latest Facility Vitals */}
       <VitalSignsCard
         className="bg-white rounded-xl border p-6"
-        title="Latest vital signs"
+        title="Latest Facility Vitals"
         vitalSigns={patientFullInfo?.latest_vitals}
       />
 

@@ -127,7 +127,7 @@ const DoctorEncounterTable = () => {
         </div>
         
         <GeneralPatientInfoForm patient={mappedPatient} />
-        <VitalSignsCard vitalSigns={mappedVitals} title="Latest vital signs" />
+        <VitalSignsCard vitalSigns={mappedVitals} title="Latest Facility Vitals" />
 
         {/* Claim Confirmation Modal */}
         <Modal
