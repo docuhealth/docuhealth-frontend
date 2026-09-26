@@ -401,7 +401,7 @@ const Hospital_Pharmacist_Prescription_Detail_Dashboard = ({ sqid, onBack, isSet
           <h2 className="font-medium text-gray-800">
             {isSettled 
               ? `Patient vital signs (As at when dispensed: ${getDatetime(order.latest_vitals?.created_at || order.updated_at || order.created_at)})` 
-              : `Latest patient vital signs (Last updated on: ${getDatetime(order.latest_vitals?.created_at || order.created_at)})`}
+              : `Latest Facility Vitals (Last updated on: ${getDatetime(order.latest_vitals?.created_at || order.created_at)})`}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[12px] mt-5">
              <div className="bg-white border border-gray-200 rounded-md p-3">

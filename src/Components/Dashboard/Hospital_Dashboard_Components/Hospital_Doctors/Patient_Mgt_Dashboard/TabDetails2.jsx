@@ -85,7 +85,7 @@ export const PatientInfo = ({ patientFullInfo, selected }) => {
       </GeneralPatientInfoForm>
       <VitalSignsCard
         className="my-5 bg-docuhealth-light-gray rounded-lg border p-4"
-        title={`Latest vital signs (Created : ${formatFullDateTime(patientFullInfo?.latest_vitals?.created_at)})`}
+        title={`Latest Facility Vitals (Created : ${formatFullDateTime(patientFullInfo?.latest_vitals?.created_at)})`}
         vitalSigns={patientFullInfo?.latest_vitals}
       />
       <div className="my-5 bg-docuhealth-light-gray rounded-lg border p-4">

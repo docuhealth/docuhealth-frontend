@@ -220,7 +220,7 @@ const NursingEncounterTable = () => {
         </div>
         
         <GeneralPatientInfoForm patient={mappedPatient} />
-        <VitalSignsCard vitalSigns={mockVitals} title="Latest vital signs" />
+        <VitalSignsCard vitalSigns={mockVitals} title="Latest Facility Vitals" />
       </div>
     );
   }
