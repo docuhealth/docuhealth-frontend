@@ -58,6 +58,10 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
       axiosInstanceHos.post("api/nurses/vital-signs/update", payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["patient-info"] });
+      queryClient.invalidateQueries({ queryKey: ["hospital-patients-nurse"] });
+      queryClient.invalidateQueries({ queryKey: ["vitals-history"] });
+      queryClient.invalidateQueries({ queryKey: ["nurse-patient-vitals-history"] });
+      queryClient.invalidateQueries({ queryKey: ["inpatient-tasks"] });
       resetForm();
       setIsSuccessModalOpen(true);
     },
@@ -83,7 +87,6 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
     !bloodPressure ||
     !temperature ||
     !respRate ||
-    !weight ||
     !heartRate;
 
   const handleSubmit = () => {

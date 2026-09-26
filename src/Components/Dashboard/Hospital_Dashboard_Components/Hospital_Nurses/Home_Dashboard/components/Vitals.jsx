@@ -132,7 +132,7 @@ const Vitals = ({ setVitals, setSelectedPatient }) => {
                       ? `${hin.slice(0, 4)}••••••${hin.slice(-2)}`
                       : hin)
                   : "N/A";
-                const staff = vital?.staff;
+                const staff = vital?.staff_info || vital?.staff;
                 const staffName = staff
                   ? `${staff?.role === "doctor" ? "Dr. " + (staff.firstname || "") : (staff.firstname || "")} ${staff.lastname || ""}`.trim()
                   : "NIL";

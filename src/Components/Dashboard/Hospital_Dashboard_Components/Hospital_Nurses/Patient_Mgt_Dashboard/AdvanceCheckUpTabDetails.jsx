@@ -5,6 +5,7 @@ import NursingTasksQueue from "./NursingTasksQueue";
 import NursingTaskHistory from "./NursingTaskHistory";
 import PatientVitalsAndMeds from "./PatientVitalsAndMeds";
 import CarePlanHistory from "./CarePlanHistory";
+import AdmissionNotesHistory from "./AdmissionNotesHistory";
 
 const PatientInfoContent = ({ patient, admission, patientFullInfo, formatDate, formatDateTime, isOutPatient }) => {
     const isDischargedInpatient = !isOutPatient && (Boolean(admission?.discharge_date) || admission?.status === "inpatient_discharge");
@@ -219,6 +220,13 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
             status: "care_plan_history",
             content: (
                 <CarePlanHistory patient={patient} patientFullInfo={patientFullInfo} />
+            )
+        },
+        {
+            title: "Admission notes history",
+            status: "admission_notes_history",
+            content: (
+                <AdmissionNotesHistory patient={patient} patientFullInfo={patientFullInfo} />
             )
         },
         {
