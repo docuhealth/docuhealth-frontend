@@ -1,38 +1,14 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Pagination2 from "../../../../Patient_Dashboard_Components/Pagination/Pagination2";
 
 import { fetchRadiologyRecentPatients } from "../../../../../../queries/Hospital/radiology/recent_patients";
 import { getHospitalToken } from "../../../../../../services/authService";
 
-// Backend shape for this endpoint isn't confirmed yet (see
-// BACKEND_RADIOLOGY_ISSUES.md), so these getters fall back across a few
-// likely field names instead of assuming one exact contract.
-const getPatientName = (p) =>
-  p.patient_name ||
-  (p.patient ? `${p.patient.firstname || ""} ${p.patient.lastname || ""}`.trim() : "") ||
-  `${p.firstname || ""} ${p.lastname || ""}`.trim() ||
-  "Unknown";
+const getDate = (p) => (p.scanned_at ? new Date(p.scanned_at).toLocaleDateString("en-GB") : "—");
 
-const getPatientHIN = (p) => p.patient_hin || p.patient?.hin || p.hin || "";
-
-const getPatientSex = (p) => p.patient_sex || p.patient?.sex || p.patient?.gender || p.gender || p.sex || "—";
-
-const getTimestamp = (p) => p.scanned_at || p.last_scanned_at || p.attended_at || p.created_at || p.date;
-
-const getDate = (p) => {
-  if (p.date && !p.time) return p.date;
-  const raw = getTimestamp(p);
-  if (!raw) return "—";
-  return new Date(raw).toLocaleDateString("en-GB");
-};
-
-const getTime = (p) => {
-  if (p.time) return p.time;
-  const raw = getTimestamp(p);
-  if (!raw) return "—";
-  return new Date(raw).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-};
+const getTime = (p) =>
+  p.scanned_at ? new Date(p.scanned_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : "—";
 
 // Mirrors the "12*********85" look from the design: first 2 and last 2
 // digits visible, everything in between masked.
@@ -58,15 +34,6 @@ const RecentPatients = () => {
   const recentPatients = data?.results || [];
   const count = data?.count || 0;
   const totalPages = Math.max(1, Math.ceil(count / 10));
-
-  const sortedPatients = useMemo(() => {
-    const now = new Date().getTime();
-    return [...recentPatients].sort((a, b) => {
-      const timeA = new Date(getTimestamp(a)).getTime() || 0;
-      const timeB = new Date(getTimestamp(b)).getTime() || 0;
-      return Math.abs(timeA - now) - Math.abs(timeB - now);
-    });
-  }, [recentPatients]);
 
   if (loading) {
     return <div className="flex justify-center items-center h-40 text-sm text-gray-500">Loading...</div>;
@@ -102,7 +69,7 @@ const RecentPatients = () => {
                 <p>HIN</p>
                 <p>Sex</p>
               </div>
-              {sortedPatients.map((patient, index) => (
+              {recentPatients.map((patient, index) => (
                 <div key={index} className="relative">
                   <div className="grid grid-cols-6 items-center text-[12px] text-gray-700 text-left w-full border-b border-b-gray-200">
                     <div className="font-semibold col-span-2 w-full py-6 pl-5 flex items-center gap-1">
@@ -112,12 +79,12 @@ const RecentPatients = () => {
                           fill="var(--color-docuhealth-secondary)"
                         />
                       </svg>
-                      <p>{getPatientName(patient)}</p>
+                      <p>{patient.patient_name}</p>
                     </div>
                     <p>{getDate(patient)}</p>
                     <p>{getTime(patient)}</p>
-                    <p>{maskHIN(getPatientHIN(patient))}</p>
-                    <p className="capitalize">{getPatientSex(patient)}</p>
+                    <p>{maskHIN(patient.patient_hin)}</p>
+                    <p className="capitalize">{patient.patient_sex || "—"}</p>
                   </div>
                 </div>
               ))}
@@ -126,21 +93,21 @@ const RecentPatients = () => {
 
           {/* Mobile cards */}
           <div className="lg:hidden flex flex-col gap-4">
-            {sortedPatients.map((patient, index) => (
+            {recentPatients.map((patient, index) => (
               <div key={index} className="bg-white border border-gray-200 rounded-md p-5 duration-200">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-blue-50 text-docuhealth-primary flex items-center justify-center font-bold text-sm border border-blue-100 uppercase">
-                      {getPatientName(patient).split(" ")[0]?.[0]}
-                      {getPatientName(patient).split(" ")[1]?.[0]}
+                      {patient.patient_name.split(" ")[0]?.[0]}
+                      {patient.patient_name.split(" ")[1]?.[0]}
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900 text-[14px] leading-tight">{getPatientName(patient)}</h3>
-                      <p className="text-[11px] text-gray-500 font-medium capitalize">{getPatientSex(patient)}</p>
+                      <h3 className="font-bold text-gray-900 text-[14px] leading-tight">{patient.patient_name}</h3>
+                      <p className="text-[11px] text-gray-500 font-medium capitalize">{patient.patient_sex || "—"}</p>
                     </div>
                   </div>
                   <span className="bg-gray-50 text-gray-600 text-[10px] px-2 py-1 rounded-md border border-gray-100 font-medium uppercase tracking-wider">
-                    {getPatientHIN(patient)?.slice(-4) || "N/A"}
+                    {patient.patient_hin?.slice(-4) || "N/A"}
                   </span>
                 </div>
 
@@ -158,7 +125,7 @@ const RecentPatients = () => {
                 <div className="mt-4 bg-docuhealth-primary-faded rounded-lg p-2.5 flex justify-between items-center">
                   <span className="text-[10px] font-semibold text-docuhealth-primary uppercase">HIN Number</span>
                   <span className="text-[12px] font-mono font-bold text-gray-600 tracking-widest">
-                    {maskHIN(getPatientHIN(patient))}
+                    {maskHIN(patient.patient_hin)}
                   </span>
                 </div>
               </div>

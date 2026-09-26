@@ -1,14 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { ArrowLeft, Pencil, Printer, Download, Eye, ArrowDownToLine, Image as ImageIcon, FileText, X, Info, CalendarDays } from "lucide-react";
+import { ArrowLeft, Pencil, Printer, Download, X, Info, CalendarDays } from "lucide-react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { formatFullDateTime } from "../../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import TimeInput from "../../../Components/ui/TimeInput";
+import ScanResultReport from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Radiology/Scan_Requests/ScanResultReport";
 import { printElement, downloadElementAsPdf, slugify } from "../../../utils/exportElement";
-import { saveBlob, urlToBlob, withExtension } from "../../../utils/fileActions";
-import { acceptScanOrderItem, rejectScanOrderItem, logImagingDateTime } from "../../../queries/Hospital/radiology/scan_requests";
+import { acceptScanOrderItem, rejectScanOrderItem, logImageCollection } from "../../../queries/Hospital/radiology/scan_requests";
 import { extractApiErrorMessage } from "../../../utils/apiError";
 
 
@@ -16,6 +16,7 @@ import { extractApiErrorMessage } from "../../../utils/apiError";
 const STATUS_STYLE = {
   pending: { label: "Pending", color: "text-amber-500" },
   in_progress: { label: "In-progress", color: "text-amber-600" },
+  image_collected: { label: "Image collected", color: "text-blue-600" },
   completed: { label: "Completed", color: "text-green-600" },
   rejected: { label: "Rejected", color: "text-red-500" },
 };
@@ -51,9 +52,6 @@ const pillOutline =
   "flex items-center justify-center gap-1 border border-docuhealth-primary text-docuhealth-primary rounded-full py-1.5 px-4 w-full sm:w-auto";
 const pillFilled =
   "flex items-center justify-center gap-1 border border-docuhealth-primary text-white bg-docuhealth-primary rounded-full py-1.5 px-4 w-full sm:w-auto";
-// Looks disabled but stays clickable, so clicking it while imaging time is unset can show the "log it first" notice.
-const pillFilledDisabledLook =
-  "flex items-center justify-center gap-1 border border-gray-200 text-gray-400 bg-gray-100 rounded-full py-1.5 px-4 w-full sm:w-auto cursor-not-allowed";
 
 const Hospital_Radiology_Scan_Detail_Dashboard = () => {
   const navigate = useNavigate();
@@ -62,22 +60,21 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
   const order = state?.order;
 
   const [status, setStatus] = useState(order?.status || "pending");
-  const [imagingAt, setImagingAt] = useState(order?.imaging_at || null);
+  const [imageCollectedAt, setImageCollectedAt] = useState(order?.image_collected_at || null);
   const [rejectionReason, setRejectionReason] = useState(order?.rejection_reason || null);
   // Set once, on the fresh mount that follows the upload-result page handing
-  // control back with a finished order — never mutated in place.
+  // control back with a finished order, never mutated in place.
   const report = order?.report || null;
   const attachments = order?.attachments || [];
 
   const [showAcceptModal, setShowAcceptModal] = useState(false);
-  const [showImagingRequiredModal, setShowImagingRequiredModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectNote, setRejectNote] = useState("");
   // Set right before an "accept now" mutation fires, so its onSuccess knows
-  // to chain straight into the imaging-time modal (accept and log-imaging
+  // to chain straight into the collection-time modal (accept and log-collection
   // are two separate API calls; "accept later" only fires the first one).
   const [openEditAfterAccept, setOpenEditAfterAccept] = useState(false);
 
@@ -87,9 +84,9 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
     mutationFn: acceptScanOrderItem,
     onSuccess: (updated) => {
       setStatus(updated.status);
-      setImagingAt(updated.imaging_at);
+      setImageCollectedAt(updated.image_collected_at);
       invalidateScanRequests();
-      toast.success("Scan request accepted — moved to In-progress");
+      toast.success("Scan request accepted and moved to In-progress");
       if (openEditAfterAccept) {
         setOpenEditAfterAccept(false);
         openEditModal();
@@ -110,35 +107,21 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
     onError: (err) => toast.error(extractApiErrorMessage(err, "Failed to reject scan request.")),
   });
 
-  const imagingTimeMutation = useMutation({
-    mutationFn: logImagingDateTime,
+  // Logging collection moves the item to image_collected, which is what unlocks the result upload.
+  const imageCollectionMutation = useMutation({
+    mutationFn: logImageCollection,
     onSuccess: (updated) => {
-      setImagingAt(updated.imaging_at);
+      setStatus(updated.status);
+      setImageCollectedAt(updated.image_collected_at);
       setShowEditModal(false);
       invalidateScanRequests();
-      toast.success("Imaging time and date updated");
+      toast.success("Image collection logged. You can now upload the result.");
     },
-    onError: (err) => toast.error(extractApiErrorMessage(err, "Failed to update imaging time.")),
+    onError: (err) => toast.error(extractApiErrorMessage(err, "Failed to log image collection.")),
   });
   // The region Print out / Download output: everything under the header row.
   const printRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
-  // Index of the attachment row whose file is being opened/saved, to stop double clicks.
-  const [busyFile, setBusyFile] = useState(null);
-  // The file open in the preview modal: { name, url (object URL), type }.
-  const [preview, setPreview] = useState(null);
-
-  useEffect(() => {
-    if (!preview) return;
-    const closeOnEscape = (e) => {
-      if (e.key === "Escape") setPreview(null);
-    };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => {
-      window.removeEventListener("keydown", closeOnEscape);
-      URL.revokeObjectURL(preview.url);
-    };
-  }, [preview]);
 
   if (!order) {
     return (
@@ -166,48 +149,11 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
   const statusStyle = STATUS_STYLE[status] || STATUS_STYLE.pending;
   const isDecided = status === "completed" || status === "rejected";
   const showImagingRow = status !== "rejected";
-
-  // Supabase serves every uploaded result file with `content-type:
-  // text/plain` regardless of what it actually is (confirmed live
-  // 2026-09-22), so the fetched blob's own `.type` can't be trusted —
-  // re-wrap it with the type the API told us at upload time instead.
-  const getAttachmentBlob = async (file) => {
-    const blob = await urlToBlob(file.url);
-    return file.contentType && file.contentType !== blob.type ? new Blob([blob], { type: file.contentType }) : blob;
-  };
-
-  const runFileAction = async (index, action, failureMessage) => {
-    if (busyFile !== null) return;
-    setBusyFile(index);
-    try {
-      await action();
-    } catch (error) {
-      console.error("Attachment action failed", error);
-      toast.error(failureMessage);
-    } finally {
-      setBusyFile(null);
-    }
-  };
-
-  const handleViewFile = (file, index) =>
-    runFileAction(
-      index,
-      async () => {
-        const blob = await getAttachmentBlob(file);
-        setPreview({ name: withExtension(file.name, blob.type), url: URL.createObjectURL(blob), type: blob.type });
-      },
-      "Could not open this file"
-    );
-
-  const handleDownloadFile = (file, index) =>
-    runFileAction(
-      index,
-      async () => {
-        const blob = await getAttachmentBlob(file);
-        saveBlob(blob, withExtension(file.name, blob.type));
-      },
-      "Could not download this file"
-    );
+  // A pending result is waiting on the ordering doctor; a rejected one lets the radiologist upload a fresh attempt.
+  const resultStatus = report?.status;
+  const awaitingApproval = status === "image_collected" && resultStatus === "pending";
+  const canUpload = status === "image_collected" && !awaitingApproval;
+  const showReport = !!report && (status === "completed" || awaitingApproval);
 
   const exportLabel = status === "completed" ? "Imaging result" : "Rejected scan order";
   const handlePrint = () => {
@@ -229,9 +175,9 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
   };
 
   // "Accept request" opens a confirmation modal first (matching the design)
-  // rather than accepting immediately — the radiologist chooses whether to
-  // log the imaging time/date right away or leave it for later. Accepting
-  // and logging imaging time are two separate API calls either way; "now"
+  // rather than accepting immediately: the radiologist chooses whether to
+  // log the image collection time right away or leave it for later. Accepting
+  // and logging collection are two separate API calls either way; "now"
   // just chains straight into the edit modal once accept succeeds.
   const handleAcceptNow = () => {
     setShowAcceptModal(false);
@@ -246,34 +192,28 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
 
   const handleReject = () => {
     if (!rejectNote.trim()) return;
-    rejectMutation.mutate({ sqid: order.sqid, rejection_note: rejectNote.trim() });
+    rejectMutation.mutate({ sqid: order.sqid, rejection_reason: rejectNote.trim() });
   };
 
   const openEditModal = () => {
-    const base = imagingAt ? new Date(imagingAt) : new Date();
+    const base = new Date();
     setEditDate(`${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, "0")}-${String(base.getDate()).padStart(2, "0")}`);
     setEditTime(base.toTimeString().slice(0, 5));
     setShowEditModal(true);
   };
 
-  const handleSaveImagingTime = () => {
+  // The picked local date and time go up as one ISO datetime.
+  const handleSaveImageCollection = () => {
     if (!editDate || !editTime) return;
-    imagingTimeMutation.mutate({ sqid: order.sqid, imaging_date: editDate, imaging_time: `${editTime}:00` });
+    imageCollectionMutation.mutate({ sqid: order.sqid, image_collected_at: new Date(`${editDate}T${editTime}`).toISOString() });
   };
 
-  // Imaging time/date must be logged before a result can be uploaded — if
-  // it's still unset (the radiologist picked "Later" at Accept time and
-  // never came back to it), block the upload and prompt for it instead.
-  // Otherwise hand off to the dedicated "Upload scan result" page, passing
-  // the current (possibly locally-edited) order forward so it can merge the
-  // finished report/attachments back in when it returns here.
+  // Results can only be uploaded once image collection is logged (status image_collected). Hand off to the
+  // dedicated "Upload scan result" page, passing the current order forward so it can merge the finished
+  // report/attachments back in when it returns here.
   const handleUploadClick = () => {
-    if (!imagingAt) {
-      setShowImagingRequiredModal(true);
-      return;
-    }
     navigate("/hospital-radiology-upload-result", {
-      state: { order: { ...order, status, imaging_at: imagingAt } },
+      state: { order: { ...order, status, image_collected_at: imageCollectedAt } },
     });
   };
 
@@ -313,16 +253,16 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
 
             {status === "in_progress" && (
               <div className="flex gap-3 w-full sm:w-auto">
-                <button type="button" onClick={openEditModal} className={pillOutline + " flex-1 sm:flex-none"}>
-                  {imagingAt ? "Edit Imaging time and date" : "Add Imaging time and date"}
+                <button type="button" onClick={openEditModal} className={pillFilled + " flex-1 sm:flex-none"}>
+                  Log image collection time
                 </button>
-                <button
-                  type="button"
-                  onClick={handleUploadClick}
-                  title={!imagingAt ? "Log the imaging time and date first" : undefined}
-                  className={(!imagingAt ? pillFilledDisabledLook : pillFilled) + " flex-1 sm:flex-none"}
-                >
-                  Upload imaging result
+              </div>
+            )}
+
+            {canUpload && (
+              <div className="flex gap-3 w-full sm:w-auto">
+                <button type="button" onClick={handleUploadClick} className={pillFilled + " flex-1 sm:flex-none"}>
+                  {resultStatus === "rejected" ? "Upload new result" : "Upload imaging result"}
                 </button>
               </div>
             )}
@@ -376,14 +316,14 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
 
               {showImagingRow && (
                 <div className="flex flex-col gap-1">
-                  <p className="text-xs text-gray-400">Imaging Time &amp; Date:</p>
+                  <p className="text-xs text-gray-400">Image collected at:</p>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-docuhealth-dark">{formatFullDateTime(imagingAt) || "N/A"}</p>
+                    <p className="text-sm font-semibold text-docuhealth-dark">{formatFullDateTime(imageCollectedAt) || "N/A"}</p>
                     {status === "in_progress" && (
                       <button
                         type="button"
                         onClick={openEditModal}
-                        title={imagingAt ? "Edit imaging time and date" : "Add imaging time and date"}
+                        title="Log image collection time"
                         className="h-4 w-4 rounded-full border border-docuhealth-primary text-docuhealth-primary flex items-center justify-center hover:bg-indigo-50 transition-colors shrink-0"
                       >
                         <Pencil size={9} />
@@ -395,19 +335,26 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
             </div>
           </div>
 
-          {/* Imaging order (pending / in_progress) */}
-          {!isDecided && (
-            <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl">
-              <p className="text-[12px] mb-1">Imaging order</p>
-              <p className="font-semibold text-docuhealth-primary mb-4">{order.modality || order.scan_type}</p>
-              {order.body_part && (
-                <>
-                  <p className="text-[12px] mb-1">Body part</p>
-                  <p className="font-semibold text-docuhealth-primary mb-4">{order.body_part}</p>
-                </>
-              )}
-              <p className="text-[12px] mb-1">Note :</p>
-              <p className="text-gray-700 leading-relaxed">{order.note || "—"}</p>
+          {/* Imaging order, on every status: the result no longer carries an "Examinations" line naming the scan */}
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl">
+            <p className="text-[12px] mb-1">Imaging order</p>
+            <p className="font-semibold text-docuhealth-primary">{order.scan_type}</p>
+          </div>
+
+          {/* Doctor's verdict on the last upload */}
+          {awaitingApproval && (
+            <div className="p-5 my-5 bg-amber-50 border border-amber-200 rounded-xl">
+              <p className="text-[12px] font-medium text-amber-600 mb-1">Awaiting doctor approval</p>
+              <p className="text-gray-700 leading-relaxed">
+                The uploaded result has been sent to the ordering doctor. It becomes final once they approve it.
+              </p>
+            </div>
+          )}
+          {status === "image_collected" && resultStatus === "rejected" && (
+            <div className="p-5 my-5 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-[12px] font-medium text-red-500 mb-1">The doctor rejected your last upload:</p>
+              <p className="text-gray-700 leading-relaxed">{report.rejection_reason || "No reason provided."}</p>
+              <p className="text-[12px] text-gray-500 mt-2">Upload a corrected result to try again.</p>
             </div>
           )}
 
@@ -419,141 +366,7 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
             </div>
           )}
 
-          {/* Completed report */}
-          {status === "completed" && report && (
-            <>
-              <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl space-y-4">
-                <div>
-                  <p className="text-[12px] mb-1 text-gray-500">Examinations:</p>
-                  <p className="font-medium text-docuhealth-dark">{report.examination}</p>
-                </div>
-                {report.clinicalIndication.length > 0 && (
-                  <div>
-                    <p className="text-[12px] mb-1 text-gray-500">Clinical Indication:</p>
-                    <ol className="list-decimal pl-5 space-y-1">
-                      {report.clinicalIndication.map((line, i) => (
-                        <li key={i} className="font-medium text-docuhealth-dark">
-                          {line}
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-                )}
-                <div>
-                  <p className="text-[12px] mb-1 text-gray-500">Technique:</p>
-                  <p className="font-medium text-docuhealth-dark">{report.technique}</p>
-                </div>
-                <div>
-                  <p className="text-[12px] mb-1 text-gray-500">Findings:</p>
-                  <ol className="list-decimal pl-5 space-y-1">
-                    {report.findings.map((line, i) => (
-                      <li key={i} className="font-medium text-docuhealth-dark">
-                        {line}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-                <div>
-                  <p className="text-[12px] mb-1 text-gray-500">Impression:</p>
-                  <ol className="list-decimal pl-5 space-y-1">
-                    {report.impression.map((line, i) => (
-                      <li key={i} className="font-medium text-docuhealth-dark">
-                        {line}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-                <div>
-                  <p className="text-[12px] mb-1 text-gray-500">Recommendations:</p>
-                  <ol className="list-decimal pl-5 space-y-1">
-                    {report.recommendations.map((line, i) => (
-                      <li key={i} className="font-medium text-docuhealth-dark">
-                        {line}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-
-                <div className="border-t pt-4 space-y-4">
-                  <div>
-                    <p className="text-[12px] mb-1 text-gray-500">Name of Reporter:</p>
-                    <p className="font-medium text-docuhealth-dark">{report.reporter}</p>
-                  </div>
-                  <div>
-                    <p className="text-[12px] mb-1 text-gray-500">Specialty:</p>
-                    <p className="font-medium text-docuhealth-dark">{report.specialty || "Radiologist"}</p>
-                  </div>
-                  <div>
-                    <p className="text-[12px] mb-1 text-gray-500">Date &amp; Time of report:</p>
-                    <p className="font-medium text-docuhealth-dark">{formatFullDateTime(report.reported_at) || "—"}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Uploaded Documents / Images — same attachment-row styling as the
-                  doctor's medical-record detail view. */}
-              <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl">
-                <p className="font-medium mb-4">Uploaded Documents / Images</p>
-                <div>
-                  {attachments.length > 0 ? (
-                    attachments.map((file, i) => {
-                      const Icon = file.kind === "image" ? ImageIcon : FileText;
-                      return (
-                        <div key={i} data-pdf-unit className="bg-white border rounded-lg px-4 py-3 mb-3">
-                          <div className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 sm:items-center">
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-[12px]">
-                              <div className="p-2 bg-docuhealth-primary/10 rounded-md">
-                                <Icon className="text-docuhealth-primary" size={20} />
-                              </div>
-                              <div>
-                                <p className="font-medium text-gray-800">{file.name}</p>
-                                <p className="text-gray-500">
-                                  {formatDate(file.date)}
-                                  {file.size ? ` • ${file.size}` : ""}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div data-print-hide className="flex flex-col sm:flex-row gap-3 text-[12px] w-full sm:w-auto">
-                              <button
-                                type="button"
-                                onClick={() => handleViewFile(file, i)}
-                                disabled={busyFile !== null}
-                                className="flex items-center justify-center gap-1 border border-docuhealth-primary text-docuhealth-primary rounded-full font-medium hover:bg-blue-50 transition py-1 px-3 w-full sm:w-28 disabled:opacity-60"
-                              >
-                                <Eye className="w-3 h-3" />
-                                View
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDownloadFile(file, i)}
-                                disabled={busyFile !== null}
-                                className="flex items-center justify-center gap-1 bg-docuhealth-primary text-white rounded-full font-medium hover:bg-docuhealth-dark-primary transition py-1 px-3 w-full sm:w-28 disabled:opacity-60"
-                              >
-                                <ArrowDownToLine className="w-3 h-3" />
-                                Download
-                              </button>
-                            </div>
-                          </div>
-                          {/* Printout / PDF only. On screen the image opens from View. */}
-                          {file.kind === "image" && file.url && (
-                            <img
-                              data-print-only
-                              src={file.url}
-                              alt={file.name}
-                              className="hidden w-full max-h-[420px] object-contain rounded-md bg-gray-100 mt-3"
-                            />
-                          )}
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <p className="text-[12px] text-gray-500">NIL</p>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
+          {showReport && <ScanResultReport report={report} attachments={attachments} />}
         </div>
       </div>
 
@@ -576,7 +389,7 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
 
             <p className="text-sm text-gray-600 leading-relaxed border border-gray-200 rounded-xl px-4 py-3 w-full">
               By proceeding you confirm that you are ready and capable of proceeding with the scan requested. Kindly
-              note that time &amp; date of imaging can be logged in now or later!
+              note that the time &amp; date the image was collected can be logged in now or later!
             </p>
 
             <button
@@ -585,7 +398,7 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
               disabled={acceptMutation.isPending}
               className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3 rounded-full hover:bg-docuhealth-dark-primary transition-colors disabled:opacity-60"
             >
-              Accept &amp; Log imaging time &amp; date now
+              Accept &amp; Log image collection time now
             </button>
             <button
               type="button"
@@ -593,43 +406,7 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
               disabled={acceptMutation.isPending}
               className="w-full border border-docuhealth-primary text-docuhealth-primary text-sm font-semibold py-3 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-60"
             >
-              Accept &amp; Log imaging time &amp; date Later
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showImagingRequiredModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 flex flex-col items-center gap-4 relative">
-            <button
-              type="button"
-              onClick={() => setShowImagingRequiredModal(false)}
-              className="absolute right-4 top-4 h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
-            >
-              <X size={16} />
-            </button>
-
-            <div className="w-11 h-11 rounded-full border-2 border-gray-800 flex items-center justify-center text-gray-800">
-              <Info size={20} />
-            </div>
-
-            <h3 className="text-base font-semibold text-gray-900 text-center">Notice!</h3>
-
-            <p className="text-sm text-gray-600 leading-relaxed border border-gray-200 rounded-xl px-4 py-3 w-full">
-              You have not logged in the date and time of imaging, kindly update it to enable you upload the
-              result/report when it is ready.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => {
-                setShowImagingRequiredModal(false);
-                openEditModal();
-              }}
-              className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3 rounded-full hover:bg-docuhealth-dark-primary transition-colors"
-            >
-              Log date &amp; time of imaging now
+              Accept &amp; Log image collection time Later
             </button>
           </div>
         </div>
@@ -687,7 +464,7 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
 
             <div className="text-center pt-2">
               <h3 className="text-lg font-semibold text-docuhealth-dark">Imaging Info</h3>
-              <p className="text-sm text-gray-500 mt-1">Kindly fill up to proceed!</p>
+              <p className="text-sm text-gray-500 mt-1">Kindly fill up to proceed! This cannot be changed once submitted.</p>
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -699,7 +476,7 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
               <label className={modalLabel}>Scan Requested</label>
               <input
                 type="text"
-                value={`${order.modality || order.scan_type}${order.body_part ? ` (${order.body_part})` : ""}`}
+                value={order.scan_type}
                 readOnly
                 tabIndex={-1}
                 className={readOnlyField}
@@ -739,45 +516,12 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
 
             <button
               type="button"
-              onClick={handleSaveImagingTime}
-              disabled={!editDate || !editTime || imagingTimeMutation.isPending}
+              onClick={handleSaveImageCollection}
+              disabled={!editDate || !editTime || imageCollectionMutation.isPending}
               className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3.5 rounded-full disabled:opacity-50"
             >
               Submit entry!
             </button>
-          </div>
-        </div>
-      )}
-
-      {preview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4" onClick={() => setPreview(null)}>
-          <div
-            className="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 flex flex-col gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between gap-4">
-              <h3 className="text-base font-semibold text-docuhealth-dark break-all">{preview.name}</h3>
-              <button
-                type="button"
-                onClick={() => setPreview(null)}
-                aria-label="Close preview"
-                className="text-docuhealth-dark hover:text-gray-600 shrink-0"
-              >
-                <X size={22} />
-              </button>
-            </div>
-
-            {preview.type.startsWith("image/") ? (
-              <div className="bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden">
-                <img src={preview.url} alt={preview.name} className="max-h-[70vh] w-auto max-w-full object-contain" />
-              </div>
-            ) : preview.type === "application/pdf" ? (
-              <iframe src={preview.url} title={preview.name} className="w-full h-[70vh] rounded-xl border" />
-            ) : (
-              <p className="text-sm text-gray-500 py-8 text-center">
-                Preview isn&apos;t available for this file type. Use Download to open it.
-              </p>
-            )}
           </div>
         </div>
       )}

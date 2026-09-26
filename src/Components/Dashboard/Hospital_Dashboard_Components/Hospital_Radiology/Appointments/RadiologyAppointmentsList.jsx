@@ -197,7 +197,7 @@ const RadiologyAppointmentsList = ({ onSeeDetails, onCreateOrder }) => {
             {/* Desktop rows */}
             <div className="hidden lg:block">
               {appointments.map((appointment, index) => (
-                <div key={appointment.id} className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10">
+                <div key={appointment.sqid} className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-gray-100 rounded-md">
                       <CalendarIcon className="w-4 h-4 text-gray-600" />
@@ -227,9 +227,9 @@ const RadiologyAppointmentsList = ({ onSeeDetails, onCreateOrder }) => {
                       <User className="w-4 h-4 text-gray-600" />
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-500 uppercase font-semibold">Requested by</p>
+                      <p className="text-[10px] text-gray-500 uppercase font-semibold">Assigned to</p>
                       <p className="text-sm font-medium">
-                        Dr. {appointment.staff.firstname} {appointment.staff.lastname}
+                        {appointment.staff?.firstname} {appointment.staff?.lastname}
                       </p>
                     </div>
                   </div>
@@ -240,8 +240,8 @@ const RadiologyAppointmentsList = ({ onSeeDetails, onCreateOrder }) => {
                         <ScanLine className="w-4 h-4 text-gray-600" />
                       </div>
                       <div>
-                        <p className="text-[10px] text-gray-500 uppercase font-semibold">Scan Type</p>
-                        <p className="text-sm font-medium truncate max-w-[150px]">{appointment.scan_type}</p>
+                        <p className="text-[10px] text-gray-500 uppercase font-semibold">Note</p>
+                        <p className="text-sm font-medium truncate max-w-[150px]">{appointment.note || "—"}</p>
                       </div>
                     </div>
 
@@ -292,7 +292,7 @@ const RadiologyAppointmentsList = ({ onSeeDetails, onCreateOrder }) => {
             {/* Mobile cards */}
             <div className="block lg:hidden space-y-4 px-1">
               {appointments.map((appointment, index) => (
-                <div key={appointment.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                <div key={appointment.sqid} className="bg-white border border-gray-200 rounded-lg p-4">
                   <div className="flex justify-between items-start mb-4">
                     <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
                       <p className="text-[10px] text-slate-400 uppercase font-bold">Scheduled</p>
@@ -341,8 +341,8 @@ const RadiologyAppointmentsList = ({ onSeeDetails, onCreateOrder }) => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs border border-indigo-100">
-                        {appointment.patient.firstname[0]}
-                        {appointment.patient.lastname[0]}
+                        {appointment.patient.firstname?.[0]}
+                        {appointment.patient.lastname?.[0]}
                       </div>
                       <div>
                         <p className="text-[10px] text-slate-400 uppercase font-medium">Patient</p>
@@ -354,14 +354,14 @@ const RadiologyAppointmentsList = ({ onSeeDetails, onCreateOrder }) => {
 
                     <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-50">
                       <div>
-                        <p className="text-[10px] text-slate-400 uppercase font-medium">Requested by</p>
+                        <p className="text-[10px] text-slate-400 uppercase font-medium">Assigned to</p>
                         <p className="text-[13px] text-slate-600">
-                          Dr. {appointment.staff.firstname} {appointment.staff.lastname}
+                          {appointment.staff?.firstname} {appointment.staff?.lastname}
                         </p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-slate-400 uppercase font-medium">Scan Type</p>
-                        <p className="text-[13px] text-slate-600 truncate">{appointment.scan_type}</p>
+                        <p className="text-[10px] text-slate-400 uppercase font-medium">Note</p>
+                        <p className="text-[13px] text-slate-600 truncate">{appointment.note || "—"}</p>
                       </div>
                     </div>
                   </div>

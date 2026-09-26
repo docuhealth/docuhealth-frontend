@@ -1,16 +1,8 @@
 import axiosInstanceHos from "../../../lib/axios/hospital";
 
-// Wired to the real `api/radiology/*` v2 endpoints — patient(HIN)-based order creation, status lives on each item, so accept/reject/imaging-time/upload all operate on an item sqid.
+// Wired to the reworked `api/radiology/*` API (2026-09-24): one paginated item list filtered by `status`, PATCH-only item actions, and results that a doctor approves unless the order was a walk-in.
 
-const STATUS_URL = {
-  pending: "pending",
-  in_progress: "in-progress",
-  completed: "completed",
-  rejected: "rejected",
-};
-
-// API says "in progress" (space); rest of the UI uses "in_progress" (underscore).
-const normalizeStatus = (raw) => (raw === "in progress" ? "in_progress" : raw);
+export const RESULT_FILE_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf", "video/mp4"];
 
 const ageFromDob = (dob) => {
   if (!dob) return null;
@@ -25,37 +17,47 @@ const mapPatient = (p = {}) => ({
   hin: p.hin,
   sex: p.gender,
   age: ageFromDob(p.dob),
-  // Not part of the real patient_info shape — no payment-category concept
-  // on this endpoint's response.
+  // Not part of the real patient_info shape, no payment-category concept on this endpoint's response.
   payment_category: null,
 });
 
-const mapResult = (result) => {
+// New results store one plain string (entries joined by newlines); rows migrated from the old API hold a JSON-stringified array.
+export const toLines = (raw) => {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean);
+  } catch {
+    // Plain text, split below.
+  }
+  return String(raw)
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+};
+
+export const mapScanResult = (result) => {
   if (!result) return null;
-  const reportedAt =
-    result.date_of_reporting && result.time_of_reporting
-      ? `${result.date_of_reporting}T${result.time_of_reporting}`
-      : result.created_at;
   return {
-    examination: result.examinations,
-    clinicalIndication: result.clinical_indication || [],
-    technique: result.technique,
+    sqid: result.sqid,
+    status: result.status,
+    rejection_reason: result.rejection_reason || null,
+    clinicalIndication: toLines(result.clinical_indication),
     findings: result.findings || [],
     impression: result.impression || [],
     recommendations: result.recommendation || [],
+    extraComment: result.extra_comment || null,
     reporter: result.reporter_name,
     specialty: result.reporter_specialty,
-    reported_at: reportedAt,
+    reported_at: result.reported_at,
+    created_at: result.created_at,
   };
 };
 
-const mapAttachments = (result) => {
+export const mapAttachments = (result) => {
   if (!result) return [];
-  // `contentType` carries the API's own metadata, not a re-fetched blob's —
-  // Supabase serves every uploaded file with `content-type: text/plain`
-  // regardless of the real type (confirmed live 2026-09-22), so the detail
-  // page must trust this field rather than whatever the browser reports
-  // after fetching the URL.
+  // `contentType` carries the API's own metadata: files uploaded before the storage fix are still served as text/plain, so the detail page must not trust the type of a re-fetched blob.
   return (result.attachments || []).map((a) => ({
     name: a.filename,
     kind: a.content_type?.startsWith("image/") ? "image" : "document",
@@ -65,65 +67,66 @@ const mapAttachments = (result) => {
   }));
 };
 
-// Maps a raw ScanOrderItem to the record shape the Scan Requests/Detail UI expects.
+// The approved result wins; otherwise the newest attempt (a rejected one stays visible until a fresh upload replaces it).
+const pickResult = (results = []) =>
+  results.find((r) => r.status === "approved") ||
+  [...results].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0] ||
+  null;
+
+// Maps a raw ScanOrderItem to the record shape the Scan Requests/Detail UI expects. Rows migrated from the old API have `scan_info: null`.
 export const mapScanOrderItem = (item) => {
-  const status = normalizeStatus(item.status);
-  const requestedBy = item.requested_by_info;
+  const order = item.order_info || {};
+  const orderedBy = order.ordered_by_info;
+  const result = pickResult(item.results);
   return {
     sqid: item.sqid,
-    patient_info: mapPatient(item.patient_info),
-    scan_type: item.type,
-    modality: item.loinc_rsna_description_info?.long_common_name || item.type,
-    body_part: null,
+    patient_info: mapPatient(order.patient_info),
+    scan_type: item.scan_info?.name || "Scan details unavailable",
     note: null,
-    status,
-    hospital_info: item.hospital_info,
-    requested_by: requestedBy ? `Dr. ${requestedBy.firstname || ""} ${requestedBy.lastname || ""}`.trim() : "—",
+    status: item.status,
+    order_source: order.order_source,
+    hospital_info: order.hospital_info,
+    requested_by: orderedBy
+      ? `${orderedBy.role === "doctor" ? "Dr. " : ""}${orderedBy.firstname || ""} ${orderedBy.lastname || ""}`.trim()
+      : "—",
     created_at: item.created_at,
-    imaging_at: item.imaging_date && item.imaging_time ? `${item.imaging_date}T${item.imaging_time}` : null,
-    report: status === "completed" ? mapResult(item.result_info) : null,
-    attachments: status === "completed" ? mapAttachments(item.result_info) : [],
-    rejection_reason: item.rejection_note || null,
+    image_collected_at: item.image_collected_at || null,
+    report: mapScanResult(result),
+    attachments: mapAttachments(result),
+    rejection_reason: item.rejection_reason || null,
   };
 };
 
-// <2 chars returns the full catalog per the API, so only query once there's enough to narrow it.
-export const fetchRadiologyTestTypes = async ({ queryKey }) => {
+// Scan catalog search; the API allows 60 requests a minute, so callers debounce and only search from 2 characters.
+export const fetchRadiologyScans = async ({ queryKey }) => {
   const [, query] = queryKey;
-  const trimmed = (query || "").trim();
-  const url =
-    trimmed.length >= 2 ? `api/radiology/test-types?query=${encodeURIComponent(trimmed)}` : "api/radiology/test-types";
-  const res = await axiosInstanceHos.get(url);
+  const res = await axiosInstanceHos.get(`api/radiology/scans?query=${encodeURIComponent((query || "").trim())}`);
   return res.data || [];
 };
 
-export const createScanOrder = async ({ patient, order_source, check_in, items }) => {
-  const payload = { patient, order_source: order_source || "walk_in", items };
+// Which link an order needs depends on its source (check_in / admission / appointment); walk_in takes none.
+export const createScanOrder = async ({ patient, order_source, check_in, appointment, admission, items }) => {
+  const payload = { patient, order_source, items };
   if (check_in) payload.check_in = check_in;
+  if (appointment) payload.appointment = appointment;
+  if (admission) payload.admission = admission;
   const res = await axiosInstanceHos.post("api/radiology/orders", payload);
   return res.data;
 };
 
-export const acceptScanOrderItem = async ({ sqid, imaging_date, imaging_time }) => {
-  const payload = {};
-  if (imaging_date && imaging_time) {
-    payload.imaging_date = imaging_date;
-    payload.imaging_time = imaging_time;
-  }
-  const res = await axiosInstanceHos.patch(`api/radiology/orders/items/${sqid}/accepted`, payload);
+export const acceptScanOrderItem = async ({ sqid }) => {
+  const res = await axiosInstanceHos.patch(`api/radiology/orders/items/${sqid}/accept`);
   return mapScanOrderItem(res.data);
 };
 
-export const rejectScanOrderItem = async ({ sqid, rejection_note }) => {
-  const res = await axiosInstanceHos.patch(`api/radiology/orders/items/${sqid}/rejected`, { rejection_note });
+export const rejectScanOrderItem = async ({ sqid, rejection_reason }) => {
+  const res = await axiosInstanceHos.patch(`api/radiology/orders/items/${sqid}/reject`, { rejection_reason });
   return mapScanOrderItem(res.data);
 };
 
-export const logImagingDateTime = async ({ sqid, imaging_date, imaging_time }) => {
-  const res = await axiosInstanceHos.patch(`api/radiology/orders/items/${sqid}/imaging-date-and-time`, {
-    imaging_date,
-    imaging_time,
-  });
+// One-way: an image-collected item can no longer be edited or rejected.
+export const logImageCollection = async ({ sqid, image_collected_at }) => {
+  const res = await axiosInstanceHos.patch(`api/radiology/orders/items/${sqid}/collection-time`, { image_collected_at });
   return mapScanOrderItem(res.data);
 };
 
@@ -133,47 +136,38 @@ export const uploadScanResult = async ({
   findings,
   impression,
   recommendation,
-  examinations,
-  technique,
   reporter_name,
   reporter_specialty,
-  time_of_reporting,
-  date_of_reporting,
+  reported_at,
   extra_comment,
   files,
 }) => {
   const formData = new FormData();
   formData.append("order_item", order_item);
-  formData.append("clinical_indication", JSON.stringify(clinical_indication || []));
+  formData.append("clinical_indication", clinical_indication);
   formData.append("findings", JSON.stringify(findings || []));
   formData.append("impression", JSON.stringify(impression || []));
   formData.append("recommendation", JSON.stringify(recommendation || []));
-  formData.append("examinations", examinations);
-  formData.append("technique", technique);
   formData.append("reporter_name", reporter_name);
   formData.append("reporter_specialty", reporter_specialty);
-  formData.append("time_of_reporting", time_of_reporting);
-  formData.append("date_of_reporting", date_of_reporting);
+  formData.append("reported_at", reported_at);
   if (extra_comment) formData.append("extra_comment", extra_comment);
   (files || []).forEach((file) => formData.append("attachments", file));
 
   const res = await axiosInstanceHos.post("api/radiology/results", formData);
-  return { report: mapResult(res.data), attachments: mapAttachments(res.data) };
+  // "approved" means a walk-in order (item completed on the spot); "pending" waits for the ordering doctor.
+  return { report: mapScanResult(res.data), attachments: mapAttachments(res.data), resultStatus: res.data.status };
 };
 
-// List endpoints have no search/ordering params (silently ignored), so pull size=100 and do it client-side, same as doctor/appointments.js.
+// The list takes `status` and `search` server-side; sorting and paging stay client-side since ordering is fixed newest-first.
 export const fetchRadiologyScanRequests = async ({ queryKey }) => {
   const [, status, page = 1, ordering = "-created_at", search = ""] = queryKey;
-  const urlStatus = STATUS_URL[status] || "pending";
-  const res = await axiosInstanceHos.get(`api/radiology/orders/items/${urlStatus}?size=100`);
+  const params = new URLSearchParams({ status, size: "100" });
+  if (search.trim()) params.set("search", search.trim());
+  const res = await axiosInstanceHos.get(`api/radiology/orders/items?${params.toString()}`);
   const allItems = (res.data?.results || []).map(mapScanOrderItem);
 
-  const term = search.trim().toLowerCase();
-  const matching = term
-    ? allItems.filter((r) => `${r.patient_info.firstname} ${r.patient_info.lastname}`.toLowerCase().includes(term))
-    : allItems;
-
-  const sorted = [...matching].sort((a, b) => {
+  const sorted = [...allItems].sort((a, b) => {
     const diff = new Date(a.created_at) - new Date(b.created_at);
     return ordering === "created_at" ? diff : -diff;
   });

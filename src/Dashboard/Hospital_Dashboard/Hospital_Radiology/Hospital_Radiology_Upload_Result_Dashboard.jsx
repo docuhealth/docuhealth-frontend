@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { ArrowLeft, X, Paperclip, FileText as FileTextIcon, Info, Check } from "lucide-react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
-import { uploadScanResult } from "../../../queries/Hospital/radiology/scan_requests";
+import { uploadScanResult, RESULT_FILE_TYPES } from "../../../queries/Hospital/radiology/scan_requests";
 import { extractApiErrorMessage } from "../../../utils/apiError";
 import Input from "../../../Components/ui/Input";
 
@@ -117,18 +117,25 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
   const [showReportInfoModal, setShowReportInfoModal] = useState(false);
   const [showConfirmUploadModal, setShowConfirmUploadModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [examinations, setExaminations] = useState("");
-  const [technique, setTechnique] = useState("");
   const [reporterName, setReporterName] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [reportDate, setReportDate] = useState("");
   const [reportTime, setReportTime] = useState("");
+  const [awaitingApproval, setAwaitingApproval] = useState(false);
   const finalOrderRef = useRef(null);
 
   const uploadMutation = useMutation({
     mutationFn: uploadScanResult,
     onSuccess: (result) => {
-      finalOrderRef.current = { ...order, status: "completed", report: result.report, attachments: result.attachments };
+      // Walk-in results are approved on upload; anything else waits on the ordering doctor and the item stays image_collected.
+      const approved = result.resultStatus === "approved";
+      finalOrderRef.current = {
+        ...order,
+        status: approved ? "completed" : "image_collected",
+        report: result.report,
+        attachments: result.attachments,
+      };
+      setAwaitingApproval(!approved);
       setShowConfirmUploadModal(false);
       setShowSuccessModal(true);
       queryClient.invalidateQueries({ queryKey: ["radiology-scan-requests"] });
@@ -187,8 +194,14 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
     SECTION_SETTERS[field]((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // The API only takes JPEG, PNG, WebP, PDF and MP4; anything else is refused with a 400, so filter here and say why.
   const addFiles = (fileList) => {
-    const next = Array.from(fileList).map((file) => ({
+    const incoming = Array.from(fileList);
+    const allowed = incoming.filter((file) => RESULT_FILE_TYPES.includes(file.type));
+    if (allowed.length < incoming.length) {
+      toast.error("Only JPEG, PNG, WebP, PDF and MP4 files can be attached.");
+    }
+    const next = allowed.map((file) => ({
       file,
       previewUrl: file.type.startsWith("image/") ? URL.createObjectURL(file) : null,
     }));
@@ -208,27 +221,24 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
     });
   };
 
-  // The backend documents findings/impression/recommendation as required on
-  // POST /api/radiology/results but doesn't actually enforce it (confirmed
-  // live 2026-09-22 — omitting them returns 201 with `[]`), so this page has
-  // to hold that line itself instead of relying on a 400 to catch it.
+  // The API refuses empty findings/impression/recommendation and a missing clinical indication.
   const cleanList = (list) => list.map((n) => n.trim()).filter(Boolean);
-  const hasRequiredNotes = findings.length > 0 && impression.length > 0 && recommendations.length > 0;
+  const hasRequiredNotes =
+    clinicalIndication.length > 0 && findings.length > 0 && impression.length > 0 && recommendations.length > 0;
 
   const handleProceedClick = () => {
     if (!hasRequiredNotes) {
-      toast.error("Findings, Impression and Recommendation each need at least one entry.");
+      toast.error("Clinical indication, Findings, Impression and Recommendation each need at least one entry.");
       return;
     }
     const now = new Date();
-    setExaminations(order.scan_type || "");
     setReportDate(now.toISOString().slice(0, 10));
     setReportTime(now.toTimeString().slice(0, 5));
     setShowReportInfoModal(true);
   };
 
   const handleReportInfoProceed = () => {
-    if (!examinations.trim() || !technique.trim() || !reporterName.trim() || !specialty.trim() || !reportDate || !reportTime) return;
+    if (!reporterName.trim() || !specialty.trim() || !reportDate || !reportTime) return;
     setShowReportInfoModal(false);
     setShowConfirmUploadModal(true);
   };
@@ -236,16 +246,13 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
   const handleConfirmUpload = () => {
     uploadMutation.mutate({
       order_item: order.sqid,
-      clinical_indication: cleanList(clinicalIndication),
+      clinical_indication: cleanList(clinicalIndication).join("\n"),
       findings: cleanList(findings),
       impression: cleanList(impression),
       recommendation: cleanList(recommendations),
-      examinations: examinations.trim(),
-      technique: technique.trim(),
       reporter_name: reporterName.trim(),
       reporter_specialty: specialty.trim(),
-      time_of_reporting: `${reportTime}:00`,
-      date_of_reporting: reportDate,
+      reported_at: new Date(`${reportDate}T${reportTime}`).toISOString(),
       extra_comment: extraComment.trim() || undefined,
       files: files.map((f) => f.file),
     });
@@ -285,6 +292,7 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
             onRemove={handleRemoveItem}
             activeSection={activeSection}
             setActiveSection={setActiveSection}
+            required
           />
           <NoteListSection
             title="Findings"
@@ -343,9 +351,12 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
               ref={fileInputRef}
               type="file"
               multiple
-              accept="image/*,video/*,application/pdf"
+              accept={RESULT_FILE_TYPES.join(",")}
               className="hidden"
-              onChange={(e) => e.target.files?.length && addFiles(e.target.files)}
+              onChange={(e) => {
+                if (e.target.files?.length) addFiles(e.target.files);
+                e.target.value = "";
+              }}
             />
 
             {files.length > 0 && (
@@ -415,26 +426,6 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-900">Examinations</label>
-              <Input
-                type="text"
-                value={examinations}
-                onChange={(e) => setExaminations(e.target.value)}
-                placeholder="e.g. CT Abdomen"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-900">Technique</label>
-              <Input
-                type="text"
-                value={technique}
-                onChange={(e) => setTechnique(e.target.value)}
-                placeholder="e.g. Multisection helical CT"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-gray-900">Name of Reporter</label>
               <Input
                 type="text"
@@ -468,7 +459,7 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
             <button
               type="button"
               onClick={handleReportInfoProceed}
-              disabled={!examinations.trim() || !technique.trim() || !reporterName.trim() || !specialty.trim() || !reportDate || !reportTime}
+              disabled={!reporterName.trim() || !specialty.trim() || !reportDate || !reportTime}
               className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3 rounded-full disabled:opacity-50 transition-colors"
             >
               Proceed
@@ -521,9 +512,19 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
             </div>
 
             <p className="text-base font-semibold text-gray-800 text-center leading-snug">
-              You have successfully uploaded a
-              <br />
-              completed scan result!
+              {awaitingApproval ? (
+                <>
+                  You have successfully uploaded the scan result!
+                  <br />
+                  It will be final once the ordering doctor approves it.
+                </>
+              ) : (
+                <>
+                  You have successfully uploaded a
+                  <br />
+                  completed scan result!
+                </>
+              )}
             </p>
 
             <button

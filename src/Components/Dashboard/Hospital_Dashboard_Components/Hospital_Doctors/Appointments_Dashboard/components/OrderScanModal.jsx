@@ -1,26 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createScanOrder, fetchRadiologyTestTypes } from "../../../../../../queries/Hospital/radiology/scan_requests";
+import { createScanOrder, fetchRadiologyScans } from "../../../../../../queries/Hospital/radiology/scan_requests";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import { ChevronDown } from "lucide-react";
-import Input from "../../../../../ui/Input";
 
-const toLocalDate = (d) => d.toISOString().slice(0, 10);
-const toLocalTime = (d) => d.toTimeString().slice(0, 5);
-
-// Patient(HIN)-based like OrderLabModal — no appointment needed; "Imaging order" searches the LOINC/RSNA catalog as you type.
+// Patient(HIN)-based like OrderLabModal. "Imaging order" searches the scans catalog as you type and the order references the picked scan by sqid.
 const OrderScanModal = ({ selectedPatientDetails, onClose }) => {
   const orderContext = resolveOrderContext(selectedPatientDetails);
   const dropdownRef = useRef(null);
 
-  const [type, setType] = useState("");
+  const [selectedScan, setSelectedScan] = useState(null);
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [orderDate, setOrderDate] = useState(toLocalDate(new Date()));
-  const [orderTime, setOrderTime] = useState(toLocalTime(new Date()));
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
@@ -38,13 +32,15 @@ const OrderScanModal = ({ selectedPatientDetails, onClose }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const { data: testTypes, isFetching: isSearching } = useQuery({
-    queryKey: ["radiology-test-types", debouncedSearch],
-    queryFn: fetchRadiologyTestTypes,
+  // The catalog is throttled to 60 requests a minute, so search from 2 characters and cache repeat lookups.
+  const { data: scans, isFetching: isSearching } = useQuery({
+    queryKey: ["radiology-scans", debouncedSearch.trim()],
+    queryFn: fetchRadiologyScans,
     enabled: debouncedSearch.trim().length >= 2,
+    staleTime: 1000 * 60 * 5,
   });
 
-  const suggestions = debouncedSearch.trim().length >= 2 ? testTypes || [] : [];
+  const suggestions = debouncedSearch.trim().length >= 2 ? scans || [] : [];
 
   const createOrderMutation = useMutation({
     mutationFn: createScanOrder,
@@ -54,19 +50,21 @@ const OrderScanModal = ({ selectedPatientDetails, onClose }) => {
     },
   });
 
-  const handleSelectType = (value) => {
-    setType(value);
-    setSearchInput(value);
+  const handleSelectScan = (scan) => {
+    setSelectedScan(scan);
+    setSearchInput(scan.name);
     setIsDropdownOpen(false);
   };
 
   const handleSubmit = () => {
-    if (!type.trim() || !orderDate || !orderTime) return;
+    if (!selectedScan) return;
     createOrderMutation.mutate({
       patient: orderContext.hin,
       order_source: orderContext.orderSource,
       check_in: orderContext.checkIn || undefined,
-      items: [{ type: type.trim(), order_date: orderDate, order_time: orderTime }],
+      admission: orderContext.admission || undefined,
+      appointment: orderContext.appointment || undefined,
+      items: [{ scan: selectedScan.sqid }],
     });
   };
 
@@ -112,11 +110,12 @@ const OrderScanModal = ({ selectedPatientDetails, onClose }) => {
                   value={searchInput}
                   onChange={(e) => {
                     setSearchInput(e.target.value);
-                    setType(e.target.value);
+                    // Editing the text drops the pick: an order needs a scan chosen from the catalog.
+                    setSelectedScan(null);
                     setIsDropdownOpen(true);
                   }}
                   onFocus={() => setIsDropdownOpen(true)}
-                  placeholder="Search or type a scan (e.g. CT Abdomen)"
+                  placeholder="Search for a scan (e.g. CT Abdomen)"
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-9 text-sm outline-hidden focus:border-docuhealth-primary transition-colors"
                 />
                 <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -126,18 +125,17 @@ const OrderScanModal = ({ selectedPatientDetails, onClose }) => {
                     {isSearching ? (
                       <div className="p-3 text-xs text-gray-500 text-center">Searching...</div>
                     ) : suggestions.length === 0 ? (
-                      <div className="p-3 text-xs text-gray-500 text-center">
-                        No catalog match — "{searchInput}" will be sent as free text.
-                      </div>
+                      <div className="p-3 text-xs text-gray-500 text-center">No scan matches "{searchInput}".</div>
                     ) : (
-                      suggestions.map((name) => (
+                      suggestions.map((scan) => (
                         <button
                           type="button"
-                          key={name}
-                          onClick={() => handleSelectType(name)}
+                          key={scan.sqid}
+                          onClick={() => handleSelectScan(scan)}
                           className="w-full text-left px-3 py-2.5 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 text-sm text-gray-700"
                         >
-                          {name}
+                          {scan.name}
+                          {scan.loinc_code && <span className="block text-[11px] text-gray-400">LOINC {scan.loinc_code}</span>}
                         </button>
                       ))
                     )}
@@ -146,17 +144,8 @@ const OrderScanModal = ({ selectedPatientDetails, onClose }) => {
               </div>
             </div>
 
-            <div className="mb-4 flex gap-3">
-              <div className="flex-1">
-                <Input label="Order date" type="date" value={orderDate} onChange={(e) => setOrderDate(e.target.value)} />
-              </div>
-              <div className="flex-1">
-                <Input label="Order time" type="time" value={orderTime} onChange={(e) => setOrderTime(e.target.value)} />
-              </div>
-            </div>
-
             <button
-              disabled={createOrderMutation.isPending || !type.trim() || !orderDate || !orderTime}
+              disabled={createOrderMutation.isPending || !selectedScan}
               className="mt-2 w-full cursor-pointer bg-docuhealth-primary text-white py-2 rounded-full disabled:bg-docuhealth-primary/60 disabled:cursor-not-allowed text-sm"
               onClick={handleSubmit}
             >
