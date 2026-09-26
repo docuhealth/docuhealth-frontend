@@ -53,9 +53,31 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
     }
   }, [profile]);
 
+  const patientHin =
+    selectedPatient?.patient_info?.hin ||
+    selectedPatient?.patient?.hin ||
+    selectedPatient?.hin;
+
+  const isAdmission = Boolean(
+    selectedPatient?.admission_date ||
+    selectedPatient?.ward_info ||
+    selectedPatient?.bed_info ||
+    selectedPatient?.status === "inpatient" ||
+    selectedPatient?.status === "inpatient_discharge" ||
+    selectedPatient?.admission_info
+  );
+
+  const admissionSqid = isAdmission
+    ? (selectedPatient?.admission_info?.sqid || selectedPatient?.sqid || selectedPatient?.id)
+    : null;
+
+  const appointmentSqid = !isAdmission
+    ? (selectedPatient?.appointment_sqid || selectedPatient?.appointment_info?.sqid || selectedPatient?.appointment?.sqid || selectedPatient?.sqid || selectedPatient?.id)
+    : null;
+
   const { mutate, isPending } = useMutation({
     mutationFn: (payload) =>
-      axiosInstanceHos.post("api/nurses/vital-signs/update", payload),
+      axiosInstanceHos.post(`api/nurses/${patientHin}/vital-signs/record`, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["patient-info"] });
       queryClient.invalidateQueries({ queryKey: ["hospital-patients-nurse"] });
@@ -67,7 +89,22 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
     },
     onError: (err) => {
       console.error("Error updating vitals:", err);
-      toast.error(err.response?.data?.message || "Failed to update vitals.");
+      const data = err.response?.data;
+      let errorMsg = "Failed to update vitals.";
+      if (data) {
+        if (typeof data.detail === "string") {
+          errorMsg = data.detail;
+        } else if (typeof data.message === "string") {
+          errorMsg = data.message;
+        } else if (typeof data === "object") {
+          const firstKey = Object.keys(data)[0];
+          if (firstKey) {
+            const firstVal = data[firstKey];
+            errorMsg = Array.isArray(firstVal) ? `${firstKey}: ${firstVal[0]}` : `${firstKey}: ${firstVal}`;
+          }
+        }
+      }
+      toast.error(errorMsg);
     },
   });
 
@@ -90,18 +127,32 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
     !heartRate;
 
   const handleSubmit = () => {
-    const payload = {
-      patient: selectedPatient.patient_info?.hin,
-      blood_pressure: bloodPressure || undefined,
-      temp: temperature ? parseFloat(temperature) : undefined,
-      resp_rate: respRate ? parseFloat(respRate) : undefined,
-      weight: weight ? parseFloat(weight) : undefined,
-      heart_rate: heartRate ? parseFloat(heartRate) : undefined,
+    if (!patientHin) {
+      toast.error("Patient identifier (HIN) missing.");
+      return;
+    }
+
+    const measurements = {
+      ...(bloodPressure && { blood_pressure: bloodPressure }),
+      ...(temperature && { temp: parseFloat(temperature) }),
+      ...(respRate && { resp_rate: parseFloat(respRate) }),
+      ...(weight && { weight: parseFloat(weight) }),
+      ...(heartRate && { heart_rate: parseFloat(heartRate) }),
       ...(height && { height: parseFloat(height) }),
       ...(bmi && { bmi: parseFloat(bmi) }),
       ...(painScore && { pain_score: parseInt(painScore.split(" ")[0], 10) }),
       ...(spo2 && { spo2: parseInt(spo2, 10) }),
       ...(notes && { notes }),
+    };
+
+    if (Object.keys(measurements).length === 0) {
+      toast.error("At least one vital sign value is required.");
+      return;
+    }
+
+    const payload = {
+      vital_signs: measurements,
+      ...(admissionSqid ? { admission: admissionSqid } : { appointment: appointmentSqid }),
     };
 
     mutate(payload);
@@ -212,7 +263,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
             </div>
           </div>
           <div className="relative">
-            <p className="pb-1">Weight</p>
+            <p className="pb-1">Weight (optional)</p>
             <div className="relative">
               <input
                 type="number"

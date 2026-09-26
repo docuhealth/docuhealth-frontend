@@ -484,7 +484,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                   { label: "Respiratory rate", name: "respiratoryRate", adornment: "/Min", placeholder: "Enter respiratory rate" },
                   { label: "Height", name: "height", adornment: "cm", placeholder: "Enter height" },
                   { label: "Heart rate", name: "heartRate", adornment: "Bpm", placeholder: "Enter heart rate" },
-                  { label: "Weight", name: "weight", adornment: "Kg", placeholder: "Enter weight" },
+                  { label: "Weight (optional)", name: "weight", adornment: "Kg", placeholder: "Enter weight" },
                 ].map((field) => (
                   <div key={field.name} className="flex flex-col gap-1.5">
                     <label className="text-[13px] font-medium text-gray-700">{field.label}</label>

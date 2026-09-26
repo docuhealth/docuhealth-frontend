@@ -1843,7 +1843,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                 </div>
               </div>
               <div className="relative">
-                <p className="pb-1.5 text-xs text-slate-500 font-medium">Weight</p>
+                <p className="pb-1.5 text-xs text-slate-500 font-medium">Weight (optional)</p>
                 <div className="relative">
                   <input type="number" className="w-full text-sm border border-slate-200 px-3 py-2.5 rounded-lg pr-12 outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary transition-colors placeholder:text-slate-300" value={vitalSignsForm.weight} onChange={(e) => setVitalSignsForm({...vitalSignsForm, weight: e.target.value})} placeholder="Enter weight" />
                   <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">Kg</span>

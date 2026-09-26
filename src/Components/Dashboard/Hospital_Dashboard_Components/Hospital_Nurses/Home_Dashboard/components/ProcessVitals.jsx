@@ -42,9 +42,11 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
 
   const bmi = calculateBmi(weight, height);
 
+  const requestSqid = selectedPatient?.sqid || selectedPatient?.id;
+
   const { mutate, isPending } = useMutation({
     mutationFn: (payload) =>
-      axiosInstanceHos.post("api/nurses/vital-signs/process", payload),
+      axiosInstanceHos.post(`api/nurses/vital-signs/requests/${requestSqid}/process`, payload),
     onSuccess: () => {
       toast.success("Vitals processed successfully!");
       queryClient.invalidateQueries({ queryKey: ["assigned-for-vitals"] });
@@ -59,7 +61,22 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
     },
     onError: (err) => {
       console.error("Error processing vitals:", err);
-      toast.error(err.response?.data?.message || "Failed to process vitals.");
+      const data = err.response?.data;
+      let errorMsg = "Failed to process vitals.";
+      if (data) {
+        if (typeof data.detail === "string") {
+          errorMsg = data.detail;
+        } else if (typeof data.message === "string") {
+          errorMsg = data.message;
+        } else if (typeof data === "object") {
+          const firstKey = Object.keys(data)[0];
+          if (firstKey) {
+            const firstVal = data[firstKey];
+            errorMsg = Array.isArray(firstVal) ? `${firstKey}: ${firstVal[0]}` : `${firstKey}: ${firstVal}`;
+          }
+        }
+      }
+      toast.error(errorMsg);
     },
   });
 
@@ -82,19 +99,28 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
     !heartRate;
 
   const handleSubmit = () => {
+    if (!requestSqid) {
+      toast.error("Vitals request identifier is missing.");
+      return;
+    }
+
     const payload = {
-      request: selectedPatient.id,
-      blood_pressure: bloodPressure || undefined,
-      temp: temperature ? parseFloat(temperature) : undefined,
-      resp_rate: respRate ? parseFloat(respRate) : undefined,
-      weight: weight ? parseFloat(weight) : undefined,
-      heart_rate: heartRate ? parseFloat(heartRate) : undefined,
+      ...(bloodPressure && { blood_pressure: bloodPressure }),
+      ...(temperature && { temp: parseFloat(temperature) }),
+      ...(respRate && { resp_rate: parseFloat(respRate) }),
+      ...(weight && { weight: parseFloat(weight) }),
+      ...(heartRate && { heart_rate: parseFloat(heartRate) }),
       ...(height && { height: parseFloat(height) }),
       ...(bmi && { bmi: parseFloat(bmi) }),
       ...(spo2 && { spo2: parseInt(spo2, 10) }),
       ...(painScore && { pain_score: parseInt(painScore.split(" ")[0], 10) }),
       ...(notes && { notes }),
     };
+
+    if (Object.keys(payload).length === 0) {
+      toast.error("At least one vital sign value is required.");
+      return;
+    }
 
     mutate(payload);
   };
@@ -204,7 +230,7 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
             </div>
           </div>
           <div className="relative">
-            <p className="pb-1">Weight</p>
+            <p className="pb-1">Weight (optional)</p>
             <div className="relative">
               <input
                 type="number"

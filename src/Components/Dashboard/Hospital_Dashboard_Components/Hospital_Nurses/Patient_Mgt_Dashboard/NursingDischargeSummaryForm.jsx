@@ -309,7 +309,7 @@ const NursingDischargeSummaryForm = ({ admission, patientFullInfo, activeTask, t
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Weight</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Weight (optional)</label>
                 <div className="relative">
                   <input 
                     type="number" 

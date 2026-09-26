@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { NursesAdmittedPatientMGTContext } from "../../../context/HospitalContext/Nurses/NursesAdmittedPatientMGTContext";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import TabComponent from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/TabComponent";
@@ -18,10 +19,10 @@ import toast from "react-hot-toast";
 import AddHandoverNoteForm from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddHandoverNoteForm";
 import Modal from "../../../Components/ui/Modal";
 import axiosInstanceHos from "../../../lib/axios/hospital";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Check } from "lucide-react";
 
 const Hospital_Nurses_Patients_Dashboard = () => {
-  const { tab } = useContext(NursesAdmittedPatientMGTContext);
+  const { tab, admittedPatients } = useContext(NursesAdmittedPatientMGTContext);
   const [updateVitals, setUpdateVitals] = useState(false);
   const [caseNoteHistory, setCaseNoteHistory] = useState(false);
   const [vitalSignsHistory, setVitalSignsHistory] = useState(false);
@@ -48,6 +49,28 @@ const Hospital_Nurses_Patients_Dashboard = () => {
 
   const [loadingSelectedPatient, setLoadingSelectedPatient] = useState(false);
   const location = useLocation();
+
+  const patientHin = selected?.patient_info?.hin || selected?.patient?.hin || selected?.hin;
+
+  const { data: admissionNotesData } = useQuery({
+    queryKey: ["patient-admission-notes", patientHin],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get(`api/records/patients/${patientHin}/admission-notes`);
+      return res.data?.results || res.data || [];
+    },
+    enabled: !!patientHin,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const matchingInpatient = (admittedPatients || []).find(
+    (p) => (p?.sqid && p?.sqid === selected?.sqid) || (p?.patient_info?.hin || p?.patient?.hin) === patientHin
+  );
+
+  const hasAdmissionNote = Boolean(
+    (selected?.admission_note_info && typeof selected.admission_note_info === "object" && Object.keys(selected.admission_note_info).length > 0) ||
+    (matchingInpatient?.admission_note_info && typeof matchingInpatient.admission_note_info === "object" && Object.keys(matchingInpatient.admission_note_info).length > 0) ||
+    (Array.isArray(admissionNotesData) && admissionNotesData.length > 0)
+  );
 
   useEffect(() => {
     const navState = location.state;
@@ -266,22 +289,29 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                   </div>
                   
                   {!showAdmissionNote && (
-                    <button
-                      className="py-2.5 px-6 w-full lg:w-auto rounded-full bg-docuhealth-primary text-white cursor-pointer flex items-center justify-center gap-2 font-medium transition-colors"
-                      onClick={() => {
-                        setCaseNoteHistory(false);
-                        setVitalSignsHistory(false);
-                        setSharedSoapNoteHistory(false);
-                        setNewCaseNote(false);
-                        setUpdateVitals(false);
-                        setShowAdmissionNote(true);
-                      }}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M7 1V13M1 7H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      Add nursing admission note
-                    </button>
+                    hasAdmissionNote ? (
+                      <div className="py-2.5 px-5 w-full lg:w-auto rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-700 flex items-center justify-center gap-2 text-xs font-semibold shadow-xs select-none">
+                        <Check className="w-3.5 h-4 text-emerald-600 stroke-[2.5]" />
+                        <span>Admission note recorded</span>
+                      </div>
+                    ) : (
+                      <button
+                        className="py-2.5 px-6 w-full lg:w-auto rounded-full bg-docuhealth-primary text-white cursor-pointer flex items-center justify-center gap-2 font-medium hover:bg-docuhealth-primary/90 transition-colors"
+                        onClick={() => {
+                          setCaseNoteHistory(false);
+                          setVitalSignsHistory(false);
+                          setSharedSoapNoteHistory(false);
+                          setNewCaseNote(false);
+                          setUpdateVitals(false);
+                          setShowAdmissionNote(true);
+                        }}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M7 1V13M1 7H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Add nursing admission note
+                      </button>
+                    )
                   )}
                 </>
               )}
