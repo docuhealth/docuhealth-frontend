@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ArrowLeft, Clock, ChevronDown, Loader2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import Modal from "../../../../ui/Modal";
 import TimeInput from "../../../../ui/TimeInput";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
@@ -194,6 +195,7 @@ const initialFormData = {
 };
 
 const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
+  const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(1);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -355,7 +357,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
           bmi: calculatedBmi ? parseFloat(calculatedBmi) : undefined,
           pain_score: formData.painScore ? parseInt(formData.painScore.split(" ")[0], 10) : undefined,
           spo2: formData.spo2 ? parseInt(formData.spo2, 10) : undefined,
-          notes: formData.vitalsNotes || "Admission Note Vitals"
+          notes: formData.vitalsNotes?.trim() || undefined
         },
         allergies: formData.allergies ? [formData.allergies] : [],
         mobility_assessment: formData.mobilityAssessment ? formData.mobilityAssessment.toLowerCase().replace(/ \/ /g, "_").replace(/ /g, "_") : undefined,
@@ -398,6 +400,13 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
       if (!admissionSqid) throw new Error("No admission SQID found");
 
       await axiosInstanceHos.post(`/api/inpatients/admissions/${admissionSqid}/admission-note`, payload);
+      
+      // Invalidate queries so admitted patient lists and patient views update immediately
+      queryClient.invalidateQueries({ queryKey: ["hospital-patients-nurse"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-info"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-admission-notes"] });
+      queryClient.invalidateQueries({ queryKey: ["nurse-patient-vitals-history"] });
+
       setShowSuccessModal(true);
     } catch (error) {
       console.error(error);
@@ -475,7 +484,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                   { label: "Respiratory rate", name: "respiratoryRate", adornment: "/Min", placeholder: "Enter respiratory rate" },
                   { label: "Height", name: "height", adornment: "cm", placeholder: "Enter height" },
                   { label: "Heart rate", name: "heartRate", adornment: "Bpm", placeholder: "Enter heart rate" },
-                  { label: "Weight", name: "weight", adornment: "Kg", placeholder: "Enter weight" },
+                  { label: "Weight (optional)", name: "weight", adornment: "Kg", placeholder: "Enter weight" },
                 ].map((field) => (
                   <div key={field.name} className="flex flex-col gap-1.5">
                     <label className="text-[13px] font-medium text-gray-700">{field.label}</label>

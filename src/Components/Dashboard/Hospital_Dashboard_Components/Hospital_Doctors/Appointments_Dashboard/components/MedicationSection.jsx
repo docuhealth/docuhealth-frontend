@@ -109,184 +109,212 @@ const MedicationSection = ({ medications, setMedications }) => {
       {medications.map((med, index) => (
         <div
           key={index}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-start mt-4 border-b pb-4 last:border-0 last:pb-0"
+          className="relative bg-gray-50/50 rounded-xl p-4 border border-gray-200 mt-4 space-y-4 last:mb-0"
         >
-          <div className="lg:col-span-3">
-            <label className="block text-[12px] font-medium text-gray-700 pb-1">Drug Name<span className="text-red-500"> *</span></label>
-            <div className="relative">
-              <Input
-                placeholder="Drug name..."
-                value={med.drug}
-                onChange={(e) => handleDrugSearch(index, e.target.value)}
-                className="text-[12px] mb-4"
-              />
-              {activeSearchIndex === index && searchResults.length > 0 && (
-                <ul className="absolute z-10 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto mt-1 top-full">
-                  {searchResults.slice((searchPage - 1) * 10, searchPage * 10).map((item, idx) => (
-                    <li key={idx} className="border-b last:border-0">
-                      <button
-                        type="button"
-                        className="w-full text-left p-2.5 text-[12px] hover:bg-docuhealth-primary/10 cursor-pointer text-gray-800"
-                        onClick={() => handleSelectDrug(index, item)}
-                      >
-                        <span className="block font-medium">{item.name}</span>
-                        <span className="block text-[10px] text-gray-500 mt-0.5">
-                          {item.strength && <span>{item.strength}</span>}
-                          {item.strength && item.dose_form && <span className="mx-1">•</span>}
-                          {item.dose_form && <span>{item.dose_form}</span>}
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                  {Math.ceil(searchResults.length / 10) > 1 && (
-                    <li className="p-2 border-t flex justify-between items-center bg-gray-50 text-[11px] sticky bottom-0">
-                      <button
-                        type="button"
-                        disabled={searchPage === 1}
-                        onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSearchPage(prev => prev - 1); }}
-                        className={`px-2 py-1 rounded ${searchPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-docuhealth-primary hover:bg-blue-100'}`}
-                      >
-                        Prev
-                      </button>
-                      <span className="text-gray-500">Page {searchPage} of {Math.ceil(searchResults.length / 10)}</span>
-                      <button
-                        type="button"
-                        disabled={searchPage === Math.ceil(searchResults.length / 10)}
-                        onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSearchPage(prev => prev + 1); }}
-                        className={`px-2 py-1 rounded ${searchPage === Math.ceil(searchResults.length / 10) ? 'text-gray-400 cursor-not-allowed' : 'text-docuhealth-primary hover:bg-blue-100'}`}
-                      >
-                        Next
-                      </button>
-                    </li>
-                  )}
-                </ul>
-              )}
-              {activeSearchIndex === index && isSearching && (
-                <div className="absolute right-3 top-2.5">
-                  <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                  </svg>
-                </div>
-              )}
+          {medications.length > 1 && (
+            <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+              <span className="text-[12px] font-semibold text-gray-700">
+                Drug #{index + 1}
+              </span>
+              <button
+                type="button"
+                onClick={() => handleRemoveMedication(index)}
+                className="text-red-500 hover:text-red-700 text-[12px] font-medium flex items-center gap-1 cursor-pointer transition-colors"
+                title="Remove medication"
+              >
+                <X size={14} /> Remove
+              </button>
             </div>
-            <div className="flex gap-2">
-              <div className="w-1/2">
-                <label className="block text-[12px] font-medium text-gray-700 pb-1">Strength <span className="text-gray-400 font-normal">(not compulsory)</span></label>
+          )}
+
+          {/* Row 1: Drug Name, Strength, Dose Form */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-12 gap-4">
+            <div className="lg:col-span-6">
+              <label className="block text-[12px] font-medium text-gray-700 pb-1">
+                Drug Name<span className="text-red-500"> *</span>
+              </label>
+              <div className="relative">
                 <Input
-                  placeholder="Strength..."
-                  value={med.strength}
-                  disabled={!!med.catalog_drug}
-                  onChange={(e) => handleChange(index, "strength", e.target.value)}
-                  className={`text-[12px] ${med.catalog_drug ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+                  placeholder="Drug name..."
+                  value={med.drug}
+                  onChange={(e) => handleDrugSearch(index, e.target.value)}
+                  className="text-[12px] w-full"
                 />
+                {activeSearchIndex === index && searchResults.length > 0 && (
+                  <ul className="absolute z-20 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto mt-1 top-full">
+                    {searchResults.slice((searchPage - 1) * 10, searchPage * 10).map((item, idx) => (
+                      <li key={idx} className="border-b last:border-0">
+                        <button
+                          type="button"
+                          className="w-full text-left p-2.5 text-[12px] hover:bg-docuhealth-primary/10 cursor-pointer text-gray-800"
+                          onClick={() => handleSelectDrug(index, item)}
+                        >
+                          <span className="block font-medium">{item.name}</span>
+                          <span className="block text-[10px] text-gray-500 mt-0.5">
+                            {item.strength && <span>{item.strength}</span>}
+                            {item.strength && item.dose_form && <span className="mx-1">•</span>}
+                            {item.dose_form && <span>{item.dose_form}</span>}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                    {Math.ceil(searchResults.length / 10) > 1 && (
+                      <li className="p-2 border-t flex justify-between items-center bg-gray-50 text-[11px] sticky bottom-0">
+                        <button
+                          type="button"
+                          disabled={searchPage === 1}
+                          onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSearchPage(prev => prev - 1); }}
+                          className={`px-2 py-1 rounded ${searchPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-docuhealth-primary hover:bg-blue-100'}`}
+                        >
+                          Prev
+                        </button>
+                        <span className="text-gray-500">Page {searchPage} of {Math.ceil(searchResults.length / 10)}</span>
+                        <button
+                          type="button"
+                          disabled={searchPage === Math.ceil(searchResults.length / 10)}
+                          onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSearchPage(prev => prev + 1); }}
+                          className={`px-2 py-1 rounded ${searchPage === Math.ceil(searchResults.length / 10) ? 'text-gray-400 cursor-not-allowed' : 'text-docuhealth-primary hover:bg-blue-100'}`}
+                        >
+                          Next
+                        </button>
+                      </li>
+                    )}
+                  </ul>
+                )}
+                {activeSearchIndex === index && isSearching && (
+                  <div className="absolute right-3 top-2.5">
+                    <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+                  </div>
+                )}
               </div>
-              <div className="w-1/2">
-                <label className="block text-[12px] font-medium text-gray-700 pb-1">Dose Form <span className="text-gray-400 font-normal">(not compulsory)</span></label>
-                <Select
-                  value={med.doseForm}
-                  disabled={!!med.catalog_drug}
-                  onChange={(value) => handleChange(index, "doseForm", value)}
-                  options={[
-                    "Tablet", "Capsule", "Syrup", "Suspension", "Injection",
-                    "Ointment", "Cream", "Drops", "Inhaler", "Suppository", "Patch",
-                  ].map((form) => ({ value: form, label: form }))}
-                  placeholder="Form..."
-                />
-              </div>
+            </div>
+
+            <div className="lg:col-span-3">
+              <label className="block text-[12px] font-medium text-gray-700 pb-1">
+                Strength <span className="text-gray-400 font-normal">(not compulsory)</span>
+              </label>
+              <Input
+                placeholder="Strength..."
+                value={med.strength}
+                disabled={!!med.catalog_drug}
+                onChange={(e) => handleChange(index, "strength", e.target.value)}
+                className={`text-[12px] w-full ${med.catalog_drug ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+              />
+            </div>
+
+            <div className="lg:col-span-3">
+              <label className="block text-[12px] font-medium text-gray-700 pb-1">
+                Dose Form <span className="text-gray-400 font-normal">(not compulsory)</span>
+              </label>
+              <Select
+                value={med.doseForm}
+                disabled={!!med.catalog_drug}
+                onChange={(value) => handleChange(index, "doseForm", value)}
+                options={[
+                  "Tablet", "Capsule", "Syrup", "Suspension", "Injection",
+                  "Ointment", "Cream", "Drops", "Inhaler", "Suppository", "Patch",
+                ].map((form) => ({ value: form, label: form }))}
+                placeholder="Form..."
+              />
             </div>
           </div>
 
-          <div className="lg:col-span-3">
-            <label className="block text-[12px] font-medium text-gray-700 pb-1">Dosage<span className="text-red-500"> *</span></label>
-            <div className="flex gap-2">
-              <Input
-                type="number"
-                placeholder="Enter dosage..."
-                value={med.dosage}
-                onChange={(e) => handleChange(index, "dosage", e.target.value)}
-                containerClassName="w-1/2"
-                className="text-[12px]"
-              />
-              <div className="w-1/2">
+          {/* Row 2: Dosage, Route, Frequency, Duration */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4">
+            <div className="lg:col-span-3">
+              <label className="block text-[12px] font-medium text-gray-700 pb-1">
+                Dosage<span className="text-red-500"> *</span>
+              </label>
+              <div className="flex gap-2">
                 <Input
-                  list={`dosage-units-${index}`}
-                  placeholder="Unit..."
-                  value={med.dosageUnit}
-                  onChange={(e) => handleChange(index, "dosageUnit", e.target.value)}
+                  type="number"
+                  placeholder="Dosage..."
+                  value={med.dosage}
+                  onChange={(e) => handleChange(index, "dosage", e.target.value)}
+                  containerClassName="w-3/5"
                   className="text-[12px]"
                 />
-                <datalist id={`dosage-units-${index}`}>
-                  {dosageUnits.map((unit) => (
-                    <option key={unit} value={unit} />
-                  ))}
-                </datalist>
+                <div className="w-2/5">
+                  <Input
+                    list={`dosage-units-${index}`}
+                    placeholder="Unit..."
+                    value={med.dosageUnit}
+                    onChange={(e) => handleChange(index, "dosageUnit", e.target.value)}
+                    className="text-[12px]"
+                  />
+                  <datalist id={`dosage-units-${index}`}>
+                    {dosageUnits.map((unit) => (
+                      <option key={unit} value={unit} />
+                    ))}
+                  </datalist>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="lg:col-span-2">
-            <label className="block text-[12px] font-medium text-gray-700 pb-1">Route<span className="text-red-500"> *</span></label>
-            <Select
-              value={med.route}
-              disabled={!!med.catalog_drug}
-              onChange={(value) => handleChange(index, "route", value)}
-              options={[
-                { value: "Oral", label: "Oral" },
-                { value: "IV", label: "IV = Intravenous" },
-                { value: "IM", label: "IM = Intramuscular" },
-                { value: "SC", label: "SC = Subcutaneous Injection" },
-                { value: "PV", label: "PV = Per Vagina (Vaginal route)" },
-                { value: "IT", label: "IT = Intrathecal" },
-                { value: "PR", label: "PR = Per rectal" },
-                { value: "SL", label: "SL = Sublingual" },
-                { value: "Topical", label: "Topical" },
-              ]}
-            />
-          </div>
-
-          <div className="lg:col-span-2">
-            <label className="block text-[12px] font-medium text-gray-700 pb-1">Frequency<span className="text-red-500"> *</span></label>
-            <Select
-              value={med.frequency}
-              onChange={(value) => handleChange(index, "frequency", value)}
-              options={FREQUENCY_OPTIONS}
-            />
-          </div>
-
-          <div className="lg:col-span-2 flex gap-2 relative">
-            <div className="flex-1">
-              <label className="block text-[12px] font-medium text-gray-700 pb-1">Duration<span className="text-red-500"> *</span></label>
-              <Input
-                type="number"
-                placeholder="duration..."
-                value={med.duration}
-                onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
-                onChange={(e) => handleChange(index, "duration", e.target.value)}
-                className="text-[12px]"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block text-[12px] pb-1">&nbsp;</label>
+            <div className="lg:col-span-3">
+              <label className="block text-[12px] font-medium text-gray-700 pb-1">
+                Route<span className="text-red-500"> *</span>
+              </label>
               <Select
-                value={med.durationUnit}
-                onChange={(value) => handleChange(index, "durationUnit", value)}
+                value={med.route}
+                disabled={!!med.catalog_drug}
+                onChange={(value) => handleChange(index, "route", value)}
                 options={[
-                  { value: "Month", label: "Month (s)" },
-                  { value: "Week", label: "Week (s)" },
-                  { value: "Day", label: "Day (s)" },
+                  { value: "Oral", label: "Oral" },
+                  { value: "IV", label: "IV = Intravenous" },
+                  { value: "IM", label: "IM = Intramuscular" },
+                  { value: "SC", label: "SC = Subcutaneous Injection" },
+                  { value: "PV", label: "PV = Per Vagina (Vaginal route)" },
+                  { value: "IT", label: "IT = Intrathecal" },
+                  { value: "PR", label: "PR = Per rectal" },
+                  { value: "SL", label: "SL = Sublingual" },
+                  { value: "Topical", label: "Topical" },
                 ]}
               />
             </div>
-            {medications.length > 1 && (
-              <button
-                onClick={() => handleRemoveMedication(index)}
-                className="text-red-500 hover:text-red-700 transition-colors mt-6 ml-1 p-1"
-                title="Remove medication"
-              >
-                <X size={16} />
-              </button>
-            )}
+
+            <div className="lg:col-span-3">
+              <label className="block text-[12px] font-medium text-gray-700 pb-1">
+                Frequency<span className="text-red-500"> *</span>
+              </label>
+              <Select
+                value={med.frequency}
+                onChange={(value) => handleChange(index, "frequency", value)}
+                options={FREQUENCY_OPTIONS}
+              />
+            </div>
+
+            <div className="lg:col-span-3">
+              <label className="block text-[12px] font-medium text-gray-700 pb-1">
+                Duration<span className="text-red-500"> *</span>
+              </label>
+              <div className="flex gap-2">
+                <div className="w-1/2">
+                  <Input
+                    type="number"
+                    placeholder="Duration..."
+                    value={med.duration}
+                    onKeyDown={(e) => ["e", "E", "+", "-", "."].includes(e.key) && e.preventDefault()}
+                    onChange={(e) => handleChange(index, "duration", e.target.value)}
+                    className="text-[12px]"
+                  />
+                </div>
+                <div className="w-1/2">
+                  <Select
+                    value={med.durationUnit}
+                    onChange={(value) => handleChange(index, "durationUnit", value)}
+                    options={[
+                      { value: "Month", label: "Month (s)" },
+                      { value: "Week", label: "Week (s)" },
+                      { value: "Day", label: "Day (s)" },
+                    ]}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       ))}

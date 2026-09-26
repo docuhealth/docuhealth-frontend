@@ -1,5 +1,5 @@
 import React from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import TaskCreationModal from "./TaskCreationModal";
 import { createInpatientTask } from "../../../../../../queries/Hospital/doctor/inpatientTasks";
@@ -28,8 +28,12 @@ const GLUCOSE_SCHEDULE_OPTIONS = [
  * along.
  */
 const GlucoseMonitoringModal = ({ admissionSqid, onClose }) => {
+  const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
     mutationFn: (payload) => createInpatientTask({ admissionSqid, payload }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inpatient-tasks"] });
+    },
     onError: (err) => {
       console.error("Error creating glucose monitoring task:", err);
       toast.error(

@@ -759,6 +759,8 @@ const ULP = () => {
                         By Signing up, you agree to our{" "}
                         <Link
                           to="/terms-and-conditions"
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="text-docuhealth-primary font-bold underline"
                         >
                           Terms &amp; Conditions
@@ -766,6 +768,8 @@ const ULP = () => {
                         and{" "}
                         <Link
                           to="/privacy-policy"
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="text-docuhealth-primary font-bold underline"
                         >
                           Privacy Policy
@@ -1309,6 +1313,8 @@ const ULP = () => {
                       By Signing up, you agree to our{" "}
                       <Link
                         to="/terms-and-conditions"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-docuhealth-primary font-bold hover:underline"
                       >
                         Terms &amp; Conditions
@@ -1316,6 +1322,8 @@ const ULP = () => {
                       and{" "}
                       <Link
                         to="/privacy-policy"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-docuhealth-primary font-bold hover:underline"
                       >
                         Privacy Policy

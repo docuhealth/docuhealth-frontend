@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import TaskCreationModal from "./TaskCreationModal";
 import MedicationSection from "./MedicationSection";
+import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { createInpatientTask } from "../../../../../../queries/Hospital/doctor/inpatientTasks";
 import { DEFAULT_FREQUENCY } from "../../../../../../utils/careTaskConstants";
+import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 
 // MedicationSection expresses duration as a value + a unit label ("Day" /
 // "Week" / "Month"); the medication-task endpoint wants the backend
@@ -67,24 +70,95 @@ const toDrugPayload = (med) => {
 
 /**
  * "Drug task (nurse)" quick-service flow from OtherMedicalServicesFab.
+ * In inpatient admission context:
  * Creates a `medication` care task on the patient's admission via
  * POST /api/inpatients/admissions/<sqid>/tasks — the backend turns this
- * into one nurse MAR task per drug (with its scheduled occurrences) and
- * raises the matching pharmacy order in the same call. Because each drug
- * carries its own frequency/duration, the shared shell's single
- * frequency/duration row is switched off (`showFrequencyDuration={false}`)
- * and the drug chart is plugged in as the `topSection`, reusing the same
- * MedicationSection + careTaskConstants the Prescribe Medication (pharmacy
- * order) form uses so the two drug forms can't drift apart.
+ * into one nurse MAR task per drug and raises the matching pharmacy order.
+ * In appointment / outpatient context:
+ * Sends the medication order via POST /api/pharmacy/orders/create so
+ * nurses and pharmacists receive the prescribed task/order.
  */
-const DrugTaskModal = ({ admissionSqid, onClose }) => {
+const DrugTaskModal = ({ admissionSqid, selectedPatientDetails, onClose }) => {
+  const queryClient = useQueryClient();
   const [medications, setMedications] = useState(() => [createEmptyMedication()]);
 
+  const orderContext = resolveOrderContext(selectedPatientDetails);
+
+  const effectiveAdmissionSqid =
+    admissionSqid ||
+    orderContext.admission ||
+    selectedPatientDetails?.admission_sqid ||
+    selectedPatientDetails?.admission?.sqid ||
+    (selectedPatientDetails?.ward_info || selectedPatientDetails?.bed_info
+      ? selectedPatientDetails?.sqid
+      : null);
+
   const { mutateAsync } = useMutation({
-    mutationFn: (payload) => createInpatientTask({ admissionSqid, payload }),
+    mutationFn: async ({ shared, filledMedications }) => {
+      if (effectiveAdmissionSqid) {
+        const payload = {
+          ...shared,
+          task_type: "medication",
+          config: { drugs: filledMedications.map(toDrugPayload) },
+        };
+        return await createInpatientTask({
+          admissionSqid: effectiveAdmissionSqid,
+          payload,
+        });
+      }
+
+      // Outpatient / Appointment context -> send pharmacy/medication order to server
+      const pharmacyPayload = {
+        patient: orderContext.hin,
+        order_source: orderContext.orderSource,
+        drugs: filledMedications.map((med) => {
+          const drugData = med.catalog_drug
+            ? { catalog_drug: med.catalog_drug }
+            : {
+                manual_drug: {
+                  name: med.drug.trim(),
+                  route: med.route,
+                  ...(med.strength ? { strength: med.strength } : {}),
+                  ...(med.doseForm ? { dose_form: med.doseForm } : {}),
+                },
+              };
+
+          return {
+            ...drugData,
+            dosage: {
+              quantity: Number(med.dosage) || 0,
+              unit: med.dosageUnit,
+              frequency: med.frequency,
+              duration: {
+                value: Number(med.duration) || 0,
+                rate: med.durationUnit,
+              },
+            },
+          };
+        }),
+      };
+
+      if (orderContext.checkIn) {
+        pharmacyPayload.check_in = orderContext.checkIn;
+      }
+
+      const res = await axiosInstanceHos.post(
+        "api/pharmacy/orders/create",
+        pharmacyPayload,
+      );
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["patient-med-records"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-prescriptions"] });
+      queryClient.invalidateQueries({ queryKey: ["inpatient-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor-activities"] });
+    },
     onError: (err) => {
-      console.error("Error creating drug task:", err);
-      toast.error(err.response?.data?.message || "Failed to create drug task.");
+      console.error("Error creating drug task / medication order:", err);
+      toast.error(
+        extractApiErrorMessage(err, "Failed to create drug task / order."),
+      );
     },
   });
 
@@ -96,11 +170,7 @@ const DrugTaskModal = ({ admissionSqid, onClose }) => {
       return Promise.reject(new Error("No medication rows filled in."));
     }
 
-    return mutateAsync({
-      ...shared,
-      task_type: "medication",
-      config: { drugs: filledMedications.map(toDrugPayload) },
-    });
+    return mutateAsync({ shared, filledMedications });
   };
 
   return (

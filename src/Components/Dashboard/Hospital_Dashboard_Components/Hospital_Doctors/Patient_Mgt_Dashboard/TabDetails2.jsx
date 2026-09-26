@@ -34,6 +34,8 @@ import SoapNoteEntry from "../Appointments_Dashboard/components/SoapNoteEntry";
 import Input from "../../../../ui/Input";
 import PatientHandoverTab from "./PatientHandoverTab";
 import DoctorIssuedTasksHistory from "./DoctorIssuedTasksHistory";
+import PatientRadiologyRecords from "./PatientRadiologyRecords";
+import PatientMedicationHistory from "./PatientMedicationHistory";
 import { createProgressNote } from "../../../../../queries/Hospital/doctor/progressNotes";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 
@@ -1814,19 +1816,39 @@ const getTabs = ({
       // reference GET /api/inpatients/tasks/<admission_sqid> expects.
       content: <DoctorIssuedTasksHistory admissionSqid={selected?.sqid} />,
     },
-    // {
-    //   title: "Lab Results",
-    //   content: (
-    //     <PatientLabRecords
-    //       labloading={labloading}
-    //       patientLabRecords={patientLabRecords}
-    //       count={labCount}
-    //       currentPage={labCurrentPage}
-    //       totalPages={labTotalPages}
-    //       setCurrentPage={setLabCurrentPage}
-    //     />
-    //   ),
-    // },
+    {
+      title: "Radiology Result",
+      content: (
+        <PatientRadiologyRecords
+          patientFullInfo={patientFullInfo}
+          selected={selected}
+        />
+      ),
+    },
+    {
+      title: "Lab Result",
+      content: (
+        <PatientLabRecords
+          labloading={labloading}
+          patientLabRecords={patientLabRecords}
+          count={labCount}
+          currentPage={labCurrentPage}
+          totalPages={labTotalPages}
+          setCurrentPage={setLabCurrentPage}
+        />
+      ),
+    },
+    {
+      title: "Medication History",
+      content: (
+        <PatientMedicationHistory
+          patientFullInfo={patientFullInfo}
+          patientMedRecords={patientMedRecords}
+          patientSoapNotes={patientSoapNotes}
+          selected={selected}
+        />
+      ),
+    },
   ];
 };
 

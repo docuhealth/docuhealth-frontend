@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import TaskCreationModal, { FIELD_BOX_CLASS, FIELD_LABEL_CLASS } from "./TaskCreationModal";
 import { createInpatientTask } from "../../../../../../queries/Hospital/doctor/inpatientTasks";
@@ -70,8 +70,12 @@ const SeizureEventModal = ({ admissionSqid, onClose }) => {
 
   const isTopSectionValid = !!characteristics && !!standingOrder;
 
+  const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
     mutationFn: (payload) => createInpatientTask({ admissionSqid, payload }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inpatient-tasks"] });
+    },
     onError: (err) => {
       console.error("Error creating seizure event task:", err);
       toast.error(err.response?.data?.message || "Failed to create seizure event task.");

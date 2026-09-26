@@ -28,6 +28,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     { label: "Receptionists", value: "receptionist" },
     { label: "Pharmacists", value: "pharmacist" },
     { label: "Lab Scientists", value: "lab_scientist" },
+    { label: "Radiologists", value: "radiologist" },
   ];
 
   // console.log(staffs)
@@ -104,6 +105,18 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     "Informatics Pharmacist",
   ];
 
+  const radiologistSpecializations = [
+    "N/A",
+    "Diagnostic Radiographer",
+    "CT Technologist",
+    "MRI Technologist",
+    "Ultrasound / Sonography",
+    "Nuclear Medicine Technologist",
+    "Radiation Therapist",
+    "Interventional Radiography",
+    "Mammography",
+  ];
+
   const specializationOptions =
     newRole === "doctor"
       ? doctorSpecializations
@@ -113,7 +126,9 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
           ? labScientistSpecializations
           : newRole === "pharmacist"
             ? pharmacistSpecializations
-            : [];
+            : newRole === "radiologist"
+              ? radiologistSpecializations
+              : [];
 
 
   const sortedStaffs = useMemo(() => {
@@ -763,6 +778,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                       <option value="receptionist">Receptionist</option>
                       <option value="pharmacist">Pharmacist</option>
                       <option value="lab_scientist">Lab Scientist</option>
+                      <option value="radiologist">Radiologist</option>
                     </select>
                   </div>
 

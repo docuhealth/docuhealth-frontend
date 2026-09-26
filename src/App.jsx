@@ -89,6 +89,8 @@ import Hospital_Doctors_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/
 import Hospital_Doctors_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Settings_Dashboard";
 import Hospital_Doctors_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_HealthPersonnel_Dashboard";
 import Hospital_Doctors_Lab_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Lab_Dashboard";
+import Hospital_Doctors_Radiology_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Radiology_Dashboard";
+import Hospital_Doctors_Handover_History from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Handover_History";
 
 import Hospital_Receptionist_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_Receptionist/Hospital_Receptionist_Layout";
 import Hospital_Receptionist_Home_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Receptionist/Hospital_Receptionist_Home_Dashboard";
@@ -137,6 +139,16 @@ import Hospital_Lab_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dashboa
 import Hospital_Lab_Upload_Result_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Upload_Result_Dashboard";
 import Hospital_Lab_Appointment_Detail_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Appointment_Detail_Dashboard";
 import HospitalLabProviders from "./Providers/Hospital/HospitalLabProviders";
+
+import HospitalRadiologyProviders from "./Providers/Hospital/HospitalRadiologyProviders";
+import Hospital_Radiology_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_Radiology/Hospital_Radiology_Layout";
+import Hospital_Radiology_Home_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Radiology/Hospital_Radiology_Home_Dashboard";
+import Hospital_Radiology_Requests_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Radiology/Hospital_Radiology_Requests_Dashboard";
+import Hospital_Radiology_Scan_Detail_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Radiology/Hospital_Radiology_Scan_Detail_Dashboard";
+import Hospital_Radiology_Appointments_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Radiology/Hospital_Radiology_Appointments_Dashboard";
+import Hospital_Radiology_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Radiology/Hospital_Radiology_HealthPersonnel_Dashboard";
+import Hospital_Radiology_Upload_Result_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Radiology/Hospital_Radiology_Upload_Result_Dashboard";
+import Hospital_Radiology_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Radiology/Hospital_Radiology_Settings_Dashboard";
 
 import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
 
@@ -503,6 +515,44 @@ function App() {
                   <HospitalProtectedRoute>
                     <HospitalDoctorProviders>
                       <Hospital_Doctors_Lab_Dashboard />
+                    </HospitalDoctorProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-doctors-radiology-dashboard"
+              element={
+                <HospitalDoctorProviders>
+                  <Hospital_Doctors_Layout />
+                </HospitalDoctorProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalDoctorProviders>
+                      <Hospital_Doctors_Radiology_Dashboard />
+                    </HospitalDoctorProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-doctors-handover-history"
+              element={
+                <HospitalDoctorProviders>
+                  <Hospital_Doctors_Layout />
+                </HospitalDoctorProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalDoctorProviders>
+                      <Hospital_Doctors_Handover_History />
                     </HospitalDoctorProviders>
                   </HospitalProtectedRoute>
                 }
@@ -1013,6 +1063,141 @@ function App() {
                     <HospitalNursesProviders>
                       <Hospital_Nurses_Tasks />
                     </HospitalNursesProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+
+            {/* Hospital Radiology Routes */}
+            <Route
+              path="/hospital-radiology-home-dashboard"
+              element={
+                <HospitalRadiologyProviders>
+                  <Hospital_Radiology_Layout />
+                </HospitalRadiologyProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalRadiologyProviders>
+                      <Hospital_Radiology_Home_Dashboard />
+                    </HospitalRadiologyProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-radiology-requests-dashboard"
+              element={
+                <HospitalRadiologyProviders>
+                  <Hospital_Radiology_Layout />
+                </HospitalRadiologyProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalRadiologyProviders>
+                      <Hospital_Radiology_Requests_Dashboard />
+                    </HospitalRadiologyProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-radiology-scan-detail"
+              element={
+                <HospitalRadiologyProviders>
+                  <Hospital_Radiology_Layout />
+                </HospitalRadiologyProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalRadiologyProviders>
+                      <Hospital_Radiology_Scan_Detail_Dashboard />
+                    </HospitalRadiologyProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-radiology-upload-result"
+              element={
+                <HospitalRadiologyProviders>
+                  <Hospital_Radiology_Layout />
+                </HospitalRadiologyProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalRadiologyProviders>
+                      <Hospital_Radiology_Upload_Result_Dashboard />
+                    </HospitalRadiologyProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-radiology-appointments-dashboard"
+              element={
+                <HospitalRadiologyProviders>
+                  <Hospital_Radiology_Layout />
+                </HospitalRadiologyProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalRadiologyProviders>
+                      <Hospital_Radiology_Appointments_Dashboard />
+                    </HospitalRadiologyProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-radiology-healthpersonnel-dashboard"
+              element={
+                <HospitalRadiologyProviders>
+                  <Hospital_Radiology_Layout />
+                </HospitalRadiologyProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalRadiologyProviders>
+                      <Hospital_Radiology_HealthPersonnel_Dashboard />
+                    </HospitalRadiologyProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-radiology-settings-dashboard"
+              element={
+                <HospitalRadiologyProviders>
+                  <Hospital_Radiology_Layout />
+                </HospitalRadiologyProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalRadiologyProviders>
+                      <Hospital_Radiology_Settings_Dashboard />
+                    </HospitalRadiologyProviders>
                   </HospitalProtectedRoute>
                 }
               />

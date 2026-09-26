@@ -74,7 +74,7 @@ const ReferOutModal = ({ appointment, onClose }) => {
         {showSuccess ? (
           <div className="flex flex-col items-center text-center py-4">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
-              <div className="w-14 h-14 rounded-full bg-green-700 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                   <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -85,7 +85,7 @@ const ReferOutModal = ({ appointment, onClose }) => {
             </p>
             <button
               onClick={onClose}
-              className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3 rounded-full hover:opacity-90 transition-colors cursor-pointer"
+              className="w-full bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-3 rounded-full transition-colors cursor-pointer"
             >
               Done
             </button>

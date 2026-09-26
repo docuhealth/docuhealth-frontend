@@ -1,5 +1,4 @@
-import React from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import TaskCreationModal from "./TaskCreationModal";
 import { createInpatientTask } from "../../../../../../queries/Hospital/doctor/inpatientTasks";
@@ -12,13 +11,17 @@ const IO_TRACKING_MODE_OPTIONS = [
 ];
 
 /**
- * "Input and output" quick-service flow from OtherMedicalServicesFab.
+ * "Fluid Input and Output" quick-service flow from OtherMedicalServicesFab.
  * Creates an `input_output` care task on the patient's admission via
  * POST /api/inpatients/admissions/<sqid>/tasks.
  */
 const FluidIntakeOutputModal = ({ admissionSqid, onClose }) => {
+  const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
     mutationFn: (payload) => createInpatientTask({ admissionSqid, payload }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inpatient-tasks"] });
+    },
     onError: (err) => {
       console.error("Error creating input/output task:", err);
       toast.error(err.response?.data?.message || "Failed to create input/output task.");
@@ -34,10 +37,10 @@ const FluidIntakeOutputModal = ({ admissionSqid, onClose }) => {
 
   return (
     <TaskCreationModal
-      title="Fluid Intake & Output Task"
+      title="Fluid Input & Output Task"
       primaryLabel="I&O Protocol Type"
       primaryOptions={IO_TRACKING_MODE_OPTIONS}
-      successMessage="Fluid Intake & Output task created!"
+      successMessage="Fluid Input and Output task created!"
       onSubmit={handleSubmit}
       onClose={onClose}
     />

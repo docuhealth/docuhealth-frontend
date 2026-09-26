@@ -1,5 +1,5 @@
 import React from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import TaskCreationModal, { FIELD_BOX_CLASS } from "./TaskCreationModal";
 import { createInpatientTask } from "../../../../../../queries/Hospital/doctor/inpatientTasks";
@@ -17,8 +17,12 @@ import { createInpatientTask } from "../../../../../../queries/Hospital/doctor/i
  * currently in Swagger).
  */
 const VitalSignsTaskModal = ({ admissionSqid, onClose }) => {
+  const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
     mutationFn: (payload) => createInpatientTask({ admissionSqid, payload }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inpatient-tasks"] });
+    },
     onError: (err) => {
       console.error("Error creating vital signs task:", err);
       toast.error(err.response?.data?.message || "Failed to create vital signs task.");

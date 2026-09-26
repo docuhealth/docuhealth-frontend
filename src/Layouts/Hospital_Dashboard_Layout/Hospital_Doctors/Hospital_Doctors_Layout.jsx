@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { ScanLine } from "lucide-react";
 import DashboardLayout from "../../../Components/ui/DashboardLayout";
 import { DoctorAppContext } from "../../../context/HospitalContext/Doctors/DoctorAppContext";
 
@@ -52,6 +53,24 @@ const Hospital_Doctors_Layout = () => {
         </svg>
       ),
     },
+        {
+      name: "Handover Note History",
+      path: "/hospital-doctors-handover-history",
+      icon: (isActive) => (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className={`group-hover:stroke-white ${isActive ? "stroke-white" : "stroke-docuhealth-secondary"}`}
+        >
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M4 5h2M4 9h2M4 13h2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+    },
     {
       name: "Appointments",
       path: "/hospital-doctors-appointments-dashboard",
@@ -88,6 +107,16 @@ const Hospital_Doctors_Layout = () => {
             className={`group-hover:fill-white ${isActive ? "fill-white" : "fill-docuhealth-secondary"}`}
           />
         </svg>
+      ),
+    },
+    {
+      name: "Radiology Results",
+      path: "/hospital-doctors-radiology-dashboard",
+      icon: (isActive) => (
+        <ScanLine
+          size={20}
+          className={`group-hover:stroke-white ${isActive ? "stroke-white" : "stroke-docuhealth-secondary"}`}
+        />
       ),
     },
     {

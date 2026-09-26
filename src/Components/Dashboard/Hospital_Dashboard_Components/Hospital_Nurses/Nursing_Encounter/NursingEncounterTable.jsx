@@ -748,7 +748,7 @@ const NursingEncounterTable = () => {
                 <Input label="Respiratory rate" value={encounterFormData.resp_rate} onChange={(e) => handleInputChange("resp_rate", e.target.value)} placeholder="Enter respiratory rate" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">/Min</span>} />
                 <Input label="Height" value={encounterFormData.height} onChange={(e) => handleInputChange("height", e.target.value)} placeholder="Enter height" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">cm</span>} />
                 <Input label="Heart rate" value={encounterFormData.heart_rate} onChange={(e) => handleInputChange("heart_rate", e.target.value)} placeholder="Enter heart rate" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Bpm</span>} />
-                <Input label="Weight" value={encounterFormData.weight} onChange={(e) => handleInputChange("weight", e.target.value)} placeholder="Enter weight" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Kg</span>} />
+                <Input label="Weight (optional)" value={encounterFormData.weight} onChange={(e) => handleInputChange("weight", e.target.value)} placeholder="Enter weight" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Kg</span>} />
                 <Input label="BMI (Auto-calculated)" value={encounterFormData.bmi} readOnly placeholder="Auto-calculated" trailingIcon={<span className="text-gray-400 text-xs whitespace-nowrap">Kg/m²</span>} />
                 
                 {/* Pain Score */}
