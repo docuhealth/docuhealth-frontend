@@ -159,7 +159,6 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
       title: "Radiologist",
       subtitle: "Medical personnel",
       icon: <Radiologist_Icon />,
-      disabled: true,
     },
     {
       id: 5,
@@ -309,6 +308,9 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                 )}
                 {isStaffSelectedRole === "pharmacist" && (
                   <option value="drug_purchase">Drug purchase / refill</option>
+                )}
+                {isStaffSelectedRole === "radiologist" && (
+                  <option value="imaging">Imaging services (scan / X-ray)</option>
                 )}
                 {/* <option value="male">Consultation</option>
                                         <option value="female">Vital checkup/other nursing services</option>

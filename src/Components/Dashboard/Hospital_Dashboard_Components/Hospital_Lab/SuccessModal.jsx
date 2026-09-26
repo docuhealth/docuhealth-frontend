@@ -15,13 +15,11 @@ const SuccessModal = ({ isOpen, onClose }) => {
         </div>
 
         <p className="text-base font-semibold text-gray-800 mb-6 leading-snug">
-          You have successfully uploaded a<br />completed test result!
+          You have successfully uploaded a<br />
+          completed test result!
         </p>
 
-        <Button
-          onClick={onClose}
-          fullWidth
-        >
+        <Button onClick={onClose} fullWidth>
           Done
         </Button>
       </div>

@@ -1,38 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
-import Input from "../../../../ui/Input";
+import OrderScanModal from "../../Hospital_Doctors/Appointments_Dashboard/components/OrderScanModal";
 
-// Dummy-only — no endpoint lets a radiologist browse real appointments yet (BACKEND_RADIOLOGY_ISSUES.md item 2).
+// The order modal is the doctor's Order Scan one: it resolves this appointment into a staff_appointment_order linked by sqid.
 
-const toLocalDate = (d) => d.toISOString().slice(0, 10);
-const toLocalTime = (d) => d.toTimeString().slice(0, 5);
+const STATUS_COLOR = {
+  pending: "text-amber-500",
+  confirmed: "text-green-600",
+  completed: "text-green-600",
+  cancelled: "text-red-500",
+};
 
 const RadiologyAppointmentPatientInfo = ({ appointment, onBack, autoOpenCreateOrder }) => {
   const patient = appointment?.patient ?? {};
+  const paymentType = patient.payment_provider?.type || patient.payment_category;
 
   const [showOrderModal, setShowOrderModal] = useState(!!autoOpenCreateOrder);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [type, setType] = useState("");
-  const [orderDate, setOrderDate] = useState(toLocalDate(new Date()));
-  const [orderTime, setOrderTime] = useState(toLocalTime(new Date()));
 
   useEffect(() => {
     if (autoOpenCreateOrder) setShowOrderModal(true);
   }, [autoOpenCreateOrder]);
-
-  const resetForm = () => {
-    setType("");
-    setOrderDate(toLocalDate(new Date()));
-    setOrderTime(toLocalTime(new Date()));
-  };
-
-  const handleCreateOrder = () => {
-    if (!type.trim() || !orderDate || !orderTime) return;
-    setShowOrderModal(false);
-    resetForm();
-    setShowSuccessModal(true);
-  };
 
   return (
     <>
@@ -45,7 +33,10 @@ const RadiologyAppointmentPatientInfo = ({ appointment, onBack, autoOpenCreateOr
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
             <p className="w-full sm:w-auto">
-              Status: <span className="font-semibold text-amber-500">Pending</span>
+              Status:{" "}
+              <span className={`font-semibold capitalize ${STATUS_COLOR[appointment?.status] || "text-gray-500"}`}>
+                {appointment?.status || "—"}
+              </span>
             </p>
             <button
               type="button"
@@ -68,9 +59,9 @@ const RadiologyAppointmentPatientInfo = ({ appointment, onBack, autoOpenCreateOr
                 {patient?.firstname} {patient?.lastname}
               </p>
               <p className="text-[14px] text-gray-500 mt-0.5 flex items-center gap-1">
-                {patient?.payment_category && (
+                {paymentType && (
                   <span className="text-[10px] text-green-700 font-bold bg-green-100 px-2 py-0.5 rounded-md uppercase tracking-wider">
-                    {patient.payment_category}
+                    {paymentType}
                   </span>
                 )}
               </p>
@@ -93,80 +84,7 @@ const RadiologyAppointmentPatientInfo = ({ appointment, onBack, autoOpenCreateOr
         </div>
       </div>
 
-      {/* ── Create Scan Order modal ── */}
-      {showOrderModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 flex flex-col gap-6 text-sm">
-            <div className="relative flex items-start justify-center">
-              <div className="text-center">
-                <h3 className="text-[20px] font-semibold text-docuhealth-dark">Create scan order</h3>
-                <p className="text-sm text-gray-500 mt-1">Kindly order a scan</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowOrderModal(false);
-                  resetForm();
-                }}
-                className="absolute right-0 top-0 text-gray-800 hover:text-black transition-colors"
-              >
-                <X size={20} strokeWidth={2.5} />
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm text-docuhealth-dark font-medium">Imaging order</label>
-              <Input type="text" value={type} onChange={(e) => setType(e.target.value)} placeholder="e.g. CT Abdomen" />
-            </div>
-
-            <div className="flex gap-3">
-              <div className="flex flex-col gap-1.5 flex-1">
-                <label className="text-sm text-docuhealth-dark font-medium">Order date</label>
-                <Input type="date" value={orderDate} onChange={(e) => setOrderDate(e.target.value)} />
-              </div>
-              <div className="flex flex-col gap-1.5 flex-1">
-                <label className="text-sm text-docuhealth-dark font-medium">Order time</label>
-                <Input type="time" value={orderTime} onChange={(e) => setOrderTime(e.target.value)} />
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleCreateOrder}
-              disabled={!type.trim() || !orderDate || !orderTime}
-              className="w-full bg-docuhealth-primary text-white text-sm font-medium py-2.5 rounded-full transition-colors disabled:opacity-50 hover:bg-docuhealth-dark-primary"
-            >
-              Proceed
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── Success modal ── */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-auto p-8 flex flex-col items-center text-center">
-            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
-              <div className="w-14 h-14 rounded-full bg-green-700 flex items-center justify-center">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                  <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-            </div>
-            <p className="text-base font-semibold text-gray-800 mb-6 leading-snug">
-              You have successfully created
-              <br />a scan order for this patient!
-            </p>
-            <button
-              type="button"
-              onClick={() => setShowSuccessModal(false)}
-              className="w-full bg-docuhealth-primary text-white text-sm font-semibold py-3 rounded-full hover:bg-docuhealth-dark-primary transition-colors"
-            >
-              Done
-            </button>
-          </div>
-        </div>
-      )}
+      {showOrderModal && <OrderScanModal selectedPatientDetails={appointment} onClose={() => setShowOrderModal(false)} />}
     </>
   );
 };

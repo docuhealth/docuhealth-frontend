@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { ScanLine } from "lucide-react";
 import DashboardLayout from "../../../Components/ui/DashboardLayout";
 import { DoctorAppContext } from "../../../context/HospitalContext/Doctors/DoctorAppContext";
 
@@ -106,6 +107,16 @@ const Hospital_Doctors_Layout = () => {
             className={`group-hover:fill-white ${isActive ? "fill-white" : "fill-docuhealth-secondary"}`}
           />
         </svg>
+      ),
+    },
+    {
+      name: "Radiology Results",
+      path: "/hospital-doctors-radiology-dashboard",
+      icon: (isActive) => (
+        <ScanLine
+          size={20}
+          className={`group-hover:stroke-white ${isActive ? "stroke-white" : "stroke-docuhealth-secondary"}`}
+        />
       ),
     },
     {

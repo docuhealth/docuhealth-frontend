@@ -33,7 +33,10 @@ const getBadge = (order, activeStatus) => {
   }
   switch (activeStatus) {
     case "in_progress":
-      return { label: "In-progress", cls: "bg-amber-100 text-amber-600" };
+      // The tab holds both accepted items and ones whose images are collected and awaiting a result.
+      return order.status === "image_collected"
+        ? { label: "Image collected", cls: "bg-blue-100 text-blue-600" }
+        : { label: "In-progress", cls: "bg-amber-100 text-amber-600" };
     case "completed":
       return { label: "Completed", cls: "bg-green-100 text-green-600" };
     case "rejected":
