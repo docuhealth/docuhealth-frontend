@@ -36,6 +36,7 @@ import PatientHandoverTab from "./PatientHandoverTab";
 import DoctorIssuedTasksHistory from "./DoctorIssuedTasksHistory";
 import PatientRadiologyRecords from "./PatientRadiologyRecords";
 import PatientMedicationHistory from "./PatientMedicationHistory";
+import EmptyState from "../../../../ui/EmptyState";
 import { createProgressNote } from "../../../../../queries/Hospital/doctor/progressNotes";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 
@@ -1818,35 +1819,62 @@ const getTabs = ({
     },
     {
       title: "Radiology Result",
+      // content: (
+      //   <PatientRadiologyRecords
+      //     patientFullInfo={patientFullInfo}
+      //     selected={selected}
+      //   />
+      // ),
       content: (
-        <PatientRadiologyRecords
-          patientFullInfo={patientFullInfo}
-          selected={selected}
-        />
+        <div className="py-16 text-center">
+          <EmptyState
+            icon="document"
+            title="Coming Soon"
+            description="Radiology results will be available soon."
+          />
+        </div>
       ),
     },
     {
       title: "Lab Result",
+      // content: (
+      //   <PatientLabRecords
+      //     labloading={labloading}
+      //     patientLabRecords={patientLabRecords}
+      //     count={labCount}
+      //     currentPage={labCurrentPage}
+      //     totalPages={labTotalPages}
+      //     setCurrentPage={setLabCurrentPage}
+      //   />
+      // ),
       content: (
-        <PatientLabRecords
-          labloading={labloading}
-          patientLabRecords={patientLabRecords}
-          count={labCount}
-          currentPage={labCurrentPage}
-          totalPages={labTotalPages}
-          setCurrentPage={setLabCurrentPage}
-        />
+        <div className="py-16 text-center">
+          <EmptyState
+            icon="document"
+            title="Coming Soon"
+            description="Lab results will be available soon."
+          />
+        </div>
       ),
     },
     {
       title: "Medication History",
+      // content: (
+      //   <PatientMedicationHistory
+      //     patientFullInfo={patientFullInfo}
+      //     patientMedRecords={patientMedRecords}
+      //     patientSoapNotes={patientSoapNotes}
+      //     selected={selected}
+      //   />
+      // ),
       content: (
-        <PatientMedicationHistory
-          patientFullInfo={patientFullInfo}
-          patientMedRecords={patientMedRecords}
-          patientSoapNotes={patientSoapNotes}
-          selected={selected}
-        />
+        <div className="py-16 text-center">
+          <EmptyState
+            icon="document"
+            title="Coming Soon"
+            description="Medication history will be available soon."
+          />
+        </div>
       ),
     },
   ];
