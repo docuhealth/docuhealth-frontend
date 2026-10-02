@@ -101,7 +101,7 @@ const NursingDischargeSummaryForm = ({ admission, patientFullInfo, activeTask, t
     // 3. Fallback: Fetch tasks directly from admission
     if (!taskSqid && admissionSqid) {
       try {
-        const res = await axiosInstanceHos.get(`/api/inpatients/admissions/${admissionSqid}/task-occurrences`);
+        const res = await axiosInstanceHos.get(`/api/inpatients/admissions/${admissionSqid}/task-occurrences?status=pending&size=100`);
         const results = res.data?.results || (Array.isArray(res.data) ? res.data : []);
         const found = results.find(t => t.task_type === 'nurse_in_patient_discharge' || t.task_type === 'discharge_summary');
         if (found?.sqid) {
