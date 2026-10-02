@@ -28,8 +28,8 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
     const sortedAdmittedPatients = useMemo(() => {
         // Sort by admission date (Most recent first)
         return [...admittedPatients].sort((a, b) => {
-            const dateA = new Date(a.admission_date).getTime();
-            const dateB = new Date(b.admission_date).getTime();
+            const dateA = new Date(a.created_at).getTime();
+            const dateB = new Date(b.created_at).getTime();
             return dateB - dateA; // Use dateA - dateB for oldest first
         });
     }, [admittedPatients]);
@@ -148,7 +148,7 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
                                     )}
                                 </p>
                                 <div className="bg-docuhealth-light-green px-2 rounded-full">
-                                    <p className="text-docuhealth-green ">{formatRecordDate(admittedPatient.admission_date)}</p>
+                                    <p className="text-docuhealth-green ">{formatRecordDate(admittedPatient.created_at)}</p>
                                 </div>
                             </div>
                             <div className='border-b py-2'>
@@ -169,8 +169,8 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
                                 </svg>
                                 <p className="">
                                     {" "}
-                                    {admittedPatient?.staff_info
-                                        ? `${'Dr. ' + admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`
+                                    {admittedPatient?.requested_by_info
+                                        ? `${'Dr. ' + admittedPatient.requested_by_info.firstname} ${admittedPatient.requested_by_info.lastname}`
                                         : "Unassigned Doctor"}
                                 </p>
                             </div>
@@ -207,7 +207,7 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
                                 </svg>
 
 
-                                <p className="">{formatFullDateTime(admittedPatient.admission_date)}</p>
+                                <p className="">{formatFullDateTime(admittedPatient.created_at)}</p>
                             </div>
                             <button className="text-center mt-3 py-2 border border-docuhealth-dark text-docuhealth-dark w-full rounded-full cursor-pointer font-medium text-sm hover:bg-gray-50 transition-colors"
                                 onClick={() => {
@@ -424,9 +424,9 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
                             </div>
                             <div className='border-b py-2'>
                                 <p className='text-gray-600'>HIN : {(admittedPatient?.patient_info?.hin || admittedPatient?.patient?.hin) ? (admittedPatient.patient_info?.hin || admittedPatient.patient?.hin).slice(0, 4) + "••••••" + (admittedPatient.patient_info?.hin || admittedPatient.patient?.hin).slice(-2) : 'N/A'}</p>
-                                {admittedPatient?.admission_date && (
+                                {admittedPatient?.created_at && (
                                     <p className="text-gray-600 pt-1">
-                                        Admitted : {formatRecordDate(admittedPatient.admission_date)}
+                                        Admitted : {formatRecordDate(admittedPatient.created_at)}
                                     </p>
                                 )}
                             </div>
@@ -446,8 +446,8 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
                                 <p className="">
                                     {admittedPatient?.discharged_by
                                         ? `Discharged by ${admittedPatient.discharged_by.role === "doctor" ? "Dr. " : ""}${admittedPatient.discharged_by.firstname} ${admittedPatient.discharged_by.lastname}`
-                                        : admittedPatient?.staff_info
-                                            ? `Dr. ${admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`
+                                        : admittedPatient?.requested_by_info
+                                            ? `Dr. ${admittedPatient.requested_by_info.firstname} ${admittedPatient.requested_by_info.lastname}`
                                             : "Unassigned Staff"}
                                 </p>
                             </div>
@@ -525,8 +525,8 @@ const OutPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected }) => {
 
     const sortedOutPatients = useMemo(() => {
         return [...outPatients].sort((a, b) => {
-            const dateA = new Date(a.created_at || a.admission_date).getTime();
-            const dateB = new Date(b.created_at || b.admission_date).getTime();
+            const dateA = new Date(a.created_at).getTime();
+            const dateB = new Date(b.created_at).getTime();
             return dateB - dateA;
         });
     }, [outPatients]);
@@ -614,7 +614,7 @@ const OutPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected }) => {
                                     <svg width="15" height="15" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M4.08366 1.7487V0.582031H5.25033V1.7487H8.75033V0.582031H9.91699V1.7487H12.2503C12.5725 1.7487 12.8337 2.00987 12.8337 2.33203V5.2487H11.667V2.91536H9.91699V4.08203H8.75033V2.91536H5.25033V4.08203H4.08366V2.91536H2.33366V11.082H5.83366V12.2487H1.75033C1.42816 12.2487 1.16699 11.9875 1.16699 11.6654V2.33203C1.16699 2.00987 1.42816 1.7487 1.75033 1.7487H4.08366ZM9.91699 6.9987C8.62835 6.9987 7.58366 8.04339 7.58366 9.33203C7.58366 10.6207 8.62835 11.6654 9.91699 11.6654C11.2056 11.6654 12.2503 10.6207 12.2503 9.33203C12.2503 8.04339 11.2056 6.9987 9.91699 6.9987ZM6.41699 9.33203C6.41699 7.39904 7.984 5.83203 9.91699 5.83203C11.85 5.83203 13.417 7.39904 13.417 9.33203C13.417 11.265 11.85 12.832 9.91699 12.832C7.984 12.832 6.41699 11.265 6.41699 9.33203ZM9.33366 7.58203V9.57365L10.6712 10.9112L11.4961 10.0862L10.5003 9.09041V7.58203H9.33366Z" fill="var(--color-docuhealth-dark)"/>
                                     </svg>
-                                    <p className="">{formatFullDateTime(outPatient.created_at || outPatient.admission_date)}</p>
+                                    <p className="">{formatFullDateTime(outPatient.created_at)}</p>
                                 </div>
                                 <button
                                     className="text-center mt-3 py-2.5 border bg-docuhealth-dark text-white w-full rounded-full cursor-pointer"

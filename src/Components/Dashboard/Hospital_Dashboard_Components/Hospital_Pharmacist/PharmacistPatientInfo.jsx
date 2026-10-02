@@ -1,5 +1,6 @@
 import React from "react";
 import { ArrowLeft } from "lucide-react";
+import AppointmentCloseControl from "../../../ui/AppointmentCloseControl";
 import LabTabComponent from "../Hospital_Lab/PatientInfoComponents/LabTabComponent";
 import getTabs from "../Hospital_Lab/PatientInfoComponents/LabTabDetails";
 
@@ -18,6 +19,7 @@ const PharmacistPatientInfo = ({ selectedPatientDetails, setSeePatientDetails, s
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+          <AppointmentCloseControl appointment={selectedPatientDetails} listKey="pharmacist-appointments" />
           {!hideCreateOrder && (
             <button
               onClick={() => {

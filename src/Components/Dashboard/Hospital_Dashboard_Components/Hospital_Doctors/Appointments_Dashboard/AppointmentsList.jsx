@@ -9,6 +9,8 @@ import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
 import SearchBar from "../../../../SearchBar/SearchBar";
 import Input from "../../../../ui/Input";
 import ReferOutModal from "./components/ReferOutModal";
+import CloseAppointmentModal from "../../../../ui/CloseAppointmentModal";
+import { isAppointmentClosed, useCloseAppointment } from "../../../../../queries/Hospital/appointments";
 
 const AppointmentsList = ({
   setSeePatientDetails,
@@ -54,6 +56,10 @@ const AppointmentsList = ({
   };
 
   const [referOutAppointment, setReferOutAppointment] = useState(null);
+  const [checkoutAppointment, setCheckoutAppointment] = useState(null);
+  const checkoutMutation = useCloseAppointment("doctor-appointments", {
+    onSuccess: () => setCheckoutAppointment(null),
+  });
 
 
   if (loading) {
@@ -384,6 +390,21 @@ const AppointmentsList = ({
                     >
                       Refer Out
                     </button>
+
+                    {isAppointmentClosed(appointment) ? (
+                      <p className="w-full text-left text-[12px] text-gray-400 p-2">Checked out</p>
+                    ) : (
+                      <button
+                        type="button"
+                        className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                        onClick={() => {
+                          setCheckoutAppointment(appointment);
+                          setOpenPopover(null);
+                        }}
+                      >
+                        Check out
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -445,6 +466,21 @@ const AppointmentsList = ({
                       >
                         Refer Out
                       </button>
+
+                      {isAppointmentClosed(appointment) ? (
+                        <p className="w-full text-left text-[12px] text-gray-400 p-2">Checked out</p>
+                      ) : (
+                        <button
+                          type="button"
+                          className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
+                          onClick={() => {
+                            setCheckoutAppointment(appointment);
+                            setOpenPopover(null);
+                          }}
+                        >
+                          Check out
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -498,6 +534,16 @@ const AppointmentsList = ({
         />
       </div>
       </>)}
+
+      <CloseAppointmentModal
+        isOpen={!!checkoutAppointment}
+        onClose={() => setCheckoutAppointment(null)}
+        onConfirm={() => checkoutMutation.mutate(checkoutAppointment.sqid)}
+        isPending={checkoutMutation.isPending}
+        firstname={checkoutAppointment?.patient?.firstname}
+        title="Check out this patient?"
+        confirmLabel="Check out"
+      />
 
       {referOutAppointment && (
         <ReferOutModal

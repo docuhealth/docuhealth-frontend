@@ -1,10 +1,15 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ReceptionistAdmissionRequestContext } from "../../../../../context/HospitalContext/Receptionist/ReceptionistAdmissionRequestContext";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
-import axiosInstanceHos from "../../../../../lib/axios/hospital";
+import {
+  acceptAdmissionRequest,
+  rejectAdmissionRequest,
+} from "../../../../../queries/Hospital/receptionist/admissionRequest";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import SearchBar from "../../../../SearchBar/SearchBar";
+import Modal from "../../../../ui/Modal";
 import toast from "react-hot-toast";
 
 const AdmissionRequestList = () => {
@@ -20,58 +25,63 @@ const AdmissionRequestList = () => {
     setSearchQuery,
   } = useContext(ReceptionistAdmissionRequestContext);
 
-  console.log(admissionRequests)
-
-
   const queryClient = useQueryClient();
 
-  const admissionMutation = useMutation({
-    mutationFn: (admissionRequestSQID) => {
-      return axiosInstanceHos.patch(
-        `api/hospitals/admissions/${admissionRequestSQID}/confirm`,
-      );
-    },
-    onSuccess: () => {
-      // Invalidate both requested queries
-      queryClient.invalidateQueries({
-        queryKey: ["hospital-admission-requests"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["hospital-patients-receptionist"],
-      });
+  // The request awaiting a rejection reason, or null when the modal is closed.
+  const [rejecting, setRejecting] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  // Hide a request as soon as it is processed so it cannot be clicked again before the refetch lands.
+  const [processedSqids, setProcessedSqids] = useState(() => new Set());
+  const markProcessed = (sqid) => setProcessedSqids((prev) => new Set(prev).add(sqid));
+  const visibleRequests = admissionRequests.filter((r) => !processedSqids.has(r.sqid));
 
-      toast.success("Patient admitted successfully");
+  const admissionMutation = useMutation({
+    mutationFn: acceptAdmissionRequest,
+    onSuccess: (res, sqid) => {
+      markProcessed(sqid);
+      queryClient.invalidateQueries({ queryKey: ["hospital-admission-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["hospital-patients-receptionist"] });
+      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
+      toast.success(res?.detail || "Patient admitted successfully");
     },
     onError: (err) => {
       console.error("Error admitting patient:", err);
-      toast.error(err.response?.data?.message || err.response?.data?.detail || "Error admitting patient");
+      toast.error(extractApiErrorMessage(err, "Error admitting patient"));
     },
   });
 
   const rejectMutation = useMutation({
-    mutationFn: (admissionRequestSQID) => {
-      return axiosInstanceHos.patch(
-        `api/receptionists/admissions/${admissionRequestSQID}/reject`,
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["hospital-admission-requests"],
-      });
-      toast.success("Admission request rejected");
+    mutationFn: rejectAdmissionRequest,
+    onSuccess: (res, { sqid }) => {
+      markProcessed(sqid);
+      queryClient.invalidateQueries({ queryKey: ["hospital-admission-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
+      toast.success(res?.detail || "Admission request rejected");
+      closeRejectModal();
     },
     onError: (err) => {
       console.error("Error rejecting admission:", err);
-      toast.error(err.response?.data?.message || err.response?.data?.detail || "Error rejecting admission");
+      toast.error(extractApiErrorMessage(err, "Error rejecting admission"));
     },
   });
+
+  const closeRejectModal = () => {
+    setRejecting(null);
+    setRejectionReason("");
+  };
 
   const onAdmitClick = (sqid) => {
     admissionMutation.mutate(sqid);
   };
 
-  const onRejectClick = (sqid) => {
-    rejectMutation.mutate(sqid);
+  const onRejectClick = (admissionRequest) => {
+    setRejecting(admissionRequest);
+  };
+
+  const onConfirmReject = () => {
+    const reason = rejectionReason.trim();
+    if (!reason || !rejecting) return;
+    rejectMutation.mutate({ sqid: rejecting.sqid, rejection_reason: reason });
   };
 
   if (loading) {
@@ -81,7 +91,7 @@ const AdmissionRequestList = () => {
       </div>
     );
   }
-  if (admissionRequests.length === 0 && !searchQuery) {
+  if (visibleRequests.length === 0 && !searchQuery) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
@@ -165,7 +175,7 @@ const AdmissionRequestList = () => {
         )}
       </div>
 
-      {admissionRequests.length === 0 && searchQuery ? (
+      {visibleRequests.length === 0 && searchQuery ? (
         <div className="py-12 text-center text-gray-500 text-sm">
           <p className="font-medium">No results found.</p>
           <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
@@ -173,7 +183,7 @@ const AdmissionRequestList = () => {
       ) : (
       <>
       <div className="my-4 text-[12px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {admissionRequests.map((admissionRequest, index) => {
+        {visibleRequests.map((admissionRequest, index) => {
           const isMutatingThis =
             admissionMutation.isPending &&
             admissionMutation.variables === admissionRequest.sqid;
@@ -187,7 +197,7 @@ const AdmissionRequestList = () => {
                 </p>
                 <div className="bg-docuhealth-light-green px-2 rounded-full">
                   <p className="text-docuhealth-green ">
-                    {formatRecordDate(admissionRequest.request_date) || 'Pending'}
+                    {formatRecordDate(admissionRequest.created_at) || 'Pending'}
                   </p>
                 </div>
               </div>
@@ -216,8 +226,8 @@ const AdmissionRequestList = () => {
                 </svg>
                 <p className="">
                   {" "}
-                  {admissionRequest?.staff_info
-                    ? `${admissionRequest?.staff_info?.role === "doctor" ? `Dr. ` + admissionRequest.staff_info.firstname : admissionRequest.staff_info.firstname} ${admissionRequest.staff_info.lastname}`
+                  {admissionRequest?.requested_by_info
+                    ? `${admissionRequest.requested_by_info.role === "doctor" ? `Dr. ` + admissionRequest.requested_by_info.firstname : admissionRequest.requested_by_info.firstname} ${admissionRequest.requested_by_info.lastname}`
                     : "NIL"}
                 </p>
               </div>
@@ -236,7 +246,7 @@ const AdmissionRequestList = () => {
                 </svg>
 
                 <p className="">
-                  admitted to :{" "}
+                  bed requested :{" "}
                   {admissionRequest?.ward_info
                     ? `${admissionRequest.ward_info.name} ward`
                     : "NIL"}
@@ -258,9 +268,9 @@ const AdmissionRequestList = () => {
                   <button
                     className="text-center py-2 border border-red-500 text-red-500 w-full rounded-full cursor-pointer disabled:opacity-50"
                     disabled={admissionMutation.isPending || rejectMutation.isPending}
-                    onClick={() => onRejectClick(admissionRequest.sqid)}
+                    onClick={() => onRejectClick(admissionRequest)}
                   >
-                    {rejectMutation.isPending && rejectMutation.variables === admissionRequest.sqid ? "Rejecting..." : "Reject"}
+                    Reject
                   </button>
                 </div>
               ) : (
@@ -282,6 +292,39 @@ const AdmissionRequestList = () => {
       />
       </>
       )}
+
+      <Modal isOpen={Boolean(rejecting)} onClose={closeRejectModal}>
+        <div className="flex flex-col gap-5">
+          <div className="text-center pr-6">
+            <h3 className="text-base font-semibold text-gray-900">Reject bed request</h3>
+            <p className="text-sm text-gray-500 mt-1">
+              {rejecting?.patient_info?.firstname} {rejecting?.patient_info?.lastname}
+              {rejecting?.ward_info ? ` · ${rejecting.ward_info.name} ward` : ""}
+              {rejecting?.bed_info ? `, Bed ${rejecting.bed_info.bed_number}` : ""}
+            </p>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-900 mb-2 block">
+              Reason <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              rows={4}
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Tell the doctor why the bed was refused..."
+              className="w-full border border-gray-200 rounded-xl px-3 py-3 text-sm text-gray-700 outline-none focus:border-red-400 resize-none transition-colors"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={onConfirmReject}
+            disabled={!rejectionReason.trim() || rejectMutation.isPending}
+            className="w-full bg-red-600 text-white text-sm font-semibold py-3.5 rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {rejectMutation.isPending ? "Rejecting..." : "Reject request"}
+          </button>
+        </div>
+      </Modal>
     </>
   );
 };

@@ -122,8 +122,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
                 selected?.discharge_date ||
                 selected?.closed_at ||
                 selected?.status === "inpatient_discharge" ||
-                selected?.status === "outpatient_discharge" ||
-                selected?.discharge_form) && (
+                selected?.status === "outpatient_discharge") && (
                 <button 
                     onClick={() => setShowDischargeSummaryModal(true)}
                     className="w-full sm:w-auto text-center bg-white border border-docuhealth-primary text-docuhealth-primary text-sm font-medium px-5 py-2.5 rounded-full hover:bg-gray-50 transition-colors cursor-pointer shrink-0"

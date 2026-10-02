@@ -1,12 +1,19 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { X, ChevronDown } from "lucide-react";
+import { X, Search } from "lucide-react";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchTestCategories, fetchLabTests } from "../../../../../../queries/Hospital/lab/requests";
+import {
+  fetchTestCategories,
+  fetchLabTests,
+  searchLabTests,
+} from "../../../../../../queries/Hospital/lab/requests";
+import useDebounce from "../../../../../../hooks/useDebounce";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import Modal from "../../../../../ui/Modal";
+import Select from "../../../../../ui/Select";
+import MultiSelect from "../../../../../ui/MultiSelect";
 
 /**
  * Unified "Order Laboratory" modal using the shared Modal component.
@@ -15,12 +22,9 @@ import Modal from "../../../../../ui/Modal";
 const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
   const queryClient = useQueryClient();
   const orderContext = resolveOrderContext(selectedPatientDetails);
-  const dropdownRef = useRef(null);
 
-  const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
   const [duplicateWarning, setDuplicateWarning] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [searchTest, setSearchTest] = useState("");
   const [formData, setFormData] = useState({
     patient_hin: orderContext.hin,
     note: "",
@@ -48,16 +52,41 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
     ? testTypesData
     : (testTypesData?.results ?? []);
 
-  // Close test dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsTestTypeDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const [testSearch, setTestSearch] = useState("");
+  const debouncedTestSearch = useDebounce(testSearch.trim(), 300);
+
+  const { data: searchData, isFetching: isSearching } = useQuery({
+    queryKey: ["lab-tests-search", debouncedTestSearch],
+    queryFn: searchLabTests,
+    enabled: debouncedTestSearch.length >= 2,
+  });
+
+  const searchResults = Array.isArray(searchData)
+    ? searchData
+    : (searchData?.results ?? []);
+
+  // A search hit fills category + test + specimen. Same category adds to the
+  // current picks; a different one resets them, like picking a new category.
+  const handlePickSearchResult = (test) => {
+    const categorySqid = test.category?.sqid;
+    if (!categorySqid) return;
+    const specimen =
+      test.specimens?.find((s) => s.is_preferred)?.name ||
+      test.specimens?.[0]?.name;
+
+    setFormData((prev) => ({
+      ...prev,
+      category: categorySqid,
+      specimen: specimen || prev.specimen,
+      test_type:
+        prev.category === categorySqid
+          ? prev.test_type.includes(test.sqid)
+            ? prev.test_type
+            : [...prev.test_type, test.sqid]
+          : [test.sqid],
+    }));
+    setTestSearch("");
+  };
 
   const { mutate: labMutate, isPending: isLabPending } = useMutation({
     mutationFn: async (payload) => {
@@ -82,7 +111,10 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
       if (payload.ignore_duplicate_warning) {
         requestPayload.ignore_duplicate_warning = true;
       }
-      return await axiosInstanceHos.post("api/lab/test-orders/create", requestPayload);
+      return await axiosInstanceHos.post(
+        "api/lab/test-orders/create",
+        requestPayload,
+      );
     },
     onSuccess: () => {
       setDuplicateWarning(null);
@@ -91,13 +123,18 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
       queryClient.invalidateQueries({ queryKey: ["doctor-lab-records"] });
     },
     onError: (err) => {
-      if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {
+      if (
+        err.response?.status === 400 &&
+        err.response?.data?.duplicate_warning
+      ) {
         setDuplicateWarning(err.response.data.duplicate_warning);
       } else {
         console.error("Error assigning patient to lab scientist:", err);
         toast.error(extractApiErrorMessage(err, "Lab test request failed."));
         queryClient.invalidateQueries({ queryKey: ["lab-test-categories"] });
-        queryClient.invalidateQueries({ queryKey: ["lab-tests", formData.category] });
+        queryClient.invalidateQueries({
+          queryKey: ["lab-tests", formData.category],
+        });
         setFormData((prev) => ({ ...prev, test_type: [] }));
       }
     },
@@ -115,35 +152,12 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
     labMutate({ ...formData, ignore_duplicate_warning: true });
   };
 
-  const handleToggleTest = (testId) => {
-    setFormData((prev) => {
-      const exists = prev.test_type.includes(testId);
-      return {
-        ...prev,
-        test_type: exists
-          ? prev.test_type.filter((id) => id !== testId)
-          : [...prev.test_type, testId],
-      };
-    });
-  };
-
-  const handleRemoveTest = (testId) => {
-    setFormData((prev) => ({
-      ...prev,
-      test_type: prev.test_type.filter((id) => id !== testId),
-    }));
-  };
-
-  const filteredTests = fetchedTestTypes.filter((t) =>
-    (t.name || "").toLowerCase().includes(searchTest.toLowerCase())
-  );
-
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      maxWidth={showSuccess || duplicateWarning ? "md" : "4xl"}
-      className="max-h-[92vh] flex flex-col p-3"
+      maxWidth={showSuccess || duplicateWarning ? "md" : "2xl"}
+      className="max-h-[88vh] flex flex-col p-2"
     >
       <div className="relative">
         {/* Close Button */}
@@ -159,12 +173,20 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
               <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                  <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M5 13l4 4L19 7"
+                    stroke="white"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </div>
             </div>
             <p className="text-base font-semibold text-gray-800 mb-6 leading-snug">
-              You have successfully assigned patient<br />to a lab scientist for a test!
+              You have successfully assigned patient
+              <br />
+              to a lab scientist for a test!
             </p>
             <button
               onClick={onClose}
@@ -177,15 +199,29 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
           <div className="py-2">
             <div className="text-center mt-2">
               <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                <svg
+                  className="w-8 h-8 text-orange-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Duplicate Order Detected</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Duplicate Order Detected
+              </h3>
               <p className="text-sm text-gray-600 mb-4 whitespace-pre-wrap text-left bg-orange-50 p-3 rounded-md">
                 {duplicateWarning}
               </p>
-              <p className="text-sm text-gray-600 font-medium">Are you sure you want to proceed?</p>
+              <p className="text-sm text-gray-600 font-medium">
+                Are you sure you want to proceed?
+              </p>
             </div>
             <div className="flex gap-3 mt-6">
               <button
@@ -221,7 +257,9 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
                   />
                 </svg>
               </div>
-              <h2 className="text-xl font-bold text-gray-900">Order Laboratory</h2>
+              <h2 className="text-xl font-bold text-gray-900">
+                Order Laboratory
+              </h2>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">
                 Fill in the required details below to create a task!
               </p>
@@ -229,159 +267,121 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
 
             {/* Modal Scrollable Body */}
             <div className="py-4 space-y-4 max-h-[58vh] overflow-y-auto pr-1">
-              {/* Category Card */}
-              <div className="border border-gray-200/80 rounded-xl p-4 bg-white shadow-[0px_1px_4px_rgba(0,0,0,0.02)]">
+              {/* Quick test search */}
+              <div>
                 <label className="block text-sm font-semibold text-docuhealth-primary mb-2">
-                  Category <span className="text-red-500">*</span>
+                  Search for a test
                 </label>
                 <div className="relative">
-                  <select
-                    value={formData.category}
-                    onChange={(e) => {
-                      const selectedVal = e.target.value;
-                      const selectedCat = categories.find(
-                        (c) => String(c.sqid || c.id) === selectedVal
-                      );
-                      setFormData({
-                        ...formData,
-                        category: selectedVal,
-                        specimen: selectedCat?.name || formData.specimen,
-                        test_type: [],
-                      });
-                    }}
-                    className="w-full border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-docuhealth-primary transition-colors appearance-none cursor-pointer pr-10"
-                  >
-                    <option value="" disabled>
-                      Select category
-                    </option>
-                    {categories.map((cat) => (
-                      <option key={cat.sqid || cat.id} value={cat.sqid || cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-gray-500">
-                    <ChevronDown size={18} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Test Card */}
-              <div
-                ref={dropdownRef}
-                className="border border-gray-200/80 rounded-xl p-4 bg-white shadow-[0px_1px_4px_rgba(0,0,0,0.02)]"
-              >
-                <label className="block text-sm font-semibold text-docuhealth-primary mb-2">
-                  Test <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <button
-                    type="button"
-                    aria-haspopup="listbox"
-                    aria-expanded={isTestTypeDropdownOpen}
-                    disabled={!formData.category}
-                    onClick={() => {
-                      if (formData.category) setIsTestTypeDropdownOpen(!isTestTypeDropdownOpen);
-                    }}
-                    className={`border border-gray-200 rounded-lg w-full px-3.5 py-2.5 text-sm outline-none flex justify-between items-center bg-white transition-colors ${
-                      !formData.category
-                        ? "opacity-50 cursor-not-allowed bg-gray-50 text-gray-400"
-                        : "cursor-pointer text-gray-700 hover:border-docuhealth-primary"
-                    }`}
-                  >
-                    <span>
-                      {isTestTypesLoading
-                        ? "Loading tests..."
-                        : formData.test_type.length > 0
-                        ? `${formData.test_type.length} test${
-                            formData.test_type.length > 1 ? "s" : ""
-                          } selected`
-                        : "Select test"}
-                    </span>
-                    <ChevronDown
-                      size={18}
-                      className={`text-gray-500 transition-transform duration-200 ${
-                        isTestTypeDropdownOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-
-                  {/* Dropdown Menu */}
-                  {isTestTypeDropdownOpen && (
-                    <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-56 overflow-y-auto">
-                      {fetchedTestTypes.length > 5 && (
-                        <div className="p-2 border-b border-gray-100 sticky top-0 bg-white">
-                          <input
-                            type="text"
-                            placeholder="Search tests..."
-                            value={searchTest}
-                            onChange={(e) => setSearchTest(e.target.value)}
-                            className="w-full px-3 py-1.5 text-xs border border-gray-200 rounded-md outline-none focus:border-docuhealth-primary"
-                          />
-                        </div>
-                      )}
-                      {filteredTests.length === 0 ? (
-                        <div className="p-3 text-xs text-gray-500 text-center">
-                          No tests found
-                        </div>
-                      ) : (
-                        filteredTests.map((test) => {
-                          const id = test.sqid || test.name;
-                          const isSelected = formData.test_type.includes(id);
-                          return (
-                            <label
-                              key={id}
-                              className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 text-xs sm:text-sm text-gray-700 ${
-                                isSelected ? "bg-docuhealth-primary/5 font-medium" : ""
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <input
-                                  type="checkbox"
-                                  className="w-4 h-4 text-docuhealth-primary rounded border-gray-300 focus:ring-docuhealth-primary cursor-pointer"
-                                  checked={isSelected}
-                                  onChange={() => handleToggleTest(id)}
-                                />
-                                <span>{test.name}</span>
-                              </div>
-                            </label>
-                          );
-                        })
-                      )}
-                    </div>
+                  <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={testSearch}
+                    onChange={(e) => setTestSearch(e.target.value)}
+                    placeholder="Type a test name, e.g. Full Blood Count, Malaria, HbA1c"
+                    className="w-full border border-gray-300 rounded-lg pl-9 pr-9 py-3 text-sm text-gray-700 outline-none focus:border-docuhealth-primary transition-colors placeholder-gray-400"
+                  />
+                  {testSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setTestSearch("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                      aria-label="Clear search"
+                    >
+                      <X size={16} />
+                    </button>
                   )}
                 </div>
 
-                {/* Selected Tests Chips Display */}
-                {formData.test_type.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-3 pt-2 border-t border-gray-100">
-                    {formData.test_type.map((id) => {
-                      const testObj = fetchedTestTypes.find(
-                        (t) => (t.sqid || t.name) === id
-                      );
-                      const name = testObj?.name || id;
-                      return (
-                        <div
-                          key={id}
-                          className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-gray-700 shadow-2xs"
-                        >
-                          <span className="truncate max-w-[200px]">{name}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveTest(id)}
-                            className="text-red-400 hover:text-red-600 transition-colors cursor-pointer"
-                          >
-                            <X size={14} />
-                          </button>
-                        </div>
-                      );
-                    })}
+                {testSearch.trim().length >= 2 && (
+                  <div className="mt-1 border border-gray-200 rounded-lg overflow-hidden">
+                    {isSearching || debouncedTestSearch !== testSearch.trim() ? (
+                      <p className="px-4 py-3 text-sm text-gray-400">Searching...</p>
+                    ) : searchResults.length === 0 ? (
+                      <p className="px-4 py-3 text-sm text-gray-400">
+                        No tests match &ldquo;{testSearch.trim()}&rdquo;
+                      </p>
+                    ) : (
+                      <div className="max-h-56 overflow-y-auto divide-y divide-gray-100">
+                        {searchResults.map((test) => {
+                          const alreadyPicked =
+                            formData.category === test.category?.sqid &&
+                            formData.test_type.includes(test.sqid);
+                          return (
+                            <button
+                              key={test.sqid}
+                              type="button"
+                              disabled={alreadyPicked}
+                              onClick={() => handlePickSearchResult(test)}
+                              className="w-full text-left px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-gray-50 transition-colors cursor-pointer disabled:cursor-default disabled:bg-gray-50"
+                            >
+                              <span className="text-sm text-gray-800">
+                                {test.name}
+                              </span>
+                              <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-docuhealth-primary/10 text-docuhealth-primary">
+                                {alreadyPicked ? "Added" : test.category?.name}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
 
+              <div className="flex items-center gap-3 text-xs text-gray-400">
+                <span className="flex-1 border-t border-gray-200" />
+                or pick by category
+                <span className="flex-1 border-t border-gray-200" />
+              </div>
+
+              {/* Category Card */}
+              <div className="">
+                <label className="block text-sm font-semibold text-docuhealth-primary mb-2">
+                  Category <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  value={formData.category}
+                  placeholder="Select category"
+                  options={categories.map((cat) => ({
+                    value: String(cat.sqid || cat.id),
+                    label: cat.name,
+                  }))}
+                  onChange={(value, option) =>
+                    setFormData({
+                      ...formData,
+                      category: value,
+                      specimen: option.label || formData.specimen,
+                      test_type: [],
+                    })
+                  }
+                />
+              </div>
+
+              {/* Test Card */}
+              <div className="">
+                <label className="block text-sm font-semibold text-docuhealth-primary mb-2">
+                  Test <span className="text-red-500">*</span>
+                </label>
+                <MultiSelect
+                  values={formData.test_type}
+                  placeholder="Select test"
+                  disabled={!formData.category}
+                  isLoading={isTestTypesLoading && !!formData.category}
+                  emptyText="No tests found"
+                  options={fetchedTestTypes.map((test) => ({
+                    value: test.sqid || test.name,
+                    label: test.name,
+                  }))}
+                  onChange={(values) =>
+                    setFormData((prev) => ({ ...prev, test_type: values }))
+                  }
+                />
+              </div>
+
               {/* Specimen needed Card */}
-              <div className="border border-gray-200/80 rounded-xl p-4 bg-white shadow-[0px_1px_4px_rgba(0,0,0,0.02)]">
+              <div className="">
                 <label className="block text-sm font-semibold text-docuhealth-primary mb-2">
                   Specimen needed
                 </label>
@@ -399,7 +399,7 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
               </div>
 
               {/* Additional information (optional) Card */}
-              <div className="border border-gray-200/80 rounded-xl p-4 bg-white shadow-[0px_1px_4px_rgba(0,0,0,0.02)]">
+              <div className="">
                 <label className="block text-sm font-semibold text-docuhealth-primary mb-2">
                   Additional information (optional)
                 </label>

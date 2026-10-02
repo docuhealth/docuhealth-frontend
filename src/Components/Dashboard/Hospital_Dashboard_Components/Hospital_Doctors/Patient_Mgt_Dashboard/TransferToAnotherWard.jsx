@@ -67,11 +67,8 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
       toast.error("Pick a destination ward and bed.");
       return;
     }
-    mutate({
-      admission: admissionSqid,
-      new_ward: form.new_ward,
-      new_bed: form.new_bed,
-    });
+    // `new_ward` only filters the bed list; the API takes the ward from the bed.
+    mutate({ admission: admissionSqid, new_bed: form.new_bed });
   };
 
   return (

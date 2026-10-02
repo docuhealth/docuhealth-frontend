@@ -127,7 +127,7 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
   const uploadMutation = useMutation({
     mutationFn: uploadScanResult,
     onSuccess: (result) => {
-      // Walk-in results are approved on upload; anything else waits on the ordering doctor and the item stays image_collected.
+      // Radiologist-ordered results are approved on upload; anything else waits on the ordering doctor and the item stays image_collected.
       const approved = result.resultStatus === "approved";
       finalOrderRef.current = {
         ...order,
@@ -511,7 +511,7 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
               </div>
             </div>
 
-            <p className="text-base font-semibold text-gray-800 text-center leading-snug">
+            <p className="text-base font-normal text-gray-800 text-center leading-snug">
               {awaitingApproval ? (
                 <>
                   You have successfully uploaded the scan result!

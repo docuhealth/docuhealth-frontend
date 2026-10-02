@@ -82,8 +82,8 @@ const Hospital_Nurses_Patients_Dashboard = () => {
       const initialPatient = navState.selectedPatient;
       const hin = navState.patientHin || initialPatient?.patient_info?.hin || initialPatient?.patient?.hin;
 
-      // If it already has full admission properties (ward_info, admission_date, staff_info)
-      if (initialPatient && initialPatient.ward_info && initialPatient.admission_date && initialPatient.staff_info) {
+      // If it already has full admission properties (ward_info, requested_by_info)
+      if (initialPatient && initialPatient.ward_info && initialPatient.requested_by_info) {
         setSelected(initialPatient);
         setAdvanceCheckUp(true);
         window.history.replaceState({}, document.title);

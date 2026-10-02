@@ -47,7 +47,7 @@ const PatientInfoContent = ({ patient, admission, patientFullInfo, formatDate, f
                         <>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-sm text-gray-600 font-medium">Date/time of admission</label>
-                                <input type="text" readOnly value={formatDateTime(admission?.admission_date)} className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none" />
+                                <input type="text" readOnly value={formatDateTime(admission?.created_at)} className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none" />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-sm text-gray-600 font-medium">Discharge date/time</label>
@@ -63,7 +63,7 @@ const PatientInfoContent = ({ patient, admission, patientFullInfo, formatDate, f
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-sm text-gray-600 font-medium">Doctor in charge</label>
-                                <input type="text" readOnly value={admission?.staff_info ? `Dr. ${admission.staff_info.firstname} ${admission.staff_info.lastname}` : 'N/A'} className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none" />
+                                <input type="text" readOnly value={admission?.requested_by_info ? `Dr. ${admission.requested_by_info.firstname} ${admission.requested_by_info.lastname}` : 'N/A'} className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none" />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-sm text-gray-600 font-medium">Gender</label>
@@ -81,11 +81,11 @@ const PatientInfoContent = ({ patient, admission, patientFullInfo, formatDate, f
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                         <div className="flex flex-col gap-1.5">
                             <label className="text-sm text-gray-600 font-medium">Admitting doctor</label>
-                            <input type="text" readOnly value={admission?.staff_info ? `Dr. ${admission.staff_info.firstname} ${admission.staff_info.lastname}` : 'N/A'} className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none" />
+                            <input type="text" readOnly value={admission?.requested_by_info ? `Dr. ${admission.requested_by_info.firstname} ${admission.requested_by_info.lastname}` : 'N/A'} className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none" />
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <label className="text-sm text-gray-600 font-medium">Date/Time of Admission</label>
-                            <input type="text" readOnly value={formatDateTime(admission?.admission_date)} className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none" />
+                            <input type="text" readOnly value={formatDateTime(admission?.created_at)} className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none" />
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <label className="text-sm text-gray-600 font-medium">Ward</label>
