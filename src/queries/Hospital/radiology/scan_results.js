@@ -1,7 +1,7 @@
 import axiosInstanceHos from "../../../lib/axios/hospital";
 import { mapScanOrderItem } from "./scan_requests";
 
-// Doctor-only approval of radiology results. The list only holds scans this doctor ordered themselves; walk-in results never appear because they are approved on upload.
+// Doctor-only approval of radiology results. The list only holds scans this doctor ordered themselves; radiologist-ordered results never appear because they are approved on upload.
 
 // Each row is an order item carrying its waiting result under `pending_result`.
 const mapPendingRow = (row) => ({

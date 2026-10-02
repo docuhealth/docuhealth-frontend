@@ -66,10 +66,14 @@ const Hospital_Nurses_Patients_Dashboard = () => {
     (p) => (p?.sqid && p?.sqid === selected?.sqid) || (p?.patient_info?.hin || p?.patient?.hin) === patientHin
   );
 
+  // Notes are one per admission; a note from an earlier (discharged) admission must not block the current one
+  const currentAdmissionSqid = matchingInpatient?.sqid || selected?.sqid;
   const hasAdmissionNote = Boolean(
     (selected?.admission_note_info && typeof selected.admission_note_info === "object" && Object.keys(selected.admission_note_info).length > 0) ||
     (matchingInpatient?.admission_note_info && typeof matchingInpatient.admission_note_info === "object" && Object.keys(matchingInpatient.admission_note_info).length > 0) ||
-    (Array.isArray(admissionNotesData) && admissionNotesData.length > 0)
+    (Array.isArray(admissionNotesData) &&
+      !!currentAdmissionSqid &&
+      admissionNotesData.some((note) => note?.admission_info?.sqid === currentAdmissionSqid))
   );
 
   useEffect(() => {
@@ -78,8 +82,8 @@ const Hospital_Nurses_Patients_Dashboard = () => {
       const initialPatient = navState.selectedPatient;
       const hin = navState.patientHin || initialPatient?.patient_info?.hin || initialPatient?.patient?.hin;
 
-      // If it already has full admission properties (ward_info, admission_date, staff_info)
-      if (initialPatient && initialPatient.ward_info && initialPatient.admission_date && initialPatient.staff_info) {
+      // If it already has full admission properties (ward_info, requested_by_info)
+      if (initialPatient && initialPatient.ward_info && initialPatient.requested_by_info) {
         setSelected(initialPatient);
         setAdvanceCheckUp(true);
         window.history.replaceState({}, document.title);
@@ -288,7 +292,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                     )}
                   </div>
                   
-                  {!showAdmissionNote && (
+                  {!showAdmissionNote && !loadingSelectedPatient && (
                     hasAdmissionNote ? (
                       <div className="py-2.5 px-5 w-full lg:w-auto rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-700 flex items-center justify-center gap-2 text-xs font-semibold shadow-xs select-none">
                         <Check className="w-3.5 h-4 text-emerald-600 stroke-[2.5]" />

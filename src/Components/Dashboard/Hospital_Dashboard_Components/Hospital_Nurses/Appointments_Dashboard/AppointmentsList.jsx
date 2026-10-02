@@ -10,6 +10,7 @@ import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SearchBar from "../../../../SearchBar/SearchBar";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import Modal from "../../../../ui/Modal";
 
 const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals, setVitalSignsHistory, setSelectedPatientForVitals, setSelectedPatientForCASE, setSharedSoapNoteHistory, setSelectedPatientForSharedSoap, setSeePatientDetails, setDashboardSelectedPatientDetails }) => {
@@ -45,7 +46,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
   const today = new Date();
 
   const [selectedDay, setSelectedDay] = useState(String(today.getDate()));
-  const [selectedMonth, setSelectedMonth] = useState("January");
+  const [selectedMonth, setSelectedMonth] = useState(today.toLocaleString("en-US", { month: "long" }));
   const [selectedYear, setSelectedYear] = useState(String(today.getFullYear()));
   const [selectedTime, setSelectedTime] = useState("08:00");
 
@@ -54,7 +55,6 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
   const [isStaffSelected, setIsStaffSelected] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
-  const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
   const sortedAppointments = useMemo(() => {
     // Sort by proximity to current time (if upcoming)
@@ -114,7 +114,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
   const assignDoctorMutation = useMutation({
     mutationFn: (payload) =>
       axiosInstanceHos.patch(
-        `api/nurses/appointments/${selectedPatientDetails.id}/assign`,
+        `api/nurses/appointments/${formData.appointment_sqid}/assign`,
         payload,
       ),
     onSuccess: () => {
@@ -126,7 +126,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
     },
     onError: (err) => {
       console.error("Error booking consultation:", err);
-      toast.error(err.response?.data?.message || "Error booking consultation.");
+      toast.error(extractApiErrorMessage(err, "Error booking consultation."));
     },
   });
 
@@ -528,7 +528,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                           setFormData({
                             ...formData,
                             patient_hin: appointment.patient.hin,
-                            appointment_id: appointment.id,
+                            appointment_sqid: appointment.sqid,
                           });
                           setOpenPopover(null);
                         }
@@ -647,7 +647,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                             setFormData({
                               ...formData,
                               patient_hin: appointment.patient.hin,
-                              appointment_id: appointment.id,
+                              appointment_sqid: appointment.sqid,
                             });
                           }
                           setOpenPopover(null);
@@ -894,7 +894,7 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                     onChange={(e) => setSelectedMonth(e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-2 py-2 focus:outline-hidden focus:border-docuhealth-primary appearance-none cursor-pointer  text-[12px] "
                   >
-                    <option value="January" selected>
+                    <option value="January">
                       January
                     </option>
                     <option value="February">February</option>

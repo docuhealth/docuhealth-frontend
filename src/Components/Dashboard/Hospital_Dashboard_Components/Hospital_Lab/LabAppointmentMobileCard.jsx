@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { isAppointmentClosed, useCloseAppointment } from "../../../../queries/Hospital/appointments";
 
 const getPatientName = (appt) =>
   appt.patient_name ||
@@ -15,6 +16,7 @@ const initials = (name) =>
 
 const LabAppointmentMobileCard = ({ appt, onOpen, onSeeDetails, onCreateOrder, hideCreateOrder }) => {
   const [open, setOpen] = useState(false);
+  const closeMutation = useCloseAppointment("lab-appointments");
   const name = getPatientName(appt);
 
   return (
@@ -58,9 +60,16 @@ const LabAppointmentMobileCard = ({ appt, onOpen, onSeeDetails, onCreateOrder, h
                   Create a test order
                 </p>
               )}
-              <p className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
-                Mark as done
-              </p>
+              {isAppointmentClosed(appt) ? (
+                <p className="text-[12px] text-gray-400 p-2">Marked as done</p>
+              ) : (
+                <p
+                  className={`text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm ${closeMutation.isPending ? "opacity-50 pointer-events-none" : "cursor-pointer"}`}
+                  onClick={() => { setOpen(false); closeMutation.mutate(appt.sqid); }}
+                >
+                  Mark as done
+                </p>
+              )}
             </div>
           )}
         </div>

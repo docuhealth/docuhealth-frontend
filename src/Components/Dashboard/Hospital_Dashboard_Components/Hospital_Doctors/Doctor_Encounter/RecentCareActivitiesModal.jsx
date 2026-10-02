@@ -17,6 +17,7 @@ import SoapNoteDetailView from "../../../../ui/SoapNoteDetailView";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 import NursingAssessmentDetailView from "../../../../ui/NursingAssessmentDetailView";
 import AdmissionDetailView from "../../../../ui/AdmissionDetailView";
+import AdmissionRequestDetailView from "../../../../ui/AdmissionRequestDetailView";
 import LabOrderDetailView from "../../../../ui/LabOrderDetailView";
 import {
   fetchRecentCareActivities,
@@ -30,6 +31,7 @@ const VIEWABLE_RECORD_TYPES = new Set([
   "VitalSigns",
   "NursingAssessment",
   "Admission",
+  "AdmissionRequest",
   "LabTestOrder",
 ]);
 
@@ -94,6 +96,24 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
     </div>
   );
 
+  // "NurseInpatientDischargeForm" -> "Nurse inpatient discharge form"; acronyms like "IV" stay uppercase.
+  const humanizeType = (type) => {
+    if (!type) return "Record";
+    const words = String(type)
+      .replace(/[_-]+/g, " ")
+      .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+      .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+      .trim()
+      .split(/\s+/);
+    return words
+      .map((w, i) => {
+        if (w.length > 1 && w === w.toUpperCase()) return w;
+        const lower = w.toLowerCase();
+        return i === 0 ? lower.charAt(0).toUpperCase() + lower.slice(1) : lower;
+      })
+      .join(" ");
+  };
+
   const getRecordTitle = (type, action) => {
     switch (type) {
       case "LabTestOrder":
@@ -108,6 +128,8 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
         return action === "requested"
           ? "Admission requested for this patient!"
           : "Patient admitted!";
+      case "AdmissionRequest":
+        return "Bed requested for this patient!";
       case "Appointment":
         return "Appointment scheduled!";
       case "EncounterCard":
@@ -117,7 +139,7 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
       case "NursingAssessment":
         return "Nursing Assessment recorded for this patient!";
       default:
-        return `${type} recorded for this patient!`;
+        return `${humanizeType(type)} recorded for this patient!`;
     }
   };
 
@@ -131,6 +153,8 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
         return "View Check-in";
       case "Admission":
         return action === "requested" ? "View Admission request" : "View Admission";
+      case "AdmissionRequest":
+        return "View Bed request";
       case "Appointment":
         return "View Appointment";
       case "EncounterCard":
@@ -140,7 +164,7 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
       case "NursingAssessment":
         return "View Nursing Assessment";
       default:
-        return `View ${type}`;
+        return `View ${humanizeType(type)}`;
     }
   };
 
@@ -161,6 +185,8 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
       // "requested" means the doctor asked for an admission; the patient
       // isn't actually admitted until the receptionist confirms it.
       actionText = action === "requested" ? "requested to admit the patient" : "admitted the patient";
+    } else if (recordType === "AdmissionRequest") {
+      actionText = "requested a bed for the patient";
     } else if (recordType === "Appointment") {
       actionText = "scheduled an appointment";
     } else if (recordType === "EncounterCard") {
@@ -277,6 +303,8 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
                 />
               ) : viewingRecord.type === "Admission" ? (
                 <AdmissionDetailView admission={viewingRecordData} />
+              ) : viewingRecord.type === "AdmissionRequest" ? (
+                <AdmissionRequestDetailView request={viewingRecordData} />
               ) : viewingRecord.type === "LabTestOrder" ? (
                 <LabOrderDetailView labOrder={viewingRecordData} />
               ) : null}

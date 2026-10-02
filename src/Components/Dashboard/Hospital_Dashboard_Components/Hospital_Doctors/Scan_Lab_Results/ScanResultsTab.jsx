@@ -17,7 +17,7 @@ const FETCH_ALL_SIZE = 100;
 
 const patientName = (order) => `${order.patient_info?.firstname || ""} ${order.patient_info?.lastname || ""}`.trim() || "Unknown patient";
 
-// Doctors approve or reject the radiologist's result for scans they ordered; walk-in orders never show up here.
+// Doctors approve or reject the radiologist's result for scans they ordered; radiologist-ordered scans never show up here.
 const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);

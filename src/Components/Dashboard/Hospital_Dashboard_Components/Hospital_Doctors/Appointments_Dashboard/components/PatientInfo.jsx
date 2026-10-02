@@ -15,10 +15,11 @@ import toast from "react-hot-toast";
 import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../../../utils/soapNoteHelpers";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
+import { closeCheckIn } from "../../../../../../queries/Hospital/doctor/checkIns";
+import { closeAppointment, isAppointmentClosed } from "../../../../../../queries/Hospital/appointments";
 import PatientInfoCard from "../../../../../ui/PatientInfoCard";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import ClinicalSummaryCard from "../../../../../ui/ClinicalSummaryCard";
-import OutpatientDischargeSummary from "../../Patient_Mgt_Dashboard/OutpatientDischargeSummary";
 import Select from "../../../../../ui/Select";
 import Modal from "../../../../../ui/Modal";
 
@@ -46,13 +47,36 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const [labCurrentPage, setLabCurrentPage] = useState(1);
 
   const [showOrderModal, setShowOrderModal] = useState(false);
-  const [showDischargeModal, setShowDischargeModal] = useState(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [showCheckoutSuccessModal, setShowCheckoutSuccessModal] = useState(false);
 
+  const checkoutMutation = useMutation({
+    mutationFn: ({ checkIn, appointment }) => (checkIn ? closeCheckIn(checkIn) : closeAppointment(appointment)),
+    onSuccess: () => {
+      setShowCheckoutModal(false);
+      setShowCheckoutSuccessModal(true);
+    },
+    onError: (err) => {
+      toast.error(extractApiErrorMessage(err, "Could not check this patient out."));
+    },
+  });
+
+  // Walk-ins close the check-in; booked visits close the appointment (needs its sqid, not the numeric id).
+  const orderContext = resolveOrderContext(selectedPatientDetails);
+  const checkoutTarget = orderContext.checkIn
+    ? { checkIn: orderContext.checkIn }
+    : selectedPatientDetails?.sqid && orderContext.appointment
+      ? { appointment: selectedPatientDetails.sqid }
+      : null;
+  const appointmentAlreadyClosed = !orderContext.checkIn && isAppointmentClosed(selectedPatientDetails);
+
   const handleConfirmCheckout = () => {
-    setShowCheckoutModal(false);
-    setShowCheckoutSuccessModal(true);
+    if (!checkoutTarget) {
+      toast.error("This visit has no check-in or appointment to close.");
+      setShowCheckoutModal(false);
+      return;
+    }
+    checkoutMutation.mutate(checkoutTarget);
   };
 
   const handleDoneCheckout = () => {
@@ -64,7 +88,6 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
     }
   };
 
-  const orderContext = resolveOrderContext(selectedPatientDetails);
   const hin = orderContext.hin;
   const pageSize = 6;
 
@@ -326,18 +349,18 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     Create a test order
                   </button>
                 )}
-                <button
-                  onClick={() => setShowDischargeModal(true)}
-                  className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary text-sm rounded-full px-6 py-2 hover:bg-blue-50 transition-colors cursor-pointer"
-                >
-                  Discharge Patient
-                </button>
-                <button
-                  onClick={() => setShowCheckoutModal(true)}
-                  className="w-full sm:w-auto border bg-docuhealth-primary border-docuhealth-primary text-white text-sm rounded-full px-6 py-2 hover:bg-opacity-90 transition-colors cursor-pointer"
-                >
-                  Check out patient
-                </button>
+                {appointmentAlreadyClosed ? (
+                  <span className="w-full sm:w-auto text-center text-sm text-gray-400 border border-gray-200 rounded-full px-6 py-2">
+                    Checked out
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => setShowCheckoutModal(true)}
+                    className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary text-sm rounded-full px-6 py-2 hover:bg-blue-50 transition-colors cursor-pointer"
+                  >
+                    Check out patient
+                  </button>
+                )}
               </div>
             </div>
 
@@ -345,11 +368,6 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
               <div className="flex justify-center items-center gap-3 px-2 py-3">
                 <p className="text-sm text-gray-500 pt-2">Loading patient data...</p>
               </div>
-            ) : showDischargeModal ? (
-              <OutpatientDischargeSummary
-                selectedPatient={selectedPatientDetails}
-                onClose={() => setShowDischargeModal(false)}
-              />
             ) : (
               <>
                 <div className="py-5 border-b">
@@ -477,9 +495,10 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
           <button
             type="button"
             onClick={handleConfirmCheckout}
-            className="w-full py-3.5 rounded-full bg-docuhealth-primary hover:bg-opacity-95 text-white font-medium text-sm transition-colors cursor-pointer"
+            disabled={checkoutMutation.isPending}
+            className="w-full py-3.5 rounded-full bg-docuhealth-primary hover:bg-opacity-95 text-white font-medium text-sm transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Confirm checkout
+            {checkoutMutation.isPending ? "Checking out..." : "Confirm checkout"}
           </button>
         </div>
       </Modal>
@@ -499,7 +518,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
           </div>
 
           {/* Success Message */}
-          <p className="text-base font-semibold text-gray-800 mb-8 max-w-xs text-center leading-relaxed">
+          <p className="text-base font-normal text-gray-800 mb-8 max-w-xs text-center leading-relaxed">
             You have successfully checked this patient out from the doctor’s encounter pool!
           </p>
 

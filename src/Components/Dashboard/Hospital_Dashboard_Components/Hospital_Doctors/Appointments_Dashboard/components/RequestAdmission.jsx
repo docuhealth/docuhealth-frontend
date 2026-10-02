@@ -27,25 +27,22 @@ const RequestAdmission = ({
 
   const admissionContext = resolveOrderContext(selectedPatientDetails);
 
-  const [form, setForm] = useState({
-    ward: "",
-    bed: "",
-    patient: admissionContext.hin,
-    // Only a genuinely open check-in should be linked here — sending an
-    // appointment's sqid (or an empty string) as `check_in` gets rejected
-    // as "Check-in not found at this hospital."
-    ...(admissionContext.checkIn ? { check_in: admissionContext.checkIn } : {}),
-  });
+  // `ward` only filters the bed dropdown; the API derives the ward from the bed.
+  const [form, setForm] = useState({ ward: "", bed: "" });
 
   useEffect(() => {
     if (Array.isArray(wards)) {
       setWardOptions(wards);
-      console.log(selectedPatientDetails);
     }
   }, [wards]);
 
   const handleChange = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+      // A bed picked under the previous ward is no longer in the list.
+      ...(field === "ward" ? { bed: "" } : {}),
+    }));
 
     if (field === "ward") {
       const selected = wardOptions.find((w) => w.sqid === value || w.id === Number(value));
@@ -61,7 +58,15 @@ const RequestAdmission = ({
 
     const { mutate, isPending } = useMutation({
     mutationFn: () => {
-      return axiosInstanceHos.post("api/doctors/admissions/request", form);
+      // Exactly one of `check_in` / `appointment` is required (400 on both or neither).
+      const payload = {
+        patient: admissionContext.hin,
+        bed: form.bed,
+        ...(admissionContext.checkIn
+          ? { check_in: admissionContext.checkIn }
+          : { appointment: admissionContext.appointment }),
+      };
+      return axiosInstanceHos.post("api/doctors/admissions/request", payload);
     },
     onSuccess: () => {
       toast.success("Admission request successful");
@@ -82,8 +87,8 @@ const RequestAdmission = ({
     },
   });
 
-  const handleSubmit = async () => {
-    mutate(form)
+  const handleSubmit = () => {
+    mutate();
   };
 
   return (

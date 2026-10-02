@@ -7,6 +7,7 @@ import SearchBar from "../../../../SearchBar/SearchBar";
 import Input from "../../../../ui/Input";
 import { fetchRadiologyAppointments } from "../../../../../queries/Hospital/radiology/appointments";
 import { getHospitalToken } from "../../../../../services/authService";
+import { isAppointmentClosed, useCloseAppointment } from "../../../../../queries/Hospital/appointments";
 
 // Same structure/styling as the doctor's AppointmentsList (tabs, search +
 // date range, desktop row / mobile card, kebab popover, Pagination2) —
@@ -54,6 +55,7 @@ const RadiologyAppointmentsList = ({ onSeeDetails, onCreateOrder }) => {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [openPopover, setOpenPopover] = useState(null);
+  const closeMutation = useCloseAppointment("radiology-appointments");
 
   const isUserLoggedIn = !!getHospitalToken();
 
@@ -282,6 +284,21 @@ const RadiologyAppointmentsList = ({ onSeeDetails, onCreateOrder }) => {
                         >
                           Create an order
                         </button>
+                        {isAppointmentClosed(appointment) ? (
+                          <p className="w-full text-left text-[12px] text-gray-400 p-2">Marked as done</p>
+                        ) : (
+                          <button
+                            type="button"
+                            className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer disabled:opacity-50"
+                            disabled={closeMutation.isPending}
+                            onClick={() => {
+                              setOpenPopover(null);
+                              closeMutation.mutate(appointment.sqid);
+                            }}
+                          >
+                            Mark as done
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -334,6 +351,21 @@ const RadiologyAppointmentsList = ({ onSeeDetails, onCreateOrder }) => {
                           >
                             Create an order
                           </button>
+                          {isAppointmentClosed(appointment) ? (
+                            <p className="w-full text-left text-[12px] text-gray-400 p-2">Marked as done</p>
+                          ) : (
+                            <button
+                              type="button"
+                              className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer disabled:opacity-50"
+                              disabled={closeMutation.isPending}
+                              onClick={() => {
+                                setOpenPopover(null);
+                                closeMutation.mutate(appointment.sqid);
+                              }}
+                            >
+                              Mark as done
+                            </button>
+                          )}
                         </div>
                       )}
                     </div>
