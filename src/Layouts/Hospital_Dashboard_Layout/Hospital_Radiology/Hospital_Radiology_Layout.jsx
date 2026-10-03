@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../Components/ui/DashboardLayout";
 import ComingSoonModal from "../../../Components/ui/ComingSoonModal";
+import HospitalLoader from "../../../Components/ui/HospitalLoader";
 import { RadiologyAppContext } from "../../../context/HospitalContext/Radiology/RadiologyAppContext";
 
 // Pages opened from the Scan Orders list. The link stays highlighted on them.
@@ -12,7 +13,7 @@ const SCAN_ORDERS_ROUTES = [
 ];
 
 const Hospital_Radiology_Layout = () => {
-  const { profile, hospitalLogo, hospitalName } = useContext(RadiologyAppContext);
+  const { profile, hospitalLogo, hospitalName, isLoading } = useContext(RadiologyAppContext);
   const navigate = useNavigate();
   const [comingSoonFeature, setComingSoonFeature] = useState(null);
 
@@ -146,6 +147,10 @@ const Hospital_Radiology_Layout = () => {
       ),
     },
   ];
+
+  if (isLoading) {
+    return <HospitalLoader variant="fullscreen" logo={hospitalLogo} label="Setting up your workspace..." />;
+  }
 
   return (
     <DashboardLayout

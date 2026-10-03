@@ -54,6 +54,19 @@ layer(base);
   --color-docuhealth-border-gray: #DDDDDD;
 
   --animate-slide-up: slideUp 0.5s ease-out;
+  --animate-logo-breathe: logoBreathe 1.6s ease-in-out infinite;
+
+  @keyframes logoBreathe {
+    0%,
+    100% {
+      opacity: 0.55;
+      transform: scale(0.94);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
   @keyframes slideUp {
     0% {

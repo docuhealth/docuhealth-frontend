@@ -5,7 +5,7 @@ import { ScanLine } from "lucide-react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import SearchBar from "../../../Components/SearchBar/SearchBar";
 import Select from "../../../Components/ui/Select";
-import ScanRequestCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Radiology/Scan_Requests/ScanRequestCard";
+import ScanRequestCard, { ScanRequestCardSkeleton } from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Radiology/Scan_Requests/ScanRequestCard";
 import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 import { fetchRadiologyScanRequests } from "../../../queries/Hospital/radiology/scan_requests";
 import { getHospitalToken } from "../../../services/authService";
@@ -122,9 +122,10 @@ const Hospital_Radiology_Requests_Dashboard = () => {
 
         {/* Cards */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-            <ScanLine size={36} className="opacity-25 mb-2" />
-            <p className="text-sm">Loading requests...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" role="status" aria-label="Loading scan orders">
+            {Array.from({ length: 6 }, (_, i) => (
+              <ScanRequestCardSkeleton key={i} />
+            ))}
           </div>
         ) : requests.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-gray-400">
