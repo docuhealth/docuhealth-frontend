@@ -31,20 +31,16 @@ const DoctorHandoverHistoryTab = ({ type = "received" }) => {
     refetchOnWindowFocus: true,
   });
 
-  const loggedInDoctorSqid = profile?.sqid;
+  // Handover doctor_info carries staff_id but no sqid, so match on staff_id.
+  const loggedInStaffId = profile?.staff_id;
 
   const mappedNotes = useMemo(() => {
     const rows = data?.results || [];
     return rows
       .filter((item) => {
-        if (!loggedInDoctorSqid) return true;
-        if (type === "received") {
-          // Handed over TO the logged-in doctor
-          return item.to_doctor_info?.sqid === loggedInDoctorSqid || !item.from_doctor_info?.sqid;
-        } else {
-          // Handed over BY the logged-in doctor
-          return item.from_doctor_info?.sqid === loggedInDoctorSqid;
-        }
+        if (!loggedInStaffId) return false;
+        const doctorInfo = type === "received" ? item.to_doctor_info : item.from_doctor_info;
+        return doctorInfo?.staff_id === loggedInStaffId;
       })
       .map((item) => {
         const otherDoctor = type === "received" ? item.from_doctor_info : item.to_doctor_info;
@@ -78,7 +74,7 @@ const DoctorHandoverHistoryTab = ({ type = "received" }) => {
           ...HANDOVER_FIELDS.reduce((acc, f) => ({ ...acc, [f.key]: item[f.key] || "" }), {}),
         };
       });
-  }, [data, type, loggedInDoctorSqid]);
+  }, [data, type, loggedInStaffId]);
 
   const filteredNotes = useMemo(() => {
     if (!searchQuery.trim()) return mappedNotes;
