@@ -64,6 +64,7 @@ const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
   const onDecided = (message) => {
     toast.success(message);
     queryClient.invalidateQueries({ queryKey: ["radiology-pending-results"] });
+    queryClient.invalidateQueries({ queryKey: ["patient-approved-scan-results"] });
     closeDetail();
   };
 

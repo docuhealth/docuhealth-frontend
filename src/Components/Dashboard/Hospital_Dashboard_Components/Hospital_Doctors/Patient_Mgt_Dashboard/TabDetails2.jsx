@@ -1819,21 +1819,7 @@ const getTabs = ({
     },
     {
       title: "Radiology Result",
-      // content: (
-      //   <PatientRadiologyRecords
-      //     patientFullInfo={patientFullInfo}
-      //     selected={selected}
-      //   />
-      // ),
-      content: (
-        <div className="py-16 text-center">
-          <EmptyState
-            icon="document"
-            title="Coming Soon"
-            description="Radiology results will be available soon."
-          />
-        </div>
-      ),
+      content: <PatientRadiologyRecords patientFullInfo={patientFullInfo} />,
     },
     {
       title: "Lab Result",
