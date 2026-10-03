@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import DashboardLayout from "../../Components/ui/DashboardLayout";
+import ComingSoonModal from "../../Components/ui/ComingSoonModal";
 import { usePatientProfile } from "../../hooks/patients/usePatientProfile";
 import { useToggleEmergency } from "../../hooks/patients/useToggleEmergency";
 import { useHasActiveSubscription } from "../../hooks/patients/useHasActiveSubscription";
@@ -18,6 +19,7 @@ const Patient_Dashboard_Layout = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
+  const [comingSoonFeature, setComingSoonFeature] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -98,9 +100,9 @@ const Patient_Dashboard_Layout = () => {
       ),
     },
     {
-      name: "My messages",
+      name: "My Messages",
       path: "/user-messages-dashboard",
-      onClick: () => toast.success("feature coming soon !"),
+      onClick: () => setComingSoonFeature("Messaging"),
       icon: (isActive: boolean) => (
         <svg
           width="20"
@@ -120,7 +122,7 @@ const Patient_Dashboard_Layout = () => {
     {
       name: "Docu Community",
       path: "/user-community-dashboard",
-      onClick: () => toast.success("feature coming soon !"),
+      onClick: () => setComingSoonFeature("Docu Community"),
       icon: (isActive: boolean) => (
         <svg
           width="20"
@@ -140,7 +142,7 @@ const Patient_Dashboard_Layout = () => {
     {
       name: "Docu Wallet",
       path: "/user-wallet-dashboard",
-      onClick: () => toast.success("feature coming soon !"),
+      onClick: () => setComingSoonFeature("Docu Wallet"),
       icon: (isActive: boolean) => (
         <svg
           width="20"
@@ -262,6 +264,11 @@ const Patient_Dashboard_Layout = () => {
         customBottomContent={customBottomContent}
       >
         <Outlet />
+        <ComingSoonModal
+          isOpen={comingSoonFeature !== null}
+          onClose={() => setComingSoonFeature(null)}
+          feature={comingSoonFeature}
+        />
       </DashboardLayout>
       {emergencyStatusModal && (
         <EmergencyModeNotice

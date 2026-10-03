@@ -1,11 +1,13 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../Components/ui/DashboardLayout";
+import ComingSoonModal from "../../../Components/ui/ComingSoonModal";
 import { ReceptionistAppContext } from "../../../context/HospitalContext/Receptionist/ReceptionistAppContext";
 
 const Hospital_Receptionist_Layout = () => {
   const { profile, hospitalLogo, hospitalName } = useContext(ReceptionistAppContext);
   const navigate = useNavigate();
+  const [comingSoonFeature, setComingSoonFeature] = useState(null);
 
   const handleLogout = () => {
     sessionStorage.clear();
@@ -66,6 +68,26 @@ const Hospital_Receptionist_Layout = () => {
         >
           <path
             d="M12.5 3.33268H4.16667V16.666H15.8333V6.66602H12.5V3.33268ZM2.5 2.49252C2.5 2.03606 2.87291 1.66602 3.33208 1.66602H13.3333L17.4998 5.83268L17.5 17.4931C17.5 17.9568 17.1292 18.3327 16.6722 18.3327H3.32783C2.87063 18.3327 2.5 17.9533 2.5 17.5062V2.49252ZM10 9.58268C8.84942 9.58268 7.91667 8.64993 7.91667 7.49935C7.91667 6.34876 8.84942 5.41602 10 5.41602C11.1506 5.41602 12.0833 6.34876 12.0833 7.49935C12.0833 8.64993 11.1506 9.58268 10 9.58268ZM6.27288 14.166C6.48016 12.291 8.06977 10.8327 10 10.8327C11.9303 10.8327 13.5198 12.291 13.7271 14.166H6.27288Z"
+            className={`group-hover:fill-white ${isActive ? "fill-white" : "fill-docuhealth-secondary"}`}
+          />
+        </svg>
+      ),
+    },
+    {
+      name: "My Messages",
+      path: "/hospital-receptionist-messages-dashboard",
+      onClick: () => setComingSoonFeature("Messaging"),
+      icon: (isActive) => (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className={`group-hover:fill-white ${isActive ? "fill-white" : "fill-docuhealth-secondary"}`}
+        >
+          <path
+            d="M1.66797 7.49478C1.66797 4.73624 3.89842 2.5 6.66852 2.5H13.3341C16.0958 2.5 18.3346 4.74565 18.3346 7.49478V17.5H6.66852C3.90679 17.5 1.66797 15.2543 1.66797 12.5052V7.49478ZM16.668 15.8333V7.49478C16.668 5.66283 15.1721 4.16667 13.3341 4.16667H6.66852C4.82179 4.16667 3.33464 5.65382 3.33464 7.49478V12.5052C3.33464 14.3372 4.83057 15.8333 6.66852 15.8333H16.668ZM11.668 9.16667H13.3346V10.8333H11.668V9.16667ZM6.66797 9.16667H8.33464V10.8333H6.66797V9.16667Z"
             className={`group-hover:fill-white ${isActive ? "fill-white" : "fill-docuhealth-secondary"}`}
           />
         </svg>
@@ -144,6 +166,11 @@ const Hospital_Receptionist_Layout = () => {
       handleLogout={handleLogout}
     >
       <Outlet />
+      <ComingSoonModal
+        isOpen={comingSoonFeature !== null}
+        onClose={() => setComingSoonFeature(null)}
+        feature={comingSoonFeature}
+      />
     </DashboardLayout>
   );
 };
