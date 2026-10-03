@@ -5,6 +5,7 @@ import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagina
 import { formatFullDate, formatTime } from "../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
 import SearchBar from "../../../../SearchBar/SearchBar";
 import Input from "../../../../ui/Input";
+import Skeleton from "../../../../ui/Skeleton";
 import { fetchRadiologyAppointments } from "../../../../../queries/Hospital/radiology/appointments";
 import { getHospitalToken } from "../../../../../services/authService";
 import { isAppointmentClosed, useCloseAppointment } from "../../../../../queries/Hospital/appointments";
@@ -99,9 +100,28 @@ const RadiologyAppointmentsList = ({ onSeeDetails, onCreateOrder }) => {
     </div>
   );
 
+  // Keep the tabs on screen while a tab's first page loads; only the rows are placeholders.
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full text-sm">Loading...</div>
+      <>
+        {tabsRow}
+        <div role="status" aria-label="Loading appointments" className="flex flex-col gap-4">
+          <Skeleton className="h-10 w-full rounded-lg" />
+          {Array.from({ length: 4 }, (_, i) => (
+            <div key={i} className="p-4 border rounded-md flex flex-wrap gap-6 lg:gap-10">
+              {Array.from({ length: 4 }, (_, j) => (
+                <div key={j} className="flex items-center gap-3">
+                  <Skeleton className="h-8 w-8" />
+                  <div className="flex flex-col gap-1.5">
+                    <Skeleton className="h-2.5 w-14" />
+                    <Skeleton className="h-3.5 w-28" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </>
     );
   }
 

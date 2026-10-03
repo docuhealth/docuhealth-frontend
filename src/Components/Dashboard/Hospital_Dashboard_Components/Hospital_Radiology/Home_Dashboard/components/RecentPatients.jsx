@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Pagination2 from "../../../../Patient_Dashboard_Components/Pagination/Pagination2";
+import Skeleton from "../../../../../ui/Skeleton";
 
 import { fetchRadiologyRecentPatients } from "../../../../../../queries/Hospital/radiology/recent_patients";
 import { getHospitalToken } from "../../../../../../services/authService";
@@ -17,6 +18,38 @@ const maskHIN = (hin) => {
   if (hin.length <= 4) return hin;
   return hin.slice(0, 2) + "*".repeat(hin.length - 4) + hin.slice(-2);
 };
+
+const RecentPatientsSkeleton = () => (
+  <div role="status" aria-label="Loading recent patients">
+    <div className="hidden lg:block">
+      <div className="bg-gray-100 h-[60px] rounded-md" />
+      {Array.from({ length: 5 }, (_, i) => (
+        <div key={i} className="grid grid-cols-6 items-center py-6 border-b border-b-gray-200">
+          <Skeleton className="col-span-2 ml-5 h-3 w-40" />
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-3 w-12" />
+        </div>
+      ))}
+    </div>
+    <div className="lg:hidden flex flex-col gap-4">
+      {Array.from({ length: 3 }, (_, i) => (
+        <div key={i} className="border border-gray-200 rounded-md p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-3.5 w-32" />
+              <Skeleton className="h-3 w-12" />
+            </div>
+          </div>
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="mt-4 h-9 w-full rounded-lg" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const RecentPatients = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,7 +69,7 @@ const RecentPatients = () => {
   const totalPages = Math.max(1, Math.ceil(count / 10));
 
   if (loading) {
-    return <div className="flex justify-center items-center h-40 text-sm text-gray-500">Loading...</div>;
+    return <RecentPatientsSkeleton />;
   }
 
   return (

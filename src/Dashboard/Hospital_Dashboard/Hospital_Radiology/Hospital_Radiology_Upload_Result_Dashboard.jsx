@@ -7,6 +7,7 @@ import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { uploadScanResult, RESULT_FILE_TYPES } from "../../../queries/Hospital/radiology/scan_requests";
 import { extractApiErrorMessage } from "../../../utils/apiError";
 import Input from "../../../Components/ui/Input";
+import HospitalLoader from "../../../Components/ui/HospitalLoader";
 
 // Same "+ Add Entry" pattern as SoapNoteEntry's NoteSection — only one section's input is open at a time.
 const NoteListSection = ({
@@ -471,6 +472,7 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
       {showConfirmUploadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 flex flex-col items-center gap-4 relative">
+            {uploadMutation.isPending && <HospitalLoader variant="overlay" label="Uploading scan result..." />}
             <button
               type="button"
               onClick={() => setShowConfirmUploadModal(false)}
