@@ -7,6 +7,7 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Modal from "../../../../../ui/Modal";
 import Button from "../../../../../ui/Button";
+import HospitalLoader from "../../../../../ui/HospitalLoader";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import Input from "../../../../../ui/Input";
 import Select from "../../../../../ui/Select";
@@ -242,6 +243,8 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
     mutationFn: (formData) =>
       axiosInstanceHos.post("api/medical-records/soap-note", formData),
     onSuccess: () => {
+      // The confirm modal stays open while uploading so its loader shows; close it here.
+      setConfirmationModal(false);
       toast.success("SOAP Note created successfully !");
 
       const hin = patientHin
@@ -306,6 +309,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       });
     },
     onError: (error) => {
+      setConfirmationModal(false);
       console.error("Upload error:", error);
       // The API rejects with DRF field-keyed errors, not `{ message }` —
       // e.g. `{ check_in: ["Check-in must be in doctor_active status to
@@ -321,6 +325,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
     // the step flow). treatment_plan and the follow-up appointment are optional.
     if (soapNoteData.care_instructions.length === 0) {
       toast.error("Care Instructions is required");
+      setConfirmationModal(false);
       return;
     }
 
@@ -1038,6 +1043,7 @@ useEffect(() => {
         // handleSubmit();
         confirmationModal && (
           <Modal isOpen={true} onClose={() => setConfirmationModal(false)} title="">
+            {isPending && <HospitalLoader variant="overlay" label="Uploading SOAP note..." />}
             <button
               type="button"
               aria-label="Close"
@@ -1072,10 +1078,8 @@ useEffect(() => {
 
             <Button
               fullWidth
-              onClick={() => {
-                setConfirmationModal(false);
-                handleSubmit();
-              }}
+              onClick={handleSubmit}
+              disabled={isPending}
             >
               Upload SOAP Note
             </Button>

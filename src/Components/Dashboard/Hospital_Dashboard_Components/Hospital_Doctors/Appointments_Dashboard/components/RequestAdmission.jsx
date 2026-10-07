@@ -19,7 +19,7 @@ const RequestAdmission = ({
   onRequested,
 }) => {
   const { profile } = useContext(DoctorAppContext);
-  const { wards } = useContext(HosWardContext);
+  const { wards, wardsLoading } = useContext(HosWardContext);
   const queryClient = useQueryClient();
 
   const [wardOptions, setWardOptions] = useState([]);
@@ -116,7 +116,8 @@ const RequestAdmission = ({
         value={form.ward}
         onChange={(value) => handleChange("ward", value)}
         options={wardOptions.map((w) => ({ value: String(w.sqid || w.id), label: `${w.name} ward` }))}
-        placeholder="Assign to ward"
+        placeholder={wardsLoading ? "Loading wards..." : "Assign to ward"}
+        disabled={wardsLoading}
       />
 
       {form.ward && (

@@ -31,6 +31,7 @@ const DischargeFollowUpStep = ({
   onFieldChange,
   hospitalName,
   pendingInvestigationOptions,
+  investigationsLoading,
   onTogglePendingInvestigation,
 }) => {
   const plan = formData.follow_up_plan;
@@ -129,6 +130,7 @@ const DischargeFollowUpStep = ({
             options={pendingInvestigationOptions}
             selected={formData.pending_investigations}
             onToggle={onTogglePendingInvestigation}
+            loading={investigationsLoading}
           />
 
           <div>

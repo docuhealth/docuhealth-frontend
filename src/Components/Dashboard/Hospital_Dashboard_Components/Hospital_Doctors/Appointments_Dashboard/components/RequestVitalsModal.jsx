@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import HospitalLoader from "../../../../../ui/HospitalLoader";
 
 /**
  * Standalone "Vitals" flow opened directly from the OtherMedicalServicesFab
@@ -149,30 +150,12 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
           </div>
         </div>
       ) : loadingStaff ? (
-        <div className="bg-white rounded-lg shadow-lg p-10 max-w-md w-full flex items-center justify-center">
-          <svg
-            className="animate-spin h-6 w-6 text-docuhealth-primary"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            ></path>
-          </svg>
+        <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+          <HospitalLoader label="Loading nurses..." />
         </div>
       ) : selectedStaffId || generalRequest ? (
         <div className="bg-white rounded-lg shadow-lg p-5 max-w-md w-full relative text-sm">
+          {isPending && <HospitalLoader variant="overlay" label="Sending vitals request..." />}
           <div className="flex justify-end">
             <button
               onClick={onClose}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, createContext } from "react";
 import { getHospitalToken } from "../../../services/authService";
 import { fetchPatientVitalSigns } from "../../../queries/Hospital/nurse/vitals";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import useDebounce from "../../../hooks/useDebounce";
 import toast from "react-hot-toast";
 
@@ -20,7 +20,8 @@ const NursesVitalSignsProvider = (props) => {
         queryKey: ["nurse-patient-vitals-history", patientHin, currentPage, debouncedSearch],
         queryFn: fetchPatientVitalSigns,
         enabled: isUserLoggedIn && !!patientHin,
-        placeholderData: keepPreviousData,
+        // Keep the old page only while paging/searching the same patient, never across patients
+        placeholderData: (prev, prevQuery) => (prevQuery?.queryKey?.[1] === patientHin ? prev : undefined),
     });
 
     // Reset page when search changes

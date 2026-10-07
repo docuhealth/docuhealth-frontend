@@ -14,6 +14,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
   const hin = (selected?.patient_info?.hin || selected?.patient?.hin || selected?.patient_hin);
   const [activeTab, setActiveTab] = useState("info");
   const [showDischargeSummaryModal, setShowDischargeSummaryModal] = useState(false);
+  const [historyScope, setHistoryScope] = useState("stay");
 
   const { data: patientFullInfo, isLoading, isError } = useQuery({
     queryKey: ["patient-info", hin],
@@ -160,7 +161,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
           </div>
 
           <AdvanceCheckUpTabComponent 
-            tabs={getAdvanceCheckUpTabs(patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail, isOutPatient, setAdvanceCheckUp)}
+            tabs={getAdvanceCheckUpTabs(patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail, isOutPatient, setAdvanceCheckUp, historyScope, setHistoryScope)}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
           />

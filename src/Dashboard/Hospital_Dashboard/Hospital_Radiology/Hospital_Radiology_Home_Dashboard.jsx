@@ -7,28 +7,7 @@ import TotalScansChart from "../../../Components/Dashboard/Hospital_Dashboard_Co
 import { useQuery } from "@tanstack/react-query";
 import { getHospitalToken } from "../../../services/authService";
 import { fetchRadiologyTrend } from "../../../queries/Hospital/radiology/trend";
-import Skeleton from "../../../Components/ui/Skeleton";
-
-// Rough monthly bar heights so the placeholder reads as a chart, not a blank box.
-const CHART_BARS = [40, 55, 35, 65, 50, 75, 60, 45, 70, 55, 80, 50];
-
-const ChartLoadingPlaceholder = ({ title }) => (
-  <div
-    role="status"
-    aria-label="Loading chart"
-    className="bg-white p-6 rounded-md border border-gray-200 w-full h-[380px] flex flex-col"
-  >
-    <div className="flex justify-between items-center mb-6">
-      <h3 className="text-xs lg:text-lg lg:font-semibold text-gray-800">{title}</h3>
-      <Skeleton className="h-8 w-24" />
-    </div>
-    <div className="flex-1 flex items-end gap-2 sm:gap-4">
-      {CHART_BARS.map((h, i) => (
-        <Skeleton key={i} className="flex-1 rounded-t-md rounded-b-none" style={{ height: `${h}%` }} />
-      ))}
-    </div>
-  </div>
-);
+import ChartSkeleton from "../../../Components/ui/ChartSkeleton";
 
 const Hospital_Radiology_Home_Dashboard = () => {
   const { hospitalName, backgroundImage } = useContext(RadiologyAppContext);
@@ -71,7 +50,7 @@ const Hospital_Radiology_Home_Dashboard = () => {
       {/* Chart */}
       <div className="mt-6 w-full">
         {trendLoading ? (
-          <ChartLoadingPlaceholder title="Total scan carried out" />
+          <ChartSkeleton title="Total scan carried out" />
         ) : (
           <TotalScansChart data={trendArray} />
         )}

@@ -1,12 +1,14 @@
 import React from "react";
 import { X } from "lucide-react";
 import Modal from "../../../../ui/Modal";
+import HospitalLoader from "../../../../ui/HospitalLoader";
 
 // Shared "are you sure?" confirmation shown before a discharge is finalized —
 // used by both the outpatient and inpatient discharge flows.
 const ConfirmDischargeModal = ({ isOpen, onConfirm, onCancel, isPending }) => {
   return (
     <Modal isOpen={isOpen} onClose={onCancel} maxWidth="md" className="!p-1 text-center">
+      {isPending && <HospitalLoader variant="overlay" label="Discharging patient..." />}
       <div className="flex justify-end mb-2">
         <button onClick={onCancel} className="text-gray-400 hover:text-gray-600 bg-gray-100 rounded-full p-1">
           <X size={18} />

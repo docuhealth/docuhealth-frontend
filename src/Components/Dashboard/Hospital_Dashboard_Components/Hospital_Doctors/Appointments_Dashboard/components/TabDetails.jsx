@@ -32,6 +32,7 @@ import PatientLabRecords from "../../Patient_Mgt_Dashboard/PatientLabRecords";
 import PatientRadiologyRecords from "../../Patient_Mgt_Dashboard/PatientRadiologyRecords";
 import PatientMedicationHistory from "../../Patient_Mgt_Dashboard/PatientMedicationHistory";
 import EmptyState from "../../../../../ui/EmptyState";
+import RecordRowsSkeleton from "../../../../../ui/RecordRowsSkeleton";
 
 const PatientInfo = ({ patientFullInfo }) => {
   console.log(patientFullInfo);
@@ -354,11 +355,7 @@ const PatientSOAPNotes = ({
   setSoapCurrentPage
 }) => {
   if (soapNotesLoading) {
-    return (
-      <div className="flex justify-center items-center h-full text-sm pt-10">
-        Loading...
-      </div>
-    );
+    return <RecordRowsSkeleton label="Loading SOAP notes" tiles={4} />;
   }
 
   if (!patientSoapNotes || patientSoapNotes.length === 0) {

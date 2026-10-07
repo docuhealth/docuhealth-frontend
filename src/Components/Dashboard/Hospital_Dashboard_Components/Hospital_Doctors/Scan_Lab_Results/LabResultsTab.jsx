@@ -5,7 +5,7 @@ import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import Hospital_Lab_Test_Detail_Dashboard from "../../../../../Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Test_Detail_Dashboard";
 import useDebounce from "../../../../../hooks/useDebounce";
 import ScanLabResultsShell from "./ScanLabResultsShell";
-import ScanLabResultCard from "./ScanLabResultCard";
+import ScanLabResultCard, { ScanLabResultGridSkeleton } from "./ScanLabResultCard";
 
 const PAGE_SIZE = 9;
 
@@ -76,7 +76,7 @@ const Hospital_Doctors_Lab_Results_Tab = ({ activeTab, onTabChange }) => {
       setCurrentPage={setCurrentPage}
     >
       {labLoading ? (
-        <div className="flex justify-center items-center h-40 text-sm">Loading...</div>
+        <ScanLabResultGridSkeleton label="Loading lab results" />
       ) : patientLabRecords.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-gray-400">
           <FlaskConical size={36} className="opacity-25 mb-2" />

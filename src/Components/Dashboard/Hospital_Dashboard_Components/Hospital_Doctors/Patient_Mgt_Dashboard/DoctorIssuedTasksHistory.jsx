@@ -4,6 +4,7 @@ import { ArrowLeft, CalendarClock, ClipboardList, User } from "lucide-react";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import EmptyState from "../../../../ui/EmptyState";
 import Spinner from "../../../../ui/Spinner";
+import RecordRowsSkeleton from "../../../../ui/RecordRowsSkeleton";
 import { fetchInpatientTasks } from "../../../../../queries/Hospital/doctor/inpatientTasks";
 import {
   taskTypeLabel,
@@ -294,11 +295,7 @@ const DoctorIssuedTasksHistory = ({ admissionSqid }) => {
   const activeFilterLabel = FILTER_OPTIONS.find((option) => option.value === filter)?.label;
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-16">
-        <Spinner className="h-6 w-6 text-docuhealth-primary" />
-      </div>
-    );
+    return <RecordRowsSkeleton label="Loading task history" tiles={4} withStatusHeader />;
   }
 
   if (isError) {

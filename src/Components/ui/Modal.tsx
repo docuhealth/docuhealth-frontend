@@ -72,7 +72,8 @@ const Modal = ({
             </button>
           </div>
         )}
-        <div className="p-5">
+        {/* rounded-[inherit] lets an overlay child (e.g. HospitalLoader) match the card's corners */}
+        <div className="p-5 rounded-[inherit]">
           {children}
         </div>
       </div>

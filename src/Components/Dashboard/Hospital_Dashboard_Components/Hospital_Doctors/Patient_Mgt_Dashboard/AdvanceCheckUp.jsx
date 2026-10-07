@@ -9,6 +9,7 @@ import PatientMedicalRecordDetail from "./PatientMedicalRecordDetail";
 import DoctorDischargeSummaryView from "./DoctorDischargeSummaryView";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProgressNotes } from "../../../../../queries/Hospital/doctor/progressNotes";
+import PatientDetailSkeleton from "../../../../ui/PatientDetailSkeleton";
 
 const AdvanceCheckUp = ({
   selected,
@@ -158,10 +159,7 @@ const AdvanceCheckUp = ({
             <span>Patient's Details</span>
           </button>
           {loadingInfo ? (
-            /* Basic Loading State */
-            <div className="flex justify-center items-center gap-3 px-2 py-3">
-              <p className="text-sm text-gray-500 pt-2">Loading patient data...</p>
-            </div>
+            <PatientDetailSkeleton />
           ) : (
             <>
               <div className="py-5 border-b">

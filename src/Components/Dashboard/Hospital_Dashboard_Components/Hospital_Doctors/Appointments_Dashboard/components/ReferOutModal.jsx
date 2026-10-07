@@ -5,6 +5,7 @@ import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doct
 import { createReferOut } from "../../../../../../queries/Hospital/doctor/referOut";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import SearchableSelect from "../../../../../ui/SearchableSelect";
+import HospitalLoader from "../../../../../ui/HospitalLoader";
 
 /**
  * "Refer Out" — opened from the row actions on the doctor's Appointments list.
@@ -71,6 +72,7 @@ const ReferOutModal = ({ appointment, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-3">
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
+        {isPending && <HospitalLoader variant="overlay" label="Referring patient out..." />}
         {showSuccess ? (
           <div className="flex flex-col items-center text-center py-4">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">

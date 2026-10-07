@@ -446,11 +446,14 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
                                 <p className="">
                                     {admittedPatient?.discharged_by
                                         ? `Discharged by ${admittedPatient.discharged_by.role === "doctor" ? "Dr. " : ""}${admittedPatient.discharged_by.firstname} ${admittedPatient.discharged_by.lastname}`
-                                        : admittedPatient?.requested_by_info
-                                            ? `Dr. ${admittedPatient.requested_by_info.firstname} ${admittedPatient.requested_by_info.lastname}`
-                                            : "Unassigned Staff"}
+                                        : admittedPatient?.closed_by_info
+                                            ? `Closed by ${admittedPatient.closed_by_info.role === "doctor" ? "Dr. " : ""}${admittedPatient.closed_by_info.firstname} ${admittedPatient.closed_by_info.lastname}`
+                                            : admittedPatient?.closed_at
+                                                ? "Encounter closed"
+                                                : "Unassigned Staff"}
                                 </p>
                             </div>
+                            {admittedPatient?.discharge_date && (<>
                             <div className="flex items-center gap-1 text-gray-600 pt-1 ">
                                 <svg width="15" height="15" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M4.66634 11.666V8.16602H9.33301V11.666H11.083V2.33268H2.91634V11.666H4.66634ZM5.83301 11.666H8.16634V9.33268H5.83301V11.666ZM12.2497 11.666H13.4163V12.8327H0.583008V11.666H1.74967V1.74935C1.74967 1.42719 2.01084 1.16602 2.33301 1.16602H11.6663C11.9885 1.16602 12.2497 1.42719 12.2497 1.74935V11.666ZM6.41634 4.66602V3.49935H7.58301V4.66602H8.74967V5.83268H7.58301V6.99935H6.41634V5.83268H5.24967V4.66602H6.41634Z" fill="var(--color-docuhealth-dark)" />
@@ -478,6 +481,7 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
                                         : "Unassigned Bed"}
                                 </p>
                             </div>
+                            </>)}
                             <div className="flex items-center gap-1 text-gray-600 pt-1 pb-3 border-b">
                                 <svg width="15" height="15" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M4.08366 1.7487V0.582031H5.25033V1.7487H8.75033V0.582031H9.91699V1.7487H12.2503C12.5725 1.7487 12.8337 2.00987 12.8337 2.33203V5.2487H11.667V2.91536H9.91699V4.08203H8.75033V2.91536H5.25033V4.08203H4.08366V2.91536H2.33366V11.082H5.83366V12.2487H1.75033C1.42816 12.2487 1.16699 11.9875 1.16699 11.6654V2.33203C1.16699 2.00987 1.42816 1.7487 1.75033 1.7487H4.08366ZM9.91699 6.9987C8.62835 6.9987 7.58366 8.04339 7.58366 9.33203C7.58366 10.6207 8.62835 11.6654 9.91699 11.6654C11.2056 11.6654 12.2503 10.6207 12.2503 9.33203C12.2503 8.04339 11.2056 6.9987 9.91699 6.9987ZM6.41699 9.33203C6.41699 7.39904 7.984 5.83203 9.91699 5.83203C11.85 5.83203 13.417 7.39904 13.417 9.33203C13.417 11.265 11.85 12.832 9.91699 12.832C7.984 12.832 6.41699 11.265 6.41699 9.33203ZM9.33366 7.58203V9.57365L10.6712 10.9112L11.4961 10.0862L10.5003 9.09041V7.58203H9.33366Z" fill="var(--color-docuhealth-dark)" />

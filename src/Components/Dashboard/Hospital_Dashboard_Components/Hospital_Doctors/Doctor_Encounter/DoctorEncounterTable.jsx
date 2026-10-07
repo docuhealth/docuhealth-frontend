@@ -7,6 +7,7 @@ import { DoctorEncounterContext } from "../../../../../context/HospitalContext/D
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../../ui/Table";
 import EmptyState from "../../../../ui/EmptyState";
 import Spinner from "../../../../ui/Spinner";
+import Skeleton from "../../../../ui/Skeleton";
 import Modal from "../../../../ui/Modal";
 import Button from "../../../../ui/Button";
 import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
@@ -41,6 +42,51 @@ const getCallUpStatus = (status) => {
   if (status === "closed") return { text: "Closed", style: "bg-gray-100 text-gray-500" };
   return { text: "Awaiting", style: "bg-amber-50 text-amber-500" };
 };
+
+// Pill header + rows on desktop, stat-tile cards on mobile; the Active tab has one
+// fewer middle column (no triage priority).
+const EncounterSkeleton = ({ middleCols }) => (
+  <div role="status" aria-label="Loading encounters">
+    <div className="hidden lg:block">
+      <div className="h-[46px] rounded-full border border-gray-200" />
+      {Array.from({ length: 5 }, (_, i) => (
+        <div key={i} className="flex items-center gap-6 py-4 pl-10 pr-4 border-b border-gray-200">
+          <div className="flex items-center gap-3 w-[20%]">
+            <Skeleton className="w-8 h-8 rounded-full" />
+            <Skeleton className="h-3.5 w-28" />
+          </div>
+          {Array.from({ length: middleCols }, (_, j) => (
+            <Skeleton key={j} className="h-3 w-24 flex-1 max-w-28" />
+          ))}
+          <Skeleton className="h-6 w-20 rounded-md" />
+          <Skeleton className="h-10 w-40 rounded-full ml-auto" />
+        </div>
+      ))}
+    </div>
+    <div className="lg:hidden flex flex-col gap-4 mt-2">
+      {Array.from({ length: 3 }, (_, i) => (
+        <div key={i} className="border border-gray-200 rounded-xl p-5 flex flex-col gap-4">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-3">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div className="flex flex-col gap-1.5">
+                <Skeleton className="h-3.5 w-32" />
+                <Skeleton className="h-3 w-36" />
+              </div>
+            </div>
+            <Skeleton className="h-3 w-12" />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Skeleton className="h-14 rounded-lg" />
+            <Skeleton className="h-14 rounded-lg" />
+            <Skeleton className="h-11 rounded-lg col-span-2" />
+          </div>
+          <Skeleton className="h-10 w-full rounded-full" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const DoctorEncounterTable = () => {
   const { 
@@ -204,11 +250,7 @@ const DoctorEncounterTable = () => {
   }
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <Spinner className="w-8 h-8 text-docuhealth-primary" />
-      </div>
-    );
+    return <EncounterSkeleton middleCols={activeTab === "Active" ? 2 : 3} />;
   }
 
   if (!encounters || encounters.length === 0) {

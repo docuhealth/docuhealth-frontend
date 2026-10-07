@@ -24,7 +24,7 @@ const HosAdmittedPatientMGTProvider = ({ children }) => {
     queryFn: async () => {
       let url = `api/hospitals/patients?status=${tab}&page=${currentPage}&size=${pageSize}`;
       if (debouncedSearch) {
-        url += `&search=${debouncedSearch}`;
+        url += `&search=${encodeURIComponent(debouncedSearch)}`;
       }
       const res = await axiosInstanceHos.get(url);
       return res.data;
@@ -40,7 +40,8 @@ const HosAdmittedPatientMGTProvider = ({ children }) => {
   // Helper to switch tabs and reset page
   const handleTabChange = (newTab) => {
     setTab(newTab);
-    setCurrentPage(1); 
+    setCurrentPage(1);
+    setSearchQuery("");
   };
 
   return (
