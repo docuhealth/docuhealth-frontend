@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "react-hot-toast";
@@ -88,8 +93,7 @@ import Hospital_Doctors_Patients_Dashboard from "./Dashboard/Hospital_Dashboard/
 import Hospital_Doctors_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Messages_Dashboard";
 import Hospital_Doctors_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Settings_Dashboard";
 import Hospital_Doctors_HealthPersonnel_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_HealthPersonnel_Dashboard";
-import Hospital_Doctors_Lab_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Lab_Dashboard";
-import Hospital_Doctors_Radiology_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Radiology_Dashboard";
+import Hospital_Doctors_Scan_Lab_Results_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Scan_Lab_Results_Dashboard";
 import Hospital_Doctors_Handover_History from "./Dashboard/Hospital_Dashboard/Hospital_Doctors/Hospital_Doctors_Handover_History";
 
 import Hospital_Receptionist_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_Receptionist/Hospital_Receptionist_Layout";
@@ -502,7 +506,7 @@ function App() {
               />
             </Route>
             <Route
-              path="/hospital-doctors-lab-dashboard"
+              path="/hospital-doctors-scan-lab-results-dashboard"
               element={
                 <HospitalDoctorProviders>
                   <Hospital_Doctors_Layout />
@@ -514,31 +518,31 @@ function App() {
                 element={
                   <HospitalProtectedRoute>
                     <HospitalDoctorProviders>
-                      <Hospital_Doctors_Lab_Dashboard />
+                      <Hospital_Doctors_Scan_Lab_Results_Dashboard />
                     </HospitalDoctorProviders>
                   </HospitalProtectedRoute>
                 }
               />
             </Route>
+            {/* The lab and radiology result pages were merged into one tabbed page; keep the old URLs working. */}
+            <Route
+              path="/hospital-doctors-lab-dashboard"
+              element={
+                <Navigate
+                  to="/hospital-doctors-scan-lab-results-dashboard?tab=lab"
+                  replace
+                />
+              }
+            />
             <Route
               path="/hospital-doctors-radiology-dashboard"
               element={
-                <HospitalDoctorProviders>
-                  <Hospital_Doctors_Layout />
-                </HospitalDoctorProviders>
+                <Navigate
+                  to="/hospital-doctors-scan-lab-results-dashboard?tab=scan"
+                  replace
+                />
               }
-            >
-              <Route
-                index
-                element={
-                  <HospitalProtectedRoute>
-                    <HospitalDoctorProviders>
-                      <Hospital_Doctors_Radiology_Dashboard />
-                    </HospitalDoctorProviders>
-                  </HospitalProtectedRoute>
-                }
-              />
-            </Route>
+            />
             <Route
               path="/hospital-doctors-handover-history"
               element={

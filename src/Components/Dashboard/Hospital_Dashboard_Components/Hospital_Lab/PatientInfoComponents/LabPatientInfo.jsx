@@ -13,6 +13,7 @@ import { fetchTestCategories, fetchLabTests, createLabTestOrder } from "../../..
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
+import AppointmentCloseControl from "../../../../ui/AppointmentCloseControl";
 
 const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateOrder }) => {
 
@@ -96,12 +97,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
               </div>
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
-                {/* <p className="text-sm font-medium text-gray-800">
-                  Status:{" "}
-                  <span className="text-amber-500 capitalize">
-                    {selectedPatientDetails?.status || "Pending"}
-                  </span>
-                </p> */}
+                <AppointmentCloseControl appointment={selectedPatientDetails} listKey="lab-appointments" />
                 {!hideCreateOrder && (
                   <button
                     onClick={() => setShowOrderModal(true)}
@@ -304,7 +300,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                 </svg>
               </div>
             </div>
-            <p className="text-base font-semibold text-gray-800 mb-6 leading-snug">
+            <p className="text-base font-normal text-gray-800 mb-6 leading-snug">
               You have successfully created/<br />accepted a patient&apos;s test request!
             </p>
             <button

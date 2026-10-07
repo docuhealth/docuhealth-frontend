@@ -92,7 +92,6 @@ const OutpatientDischargeSummary = ({ row, fallbackPatient }) => {
     row?.patient_info || fallbackPatient?.patient_info || fallbackPatient?.patient || {};
   const patientName =
     [patient.firstname, patient.lastname].filter(Boolean).join(" ") || "N/A";
-  const form = row?.discharge_form;
   const providerInfo =
     patient?.payment_provider?.type ||
     fallbackPatient?.patient_info?.payment_provider?.type ||
@@ -128,41 +127,19 @@ const OutpatientDischargeSummary = ({ row, fallbackPatient }) => {
           <div>
             <p className="text-xs text-gray-500 mb-1">Discharged by</p>
             <p className="font-medium text-sm text-gray-800">
-              {staffLabel(form?.discharged_by || row?.discharged_by) || "—"}
+              {staffLabel(row?.discharged_by) || "Closed automatically"}
             </p>
           </div>
         </div>
       </div>
 
-      <Section
-        title="Outpatient discharge"
-        right={
-          form?.created_at && (
-            <span className="text-xs text-gray-500 text-right">
-              {formatFullDateTime(form.created_at)}
-            </span>
-          )
-        }
-      >
-        {!form ? (
-          <p className="text-sm text-gray-500">
-            No discharge form was linked to this checkout.
-          </p>
-        ) : (
-          <div className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <Field label="Chief complaint" value={form.chief_complaint} />
-              <Field
-                label="Condition at checkout"
-                value={titleCase(form.condition_at_checkout)}
-              />
-              <Field label="Diagnosis" value={form.diagnosis} />
-              <Field label="Treatment plan" value={form.treatment_plan} />
-            </div>
-            <Field label="Follow-up instructions" value={form.follow_up_instructions} />
-          </div>
-        )}
-      </Section>
+      <p className="text-sm text-gray-500">
+
+        Out-patient visits are closed without a discharge form. The clinical notes from
+
+        this visit are in the patient&apos;s record.
+
+      </p>
     </div>
   );
 };
@@ -185,8 +162,7 @@ const NursingDischargeSummaryView = ({
   const targetRow = dischargeRow || admission;
   const isOutpatientRow =
     !!targetRow &&
-    ("discharge_form" in targetRow ||
-      targetRow?.status === "outpatient_discharge" ||
+    (targetRow?.status === "outpatient_discharge" ||
       (!targetRow?.ward_info && !!targetRow?.closed_at));
   const hasInlineInpatient =
     !!targetRow &&
@@ -258,8 +234,8 @@ const NursingDischargeSummaryView = ({
   const primaryDoctor =
     data?.admitted_by
       ? staffLabel(data.admitted_by)
-      : targetRow?.staff_info
-        ? `Dr. ${targetRow.staff_info.firstname ?? ""} ${targetRow.staff_info.lastname ?? ""}`.trim()
+      : targetRow?.requested_by_info
+        ? `Dr. ${targetRow.requested_by_info.firstname ?? ""} ${targetRow.requested_by_info.lastname ?? ""}`.trim()
         : null;
 
   const providerInfo =
@@ -359,7 +335,7 @@ const NursingDischargeSummaryView = ({
           <div>
             <p className="text-xs text-gray-500 mb-1">Admitted / Discharged</p>
             <p className="font-medium text-sm text-gray-800">
-              {formatFullDateTime(data.admission_date || targetRow?.admission_date) || "—"}
+              {formatFullDateTime(data.created_at || targetRow?.created_at) || "—"}
             </p>
             <p className="text-xs text-gray-500 mt-1">
               Discharged: {formatFullDateTime(data.discharge_date || targetRow?.discharge_date) || "—"}

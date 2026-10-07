@@ -64,20 +64,20 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       ? `${selectedDischargePatient.ward_info.name} ward`
       : null;
 
-    const admissionDateTime = formatFullDateTime(selectedDischargePatient?.admission_date);
+    const admissionDateTime = formatFullDateTime(selectedDischargePatient?.created_at);
     const dischargeDateTime = formatFullDateTime(new Date());
 
     let lengthOfStay = null;
-    if (selectedDischargePatient?.admission_date) {
-      const admitted = new Date(selectedDischargePatient.admission_date);
+    if (selectedDischargePatient?.created_at) {
+      const admitted = new Date(selectedDischargePatient.created_at);
       if (!isNaN(admitted.getTime())) {
         const days = Math.max(1, Math.round((Date.now() - admitted.getTime()) / 86400000));
         lengthOfStay = `${days} day${days !== 1 ? "s" : ""}`;
       }
     }
 
-    const admittingDoctor = selectedDischargePatient?.staff_info
-      ? `Dr. ${selectedDischargePatient.staff_info.firstname} ${selectedDischargePatient.staff_info.lastname}`
+    const admittingDoctor = selectedDischargePatient?.requested_by_info
+      ? `Dr. ${selectedDischargePatient.requested_by_info.firstname} ${selectedDischargePatient.requested_by_info.lastname}`
       : null;
 
     return {

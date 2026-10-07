@@ -1,20 +1,48 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { createScanOrder, fetchRadiologyScans } from "../../../../../../queries/Hospital/radiology/scan_requests";
+import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import {
+  COMMON_SCAN_QUERIES,
+  createScanOrder,
+  radiologyScanSearchQuery,
+} from "../../../../../../queries/Hospital/radiology/scan_requests";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
-import { ChevronDown } from "lucide-react";
+import SearchableSelect from "../../../../../ui/SearchableSelect";
 
-// Patient(HIN)-based like OrderLabModal. "Imaging order" searches the scans catalog as you type and the order references the picked scan by sqid.
-const OrderScanModal = ({ selectedPatientDetails, onClose }) => {
-  const orderContext = resolveOrderContext(selectedPatientDetails);
-  const dropdownRef = useRef(null);
+// Each scan order source belongs to one role: a radiologist can only order against an appointment booked with them, a doctor against their appointment, admission or check-in.
+const resolveScanOrderContext = (details, orderedBy) =>
+  orderedBy === "radiologist"
+    ? {
+        hin: details?.patient?.hin || details?.patient_info?.hin || "",
+        orderSource: "radiologist_appointment_order",
+        appointment: details?.sqid || null,
+        checkIn: null,
+        admission: null,
+      }
+    : resolveOrderContext(details, { fallbackOrderSource: "doctor_appointment_order" });
 
-  const [selectedScan, setSelectedScan] = useState(null);
+// Preloaded common scans filter instantly on every word typed ("chest xr" finds "XR Chest 2 Views"); the server's catalog-wide matches are appended once they arrive.
+const mergeScanOptions = (term, commonScans, searchResults = []) => {
+  const words = term.toLowerCase().split(/\s+/).filter(Boolean);
+  const seen = new Set();
+  const local = commonScans
+    .filter((scan) => !seen.has(scan.sqid) && seen.add(scan.sqid))
+    .filter((scan) => words.every((w) => scan.name.toLowerCase().includes(w)))
+    .sort((a, b) => Number(b.name.toLowerCase().startsWith(words[0] || "")) - Number(a.name.toLowerCase().startsWith(words[0] || "")));
+  const remote = (searchResults || []).filter((scan) => !seen.has(scan.sqid));
+  return [...local, ...remote].map((scan) => ({ value: scan.sqid, label: scan.name }));
+};
+
+// Patient(HIN)-based like OrderLabModal. "Imaging order" searches the scans catalog server-side as you type and the order references the picked scan by sqid.
+const OrderScanModal = ({ selectedPatientDetails, onClose, orderedBy = "doctor" }) => {
+  const orderContext = resolveScanOrderContext(selectedPatientDetails, orderedBy);
+  // Every source needs exactly one linked record now that walk-in is gone.
+  const missingRecord = !orderContext.appointment && !orderContext.checkIn && !orderContext.admission;
+
+  const [selectedScanSqid, setSelectedScanSqid] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
@@ -22,25 +50,23 @@ const OrderScanModal = ({ selectedPatientDetails, onClose }) => {
     return () => clearTimeout(id);
   }, [searchInput]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  // Each common group shows as soon as it lands instead of waiting for all ten.
+  const commonQueries = useQueries({ queries: COMMON_SCAN_QUERIES.map(radiologyScanSearchQuery) });
+  const commonScans = commonQueries.flatMap((q) => q.data || []);
+  const isLoadingCommon = commonQueries.some((q) => q.isLoading);
 
   // The catalog is throttled to 60 requests a minute, so search from 2 characters and cache repeat lookups.
   const { data: scans, isFetching: isSearching } = useQuery({
-    queryKey: ["radiology-scans", debouncedSearch.trim()],
-    queryFn: fetchRadiologyScans,
+    ...radiologyScanSearchQuery(debouncedSearch.trim()),
     enabled: debouncedSearch.trim().length >= 2,
-    staleTime: 1000 * 60 * 5,
   });
 
-  const suggestions = debouncedSearch.trim().length >= 2 ? scans || [] : [];
+  const term = searchInput.trim();
+  const canSearch = term.length >= 2;
+  // Also "searching" while the debounce is pending, so the panel never flashes "No scan matches" for a request that hasn't gone out yet.
+  const isSearchPending = canSearch && (term !== debouncedSearch.trim() || isSearching);
+  const scanOptions = mergeScanOptions(term, commonScans, canSearch && !isSearchPending ? scans : []);
+  const isLoadingScans = scanOptions.length === 0 && (term ? isSearchPending : isLoadingCommon);
 
   const createOrderMutation = useMutation({
     mutationFn: createScanOrder,
@@ -50,21 +76,15 @@ const OrderScanModal = ({ selectedPatientDetails, onClose }) => {
     },
   });
 
-  const handleSelectScan = (scan) => {
-    setSelectedScan(scan);
-    setSearchInput(scan.name);
-    setIsDropdownOpen(false);
-  };
-
   const handleSubmit = () => {
-    if (!selectedScan) return;
+    if (!selectedScanSqid || missingRecord) return;
     createOrderMutation.mutate({
       patient: orderContext.hin,
       order_source: orderContext.orderSource,
       check_in: orderContext.checkIn || undefined,
       admission: orderContext.admission || undefined,
       appointment: orderContext.appointment || undefined,
-      items: [{ scan: selectedScan.sqid }],
+      items: [{ scan: selectedScanSqid }],
     });
   };
 
@@ -100,52 +120,33 @@ const OrderScanModal = ({ selectedPatientDetails, onClose }) => {
             <h2 className="text-center font-semibold text-lg text-gray-800">Order scan/X-ray</h2>
             <p className="text-center text-gray-500 mb-4 text-sm">Kindly order a scan for this patient</p>
 
-            <div className="mb-4 text-[12px]" ref={dropdownRef}>
+            <div className="mb-4 text-[12px]">
               <label className="font-semibold text-gray-900 pb-1 block">
                 Imaging order <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchInput}
-                  onChange={(e) => {
-                    setSearchInput(e.target.value);
-                    // Editing the text drops the pick: an order needs a scan chosen from the catalog.
-                    setSelectedScan(null);
-                    setIsDropdownOpen(true);
-                  }}
-                  onFocus={() => setIsDropdownOpen(true)}
-                  placeholder="Search for a scan (e.g. CT Abdomen)"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-9 text-sm outline-hidden focus:border-docuhealth-primary transition-colors"
-                />
-                <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-
-                {isDropdownOpen && debouncedSearch.trim().length >= 2 && (
-                  <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-52 overflow-y-auto">
-                    {isSearching ? (
-                      <div className="p-3 text-xs text-gray-500 text-center">Searching...</div>
-                    ) : suggestions.length === 0 ? (
-                      <div className="p-3 text-xs text-gray-500 text-center">No scan matches "{searchInput}".</div>
-                    ) : (
-                      suggestions.map((scan) => (
-                        <button
-                          type="button"
-                          key={scan.sqid}
-                          onClick={() => handleSelectScan(scan)}
-                          className="w-full text-left px-3 py-2.5 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 text-sm text-gray-700"
-                        >
-                          {scan.name}
-                          {scan.loinc_code && <span className="block text-[11px] text-gray-400">LOINC {scan.loinc_code}</span>}
-                        </button>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
+              <SearchableSelect
+                value={selectedScanSqid}
+                onChange={(sqid) => setSelectedScanSqid(sqid)}
+                onSearchChange={setSearchInput}
+                options={scanOptions}
+                placeholder="Search for a scan (e.g. CT Abdomen)"
+                isLoading={isLoadingScans}
+                emptyText={
+                  canSearch ? `No scan matches "${term}".` : term ? "Keep typing to search all scans." : "Type to search all scans."
+                }
+              />
             </div>
 
+            {missingRecord && (
+              <p className="mb-2 text-[12px] text-red-500">
+                {orderedBy === "radiologist"
+                  ? "This patient needs an appointment booked with you by the reception desk before you can order a scan."
+                  : "Open this patient from an appointment, admission or check-in to order a scan."}
+              </p>
+            )}
+
             <button
-              disabled={createOrderMutation.isPending || !selectedScan}
+              disabled={createOrderMutation.isPending || !selectedScanSqid || missingRecord}
               className="mt-2 w-full cursor-pointer bg-docuhealth-primary text-white py-2 rounded-full disabled:bg-docuhealth-primary/60 disabled:cursor-not-allowed text-sm"
               onClick={handleSubmit}
             >

@@ -302,7 +302,7 @@ const AppointmentsList = () => {
                   Last Visit
                 </p>
                 <p className="text-sm font-medium">
-                  {appointment.last_visited || "NIL"}
+                  {appointment.last_visited ? formatFullDate(appointment.last_visited) : "NIL"}
                 </p>
               </div>
             </div>
@@ -388,7 +388,7 @@ const AppointmentsList = () => {
                 <div className="text-right">
                   <p className="text-[10px] text-gray-400">Last Visit</p>
                   <p className="text-[11px] font-medium text-gray-500">
-                    {appointment.last_visited || "NIL"}
+                    {appointment.last_visited ? formatFullDate(appointment.last_visited) : "NIL"}
                   </p>
                 </div>
               </div>

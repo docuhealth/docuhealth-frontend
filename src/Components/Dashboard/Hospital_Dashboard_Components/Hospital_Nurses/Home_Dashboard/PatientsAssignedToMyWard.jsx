@@ -146,13 +146,13 @@ const PatientsAssignedToMyWard = () => {
                         <p className="font-semibold text-gray-800 ">{patient?.patient_info?.firstname || patient?.user?.first_name || patient?.patient_info?.first_name || 'Unknown'} {patient?.patient_info?.lastname || patient?.user?.last_name || patient?.patient_info?.last_name || 'Patient'}</p>
                     </div>
                     <p>
-                        {formatFullDate(patient.admission_date)}
+                        {formatFullDate(patient.created_at)}
                     </p>
                     <p>
-                    {formatTime(patient.admission_date)}
+                    {formatTime(patient.created_at)}
                     </p>
                     <p>
-                    {patient?.staff_info?.firstname || 'Unknown'} {patient?.staff_info?.lastname || 'Doctor'}
+                    {patient?.requested_by_info?.firstname || 'Unknown'} {patient?.requested_by_info?.lastname || 'Doctor'}
                     </p>
                     <p className='truncate max-w-[120px]'>
                         {patient?.patient_info?.email || patient?.user?.email ||"NIL"} 
@@ -187,15 +187,15 @@ const PatientsAssignedToMyWard = () => {
             <div className="grid grid-cols-2 gap-y-4">
               <div>
                 <p className="text-[10px] text-gray-400 uppercase">Admission Date</p>
-                <p className="text-[12px] font-medium text-gray-700">{formatFullDate(patient.admission_date)}</p>
+                <p className="text-[12px] font-medium text-gray-700">{formatFullDate(patient.created_at)}</p>
               </div>
               <div>
                 <p className="text-[10px] text-gray-400 uppercase">Admission Time</p>
-                <p className="text-[12px] font-medium text-gray-700">{formatTime(patient.admission_date)}</p>
+                <p className="text-[12px] font-medium text-gray-700">{formatTime(patient.created_at)}</p>
               </div>
               <div>
                 <p className="text-[10px] text-gray-400 uppercase">Assigned Doctor</p>
-                <p className="text-gray-800 text-[12px]">{patient?.staff_info?.firstname || 'Unknown'} {patient?.staff_info?.lastname || 'Doctor'}</p>
+                <p className="text-gray-800 text-[12px]">{patient?.requested_by_info?.firstname || 'Unknown'} {patient?.requested_by_info?.lastname || 'Doctor'}</p>
               </div>
               <div>
                 <p className="text-[10px] text-gray-400 uppercase">Email/Info</p>

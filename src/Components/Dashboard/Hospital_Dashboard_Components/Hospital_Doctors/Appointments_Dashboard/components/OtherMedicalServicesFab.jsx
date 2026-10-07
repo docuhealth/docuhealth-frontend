@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import { prefetchCommonRadiologyScans } from "../../../../../../queries/Hospital/radiology/scan_requests";
 import OrderLabModal from "./OrderLabModal";
 import OrderScanModal from "./OrderScanModal";
 import RequestVitalsModal from "./RequestVitalsModal";
@@ -31,6 +33,12 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, onOrde
   const [open, setOpen] = useState(false);
   const [activeModal, setActiveModal] = useState(null); // "lab" | "scan" | "vitals" | "vitals-task" | "input-output" | "procedure" | "glucose" | "drug-task" | "iv-fluid" | "seizure" | null
   const containerRef = useRef(null);
+  const queryClient = useQueryClient();
+
+  // Warm the scan picker's common list while the doctor is still on the patient, so "Order scan/X-ray" opens with options ready.
+  useEffect(() => {
+    prefetchCommonRadiologyScans(queryClient);
+  }, [queryClient]);
 
   useEffect(() => {
     if (!open) return;
@@ -103,7 +111,7 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, onOrde
     admissionSqid ||
     selectedPatientDetails?.ward_info ||
     selectedPatientDetails?.bed_info ||
-    selectedPatientDetails?.admission_date
+    selectedPatientDetails?.requested_by_info
   );
 
   const availableServices = QUICK_SERVICES.filter((item) => {

@@ -2,15 +2,9 @@ import React, { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
 import OrderScanModal from "../../Hospital_Doctors/Appointments_Dashboard/components/OrderScanModal";
+import AppointmentCloseControl from "../../../../ui/AppointmentCloseControl";
 
-// The order modal is the doctor's Order Scan one: it resolves this appointment into a staff_appointment_order linked by sqid.
-
-const STATUS_COLOR = {
-  pending: "text-amber-500",
-  confirmed: "text-green-600",
-  completed: "text-green-600",
-  cancelled: "text-red-500",
-};
+// Reuses the doctor's Order Scan modal as a radiologist: the order is a radiologist_appointment_order linked to this appointment, approved as soon as the result is uploaded.
 
 const RadiologyAppointmentPatientInfo = ({ appointment, onBack, autoOpenCreateOrder }) => {
   const patient = appointment?.patient ?? {};
@@ -32,12 +26,7 @@ const RadiologyAppointmentPatientInfo = ({ appointment, onBack, autoOpenCreateOr
           </button>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
-            <p className="w-full sm:w-auto">
-              Status:{" "}
-              <span className={`font-semibold capitalize ${STATUS_COLOR[appointment?.status] || "text-gray-500"}`}>
-                {appointment?.status || "—"}
-              </span>
-            </p>
+            <AppointmentCloseControl appointment={appointment} listKey="radiology-appointments" />
             <button
               type="button"
               onClick={() => setShowOrderModal(true)}
@@ -84,7 +73,7 @@ const RadiologyAppointmentPatientInfo = ({ appointment, onBack, autoOpenCreateOr
         </div>
       </div>
 
-      {showOrderModal && <OrderScanModal selectedPatientDetails={appointment} onClose={() => setShowOrderModal(false)} />}
+      {showOrderModal && <OrderScanModal selectedPatientDetails={appointment} orderedBy="radiologist" onClose={() => setShowOrderModal(false)} />}
     </>
   );
 };

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import React, { useMemo, useContext } from "react";
 import { HosAppointmentsContext } from "../../../../../context/HospitalContext/Admin/HosAppointmentsContext";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
@@ -303,7 +304,7 @@ const AppointmentsListHospital = () => {
                     Last Visit
                   </p>
                   <p className="text-sm font-medium">
-                    {appointment.last_visited || "NIL"}
+                    {appointment.last_visited ? formatFullDate(appointment.last_visited) : "NIL"}
                   </p>
                 </div>
               </div>
@@ -390,7 +391,7 @@ const AppointmentsListHospital = () => {
                   <div className="text-right">
                     <p className="text-[10px] text-gray-400">Last Visit</p>
                     <p className="text-[11px] font-medium text-gray-500">
-                      {appointment.last_visited || "NIL"}
+                      {appointment.last_visited ? formatFullDate(appointment.last_visited) : "NIL"}
                     </p>
                   </div>
                 </div>

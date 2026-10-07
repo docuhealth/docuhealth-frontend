@@ -1,12 +1,13 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import DashboardLayout from "../../../Components/ui/DashboardLayout";
+import ComingSoonModal from "../../../Components/ui/ComingSoonModal";
 import { HosAppContext } from "../../../context/HospitalContext/Admin/HosAppContext";
 
 const Hospital_Admin_Layout = () => {
   const { profile } = useContext(HosAppContext);
   const navigate = useNavigate();
+  const [comingSoonFeature, setComingSoonFeature] = useState(null);
 
   const handleLogout = () => {
     sessionStorage.clear();
@@ -91,9 +92,9 @@ const Hospital_Admin_Layout = () => {
       ),
     },
     {
-      name: "Messages",
+      name: "My Messages",
       path: "/hospital-admin-messages-dashboard",
-      onClick: () => toast.success("Feature is coming soon"),
+      onClick: () => setComingSoonFeature("Messaging"),
       icon: (isActive) => (
         <svg
           width="20"
@@ -132,7 +133,7 @@ const Hospital_Admin_Layout = () => {
     {
       name: "Wallet",
       path: "/hospital-admin-wallet-dashboard",
-      onClick: () => toast.success("Feature is coming soon"),
+      onClick: () => setComingSoonFeature("Wallet"),
       icon: (isActive) => (
         <svg
           width="20"
@@ -205,6 +206,11 @@ const Hospital_Admin_Layout = () => {
       handleLogout={handleLogout}
     >
       <Outlet />
+      <ComingSoonModal
+        isOpen={comingSoonFeature !== null}
+        onClose={() => setComingSoonFeature(null)}
+        feature={comingSoonFeature}
+      />
     </DashboardLayout>
   );
 };

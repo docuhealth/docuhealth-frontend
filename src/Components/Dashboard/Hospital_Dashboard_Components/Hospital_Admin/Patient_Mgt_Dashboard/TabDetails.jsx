@@ -27,16 +27,16 @@ const AdmittedPatientsTab = () => {
         item.patient_info?.firstname?.toLowerCase().includes(searchStr) ||
         item.patient_info?.lastname?.toLowerCase().includes(searchStr) ||
         item.patient_info?.hin?.toLowerCase().includes(searchStr) ||
-        item.staff_info?.firstname?.toLowerCase().includes(searchStr) ||
-        item.staff_info?.lastname?.toLowerCase().includes(searchStr) ||
+        item.requested_by_info?.firstname?.toLowerCase().includes(searchStr) ||
+        item.requested_by_info?.lastname?.toLowerCase().includes(searchStr) ||
         item.ward_info?.name?.toLowerCase().includes(searchStr)
       );
     });
   
     // 2. Sort by admission date (Most recent first)
     return [...filtered].sort((a, b) => {
-      const dateA = new Date(a.admission_date).getTime();
-      const dateB = new Date(b.admission_date).getTime();
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
       return dateB - dateA; // Use dateA - dateB for oldest first
     });
   }, [admittedPatients, searchQuery]);
@@ -140,7 +140,7 @@ const AdmittedPatientsTab = () => {
               </p>
               <div className="bg-docuhealth-light-green px-2 rounded-full">
                 <p className="text-docuhealth-green ">
-                  {formatRecordDate(admittedPatient.admission_date)}
+                  {formatRecordDate(admittedPatient.created_at)}
                 </p>
               </div>
             </div>
@@ -167,8 +167,8 @@ const AdmittedPatientsTab = () => {
               </svg>
               <p className="">
                 {" "}
-                {admittedPatient?.staff_info
-                  ? `${admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`
+                {admittedPatient?.requested_by_info
+                  ? `${admittedPatient.requested_by_info.firstname} ${admittedPatient.requested_by_info.lastname}`
                   : "NIL"}
               </p>
             </div>
@@ -229,7 +229,7 @@ const AdmittedPatientsTab = () => {
               </svg>
 
               <p className="">
-                {formatFullDateTime(admittedPatient.admission_date)}
+                {formatFullDateTime(admittedPatient.created_at)}
               </p>
             </div>
             <button
@@ -305,9 +305,9 @@ const AdmittedPatientsTab = () => {
                 </p>
 
                 <p>
-                  <strong>Assigned doctor:</strong>{" "}
-                  {selectedPatient?.staff
-                    ? `Dr. ${selectedPatient.staff.firstname} ${selectedPatient.staff.lastname}`
+                  <strong>Admitting doctor:</strong>{" "}
+                  {selectedPatient?.requested_by_info
+                    ? `Dr. ${selectedPatient.requested_by_info.firstname} ${selectedPatient.requested_by_info.lastname}`
                     : "NIL"}
                 </p>
 
@@ -325,8 +325,8 @@ const AdmittedPatientsTab = () => {
 
                 <p>
                   <strong>Date of Admission:</strong>{" "}
-                  {selectedPatient?.admission_date
-                    ? formatFullDateTime(selectedPatient.admission_date)
+                  {selectedPatient?.created_at
+                    ? formatFullDateTime(selectedPatient.created_at)
                     : "NIL"}
                 </p>
 
@@ -374,8 +374,8 @@ const DischargedPatientsTab = () => {
         item.patient_info?.firstname?.toLowerCase().includes(searchStr) ||
         item.patient_info?.lastname?.toLowerCase().includes(searchStr) ||
         item.patient_info?.hin?.toLowerCase().includes(searchStr) ||
-        item.staff_info?.firstname?.toLowerCase().includes(searchStr) ||
-        item.staff_info?.lastname?.toLowerCase().includes(searchStr) ||
+        item.requested_by_info?.firstname?.toLowerCase().includes(searchStr) ||
+        item.requested_by_info?.lastname?.toLowerCase().includes(searchStr) ||
         item.ward_info?.name?.toLowerCase().includes(searchStr)
       );
     });
@@ -655,9 +655,9 @@ const DischargedPatientsTab = () => {
                   </p>
 
                   <p>
-                    <strong>Assigned doctor:</strong>{" "}
-                    {selectedPatient?.staff
-                      ? `Dr. ${selectedPatient.staff.firstname} ${selectedPatient.staff.lastname}`
+                    <strong>Admitting doctor:</strong>{" "}
+                    {selectedPatient?.requested_by_info
+                      ? `Dr. ${selectedPatient.requested_by_info.firstname} ${selectedPatient.requested_by_info.lastname}`
                       : "NIL"}
                   </p>
 
@@ -675,8 +675,8 @@ const DischargedPatientsTab = () => {
 
                   <p>
                     <strong>Date of Admission:</strong>{" "}
-                    {selectedPatient?.admission_date
-                      ? formatFullDateTime(selectedPatient.admission_date)
+                    {selectedPatient?.created_at
+                      ? formatFullDateTime(selectedPatient.created_at)
                       : "NIL"}
                   </p>
 
@@ -717,8 +717,8 @@ const OutPatientsTab = () => {
 
     const sortedOutPatients = useMemo(() => {
         return [...outPatients].sort((a, b) => {
-            const dateA = new Date(a.created_at || a.admission_date).getTime();
-            const dateB = new Date(b.created_at || b.admission_date).getTime();
+            const dateA = new Date(a.created_at).getTime();
+            const dateB = new Date(b.created_at).getTime();
             return dateB - dateA;
         });
     }, [outPatients]);
@@ -784,7 +784,7 @@ const OutPatientsTab = () => {
                                     </p>
                                     <div className="bg-docuhealth-light-green px-2 rounded-full">
                                         <p className="text-docuhealth-green ">
-                                            {formatRecordDate(outPatient.admission_date)}
+                                            {formatRecordDate(outPatient.created_at)}
                                         </p>
                                     </div>
                                 </div>
@@ -802,8 +802,8 @@ const OutPatientsTab = () => {
                                     </svg>
                                     <p className="">
                                         {" "}
-                                        {outPatient?.staff_info
-                                            ? `${'Dr. ' + outPatient.staff_info.firstname} ${outPatient.staff_info.lastname}`
+                                        {outPatient?.requested_by_info
+                                            ? `${'Dr. ' + outPatient.requested_by_info.firstname} ${outPatient.requested_by_info.lastname}`
                                             : "NIL"}
                                     </p>
                                 </div>
@@ -817,7 +817,7 @@ const OutPatientsTab = () => {
                                     <svg width="15" height="15" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M4.08366 1.7487V0.582031H5.25033V1.7487H8.75033V0.582031H9.91699V1.7487H12.2503C12.5725 1.7487 12.8337 2.00987 12.8337 2.33203V5.2487H11.667V2.91536H9.91699V4.08203H8.75033V2.91536H5.25033V4.08203H4.08366V2.91536H2.33366V11.082H5.83366V12.2487H1.75033C1.42816 12.2487 1.16699 11.9875 1.16699 11.6654V2.33203C1.16699 2.00987 1.42816 1.7487 1.75033 1.7487H4.08366ZM9.91699 6.9987C8.62835 6.9987 7.58366 8.04339 7.58366 9.33203C7.58366 10.6207 8.62835 11.6654 9.91699 11.6654C11.2056 11.6654 12.2503 10.6207 12.2503 9.33203C12.2503 8.04339 11.2056 6.9987 9.91699 6.9987ZM6.41699 9.33203C6.41699 7.39904 7.984 5.83203 9.91699 5.83203C11.85 5.83203 13.417 7.39904 13.417 9.33203C13.417 11.265 11.85 12.832 9.91699 12.832C7.984 12.832 6.41699 11.265 6.41699 9.33203ZM9.33366 7.58203V9.57365L10.6712 10.9112L11.4961 10.0862L10.5003 9.09041V7.58203H9.33366Z" fill="var(--color-docuhealth-dark)"/>
                                     </svg>
-                                    <p className="">{formatFullDateTime(outPatient.created_at || outPatient.admission_date)}</p>
+                                    <p className="">{formatFullDateTime(outPatient.created_at)}</p>
                                 </div>
                                 <button
                                     className="text-center mt-3 py-2 border border-docuhealth-dark w-full rounded-full cursor-pointer"
@@ -847,7 +847,7 @@ const OutPatientsTab = () => {
                             <p><strong>Gender:</strong> {selectedPatient?.patient_info?.gender ?? "NIL"}</p>
                             <p><strong>D.O.B:</strong> {selectedPatient?.patient_info?.dob ?? "NIL"}</p>
                             <p><strong>Contact info:</strong> {selectedPatient?.patient_info?.phone_num ?? "NIL"}</p>
-                            <p><strong>Date created:</strong> {formatFullDateTime(selectedPatient?.created_at || selectedPatient?.admission_date) ?? "NIL"}</p>
+                            <p><strong>Date created:</strong> {formatFullDateTime(selectedPatient?.created_at) ?? "NIL"}</p>
                         </div>
                     </div>
                 </div>

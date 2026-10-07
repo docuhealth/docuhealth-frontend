@@ -51,7 +51,7 @@ export const PatientInfo = ({ patientFullInfo, selected }) => {
           <Input
             label="Admission Date / Time"
             readOnly
-            value={formatFullDateTime(selected?.admission_date)}
+            value={formatFullDateTime(selected?.created_at)}
           />
           <Input
             label="Discharge Date / Time"
@@ -71,11 +71,11 @@ export const PatientInfo = ({ patientFullInfo, selected }) => {
           <Input
             label="Doctor in charge"
             readOnly
+            // The doctor who requested the bed; admissions have no other doctor field.
             value={
-              "Dr. " +
-              selected?.staff?.firstname +
-              " " +
-              selected?.staff?.lastname
+              selected?.requested_by_info
+                ? `Dr. ${selected.requested_by_info.firstname} ${selected.requested_by_info.lastname}`
+                : "NIL"
             }
           />
           <Input
@@ -1819,21 +1819,7 @@ const getTabs = ({
     },
     {
       title: "Radiology Result",
-      // content: (
-      //   <PatientRadiologyRecords
-      //     patientFullInfo={patientFullInfo}
-      //     selected={selected}
-      //   />
-      // ),
-      content: (
-        <div className="py-16 text-center">
-          <EmptyState
-            icon="document"
-            title="Coming Soon"
-            description="Radiology results will be available soon."
-          />
-        </div>
-      ),
+      content: <PatientRadiologyRecords patientFullInfo={patientFullInfo} />,
     },
     {
       title: "Lab Result",

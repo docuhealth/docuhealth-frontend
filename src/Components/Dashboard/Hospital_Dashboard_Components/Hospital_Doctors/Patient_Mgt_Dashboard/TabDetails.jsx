@@ -23,8 +23,8 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
 
   const sortedAdmittedPatients = useMemo(() => {
     return [...admittedPatients].sort((a, b) => {
-      const dateA = new Date(a.admission_date).getTime();
-      const dateB = new Date(b.admission_date).getTime();
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
       return dateB - dateA;
     });
   }, [admittedPatients]);
@@ -145,7 +145,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
               </p>
               <div className="bg-docuhealth-light-green px-2 rounded-full">
                 <p className="text-docuhealth-green ">
-                  {formatRecordDate(admittedPatient.admission_date)}
+                  {formatRecordDate(admittedPatient.created_at)}
                 </p>
               </div>
             </div>
@@ -164,7 +164,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
                   admittedPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
             </div>
-            {admittedPatient?.staff_info && (
+            {admittedPatient?.requested_by_info && (
               <div className="flex items-center gap-1 text-gray-600 pt-3">
                 <svg
                   width="15"
@@ -180,7 +180,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
                 </svg>
                 <p className="">
                   {" "}
-                  {`${admittedPatient.staff_info.firstname} ${admittedPatient.staff_info.lastname}`}
+                  {`${admittedPatient.requested_by_info.firstname} ${admittedPatient.requested_by_info.lastname}`}
                 </p>
               </div>
             )}
@@ -241,7 +241,7 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
               </svg>
 
               <p className="">
-                {formatFullDateTime(admittedPatient.admission_date)}
+                {formatFullDateTime(admittedPatient.created_at)}
               </p>
             </div>
             <button
@@ -303,8 +303,8 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
 
   const sortedOutPatients = useMemo(() => {
     return [...outPatients].sort((a, b) => {
-      const dateA = new Date(a.created_at || a.admission_date).getTime();
-      const dateB = new Date(b.created_at || b.admission_date).getTime();
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
       return dateB - dateA;
     });
   }, [outPatients]);
@@ -370,7 +370,7 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
               </p>
               <div className="bg-docuhealth-light-green px-2 rounded-full">
                 <p className="text-docuhealth-green ">
-                  {formatRecordDate(outPatient.admission_date)}
+                  {formatRecordDate(outPatient.created_at)}
                 </p>
               </div>
             </div>
@@ -382,14 +382,14 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
                   outPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
             </div>
-            {outPatient?.staff_info && (
+            {outPatient?.requested_by_info && (
               <div className="flex items-center gap-1 text-gray-600 pt-3">
                 <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M7.50165 9.24984C9.88142 9.24984 11.8452 11.0312 12.1322 13.3332H2.87109C3.15814 11.0312 5.12187 9.24984 7.50165 9.24984ZM6.44401 10.5795C5.60773 10.8447 4.90335 11.4159 4.46914 12.1665H7.50165L6.44401 10.5795ZM8.55953 10.5797L7.50165 12.1665H10.5342C10.1 11.416 9.39574 10.8448 8.55953 10.5797ZM11.0017 1.6665V5.1665C11.0017 7.0995 9.43464 8.6665 7.50165 8.6665C5.56866 8.6665 4.00166 7.0995 4.00166 5.1665V1.6665H11.0017ZM5.16832 5.1665C5.16832 6.45515 6.21299 7.49984 7.50165 7.49984C8.79035 7.49984 9.83499 6.45515 9.83499 5.1665H5.16832ZM9.83499 2.83317H5.16832L5.16826 3.99984H9.83493L9.83499 2.83317Z" fill="var(--color-docuhealth-dark)"/>
                 </svg>
                 <p className="">
                   {" "}
-                  {`Dr. ${outPatient.staff_info.firstname} ${outPatient.staff_info.lastname}`}
+                  {`Dr. ${outPatient.requested_by_info.firstname} ${outPatient.requested_by_info.lastname}`}
                 </p>
               </div>
             )}
@@ -403,7 +403,7 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
               <svg width="15" height="15" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4.08366 1.7487V0.582031H5.25033V1.7487H8.75033V0.582031H9.91699V1.7487H12.2503C12.5725 1.7487 12.8337 2.00987 12.8337 2.33203V5.2487H11.667V2.91536H9.91699V4.08203H8.75033V2.91536H5.25033V4.08203H4.08366V2.91536H2.33366V11.082H5.83366V12.2487H1.75033C1.42816 12.2487 1.16699 11.9875 1.16699 11.6654V2.33203C1.16699 2.00987 1.42816 1.7487 1.75033 1.7487H4.08366ZM9.91699 6.9987C8.62835 6.9987 7.58366 8.04339 7.58366 9.33203C7.58366 10.6207 8.62835 11.6654 9.91699 11.6654C11.2056 11.6654 12.2503 10.6207 12.2503 9.33203C12.2503 8.04339 11.2056 6.9987 9.91699 6.9987ZM6.41699 9.33203C6.41699 7.39904 7.984 5.83203 9.91699 5.83203C11.85 5.83203 13.417 7.39904 13.417 9.33203C13.417 11.265 11.85 12.832 9.91699 9.33203ZM9.33366 7.58203V9.57365L10.6712 10.9112L11.4961 10.0862L10.5003 9.09041V7.58203H9.33366Z" fill="var(--color-docuhealth-dark)"/>
               </svg>
-              <p className="">{formatFullDateTime(outPatient.created_at || outPatient.admission_date)}</p>
+              <p className="">{formatFullDateTime(outPatient.created_at)}</p>
             </div>
             <button
               className="text-center mt-4 py-2.5 border bg-docuhealth-dark text-white w-full rounded-full cursor-pointer"
@@ -581,9 +581,9 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
                   "••••••" +
                   admittedPatient.patient_info.hin.slice(-2) : 'N/A'}
               </p>
-              {admittedPatient?.admission_date && (
+              {admittedPatient?.created_at && (
                 <p className="text-gray-600 pt-1">
-                  Admitted : {formatRecordDate(admittedPatient.admission_date)}
+                  Admitted : {formatRecordDate(admittedPatient.created_at)}
                 </p>
               )}
             </div>

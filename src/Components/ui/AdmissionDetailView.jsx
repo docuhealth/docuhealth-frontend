@@ -57,8 +57,8 @@ const AdmissionDetailView = ({ admission }) => {
           <p>
             Admission date:{" "}
             <span className="font-medium text-gray-900">
-              {admission.admission_date
-                ? formatFullDateTime(admission.admission_date)
+              {admission.created_at
+                ? formatFullDateTime(admission.created_at)
                 : "Pending confirmation"}
             </span>
           </p>
