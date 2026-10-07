@@ -11,6 +11,22 @@ import Input from "../../../../ui/Input";
 import ReferOutModal from "./components/ReferOutModal";
 import CloseAppointmentModal from "../../../../ui/CloseAppointmentModal";
 import { isAppointmentClosed, useCloseAppointment } from "../../../../../queries/Hospital/appointments";
+import Skeleton from "../../../../ui/Skeleton";
+import RecordRowsSkeleton from "../../../../ui/RecordRowsSkeleton";
+
+const APPOINTMENT_TABS = [
+  { value: "today", label: "Today's Appointments" },
+  { value: "upcoming", label: "Upcoming Appointments" },
+  { value: "history", label: "Past Appointments" },
+];
+
+// Filter bar stub + the same icon-tile rows (desktop) / date-pill cards (mobile) as the list.
+const AppointmentRowsSkeleton = () => (
+  <div className="w-full">
+    <Skeleton className="h-10 w-full rounded-lg" />
+    <RecordRowsSkeleton label="Loading appointments" tiles={4} count={4} />
+  </div>
+);
 
 const AppointmentsList = ({
   setSeePatientDetails,
@@ -62,59 +78,42 @@ const AppointmentsList = ({
   });
 
 
+  const tabsRow = (
+    <div className="w-full mb-8 md:border-b md:border-gray-200">
+      <div className="grid grid-cols-2 gap-3 md:flex md:flex-row md:gap-8">
+        {APPOINTMENT_TABS.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => setAppointmentType(tab.value)}
+            className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
+              appointmentType === tab.value
+                ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
+                : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Keep the tabs on screen while a tab's first page loads; only the rows are placeholders.
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full text-sm">
-        Loading...
-      </div>
+      <>
+        {tabsRow}
+        <AppointmentRowsSkeleton />
+      </>
     );
   }
   if (appointments.length === 0 && !searchQuery && !dateFrom && !dateTo) {
     return (
       <div className="flex flex-col justify-center items-center text-center h-full pb-10">
-        <div className="w-full mb-8 md:border-b md:border-gray-200">
-          <div className="grid grid-cols-2 gap-3 md:flex md:flex-row md:gap-8">
-            <button
-              onClick={() => setAppointmentType('today')}
-              className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
-                appointmentType === 'today'
-                  ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
-                  : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
-              }`}
-            >
-              Today's Appointments
-            </button>
-            <button
-              onClick={() => setAppointmentType('upcoming')}
-              className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
-                appointmentType === 'upcoming'
-                  ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
-                  : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
-              }`}
-            >
-              Upcoming Appointments
-            </button>
-            <button
-              onClick={() => setAppointmentType('history')}
-              className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
-                appointmentType === 'history'
-                  ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
-                  : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
-              }`}
-            >
-              Past Appointments
-            </button>
-          </div>
-        </div>
+        {tabsRow}
         
         {isRefreshing ? (
-          <div className="flex justify-center items-center h-40 text-sm text-gray-500 mt-10">
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-docuhealth-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Loading appointments...
-          </div>
+          <AppointmentRowsSkeleton />
         ) : (
           <div className="flex flex-col items-center">
             <svg
@@ -194,40 +193,7 @@ const AppointmentsList = ({
 
   return (
     <>
-      <div className="w-full mb-8 md:border-b md:border-gray-200">
-        <div className="grid grid-cols-2 gap-3 md:flex md:flex-row md:gap-8">
-          <button
-            onClick={() => setAppointmentType('today')}
-            className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
-              appointmentType === 'today'
-                ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
-                : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
-            }`}
-          >
-            Today's Appointments
-          </button>
-          <button
-            onClick={() => setAppointmentType('upcoming')}
-            className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
-              appointmentType === 'upcoming'
-                ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
-                : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
-            }`}
-          >
-            Upcoming Appointments
-          </button>
-          <button
-            onClick={() => setAppointmentType('history')}
-            className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
-              appointmentType === 'history'
-                ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
-                : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
-            }`}
-          >
-            Past Appointments
-          </button>
-        </div>
-      </div>
+      {tabsRow}
 
       <div className="mb-4 w-full space-y-3">
         <SearchBar

@@ -38,14 +38,14 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
     enabled: !!hin,
   });
 
-  const { data: medRecordsData } = useQuery({
+  const { data: medRecordsData, isLoading: medRecordsLoading } = useQuery({
     queryKey: ["patient-med-records", hin, 1],
     queryFn: async () =>
       (await axiosInstanceHos.get(`api/doctors/patient/records/${hin}?page=1&size=6`)).data,
     enabled: !!hin,
   });
 
-  const { data: labRecordsData } = useQuery({
+  const { data: labRecordsData, isLoading: labRecordsLoading } = useQuery({
     queryKey: ["patient-lab-records", hin, 1],
     queryFn: async () =>
       (await axiosInstanceHos.get(`api/lab/test-orders/patient/${hin}?page=1&size=${pageSize}`)).data,
@@ -420,6 +420,8 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       {currentStep === 2 && (
         <DischargeProceduresMedicationsStep
           completedInvestigationOptions={completedInvestigationOptions}
+          investigationsLoading={labRecordsLoading}
+          medicationsLoading={medRecordsLoading}
           formData={formData}
           onFieldChange={handleFieldChange}
           onToggleCompletedInvestigation={toggleSelection("completed_investigations")}
@@ -438,6 +440,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
           onFieldChange={handleFieldChange}
           hospitalName={hospitalName}
           pendingInvestigationOptions={pendingInvestigationOptions}
+          investigationsLoading={labRecordsLoading}
           onTogglePendingInvestigation={toggleSelection("pending_investigations")}
         />
       )}

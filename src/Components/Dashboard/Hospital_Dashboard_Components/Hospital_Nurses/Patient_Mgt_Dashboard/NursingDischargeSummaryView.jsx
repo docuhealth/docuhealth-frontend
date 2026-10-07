@@ -125,9 +125,9 @@ const OutpatientDischargeSummary = ({ row, fallbackPatient }) => {
             </p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Discharged by</p>
+            <p className="text-xs text-gray-500 mb-1">Closed by</p>
             <p className="font-medium text-sm text-gray-800">
-              {staffLabel(row?.discharged_by) || "Closed automatically"}
+              {staffLabel(row?.closed_by_info) || "Closed automatically"}
             </p>
           </div>
         </div>

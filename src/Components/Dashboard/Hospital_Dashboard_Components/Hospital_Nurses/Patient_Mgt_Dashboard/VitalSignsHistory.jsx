@@ -1,4 +1,7 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import useDebounce from "../../../../../hooks/useDebounce";
+import { fetchAllPatientVitalSigns, isWithinStay } from "../../../../../queries/Hospital/nurse/patientHistory";
 import toast from "react-hot-toast";
 import { Activity, ChevronLeft, ChevronRight, FileText, User, Calendar, Clock } from "lucide-react";
 import { NursesVitalSignsContext } from "../../../../../context/HospitalContext/Nurses/NursesVitalSignsContext";
@@ -15,8 +18,44 @@ const getPainBadgeClass = (score) => {
     return "bg-rose-50 text-rose-700 border-rose-200";
 };
 
-const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
+const VitalSignsHistory = ({ selected, setVitalSignsHistory, embedded = false, stayWindow = null }) => {
     const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
+    const shared = useContext(NursesVitalSignsContext);
+    const { setPatientHin, setCurrentPage: setSharedPage } = shared;
+
+    useEffect(() => {
+        if (hin && !stayWindow) {
+            setPatientHin(hin);
+        }
+        return () => {
+            setPatientHin(null);
+            setSharedPage(1);
+        };
+    }, [hin, stayWindow, setPatientHin, setSharedPage]);
+
+    // One discharged stay: the API can't filter by admission, so fetch everything and filter by the stay's dates
+    const [stayPage, setStayPage] = useState(1);
+    const [staySearch, setStaySearch] = useState("");
+    const debouncedStaySearch = useDebounce(staySearch, 300);
+    const stayQuery = useQuery({
+        queryKey: ["nurse-patient-vitals-all", hin],
+        queryFn: () => fetchAllPatientVitalSigns(hin),
+        enabled: !!hin && !!stayWindow,
+    });
+
+    useEffect(() => {
+        setStayPage(1);
+    }, [debouncedStaySearch, stayWindow?.start, stayWindow?.end]);
+
+    const stayPageSize = 7;
+    const stayVitals = (stayQuery.data || []).filter((v) => {
+        if (!isWithinStay(v.created_at, stayWindow)) return false;
+        const q = debouncedStaySearch.trim().toLowerCase();
+        if (!q) return true;
+        return [v.notes, v.staff_info?.firstname, v.staff_info?.lastname, new Date(v.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })]
+            .some((x) => String(x || "").toLowerCase().includes(q));
+    });
+
     const {
         vitals,
         count,
@@ -25,23 +64,30 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
         totalPages,
         loading,
         isRefreshing,
-        setPatientHin,
         searchQuery,
         setSearchQuery,
-    } = useContext(NursesVitalSignsContext);
+    } = stayWindow
+        ? {
+            vitals: stayVitals.slice((stayPage - 1) * stayPageSize, stayPage * stayPageSize),
+            count: stayVitals.length,
+            currentPage: stayPage,
+            setCurrentPage: setStayPage,
+            totalPages: Math.ceil(stayVitals.length / stayPageSize),
+            loading: stayQuery.isPending,
+            isRefreshing: false,
+            searchQuery: staySearch,
+            setSearchQuery: setStaySearch,
+        }
+        : shared;
 
     useEffect(() => {
-        if (hin) {
-            setPatientHin(hin);
-        }
-        return () => {
-            setPatientHin(null);
-            setCurrentPage(1);
-        };
-    }, [hin, setPatientHin, setCurrentPage]);
+        if (stayQuery.isError) toast.error("Error fetching vitals history");
+    }, [stayQuery.isError]);
 
     return (
-        <div className="bg-white my-5 border border-slate-200 rounded-xl pt-5 lg:pt-8 px-4 lg:px-6 text-sm shadow-xs">
+        <div className={embedded ? "text-sm" : "bg-white my-5 border border-slate-200 rounded-xl pt-5 lg:pt-8 px-4 lg:px-6 text-sm shadow-xs"}>
+            {/* Embedded as a patient-details tab: the tab bar already provides navigation */}
+            {!embedded && (
             <div
                 className="flex justify-start items-center gap-2 cursor-pointer border-b border-slate-200 pb-4 text-slate-700 hover:text-docuhealth-primary transition-colors"
                 onClick={() => setVitalSignsHistory(false)}
@@ -60,6 +106,7 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
                 </svg>
                 <h2 className="text-base font-semibold text-slate-800">Vital Signs History</h2>
             </div>
+            )}
 
             <div className="my-5">
                 <SearchBar
@@ -100,7 +147,9 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
                         <h2 className="font-semibold text-slate-800 text-base pb-1">No Vital Signs Records</h2>
                         <div className="max-w-sm text-center">
                             <p className="text-xs text-slate-500 leading-relaxed">
-                                This patient does not have any recorded vital signs yet.
+                                {stayWindow
+                                    ? "No vital signs were recorded during this admission."
+                                    : "This patient does not have any recorded vital signs yet."}
                             </p>
                         </div>
                     </div>

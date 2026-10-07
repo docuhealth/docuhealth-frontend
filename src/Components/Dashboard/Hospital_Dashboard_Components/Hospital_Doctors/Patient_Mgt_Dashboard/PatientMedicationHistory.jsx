@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Pill, Search, Calendar, User, Clock, CheckCircle, AlertCircle, ShieldAlert, Sparkles } from "lucide-react";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
+import CardGridSkeleton from "../../../../ui/CardGridSkeleton";
 
 const PatientMedicationHistory = ({
   patientFullInfo,
@@ -156,14 +157,7 @@ const PatientMedicationHistory = ({
   }, [allMedications, activeFilter, searchQuery]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-40 text-sm">
-        <div className="flex items-center gap-2 text-gray-500">
-          <div className="w-5 h-5 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin"></div>
-          <span>Loading medication history...</span>
-        </div>
-      </div>
-    );
+    return <CardGridSkeleton label="Loading medication history" />;
   }
 
   if (allMedications.length === 0) {

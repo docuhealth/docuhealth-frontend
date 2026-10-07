@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstanceHos from "../../../../../lib/axios/hospital";
-import toast from "react-hot-toast";
+import { fetchPatientAdmissionNotes } from "../../../../../queries/Hospital/nurse/patientHistory";
 import { Loader2, Calendar, Clock, User, Building, FileText, ChevronRight, Bed } from "lucide-react";
 import AdmissionNoteDetail from "./AdmissionNoteDetail";
 
-const AdmissionNotesHistory = ({ patient, patientFullInfo }) => {
+const AdmissionNotesHistory = ({ patient, patientFullInfo, admissionSqid = null }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [view, setView] = useState("list"); // 'list', 'detail'
   const [selectedNote, setSelectedNote] = useState(null);
@@ -14,15 +13,13 @@ const AdmissionNotesHistory = ({ patient, patientFullInfo }) => {
 
   const { data, isLoading: loading } = useQuery({
     queryKey: ["patient-admission-notes", patientHin],
-    queryFn: async () => {
-      const res = await axiosInstanceHos.get(`api/records/patients/${patientHin}/admission-notes`);
-      return res.data?.results || res.data || [];
-    },
+    queryFn: () => fetchPatientAdmissionNotes(patientHin),
     enabled: !!patientHin,
     staleTime: 5 * 60 * 1000,
   });
 
-  const notes = data || [];
+  // Scoped to one stay, a note only counts if it was written for that admission
+  const notes = (data || []).filter((note) => !admissionSqid || note?.admission_info?.sqid === admissionSqid);
 
   const toggleDropdown = (index) => {
     if (openDropdown === index) {
@@ -88,7 +85,11 @@ const AdmissionNotesHistory = ({ patient, patientFullInfo }) => {
           <div className="py-12 text-center text-gray-500 text-sm bg-gray-50/50 rounded-xl border border-gray-100">
             <FileText className="w-8 h-8 text-gray-300 mx-auto mb-2" />
             <p className="font-medium text-gray-700">No admission notes found</p>
-            <p className="text-xs text-gray-400 mt-1">This patient does not have any recorded admission notes at this hospital.</p>
+            <p className="text-xs text-gray-400 mt-1">
+              {admissionSqid
+                ? "No nursing admission note was recorded for this admission."
+                : "This patient does not have any recorded admission notes at this hospital."}
+            </p>
           </div>
         ) : (
           <>

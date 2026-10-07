@@ -12,6 +12,7 @@ import useDebounce from "../../../../../../hooks/useDebounce";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import Modal from "../../../../../ui/Modal";
+import HospitalLoader from "../../../../../ui/HospitalLoader";
 import Select from "../../../../../ui/Select";
 import MultiSelect from "../../../../../ui/MultiSelect";
 
@@ -159,6 +160,7 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
       maxWidth={showSuccess || duplicateWarning ? "md" : "2xl"}
       className="max-h-[88vh] flex flex-col p-2"
     >
+      {isLabPending && <HospitalLoader variant="overlay" label="Sending lab order..." />}
       <div className="relative">
         {/* Close Button */}
         <button

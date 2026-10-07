@@ -10,6 +10,7 @@ import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagina
 import AddHandoverNoteForm, { HANDOVER_FIELDS } from "./AddHandoverNoteForm";
 import HandoverNoteDetailPage from "./HandoverNoteDetailPage";
 import SelectHandoverDoctorModal from "./SelectHandoverDoctorModal";
+import Skeleton from "../../../../ui/Skeleton";
 
 const PAGE_SIZE = 6;
 
@@ -35,6 +36,30 @@ const doctorName = (info) =>
  * with the 8 structured fields from AddHandoverNoteForm plus the recipient
  * doctor's SQID and the patient HIN.
  */
+// Mirrors a handover card: date pill, book icon, five detail lines, outline button.
+const HandoverNotesSkeleton = () => (
+  <div role="status" aria-label="Loading handover notes" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+    {Array.from({ length: 3 }, (_, i) => (
+      <div key={i} className="border rounded-2xl p-5">
+        <div className="flex justify-end mb-2">
+          <Skeleton className="h-5 w-20 rounded-full" />
+        </div>
+        <div className="flex justify-center py-4">
+          <Skeleton className="h-14 w-14 rounded-lg" />
+        </div>
+        <div className="border-t pt-3 space-y-3">
+          <Skeleton className="h-3 w-36" />
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-3 w-32" />
+          <Skeleton className="h-3 w-40" />
+          <Skeleton className="h-3 w-36" />
+        </div>
+        <Skeleton className="mt-4 h-9 w-full rounded-full" />
+      </div>
+    ))}
+  </div>
+);
+
 const PatientHandoverTab = ({ selected, patientFullInfo }) => {
   const queryClient = useQueryClient();
 
@@ -250,12 +275,7 @@ const PatientHandoverTab = ({ selected, patientFullInfo }) => {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center items-center py-16">
-          <svg className="animate-spin h-6 w-6 text-docuhealth-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-          </svg>
-        </div>
+        <HandoverNotesSkeleton />
       ) : isError ? (
         <div className="py-16 text-center text-sm text-gray-500">
           <p className="font-medium">Couldn't load handover notes.</p>

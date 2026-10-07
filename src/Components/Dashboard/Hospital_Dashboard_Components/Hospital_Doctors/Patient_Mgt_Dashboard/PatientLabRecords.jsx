@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Hospital_Lab_Test_Detail_Dashboard from "../../../../../Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Test_Detail_Dashboard";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
+import CardGridSkeleton from "../../../../ui/CardGridSkeleton";
 
 const PatientLabRecords = ({
   patientLabRecords = [],
@@ -13,14 +14,7 @@ const PatientLabRecords = ({
   const [selectedRecord, setSelectedRecord] = useState(null);
 
   if (labloading) {
-    return (
-      <div className="flex justify-center items-center h-40 text-sm">
-        <div className="flex items-center gap-2 text-gray-500">
-          <div className="w-5 h-5 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin"></div>
-          <span>Loading lab records...</span>
-        </div>
-      </div>
-    );
+    return <CardGridSkeleton label="Loading lab records" />;
   }
 
   if (selectedRecord) {

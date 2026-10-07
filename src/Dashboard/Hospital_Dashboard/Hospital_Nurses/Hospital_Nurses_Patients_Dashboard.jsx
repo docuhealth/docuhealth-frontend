@@ -19,6 +19,7 @@ import toast from "react-hot-toast";
 import AddHandoverNoteForm from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddHandoverNoteForm";
 import Modal from "../../../Components/ui/Modal";
 import axiosInstanceHos from "../../../lib/axios/hospital";
+import { fetchPatientAdmissionNotes } from "../../../queries/Hospital/nurse/patientHistory";
 import { ChevronDown, Check } from "lucide-react";
 
 const Hospital_Nurses_Patients_Dashboard = () => {
@@ -54,10 +55,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
 
   const { data: admissionNotesData } = useQuery({
     queryKey: ["patient-admission-notes", patientHin],
-    queryFn: async () => {
-      const res = await axiosInstanceHos.get(`api/records/patients/${patientHin}/admission-notes`);
-      return res.data?.results || res.data || [];
-    },
+    queryFn: () => fetchPatientAdmissionNotes(patientHin),
     enabled: !!patientHin,
     staleTime: 5 * 60 * 1000,
   });

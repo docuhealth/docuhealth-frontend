@@ -9,6 +9,8 @@ const conditionOptions = ["Stable", "Improved", "Unchanged", "Deteriorated", "De
 
 const DischargeProceduresMedicationsStep = ({
   completedInvestigationOptions,
+  investigationsLoading,
+  medicationsLoading,
   formData,
   onFieldChange,
   onToggleCompletedInvestigation,
@@ -31,6 +33,7 @@ const DischargeProceduresMedicationsStep = ({
           options={completedInvestigationOptions}
           selected={formData.completed_investigations}
           onToggle={onToggleCompletedInvestigation}
+          loading={investigationsLoading}
         />
       </div>
 
@@ -65,6 +68,7 @@ const DischargeProceduresMedicationsStep = ({
         <DischargeMedicationsTable
           medications={existingMedications}
           setMedications={setExistingMedications}
+          loading={medicationsLoading}
         />
 
         {showAddMedication && (

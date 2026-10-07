@@ -8,7 +8,8 @@ const formatRecordDate = (dateString) => {
   const diffMinutes = Math.floor(diffSeconds / 60);
   const diffHours = Math.floor(diffMinutes / 60);
   const diffDays = Math.floor(diffHours / 24);
-  const diffMonths = Math.floor(diffDays / 30.44); // average month length
+  // Day 30 falls past the weeks branch but floors to 0 months, so clamp to 1
+  const diffMonths = Math.max(1, Math.floor(diffDays / 30.44)); // average month length
   const diffYears = Math.floor(diffDays / 365.25);
 
   if (diffHours < 24) {

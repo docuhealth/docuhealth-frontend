@@ -9,6 +9,7 @@ import {
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import SearchableSelect from "../../../../../ui/SearchableSelect";
+import HospitalLoader from "../../../../../ui/HospitalLoader";
 
 // Each scan order source belongs to one role: a radiologist can only order against an appointment booked with them, a doctor against their appointment, admission or check-in.
 const resolveScanOrderContext = (details, orderedBy) =>
@@ -91,6 +92,7 @@ const OrderScanModal = ({ selectedPatientDetails, onClose, orderedBy = "doctor" 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-3">
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
+        {createOrderMutation.isPending && <HospitalLoader variant="overlay" label="Sending scan order..." />}
         {showSuccess ? (
           <div className="flex flex-col items-center text-center py-4">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">

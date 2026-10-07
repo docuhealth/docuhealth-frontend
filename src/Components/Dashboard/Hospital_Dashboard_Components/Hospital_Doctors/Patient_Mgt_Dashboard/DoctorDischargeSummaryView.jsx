@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchInpatientDischargeSummary } from "../../../../../queries/Hospital/doctor/discharge";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
+import Skeleton from "../../../../ui/Skeleton";
 
 // Read-only doctor + nurse in-patient discharge summary, off
 // GET /api/inpatients/discharged-patients (matched by admission sqid in the query
@@ -54,12 +55,44 @@ const Section = ({ title, right, children }) => (
   </div>
 );
 
+// Patient banner + the doctor / nurse sections, in the same frames as the loaded view.
+const DischargeSummarySkeleton = () => (
+  <div role="status" aria-label="Loading discharge summary" className="mb-4">
+    <div className="bg-gray-50 rounded-xl border border-gray-100 p-5 mb-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      {Array.from({ length: 4 }, (_, i) => (
+        <div key={i} className="flex flex-col gap-2">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-3 w-20" />
+        </div>
+      ))}
+    </div>
+    {Array.from({ length: 2 }, (_, i) => (
+      <div key={i} className="bg-gray-50 rounded-xl border border-gray-100 p-5 mb-6">
+        <Skeleton className="h-4 w-48 mb-5" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {Array.from({ length: 4 }, (_, j) => (
+            <div key={j} className="flex flex-col gap-2">
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-3.5 w-48" />
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 const staffLabel = (s) =>
   s ? `Dr. ${s.firstname ?? ""} ${s.lastname ?? ""}`.trim() : null;
 
+// Check-ins can be closed by non-doctors, so only doctors get the "Dr." prefix.
+const closerLabel = (s) =>
+  s ? `${s.role === "doctor" ? "Dr. " : ""}${s.firstname ?? ""} ${s.lastname ?? ""}`.trim() : null;
+
 // Out-patient discharge summary, rendered from the closed check-in row
 // (GET /api/hospitals/patients?status=outpatient_discharge). The row has no
-// discharge form; `discharged_by` is null when the system closed the visit.
+// discharge form; `closed_by_info` is null when the end-of-day job closed the visit.
 const OutpatientDischargeSummary = ({ row, fallbackPatient }) => {
   const patient =
     row?.patient_info || fallbackPatient?.patient_info || fallbackPatient?.patient || {};
@@ -84,9 +117,9 @@ const OutpatientDischargeSummary = ({ row, fallbackPatient }) => {
             </p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Discharged by</p>
+            <p className="text-xs text-gray-500 mb-1">Closed by</p>
             <p className="font-medium text-sm text-gray-800">
-              {staffLabel(row?.discharged_by) || "Closed automatically"}
+              {closerLabel(row?.closed_by_info) || "Closed automatically"}
             </p>
           </div>
         </div>
@@ -108,7 +141,7 @@ const DoctorDischargeSummaryView = ({ admissionSqid, dischargeRow, fallbackPatie
   // when we're handed that row we render from it directly — no lookup. The
   // paginated /api/inpatients/discharged-patients hunt stays as a fallback for
   // legacy rows opened without the inline forms.
-  // Out-patient rows are closed check-ins: `sqid, patient_info, discharged_by, closed_at`.
+  // Out-patient rows are closed check-ins: `sqid, patient_info, closed_by_info, closed_at`.
   const isOutpatientRow = !!dischargeRow && "closed_at" in dischargeRow;
   const hasInlineInpatient =
     !!dischargeRow &&
@@ -136,11 +169,7 @@ const DoctorDischargeSummaryView = ({ admissionSqid, dischargeRow, fallbackPatie
   const data = hasInlineInpatient ? dischargeRow : fetchedData;
 
   if (!hasInlineInpatient && isLoading) {
-    return (
-      <div className="flex justify-center items-center py-16 text-sm text-gray-500">
-        Loading discharge summary...
-      </div>
-    );
+    return <DischargeSummarySkeleton />;
   }
 
   if (!hasInlineInpatient && isError) {

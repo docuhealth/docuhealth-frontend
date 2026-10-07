@@ -39,6 +39,8 @@ import PatientMedicationHistory from "./PatientMedicationHistory";
 import EmptyState from "../../../../ui/EmptyState";
 import { createProgressNote } from "../../../../../queries/Hospital/doctor/progressNotes";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
+import CardGridSkeleton from "../../../../ui/CardGridSkeleton";
+import RecordRowsSkeleton from "../../../../ui/RecordRowsSkeleton";
 
 export const PatientInfo = ({ patientFullInfo, selected }) => {
   console.log(selected);
@@ -174,11 +176,7 @@ export const PatientMedicalRecord = ({
 
   console.log(patientMedRecords)
   if (medloading) {
-    return (
-      <div className="flex justify-center items-center h-full text-sm pt-10">
-        Loading...
-      </div>
-    );
+    return <CardGridSkeleton label="Loading medical records" className="pt-4" />;
   }
 
   if (!patientMedRecords || patientMedRecords.length === 0) {
@@ -470,11 +468,7 @@ export const PatientSOAPNotes = ({
   }
 
   if (soapNotesLoading) {
-    return (
-      <div className="flex justify-center items-center h-full text-sm pt-10">
-        Loading...
-      </div>
-    );
+    return <RecordRowsSkeleton label="Loading SOAP notes" tiles={4} />;
   }
 
   if (!patientSoapNotes || patientSoapNotes.length === 0) {
@@ -1129,11 +1123,7 @@ const PatientLabRecords = ({
   const [selectedRecord, setSelectedRecord] = useState(null);
 
   if (labloading) {
-    return (
-      <div className="flex justify-center items-center h-full text-sm pt-10">
-        Loading...
-      </div>
-    );
+    return <CardGridSkeleton label="Loading lab records" className="pt-4" />;
   }
 
   if (selectedRecord) {
@@ -1295,6 +1285,41 @@ const PatientLabRecords = ({
   );
 };
 
+// Progress notes only carry patient_info (no author/hospital yet), so the shared
+// PatientInfoCard printed NIL for those; author/hospital rows render once sent.
+const ProgressNoteInfoCard = ({ note, fallbackPatient }) => {
+  const patient = note?.patient_info || fallbackPatient || {};
+  const author = note?.staff_info || note?.doctor_info;
+  const hospital = note?.hospital_info;
+
+  const rows = [
+    ["Patient's HIN", patient.hin],
+    ["Patient's Age", getAge(patient.dob)],
+    ["Patient's Gender", patient.gender],
+    author && ["Written by", `Dr. ${author.firstname} ${author.lastname}`],
+    author?.specialization && ["Specialisation", author.specialization],
+    hospital?.name && ["Hospital", hospital.name],
+    ["Date / Time Uploaded", formatFullDateTime(note?.created_at)],
+  ].filter(Boolean);
+
+  return (
+    <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+      <p className="text-[12px] mb-4">
+        Patient's name :{" "}
+        <span className="font-medium text-sm">
+          {[patient.firstname, patient.lastname].filter(Boolean).join(" ") || "NIL"}
+        </span>
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        {rows.map(([label, value]) => (
+          <p key={label} className="text-[12px]">
+            {label} : <span className="font-medium capitalize">{value || "NIL"}</span>
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const PROGRESS_NOTE_FORM_FIELDS = [
   { key: "subjective", label: "Subjective", placeholder: "Add note" },
@@ -1473,9 +1498,9 @@ const ProgressNote = ({
             <span className="text-sm">Progress Note Overview</span>
           </button>
 
-          <PatientInfoCard
-            className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg"
-            selectedMedicalRecord={selectedNote}
+          <ProgressNoteInfoCard
+            note={selectedNote}
+            fallbackPatient={patientFullInfo?.patient_info || selected?.patient_info}
           />
 
           <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
@@ -1518,9 +1543,7 @@ const ProgressNote = ({
           )}
 
           {progressNotesLoading ? (
-            <div className="flex justify-center items-center h-full text-sm pt-10">
-              Loading...
-            </div>
+            <RecordRowsSkeleton label="Loading progress notes" />
           ) : notes.length === 0 ? (
             <p className="text-center py-10 text-sm text-gray-500">
               No progress notes found.

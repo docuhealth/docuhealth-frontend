@@ -1,4 +1,6 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchPatientAdmissionNotes } from "../../../../../queries/Hospital/nurse/patientHistory";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 import SharedSoapNotes from "./SharedSoapNotes";
 import NursingTasksQueue from "./NursingTasksQueue";
@@ -6,9 +8,20 @@ import NursingTaskHistory from "./NursingTaskHistory";
 import PatientVitalsAndMeds from "./PatientVitalsAndMeds";
 import CarePlanHistory from "./CarePlanHistory";
 import AdmissionNotesHistory from "./AdmissionNotesHistory";
+import VitalSignsHistory from "./VitalSignsHistory";
 
 const PatientInfoContent = ({ patient, admission, patientFullInfo, formatDate, formatDateTime, isOutPatient }) => {
     const isDischargedInpatient = !isOutPatient && (Boolean(admission?.discharge_date) || admission?.status === "inpatient_discharge");
+
+    // Discharge rows don't carry the requesting doctor; this admission's nursing note does
+    const { data: admissionNotes } = useQuery({
+        queryKey: ["patient-admission-notes", patient?.hin],
+        queryFn: () => fetchPatientAdmissionNotes(patient?.hin),
+        enabled: isDischargedInpatient && !admission?.requested_by_info && !!patient?.hin,
+        staleTime: 5 * 60 * 1000,
+    });
+    const doctorInCharge = admission?.requested_by_info
+        || (admissionNotes || []).find((n) => n?.admission_info?.sqid === admission?.sqid)?.admission_info?.requested_by_info;
 
     return (
         <div className="space-y-6">
@@ -63,7 +76,7 @@ const PatientInfoContent = ({ patient, admission, patientFullInfo, formatDate, f
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-sm text-gray-600 font-medium">Doctor in charge</label>
-                                <input type="text" readOnly value={admission?.requested_by_info ? `Dr. ${admission.requested_by_info.firstname} ${admission.requested_by_info.lastname}` : 'N/A'} className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none" />
+                                <input type="text" readOnly value={doctorInCharge ? `Dr. ${doctorInCharge.firstname} ${doctorInCharge.lastname}` : 'N/A'} className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none" />
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-sm text-gray-600 font-medium">Gender</label>
@@ -129,7 +142,7 @@ const PatientInfoContent = ({ patient, admission, patientFullInfo, formatDate, f
                             <div className="space-y-2 text-[12px] text-gray-500">
                             <div className="flex justify-between">
                                 <p>Dosage:</p>
-                                <p className="font-medium text-gray-800">{drug.quantity ? `${drug.quantity} mg` : "N/A"}</p>
+                                <p className="font-medium text-gray-800">{drug.quantity ? `${drug.quantity} ${drug.unit || ""}`.trim() : "N/A"}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p>Frequency:</p>
@@ -141,14 +154,6 @@ const PatientInfoContent = ({ patient, admission, patientFullInfo, formatDate, f
                                 <p>Duration:</p>
                                 <p className="font-medium text-gray-800">
                                 {drug.duration ? `${drug.duration.value} ${drug.duration.rate}` : "N/A"}
-                                </p>
-                            </div>
-                            <div className="flex justify-between pt-1 border-t border-gray-50">
-                                <p>Prescribed by:</p>
-                                <p className="font-medium text-gray-800">
-                                {patientFullInfo?.latest_vitals?.staff_info
-                                    ? `Dr. ${patientFullInfo.latest_vitals.staff_info.firstname} ${patientFullInfo.latest_vitals.staff_info.lastname}`
-                                    : "N/A"}
                                 </p>
                             </div>
                             </div>
@@ -166,7 +171,40 @@ const PatientInfoContent = ({ patient, admission, patientFullInfo, formatDate, f
     );
 };
 
-export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail, isOutPatient = false, setAdvanceCheckUp = null) => {
+const StayScopeSwitch = ({ historyScope, setHistoryScope, admission, formatDateTime }) => (
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 bg-gray-50 border rounded-lg px-4 py-3">
+        <p className="text-xs text-gray-600">
+            {historyScope === "stay"
+                ? `Showing records from this admission: ${formatDateTime(admission?.created_at)} to ${formatDateTime(admission?.discharge_date)}`
+                : "Showing this patient's full history at this hospital"}
+        </p>
+        <div className="flex bg-white border rounded-full p-0.5 text-xs font-medium shrink-0">
+            {[["stay", "This admission"], ["all", "All history"]].map(([value, label]) => (
+                <button
+                    key={value}
+                    onClick={() => setHistoryScope(value)}
+                    className={`px-3 py-1.5 rounded-full cursor-pointer transition-colors ${historyScope === value ? "bg-docuhealth-primary text-white" : "text-gray-600 hover:text-gray-800"}`}
+                >
+                    {label}
+                </button>
+            ))}
+        </div>
+    </div>
+);
+
+export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail, isOutPatient = false, setAdvanceCheckUp = null, historyScope = "all", setHistoryScope = null) => {
+    const isDischargedStay = !isOutPatient && Boolean(admission?.discharge_date && admission?.created_at);
+    // Out-patient discharge rows have no start time, so only in-patient stays can be scoped
+    const stayWindow = isDischargedStay && historyScope === "stay"
+        ? { start: admission.created_at, end: admission.discharge_date }
+        : null;
+    const withScope = (content) => (isDischargedStay && setHistoryScope ? (
+        <>
+            <StayScopeSwitch historyScope={historyScope} setHistoryScope={setHistoryScope} admission={admission} formatDateTime={formatDateTime} />
+            {content}
+        </>
+    ) : content);
+
     const tabs = [
         {
             title: "Patient's information",
@@ -206,11 +244,13 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
         {
             title: "Shared soap notes",
             status: "soap",
-            content: (
+            content: withScope(
                 <SharedSoapNotes 
+                    key={stayWindow ? "stay" : "all"}
                     selected={admission}
                     setSharedSoapNoteHistory={() => {}}
                     setSharedSoapNoteDetail={setSharedSoapNoteDetail}
+                    stayWindow={stayWindow}
                 />
             )
         },
@@ -225,8 +265,15 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
         {
             title: "Admission notes history",
             status: "admission_notes_history",
-            content: (
-                <AdmissionNotesHistory patient={patient} patientFullInfo={patientFullInfo} />
+            content: withScope(
+                <AdmissionNotesHistory patient={patient} patientFullInfo={patientFullInfo} admissionSqid={stayWindow ? admission?.sqid : null} />
+            )
+        },
+        {
+            title: "Vital signs history",
+            status: "vitals_history",
+            content: withScope(
+                <VitalSignsHistory key={stayWindow ? "stay" : "all"} selected={admission} setVitalSignsHistory={() => {}} embedded stayWindow={stayWindow} />
             )
         },
         {
@@ -238,14 +285,16 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
         }
     ];
 
+    // Discharged patients get read-only history; active ones reach vitals history via the header dropdown
     if (isOutPatient) {
-        return tabs.filter(t => t.status === "info" || t.status === "soap");
+        const isDischargedOutpatient = Boolean(admission?.closed_at || admission?.discharge_date);
+        return tabs.filter(t => t.status === "info" || t.status === "soap" || (isDischargedOutpatient && t.status === "vitals_history"));
     }
 
-    const isDischargedInpatient = !isOutPatient && (Boolean(admission?.discharge_date) || admission?.status === "inpatient_discharge");
+    const isDischargedInpatient = Boolean(admission?.discharge_date) || admission?.status === "inpatient_discharge";
     if (isDischargedInpatient) {
-        return tabs.filter(t => t.status === "info");
+        return tabs.filter(t => ["info", "soap", "vitals_history", "admission_notes_history"].includes(t.status));
     }
 
-    return tabs;
+    return tabs.filter(t => t.status !== "vitals_history");
 };

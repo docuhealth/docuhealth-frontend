@@ -22,6 +22,7 @@ import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import ClinicalSummaryCard from "../../../../../ui/ClinicalSummaryCard";
 import Select from "../../../../../ui/Select";
 import Modal from "../../../../../ui/Modal";
+import PatientDetailSkeleton from "../../../../../ui/PatientDetailSkeleton";
 
 const DUMMY_PATIENT_INFO = {
   patient_info: {
@@ -365,9 +366,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
             </div>
 
             {loadingInfo ? (
-              <div className="flex justify-center items-center gap-3 px-2 py-3">
-                <p className="text-sm text-gray-500 pt-2">Loading patient data...</p>
-              </div>
+              <PatientDetailSkeleton tabs={5} />
             ) : (
               <>
                 <div className="py-5 border-b">
