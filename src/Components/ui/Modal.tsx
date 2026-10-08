@@ -48,15 +48,22 @@ const Modal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
-      <div 
+      <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
-      
+
+      {/* min-h-full centers short modals; tall ones scroll inside the overlay instead of clipping off-screen */}
+      <div
+        className="relative flex min-h-full items-center justify-center p-4"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+      >
       {/* Modal Content */}
-      <div 
+      <div
         className={`relative bg-white rounded-xl shadow-xl w-full ${maxWidthClass[maxWidth]} ${className} transform transition-all`}
       >
         {title && (
@@ -76,6 +83,7 @@ const Modal = ({
         <div className="p-5 rounded-[inherit]">
           {children}
         </div>
+      </div>
       </div>
     </div>
   );
