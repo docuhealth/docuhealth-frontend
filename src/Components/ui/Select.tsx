@@ -4,6 +4,7 @@ import { ChevronDown } from "lucide-react";
 export interface SelectOption {
   value: string;
   label: string;
+  disabled?: boolean;
   [key: string]: unknown;
 }
 
@@ -86,14 +87,18 @@ const Select = ({
                 <button
                   key={option.value}
                   type="button"
+                  disabled={option.disabled}
                   onClick={() => {
+                    if (option.disabled) return;
                     onChange(option.value, option);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer ${
-                    option.value === value
-                      ? "bg-docuhealth-primary/10 text-docuhealth-primary font-semibold"
-                      : "text-gray-700 hover:bg-gray-50"
+                  className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                    option.disabled
+                      ? "text-gray-400 bg-gray-50 cursor-not-allowed opacity-60"
+                      : option.value === value
+                        ? "bg-docuhealth-primary/10 text-docuhealth-primary font-semibold cursor-pointer"
+                        : "text-gray-700 hover:bg-gray-50 cursor-pointer"
                   }`}
                 >
                   {option.label}

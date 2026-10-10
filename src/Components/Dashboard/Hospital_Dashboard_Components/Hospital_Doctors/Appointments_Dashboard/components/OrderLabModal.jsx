@@ -89,6 +89,8 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
       setShowSuccess(true);
       queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
       queryClient.invalidateQueries({ queryKey: ["doctor-lab-records"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-dashboard"] });
     },
     onError: (err) => {
       if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {

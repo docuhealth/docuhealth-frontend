@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { ArrowLeft, Save } from "lucide-react";
 import ConfirmUploadModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/ConfirmUploadModal";
@@ -16,6 +16,7 @@ const getRefRange = (p) => {
 
 const Hospital_Lab_Upload_Result_Dashboard = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { state } = useLocation();
   const order = state?.order;
   const item = state?.item;
@@ -48,6 +49,11 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
     };
     try {
       await submitMutation.mutateAsync({ order_sqid: order?.id, item_sqid: item?.sqid, payload });
+      queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-order"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor-lab-records"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
       setShowConfirm(false);
       setShowSuccess(true);
     } catch {

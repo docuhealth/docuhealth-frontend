@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { fetchTestCategories, fetchLabTests, createLabTestOrder } from "../../../../queries/Hospital/lab/requests";
 import { extractApiErrorMessage } from "../../../../utils/apiError";
@@ -9,6 +9,7 @@ import Button from "../../../ui/Button";
 import Modal from "../../../ui/Modal";
 
 const CreateOrderModal = ({ isOpen, onClose, patientHin }) => {
+  const queryClient = useQueryClient();
   const [showSuccess, setShowSuccess] = useState(false);
   const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
   const [form, setForm] = useState({ category: "", test_type: [], note: "" });
@@ -56,6 +57,10 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin }) => {
       setForm({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });
       setDuplicateWarning(null);
       setShowSuccess(true);
+      queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
     },
     onError: (err) => {
       if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {

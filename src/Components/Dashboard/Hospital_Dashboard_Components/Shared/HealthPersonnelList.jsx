@@ -10,12 +10,22 @@ const ROLE_TABS = [
   { label: "Receptionists", value: "receptionist" },
   { label: "Pharmacists",   value: "pharmacist" },
   { label: "Lab Scientists",value: "lab_scientist" },
+  { label: "Lab Admin",     value: "lab_admin" },
   { label: "Radiologists",  value: "radiologist" },
 ];
 
-// Reuses the tab labels above so a row reads "Lab Scientists", not "Lab_scientist".
-const ROLE_LABELS = Object.fromEntries(ROLE_TABS.filter((t) => t.value).map((t) => [t.value, t.label]));
-const roleLabel = (role) => ROLE_LABELS[role] || role || "—";
+const ROLE_LABELS = {
+  doctor: "Doctor",
+  nurse: "Nurse",
+  receptionist: "Receptionist",
+  pharmacist: "Pharmacist",
+  lab_scientist: "Lab Scientist",
+  lab_admin: "Lab Admin",
+  radiologist: "Radiologist",
+};
+const roleLabel = (role) =>
+  ROLE_LABELS[role] ||
+  (role ? role.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—");
 
 const displayName = (staff) =>
   staff.role === "doctor"

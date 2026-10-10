@@ -7,10 +7,11 @@ export const LabRequestsContext = createContext();
 
 const TAB_STATUS_MAP = {
   "Pending Test": "pending",
-  "Sample Collected": "sample_collected",
   "In-progress": "in_progress",
+  "Sample Collected": "sample_collected",
   "Result Ready": "result_ready",
   "Rejected test": "rejected",
+  "Result Approval": "result_ready",
 };
 
 const LabRequestsProvider = (props) => {

@@ -8,14 +8,14 @@ import formatRecordDate, {
   formatFullDateTime,
   getAge,
 } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchTestCategories, fetchLabTests, createLabTestOrder } from "../../../../../queries/Hospital/lab/requests";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 
 const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateOrder }) => {
-
+  const queryClient = useQueryClient();
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
@@ -61,6 +61,9 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
       setOrderForm({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });
       setDuplicateWarning(null);
       setShowSuccessModal(true);
+      queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
     },
     onError: (err) => {
       if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {

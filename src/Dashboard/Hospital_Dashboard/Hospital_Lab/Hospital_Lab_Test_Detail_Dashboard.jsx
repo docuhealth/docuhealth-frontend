@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
@@ -14,6 +14,10 @@ import {
   rejectLabTestResult,
 } from "../../../queries/Hospital/lab/requests";
 import DoctorReviewModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/DoctorReviewModal";
+import AcceptApprovalModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/AcceptApprovalModal";
+import ApprovalSuccessModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/ApprovalSuccessModal";
+import RejectApprovalModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/RejectApprovalModal";
+import { LabAppContext } from "../../../context/HospitalContext/Lab/LabAppContext";
 import { extractApiErrorMessage } from "../../../utils/apiError";
 
 const STATUS_STYLES = {
@@ -123,13 +127,20 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
 
   const actualItemSqid = item.sqid;
 
+  const invalidateAllLabQueries = () => {
+    queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
+    queryClient.invalidateQueries({ queryKey: ["lab-dashboard"] });
+    queryClient.invalidateQueries({ queryKey: ["lab-order"] });
+    queryClient.invalidateQueries({ queryKey: ["doctor-lab-records"] });
+    queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
+  };
+
   const acceptMutation = useMutation({
     mutationFn: () => acceptLabRequest({ order_sqid: order.id, item_sqid: actualItemSqid }),
     onSuccess: () => {
       toast.success("Request accepted — moved to In Progress");
       setShowAcceptModal(false);
-      queryClient.invalidateQueries(["labRequests"]);
-      queryClient.invalidateQueries(["lab-order", order.id]);
+      invalidateAllLabQueries();
     },
     onError: (err) => {
       toast.error(extractApiErrorMessage(err, "Failed to accept request"));
@@ -141,8 +152,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
     onSuccess: () => {
       toast.success("Request rejected successfully!");
       setIsRejectModalOpen(false);
-      queryClient.invalidateQueries(["lab-order", order.id]);
-      queryClient.invalidateQueries(["labRequests"]);
+      invalidateAllLabQueries();
     },
     onError: (err) => {
       toast.error(extractApiErrorMessage(err, "Failed to reject request"));
@@ -158,12 +168,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
     onSuccess: () => {
       toast.success("Result approved successfully!");
       setIsDoctorReviewModalOpen(false);
-      queryClient.invalidateQueries(["patient-lab-records"]);
-      queryClient.invalidateQueries(["lab-order", order.id]);
-      queryClient.invalidateQueries(["labRequests"]);
-      // Approve/reject bumps the item off `result_ready`, so it should drop out
-      // of the doctor's "Lab Results Approvals" list on the next fetch.
-      queryClient.invalidateQueries(["doctor-lab-records"]);
+      invalidateAllLabQueries();
     },
     onError: (err) => {
       toast.error(extractApiErrorMessage(err, "Failed to approve result"));
@@ -176,10 +181,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
       toast.success("Result rejected successfully!");
       setIsDoctorReviewModalOpen(false);
       setDoctorReviewReason("");
-      queryClient.invalidateQueries(["patient-lab-records"]);
-      queryClient.invalidateQueries(["lab-order", order.id]);
-      queryClient.invalidateQueries(["labRequests"]);
-      queryClient.invalidateQueries(["doctor-lab-records"]);
+      invalidateAllLabQueries();
     },
     onError: (err) => {
       toast.error(extractApiErrorMessage(err, "Failed to reject result"));
@@ -197,8 +199,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
       toast.success(fromAccept ? "Sample collection logged" : "Sample collection updated");
       setShowSampleModal(false);
       setSampleLogged(true);
-      queryClient.invalidateQueries(["lab-order", order.id]);
-      queryClient.invalidateQueries(["labRequests"]);
+      invalidateAllLabQueries();
     } catch {
       toast.error("Something went wrong. Please try again.");
     }
@@ -214,20 +215,20 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
           {isPending && !isDoctorView && (
             <>
               <button
                 onClick={() => setIsRejectModalOpen(true)}
                 disabled={acceptMutation.isPending || rejectMutation.isPending}
-                className="w-full sm:w-auto border border-red-400 text-red-500 text-xs font-medium px-4 py-2 rounded-full hover:bg-red-50 transition-colors disabled:opacity-50"
+                className="w-full sm:w-auto border border-red-400 text-red-500 text-xs font-medium px-8 py-2 rounded-full hover:bg-red-50 transition-colors disabled:opacity-50 cursor-pointer text-center"
               >
                 Reject
               </button>
               <button
                 onClick={() => setShowAcceptModal(true)}
                 disabled={acceptMutation.isPending || rejectMutation.isPending}
-                className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary text-xs font-medium px-4 py-2 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50"
+                className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary text-xs font-medium px-8 py-2 rounded-full hover:bg-indigo-50 transition-colors disabled:opacity-50 cursor-pointer text-center"
               >
                 Accept
               </button>
@@ -546,6 +547,17 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   );
 };
 
+const isCompletelyResultReadyOrder = (ord) => {
+  const items = ord?.items_info || ord?.items;
+  if (Array.isArray(items) && items.length > 0) {
+    return items.every((i) =>
+      ["result_ready", "all_ready", "completed", "ready"].includes(i.status?.toLowerCase())
+    );
+  }
+  const st = (ord?.aggregate_status || ord?.status || "").toLowerCase();
+  return st === "result_ready" || st === "all_ready" || st === "completed";
+};
+
 const Hospital_Lab_Test_Detail_Dashboard = ({ 
   orderIdProp, 
   onBackProp, 
@@ -553,9 +565,15 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
 } = {}) => {
   const navigate      = useNavigate();
   const queryClient   = useQueryClient();
+  const { isLabAdmin } = useContext(LabAppContext);
   const { state }     = useLocation() || {};
   const isDirectOrder = typeof orderIdProp === "object" && orderIdProp !== null;
   const sqid          = isDirectOrder ? orderIdProp.sqid : (orderIdProp || state?.sqid || state?.order?.sqid || state?.order?.id);
+
+  const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
 
   const { data: fetchedOrder, isLoading: orderLoading } = useQuery({
     queryKey: ["lab-order", sqid],
@@ -565,7 +583,68 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
 
   const rawData = isDirectOrder ? orderIdProp : (fetchedOrder || state?.order);
   const rawOrder = rawData?.results ? rawData.results[0] : rawData;
-  const order = rawOrder ? normalizeOrder(rawOrder, state?.order?.tab) : {};
+  const order = rawOrder ? normalizeOrder(rawOrder, state?.order?.tab || state?.tab) : {};
+
+  const isApprovalView =
+    !isDoctorView &&
+    (state?.tab === "Result Approval" || (isLabAdmin && isCompletelyResultReadyOrder(order)));
+
+  const approveMutation = useMutation({
+    mutationFn: async () => {
+      const items = order.items_info || order.items;
+      if (Array.isArray(items) && items.length > 0) {
+        await Promise.all(
+          items.map((i) => approveLabTestResult({ item_sqid: i.sqid || i.id }))
+        );
+      } else if (order.id || sqid) {
+        await approveLabTestResult({ item_sqid: order.id || sqid });
+      }
+    },
+    onSuccess: () => {
+      setIsAcceptModalOpen(false);
+      setIsSuccessModalOpen(true);
+      queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-order"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-dashboard"] });
+    },
+    onError: (err) => {
+      toast.error(extractApiErrorMessage(err, "Failed to approve test result"));
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: async (reason) => {
+      const items = order.items_info || order.items;
+      if (Array.isArray(items) && items.length > 0) {
+        await Promise.all(
+          items.map((i) =>
+            rejectLabTestResult({
+              item_sqid: i.sqid || i.id,
+              rejection_reason: reason.trim(),
+            })
+          )
+        );
+      } else if (order.id || sqid) {
+        await rejectLabTestResult({
+          item_sqid: order.id || sqid,
+          rejection_reason: reason.trim(),
+        });
+      }
+    },
+    onSuccess: () => {
+      setIsRejectModalOpen(false);
+      setRejectReason("");
+      toast.success("Test result rejected successfully");
+      queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-order"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-dashboard"] });
+      if (onBackProp) onBackProp();
+      else navigate(-1);
+    },
+    onError: (err) => {
+      toast.error(extractApiErrorMessage(err, "Failed to reject test result"));
+    },
+  });
 
   if (orderLoading && !isDirectOrder) {
     return (
@@ -582,14 +661,33 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
         <DynamicDate />
       </div>
 
-      <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-5 py-4 flex items-center gap-3">
+      <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <button
           onClick={() => onBackProp ? onBackProp() : navigate(-1)}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-docuhealth-primary transition-colors w-fit"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-docuhealth-primary transition-colors w-fit cursor-pointer"
         >
           <ArrowLeft size={16} />
           Lab Order Details
         </button>
+
+        {isApprovalView && (
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <button
+              onClick={() => { setRejectReason(""); setIsRejectModalOpen(true); }}
+              disabled={approveMutation.isPending || rejectMutation.isPending}
+              className="w-full sm:w-auto border border-red-500 text-red-500 hover:bg-red-50 text-xs font-semibold px-8 py-2 rounded-full transition-colors disabled:opacity-50 cursor-pointer text-center"
+            >
+              Reject
+            </button>
+            <button
+              onClick={() => setIsAcceptModalOpen(true)}
+              disabled={approveMutation.isPending || rejectMutation.isPending}
+              className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary hover:bg-indigo-50 text-xs font-semibold px-8 py-2 rounded-full transition-colors disabled:opacity-50 cursor-pointer text-center"
+            >
+              Accept
+            </button>
+          </div>
+        )}
       </div>
 
       {order.hin && order.hin !== "—" && (
@@ -644,6 +742,39 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
           <p className="text-sm text-gray-500 py-4">No test items found for this order.</p>
         )}
       </div>
+
+      {/* Accept Confirmation Modal */}
+      <AcceptApprovalModal
+        isOpen={isAcceptModalOpen}
+        onClose={() => setIsAcceptModalOpen(false)}
+        onConfirm={() => approveMutation.mutate()}
+        isPending={approveMutation.isPending}
+      />
+
+      {/* Success Modal */}
+      <ApprovalSuccessModal
+        isOpen={isSuccessModalOpen}
+        onClose={() => {
+          setIsSuccessModalOpen(false);
+          if (onBackProp) onBackProp();
+          else navigate(-1);
+        }}
+      />
+
+      {/* Reject Modal */}
+      <RejectApprovalModal
+        isOpen={isRejectModalOpen}
+        onClose={() => setIsRejectModalOpen(false)}
+        onConfirm={() => {
+          if (!rejectReason.trim()) {
+            return toast.error("Please provide a reason for rejection");
+          }
+          rejectMutation.mutate(rejectReason);
+        }}
+        isPending={rejectMutation.isPending}
+        reason={rejectReason}
+        onReasonChange={setRejectReason}
+      />
     </>
   );
 };
