@@ -3,7 +3,7 @@ import { HosStaffsContext } from "../../../../../context/HospitalContext/HosStaf
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import SearchBar from "../../../../SearchBar/SearchBar";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
@@ -28,6 +28,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     { label: "Receptionists", value: "receptionist" },
     { label: "Pharmacists", value: "pharmacist" },
     { label: "Lab Scientists", value: "lab_scientist" },
+    { label: "Lab Admin", value: "lab_admin" },
     { label: "Radiologists", value: "radiologist" },
   ];
 
@@ -40,6 +41,17 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
   const [newSpecialization, setNewSpecialization] = useState("");
 
   const queryClient = useQueryClient();
+
+  const { data: labAdminData } = useQuery({
+    queryKey: ["hospital-staffs-lab-admin-check"],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get("api/hospitals/team-members?role=lab_admin");
+      return res.data;
+    },
+    staleTime: 1000 * 30,
+  });
+
+  const hasLabAdmin = (labAdminData?.count || labAdminData?.results?.length || 0) > 0;
 
   const doctorSpecializations = [
     "Surgeon",
@@ -122,7 +134,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       ? doctorSpecializations
       : newRole === "nurse"
         ? nurseSpecializations
-        : newRole === "lab_scientist"
+        : newRole === "lab_scientist" || newRole === "lab_admin"
           ? labScientistSpecializations
           : newRole === "pharmacist"
             ? pharmacistSpecializations
@@ -130,6 +142,12 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
               ? radiologistSpecializations
               : [];
 
+  const formatRole = (role) => {
+    if (!role) return "Staff";
+    if (role === "lab_scientist") return "Lab Scientist";
+    if (role === "lab_admin") return "Lab Admin";
+    return role.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  };
 
   const sortedStaffs = useMemo(() => {
     const getDisplayName = (staff) => {
@@ -167,6 +185,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       toast.success("Staff member(s) removed successfully");
       // Invalidate the specific page of the staff list to trigger a refetch
       queryClient.invalidateQueries(["hospital-staffs", currentPage]);
+      queryClient.invalidateQueries(["hospital-staffs-lab-admin-check"]);
       setSelectedStaff([]); // Clear checkboxes after bulk removal
     },
     onError: (err) => {
@@ -184,6 +203,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       toast.success("Staff member account deactivated successfully");
       // Invalidate the specific page of the staff list to trigger a refetch
       queryClient.invalidateQueries(["hospital-staffs", currentPage]);
+      queryClient.invalidateQueries(["hospital-staffs-lab-admin-check"]);
       setSelectedStaff([]); // Clear checkboxes after bulk removal
     },
     onError: (err) => {
@@ -227,6 +247,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
     onSuccess: () => {
       toast.success("Role updated successfully");
       queryClient.invalidateQueries(["hospital-staffs", currentPage]);
+      queryClient.invalidateQueries(["hospital-staffs-lab-admin-check"]);
       setSelectedStaffForRole(null);
     },
     onError: (err) => {
@@ -257,6 +278,16 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
   const submitRoleUpdate = (e) => {
     e.preventDefault();
     if (!newRole) return toast.error("Please select a role");
+
+    if (
+      newRole === "lab_admin" &&
+      hasLabAdmin &&
+      selectedStaffForRole?.role !== "lab_admin"
+    ) {
+      return toast.error(
+        "A Lab Admin already exists in this hospital. Only one Lab Admin is allowed.",
+      );
+    }
 
     updateRole({
       staff_id: selectedStaffForRole.staff_id,
@@ -509,7 +540,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                   </div>
 
                   <p>{staff.staff_id}</p>
-                  <p>{staff.role}</p>
+                  <p>{formatRole(staff.role)}</p>
                   <p>{staff.phone_num}</p>
                   <p className="truncate max-w-[120px] ">{staff.email}</p>
                   <p>{staff.gender}</p>
@@ -603,7 +634,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                         </h3>
                         <div className="flex items-center gap-1.5">
                           <span className="text-[10px] bg-docuhealth-primary text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                            {staff.role || "Staff"}
+                            {formatRole(staff.role)}
                           </span>
                           <span className="text-[10px] text-gray-400 font-mono">
                             #{staff.staff_id || "N/A"}
@@ -778,6 +809,12 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                       <option value="receptionist">Receptionist</option>
                       <option value="pharmacist">Pharmacist</option>
                       <option value="lab_scientist">Lab Scientist</option>
+                      <option
+                        value="lab_admin"
+                        disabled={hasLabAdmin && selectedStaffForRole?.role !== "lab_admin"}
+                      >
+                        Lab Admin {hasLabAdmin && selectedStaffForRole?.role !== "lab_admin" ? "(Already assigned)" : ""}
+                      </option>
                       <option value="radiologist">Radiologist</option>
                     </select>
                   </div>

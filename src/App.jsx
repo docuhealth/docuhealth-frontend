@@ -133,6 +133,7 @@ import Hospital_Pharmacist_Prescription_Detail_Dashboard from "./Dashboard/Hospi
 
 import Hospital_Lab_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_Lab/Hospital_Lab_Layout";
 import Hospital_Lab_Home_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Home_Dashboard";
+import Hospital_Lab_Administration_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Administration_Dashboard";
 import Hospital_Lab_Requests_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Requests_Dashboard";
 import Hospital_Lab_Patients_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Patients_Dashboard";
 import Hospital_Lab_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Settings_Dashboard";
@@ -578,6 +579,25 @@ function App() {
                   <HospitalProtectedRoute>
                     <HospitalLabProviders>
                       <Hospital_Lab_Home_Dashboard />
+                    </HospitalLabProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-lab-administration-dashboard"
+              element={
+                <HospitalLabProviders>
+                  <Hospital_Lab_Layout />
+                </HospitalLabProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalLabProviders>
+                      <Hospital_Lab_Administration_Dashboard />
                     </HospitalLabProviders>
                   </HospitalProtectedRoute>
                 }

@@ -14,10 +14,14 @@ const LabProfileProvider = (props) => {
     refetchOnWindowFocus: true,
   });
 
+  const profile = data?.lab_admin ?? data?.lab_scientist ?? null;
+  const isLabAdmin = profile?.role === "lab_admin" || !!data?.lab_admin;
+
   return (
     <LabAppContext.Provider
       value={{
-        profile:         data?.lab_scientist ?? null,
+        profile,
+        isLabAdmin,
         isLoading,
         backgroundImage: data?.theme?.bg_image ?? null,
         hospitalName:    data?.theme?.name ?? null,
