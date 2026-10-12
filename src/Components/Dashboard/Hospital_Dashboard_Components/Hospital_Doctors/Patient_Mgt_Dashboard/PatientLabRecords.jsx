@@ -123,8 +123,8 @@ const PatientLabRecords = ({
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
               <p className="text-gray-500 text-[12px] truncate">
-                {record?.ordered_by
-                  ? `Dr. ${record.ordered_by.firstname || ""} ${record.ordered_by.lastname || ""}`
+                {record?.ordered_by_info
+                  ? `Dr. ${record.ordered_by_info.firstname || ""} ${record.ordered_by_info.lastname || ""}`
                   : "Dr. Medical Officer"}
               </p>
             </div>

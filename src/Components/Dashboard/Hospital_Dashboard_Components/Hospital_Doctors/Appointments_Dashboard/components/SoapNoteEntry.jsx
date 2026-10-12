@@ -13,6 +13,7 @@ import Input from "../../../../../ui/Input";
 import Select from "../../../../../ui/Select";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { ACTIVE_CHECK_INS_KEY } from "../../../../../../queries/Hospital/doctor/checkIns";
 
 
 const NoteSection = ({
@@ -241,7 +242,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
 
   const { mutate, isPending } = useMutation({
     mutationFn: (formData) =>
-      axiosInstanceHos.post("api/medical-records/soap-note", formData),
+      axiosInstanceHos.post("api/records/soap-note", formData),
     onSuccess: () => {
       // The confirm modal stays open while uploading so its loader shows; close it here.
       setConfirmationModal(false);
@@ -259,12 +260,13 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       queryClient.invalidateQueries({
         queryKey: ["doctor-appointments"],
       });
-      // A note from the outpatient flow can move the check-in
-      // doctor_idle -> doctor_active, which changes its row in the
-      // Patient Mgt "OutPatients" list.
+      // Saving the note ends the consultation (doctor_active -> doctor_idle),
+      // which changes its row in the Patient Mgt "OutPatients" list and
+      // closes ordering against the check-in until the patient is re-claimed.
       queryClient.invalidateQueries({
         queryKey: ["hospital-patients-doctor"],
       });
+      queryClient.invalidateQueries({ queryKey: ACTIVE_CHECK_INS_KEY });
 
       setStep(1);
       // `onSubmitted` lets the parent decide where to land (e.g. reopen the
@@ -320,7 +322,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
   });
 
   const handleSubmit = async () => {
-    // Only care_instructions is required by POST /api/medical-records/soap-note
+    // Only care_instructions is required by POST /api/records/soap-note
     // (alongside patient / chief_complaint / primary_diagnosis, already gated in
     // the step flow). treatment_plan and the follow-up appointment are optional.
     if (soapNoteData.care_instructions.length === 0) {

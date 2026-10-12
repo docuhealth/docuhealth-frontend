@@ -30,7 +30,8 @@ const HosAdmittedPatientMGTProvider = ({ children }) => {
       return res.data;
     },
     enabled: isUserLoggedIn,
-    placeholderData: (previousData) => previousData,
+    // Keep the old page while paging/searching, but never show another tab's rows under this tab
+    placeholderData: (previousData, previousQuery) => (previousQuery?.queryKey?.[1] === tab ? previousData : undefined),
   });
 
   const admittedPatients = data?.results || [];

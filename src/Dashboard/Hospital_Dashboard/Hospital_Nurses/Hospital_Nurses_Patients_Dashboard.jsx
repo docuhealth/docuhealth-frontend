@@ -24,6 +24,7 @@ import { ChevronDown, Check } from "lucide-react";
 
 const Hospital_Nurses_Patients_Dashboard = () => {
   const { tab, admittedPatients } = useContext(NursesAdmittedPatientMGTContext);
+  const isDischargedTab = tab === "inpatient_discharge" || tab === "outpatient_discharge";
   const [updateVitals, setUpdateVitals] = useState(false);
   const [caseNoteHistory, setCaseNoteHistory] = useState(false);
   const [vitalSignsHistory, setVitalSignsHistory] = useState(false);
@@ -187,13 +188,15 @@ const Hospital_Nurses_Patients_Dashboard = () => {
     <>
       {advanceCheckUp ? (
         <>
-          <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start gap-3 lg:gap-0 lg:items-center">
+          {!(isDischargedTab && !sharedSoapNoteDetail) && <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start gap-3 lg:gap-0 lg:items-center">
             <DynamicDate />
             <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
               {updateVitals ? (
                 <></>
               ) : (caseNoteHistory || vitalSignsHistory) && !caseNoteDetail ? (
                 <>
+                  {/* Case notes need an active admission. */}
+                  {selected?.ward_info && selected?.status === "active" && (
                   <button
                     className="py-2.5 px-10 w-full lg:w-60 rounded-full bg-docuhealth-primary text-white cursor-pointer"
                     onClick={() => {
@@ -206,6 +209,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                   >
                     Add New Case Note
                   </button>
+                  )}
                 </>
               ) : (tab === "inpatient_discharge" || tab === "outpatient_discharge") ? null : (
                 <>
@@ -318,7 +322,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                 </>
               )}
             </div>
-          </div>
+          </div>}
           {updateVitals ? (
             <UpdateVitals
               selectedPatient={selected}
@@ -396,7 +400,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
               }}
             />
           ) : (
-            <div className="bg-white my-5 border rounded-lg p-5 text-sm">
+            <div className={isDischargedTab ? "my-5 text-sm" : "bg-white my-5 border rounded-lg p-5 text-sm"}>
               <AdvanceCheckUp
                 selected={selected}
                 setAdvanceCheckUp={setAdvanceCheckUp}

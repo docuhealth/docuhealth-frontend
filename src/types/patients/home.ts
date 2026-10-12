@@ -17,6 +17,7 @@ export interface MedicalRecord {
   drug_records?: DrugRecordDetail[];
   lab_tests_info?: any[];
   lab_tests?: any[];
+  scans_info?: any[];
   care_instructions?: string[];
   treatment_plan?: string[];
   appointment?: AppointmentDetail;

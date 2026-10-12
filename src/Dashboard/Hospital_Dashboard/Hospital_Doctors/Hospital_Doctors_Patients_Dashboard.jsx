@@ -3,6 +3,7 @@ import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import TabComponent from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/TabComponent";
 import getTabs from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/TabDetails";
 import AdvanceCheckUp from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/AdvanceCheckUp";
+import DischargedPatientRecord from "../../../Components/ui/DischargedPatientRecord";
 import OtherMedicalServicesFab from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/OtherMedicalServicesFab";
 import TransferToAnotherWard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/TransferToAnotherWard";
 import InpatientDischargeSummary from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/InpatientDischargeSummary";
@@ -73,6 +74,14 @@ const Hospital_Doctors_Patients_Dashboard = () => {
             setDischargePatient={setDischargePatient}
           />
         </>
+      ) : advanceCheckUp && advanceCheckUpSource === "discharged" ? (
+        <div className="my-5 text-sm">
+          <DischargedPatientRecord
+            key={selected?.sqid}
+            admission={selected}
+            onBack={() => setAdvanceCheckUp(false)}
+          />
+        </div>
       ) : advanceCheckUp ? (
         <>
           <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start gap-3 lg:gap-0 lg:items-center">

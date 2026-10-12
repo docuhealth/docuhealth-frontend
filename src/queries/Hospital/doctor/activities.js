@@ -7,7 +7,7 @@ export const fetchRecentCareActivities = async ({ queryKey }) => {
   return res.data;
 };
 
-// GET /api/medical-records/events/<event_sqid> — resolves one activity feed
+// GET /api/records/events/<event_sqid> — resolves one activity feed
 // row to its full record detail, whatever the record type. Replaces the old
 // per-type `<segment>/<hin>/<sqid>` routes (all removed server-side as of
 // 2026-09-16 — see `unified-event-detail.md`). Confirmed live for SoapNote,
@@ -20,6 +20,6 @@ export const fetchRecentCareActivities = async ({ queryKey }) => {
 export const fetchMedicalRecordDetail = async ({ queryKey }) => {
   const [_key, _recordType, eventSqid] = queryKey;
   if (!eventSqid) return null;
-  const res = await axiosInstanceHos.get(`api/medical-records/events/${eventSqid}`);
+  const res = await axiosInstanceHos.get(`api/records/events/${eventSqid}`);
   return res.data;
 };

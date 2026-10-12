@@ -8,6 +8,7 @@ import {
   renderListOrString,
   renderLabTests,
   renderDrugRecords,
+  renderScans,
 } from "../../utils/soapNoteHelpers";
 import { formatFullDateTime } from "../Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 
@@ -135,6 +136,8 @@ const SoapNoteDetailView = ({ soapNote }) => {
       </div>
 
       {renderLabTests(soapNote?.lab_tests_info)}
+
+      {renderScans(soapNote?.scans_info)}
 
       {/* Follow Up / Next appointment — note the field is `next_appointment_info`
           on the current API, not `appointment_info` (TabDetails2.jsx /

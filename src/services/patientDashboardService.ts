@@ -83,7 +83,7 @@ export async function fetchSubaccountMedicalRecords(
   pageSize: number
 ): Promise<PaginatedResponse<any>> {
   const res = await axiosInstance.get(
-    `api/patients/subaccounts/medical-records/${hin}?page=${page}&size=${pageSize}`
+    `api/patients/subaccounts/soap-notes/${hin}?page=${page}&size=${pageSize}`
   );
   return res.data;
 }
@@ -99,7 +99,7 @@ export async function fetchPatientMedicalSummaries(
   pageSize: number = 10,
   ordering?: string
 ): Promise<PaginatedResponse<any>> {
-  let url = `api/medical-records/summaries/${hin}?page=${page}&size=${pageSize}`;
+  let url = `api/records/summaries/${hin}?page=${page}&size=${pageSize}`;
   if (ordering) url += `&ordering=${ordering}`;
   const res = await axiosInstance.get(url);
   return res.data;

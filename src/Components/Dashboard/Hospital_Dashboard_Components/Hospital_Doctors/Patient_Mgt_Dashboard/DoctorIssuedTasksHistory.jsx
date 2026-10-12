@@ -5,6 +5,7 @@ import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagina
 import EmptyState from "../../../../ui/EmptyState";
 import Spinner from "../../../../ui/Spinner";
 import RecordRowsSkeleton from "../../../../ui/RecordRowsSkeleton";
+import Skeleton from "../../../../ui/Skeleton";
 import { fetchInpatientTasks } from "../../../../../queries/Hospital/doctor/inpatientTasks";
 import {
   taskTypeLabel,
@@ -295,7 +296,15 @@ const DoctorIssuedTasksHistory = ({ admissionSqid }) => {
   const activeFilterLabel = FILTER_OPTIONS.find((option) => option.value === filter)?.label;
 
   if (isLoading) {
-    return <RecordRowsSkeleton label="Loading task history" tiles={4} withStatusHeader />;
+    return (
+      <div className="my-4">
+        {/* Holds the "Filter: All tasks" dropdown's space above the list. */}
+        <div className="flex justify-end mb-4">
+          <Skeleton className="h-8 w-36 rounded-md" />
+        </div>
+        <RecordRowsSkeleton label="Loading task history" tiles={4} withStatusHeader className="!my-0" />
+      </div>
+    );
   }
 
   if (isError) {

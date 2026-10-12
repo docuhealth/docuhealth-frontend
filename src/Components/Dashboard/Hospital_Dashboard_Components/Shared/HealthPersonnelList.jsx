@@ -128,10 +128,23 @@ const MobileCard = ({ staff, isAdmin }) => (
   </div>
 );
 
-const HealthPersonnelSkeleton = ({ colCount }) => (
+// Column titles shared by the table and its skeleton.
+const PersonnelHeader = ({ colCount, isAdmin }) => (
+  <div className={`grid grid-cols-${colCount} text-left text-sm bg-gray-100 py-5 rounded-md`}>
+    <div className="col-span-2 pl-5">Name of Staff</div>
+    <p>Staff Id</p>
+    <p>Role</p>
+    <p>Phone no</p>
+    <p>Email Address</p>
+    <p>Sex</p>
+    {isAdmin && <p>Actions</p>}
+  </div>
+);
+
+const HealthPersonnelSkeleton = ({ colCount, isAdmin }) => (
   <div role="status" aria-label="Loading health personnel">
     <div className="hidden lg:flex lg:flex-col">
-      <div className="bg-gray-100 h-[60px] rounded-md" />
+      <PersonnelHeader colCount={colCount} isAdmin={isAdmin} />
       {Array.from({ length: 7 }, (_, i) => (
         <div key={i} className={`grid grid-cols-${colCount} items-center py-6 border-b border-b-gray-200`}>
           <Skeleton className="col-span-2 ml-5 h-3 w-36" />
@@ -193,7 +206,7 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
           onChange={setSearchQuery}
           placeholder="Search by name or email..."
         />
-        {isRefreshing && (
+        {isRefreshing && !loading && (
           <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
             <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin" />
             Searching...
@@ -217,7 +230,7 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
       </div>
 
       {loading ? (
-        <HealthPersonnelSkeleton colCount={colCount} />
+        <HealthPersonnelSkeleton colCount={colCount} isAdmin={isAdmin} />
       ) : healthPersonnelList.length === 0 && searchQuery ? (
         <div className="py-12 text-center text-gray-500 text-sm">
           <p className="font-medium">No results found for "{searchQuery}"</p>
@@ -229,15 +242,7 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
         <>
           {/* Desktop table */}
           <div className="hidden lg:flex lg:flex-col">
-            <div className={`grid grid-cols-${colCount} text-left text-sm bg-gray-100 py-5 rounded-md`}>
-              <div className="col-span-2 pl-5">Name of Staff</div>
-              <p>Staff Id</p>
-              <p>Role</p>
-              <p>Phone no</p>
-              <p>Email Address</p>
-              <p>Sex</p>
-              {isAdmin && <p>Actions</p>}
-            </div>
+            <PersonnelHeader colCount={colCount} isAdmin={isAdmin} />
             {healthPersonnelList.map((staff, index) => (
               <div key={staff.id ?? index} className={`grid grid-cols-${colCount} items-center text-[12px] text-gray-700 border-b border-b-gray-200`}>
                 <div className="font-semibold col-span-2 py-6 pl-5 flex items-center gap-1">
