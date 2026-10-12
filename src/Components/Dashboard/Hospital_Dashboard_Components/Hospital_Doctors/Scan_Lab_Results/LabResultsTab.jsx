@@ -87,7 +87,7 @@ const Hospital_Doctors_Lab_Results_Tab = ({ activeTab, onTabChange }) => {
         <div className="text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {patientLabRecords.map((record) => {
             const info = record.patient_info;
-            const submittedBy = record.result_info?.submitted_by;
+            const submittedBy = record.result_info?.submitted_by_info;
             const approvalStatus = record.result_info?.status;
             return (
               <ScanLabResultCard

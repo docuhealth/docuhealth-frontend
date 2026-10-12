@@ -48,7 +48,7 @@ const AdvanceCheckUp = ({
     queryKey: ["patient-med-records", hin, currentPage],
     queryFn: async () => {
       const res = await axiosInstanceHos.get(
-        `api/medical-records/all?patient=${hin}&page=${currentPage}&size=${pageSize}`,
+        `api/doctors/patient/records/${hin}?page=${currentPage}&size=${pageSize}`,
       );
       return res.data;
     },
@@ -159,7 +159,7 @@ const AdvanceCheckUp = ({
             <span>Patient's Details</span>
           </button>
           {loadingInfo ? (
-            <PatientDetailSkeleton />
+            <PatientDetailSkeleton tabs={9} />
           ) : (
             <>
               <div className="py-5 border-b">

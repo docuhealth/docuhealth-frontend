@@ -9,8 +9,8 @@ const getPatientName = (order) => {
 const getHIN = (order) => order.patient_info?.hin || "—";
 
 const getDrugsSummary = (order) => {
-  if (order.drugs && order.drugs.length > 0) {
-    const count = order.drugs.length;
+  if (order.drugs_info && order.drugs_info.length > 0) {
+    const count = order.drugs_info.length;
     return `${count} Medication${count > 1 ? "s" : ""}`;
   }
   return "No medications";
@@ -28,7 +28,7 @@ const getDatetime = (order) => {
 };
 
 const getRequestedBy = (order) => {
-  const o = order.ordered_by;
+  const o = order.ordered_by_info;
   if (!o) return undefined;
   return `${o.role === "doctor" ? "Dr. " : ""}${o.firstname || ""} ${o.lastname || ""}`.trim();
 };

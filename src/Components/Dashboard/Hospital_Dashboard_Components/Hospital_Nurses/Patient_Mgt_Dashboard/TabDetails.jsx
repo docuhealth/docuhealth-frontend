@@ -444,8 +444,8 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
                                     />
                                 </svg>
                                 <p className="">
-                                    {admittedPatient?.discharged_by
-                                        ? `Discharged by ${admittedPatient.discharged_by.role === "doctor" ? "Dr. " : ""}${admittedPatient.discharged_by.firstname} ${admittedPatient.discharged_by.lastname}`
+                                    {admittedPatient?.discharged_by_info
+                                        ? `Discharged by ${admittedPatient.discharged_by_info.role === "doctor" ? "Dr. " : ""}${admittedPatient.discharged_by_info.firstname} ${admittedPatient.discharged_by_info.lastname}`
                                         : admittedPatient?.closed_by_info
                                             ? `Closed by ${admittedPatient.closed_by_info.role === "doctor" ? "Dr. " : ""}${admittedPatient.closed_by_info.firstname} ${admittedPatient.closed_by_info.lastname}`
                                             : admittedPatient?.closed_at

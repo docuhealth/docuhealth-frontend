@@ -12,7 +12,7 @@ const TRIAGE_STYLES = {
 // Full read-only rendering of one nursing assessment (triage note + the
 // vitals recorded alongside it) — same pattern as SoapNoteDetailView, for
 // "View Nursing Assessment" from Recent Care Activities
-// (GET /api/medical-records/events/<event_sqid>).
+// (GET /api/records/events/<event_sqid>).
 const NursingAssessmentDetailView = ({ nursingAssessment }) => {
   if (!nursingAssessment) return null;
 
@@ -55,7 +55,7 @@ const NursingAssessmentDetailView = ({ nursingAssessment }) => {
 
       <VitalSignsCard
         className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg"
-        vitalSigns={nursingAssessment.vital_signs}
+        vitalSigns={nursingAssessment.vital_signs_info}
         title="Vital signs recorded with this assessment"
       />
     </div>

@@ -18,14 +18,14 @@ const getRefRange = (p) => {
 };
 
 // Full read-only rendering of one lab test order, for "View Lab order" from
-// Recent Care Activities (GET /api/medical-records/events/<event_sqid>).
+// Recent Care Activities (GET /api/records/events/<event_sqid>).
 // Read-only by design — accept/reject/log-sample/submit-result actions live
 // on the lab dashboards, not here.
 const LabOrderDetailView = ({ labOrder }) => {
   if (!labOrder) return null;
 
   const items = labOrder.items_info || [];
-  const orderedBy = labOrder.ordered_by;
+  const orderedBy = labOrder.ordered_by_info;
   const orderedByName = orderedBy
     ? `${orderedBy.role === "doctor" ? "Dr. " : ""}${orderedBy.firstname || ""} ${orderedBy.lastname || ""}`.trim()
     : "N/A";
@@ -52,7 +52,7 @@ const LabOrderDetailView = ({ labOrder }) => {
 
       {items.map((item) => {
         const status = (item.status || "pending").toLowerCase();
-        const params = item.result_info?.parameters || [];
+        const params = item.result_info?.parameters_info || [];
 
         return (
           <div

@@ -182,8 +182,8 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
     const drugOrdersInfo = latestRecord?.drug_orders_info || latestRecord?.drug_records;
     if (!drugOrdersInfo || drugOrdersInfo.length === 0) return;
 
-    const flatDrugs = drugOrdersInfo[0]?.drugs
-      ? drugOrdersInfo.flatMap((order) => order.drugs || [])
+    const flatDrugs = drugOrdersInfo[0]?.drugs_info
+      ? drugOrdersInfo.flatMap((order) => order.drugs_info || [])
       : drugOrdersInfo;
 
     const seeded = flatDrugs.map((drugItem) => {

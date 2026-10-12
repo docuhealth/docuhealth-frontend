@@ -7,6 +7,7 @@ import { getAdvanceCheckUpTabs } from "./AdvanceCheckUpTabDetails";
 import { NursesAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Nurses/NursesAdmittedPatientMGTContext";
 import Modal from "../../../../ui/Modal";
 import NursingDischargeSummaryView from "./NursingDischargeSummaryView";
+import DischargedPatientRecord from "../../../../ui/DischargedPatientRecord";
 
 const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, loadingAdmission }) => {
   const context = useContext(NursesAdmittedPatientMGTContext);
@@ -60,6 +61,30 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
       hour12: true
     });
   };
+
+  const isDischarged = context?.tab === "inpatient_discharge" ||
+    context?.tab === "outpatient_discharge" ||
+    Boolean(selected?.discharge_date || selected?.closed_at) ||
+    selected?.status === "inpatient_discharge" ||
+    selected?.status === "outpatient_discharge";
+
+  if (isDischarged) {
+    if (isLoading || loadingAdmission) {
+      return (
+        <div className="flex justify-center items-center py-20">
+          <p className="text-sm text-gray-500">Loading patient data...</p>
+        </div>
+      );
+    }
+    return (
+      <DischargedPatientRecord
+        patient={patient}
+        admission={admission}
+        isOutPatient={isOutPatient}
+        onBack={() => setAdvanceCheckUp(false)}
+      />
+    );
+  }
 
   return (
     <div>

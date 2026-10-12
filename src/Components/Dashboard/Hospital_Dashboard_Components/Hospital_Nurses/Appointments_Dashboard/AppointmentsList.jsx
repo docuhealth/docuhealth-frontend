@@ -13,7 +13,7 @@ import SearchBar from "../../../../SearchBar/SearchBar";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import Modal from "../../../../ui/Modal";
 
-const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals, setVitalSignsHistory, setSelectedPatientForVitals, setSelectedPatientForCASE, setSharedSoapNoteHistory, setSelectedPatientForSharedSoap, setSeePatientDetails, setDashboardSelectedPatientDetails }) => {
+const AppointmentsList = ({ setCaseNoteHistory, setUpdateVitals, setVitalSignsHistory, setSelectedPatientForVitals, setSelectedPatientForCASE, setSharedSoapNoteHistory, setSelectedPatientForSharedSoap, setSeePatientDetails, setDashboardSelectedPatientDetails }) => {
   const {
     appointments,
     count,
@@ -470,16 +470,6 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                       className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                       onClick={() => {
                         setOpenPopover(null);
-                        setNewCaseNote(true)
-                        setSelectedPatientForCASE(appointment)
-                      }}
-                    >
-                      Add CASE Note
-                    </p>
-                    <p
-                      className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
-                      onClick={() => {
-                        setOpenPopover(null);
                         setCaseNoteHistory(true)
                         setSelectedPatientForCASE(appointment)
                       }}
@@ -587,16 +577,6 @@ const AppointmentsList = ({ setNewCaseNote, setCaseNoteHistory, setUpdateVitals,
                         }}
                       >
                         See patient's details
-                      </button>
-                      <button
-                        className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"
-                        onClick={() => {
-                          setOpenPopover(null);
-                          setNewCaseNote(true)
-                          setSelectedPatientForCASE(appointment)
-                        }}
-                      >
-                        Add CASE Note
                       </button>
                       <button
                         className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"

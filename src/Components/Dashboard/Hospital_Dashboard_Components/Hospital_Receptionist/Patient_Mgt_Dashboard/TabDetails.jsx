@@ -477,8 +477,8 @@ const DischargedPatientsTab = () => {
                                 <p className="">
                                     {" "}
                                     {(() => {
-                                        // In-patient discharge rows carry `discharged_by`, out-patient ones `closed_by_info`.
-                                        const closer = admittedPatient?.discharged_by || admittedPatient?.closed_by_info;
+                                        // In-patient discharge rows carry `discharged_by_info`, out-patient ones `closed_by_info`.
+                                        const closer = admittedPatient?.discharged_by_info || admittedPatient?.closed_by_info;
                                         if (closer) return `${closer.role === "doctor" ? "Dr. " : ""}${closer.firstname} ${closer.lastname}`;
                                         return admittedPatient?.closed_at ? "Closed automatically" : "NIL";
                                     })()}

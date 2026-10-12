@@ -69,7 +69,14 @@ const AdmissionRequestList = () => {
     },
     onError: (err) => {
       console.error("Error admitting patient:", err);
+      // Two doctors can request one bed; once one is accepted the other 400s
+      // and stays pending. Refetch so the list and bed show the current state.
+      queryClient.invalidateQueries({ queryKey: ["hospital-admission-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
       toast.error(extractApiErrorMessage(err, "Error admitting patient"));
+      // A 400 here can mean another request already took the bed; refetch so the list and bed states are current.
+      queryClient.invalidateQueries({ queryKey: ["hospital-admission-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
     },
   });
 

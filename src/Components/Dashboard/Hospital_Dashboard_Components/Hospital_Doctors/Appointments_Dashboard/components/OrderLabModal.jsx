@@ -109,6 +109,10 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
       if (orderContext.checkIn) {
         requestPayload.check_in = orderContext.checkIn;
       }
+      // staff_admission_order requires the admission (400 without it).
+      if (orderContext.admission) {
+        requestPayload.admission = orderContext.admission;
+      }
       if (payload.ignore_duplicate_warning) {
         requestPayload.ignore_duplicate_warning = true;
       }

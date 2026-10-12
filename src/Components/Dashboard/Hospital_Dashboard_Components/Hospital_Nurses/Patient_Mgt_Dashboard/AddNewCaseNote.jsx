@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import axiosInstanceHos from '../../../../../lib/axios/hospital';
 import toast from 'react-hot-toast'; // or your preferred toast library
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { extractApiErrorMessage } from '../../../../../utils/apiError';
 
 const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInputs, handleAddListItem, handleRemoveItem, activeInput, setActiveInput }) => (
     <div className="border rounded-md p-4 mt-3 bg-gray-50/30">
@@ -143,13 +144,22 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
         },
         onError: (error) => {
             console.error("Upload error:", error);
-            toast.error(error.response?.data?.message || "Failed to upload case note");
+            toast.error(extractApiErrorMessage(error, "Failed to upload case note"));
         }
     });
 
     const handleSubmit = () => {
+        // Case notes are saved against the patient's active admission; `selected` is an admission row when it has ward_info.
+        const admissionSqid = selected?.ward_info && selected?.status === "active" ? selected.sqid : null;
+        if (!admissionSqid) {
+            toast.error("Case notes can only be added for currently admitted patients.");
+            return;
+        }
+
         const fullPayload = {
             patient: (selected?.patient_info?.hin || selected?.patient?.hin),
+            // Case notes belong to a hospital stay; admitted rows carry ward/bed info, check-in rows don't
+            admission: (selected?.ward_info || selected?.bed_info) ? selected?.sqid : undefined,
             observation: caseNoteData.observations,
             care: caseNoteData.nursingCare,
             response: caseNoteData.patientResponse,
@@ -171,7 +181,7 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
             return;
         }
 
-        mutate(filteredPayload);
+        mutate({ ...filteredPayload, admission: admissionSqid });
     };
 
  

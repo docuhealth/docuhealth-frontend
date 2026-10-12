@@ -254,9 +254,9 @@ const DoctorDischargeSummaryView = ({ admissionSqid, dischargeRow, fallbackPatie
       <Section
         title="Doctor's discharge"
         right={
-          doc?.discharged_by && (
+          doc?.discharged_by_info && (
             <span className="text-xs text-gray-500 text-right">
-              {staffLabel(doc.discharged_by)}
+              {staffLabel(doc.discharged_by_info)}
               {doc.created_at ? ` · ${formatFullDateTime(doc.created_at)}` : ""}
             </span>
           )
@@ -309,9 +309,9 @@ const DoctorDischargeSummaryView = ({ admissionSqid, dischargeRow, fallbackPatie
       <Section
         title="Nurse's discharge"
         right={
-          nurse?.discharged_by && (
+          nurse?.discharged_by_info && (
             <span className="text-xs text-gray-500 text-right">
-              {`${nurse.discharged_by.firstname ?? ""} ${nurse.discharged_by.lastname ?? ""}`.trim()}
+              {`${nurse.discharged_by_info.firstname ?? ""} ${nurse.discharged_by_info.lastname ?? ""}`.trim()}
               {nurse.created_at ? ` · ${formatFullDateTime(nurse.created_at)}` : ""}
             </span>
           )
@@ -327,10 +327,10 @@ const DoctorDischargeSummaryView = ({ admissionSqid, dischargeRow, fallbackPatie
           </div>
         ) : (
           <div className="space-y-6">
-            {nurse.final_vital_signs && (
+            {nurse.final_vital_signs_info && (
               <VitalSignsCard
                 title="Final discharge vitals"
-                vitalSigns={nurse.final_vital_signs}
+                vitalSigns={nurse.final_vital_signs_info}
                 className="bg-white rounded-xl border border-gray-100 p-4"
               />
             )}

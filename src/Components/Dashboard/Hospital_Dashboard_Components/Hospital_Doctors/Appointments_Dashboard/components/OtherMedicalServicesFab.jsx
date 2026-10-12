@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { prefetchCommonRadiologyScans } from "../../../../../../queries/Hospital/radiology/scan_requests";
+import { ACTIVE_CHECK_INS_KEY, fetchActiveCheckIns } from "../../../../../../queries/Hospital/doctor/checkIns";
+import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import OrderLabModal from "./OrderLabModal";
 import OrderScanModal from "./OrderScanModal";
 import RequestVitalsModal from "./RequestVitalsModal";
@@ -13,13 +15,14 @@ import DrugTaskModal from "./DrugTaskModal";
 import IVFluidModal from "./IVFluidModal";
 import SeizureEventModal from "./SeizureEventModal";
 
-// No `action` shows a "coming soon" toast; `admissionOnly` items need a real admission sqid to create their care task.
+// No `action` shows a "coming soon" toast; `admissionOnly` items need a real admission sqid to create their care task;
+// `needsConsultation` items are refused against a check-in unless the doctor's consultation is open.
 const QUICK_SERVICES = [
-  { id: "lab", label: "Order lab", action: "lab" },
-  { id: "scan", label: "Order scan/X-ray", action: "scan" },
-  { id: "pharmacy", label: "Order pharmacy", action: "pharmacy" },
-  { id: "drug-task", label: "Drug task (nurse)", action: "drug-task" },
-  { id: "vitals", label: "Quick Vitals request", action: "vitals" },
+  { id: "lab", label: "Order lab", action: "lab", needsConsultation: true },
+  { id: "scan", label: "Order scan/X-ray", action: "scan", needsConsultation: true },
+  { id: "pharmacy", label: "Order pharmacy", action: "pharmacy", needsConsultation: true },
+  { id: "drug-task", label: "Drug task (nurse)", action: "drug-task", needsConsultation: true },
+  { id: "vitals", label: "Quick Vitals request", action: "vitals", needsConsultation: true },
   { id: "vitals-task", label: "Vitals monitoring task", action: "vitals-task", admissionOnly: true },
   { id: "procedure", label: "Procedure", action: "procedure", admissionOnly: true },
   { id: "input-output", label: "Fluid Input and Output", action: "input-output", admissionOnly: true },
@@ -39,6 +42,17 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, onOrde
   useEffect(() => {
     prefetchCommonRadiologyScans(queryClient);
   }, [queryClient]);
+
+  // The patient object handed to this page can predate the claim, so read the check-in's live status instead.
+  const checkInSqid = admissionSqid ? null : resolveOrderContext(selectedPatientDetails).checkIn;
+  const { data: activeCheckIns } = useQuery({
+    queryKey: ACTIVE_CHECK_INS_KEY,
+    queryFn: fetchActiveCheckIns,
+    enabled: !!checkInSqid,
+  });
+  // Unknown (still loading / failed) counts as open; the API refuses the action anyway.
+  const isConsultationClosed =
+    !!checkInSqid && Array.isArray(activeCheckIns) && !activeCheckIns.some((c) => c.sqid === checkInSqid);
 
   useEffect(() => {
     if (!open) return;
@@ -65,6 +79,11 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, onOrde
 
     if (item.admissionOnly && !admissionSqid) {
       toast.error("Only available for admitted patients.");
+      return;
+    }
+
+    if (item.needsConsultation && isConsultationClosed) {
+      toast.error("This visit has no consultation in progress. Call the patient from the queue to start one.");
       return;
     }
 

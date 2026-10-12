@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
@@ -12,7 +12,6 @@ import { fetchAllSharedSoapNotes, isWithinStay } from "../../../../../queries/Ho
 const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, stayWindow = null }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [localDetail, setLocalDetail] = useState(null);
-  const menuRef = useRef(null);
   const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -74,7 +73,8 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, stayWindow = null
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      // One ref can't cover every row's menu; ignore clicks inside any of them.
+      if (!event.target.closest?.("[data-row-menu]")) {
         setOpenMenuId(null);
       }
     };
@@ -189,7 +189,7 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, stayWindow = null
             <div className="flex flex-col gap-4 mt-4">
               {caseNotes?.map((note) => (
                 <div
-                  key={note.id}
+                  key={note.sqid || note.id}
                   className="flex flex-col-reverse lg:flex-row lg:items-center justify-between border rounded-lg p-4 transition-colors"
                 >
                   <div className="flex flex-row flex-wrap gap-4 lg:gap-10">
@@ -260,18 +260,18 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, stayWindow = null
                   </div>
 
                   {/* Actions Menu */}
-                  <div className="relative flex justify-end  lg:mt-0" ref={menuRef}>
+                  <div className="relative flex justify-end  lg:mt-0" data-row-menu>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setOpenMenuId(openMenuId === note.id ? null : note.id);
+                        setOpenMenuId(openMenuId === (note.sqid || note.id) ? null : (note.sqid || note.id));
                       }}
                       className="p-2 hover:bg-gray-200 rounded-full transition-all"
                     >
                       <MoreVertical size={16} />
                     </button>
 
-                    {openMenuId === note.id && (
+                    {openMenuId === (note.sqid || note.id) && (
                       <div 
                         onMouseDown={(e) => e.stopPropagation()}
                         className="absolute right-0 top-10 z-10 w-40 bg-white rounded-md shadow text-sm border border-gray-100  animate-in fade-in zoom-in duration-200">

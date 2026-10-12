@@ -1,5 +1,6 @@
 import React from "react";
 import { ArrowLeft, User, Calendar, Clock, Building, Bed, AlertCircle, ShieldAlert } from "lucide-react";
+import VitalSignsCard from "../../../../ui/VitalSignsCard";
 
 const AdmissionNoteDetail = ({ note, onBack }) => {
   if (!note) return null;
@@ -77,6 +78,20 @@ const AdmissionNoteDetail = ({ note, onBack }) => {
           </div>
         </div>
       </div>
+
+      {/* Vitals taken with the note; older notes may have none matched */}
+      {note.vital_signs_info ? (
+        <VitalSignsCard
+          vitalSigns={note.vital_signs_info}
+          title="Vital signs taken on admission"
+          className="p-5 mb-6 bg-docuhealth-light-gray border border-gray-100 rounded-xl"
+        />
+      ) : (
+        <div className="p-5 mb-6 bg-docuhealth-light-gray border border-gray-100 rounded-xl">
+          <p className="font-medium mb-1">Vital signs taken on admission</p>
+          <p className="text-sm text-gray-400 italic">No vital signs recorded</p>
+        </div>
+      )}
 
       {/* Clinical Assessments Card */}
       <div className="p-5 mb-6 bg-docuhealth-light-gray border border-gray-100 rounded-xl space-y-5">

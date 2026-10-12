@@ -259,7 +259,7 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
             title: "Care plan history",
             status: "care_plan_history",
             content: (
-                <CarePlanHistory patient={patient} patientFullInfo={patientFullInfo} />
+                <CarePlanHistory patient={patient} patientFullInfo={patientFullInfo} activeAdmissionSqid={admission?.status === "active" ? admission?.sqid : null} />
             )
         },
         {

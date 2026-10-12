@@ -6,6 +6,7 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import { DEFAULT_FREQUENCY } from "../../../../../../utils/careTaskConstants";
 import Input from "../../../../../ui/Input";
 
@@ -148,9 +149,7 @@ const PrescribeMedication = ({
     },
     onError: (error) => {
       console.error("Prescription error:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to prescribe medication",
-      );
+      toast.error(extractApiErrorMessage(error, "Failed to prescribe medication"));
     },
   });
 
@@ -200,6 +199,10 @@ const PrescribeMedication = ({
 
     if (orderContext.checkIn) {
       payload.check_in = orderContext.checkIn;
+    }
+    // staff_admission_order requires the admission (400 without it).
+    if (orderContext.admission) {
+      payload.admission = orderContext.admission;
     }
 
     mutate(payload);

@@ -20,10 +20,24 @@ const APPOINTMENT_TABS = [
   { value: "history", label: "Past Appointments" },
 ];
 
-// Filter bar stub + the same icon-tile rows (desktop) / date-pill cards (mobile) as the list.
+// Search box + From/To date row + the same icon-tile rows (desktop) / date-pill cards
+// (mobile) as the list, so the rows land where the loaded ones will.
 const AppointmentRowsSkeleton = () => (
   <div className="w-full">
-    <Skeleton className="h-10 w-full rounded-lg" />
+    <div className="mb-4 w-full space-y-3">
+      <div className="h-[38px] rounded-md border border-gray-300 bg-white flex items-center pl-3">
+        <Skeleton className="h-4 w-4" />
+        <Skeleton className="h-3 w-36 ml-3" />
+      </div>
+      <div className="flex flex-wrap gap-3">
+        {["From:", "To:"].map((label) => (
+          <div key={label} className="flex items-center gap-2">
+            <span className="text-xs text-gray-500 whitespace-nowrap">{label}</span>
+            <Skeleton className="h-[46px] w-40 rounded-lg" />
+          </div>
+        ))}
+      </div>
+    </div>
     <RecordRowsSkeleton label="Loading appointments" tiles={4} count={4} />
   </div>
 );
