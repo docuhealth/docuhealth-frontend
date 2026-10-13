@@ -3,8 +3,6 @@ import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import AppointmentsList from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/AppointmentsList";
 import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PatientInfo";
 import SoapNoteEntry from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/SoapNoteEntry";
-import RequestAdmission from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/RequestAdmission";
-import OtherMedicalServicesFab from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/OtherMedicalServicesFab";
 import PrescribeMedication from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PrescribeMedication";
 import { DoctorAppointmentsListContext } from "../../../context/HospitalContext/Doctors/DoctorAppointmentsListContext";
 
@@ -24,7 +22,6 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
 
   const [prescribeMedication, setPrescribeMedication] = useState(false);
 
-  const [requestAdmission, setRequestAdmission] = useState(false);
 
   const { appointmentType } = useContext(DoctorAppointmentsListContext);
 
@@ -34,25 +31,10 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
         <>
           <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
             <DynamicDate />
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-              <button
-                className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
-                onClick={() => {
-                  setRequestAdmission(true);
-                }}
-              >
-                Request for admission
-              </button>
-              <button
-                className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
-                onClick={() => {
-                  setSoapNoteEntry(true);
-                  setSeePatientDetails(false);
-                }}
-              >
-                Add new SOAP Note
-              </button>
-            </div>
+            {/* An appointment is not a visit: SOAP notes, bed requests and orders need a check-in. */}
+            <p className="text-[13px] text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 w-full lg:w-auto">
+              To write a SOAP note, request a bed or place orders, check this patient in first.
+            </p>
           </div>
           <div className="my-5">
             <PatientInfo
@@ -61,23 +43,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
               initialTabTitle={detailsTab}
             />
           </div>
-          <OtherMedicalServicesFab
-            selectedPatientDetails={selectedPatientDetails}
-            // This list is appointments, never admissions, so there's no
-            // admission sqid to scope a care task to — admission-only
-            // quick-services stay disabled here.
-            admissionSqid={null}
-            onOrderPharmacy={() => {
-              setPrescribeMedication(true);
-              setSeePatientDetails(false);
-            }}
-          />
-          {requestAdmission && (
-            <RequestAdmission
-              setRequestAdmission={setRequestAdmission}
-              selectedPatientDetails={selectedPatientDetails}
-            />
-          )}
+
         </>
       ) : soapNoteEntry ? (
         <>

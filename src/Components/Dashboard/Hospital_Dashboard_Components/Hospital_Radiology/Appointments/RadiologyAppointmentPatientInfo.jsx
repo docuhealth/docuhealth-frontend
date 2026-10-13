@@ -4,7 +4,8 @@ import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
 import OrderScanModal from "../../Hospital_Doctors/Appointments_Dashboard/components/OrderScanModal";
 import AppointmentCloseControl from "../../../../ui/AppointmentCloseControl";
 
-// Reuses the doctor's Order Scan modal as a radiologist: the order is a radiologist_appointment_order linked to this appointment, approved as soon as the result is uploaded.
+// Reuses the doctor's Order Scan modal as a radiologist. Scan orders now need a check-in or admission,
+// so ordering from an appointment shows a "check the patient in" message until appointments become check-ins.
 
 const RadiologyAppointmentPatientInfo = ({ appointment, onBack, autoOpenCreateOrder }) => {
   const patient = appointment?.patient ?? {};

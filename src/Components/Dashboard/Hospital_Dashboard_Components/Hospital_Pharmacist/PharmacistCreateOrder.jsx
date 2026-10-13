@@ -5,6 +5,7 @@ import MedicationSection from "../Hospital_Doctors/Appointments_Dashboard/compon
 import axiosInstanceHos from "../../../../lib/axios/hospital";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DEFAULT_FREQUENCY } from "../../../../utils/careTaskConstants";
+import { extractApiErrorMessage } from "../../../../utils/apiError";
 
 const NoteSection = ({
   title,
@@ -135,9 +136,8 @@ const PharmacistCreateOrder = ({
     },
     onError: (error) => {
       console.error("Order error:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to create order",
-      );
+      // Walk-in sales are refused until the backend restores a visit-free pharmacy sale (A7).
+      toast.error(extractApiErrorMessage(error, "Failed to create order"));
     },
   });
 
