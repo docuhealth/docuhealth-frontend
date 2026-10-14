@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { ArrowLeft, X, Plus, UploadCloud, FileText, AlertTriangle } from "lucide-react";
 import { truncateWords } from "../../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import toast from "react-hot-toast";
@@ -27,12 +27,46 @@ const NoteSection = ({
   handleRemoveItem,
   activeInput,
   setActiveInput,
-}) => (
-  <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3 bg-gray-50/30">
-    <p className="font-medium text-docuhealth-dark mb-2">{title}</p>
+}) => {
+  const items = soapNoteData[field];
+  const listRef = useRef(null);
+  const prevCount = useRef(items.length);
+  const [moreBelow, setMoreBelow] = useState(false);
 
-    <div className="space-y-2 max-h-[200px] overflow-y-auto mb-2">
-      {soapNoteData[field].map((item, idx) => (
+  const updateMoreBelow = () => {
+    const el = listRef.current;
+    if (!el) return;
+    setMoreBelow(el.scrollHeight - el.scrollTop - el.clientHeight > 4);
+  };
+
+  // Bring a newly added item into view so the doctor sees it landed
+  useEffect(() => {
+    const el = listRef.current;
+    if (el && items.length > prevCount.current) {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    }
+    prevCount.current = items.length;
+    updateMoreBelow();
+  }, [items.length]);
+
+  return (
+  <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3 bg-gray-50/30">
+    <p className="font-medium text-docuhealth-dark mb-2">
+      {title}
+      {items.length > 0 && (
+        <span className="ml-2 text-[11px] font-normal text-gray-500">
+          ({items.length} {items.length === 1 ? "item" : "items"})
+        </span>
+      )}
+    </p>
+
+    <div className="relative mb-2">
+    <div
+      ref={listRef}
+      onScroll={updateMoreBelow}
+      className="space-y-2 max-h-[200px] overflow-y-auto scrollbar-visible pr-1"
+    >
+      {items.map((item, idx) => (
         <div
           key={idx}
           className="bg-white border border-gray-200 rounded p-2 text-[12px] flex justify-between items-center"
@@ -47,6 +81,16 @@ const NoteSection = ({
           </button>
         </div>
       ))}
+    </div>
+    {moreBelow && (
+      <button
+        type="button"
+        onClick={() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" })}
+        className="absolute inset-x-0 bottom-0 flex items-end justify-center h-10 pb-1 bg-linear-to-t from-white via-white/90 to-transparent text-[11px] font-medium text-docuhealth-primary"
+      >
+        Scroll for more ↓
+      </button>
+    )}
     </div>
 
     {activeInput === field ? (
@@ -84,7 +128,8 @@ const NoteSection = ({
       </button>
     )}
   </div>
-);
+  );
+};
 
 const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBack, onSubmitted }) => {
   const { profile, hospitals } = useContext(DoctorAppContext);
