@@ -108,6 +108,24 @@ layer(base);
     scroll-behavior: smooth;
 }
 
+/* Always-visible scrollbar for capped lists (overlay scrollbars hide it otherwise) */
+.scrollbar-visible {
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af #f3f4f6;
+}
+.scrollbar-visible::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 6px;
+}
+.scrollbar-visible::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 9999px;
+}
+.scrollbar-visible::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 9999px;
+}
+
 .underline-double {
   position: relative;
   display: inline-block;
