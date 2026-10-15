@@ -44,28 +44,80 @@ export const rejectLabRequest = async ({ order_sqid, item_sqid, reason }) => {
 };
 
 export const logSpecimenCollectionTime = async ({ order_sqid, item_sqid, specimen_collected_at }) => {
-  const res = await axiosInstanceHos.patch(`api/lab/test-orders/${order_sqid}/items/${item_sqid}/specimen-collection-time`, { specimen_collected_at });
+  const res = await axiosInstanceHos.patch(`api/lab/test-orders/${order_sqid}/items/${item_sqid}/result/specimen-collection-time`, { specimen_collected_at });
   return res.data;
 };
 
 export const submitTestResult = async ({ order_sqid, item_sqid, payload }) => {
-  const res = await axiosInstanceHos.post(`api/lab/test-orders/${order_sqid}/items/${item_sqid}/result/submit`, payload);
+  const res = await axiosInstanceHos.patch(`api/lab/test-orders/${order_sqid}/items/${item_sqid}/result/submit`, payload);
   return res.data;
 };
 
-export const approveLabTestResult = async ({ item_sqid }) => {
-  const res = await axiosInstanceHos.patch(`api/lab/test-orders/items/${item_sqid}/result/approve`);
+// Lab Admin specific approval
+export const approveLabTestResultByLabAdmin = async ({ item_sqid }) => {
+  const res = await axiosInstanceHos.patch(`api/lab/test-orders/items/${item_sqid}/result/approve-by-lab-admin`);
   return res.data;
 };
 
-// `.../result/reject` now requires a non-empty `rejection_reason` in the body;
-// it 400s without one. The lab scientist sees this reason on the bounced item.
-export const rejectLabTestResult = async ({ item_sqid, rejection_reason }) => {
-  const res = await axiosInstanceHos.patch(`api/lab/test-orders/items/${item_sqid}/result/reject`, { rejection_reason });
+// Doctor specific approval
+export const approveLabTestResultByDoctor = async ({ item_sqid }) => {
+  const res = await axiosInstanceHos.patch(`api/lab/test-orders/items/${item_sqid}/result/approve-by-doctor`);
   return res.data;
+};
+
+// Backwards-compatible alias (defaults to lab admin if not specified)
+export const approveLabTestResult = async ({ item_sqid, isDoctor = false }) => {
+  if (isDoctor) {
+    return approveLabTestResultByDoctor({ item_sqid });
+  }
+  return approveLabTestResultByLabAdmin({ item_sqid });
+};
+
+// Lab Admin specific rejection
+export const rejectLabTestResultByLabAdmin = async ({ item_sqid, rejection_reason }) => {
+  const res = await axiosInstanceHos.patch(`api/lab/test-orders/items/${item_sqid}/result/reject-by-lab-admin`, { rejection_reason });
+  return res.data;
+};
+
+// Doctor specific rejection
+export const rejectLabTestResultByDoctor = async ({ item_sqid, rejection_reason }) => {
+  const res = await axiosInstanceHos.patch(`api/lab/test-orders/items/${item_sqid}/result/reject-by-doctor`, { rejection_reason });
+  return res.data;
+};
+
+// Backwards-compatible alias
+export const rejectLabTestResult = async ({ item_sqid, rejection_reason, isDoctor = false }) => {
+  if (isDoctor) {
+    return rejectLabTestResultByDoctor({ item_sqid, rejection_reason });
+  }
+  return rejectLabTestResultByLabAdmin({ item_sqid, rejection_reason });
 };
 
 export const createLabTestOrder = async (payload) => {
   const res = await axiosInstanceHos.post("api/lab/test-orders/create", payload);
+  return res.data;
+};
+
+// Audit Logs (Lab Admin only)
+export const fetchLabAuditLogs = async ({ page = 1, pageSize = 10 } = {}) => {
+  const res = await axiosInstanceHos.get(`api/lab/audit-logs?page=${page}&size=${pageSize}`);
+  return res.data;
+};
+
+// Add Lab Scientist (Lab Admin only)
+export const createLabScientist = async (payload) => {
+  const res = await axiosInstanceHos.post("api/lab/lab-scientist", payload);
+  return res.data;
+};
+
+// Lab Test Details (Create)
+export const createLabTestDetails = async (payload) => {
+  const res = await axiosInstanceHos.post("api/lab/lab-tests-details/create", payload);
+  return res.data;
+};
+
+// Lab Test Details (List)
+export const fetchLabTestDetails = async ({ page = 1, pageSize = 100 } = {}) => {
+  const res = await axiosInstanceHos.get(`api/lab/lab-tests-details?page=${page}&size=${pageSize}`);
   return res.data;
 };

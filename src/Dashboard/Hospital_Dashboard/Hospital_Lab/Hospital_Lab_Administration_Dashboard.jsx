@@ -15,6 +15,7 @@ const Hospital_Lab_Administration_Dashboard = () => {
 
   const [activeView, setActiveView] = useState("catalogue"); // "catalogue" | "reports_settings" | "audit_logs"
   const [isAddNewTestOpen, setIsAddNewTestOpen] = useState(false);
+  const [selectedTestToConfigure, setSelectedTestToConfigure] = useState(null);
   const [createdTests, setCreatedTests] = useState([]);
 
   useEffect(() => {
@@ -30,6 +31,11 @@ const Hospital_Lab_Administration_Dashboard = () => {
 
   const handleTestAdded = (newTest) => {
     setCreatedTests((prev) => [newTest, ...prev]);
+  };
+
+  const handleOpenAddTest = (test = null) => {
+    setSelectedTestToConfigure(test);
+    setIsAddNewTestOpen(true);
   };
 
   if (activeView === "reports_settings") {
@@ -59,7 +65,7 @@ const Hospital_Lab_Administration_Dashboard = () => {
           </button>
 
           <button
-            onClick={() => setIsAddNewTestOpen(true)}
+            onClick={() => handleOpenAddTest(null)}
             className="py-2.5 px-6 sm:px-8 rounded-full text-docuhealth-primary border border-docuhealth-primary hover:bg-indigo-50 transition-colors cursor-pointer text-sm font-medium w-full sm:w-auto text-center whitespace-nowrap"
           >
             Add new test
@@ -77,13 +83,18 @@ const Hospital_Lab_Administration_Dashboard = () => {
       {/* Main Test Catalogue Content */}
       <TestCatalogueTable
         extraTests={createdTests}
-        onOpenAddTest={() => setIsAddNewTestOpen(true)}
+        onOpenAddTest={() => handleOpenAddTest(null)}
+        onConfigureTest={(test) => handleOpenAddTest(test)}
       />
 
       {/* Add New Test Modal */}
       <AddNewTestModal
         isOpen={isAddNewTestOpen}
-        onClose={() => setIsAddNewTestOpen(false)}
+        initialTest={selectedTestToConfigure}
+        onClose={() => {
+          setIsAddNewTestOpen(false);
+          setSelectedTestToConfigure(null);
+        }}
         onTestAdded={handleTestAdded}
       />
     </>
