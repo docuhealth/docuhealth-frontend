@@ -52,6 +52,7 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
       queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
       queryClient.invalidateQueries({ queryKey: ["lab-dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["lab-order"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-audit-logs"] });
       queryClient.invalidateQueries({ queryKey: ["doctor-lab-records"] });
       queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
       setShowConfirm(false);

@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import HealthPersonnelList from "../../../Components/Dashboard/Hospital_Dashboard_Components/Shared/HealthPersonnelList";
-import OnboardNewStaff from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Staff_Mgt_Dashboard/components/OnboardNewStaff";
+import AddLabScientistModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/AddLabScientistModal";
 import { LabAppContext } from "../../../context/HospitalContext/Lab/LabAppContext";
 
 const Hospital_Lab_HealthPersonnel_Dashboard = () => {
@@ -28,13 +28,10 @@ const Hospital_Lab_HealthPersonnel_Dashboard = () => {
         </div>
       </div>
 
-      {createNewStaff && (
-        <OnboardNewStaff
-          setCreateNewStaff={setCreateNewStaff}
-          defaultRole="lab_scientist"
-          lockRole={true}
-        />
-      )}
+      <AddLabScientistModal
+        isOpen={createNewStaff}
+        onClose={() => setCreateNewStaff(false)}
+      />
     </>
   );
 };

@@ -10,8 +10,10 @@ import {
   acceptLabRequest,
   rejectLabRequest,
   logSpecimenCollectionTime,
-  approveLabTestResult,
-  rejectLabTestResult,
+  approveLabTestResultByLabAdmin,
+  approveLabTestResultByDoctor,
+  rejectLabTestResultByLabAdmin,
+  rejectLabTestResultByDoctor,
 } from "../../../queries/Hospital/lab/requests";
 import DoctorReviewModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/DoctorReviewModal";
 import AcceptApprovalModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/AcceptApprovalModal";
@@ -25,6 +27,8 @@ const STATUS_STYLES = {
   sample_collected: { label: "Sample Collected", color: "text-blue-600" },
   in_progress:      { label: "In Progress", color: "text-amber-600" },
   result_ready:     { label: "Result Ready", color: "text-green-600" },
+  result_accepted_by_lab_admin: { label: "Lab Admin Approved", color: "text-indigo-600" },
+  result_accepted_by_doctor:    { label: "Doctor Approved", color: "text-green-600" },
   completed:        { label: "Completed",   color: "text-green-600" },
   rejected:         { label: "Rejected",    color: "text-red-500"   },
   approved:         { label: "Approved",    color: "text-green-600" },
@@ -131,6 +135,8 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
     queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
     queryClient.invalidateQueries({ queryKey: ["lab-dashboard"] });
     queryClient.invalidateQueries({ queryKey: ["lab-order"] });
+    queryClient.invalidateQueries({ queryKey: ["lab-order-item"] });
+    queryClient.invalidateQueries({ queryKey: ["lab-audit-logs"] });
     queryClient.invalidateQueries({ queryKey: ["doctor-lab-records"] });
     queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
   };
@@ -164,7 +170,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   });
 
   const approveMutation = useMutation({
-    mutationFn: () => approveLabTestResult({ item_sqid: actualItemSqid }),
+    mutationFn: () => approveLabTestResultByDoctor({ item_sqid: actualItemSqid }),
     onSuccess: () => {
       toast.success("Result approved successfully!");
       setIsDoctorReviewModalOpen(false);
@@ -176,7 +182,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   });
 
   const rejectDoctorMutation = useMutation({
-    mutationFn: () => rejectLabTestResult({ item_sqid: actualItemSqid, rejection_reason: doctorReviewReason.trim() }),
+    mutationFn: () => rejectLabTestResultByDoctor({ item_sqid: actualItemSqid, rejection_reason: doctorReviewReason.trim() }),
     onSuccess: () => {
       toast.success("Result rejected successfully!");
       setIsDoctorReviewModalOpen(false);
@@ -594,10 +600,10 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
       const items = order.items_info || order.items;
       if (Array.isArray(items) && items.length > 0) {
         await Promise.all(
-          items.map((i) => approveLabTestResult({ item_sqid: i.sqid || i.id }))
+          items.map((i) => approveLabTestResultByLabAdmin({ item_sqid: i.sqid || i.id }))
         );
       } else if (order.id || sqid) {
-        await approveLabTestResult({ item_sqid: order.id || sqid });
+        await approveLabTestResultByLabAdmin({ item_sqid: order.id || sqid });
       }
     },
     onSuccess: () => {
@@ -606,6 +612,9 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
       queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
       queryClient.invalidateQueries({ queryKey: ["lab-order"] });
       queryClient.invalidateQueries({ queryKey: ["lab-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-audit-logs"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor-lab-records"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
     },
     onError: (err) => {
       toast.error(extractApiErrorMessage(err, "Failed to approve test result"));
@@ -618,14 +627,14 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
       if (Array.isArray(items) && items.length > 0) {
         await Promise.all(
           items.map((i) =>
-            rejectLabTestResult({
+            rejectLabTestResultByLabAdmin({
               item_sqid: i.sqid || i.id,
               rejection_reason: reason.trim(),
             })
           )
         );
       } else if (order.id || sqid) {
-        await rejectLabTestResult({
+        await rejectLabTestResultByLabAdmin({
           item_sqid: order.id || sqid,
           rejection_reason: reason.trim(),
         });
@@ -638,6 +647,9 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
       queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
       queryClient.invalidateQueries({ queryKey: ["lab-order"] });
       queryClient.invalidateQueries({ queryKey: ["lab-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-audit-logs"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor-lab-records"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
       if (onBackProp) onBackProp();
       else navigate(-1);
     },
@@ -738,9 +750,14 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
             queryClient={queryClient} 
           />
         ))}
-        {(!order.items || order.items.length === 0) && (
+        {orderLoading ? (
+          <div className="flex items-center gap-2 py-6 text-sm text-gray-500">
+            <div className="w-4 h-4 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin" />
+            <span>Loading test items...</span>
+          </div>
+        ) : (!order.items || order.items.length === 0) ? (
           <p className="text-sm text-gray-500 py-4">No test items found for this order.</p>
-        )}
+        ) : null}
       </div>
 
       {/* Accept Confirmation Modal */}
