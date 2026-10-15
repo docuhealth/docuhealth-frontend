@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import React, { useEffect, useState, createContext } from "react";
 import axiosInstanceHos from "../../../lib/axios/hospital";
 import { getHospitalToken } from "../../../services/authService";

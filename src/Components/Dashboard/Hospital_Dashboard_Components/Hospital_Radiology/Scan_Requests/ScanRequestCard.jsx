@@ -1,5 +1,6 @@
 import { ScanLine, Building2, CalendarClock } from "lucide-react";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
+import Skeleton from "../../../../ui/Skeleton";
 
 // Structure, sizing (text-[12px] throughout) and spacing rhythm mirror the
 // "admitted patient" card on the doctor's Patient Mgt dashboard
@@ -55,5 +56,24 @@ const ScanRequestCard = ({ order, badge, onViewDetails }) => {
     </div>
   );
 };
+
+// Same box model as the card so the grid doesn't shift when results land.
+export const ScanRequestCardSkeleton = () => (
+  <div className="border p-3 rounded-xl">
+    <div className="flex justify-between items-center">
+      <Skeleton className="h-4 w-32" />
+      <Skeleton className="h-4 w-14 rounded-full" />
+    </div>
+    <div className="border-b py-2">
+      <Skeleton className="h-3 w-24" />
+    </div>
+    <div className="flex flex-col gap-2 pt-3 pb-3 border-b">
+      <Skeleton className="h-3 w-40" />
+      <Skeleton className="h-3 w-36" />
+      <Skeleton className="h-3 w-44" />
+    </div>
+    <Skeleton className="mt-3 h-10 w-full rounded-full" />
+  </div>
+);
 
 export default ScanRequestCard;

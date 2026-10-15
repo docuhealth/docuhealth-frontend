@@ -1,12 +1,13 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import DashboardLayout from "../../../Components/ui/DashboardLayout";
+import ComingSoonModal from "../../../Components/ui/ComingSoonModal";
 import { PharmacistAppContext } from "../../../context/HospitalContext/Pharmacist/PharmacistAppContext";
 
 const Hospital_Pharmacist_Layout = () => {
   const { profile, hospitalLogo, hospitalName } = useContext(PharmacistAppContext);
   const navigate = useNavigate();
+  const [comingSoonFeature, setComingSoonFeature] = useState(null);
 
   const handleLogout = () => {
     sessionStorage.clear();
@@ -72,9 +73,9 @@ const Hospital_Pharmacist_Layout = () => {
       ),
     },
     {
-      name: "Messages",
+      name: "My Messages",
       path: "/hospital-pharmacist-messages-dashboard",
-      onClick: () => toast.success("feature coming soon !"),
+      onClick: () => setComingSoonFeature("Messaging"),
       icon: (isActive) => (
         <svg
           width="20"
@@ -145,6 +146,11 @@ const Hospital_Pharmacist_Layout = () => {
       handleLogout={handleLogout}
     >
       <Outlet />
+      <ComingSoonModal
+        isOpen={comingSoonFeature !== null}
+        onClose={() => setComingSoonFeature(null)}
+        feature={comingSoonFeature}
+      />
     </DashboardLayout>
   );
 };

@@ -5,7 +5,7 @@ import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import Hospital_Lab_Test_Detail_Dashboard from "../../../../../Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Test_Detail_Dashboard";
 import useDebounce from "../../../../../hooks/useDebounce";
 import ScanLabResultsShell from "./ScanLabResultsShell";
-import ScanLabResultCard from "./ScanLabResultCard";
+import ScanLabResultCard, { ScanLabResultGridSkeleton } from "./ScanLabResultCard";
 
 const PAGE_SIZE = 9;
 
@@ -76,7 +76,7 @@ const Hospital_Doctors_Lab_Results_Tab = ({ activeTab, onTabChange }) => {
       setCurrentPage={setCurrentPage}
     >
       {labLoading ? (
-        <div className="flex justify-center items-center h-40 text-sm">Loading...</div>
+        <ScanLabResultGridSkeleton label="Loading lab results" />
       ) : patientLabRecords.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-gray-400">
           <FlaskConical size={36} className="opacity-25 mb-2" />
@@ -87,7 +87,7 @@ const Hospital_Doctors_Lab_Results_Tab = ({ activeTab, onTabChange }) => {
         <div className="text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {patientLabRecords.map((record) => {
             const info = record.patient_info;
-            const submittedBy = record.result_info?.submitted_by;
+            const submittedBy = record.result_info?.submitted_by_info;
             const approvalStatus = record.result_info?.status;
             return (
               <ScanLabResultCard

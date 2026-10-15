@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import DashboardLayout from "../../../Components/ui/DashboardLayout";
+import ComingSoonModal from "../../../Components/ui/ComingSoonModal";
 import { LabAppContext } from "../../../context/HospitalContext/Lab/LabAppContext";
 
 const LAB_ADMIN_ROUTES = [
@@ -22,6 +22,7 @@ const APPOINTMENT_ROUTES = [
 const Hospital_Lab_Layout = () => {
   const { profile, isLabAdmin, hospitalLogo, hospitalName } = useContext(LabAppContext);
   const navigate = useNavigate();
+  const [comingSoonFeature, setComingSoonFeature] = useState(null);
 
   const handleLogout = () => {
     sessionStorage.clear();
@@ -113,9 +114,9 @@ const Hospital_Lab_Layout = () => {
       ),
     },
     {
-      name: "Messages",
+      name: "My Messages",
       path: "/hospital-lab-messages-dashboard",
-      onClick: () => toast.success("Coming Soon !"),
+      onClick: () => setComingSoonFeature("Messaging"),
       icon: (isActive) => (
         <svg
           width="20"
@@ -186,6 +187,11 @@ const Hospital_Lab_Layout = () => {
       handleLogout={handleLogout}
     >
       <Outlet />
+      <ComingSoonModal
+        isOpen={comingSoonFeature !== null}
+        onClose={() => setComingSoonFeature(null)}
+        feature={comingSoonFeature}
+      />
     </DashboardLayout>
   );
 };

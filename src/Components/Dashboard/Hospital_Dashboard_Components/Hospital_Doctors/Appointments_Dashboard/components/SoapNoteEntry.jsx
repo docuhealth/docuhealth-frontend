@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { ArrowLeft, X, Plus, UploadCloud, FileText, AlertTriangle } from "lucide-react";
 import { truncateWords } from "../../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import toast from "react-hot-toast";
@@ -7,11 +7,13 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Modal from "../../../../../ui/Modal";
 import Button from "../../../../../ui/Button";
+import HospitalLoader from "../../../../../ui/HospitalLoader";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import Input from "../../../../../ui/Input";
 import Select from "../../../../../ui/Select";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { ACTIVE_CHECK_INS_KEY } from "../../../../../../queries/Hospital/doctor/checkIns";
 
 
 const NoteSection = ({
@@ -25,12 +27,46 @@ const NoteSection = ({
   handleRemoveItem,
   activeInput,
   setActiveInput,
-}) => (
-  <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3 bg-gray-50/30">
-    <p className="font-medium text-docuhealth-dark mb-2">{title}</p>
+}) => {
+  const items = soapNoteData[field];
+  const listRef = useRef(null);
+  const prevCount = useRef(items.length);
+  const [moreBelow, setMoreBelow] = useState(false);
 
-    <div className="space-y-2 max-h-[200px] overflow-y-auto mb-2">
-      {soapNoteData[field].map((item, idx) => (
+  const updateMoreBelow = () => {
+    const el = listRef.current;
+    if (!el) return;
+    setMoreBelow(el.scrollHeight - el.scrollTop - el.clientHeight > 4);
+  };
+
+  // Bring a newly added item into view so the doctor sees it landed
+  useEffect(() => {
+    const el = listRef.current;
+    if (el && items.length > prevCount.current) {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    }
+    prevCount.current = items.length;
+    updateMoreBelow();
+  }, [items.length]);
+
+  return (
+  <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3 bg-gray-50/30">
+    <p className="font-medium text-docuhealth-dark mb-2">
+      {title}
+      {items.length > 0 && (
+        <span className="ml-2 text-[11px] font-normal text-gray-500">
+          ({items.length} {items.length === 1 ? "item" : "items"})
+        </span>
+      )}
+    </p>
+
+    <div className="relative mb-2">
+    <div
+      ref={listRef}
+      onScroll={updateMoreBelow}
+      className="space-y-2 max-h-[200px] overflow-y-auto scrollbar-visible pr-1"
+    >
+      {items.map((item, idx) => (
         <div
           key={idx}
           className="bg-white border border-gray-200 rounded p-2 text-[12px] flex justify-between items-center"
@@ -45,6 +81,16 @@ const NoteSection = ({
           </button>
         </div>
       ))}
+    </div>
+    {moreBelow && (
+      <button
+        type="button"
+        onClick={() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" })}
+        className="absolute inset-x-0 bottom-0 flex items-end justify-center h-10 pb-1 bg-linear-to-t from-white via-white/90 to-transparent text-[11px] font-medium text-docuhealth-primary"
+      >
+        Scroll for more ↓
+      </button>
+    )}
     </div>
 
     {activeInput === field ? (
@@ -82,7 +128,8 @@ const NoteSection = ({
       </button>
     )}
   </div>
-);
+  );
+};
 
 const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBack, onSubmitted }) => {
   const { profile, hospitals } = useContext(DoctorAppContext);
@@ -240,8 +287,10 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
 
   const { mutate, isPending } = useMutation({
     mutationFn: (formData) =>
-      axiosInstanceHos.post("api/medical-records/soap-note", formData),
+      axiosInstanceHos.post("api/records/soap-note", formData),
     onSuccess: () => {
+      // The confirm modal stays open while uploading so its loader shows; close it here.
+      setConfirmationModal(false);
       toast.success("SOAP Note created successfully !");
 
       const hin = patientHin
@@ -256,12 +305,13 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       queryClient.invalidateQueries({
         queryKey: ["doctor-appointments"],
       });
-      // A note from the outpatient flow can move the check-in
-      // doctor_idle -> doctor_active, which changes its row in the
-      // Patient Mgt "OutPatients" list.
+      // Saving the note ends the consultation (doctor_active -> doctor_idle),
+      // which changes its row in the Patient Mgt "OutPatients" list and
+      // closes ordering against the check-in until the patient is re-claimed.
       queryClient.invalidateQueries({
         queryKey: ["hospital-patients-doctor"],
       });
+      queryClient.invalidateQueries({ queryKey: ACTIVE_CHECK_INS_KEY });
 
       setStep(1);
       // `onSubmitted` lets the parent decide where to land (e.g. reopen the
@@ -306,6 +356,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       });
     },
     onError: (error) => {
+      setConfirmationModal(false);
       console.error("Upload error:", error);
       // The API rejects with DRF field-keyed errors, not `{ message }` —
       // e.g. `{ check_in: ["Check-in must be in doctor_active status to
@@ -316,11 +367,12 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
   });
 
   const handleSubmit = async () => {
-    // Only care_instructions is required by POST /api/medical-records/soap-note
+    // Only care_instructions is required by POST /api/records/soap-note
     // (alongside patient / chief_complaint / primary_diagnosis, already gated in
     // the step flow). treatment_plan and the follow-up appointment are optional.
     if (soapNoteData.care_instructions.length === 0) {
       toast.error("Care Instructions is required");
+      setConfirmationModal(false);
       return;
     }
 
@@ -1038,6 +1090,7 @@ useEffect(() => {
         // handleSubmit();
         confirmationModal && (
           <Modal isOpen={true} onClose={() => setConfirmationModal(false)} title="">
+            {isPending && <HospitalLoader variant="overlay" label="Uploading SOAP note..." />}
             <button
               type="button"
               aria-label="Close"
@@ -1072,10 +1125,8 @@ useEffect(() => {
 
             <Button
               fullWidth
-              onClick={() => {
-                setConfirmationModal(false);
-                handleSubmit();
-              }}
+              onClick={handleSubmit}
+              disabled={isPending}
             >
               Upload SOAP Note
             </Button>

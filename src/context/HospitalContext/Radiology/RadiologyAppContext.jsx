@@ -1,7 +1,8 @@
-import React, { createContext } from "react";
+import React, { createContext, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchRadiologyProfile } from "../../../queries/Hospital/radiology/profile";
 import { getHospitalToken } from "../../../services/authService";
+import { rememberHospitalLogo } from "../../../utils/hospitalBranding";
 
 export const RadiologyAppContext = createContext();
 
@@ -19,6 +20,10 @@ const RadiologyProfileProvider = ({ children }) => {
   const backgroundImage = data?.hospital_theme?.bg_image;
   const hospitalName = data?.hospital_info?.name;
   const hospitalLogo = data?.hospital_theme?.profile_image;
+
+  useEffect(() => {
+    rememberHospitalLogo(hospitalLogo);
+  }, [hospitalLogo]);
 
   return (
     <RadiologyAppContext.Provider

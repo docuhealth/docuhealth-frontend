@@ -2,7 +2,7 @@ import React from "react";
 import formatRecordDate from "./Components/formatRecordDate";
 import { formatFullDateTime, getAge } from "./Components/formatRecordDate";
 import { Image, FileText, Eye, ArrowDownToLine } from "lucide-react";
-import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../utils/soapNoteHelpers";
+import { renderListOrString, renderLabTests, renderDrugRecords, renderScans } from "../../../../utils/soapNoteHelpers";
 import { MedicalRecord } from "../../../../types/patients/home";
 
 interface MedicalRecordsDetailProps {
@@ -411,6 +411,11 @@ const MedicalRecordsDetail = ({
         {/* Lab Tests */}
         <div className="mb-5">
           {renderLabTests(selectedMedicalRecord?.lab_tests_info || selectedMedicalRecord?.lab_tests)}
+        </div>
+
+        {/* Scans */}
+        <div className="mb-5">
+          {renderScans(selectedMedicalRecord?.scans_info)}
         </div>
 
         {/* Care Instructions */}

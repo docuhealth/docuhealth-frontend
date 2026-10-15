@@ -8,6 +8,7 @@ import PatientVitalsDetails from '../../../Components/Dashboard/Hospital_Dashboa
 import UpdateVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/components/UpdateVitals'
 import PatientsAssignedToMyWard from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/PatientsAssignedToMyWard'
 import ProcessVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/components/ProcessVitals'
+import IncomingBedRequests from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/IncomingBedRequests'
 
 const Hospital_Nurses_Home_Dashboard = () => {
 
@@ -174,6 +175,15 @@ const Hospital_Nurses_Home_Dashboard = () => {
                         Ward</p>
                     </div>
                   </div>
+                </div>
+              </div>
+              <div className="bg-white mt-5 rounded-lg">
+                <div className="border rounded-lg p-4 lg:p-6">
+                  <div className='border-b pb-2 mb-2'>
+                    <h2 className="font-medium">Incoming bed requests</h2>
+                    <p className='text-xs text-gray-500'>Doctors have asked for a bed in your ward. Reception confirms or refuses each one.</p>
+                  </div>
+                  <IncomingBedRequests />
                 </div>
               </div>
               <div className="bg-white my-5 rounded-lg ">

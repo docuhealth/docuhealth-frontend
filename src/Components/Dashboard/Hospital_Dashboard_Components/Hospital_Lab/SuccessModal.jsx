@@ -14,7 +14,7 @@ const SuccessModal = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        <p className="text-base font-semibold text-gray-800 mb-6 leading-snug">
+        <p className="text-base font-normal text-gray-800 mb-6 leading-snug">
           You have successfully uploaded a<br />
           completed test result!
         </p>

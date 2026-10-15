@@ -28,6 +28,16 @@ export const fetchLabTests = async ({ queryKey }) => {
   return res.data;
 };
 
+// Cross-category lookup: `search` matches test name, category, parameter name,
+// LOINC code and specimen name, and each hit carries its `category` object.
+export const searchLabTests = async ({ queryKey }) => {
+  const [_key, search] = queryKey;
+  const res = await axiosInstanceHos.get(
+    `api/lab/lab-tests?size=10&search=${encodeURIComponent(search)}`
+  );
+  return res.data;
+};
+
 export const fetchLabOrderDetail = async (sqid) => {
   const res = await axiosInstanceHos.get(`api/lab/test-orders/${sqid}`);
   return res.data;

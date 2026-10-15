@@ -19,10 +19,12 @@ import toast from "react-hot-toast";
 import AddHandoverNoteForm from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddHandoverNoteForm";
 import Modal from "../../../Components/ui/Modal";
 import axiosInstanceHos from "../../../lib/axios/hospital";
+import { fetchPatientAdmissionNotes } from "../../../queries/Hospital/nurse/patientHistory";
 import { ChevronDown, Check } from "lucide-react";
 
 const Hospital_Nurses_Patients_Dashboard = () => {
   const { tab, admittedPatients } = useContext(NursesAdmittedPatientMGTContext);
+  const isDischargedTab = tab === "inpatient_discharge" || tab === "outpatient_discharge";
   const [updateVitals, setUpdateVitals] = useState(false);
   const [caseNoteHistory, setCaseNoteHistory] = useState(false);
   const [vitalSignsHistory, setVitalSignsHistory] = useState(false);
@@ -54,10 +56,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
 
   const { data: admissionNotesData } = useQuery({
     queryKey: ["patient-admission-notes", patientHin],
-    queryFn: async () => {
-      const res = await axiosInstanceHos.get(`api/records/patients/${patientHin}/admission-notes`);
-      return res.data?.results || res.data || [];
-    },
+    queryFn: () => fetchPatientAdmissionNotes(patientHin),
     enabled: !!patientHin,
     staleTime: 5 * 60 * 1000,
   });
@@ -66,10 +65,14 @@ const Hospital_Nurses_Patients_Dashboard = () => {
     (p) => (p?.sqid && p?.sqid === selected?.sqid) || (p?.patient_info?.hin || p?.patient?.hin) === patientHin
   );
 
+  // Notes are one per admission; a note from an earlier (discharged) admission must not block the current one
+  const currentAdmissionSqid = matchingInpatient?.sqid || selected?.sqid;
   const hasAdmissionNote = Boolean(
     (selected?.admission_note_info && typeof selected.admission_note_info === "object" && Object.keys(selected.admission_note_info).length > 0) ||
     (matchingInpatient?.admission_note_info && typeof matchingInpatient.admission_note_info === "object" && Object.keys(matchingInpatient.admission_note_info).length > 0) ||
-    (Array.isArray(admissionNotesData) && admissionNotesData.length > 0)
+    (Array.isArray(admissionNotesData) &&
+      !!currentAdmissionSqid &&
+      admissionNotesData.some((note) => note?.admission_info?.sqid === currentAdmissionSqid))
   );
 
   useEffect(() => {
@@ -78,8 +81,8 @@ const Hospital_Nurses_Patients_Dashboard = () => {
       const initialPatient = navState.selectedPatient;
       const hin = navState.patientHin || initialPatient?.patient_info?.hin || initialPatient?.patient?.hin;
 
-      // If it already has full admission properties (ward_info, admission_date, staff_info)
-      if (initialPatient && initialPatient.ward_info && initialPatient.admission_date && initialPatient.staff_info) {
+      // If it already has full admission properties (ward_info, requested_by_info)
+      if (initialPatient && initialPatient.ward_info && initialPatient.requested_by_info) {
         setSelected(initialPatient);
         setAdvanceCheckUp(true);
         window.history.replaceState({}, document.title);
@@ -185,13 +188,15 @@ const Hospital_Nurses_Patients_Dashboard = () => {
     <>
       {advanceCheckUp ? (
         <>
-          <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start gap-3 lg:gap-0 lg:items-center">
+          {!(isDischargedTab && !sharedSoapNoteDetail) && <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start gap-3 lg:gap-0 lg:items-center">
             <DynamicDate />
             <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
               {updateVitals ? (
                 <></>
               ) : (caseNoteHistory || vitalSignsHistory) && !caseNoteDetail ? (
                 <>
+                  {/* Case notes need an active admission. */}
+                  {selected?.ward_info && selected?.status === "active" && (
                   <button
                     className="py-2.5 px-10 w-full lg:w-60 rounded-full bg-docuhealth-primary text-white cursor-pointer"
                     onClick={() => {
@@ -204,6 +209,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                   >
                     Add New Case Note
                   </button>
+                  )}
                 </>
               ) : (tab === "inpatient_discharge" || tab === "outpatient_discharge") ? null : (
                 <>
@@ -288,7 +294,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                     )}
                   </div>
                   
-                  {!showAdmissionNote && (
+                  {!showAdmissionNote && !loadingSelectedPatient && (
                     hasAdmissionNote ? (
                       <div className="py-2.5 px-5 w-full lg:w-auto rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-700 flex items-center justify-center gap-2 text-xs font-semibold shadow-xs select-none">
                         <Check className="w-3.5 h-4 text-emerald-600 stroke-[2.5]" />
@@ -316,7 +322,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                 </>
               )}
             </div>
-          </div>
+          </div>}
           {updateVitals ? (
             <UpdateVitals
               selectedPatient={selected}
@@ -394,7 +400,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
               }}
             />
           ) : (
-            <div className="bg-white my-5 border rounded-lg p-5 text-sm">
+            <div className={isDischargedTab ? "my-5 text-sm" : "bg-white my-5 border rounded-lg p-5 text-sm"}>
               <AdvanceCheckUp
                 selected={selected}
                 setAdvanceCheckUp={setAdvanceCheckUp}

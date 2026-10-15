@@ -12,7 +12,7 @@ const AppointmentSuccessModal = ({ onClose }) => {
           </div>
         </div>
 
-        <p className="text-base font-medium text-gray-800 mb-6 leading-snug">
+        <p className="text-base font-normal text-gray-800 mb-6 leading-snug">
           You have successfully booked a
           <br />
           consultation for a patient

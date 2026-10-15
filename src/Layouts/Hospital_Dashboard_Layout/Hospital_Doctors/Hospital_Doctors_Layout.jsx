@@ -1,12 +1,14 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import DashboardLayout from "../../../Components/ui/DashboardLayout";
+import ComingSoonModal from "../../../Components/ui/ComingSoonModal";
+import HospitalLoader from "../../../Components/ui/HospitalLoader";
 import { DoctorAppContext } from "../../../context/HospitalContext/Doctors/DoctorAppContext";
 
 const Hospital_Doctors_Layout = () => {
-  const { profile, hospitalLogo, hospitalName } = useContext(DoctorAppContext);
+  const { profile, hospitalLogo, hospitalName, isLoading } = useContext(DoctorAppContext);
   const navigate = useNavigate();
+  const [comingSoonFeature, setComingSoonFeature] = useState(null);
 
   const handleLogout = () => {
     sessionStorage.clear();
@@ -128,9 +130,9 @@ const Hospital_Doctors_Layout = () => {
       ),
     },
     {
-      name: "Messages",
+      name: "My Messages",
       path: "/hospital-doctors-messages-dashboard",
-      onClick: () => toast.success("feature coming soon !"),
+      onClick: () => setComingSoonFeature("Messaging"),
       icon: (isActive) => (
         <svg
           width="20"
@@ -190,6 +192,10 @@ const Hospital_Doctors_Layout = () => {
     },
   ];
 
+  if (isLoading) {
+    return <HospitalLoader variant="fullscreen" logo={hospitalLogo} label="Setting up your workspace..." />;
+  }
+
   return (
     <DashboardLayout
       profile={profile}
@@ -201,6 +207,11 @@ const Hospital_Doctors_Layout = () => {
       handleLogout={handleLogout}
     >
       <Outlet />
+      <ComingSoonModal
+        isOpen={comingSoonFeature !== null}
+        onClose={() => setComingSoonFeature(null)}
+        feature={comingSoonFeature}
+      />
     </DashboardLayout>
   );
 };

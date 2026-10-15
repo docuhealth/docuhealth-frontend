@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { isAppointmentClosed, useCloseAppointment } from "../../../../queries/Hospital/appointments";
 import { UserIcon, FlaskConical, FileText } from "lucide-react";
 
 const getPatientName = (appt) =>
@@ -13,6 +14,7 @@ const getNote = (appt) => appt.note || appt.doctor_note || appt.description || "
 
 const LabAppointmentRow = ({ appt, onOpen, onSeeDetails, onCreateOrder, hideCreateOrder }) => {
   const [open, setOpen] = useState(false);
+  const closeMutation = useCloseAppointment("lab-appointments");
 
   return (
     <div className="mb-4 p-4 border rounded-md flex flex-wrap items-center gap-4 lg:gap-8">
@@ -74,9 +76,16 @@ const LabAppointmentRow = ({ appt, onOpen, onSeeDetails, onCreateOrder, hideCrea
                 Create a test order
               </p>
             )}
-            <p className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer">
-              Mark as done
-            </p>
+            {isAppointmentClosed(appt) ? (
+              <p className="text-[12px] text-gray-400 p-2">Marked as done</p>
+            ) : (
+              <p
+                className={`text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm ${closeMutation.isPending ? "opacity-50 pointer-events-none" : "cursor-pointer"}`}
+                onClick={() => { setOpen(false); closeMutation.mutate(appt.sqid); }}
+              >
+                Mark as done
+              </p>
+            )}
           </div>
         )}
       </div>

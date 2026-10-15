@@ -4,8 +4,10 @@ import toast from "react-hot-toast";
 import { Loader2, Calendar, Clock, User } from "lucide-react";
 import CarePlanDetail from "./CarePlanDetail";
 import AddCarePlanForm from "./AddCarePlanForm";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
 
-const CarePlanHistory = ({ patient, patientFullInfo }) => {
+// activeAdmissionSqid: care plans can only be written against an active admission, so adding is hidden without one.
+const CarePlanHistory = ({ patient, patientFullInfo, activeAdmissionSqid }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [view, setView] = useState("list"); // 'list', 'detail', 'add'
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -37,12 +39,13 @@ const CarePlanHistory = ({ patient, patientFullInfo }) => {
   }, [patientHin]);
 
   const handleUpload = async (formData) => {
-    if (!patientHin) return;
+    if (!patientHin || !activeAdmissionSqid) return;
     setIsSubmitting(true);
     try {
       const payload = {
         ...formData,
-        patient: patientHin
+        patient: patientHin,
+        admission: activeAdmissionSqid,
       };
       await axiosInstanceHos.post(`api/nurses/care-plans`, payload);
       toast.success("Care plan added successfully");
@@ -50,7 +53,7 @@ const CarePlanHistory = ({ patient, patientFullInfo }) => {
       setView("list");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to add care plan");
+      toast.error(extractApiErrorMessage(err, "Failed to add care plan"));
     } finally {
       setIsSubmitting(false);
     }
@@ -106,7 +109,7 @@ const CarePlanHistory = ({ patient, patientFullInfo }) => {
     );
   }
 
-  if (view === "add") {
+  if (view === "add" && activeAdmissionSqid) {
     return (
       <AddCarePlanForm 
         onBack={() => setView("list")}
@@ -122,12 +125,14 @@ const CarePlanHistory = ({ patient, patientFullInfo }) => {
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8 gap-4 md:gap-0">
         <h2 className="text-xl font-semibold text-gray-800">Care plan history</h2>
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-          <button 
-            onClick={() => setView("add")}
-            className="w-full sm:w-auto text-docuhealth-primary border border-docuhealth-primary font-medium rounded-full px-5 py-2 text-sm hover:bg-blue-50 transition-colors"
-          >
-            Add new care plan
-          </button>
+          {activeAdmissionSqid && (
+            <button 
+              onClick={() => setView("add")}
+              className="w-full sm:w-auto text-docuhealth-primary border border-docuhealth-primary font-medium rounded-full px-5 py-2 text-sm hover:bg-blue-50 transition-colors"
+            >
+              Add new care plan
+            </button>
+          )}
           <button className="w-full sm:w-auto flex justify-center items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-black whitespace-nowrap">
             Filter 
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

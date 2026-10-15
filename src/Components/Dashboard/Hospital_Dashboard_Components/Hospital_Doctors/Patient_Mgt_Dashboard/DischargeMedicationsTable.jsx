@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Check, X, Pencil } from "lucide-react";
 import Input from "../../../../ui/Input";
+import Skeleton from "../../../../ui/Skeleton";
 
 // Renders the medications the patient is currently on (pulled from their
 // most recent drug record) so the discharging doctor can Stop, Continue, or
@@ -12,9 +13,25 @@ const statusStyles = {
   modified: "bg-amber-50 text-amber-600 border-amber-200",
 };
 
-const DischargeMedicationsTable = ({ medications, setMedications }) => {
+const DischargeMedicationsTable = ({ medications, setMedications, loading = false }) => {
   const [editingIndex, setEditingIndex] = useState(null);
   const [draft, setDraft] = useState(null);
+
+  if (loading) {
+    return (
+      <div role="status" aria-label="Loading current medications" className="flex flex-col">
+        {Array.from({ length: 3 }, (_, i) => (
+          <div key={i} className="grid grid-cols-5 gap-4 py-3 border-b last:border-0">
+            <Skeleton className="h-3.5 w-28" />
+            <Skeleton className="h-3 w-12" />
+            <Skeleton className="h-3 w-14" />
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-6 w-24 rounded-full" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   if (!medications || medications.length === 0) {
     return (

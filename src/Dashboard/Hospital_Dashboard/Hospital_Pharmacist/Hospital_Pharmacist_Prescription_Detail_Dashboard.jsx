@@ -75,12 +75,12 @@ const Hospital_Pharmacist_Prescription_Detail_Dashboard = ({ sqid, onBack, isSet
   }
 
   const patientName = `${order.patient_info?.firstname || ""} ${order.patient_info?.lastname || ""}`.trim();
-  const requestedBy = order.ordered_by ? `Dr. ${order.ordered_by.firstname || ""} ${order.ordered_by.lastname || ""}`.trim() : "—";
+  const requestedBy = order.ordered_by_info ? `Dr. ${order.ordered_by_info.firstname || ""} ${order.ordered_by_info.lastname || ""}`.trim() : "—";
   const clinic = order.hospital_info?.name || "—";
   const email = order.hospital_info?.email || "—";
   
-  const allergiesList = order.drugs && order.drugs.length > 0 && order.drugs[0].drug_record?.allergies 
-    ? Array.isArray(order.drugs[0].drug_record.allergies) ? order.drugs[0].drug_record.allergies : [order.drugs[0].drug_record.allergies]
+  const allergiesList = order.drugs_info && order.drugs_info.length > 0 && order.drugs_info[0].drug_record?.allergies 
+    ? Array.isArray(order.drugs_info[0].drug_record.allergies) ? order.drugs_info[0].drug_record.allergies : [order.drugs_info[0].drug_record.allergies]
     : [];
 
   const handleUpdateStatus = (items, status) => {
@@ -105,7 +105,7 @@ const Hospital_Pharmacist_Prescription_Detail_Dashboard = ({ sqid, onBack, isSet
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
-      const pendingIds = order.drugs?.filter(d => d.status === "pending").map(d => d.sqid) || [];
+      const pendingIds = order.drugs_info?.filter(d => d.status === "pending").map(d => d.sqid) || [];
       setSelectedItems(pendingIds);
     } else {
       setSelectedItems([]);
@@ -120,7 +120,7 @@ const Hospital_Pharmacist_Prescription_Detail_Dashboard = ({ sqid, onBack, isSet
     }
   };
 
-  const pendingDrugs = order.drugs?.filter(d => d.status === "pending") || [];
+  const pendingDrugs = order.drugs_info?.filter(d => d.status === "pending") || [];
   const allSelected = pendingDrugs.length > 0 && selectedItems.length === pendingDrugs.length;
   const isUpdating = mutation.isPending;
 
@@ -218,7 +218,7 @@ const Hospital_Pharmacist_Prescription_Detail_Dashboard = ({ sqid, onBack, isSet
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {order.drugs?.map((item, idx) => {
+                  {order.drugs_info?.map((item, idx) => {
                     const drug = item.drug_record || {};
                     const isPending = item.status === "pending";
                     const statusClass = isPending ? "text-amber-500" : item.status === "unavailable" ? "text-red-500" : "text-green-500";
@@ -292,7 +292,7 @@ const Hospital_Pharmacist_Prescription_Detail_Dashboard = ({ sqid, onBack, isSet
 
             {/* Mobile View */}
             <div className="block sm:hidden space-y-4">
-              {order.drugs?.map((item, idx) => {
+              {order.drugs_info?.map((item, idx) => {
                 const drug = item.drug_record || {};
                 const isPending = item.status === "pending";
                 const statusClass = isPending ? "text-amber-500" : item.status === "unavailable" ? "text-red-500" : "text-green-500";

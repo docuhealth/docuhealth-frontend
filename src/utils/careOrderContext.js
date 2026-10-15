@@ -6,12 +6,11 @@
  *   - Appointment  → legacy shape: `.patient` (see AppointmentsList.jsx)
  *   - CheckIn      → `.patient_info`, no ward/bed/admission info (see
  *                    `api/doctors/check-ins`: `created_at`, `escalated_at`,
- *                    `claimed_by`, no `admission_date`)
- *   - Admission    → `.patient_info` + either `.ward_info` / `.bed_info`
- *                    (nurse-facing admission shapes) or `.admission_date`
- *                    (the doctor's inpatient list, `api/hospitals/patients
- *                    ?status=inpatient`, which carries no ward/bed info at
- *                    all)
+ *                    `claimed_by`, no ward/bed info)
+ *   - Admission    → `.patient_info` + `.ward_info` / `.bed_info` /
+ *                    `.requested_by_info` (nurse admissions and the doctor's
+ *                    `api/hospitals/patients?status=inpatient` list; the old
+ *                    `.admission_date` was renamed to `created_at`)
  *
  * Each context needs a different `order_source` and a different (or no)
  * `check_in` link on lab/pharmacy/admission requests. This inspects the
@@ -19,11 +18,8 @@
  * duplicate the sniffing logic (or, worse, assume `.patient` and silently
  * send nothing when it's actually a check-in/admission object).
  *
- * Previously this only recognized Admission via `.ward_info`/`.bed_info`,
- * which the doctor's real inpatient list never sends — every inpatient
- * order fell through to the CheckIn branch and sent the *admission's*
- * sqid as `check_in`, 400ing with "Object with sqid=... does not exist."
- * since that sqid isn't a CheckIn record.
+ * If an admission is ever misread as a CheckIn, the *admission's* sqid goes
+ * out as `check_in` and 400s with "Object with sqid=... does not exist.".
  */
 export const resolveOrderContext = (
   details,
@@ -46,7 +42,7 @@ export const resolveOrderContext = (
   }
 
   // Admission (ward) context.
-  if (details.ward_info || details.bed_info || details.admission_date) {
+  if (details.ward_info || details.bed_info || details.requested_by_info) {
     return {
       hin,
       orderSource: "staff_admission_order",

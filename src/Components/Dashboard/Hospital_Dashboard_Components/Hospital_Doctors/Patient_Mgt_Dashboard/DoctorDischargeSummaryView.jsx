@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchInpatientDischargeSummary } from "../../../../../queries/Hospital/doctor/discharge";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
+import Skeleton from "../../../../ui/Skeleton";
 
 // Read-only doctor + nurse in-patient discharge summary, off
 // GET /api/inpatients/discharged-patients (matched by admission sqid in the query
@@ -54,19 +55,49 @@ const Section = ({ title, right, children }) => (
   </div>
 );
 
+// Patient banner + the doctor / nurse sections, in the same frames as the loaded view.
+const DischargeSummarySkeleton = () => (
+  <div role="status" aria-label="Loading discharge summary" className="mb-4">
+    <div className="bg-gray-50 rounded-xl border border-gray-100 p-5 mb-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      {Array.from({ length: 4 }, (_, i) => (
+        <div key={i} className="flex flex-col gap-2">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-3 w-20" />
+        </div>
+      ))}
+    </div>
+    {Array.from({ length: 2 }, (_, i) => (
+      <div key={i} className="bg-gray-50 rounded-xl border border-gray-100 p-5 mb-6">
+        <Skeleton className="h-4 w-48 mb-5" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {Array.from({ length: 4 }, (_, j) => (
+            <div key={j} className="flex flex-col gap-2">
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-3.5 w-48" />
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 const staffLabel = (s) =>
   s ? `Dr. ${s.firstname ?? ""} ${s.lastname ?? ""}`.trim() : null;
 
-// Out-patient discharge summary, rendered straight from the list row's inline
-// `discharge_form` (GET /api/hospitals/patients?status=outpatient_discharge).
-// The out-patient form is a flat 5-field checkout note — there is no nurse
-// checklist or structured vitals block, unlike the in-patient discharge.
+// Check-ins can be closed by non-doctors, so only doctors get the "Dr." prefix.
+const closerLabel = (s) =>
+  s ? `${s.role === "doctor" ? "Dr. " : ""}${s.firstname ?? ""} ${s.lastname ?? ""}`.trim() : null;
+
+// Out-patient discharge summary, rendered from the closed check-in row
+// (GET /api/hospitals/patients?status=outpatient_discharge). The row has no
+// discharge form; `closed_by_info` is null when the end-of-day job closed the visit.
 const OutpatientDischargeSummary = ({ row, fallbackPatient }) => {
   const patient =
     row?.patient_info || fallbackPatient?.patient_info || fallbackPatient?.patient || {};
   const patientName =
     [patient.firstname, patient.lastname].filter(Boolean).join(" ") || "N/A";
-  const form = row?.discharge_form;
 
   return (
     <div className="mb-4">
@@ -86,43 +117,21 @@ const OutpatientDischargeSummary = ({ row, fallbackPatient }) => {
             </p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Discharged by</p>
+            <p className="text-xs text-gray-500 mb-1">Closed by</p>
             <p className="font-medium text-sm text-gray-800">
-              {staffLabel(form?.discharged_by || row?.discharged_by) || "—"}
+              {closerLabel(row?.closed_by_info) || "Closed automatically"}
             </p>
           </div>
         </div>
       </div>
 
-      <Section
-        title="Out-patient discharge"
-        right={
-          form?.created_at && (
-            <span className="text-xs text-gray-500 text-right">
-              {formatFullDateTime(form.created_at)}
-            </span>
-          )
-        }
-      >
-        {!form ? (
-          <p className="text-sm text-gray-500">
-            No discharge form was linked to this checkout.
-          </p>
-        ) : (
-          <div className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <Field label="Chief complaint" value={form.chief_complaint} />
-              <Field
-                label="Condition at checkout"
-                value={titleCase(form.condition_at_checkout)}
-              />
-              <Field label="Diagnosis" value={form.diagnosis} />
-              <Field label="Treatment plan" value={form.treatment_plan} />
-            </div>
-            <Field label="Follow-up instructions" value={form.follow_up_instructions} />
-          </div>
-        )}
-      </Section>
+      <p className="text-sm text-gray-500">
+
+        Out-patient visits are closed without a discharge form. The clinical notes from
+
+        this visit are in the patient&apos;s record.
+
+      </p>
     </div>
   );
 };
@@ -132,7 +141,8 @@ const DoctorDischargeSummaryView = ({ admissionSqid, dischargeRow, fallbackPatie
   // when we're handed that row we render from it directly — no lookup. The
   // paginated /api/inpatients/discharged-patients hunt stays as a fallback for
   // legacy rows opened without the inline forms.
-  const isOutpatientRow = !!dischargeRow && "discharge_form" in dischargeRow;
+  // Out-patient rows are closed check-ins: `sqid, patient_info, closed_by_info, closed_at`.
+  const isOutpatientRow = !!dischargeRow && "closed_at" in dischargeRow;
   const hasInlineInpatient =
     !!dischargeRow &&
     ("doctor_discharge_form" in dischargeRow ||
@@ -159,11 +169,7 @@ const DoctorDischargeSummaryView = ({ admissionSqid, dischargeRow, fallbackPatie
   const data = hasInlineInpatient ? dischargeRow : fetchedData;
 
   if (!hasInlineInpatient && isLoading) {
-    return (
-      <div className="flex justify-center items-center py-16 text-sm text-gray-500">
-        Loading discharge summary...
-      </div>
-    );
+    return <DischargeSummarySkeleton />;
   }
 
   if (!hasInlineInpatient && isError) {
@@ -230,7 +236,7 @@ const DoctorDischargeSummaryView = ({ admissionSqid, dischargeRow, fallbackPatie
           <div>
             <p className="text-xs text-gray-500 mb-1">Admitted</p>
             <p className="font-medium text-sm text-gray-800">
-              {formatFullDateTime(data.admission_date) || "—"}
+              {formatFullDateTime(data.created_at) || "—"}
             </p>
           </div>
           <div>
@@ -248,9 +254,9 @@ const DoctorDischargeSummaryView = ({ admissionSqid, dischargeRow, fallbackPatie
       <Section
         title="Doctor's discharge"
         right={
-          doc?.discharged_by && (
+          doc?.discharged_by_info && (
             <span className="text-xs text-gray-500 text-right">
-              {staffLabel(doc.discharged_by)}
+              {staffLabel(doc.discharged_by_info)}
               {doc.created_at ? ` · ${formatFullDateTime(doc.created_at)}` : ""}
             </span>
           )
@@ -303,9 +309,9 @@ const DoctorDischargeSummaryView = ({ admissionSqid, dischargeRow, fallbackPatie
       <Section
         title="Nurse's discharge"
         right={
-          nurse?.discharged_by && (
+          nurse?.discharged_by_info && (
             <span className="text-xs text-gray-500 text-right">
-              {`${nurse.discharged_by.firstname ?? ""} ${nurse.discharged_by.lastname ?? ""}`.trim()}
+              {`${nurse.discharged_by_info.firstname ?? ""} ${nurse.discharged_by_info.lastname ?? ""}`.trim()}
               {nurse.created_at ? ` · ${formatFullDateTime(nurse.created_at)}` : ""}
             </span>
           )
@@ -321,10 +327,10 @@ const DoctorDischargeSummaryView = ({ admissionSqid, dischargeRow, fallbackPatie
           </div>
         ) : (
           <div className="space-y-6">
-            {nurse.final_vital_signs && (
+            {nurse.final_vital_signs_info && (
               <VitalSignsCard
                 title="Final discharge vitals"
-                vitalSigns={nurse.final_vital_signs}
+                vitalSigns={nurse.final_vital_signs_info}
                 className="bg-white rounded-xl border border-gray-100 p-4"
               />
             )}

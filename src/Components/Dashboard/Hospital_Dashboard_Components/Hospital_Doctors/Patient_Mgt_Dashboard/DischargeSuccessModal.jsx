@@ -16,7 +16,12 @@ const DischargeSuccessModal = ({
   ),
 }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onDone} maxWidth="sm" className="!rounded-3xl !p-3 text-center">
+    <Modal
+      isOpen={isOpen}
+      onClose={onDone}
+      maxWidth="sm"
+      className="!rounded-3xl !p-3 text-center"
+    >
       <div className="flex justify-center mb-6 mt-4">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
           <div className="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center text-white">
@@ -24,7 +29,9 @@ const DischargeSuccessModal = ({
           </div>
         </div>
       </div>
-      <p className="text-docuhealth-dark font-medium mb-8 px-4 leading-relaxed">{message}</p>
+      <p className="text-docuhealth-dark font-normal mb-8 px-4 leading-relaxed">
+        {message}
+      </p>
       <button
         onClick={onDone}
         className="w-full py-3.5 bg-green-500 hover:bg-green-600 rounded-full text-white font-medium"

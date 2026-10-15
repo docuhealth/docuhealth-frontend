@@ -10,6 +10,7 @@ import ScanResultReport from "../../../Components/Dashboard/Hospital_Dashboard_C
 import { printElement, downloadElementAsPdf, slugify } from "../../../utils/exportElement";
 import { acceptScanOrderItem, rejectScanOrderItem, logImageCollection } from "../../../queries/Hospital/radiology/scan_requests";
 import { extractApiErrorMessage } from "../../../utils/apiError";
+import HospitalLoader from "../../../Components/ui/HospitalLoader";
 
 
 // Same layout format as the doctor's patient-record detail view (PatientInfo.jsx's "viewDetailMedicalRecord").
@@ -85,6 +86,8 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
     onSuccess: (updated) => {
       setStatus(updated.status);
       setImageCollectedAt(updated.image_collected_at);
+      // The modal stays open while accepting so its loader shows; close it on success.
+      setShowAcceptModal(false);
       invalidateScanRequests();
       toast.success("Scan request accepted and moved to In-progress");
       if (openEditAfterAccept) {
@@ -180,13 +183,11 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
   // and logging collection are two separate API calls either way; "now"
   // just chains straight into the edit modal once accept succeeds.
   const handleAcceptNow = () => {
-    setShowAcceptModal(false);
     setOpenEditAfterAccept(true);
     acceptMutation.mutate({ sqid: order.sqid });
   };
 
   const handleAcceptLater = () => {
-    setShowAcceptModal(false);
     acceptMutation.mutate({ sqid: order.sqid });
   };
 
@@ -373,6 +374,7 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
       {showAcceptModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 flex flex-col items-center gap-4 relative">
+            {acceptMutation.isPending && <HospitalLoader variant="overlay" label="Accepting scan request..." />}
             <button
               type="button"
               onClick={() => setShowAcceptModal(false)}
@@ -415,6 +417,7 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
       {showRejectModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 flex flex-col gap-5 relative">
+            {rejectMutation.isPending && <HospitalLoader variant="overlay" label="Rejecting scan request..." />}
             <button
               type="button"
               onClick={() => setShowRejectModal(false)}
@@ -454,6 +457,7 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
       {showEditModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 flex flex-col gap-5 relative text-sm">
+            {imageCollectionMutation.isPending && <HospitalLoader variant="overlay" label="Logging image collection..." />}
             <button
               type="button"
               onClick={() => setShowEditModal(false)}

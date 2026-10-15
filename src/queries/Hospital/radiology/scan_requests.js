@@ -1,6 +1,6 @@
 import axiosInstanceHos from "../../../lib/axios/hospital";
 
-// Wired to the reworked `api/radiology/*` API (2026-09-24): one paginated item list filtered by `status`, PATCH-only item actions, and results that a doctor approves unless the order was a walk-in.
+// Wired to the reworked `api/radiology/*` API (2026-09-24): one paginated item list filtered by `status`, PATCH-only item actions, and results that a doctor approves unless a radiologist ordered it (radiologist_appointment_order).
 
 export const RESULT_FILE_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf", "video/mp4"];
 
@@ -98,13 +98,44 @@ export const mapScanOrderItem = (item) => {
 };
 
 // Scan catalog search; the API allows 60 requests a minute, so callers debounce and only search from 2 characters.
-export const fetchRadiologyScans = async ({ queryKey }) => {
-  const [, query] = queryKey;
+// Never call it without a query: the full 7,451-row catalog stalled staging for ~18 min, and `page`/`size` are ignored (always max 20 rows).
+const searchRadiologyScans = async (query) => {
   const res = await axiosInstanceHos.get(`api/radiology/scans?query=${encodeURIComponent((query || "").trim())}`);
   return res.data || [];
 };
 
-// Which link an order needs depends on its source (check_in / admission / appointment); walk_in takes none.
+export const fetchRadiologyScans = async ({ queryKey }) => {
+  const [, query] = queryKey;
+  return searchRadiologyScans(query);
+};
+
+// Everyday exams, preloaded so the picker has options the moment it opens; names follow the catalog's RSNA style ("XR Chest", not "X-ray").
+export const COMMON_SCAN_QUERIES = [
+  "XR Chest",
+  "CT Head",
+  "US Abdomen",
+  "US Pelvis",
+  "CT Abdomen",
+  "CT Chest",
+  "MR Brain",
+  "XR Abdomen",
+  "XR Knee",
+  "MR Spine",
+];
+
+// The catalog is static, so every search is cached for the session; the common list shares these keys, so typing "CT Head" later is instant.
+export const radiologyScanSearchQuery = (query) => ({
+  queryKey: ["radiology-scans", query],
+  queryFn: fetchRadiologyScans,
+  staleTime: Infinity,
+  gcTime: Infinity,
+});
+
+// Staging answers these roughly one at a time, so warm them before the order modal opens.
+export const prefetchCommonRadiologyScans = (queryClient) =>
+  COMMON_SCAN_QUERIES.forEach((query) => queryClient.prefetchQuery(radiologyScanSearchQuery(query)));
+
+// Every source needs exactly one link: check_in, admission or appointment (see OrderScanModal for which role sends which).
 export const createScanOrder = async ({ patient, order_source, check_in, appointment, admission, items }) => {
   const payload = { patient, order_source, items };
   if (check_in) payload.check_in = check_in;
@@ -155,7 +186,7 @@ export const uploadScanResult = async ({
   (files || []).forEach((file) => formData.append("attachments", file));
 
   const res = await axiosInstanceHos.post("api/radiology/results", formData);
-  // "approved" means a walk-in order (item completed on the spot); "pending" waits for the ordering doctor.
+  // "approved" means a radiologist_appointment_order (item completed on the spot); "pending" waits for the ordering doctor.
   return { report: mapScanResult(res.data), attachments: mapAttachments(res.data), resultStatus: res.data.status };
 };
 

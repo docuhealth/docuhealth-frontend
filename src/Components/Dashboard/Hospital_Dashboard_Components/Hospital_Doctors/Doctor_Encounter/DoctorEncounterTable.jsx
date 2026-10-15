@@ -7,6 +7,7 @@ import { DoctorEncounterContext } from "../../../../../context/HospitalContext/D
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../../ui/Table";
 import EmptyState from "../../../../ui/EmptyState";
 import Spinner from "../../../../ui/Spinner";
+import Skeleton from "../../../../ui/Skeleton";
 import Modal from "../../../../ui/Modal";
 import Button from "../../../../ui/Button";
 import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
@@ -41,6 +42,86 @@ const getCallUpStatus = (status) => {
   if (status === "closed") return { text: "Closed", style: "bg-gray-100 text-gray-500" };
   return { text: "Awaiting", style: "bg-amber-50 text-amber-500" };
 };
+
+// Column header shared by the table and its skeleton so titles and widths stay in step.
+const EncounterHeader = ({ activeTab }) => (
+  <TableHeader className="!bg-transparent !border-none">
+    <tr>
+      <TableHead className="w-[20%] rounded-l-full border-y border-l border-gray-200 normal-case text-gray-700 pl-10">Patient</TableHead>
+      {activeTab === "Active" ? (
+        <>
+          <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Last Encounter Time</TableHead>
+          <TableHead className="w-[20%] border-y border-gray-200 normal-case text-gray-700">Last Doctor Encountered</TableHead>
+        </>
+      ) : (
+        <>
+          <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Wait Time</TableHead>
+          <TableHead className="w-[20%] border-y border-gray-200 normal-case text-gray-700">Nurse Encountered</TableHead>
+          <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Triage Priority</TableHead>
+        </>
+      )}
+      <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Encounter Status</TableHead>
+      <TableHead className="w-[15%] rounded-r-full border-y border-r border-gray-200 normal-case text-gray-700">Doctor's Action</TableHead>
+    </tr>
+  </TableHeader>
+);
+
+// Real header + placeholder rows on desktop, stat-tile cards on mobile; the Active tab
+// has one fewer middle column (no triage priority).
+const EncounterSkeleton = ({ activeTab }) => (
+  <div role="status" aria-label="Loading encounters">
+    <div className="hidden lg:block w-full">
+      <Table className="w-full [&_table]:border-separate [&_table]:border-spacing-0">
+        <EncounterHeader activeTab={activeTab} />
+        <TableBody>
+          {Array.from({ length: 5 }, (_, i) => (
+            <TableRow key={i}>
+              <TableCell className="border-b border-gray-200 pl-10">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="w-8 h-8 rounded-full" />
+                  <Skeleton className="h-3.5 w-28" />
+                </div>
+              </TableCell>
+              {Array.from({ length: activeTab === "Active" ? 2 : 3 }, (_, j) => (
+                <TableCell key={j} className="border-b border-gray-200">
+                  <Skeleton className="h-3.5 w-24" />
+                </TableCell>
+              ))}
+              <TableCell className="border-b border-gray-200">
+                <Skeleton className="h-6 w-20 rounded-md" />
+              </TableCell>
+              <TableCell className="border-b border-gray-200">
+                <Skeleton className="h-10 w-40 rounded-full" />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+    <div className="lg:hidden flex flex-col gap-4 mt-2">
+      {Array.from({ length: 3 }, (_, i) => (
+        <div key={i} className="border border-gray-200 rounded-xl p-5 flex flex-col gap-4">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-3">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div className="flex flex-col gap-1.5">
+                <Skeleton className="h-3.5 w-32" />
+                <Skeleton className="h-3 w-36" />
+              </div>
+            </div>
+            <Skeleton className="h-3 w-12" />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Skeleton className="h-14 rounded-lg" />
+            <Skeleton className="h-14 rounded-lg" />
+            <Skeleton className="h-11 rounded-lg col-span-2" />
+          </div>
+          <Skeleton className="h-10 w-full rounded-full" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const DoctorEncounterTable = () => {
   const { 
@@ -187,7 +268,7 @@ const DoctorEncounterTable = () => {
               </div>
             </div>
 
-            <p className="text-base font-semibold text-gray-800 mb-6 leading-snug">
+            <p className="text-base font-normal text-gray-800 mb-6 leading-snug">
               Patient is coming.<br />The patient has been called from the queue!
             </p>
 
@@ -204,11 +285,7 @@ const DoctorEncounterTable = () => {
   }
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <Spinner className="w-8 h-8 text-docuhealth-primary" />
-      </div>
-    );
+    return <EncounterSkeleton activeTab={activeTab} />;
   }
 
   if (!encounters || encounters.length === 0) {
@@ -227,25 +304,7 @@ const DoctorEncounterTable = () => {
       {/* Desktop View */}
       <div className="hidden lg:block w-full">
         <Table className="w-full [&_table]:border-separate [&_table]:border-spacing-0">
-          <TableHeader className="!bg-transparent !border-none">
-            <tr>
-              <TableHead className="w-[20%] rounded-l-full border-y border-l border-gray-200 normal-case text-gray-700 pl-10">Patient</TableHead>
-              {activeTab === "Active" ? (
-                <>
-                  <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Last Encounter Time</TableHead>
-                  <TableHead className="w-[20%] border-y border-gray-200 normal-case text-gray-700">Last Doctor Encountered</TableHead>
-                </>
-              ) : (
-                <>
-                  <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Wait Time</TableHead>
-                  <TableHead className="w-[20%] border-y border-gray-200 normal-case text-gray-700">Nurse Encountered</TableHead>
-                  <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Triage Priority</TableHead>
-                </>
-              )}
-              <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Encounter Status</TableHead>
-              <TableHead className="w-[15%] rounded-r-full border-y border-r border-gray-200 normal-case text-gray-700">Doctor's Action</TableHead>
-            </tr>
-          </TableHeader>
+          <EncounterHeader activeTab={activeTab} />
           <TableBody>
             {encounters.map((encounter) => {
               const patientName = encounter.patient_info

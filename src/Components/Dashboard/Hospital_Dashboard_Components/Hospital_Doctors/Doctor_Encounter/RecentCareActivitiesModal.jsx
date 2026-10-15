@@ -17,20 +17,22 @@ import SoapNoteDetailView from "../../../../ui/SoapNoteDetailView";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 import NursingAssessmentDetailView from "../../../../ui/NursingAssessmentDetailView";
 import AdmissionDetailView from "../../../../ui/AdmissionDetailView";
-import LabOrderDetailView from "../../../../ui/LabOrderDetailView";
+import { renderLabTests, renderScans } from "../../../../../utils/soapNoteHelpers";
 import {
   fetchRecentCareActivities,
   fetchMedicalRecordDetail,
 } from "../../../../../queries/Hospital/doctor/activities";
 
 // Record types with a real detail view wired up — everything else still
-// falls back to the "not available yet" toast.
+// falls back to the "not available yet" toast. Orders and requests
+// (LabTestOrder, AdmissionRequest, ...) are no longer in the feed.
 const VIEWABLE_RECORD_TYPES = new Set([
   "SoapNote",
   "VitalSigns",
   "NursingAssessment",
   "Admission",
-  "LabTestOrder",
+  "LabTestResult",
+  "ScanResult",
 ]);
 
 const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
@@ -94,14 +96,34 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
     </div>
   );
 
+  // "NurseInpatientDischargeForm" -> "Nurse inpatient discharge form"; acronyms like "IV" stay uppercase.
+  const humanizeType = (type) => {
+    if (!type) return "Record";
+    const words = String(type)
+      .replace(/[_-]+/g, " ")
+      .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+      .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+      .trim()
+      .split(/\s+/);
+    return words
+      .map((w, i) => {
+        if (w.length > 1 && w === w.toUpperCase()) return w;
+        const lower = w.toLowerCase();
+        return i === 0 ? lower.charAt(0).toUpperCase() + lower.slice(1) : lower;
+      })
+      .join(" ");
+  };
+
   const getRecordTitle = (type, action) => {
     switch (type) {
-      case "LabTestOrder":
-        return "Lab test ordered for this patient!";
       case "SoapNote":
         return "SOAP note recorded for this patient!";
-      case "CheckIn":
-        return "Patient checked in!";
+      case "LabTestResult":
+        return "Lab result recorded for this patient!";
+      case "ScanResult":
+        return "Scan result recorded for this patient!";
+      case "DrugRecord":
+        return "Medication recorded for this patient!";
       case "Admission":
         // Requesting an admission doesn't admit the patient — the
         // receptionist still has to confirm it before a bed is assigned.
@@ -117,18 +139,20 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
       case "NursingAssessment":
         return "Nursing Assessment recorded for this patient!";
       default:
-        return `${type} recorded for this patient!`;
+        return `${humanizeType(type)} recorded for this patient!`;
     }
   };
 
   const getRecordLinkText = (type, action) => {
     switch (type) {
-      case "LabTestOrder":
-        return "View Lab order";
       case "SoapNote":
         return "View SOAP note";
-      case "CheckIn":
-        return "View Check-in";
+      case "LabTestResult":
+        return "View Lab result";
+      case "ScanResult":
+        return "View Scan result";
+      case "DrugRecord":
+        return "View Medication";
       case "Admission":
         return action === "requested" ? "View Admission request" : "View Admission";
       case "Appointment":
@@ -140,7 +164,7 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
       case "NursingAssessment":
         return "View Nursing Assessment";
       default:
-        return `View ${type}`;
+        return `View ${humanizeType(type)}`;
     }
   };
 
@@ -151,12 +175,18 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
     let actionText = action || "created";
 
     // Customize text based on record type
-    if (recordType === "LabTestOrder") {
-      actionText = "made a lab order";
-    } else if (recordType === "SoapNote") {
+    if (recordType === "SoapNote") {
       actionText = "created a SOAP note";
-    } else if (recordType === "CheckIn") {
-      actionText = "checked in the patient";
+    } else if (recordType === "LabTestResult") {
+      actionText = "recorded a lab result";
+    } else if (recordType === "ScanResult") {
+      actionText = "recorded a scan result";
+    } else if (recordType === "CarePlan") {
+      actionText = "created a care plan";
+    } else if (recordType === "CaseNote") {
+      actionText = "wrote a case note";
+    } else if (recordType === "DrugRecord") {
+      actionText = action === "task_completed" ? "gave a medication" : "recorded a medication";
     } else if (recordType === "Admission") {
       // "requested" means the doctor asked for an admission; the patient
       // isn't actually admitted until the receptionist confirms it.
@@ -277,8 +307,26 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
                 />
               ) : viewingRecord.type === "Admission" ? (
                 <AdmissionDetailView admission={viewingRecordData} />
-              ) : viewingRecord.type === "LabTestOrder" ? (
-                <LabOrderDetailView labOrder={viewingRecordData} />
+              ) : viewingRecord.type === "LabTestResult" ? (
+                // The event returns the lab result itself (`item` is only the order item's sqid); like on SOAP notes, only an accepted result is shown.
+                renderLabTests([{
+                  sqid: viewingRecordData.item,
+                  test_info: { name: "Lab result" },
+                  status: viewingRecordData.status === "accepted" ? "completed"
+                    : viewingRecordData.status?.includes("rejected") ? "rejected" : "result_ready",
+                  result_info: viewingRecordData.status === "accepted" ? viewingRecordData : null,
+                }])
+              ) : viewingRecord.type === "ScanResult" ? (
+                // The event returns the scan result itself; like on SOAP notes, only an approved result is shown.
+                renderScans([{
+                  items_info: [{
+                    sqid: viewingRecordData.sqid,
+                    scan_info: { name: "Scan result" },
+                    status: viewingRecordData.status === "approved" ? "completed" : viewingRecordData.status,
+                    rejection_reason: viewingRecordData.rejection_reason,
+                    result_info: viewingRecordData.status === "approved" ? viewingRecordData : null,
+                  }],
+                }])
               ) : null}
             </div>
           ) : isLoading ? (

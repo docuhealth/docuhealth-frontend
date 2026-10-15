@@ -10,7 +10,7 @@ import Select from "../../../../ui/Select";
 
 const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) => {
   const queryClient = useQueryClient();
-  const { wards } = useContext(HosWardContext);
+  const { wards, wardsLoading } = useContext(HosWardContext);
 
   const [wardOptions, setWardOptions] = useState([]);
   const [availableBeds, setAvailableBeds] = useState([]);
@@ -67,11 +67,8 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
       toast.error("Pick a destination ward and bed.");
       return;
     }
-    mutate({
-      admission: admissionSqid,
-      new_ward: form.new_ward,
-      new_bed: form.new_bed,
-    });
+    // `new_ward` only filters the bed list; the API takes the ward from the bed.
+    mutate({ admission: admissionSqid, new_bed: form.new_bed });
   };
 
   return (
@@ -99,7 +96,8 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
         value={form.new_ward}
         onChange={(value) => handleChange("new_ward", value)}
         options={wardOptions.map((w) => ({ value: String(w.sqid), label: `${w.name} ward` }))}
-        placeholder="Assign to ward"
+        placeholder={wardsLoading ? "Loading wards..." : "Assign to ward"}
+        disabled={wardsLoading}
       />
 
       {form.new_ward && (

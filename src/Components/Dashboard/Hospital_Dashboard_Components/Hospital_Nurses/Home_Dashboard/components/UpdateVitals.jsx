@@ -59,7 +59,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
     selectedPatient?.hin;
 
   const isAdmission = Boolean(
-    selectedPatient?.admission_date ||
+    selectedPatient?.requested_by_info ||
     selectedPatient?.ward_info ||
     selectedPatient?.bed_info ||
     selectedPatient?.status === "inpatient" ||

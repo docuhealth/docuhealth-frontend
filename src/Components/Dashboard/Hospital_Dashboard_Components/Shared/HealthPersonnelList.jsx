@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { HosStaffsContext } from "../../../../context/HospitalContext/HosStaffsContext";
 import Pagination2 from "../../Patient_Dashboard_Components/Pagination/Pagination2";
 import SearchBar from "../../../SearchBar/SearchBar";
+import Skeleton from "../../../ui/Skeleton";
 
 const ROLE_TABS = [
   { label: "All",           value: "" },
@@ -127,6 +128,59 @@ const MobileCard = ({ staff, isAdmin }) => (
   </div>
 );
 
+// Column titles shared by the table and its skeleton.
+const PersonnelHeader = ({ colCount, isAdmin }) => (
+  <div className={`grid grid-cols-${colCount} text-left text-sm bg-gray-100 py-5 rounded-md`}>
+    <div className="col-span-2 pl-5">Name of Staff</div>
+    <p>Staff Id</p>
+    <p>Role</p>
+    <p>Phone no</p>
+    <p>Email Address</p>
+    <p>Sex</p>
+    {isAdmin && <p>Actions</p>}
+  </div>
+);
+
+const HealthPersonnelSkeleton = ({ colCount, isAdmin }) => (
+  <div role="status" aria-label="Loading health personnel">
+    <div className="hidden lg:flex lg:flex-col">
+      <PersonnelHeader colCount={colCount} isAdmin={isAdmin} />
+      {Array.from({ length: 7 }, (_, i) => (
+        <div key={i} className={`grid grid-cols-${colCount} items-center py-6 border-b border-b-gray-200`}>
+          <Skeleton className="col-span-2 ml-5 h-3 w-36" />
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-3 w-28" />
+          <Skeleton className="h-3 w-10" />
+          {colCount === 8 && <Skeleton className="h-3 w-16" />}
+        </div>
+      ))}
+    </div>
+    <div className="lg:hidden flex flex-col gap-4">
+      {Array.from({ length: 3 }, (_, i) => (
+        <div key={i} className="border border-gray-200 rounded-lg p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-11 w-11 rounded-full" />
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-3.5 w-32" />
+                <Skeleton className="h-3 w-24 rounded-full" />
+              </div>
+            </div>
+            <Skeleton className="h-5 w-12 rounded-lg" />
+          </div>
+          <div className="flex flex-col gap-3 bg-gray-50 rounded-lg p-3 mb-4">
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-3 w-44" />
+          </div>
+          <Skeleton className="h-9 w-full rounded-full" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 const HealthPersonnelList = ({ isAdmin = false }) => {
   const {
     staffs: healthPersonnelList,
@@ -142,12 +196,6 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
     setSelectedRole,
   } = useContext(HosStaffsContext);
 
-  if (loading) {
-    return <div className="flex justify-center items-center h-full text-sm py-12">Loading...</div>;
-  }
-
-
-
   const colCount = isAdmin ? 8 : 7;
 
   return (
@@ -158,7 +206,7 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
           onChange={setSearchQuery}
           placeholder="Search by name or email..."
         />
-        {isRefreshing && (
+        {isRefreshing && !loading && (
           <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5">
             <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin" />
             Searching...
@@ -181,7 +229,9 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
         </div>
       </div>
 
-      {healthPersonnelList.length === 0 && searchQuery ? (
+      {loading ? (
+        <HealthPersonnelSkeleton colCount={colCount} isAdmin={isAdmin} />
+      ) : healthPersonnelList.length === 0 && searchQuery ? (
         <div className="py-12 text-center text-gray-500 text-sm">
           <p className="font-medium">No results found for "{searchQuery}"</p>
           <p className="text-xs text-gray-400 mt-1">Try a different search term.</p>
@@ -192,15 +242,7 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
         <>
           {/* Desktop table */}
           <div className="hidden lg:flex lg:flex-col">
-            <div className={`grid grid-cols-${colCount} text-left text-sm bg-gray-100 py-5 rounded-md`}>
-              <div className="col-span-2 pl-5">Name of Staff</div>
-              <p>Staff Id</p>
-              <p>Role</p>
-              <p>Phone no</p>
-              <p>Email Address</p>
-              <p>Sex</p>
-              {isAdmin && <p>Actions</p>}
-            </div>
+            <PersonnelHeader colCount={colCount} isAdmin={isAdmin} />
             {healthPersonnelList.map((staff, index) => (
               <div key={staff.id ?? index} className={`grid grid-cols-${colCount} items-center text-[12px] text-gray-700 border-b border-b-gray-200`}>
                 <div className="font-semibold col-span-2 py-6 pl-5 flex items-center gap-1">
@@ -231,12 +273,14 @@ const HealthPersonnelList = ({ isAdmin = false }) => {
         </>
       )}
 
-      <Pagination2
-        count={count}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        setCurrentPage={setCurrentPage}
-      />
+      {!loading && (
+        <Pagination2
+          count={count}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+        />
+      )}
     </>
   );
 };

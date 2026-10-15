@@ -13,7 +13,7 @@ const STATUS_STYLES = {
 
 // Full read-only rendering of one admission, for "View Admission" / "View
 // Admission request" from Recent Care Activities
-// (GET /api/medical-records/events/<event_sqid>). `discharged_by` is left
+// (GET /api/records/events/<event_sqid>). `discharged_by_info` is left
 // unrendered — the backend returns it populated even on a still-`pending`
 // admission with no discharge_date, which reads as a data-modeling quirk
 // rather than an actual discharge attribution.
@@ -57,8 +57,8 @@ const AdmissionDetailView = ({ admission }) => {
           <p>
             Admission date:{" "}
             <span className="font-medium text-gray-900">
-              {admission.admission_date
-                ? formatFullDateTime(admission.admission_date)
+              {admission.created_at
+                ? formatFullDateTime(admission.created_at)
                 : "Pending confirmation"}
             </span>
           </p>

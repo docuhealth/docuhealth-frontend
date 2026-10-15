@@ -7,18 +7,7 @@ import TotalScansChart from "../../../Components/Dashboard/Hospital_Dashboard_Co
 import { useQuery } from "@tanstack/react-query";
 import { getHospitalToken } from "../../../services/authService";
 import { fetchRadiologyTrend } from "../../../queries/Hospital/radiology/trend";
-
-const ChartLoadingPlaceholder = ({ title }) => (
-  <div className="bg-white p-6 rounded-md border border-gray-200 w-full h-[380px] flex flex-col justify-between animate-pulse">
-    <div className="flex justify-between items-center mb-6">
-      <h3 className="text-xs lg:text-lg lg:font-semibold text-gray-800">{title}</h3>
-      <div className="h-8 w-24 bg-gray-200 rounded"></div>
-    </div>
-    <div className="flex-1 flex justify-center items-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-docuhealth-primary"></div>
-    </div>
-  </div>
-);
+import ChartSkeleton from "../../../Components/ui/ChartSkeleton";
 
 const Hospital_Radiology_Home_Dashboard = () => {
   const { hospitalName, backgroundImage } = useContext(RadiologyAppContext);
@@ -61,7 +50,7 @@ const Hospital_Radiology_Home_Dashboard = () => {
       {/* Chart */}
       <div className="mt-6 w-full">
         {trendLoading ? (
-          <ChartLoadingPlaceholder title="Total scan carried out" />
+          <ChartSkeleton title="Total scan carried out" />
         ) : (
           <TotalScansChart data={trendArray} />
         )}

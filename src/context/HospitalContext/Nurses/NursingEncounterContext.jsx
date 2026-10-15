@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import axiosInstanceHos from "../../../lib/axios/hospital";
 import toast from "react-hot-toast";
+import { extractApiErrorMessage } from "../../../utils/apiError";
 
 export const NursingEncounterContext = createContext();
 
@@ -89,7 +90,7 @@ export const NursingEncounterProvider = ({ children }) => {
       return true;
     } catch (error) {
       console.error("Error reserving encounter:", error);
-      toast.error(error.response?.data?.check_in?.[0] || error.response?.data?.check_in || error.response?.data?.message || "Failed to claim check-in.");
+      toast.error(extractApiErrorMessage(error, "Failed to claim check-in."));
       return false;
     }
   };
@@ -106,7 +107,7 @@ export const NursingEncounterProvider = ({ children }) => {
       return true;
     } catch (error) {
       console.error("Error submitting assessment:", error);
-      toast.error(error.response?.data?.check_in?.[0] || error.response?.data?.check_in || error.response?.data?.message || "Failed to submit assessment.");
+      toast.error(extractApiErrorMessage(error, "Failed to submit assessment."));
       return false;
     }
   };

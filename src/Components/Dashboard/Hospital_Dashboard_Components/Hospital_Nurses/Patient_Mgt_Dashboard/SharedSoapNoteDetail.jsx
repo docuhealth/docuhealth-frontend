@@ -5,7 +5,7 @@ import {
 } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { FileText, Eye, ArrowDownToLine, Image, ArrowLeft } from "lucide-react";
-import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../../utils/soapNoteHelpers";
+import { renderListOrString, renderLabTests, renderDrugRecords, renderScans } from "../../../../../utils/soapNoteHelpers";
 import PatientInfoCard from "../../../../ui/PatientInfoCard";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 
@@ -171,6 +171,8 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
       </div>
 
       {renderLabTests(sharedSoapNoteDetail?.lab_tests_info)}
+
+      {renderScans(sharedSoapNoteDetail?.scans_info)}
 
       {/* Follow Up / Appointment — appointment_info was removed from the
           SOAP note response; only render this if it's actually present

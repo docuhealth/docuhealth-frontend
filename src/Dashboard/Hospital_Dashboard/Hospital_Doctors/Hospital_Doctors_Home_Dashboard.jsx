@@ -10,18 +10,18 @@ import { useQuery } from "@tanstack/react-query";
 import { getHospitalToken } from "../../../services/authService";
 import { fetchHospitalDoctorDashboardMetrics } from "../../../queries/Hospital/doctor/dashboard_metrics";
 import { getDatesForFilter } from "../../../utils/dateFilterHelper";
+import Skeleton from "../../../Components/ui/Skeleton";
+import ChartSkeleton from "../../../Components/ui/ChartSkeleton";
 
-const ChartLoadingPlaceholder = ({ title }) => (
-  <div className="bg-white p-6 rounded-md border border-gray-200 w-full h-[380px] flex flex-col justify-between animate-pulse">
-    <div className="flex justify-between items-center mb-6">
-      <h3 className="text-xs lg:text-lg lg:font-semibold text-gray-800">
-        {title}
-      </h3>
-      <div className="h-8 w-24 bg-gray-200 rounded"></div>
+// Same box model as a stat card so the row doesn't shift when the numbers land.
+const StatCardSkeleton = () => (
+  <div className="bg-white border border-gray-200 rounded-md p-5 flex flex-col justify-between">
+    <div className="flex items-center gap-3 mb-4">
+      <Skeleton className="w-10 h-10 rounded-sm" />
+      <Skeleton className="h-3.5 w-32" />
     </div>
-    <div className="flex-1 flex justify-center items-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-docuhealth-primary"></div>
-    </div>
+    <Skeleton className="h-8 w-16 mb-3" />
+    <Skeleton className="h-3 w-40" />
   </div>
 );
 
@@ -118,8 +118,19 @@ const Hospital_Doctors_Home_Dashboard = () => {
       </div>
 
       {dashboardMetricsLoading && (
-        <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-docuhealth-primary"></div>
+        <div role="status" aria-label="Loading dashboard">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-6">
+            {Array.from({ length: 3 }, (_, i) => (
+              <StatCardSkeleton key={i} />
+            ))}
+          </div>
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+            <ChartSkeleton title="Admitted patients" withControls />
+            <ChartSkeleton title="Discharged patients" withControls />
+          </div>
+          <div className="mt-6 w-full">
+            <ChartSkeleton title="Patient's Attendance overview" withControls />
+          </div>
         </div>
       )}
 
@@ -156,7 +167,7 @@ const Hospital_Doctors_Home_Dashboard = () => {
       {!dashboardMetricsLoading && (
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
           {admittedLoading ? (
-            <ChartLoadingPlaceholder title="Admitted patients" />
+            <ChartSkeleton title="Admitted patients" withControls />
           ) : (
             <AdmittedPatientsChart
               data={admittedMetrics?.charts?.admissions_overview || []}
@@ -165,7 +176,7 @@ const Hospital_Doctors_Home_Dashboard = () => {
             />
           )}
           {dischargedLoading ? (
-            <ChartLoadingPlaceholder title="Discharged patients" />
+            <ChartSkeleton title="Discharged patients" withControls />
           ) : (
             <DischargedPatientsChart
               data={dischargedMetrics?.charts?.discharged_patients || []}
@@ -179,7 +190,7 @@ const Hospital_Doctors_Home_Dashboard = () => {
       {!dashboardMetricsLoading && (
         <div className="mt-6 w-full">
           {attendanceLoading ? (
-            <ChartLoadingPlaceholder title="Patient's Attendance overview" />
+            <ChartSkeleton title="Patient's Attendance overview" withControls />
           ) : (
             <AttendanceOverviewChart
               data={attendanceMetrics?.charts?.attendance_overview || []}

@@ -1,17 +1,17 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { CalendarIcon, ClockIcon, UserIcon, FileText, ArrowLeft, MoreVertical } from "lucide-react";
 import SearchBar from "../../../../SearchBar/SearchBar";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import useDebounce from "../../../../../hooks/useDebounce";
 import SharedSoapNoteDetail from "./SharedSoapNoteDetail";
+import { fetchAllSharedSoapNotes, isWithinStay } from "../../../../../queries/Hospital/nurse/patientHistory";
 
-const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory }) => {
+const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, stayWindow = null }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [localDetail, setLocalDetail] = useState(null);
-  const menuRef = useRef(null);
   const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,7 +20,7 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory }) => {
 
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  const { data, isPending: loading, isFetching: isRefreshing, isError, error } = useQuery({
+  const { data, isPending: pagedLoading, isFetching: pagedRefreshing, isError: pagedIsError, error: pagedError } = useQuery({
     queryKey: ["nurse-shared-soap-notes", hin, currentPage, debouncedSearch],
     queryFn: async () => {
       const res = await axiosInstanceHos.get(
@@ -28,13 +28,25 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory }) => {
       );
       return res.data;
     },
-    enabled: !!hin,
-    placeholderData: keepPreviousData,
+    enabled: !!hin && !stayWindow,
+    placeholderData: (prev, prevQuery) => (prevQuery?.queryKey?.[1] === hin ? prev : undefined),
   });
+
+  // One discharged stay: the API can't filter by admission, so fetch everything and filter by the stay's dates
+  const stayQuery = useQuery({
+    queryKey: ["nurse-shared-soap-notes-all", hin],
+    queryFn: () => fetchAllSharedSoapNotes(hin),
+    enabled: !!hin && !!stayWindow,
+  });
+
+  const loading = stayWindow ? stayQuery.isPending : pagedLoading;
+  const isRefreshing = stayWindow ? false : pagedRefreshing;
+  const isError = stayWindow ? stayQuery.isError : pagedIsError;
+  const error = stayWindow ? stayQuery.error : pagedError;
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, stayWindow?.start, stayWindow?.end]);
 
   useEffect(() => {
     if (isError) {
@@ -45,13 +57,24 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory }) => {
     }
   }, [isError, error]);
 
-  const caseNotes = data?.results || [];
-  const count = data?.count || 0;
+  const stayNotes = (stayQuery.data || []).filter((note) => {
+    if (!isWithinStay(note.created_at, stayWindow)) return false;
+    const q = debouncedSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [note.chief_complaint, note.primary_diagnosis, note.staff_info?.firstname, note.staff_info?.lastname]
+      .some((v) => String(v || "").toLowerCase().includes(q));
+  });
+
+  const caseNotes = stayWindow
+    ? stayNotes.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    : data?.results || [];
+  const count = stayWindow ? stayNotes.length : data?.count || 0;
   const totalPages = Math.ceil(count / pageSize);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      // One ref can't cover every row's menu; ignore clicks inside any of them.
+      if (!event.target.closest?.("[data-row-menu]")) {
         setOpenMenuId(null);
       }
     };
@@ -154,7 +177,9 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory }) => {
               <div className="max-w-md text-center">
                 <p className="text-[12px] text-gray-500">
                   {" "}
-                  There are currently no shared SOAP notes available for this patient.
+                  {stayWindow
+                    ? "No shared SOAP notes were recorded during this admission."
+                    : "There are currently no shared SOAP notes available for this patient."}
                 </p>
               </div>
             </div>
@@ -164,7 +189,7 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory }) => {
             <div className="flex flex-col gap-4 mt-4">
               {caseNotes?.map((note) => (
                 <div
-                  key={note.id}
+                  key={note.sqid || note.id}
                   className="flex flex-col-reverse lg:flex-row lg:items-center justify-between border rounded-lg p-4 transition-colors"
                 >
                   <div className="flex flex-row flex-wrap gap-4 lg:gap-10">
@@ -235,18 +260,18 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory }) => {
                   </div>
 
                   {/* Actions Menu */}
-                  <div className="relative flex justify-end  lg:mt-0" ref={menuRef}>
+                  <div className="relative flex justify-end  lg:mt-0" data-row-menu>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setOpenMenuId(openMenuId === note.id ? null : note.id);
+                        setOpenMenuId(openMenuId === (note.sqid || note.id) ? null : (note.sqid || note.id));
                       }}
                       className="p-2 hover:bg-gray-200 rounded-full transition-all"
                     >
                       <MoreVertical size={16} />
                     </button>
 
-                    {openMenuId === note.id && (
+                    {openMenuId === (note.sqid || note.id) && (
                       <div 
                         onMouseDown={(e) => e.stopPropagation()}
                         className="absolute right-0 top-10 z-10 w-40 bg-white rounded-md shadow text-sm border border-gray-100  animate-in fade-in zoom-in duration-200">

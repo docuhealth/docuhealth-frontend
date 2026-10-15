@@ -1,12 +1,13 @@
 import React, { useState, useContext, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { fetchDoctorHandovers } from "../../../../../queries/Hospital/doctor/handover";
 import { DoctorAppContext } from "../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import HandoverNoteDetailPage from "../Patient_Mgt_Dashboard/HandoverNoteDetailPage";
 import EmptyState from "../../../../ui/EmptyState";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import Input from "../../../../ui/Input";
+import Skeleton from "../../../../ui/Skeleton";
 import { HANDOVER_FIELDS } from "../Patient_Mgt_Dashboard/AddHandoverNoteForm";
 
 const PAGE_SIZE = 9;
@@ -16,6 +17,27 @@ const doctorFullName = (info) => {
   const name = [info.firstname, info.lastname].filter(Boolean).join(" ").trim();
   return name ? `Dr. ${name}` : "—";
 };
+
+// Same box model as a handover card so the grid doesn't shift when notes land.
+const HandoverCardSkeleton = () => (
+  <div className="border border-gray-200 rounded-2xl bg-white flex flex-col p-5">
+    <div className="flex justify-center items-center py-5 mb-2">
+      <Skeleton className="h-14 w-14 rounded-lg" />
+    </div>
+    <div className="flex flex-col space-y-2.5">
+      <div className="border-b border-gray-100 pb-2.5">
+        <Skeleton className="h-4 w-40" />
+      </div>
+      <Skeleton className="h-3 w-28" />
+      <Skeleton className="h-3 w-44" />
+      <Skeleton className="h-3 w-36" />
+      <Skeleton className="h-3 w-32" />
+      <div className="pt-4">
+        <Skeleton className="h-9 w-full rounded-full" />
+      </div>
+    </div>
+  </div>
+);
 
 const DoctorHandoverHistoryTab = ({ type = "received" }) => {
   const { profile } = useContext(DoctorAppContext);
@@ -31,20 +53,16 @@ const DoctorHandoverHistoryTab = ({ type = "received" }) => {
     refetchOnWindowFocus: true,
   });
 
-  const loggedInDoctorSqid = profile?.sqid;
+  // Handover doctor_info carries staff_id but no sqid, so match on staff_id.
+  const loggedInStaffId = profile?.staff_id;
 
   const mappedNotes = useMemo(() => {
     const rows = data?.results || [];
     return rows
       .filter((item) => {
-        if (!loggedInDoctorSqid) return true;
-        if (type === "received") {
-          // Handed over TO the logged-in doctor
-          return item.to_doctor_info?.sqid === loggedInDoctorSqid || !item.from_doctor_info?.sqid;
-        } else {
-          // Handed over BY the logged-in doctor
-          return item.from_doctor_info?.sqid === loggedInDoctorSqid;
-        }
+        if (!loggedInStaffId) return false;
+        const doctorInfo = type === "received" ? item.to_doctor_info : item.from_doctor_info;
+        return doctorInfo?.staff_id === loggedInStaffId;
       })
       .map((item) => {
         const otherDoctor = type === "received" ? item.from_doctor_info : item.to_doctor_info;
@@ -78,7 +96,7 @@ const DoctorHandoverHistoryTab = ({ type = "received" }) => {
           ...HANDOVER_FIELDS.reduce((acc, f) => ({ ...acc, [f.key]: item[f.key] || "" }), {}),
         };
       });
-  }, [data, type, loggedInDoctorSqid]);
+  }, [data, type, loggedInStaffId]);
 
   const filteredNotes = useMemo(() => {
     if (!searchQuery.trim()) return mappedNotes;
@@ -132,8 +150,10 @@ const DoctorHandoverHistoryTab = ({ type = "received" }) => {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center items-center py-16">
-          <Loader2 className="animate-spin h-8 w-8 text-docuhealth-primary" />
+        <div role="status" aria-label="Loading handover notes" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }, (_, i) => (
+            <HandoverCardSkeleton key={i} />
+          ))}
         </div>
       ) : isError ? (
         <div className="py-16 text-center text-sm text-gray-500">

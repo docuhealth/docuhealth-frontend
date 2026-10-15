@@ -54,6 +54,19 @@ layer(base);
   --color-docuhealth-border-gray: #DDDDDD;
 
   --animate-slide-up: slideUp 0.5s ease-out;
+  --animate-logo-breathe: logoBreathe 1.6s ease-in-out infinite;
+
+  @keyframes logoBreathe {
+    0%,
+    100% {
+      opacity: 0.55;
+      transform: scale(0.94);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
   @keyframes slideUp {
     0% {
@@ -93,6 +106,24 @@ layer(base);
     box-sizing: border-box;
     font-family: "Montserrat", sans-serif;
     scroll-behavior: smooth;
+}
+
+/* Always-visible scrollbar for capped lists (overlay scrollbars hide it otherwise) */
+.scrollbar-visible {
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af #f3f4f6;
+}
+.scrollbar-visible::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 6px;
+}
+.scrollbar-visible::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 9999px;
+}
+.scrollbar-visible::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 9999px;
 }
 
 .underline-double {

@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import axiosInstanceHos from "../../../lib/axios/hospital";
 import toast from "react-hot-toast";
+import { extractApiErrorMessage } from "../../../utils/apiError";
 
 export const DoctorEncounterContext = createContext();
 
@@ -82,7 +83,7 @@ export const DoctorEncounterProvider = ({ children }) => {
       return true;
     } catch (error) {
       console.error("Error claiming patient:", error);
-      toast.error(error.response?.data?.check_in?.[0] || "Failed to claim patient.");
+      toast.error(extractApiErrorMessage(error, "Failed to claim patient."));
       return false;
     }
   };

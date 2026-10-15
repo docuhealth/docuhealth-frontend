@@ -22,7 +22,7 @@ import {
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import {useMutation, useQueryClient } from "@tanstack/react-query";
-import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../../../utils/soapNoteHelpers";
+import { renderListOrString, renderLabTests, renderDrugRecords, renderScans } from "../../../../../../utils/soapNoteHelpers";
 import PatientInfoCard from "../../../../../ui/PatientInfoCard";
 import GeneralPatientInfoForm from "../../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
@@ -32,6 +32,8 @@ import PatientLabRecords from "../../Patient_Mgt_Dashboard/PatientLabRecords";
 import PatientRadiologyRecords from "../../Patient_Mgt_Dashboard/PatientRadiologyRecords";
 import PatientMedicationHistory from "../../Patient_Mgt_Dashboard/PatientMedicationHistory";
 import EmptyState from "../../../../../ui/EmptyState";
+import RecordRowsSkeleton from "../../../../../ui/RecordRowsSkeleton";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 
 const PatientInfo = ({ patientFullInfo }) => {
   console.log(patientFullInfo);
@@ -354,11 +356,7 @@ const PatientSOAPNotes = ({
   setSoapCurrentPage
 }) => {
   if (soapNotesLoading) {
-    return (
-      <div className="flex justify-center items-center h-full text-sm pt-10">
-        Loading...
-      </div>
-    );
+    return <RecordRowsSkeleton label="Loading SOAP notes" tiles={4} />;
   }
 
   if (!patientSoapNotes || patientSoapNotes.length === 0) {
@@ -440,14 +438,14 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
     setOpenPopover(openPopover === index ? null : index);
   };
 
-  const selectedPatientDetails = patientSoapNotes?.find(soapNote => soapNote.id === selectedNoteId);
+  const selectedPatientDetails = patientSoapNotes?.find(soapNote => (soapNote.sqid || soapNote.id) === selectedNoteId);
   const queryClient = useQueryClient()
 
 
 
     const { mutate, isPending } = useMutation({
       mutationFn: (payload) =>
-        axiosInstanceHos.post("api/medical-records/soap-note/additional-notes", payload),
+        axiosInstanceHos.post("api/records/soap-note/additional-notes", payload),
       onSuccess: () => {
         toast.success("Additional Note created successfully !");
 
@@ -467,18 +465,20 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
       onError: (error) => {
         console.error("Upload error:", error);
         toast.error(
-          error.response?.data?.message || "Failed to create additional note",
+          extractApiErrorMessage(error, "Failed to create additional note"),
         );
       },
     });
 
   const handleCreateAdditionalNote = () => {
-    if(!noteDescription) {
+    if(!noteDescription.trim()) {
       toast.error('Please enter a note.')
+      return
     }
 
+    // SOAP lists now return only `sqid`; `id` is kept for older responses.
     const payload = {
-      soap_note : selectedPatientDetails.id, 
+      soap_note : selectedPatientDetails.id ?? selectedPatientDetails.sqid, 
       note : noteDescription
     }
     
@@ -681,6 +681,8 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
 
           {renderLabTests(selectedPatientDetails?.lab_tests_info)}
 
+          {renderScans(selectedPatientDetails?.scans_info)}
+
           {/* 7. Follow Up / Appointment — appointment_info was removed from
               the SOAP note response; only render this if it's actually
               present (older notes created before the check-in migration). */}
@@ -759,7 +761,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                 <div className="hidden lg:block">
                   {patientSoapNotes.map((soapNote, index) => (
                     <div
-                      key={soapNote.id}
+                      key={soapNote.sqid || soapNote.id}
                       className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10 "
                     >
                       <div className="flex items-center gap-3">
@@ -829,7 +831,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                           aria-expanded={openPopover === index}
                           onClick={() => {
                             togglePopover(index);
-                          setSelectedNoteId(soapNote.id);
+                          setSelectedNoteId(soapNote.sqid || soapNote.id);
                           }}
                           className={` hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer
         ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
@@ -851,7 +853,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                               type="button"
                               className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
-                                setSelectedNoteId(soapNote.id);
+                                setSelectedNoteId(soapNote.sqid || soapNote.id);
                                 setSeePatientDetails(true);
                                 setOpenPopover(null);
                               }}
@@ -869,7 +871,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
               <div className="block lg:hidden space-y-4 px-1">
                 {patientSoapNotes.map((soapNote, index) => (
                   <div
-                    key={soapNote.id}
+                    key={soapNote.sqid || soapNote.id}
                     className="bg-white border border-gray-200 rounded-lg p-4"
                   >
                     <div className="flex justify-between items-start mb-4">
@@ -886,7 +888,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                         <button
                           onClick={() => {
                             togglePopover(index);
-                      setSelectedNoteId(soapNote.id);
+                      setSelectedNoteId(soapNote.sqid || soapNote.id);
                           }}
                           className={`h-9 w-9 flex items-center justify-center rounded-full ${openPopover === index ? "bg-slate-200" : "bg-gray-50"}`}
                         >
@@ -908,7 +910,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                               type="button"
                               className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
-                          setSelectedNoteId(soapNote.id);
+                          setSelectedNoteId(soapNote.sqid || soapNote.id);
                                 setSeePatientDetails(true);
                                 setOpenPopover(null);
                               }}
@@ -1091,21 +1093,7 @@ const getTabs = ({
     },
     {
       title: "Radiology Result",
-      // content: (
-      //   <PatientRadiologyRecords
-      //     patientFullInfo={patientFullInfo}
-      //     selected={selectedPatientDetails}
-      //   />
-      // ),
-      content: (
-        <div className="py-16 text-center">
-          <EmptyState
-            icon="document"
-            title="Coming Soon"
-            description="Radiology results will be available soon."
-          />
-        </div>
-      ),
+      content: <PatientRadiologyRecords patientFullInfo={patientFullInfo} />,
     },
     {
       title: "Lab Result",
@@ -1131,23 +1119,7 @@ const getTabs = ({
     },
     {
       title: "Medication History",
-      // content: (
-      //   <PatientMedicationHistory
-      //     patientFullInfo={patientFullInfo}
-      //     patientMedRecords={patientMedRecords}
-      //     patientSoapNotes={patientSoapNotes}
-      //     selected={selectedPatientDetails}
-      //   />
-      // ),
-      content: (
-        <div className="py-16 text-center">
-          <EmptyState
-            icon="document"
-            title="Coming Soon"
-            description="Medication history will be available soon."
-          />
-        </div>
-      ),
+      content: <PatientMedicationHistory patientFullInfo={patientFullInfo} />,
     },
   ];
 

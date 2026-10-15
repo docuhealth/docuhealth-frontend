@@ -8,7 +8,7 @@ import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_D
 import { fetchPendingScanResults, acceptScanResult, rejectScanResult } from "../../../../../queries/Hospital/radiology/scan_results";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import ScanLabResultsShell from "./ScanLabResultsShell";
-import ScanLabResultCard from "./ScanLabResultCard";
+import ScanLabResultCard, { ScanLabResultGridSkeleton } from "./ScanLabResultCard";
 import { maskHIN } from "./scanLabResults";
 
 const PAGE_SIZE = 9;
@@ -17,7 +17,7 @@ const FETCH_ALL_SIZE = 100;
 
 const patientName = (order) => `${order.patient_info?.firstname || ""} ${order.patient_info?.lastname || ""}`.trim() || "Unknown patient";
 
-// Doctors approve or reject the radiologist's result for scans they ordered; walk-in orders never show up here.
+// Doctors approve or reject the radiologist's result for scans they ordered; radiologist-ordered scans never show up here.
 const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,6 +64,7 @@ const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
   const onDecided = (message) => {
     toast.success(message);
     queryClient.invalidateQueries({ queryKey: ["radiology-pending-results"] });
+    queryClient.invalidateQueries({ queryKey: ["patient-approved-scan-results"] });
     closeDetail();
   };
 
@@ -227,7 +228,7 @@ const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
       setCurrentPage={setCurrentPage}
     >
       {isLoading ? (
-        <div className="flex justify-center items-center h-40 text-sm">Loading...</div>
+        <ScanLabResultGridSkeleton label="Loading scan results" />
       ) : rows.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-gray-400">
           <ScanLine size={36} className="opacity-25 mb-2" />

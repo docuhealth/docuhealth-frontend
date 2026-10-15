@@ -7,6 +7,7 @@ import { getAdvanceCheckUpTabs } from "./AdvanceCheckUpTabDetails";
 import { NursesAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Nurses/NursesAdmittedPatientMGTContext";
 import Modal from "../../../../ui/Modal";
 import NursingDischargeSummaryView from "./NursingDischargeSummaryView";
+import DischargedPatientRecord from "../../../../ui/DischargedPatientRecord";
 
 const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, loadingAdmission }) => {
   const context = useContext(NursesAdmittedPatientMGTContext);
@@ -14,6 +15,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
   const hin = (selected?.patient_info?.hin || selected?.patient?.hin || selected?.patient_hin);
   const [activeTab, setActiveTab] = useState("info");
   const [showDischargeSummaryModal, setShowDischargeSummaryModal] = useState(false);
+  const [historyScope, setHistoryScope] = useState("stay");
 
   const { data: patientFullInfo, isLoading, isError } = useQuery({
     queryKey: ["patient-info", hin],
@@ -59,6 +61,30 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
       hour12: true
     });
   };
+
+  const isDischarged = context?.tab === "inpatient_discharge" ||
+    context?.tab === "outpatient_discharge" ||
+    Boolean(selected?.discharge_date || selected?.closed_at) ||
+    selected?.status === "inpatient_discharge" ||
+    selected?.status === "outpatient_discharge";
+
+  if (isDischarged) {
+    if (isLoading || loadingAdmission) {
+      return (
+        <div className="flex justify-center items-center py-20">
+          <p className="text-sm text-gray-500">Loading patient data...</p>
+        </div>
+      );
+    }
+    return (
+      <DischargedPatientRecord
+        patient={patient}
+        admission={admission}
+        isOutPatient={isOutPatient}
+        onBack={() => setAdvanceCheckUp(false)}
+      />
+    );
+  }
 
   return (
     <div>
@@ -122,8 +148,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
                 selected?.discharge_date ||
                 selected?.closed_at ||
                 selected?.status === "inpatient_discharge" ||
-                selected?.status === "outpatient_discharge" ||
-                selected?.discharge_form) && (
+                selected?.status === "outpatient_discharge") && (
                 <button 
                     onClick={() => setShowDischargeSummaryModal(true)}
                     className="w-full sm:w-auto text-center bg-white border border-docuhealth-primary text-docuhealth-primary text-sm font-medium px-5 py-2.5 rounded-full hover:bg-gray-50 transition-colors cursor-pointer shrink-0"
@@ -161,7 +186,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
           </div>
 
           <AdvanceCheckUpTabComponent 
-            tabs={getAdvanceCheckUpTabs(patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail, isOutPatient, setAdvanceCheckUp)}
+            tabs={getAdvanceCheckUpTabs(patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail, isOutPatient, setAdvanceCheckUp, historyScope, setHistoryScope)}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
           />

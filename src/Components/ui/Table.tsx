@@ -35,8 +35,8 @@ export const TableHead = ({ children, className = "" }: { children: ReactNode, c
   </th>
 );
 
-export const TableCell = ({ children, className = "" }: { children: ReactNode, className?: string }) => (
-  <td className={`px-4 py-4 whitespace-nowrap text-sm text-gray-700 ${className}`}>
+export const TableCell = ({ children, className = "", colSpan }: { children: ReactNode, className?: string, colSpan?: number }) => (
+  <td colSpan={colSpan} className={`px-4 py-4 whitespace-nowrap text-sm text-gray-700 ${className}`}>
     {children}
   </td>
 );

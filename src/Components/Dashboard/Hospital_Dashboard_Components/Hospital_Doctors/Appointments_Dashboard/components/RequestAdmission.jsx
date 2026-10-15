@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import { HosWardContext } from "../../../../../../context/HospitalContext/HosWardContext";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
@@ -19,60 +19,71 @@ const RequestAdmission = ({
   onRequested,
 }) => {
   const { profile } = useContext(DoctorAppContext);
-  const { wards } = useContext(HosWardContext);
+  const { wards, wardsLoading, refetchWards } = useContext(HosWardContext);
   const queryClient = useQueryClient();
-
-  const [wardOptions, setWardOptions] = useState([]);
-  const [availableBeds, setAvailableBeds] = useState([]);
 
   const admissionContext = resolveOrderContext(selectedPatientDetails);
 
-  const [form, setForm] = useState({
-    ward: "",
-    bed: "",
-    patient: admissionContext.hin,
-    // Only a genuinely open check-in should be linked here — sending an
-    // appointment's sqid (or an empty string) as `check_in` gets rejected
-    // as "Check-in not found at this hospital."
-    ...(admissionContext.checkIn ? { check_in: admissionContext.checkIn } : {}),
-  });
+  // `ward` only filters the bed dropdown; the API derives the ward from the bed.
+  const [form, setForm] = useState({ ward: "", bed: "" });
 
+  const wardOptions = useMemo(() => (Array.isArray(wards) ? wards : []), [wards]);
+
+  // Bed statuses change under other users (accepts, rejects), so load fresh ones on open.
   useEffect(() => {
-    if (Array.isArray(wards)) {
-      setWardOptions(wards);
-      console.log(selectedPatientDetails);
+    refetchWards?.();
+  }, [refetchWards]);
+
+  // Derived from the live ward list so a refetch drops beds that became occupied.
+  // Several doctors may request the same bed; only occupied beds are refused.
+  const availableBeds = useMemo(() => {
+    const selected = wardOptions.find((w) => w.sqid === form.ward || w.id === Number(form.ward));
+    return (selected?.beds || []).filter(
+      (b) => b.status === "available" || b.status === "requested",
+    );
+  }, [wardOptions, form.ward]);
+
+  // Clear a picked bed that a refetch shows is now occupied.
+  useEffect(() => {
+    if (form.bed && !availableBeds.some((b) => String(b.sqid || b.id) === form.bed)) {
+      setForm((prev) => ({ ...prev, bed: "" }));
     }
-  }, [wards]);
+  }, [availableBeds, form.bed]);
 
   const handleChange = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-
-    if (field === "ward") {
-      const selected = wardOptions.find((w) => w.sqid === value || w.id === Number(value));
-
-      if (selected) {
-        const beds = selected.beds.filter((b) => b.status === "available");
-        setAvailableBeds(beds);
-      } else {
-        setAvailableBeds([]);
-      }
-    }
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+      // A bed picked under the previous ward is no longer in the list.
+      ...(field === "ward" ? { bed: "" } : {}),
+    }));
   };
 
     const { mutate, isPending } = useMutation({
     mutationFn: () => {
-      return axiosInstanceHos.post("api/doctors/admissions/request", form);
+      // Exactly one of `check_in` / `appointment` is required (400 on both or neither).
+      const payload = {
+        patient: admissionContext.hin,
+        bed: form.bed,
+        ...(admissionContext.checkIn
+          ? { check_in: admissionContext.checkIn }
+          : { appointment: admissionContext.appointment }),
+      };
+      return axiosInstanceHos.post("api/doctors/admissions/request", payload);
     },
     onSuccess: () => {
       toast.success("Admission request successful");
       // The outpatient row now carries `admission_request_status: "pending"`
       // server-side; refetch so a later list render / re-open reflects it.
       queryClient.invalidateQueries({ queryKey: ["hospital-patients-doctor"] });
+      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
       onRequested?.();
       setRequestAdmission(false);
     },
     onError: (err) => {
       console.error("Error submitting admission request:", err);
+      // e.g. "Bed X is occupied" after someone else filled it: refresh the bed list.
+      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
       // The API returns the reason as `{ detail: ["Patient already has a
       // pending admission request"] }` (array), not `{ message }`, so read
       // through the shared extractor or the toast is just the generic fallback.
@@ -82,8 +93,8 @@ const RequestAdmission = ({
     },
   });
 
-  const handleSubmit = async () => {
-    mutate(form)
+  const handleSubmit = () => {
+    mutate();
   };
 
   return (
@@ -111,7 +122,8 @@ const RequestAdmission = ({
         value={form.ward}
         onChange={(value) => handleChange("ward", value)}
         options={wardOptions.map((w) => ({ value: String(w.sqid || w.id), label: `${w.name} ward` }))}
-        placeholder="Assign to ward"
+        placeholder={wardsLoading ? "Loading wards..." : "Assign to ward"}
+        disabled={wardsLoading}
       />
 
       {form.ward && (
@@ -120,8 +132,8 @@ const RequestAdmission = ({
           required
           value={form.bed}
           onChange={(value) => handleChange("bed", value)}
-          options={availableBeds.map((b) => ({ value: String(b.sqid || b.id), label: `Bed ${b.bed_number}` }))}
-          placeholder={availableBeds.length > 0 ? "Select available bed" : "No available beds"}
+          options={availableBeds.map((b) => ({ value: String(b.sqid || b.id), label: b.status === "requested" ? `Bed ${b.bed_number} (already requested)` : `Bed ${b.bed_number}` }))}
+          placeholder={availableBeds.length > 0 ? "Select a bed" : "No free beds in this ward"}
           disabled={availableBeds.length === 0}
           className="mt-3"
         />

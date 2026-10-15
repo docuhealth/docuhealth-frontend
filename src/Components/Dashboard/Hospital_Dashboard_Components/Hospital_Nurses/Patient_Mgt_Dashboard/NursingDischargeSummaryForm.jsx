@@ -79,8 +79,8 @@ const NursingDischargeSummaryForm = ({ admission, patientFullInfo, activeTask, t
       ? `${admission.patient.firstname} ${admission.patient.lastname}`
       : "";
 
-  const admittingDoctorName = admission?.staff_info 
-    ? `Dr. ${admission.staff_info.firstname} ${admission.staff_info.lastname}` 
+  const admittingDoctorName = admission?.requested_by_info 
+    ? `Dr. ${admission.requested_by_info.firstname} ${admission.requested_by_info.lastname}` 
     : "";
 
   const handleSubmit = async () => {
@@ -101,7 +101,7 @@ const NursingDischargeSummaryForm = ({ admission, patientFullInfo, activeTask, t
     // 3. Fallback: Fetch tasks directly from admission
     if (!taskSqid && admissionSqid) {
       try {
-        const res = await axiosInstanceHos.get(`/api/inpatients/admissions/${admissionSqid}/task-occurrences`);
+        const res = await axiosInstanceHos.get(`/api/inpatients/admissions/${admissionSqid}/task-occurrences?status=pending&size=100`);
         const results = res.data?.results || (Array.isArray(res.data) ? res.data : []);
         const found = results.find(t => t.task_type === 'nurse_in_patient_discharge' || t.task_type === 'discharge_summary');
         if (found?.sqid) {
@@ -213,7 +213,7 @@ const NursingDischargeSummaryForm = ({ admission, patientFullInfo, activeTask, t
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Date/time of admission</label>
-                <input type="text" readOnly value={safeFormatDate(admission?.admission_date)} className="w-full border border-gray-200 rounded-md px-3 py-2 text-xs bg-gray-50 text-gray-500 focus:outline-none" />
+                <input type="text" readOnly value={safeFormatDate(admission?.created_at)} className="w-full border border-gray-200 rounded-md px-3 py-2 text-xs bg-gray-50 text-gray-500 focus:outline-none" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Discharge date</label>
@@ -221,7 +221,7 @@ const NursingDischargeSummaryForm = ({ admission, patientFullInfo, activeTask, t
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Length of stay (Days)</label>
-                <input type="text" readOnly value={calculateDays(admission?.admission_date)} className="w-full border border-gray-200 rounded-md px-3 py-2 text-xs bg-gray-50 text-gray-500 focus:outline-none" />
+                <input type="text" readOnly value={calculateDays(admission?.created_at)} className="w-full border border-gray-200 rounded-md px-3 py-2 text-xs bg-gray-50 text-gray-500 focus:outline-none" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Admitting doctor</label>
