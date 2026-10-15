@@ -1,6 +1,6 @@
 import axiosInstanceHos from "../../../lib/axios/hospital";
 
-// Wired to the reworked `api/radiology/*` API (2026-09-24): one paginated item list filtered by `status`, PATCH-only item actions, and results that a doctor approves unless a radiologist ordered it (radiologist_appointment_order).
+// Wired to the reworked `api/radiology/*` API (2026-09-24): one paginated item list filtered by `status`, PATCH-only item actions, and results that a doctor approves unless a radiologist ordered it.
 
 export const RESULT_FILE_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf", "video/mp4"];
 
@@ -84,7 +84,6 @@ export const mapScanOrderItem = (item) => {
     scan_type: item.scan_info?.name || "Scan details unavailable",
     note: null,
     status: item.status,
-    order_source: order.order_source,
     hospital_info: order.hospital_info,
     requested_by: orderedBy
       ? `${orderedBy.role === "doctor" ? "Dr. " : ""}${orderedBy.firstname || ""} ${orderedBy.lastname || ""}`.trim()
@@ -135,11 +134,10 @@ export const radiologyScanSearchQuery = (query) => ({
 export const prefetchCommonRadiologyScans = (queryClient) =>
   COMMON_SCAN_QUERIES.forEach((query) => queryClient.prefetchQuery(radiologyScanSearchQuery(query)));
 
-// Every source needs exactly one link: check_in, admission or appointment (see OrderScanModal for which role sends which).
-export const createScanOrder = async ({ patient, order_source, check_in, appointment, admission, items }) => {
-  const payload = { patient, order_source, items };
+// Exactly one of check_in / admission; order_source no longer exists.
+export const createScanOrder = async ({ patient, check_in, admission, items }) => {
+  const payload = { patient, items };
   if (check_in) payload.check_in = check_in;
-  if (appointment) payload.appointment = appointment;
   if (admission) payload.admission = admission;
   const res = await axiosInstanceHos.post("api/radiology/orders", payload);
   return res.data;
@@ -186,7 +184,7 @@ export const uploadScanResult = async ({
   (files || []).forEach((file) => formData.append("attachments", file));
 
   const res = await axiosInstanceHos.post("api/radiology/results", formData);
-  // "approved" means a radiologist_appointment_order (item completed on the spot); "pending" waits for the ordering doctor.
+  // "approved" means a radiologist ordered the scan (completed on the spot); "pending" waits for the ordering doctor.
   return { report: mapScanResult(res.data), attachments: mapAttachments(res.data), resultStatus: res.data.status };
 };
 

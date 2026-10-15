@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { prefetchCommonRadiologyScans } from "../../../../../../queries/Hospital/radiology/scan_requests";
 import { ACTIVE_CHECK_INS_KEY, fetchActiveCheckIns } from "../../../../../../queries/Hospital/doctor/checkIns";
-import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { resolveOrderContext, NO_VISIT_MESSAGE } from "../../../../../../utils/careOrderContext";
 import OrderLabModal from "./OrderLabModal";
 import OrderScanModal from "./OrderScanModal";
 import RequestVitalsModal from "./RequestVitalsModal";
@@ -79,6 +79,12 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, onOrde
 
     if (item.admissionOnly && !admissionSqid) {
       toast.error("Only available for admitted patients.");
+      return;
+    }
+
+    // Orders and requests need a check-in or an admission; an appointment alone is not a visit.
+    if (item.needsConsultation && !admissionSqid && !checkInSqid) {
+      toast.error(NO_VISIT_MESSAGE);
       return;
     }
 

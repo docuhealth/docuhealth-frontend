@@ -1,11 +1,11 @@
 import axiosInstanceHos from "../../../lib/axios/hospital";
 
-// POST /api/doctors/refer-out — refer an appointment's patient out to another DocuHealth
-// hospital (doctor-only). Fields: appointment_id (appointment SQID, not the numeric id),
-// hospital_to_id (destination hospital SQID, not the hin), reason. Appointment validated first.
-export const createReferOut = async ({ appointment_id, hospital_to_id, reason }) => {
+// POST /api/doctors/refer-out — refer a patient out to another DocuHealth hospital (doctor-only).
+// Send exactly one of check_in (the doctor must be in that consultation) or admission (an active
+// stay at the doctor's hospital), plus hospital_to_id (destination hospital SQID) and reason.
+export const createReferOut = async ({ check_in, admission, hospital_to_id, reason }) => {
   const res = await axiosInstanceHos.post("api/doctors/refer-out", {
-    appointment_id,
+    ...(admission ? { admission } : { check_in }),
     hospital_to_id,
     reason,
   });

@@ -61,13 +61,11 @@ const RequestAdmission = ({
 
     const { mutate, isPending } = useMutation({
     mutationFn: () => {
-      // Exactly one of `check_in` / `appointment` is required (400 on both or neither).
+      // A bed request always needs a check-in; appointments are no longer a visit.
       const payload = {
         patient: admissionContext.hin,
         bed: form.bed,
-        ...(admissionContext.checkIn
-          ? { check_in: admissionContext.checkIn }
-          : { appointment: admissionContext.appointment }),
+        check_in: admissionContext.checkIn,
       };
       return axiosInstanceHos.post("api/doctors/admissions/request", payload);
     },
@@ -94,6 +92,10 @@ const RequestAdmission = ({
   });
 
   const handleSubmit = () => {
+    if (!admissionContext.checkIn) {
+      toast.error("A bed request needs a check-in. Check the patient in first.");
+      return;
+    }
     mutate();
   };
 

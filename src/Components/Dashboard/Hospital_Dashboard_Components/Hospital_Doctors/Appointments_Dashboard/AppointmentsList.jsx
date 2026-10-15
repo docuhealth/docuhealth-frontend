@@ -8,7 +8,6 @@ import {
 import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
 import SearchBar from "../../../../SearchBar/SearchBar";
 import Input from "../../../../ui/Input";
-import ReferOutModal from "./components/ReferOutModal";
 import CloseAppointmentModal from "../../../../ui/CloseAppointmentModal";
 import { isAppointmentClosed, useCloseAppointment } from "../../../../../queries/Hospital/appointments";
 import Skeleton from "../../../../ui/Skeleton";
@@ -85,7 +84,6 @@ const AppointmentsList = ({
     setOpenPopover(openPopover === index ? null : index);
   };
 
-  const [referOutAppointment, setReferOutAppointment] = useState(null);
   const [checkoutAppointment, setCheckoutAppointment] = useState(null);
   const checkoutMutation = useCloseAppointment("doctor-appointments", {
     onSuccess: () => setCheckoutAppointment(null),
@@ -360,17 +358,6 @@ const AppointmentsList = ({
                       See patient's details
                     </button>
 
-                    <button
-                      type="button"
-                      className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
-                      onClick={() => {
-                        setReferOutAppointment(appointment);
-                        setOpenPopover(null);
-                      }}
-                    >
-                      Refer Out
-                    </button>
-
                     {isAppointmentClosed(appointment) ? (
                       <p className="w-full text-left text-[12px] text-gray-400 p-2">Checked out</p>
                     ) : (
@@ -434,17 +421,6 @@ const AppointmentsList = ({
                         }}
                       >
                         See patient's details
-                      </button>
-
-                      <button
-                        type="button"
-                        className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
-                        onClick={() => {
-                          setReferOutAppointment(appointment);
-                          setOpenPopover(null);
-                        }}
-                      >
-                        Refer Out
                       </button>
 
                       {isAppointmentClosed(appointment) ? (
@@ -524,13 +500,6 @@ const AppointmentsList = ({
         title="Check out this patient?"
         confirmLabel="Check out"
       />
-
-      {referOutAppointment && (
-        <ReferOutModal
-          appointment={referOutAppointment}
-          onClose={() => setReferOutAppointment(null)}
-        />
-      )}
     </>
   );
 };

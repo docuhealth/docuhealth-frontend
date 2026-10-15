@@ -322,6 +322,12 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
   });
 
   const handleSubmit = async () => {
+    const orderContext = resolveOrderContext(selectedPatientDetails);
+    if (!orderContext.checkIn) {
+      setConfirmationModal(false);
+      toast.error("A SOAP note can only be saved for a checked-in patient during a consultation.");
+      return;
+    }
     // Only care_instructions is required by POST /api/records/soap-note
     // (alongside patient / chief_complaint / primary_diagnosis, already gated in
     // the step flow). treatment_plan and the follow-up appointment are optional.
@@ -423,21 +429,8 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       }
     }
 
-    const orderContext = resolveOrderContext(selectedPatientDetails, {
-      fallbackOrderSource:
-        source === "appointments" ? "staff_appointment_order" : undefined,
-    });
-
-    if (source === "appointments" || orderContext.appointment) {
-      const apptSqid = orderContext.appointment || selectedPatientDetails?.sqid;
-      if (apptSqid) {
-        formData.append("appointment", apptSqid);
-      }
-    } else if (orderContext.admission) {
-      formData.append("admission", orderContext.admission);
-    } else if (orderContext.checkIn) {
-      formData.append("check_in", orderContext.checkIn);
-    }
+    // A SOAP note is saved against the check-in only (the API refuses admission and appointment).
+    formData.append("check_in", orderContext.checkIn);
 
     attachments.forEach((fileObj) => {
       formData.append("investigation_docs", fileObj.file);
