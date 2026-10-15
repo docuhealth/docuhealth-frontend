@@ -171,7 +171,8 @@ const Hospital_Pharmacist_Prescription_Detail_Dashboard = ({ sqid, onBack, isSet
         <div className="bg-white border border-gray-200 rounded-xl p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
              <h3 className="text-[15px] font-semibold text-gray-700">
-               {order.order_source?.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase()) || "Prescription Details"}
+               {/* order_source was removed from the API, so there is no order type to show here. */}
+               Prescription Details
              </h3>
              {!isSettled && selectedItems.length > 0 && (
                <div className="flex items-center gap-3">

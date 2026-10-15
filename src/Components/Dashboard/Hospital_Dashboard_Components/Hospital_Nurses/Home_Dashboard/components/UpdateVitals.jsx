@@ -71,9 +71,6 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
     ? (selectedPatient?.admission_info?.sqid || selectedPatient?.sqid || selectedPatient?.id)
     : null;
 
-  const appointmentSqid = !isAdmission
-    ? (selectedPatient?.appointment_sqid || selectedPatient?.appointment_info?.sqid || selectedPatient?.appointment?.sqid || selectedPatient?.sqid || selectedPatient?.id)
-    : null;
 
   const { mutate, isPending } = useMutation({
     mutationFn: (payload) =>
@@ -150,9 +147,15 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
       return;
     }
 
+    if (!admissionSqid) {
+      toast.error("Vitals can only be recorded here for an admitted patient.");
+      return;
+    }
+
     const payload = {
       vital_signs: measurements,
-      ...(admissionSqid ? { admission: admissionSqid } : { appointment: appointmentSqid }),
+      // Nurse-recorded vitals need an active admission; appointments are no longer a visit.
+      admission: admissionSqid,
     };
 
     mutate(payload);

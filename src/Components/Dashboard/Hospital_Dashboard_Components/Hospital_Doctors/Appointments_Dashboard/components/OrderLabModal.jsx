@@ -9,7 +9,7 @@ import {
   searchLabTests,
 } from "../../../../../../queries/Hospital/lab/requests";
 import useDebounce from "../../../../../../hooks/useDebounce";
-import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { resolveOrderContext, visitPayload, NO_VISIT_MESSAGE } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import Modal from "../../../../../ui/Modal";
 import HospitalLoader from "../../../../../ui/HospitalLoader";
@@ -98,21 +98,15 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
         .filter(Boolean)
         .join("\n\n");
 
+      // Exactly one of check_in / admission; there is no visit-free order any more.
       const requestPayload = {
         patient: payload.patient_hin,
-        order_source: orderContext.orderSource,
+        ...visitPayload(orderContext),
         items: payload.test_type.map((testSqid) => ({
           test: testSqid,
           note: fullNote || undefined,
         })),
       };
-      if (orderContext.checkIn) {
-        requestPayload.check_in = orderContext.checkIn;
-      }
-      // staff_admission_order requires the admission (400 without it).
-      if (orderContext.admission) {
-        requestPayload.admission = orderContext.admission;
-      }
       if (payload.ignore_duplicate_warning) {
         requestPayload.ignore_duplicate_warning = true;
       }
@@ -148,6 +142,10 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
   });
 
   const handleLabRequest = () => {
+    if (!orderContext.hasVisit) {
+      toast.error(NO_VISIT_MESSAGE);
+      return;
+    }
     if (!formData.category || formData.test_type.length === 0) {
       toast.error("Please select a category and at least one test.");
       return;

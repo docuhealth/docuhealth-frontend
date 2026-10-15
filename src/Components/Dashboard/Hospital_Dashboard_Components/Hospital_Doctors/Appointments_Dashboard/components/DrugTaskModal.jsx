@@ -6,7 +6,7 @@ import MedicationSection from "./MedicationSection";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { createInpatientTask } from "../../../../../../queries/Hospital/doctor/inpatientTasks";
 import { DEFAULT_FREQUENCY } from "../../../../../../utils/careTaskConstants";
-import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { resolveOrderContext, visitPayload, NO_VISIT_MESSAGE } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 
 // MedicationSection expresses duration as a value + a unit label ("Day" /
@@ -110,7 +110,6 @@ const DrugTaskModal = ({ admissionSqid, selectedPatientDetails, onClose }) => {
       // Outpatient / Appointment context -> send pharmacy/medication order to server
       const pharmacyPayload = {
         patient: orderContext.hin,
-        order_source: orderContext.orderSource,
         drugs: filledMedications.map((med) => {
           const drugData = med.catalog_drug
             ? { catalog_drug: med.catalog_drug }
@@ -138,9 +137,8 @@ const DrugTaskModal = ({ admissionSqid, selectedPatientDetails, onClose }) => {
         }),
       };
 
-      if (orderContext.checkIn) {
-        pharmacyPayload.check_in = orderContext.checkIn;
-      }
+      if (!orderContext.checkIn) throw new Error(NO_VISIT_MESSAGE);
+      Object.assign(pharmacyPayload, visitPayload(orderContext));
 
       const res = await axiosInstanceHos.post(
         "api/pharmacy/orders/create",
@@ -157,7 +155,9 @@ const DrugTaskModal = ({ admissionSqid, selectedPatientDetails, onClose }) => {
     onError: (err) => {
       console.error("Error creating drug task / medication order:", err);
       toast.error(
-        extractApiErrorMessage(err, "Failed to create drug task / order."),
+        err?.response
+          ? extractApiErrorMessage(err, "Failed to create drug task / order.")
+          : err?.message || "Failed to create drug task / order.",
       );
     },
   });

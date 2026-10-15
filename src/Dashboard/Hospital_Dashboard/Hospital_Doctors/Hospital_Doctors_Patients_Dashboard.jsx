@@ -11,6 +11,7 @@ import SoapNoteEntry from "../../../Components/Dashboard/Hospital_Dashboard_Comp
 import PrescribeMedication from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PrescribeMedication";
 import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PatientInfo";
 import RequestAdmission from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/RequestAdmission";
+import ReferOutModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/ReferOutModal";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useContext } from "react";
 import { DoctorsAdmittedPatientMGTContext } from "../../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
@@ -40,6 +41,8 @@ const Hospital_Doctors_Patients_Dashboard = () => {
   const [prescribeMedication, setPrescribeMedication] = useState(false);
   const [transferRequest, setTransferRequest] = useState(false);
   const [requestAdmission, setRequestAdmission] = useState(false);
+  // Refer-out works from both the check-in (outpatient) and the admission screens.
+  const [referOut, setReferOut] = useState(false);
 
   const [soapNoteEntry, setSoapNoteEntry] = useState(false);
 
@@ -126,6 +129,12 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                         </button>
                       )}
                       <button
+                        className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                        onClick={() => setReferOut(true)}
+                      >
+                        Refer out
+                      </button>
+                      <button
                         className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
                         onClick={() => {
                           setSoapNoteEntry(true);
@@ -137,6 +146,12 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                     </>
                   ) : (
                     <>
+                      <button
+                        className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                        onClick={() => setReferOut(true)}
+                      >
+                        Refer out
+                      </button>
                       <button
                         className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
                         onClick={() => {
@@ -223,6 +238,10 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                 )
               }
             />
+          )}
+
+          {referOut && (
+            <ReferOutModal patientRecord={selected} onClose={() => setReferOut(false)} />
           )}
         </>
       ) : soapNoteEntry ? (

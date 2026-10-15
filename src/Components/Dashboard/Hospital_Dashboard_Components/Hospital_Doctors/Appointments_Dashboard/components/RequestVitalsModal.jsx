@@ -101,14 +101,14 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
   const handleSubmitRequest = () => {
     const orderCtx = resolveOrderContext(selectedPatientDetails);
     const hin = orderCtx.hin || selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin;
+    // A vitals request always needs a check-in now; appointments are no longer a visit.
     const checkInSqid = orderCtx.checkIn || selectedPatientDetails?.check_in_sqid || selectedPatientDetails?.check_in;
-    const appointmentSqid = (!checkInSqid ? (orderCtx.appointment || selectedPatientDetails?.appointment_sqid || selectedPatientDetails?.appointment) : null);
 
     const payload = {
       patient_hin: hin,
       note: formData.note?.trim(),
       ...(selectedStaffId ? { staff: selectedStaffId } : {}),
-      ...(checkInSqid ? { check_in: checkInSqid } : (appointmentSqid ? { appointment: appointmentSqid } : {})),
+      ...(checkInSqid ? { check_in: checkInSqid } : {}),
     };
 
     if (!payload.patient_hin) {
@@ -116,8 +116,8 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
       return;
     }
 
-    if (!payload.check_in && !payload.appointment) {
-      toast.error("Could not resolve check-in or appointment for this patient.");
+    if (!payload.check_in) {
+      toast.error("A vitals request needs a check-in. Check the patient in first.");
       return;
     }
 

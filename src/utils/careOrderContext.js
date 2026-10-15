@@ -12,63 +12,43 @@
  *                    `api/hospitals/patients?status=inpatient` list; the old
  *                    `.admission_date` was renamed to `created_at`)
  *
- * Each context needs a different `order_source` and a different (or no)
- * `check_in` link on lab/pharmacy/admission requests. This inspects the
- * object's shape once and resolves all three so call sites don't have to
- * duplicate the sniffing logic (or, worse, assume `.patient` and silently
- * send nothing when it's actually a check-in/admission object).
+ * Orders, vitals requests, bed requests and refer-out are saved against
+ * exactly one visit: a `check_in` or an `admission`. An appointment is no
+ * longer a visit, so `hasVisit` is false for it and callers block the action.
+ * This inspects the object's shape once so call sites don't have to
+ * duplicate the sniffing logic.
  *
  * If an admission is ever misread as a CheckIn, the *admission's* sqid goes
  * out as `check_in` and 400s with "Object with sqid=... does not exist.".
  */
-export const resolveOrderContext = (
-  details,
-  { fallbackOrderSource = "staff_appointment_order" } = {},
-) => {
+export const NO_VISIT_MESSAGE =
+  "This needs a check-in or an admission. Check the patient in first.";
+
+export const resolveOrderContext = (details) => {
   const hin =
     details?.patient_info?.hin ||
     details?.patient?.hin ||
     details?.patient_hin ||
     "";
 
-  if (!details) {
-    return {
-      hin,
-      orderSource: fallbackOrderSource,
-      checkIn: null,
-      admission: null,
-      appointment: null,
-    };
+  const context = { hin, checkIn: null, admission: null, appointment: null };
+
+  if (details) {
+    if (details.ward_info || details.bed_info || details.requested_by_info) {
+      // Admission (ward) context.
+      context.admission = details.sqid || details.id || null;
+    } else if (details.patient_info && !details.scheduled_time) {
+      // CheckIn context: has patient_info but no ward/bed/admission info.
+      context.checkIn = details.sqid || details.id || null;
+    } else {
+      // Appointment context: kept so callers can recognise it, but it is not a visit.
+      context.appointment = details.sqid || details.id || null;
+    }
   }
 
-  // Admission (ward) context.
-  if (details.ward_info || details.bed_info || details.requested_by_info) {
-    return {
-      hin,
-      orderSource: "staff_admission_order",
-      checkIn: null,
-      admission: details.sqid || details.id || null,
-      appointment: null,
-    };
-  }
-
-  // CheckIn context: has patient_info but no ward/bed/admission info.
-  if (details.patient_info && !details.scheduled_time) {
-    return {
-      hin,
-      orderSource: "staff_check_in_order",
-      checkIn: details.sqid || details.id || null,
-      admission: null,
-      appointment: null,
-    };
-  }
-
-  // Appointment (legacy/standard) context
-  return {
-    hin,
-    orderSource: fallbackOrderSource,
-    checkIn: null,
-    admission: null,
-    appointment: details.sqid || details.id || null,
-  };
+  return { ...context, hasVisit: !!(context.checkIn || context.admission) };
 };
+
+// The visit field an order, vitals request or refer-out sends: exactly one of check_in / admission.
+export const visitPayload = ({ checkIn, admission }) =>
+  admission ? { admission } : checkIn ? { check_in: checkIn } : {};
