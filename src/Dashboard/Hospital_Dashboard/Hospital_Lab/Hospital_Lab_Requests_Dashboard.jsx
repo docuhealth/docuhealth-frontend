@@ -35,6 +35,10 @@ const getBadgeStyle = (status) => {
     case "approved":
     case "accepted":
       return { label: "Result Ready", cls: "bg-green-100 text-green-600" };
+    case "result_accepted_by_lab_admin":
+      return { label: "Lab Admin Approved", cls: "bg-indigo-100 text-indigo-700 font-semibold" };
+    case "result_accepted_by_doctor":
+      return { label: "Doctor Approved", cls: "bg-green-100 text-green-700 font-semibold" };
     case "partial_ready":
     case "partially_result_ready":
       return { label: "Partial Ready", cls: "bg-indigo-100 text-indigo-600" };
@@ -60,11 +64,11 @@ const isCompletelyResultReady = (order) => {
   const items = order.items_info || order.items;
   if (Array.isArray(items) && items.length > 0) {
     return items.every((i) =>
-      ["result_ready", "all_ready", "completed", "ready", "approved", "accepted"].includes(i.status?.toLowerCase())
+      ["result_ready", "all_ready", "completed", "ready", "approved", "accepted", "result_accepted_by_lab_admin", "result_accepted_by_doctor"].includes(i.status?.toLowerCase())
     );
   }
   const st = (order.aggregate_status || order.status || "").toLowerCase();
-  return st === "result_ready" || st === "all_ready" || st === "completed";
+  return st === "result_ready" || st === "all_ready" || st === "completed" || st === "result_accepted_by_lab_admin" || st === "result_accepted_by_doctor";
 };
 
 const resolveOrderStatus = (order, activeTab) => {
@@ -210,8 +214,9 @@ const Hospital_Lab_Requests_Dashboard = () => {
         {/* Cards Grid */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-            <FlaskConical size={36} className="opacity-25 mb-2" />
-            <p className="text-sm">Loading requests...</p>
+            <div className="w-6 h-6 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin mb-3" />
+            <p className="text-sm font-medium text-slate-700">Loading test orders...</p>
+            <p className="text-xs text-gray-400 mt-1">Please wait while requests load</p>
           </div>
         ) : displayedRequests.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-gray-400">

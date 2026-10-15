@@ -7,6 +7,7 @@ export interface ModalProps {
   children: ReactNode;
   maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl" | "8xl" | "9xl" | "full";
   className?: string;
+  closeDisabled?: boolean;
 }
 
 const maxWidthClass = {
@@ -32,6 +33,7 @@ const Modal = ({
   children,
   maxWidth = "md",
   className = "",
+  closeDisabled = false,
 }: ModalProps) => {
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -52,7 +54,9 @@ const Modal = ({
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
+        onClick={() => {
+          if (!closeDisabled) onClose();
+        }}
       />
 
       {/* min-h-full centers short modals; tall ones scroll inside the overlay instead of clipping off-screen */}
@@ -70,8 +74,11 @@ const Modal = ({
           <div className="flex items-center justify-between p-5 border-b border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
             <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-500 focus:outline-none"
+              onClick={() => {
+                if (!closeDisabled) onClose();
+              }}
+              disabled={closeDisabled}
+              className={`${closeDisabled ? "text-gray-300 cursor-not-allowed" : "text-gray-400 hover:text-gray-500 cursor-pointer"} focus:outline-none`}
             >
               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
