@@ -57,7 +57,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
   // is opened so it doesn't carry over between patients.
   const [dischargedView, setDischargedView] = useState("tabs");
 
-  // Tab title the outpatient details view should open on. Set to "SOAP Notes"
+  // Tab title the outpatient details view should open on. Set to "Encounter Notes"
   // right after a SOAP note is created so the doctor lands on their new note;
   // cleared whenever a different patient is opened.
   const [outpatientDetailsTab, setOutpatientDetailsTab] = useState(null);
@@ -107,7 +107,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                   className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
                   onClick={() => setDischargedView("soap-history")}
                 >
-                  View soap note history
+                  View encounter note history
                 </button>
               </div>
             ) : (
@@ -116,7 +116,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                   {advanceCheckUpSource === "outpatient" && isOtherDoctors ? (
                     <span
                       className="inline-flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-full text-gray-500 border border-gray-200 bg-gray-50 select-none w-full lg:w-auto"
-                      title="Only the doctor running this consultation can add a SOAP note, order, request vitals or a bed, or refer out."
+                      title="Only the doctor running this consultation can add an encounter note, order, request vitals or a bed, or refer out."
                     >
                       <i className="bx bx-user-check text-base"></i>
                       {ownerName || "Another doctor"} is running this consultation
@@ -155,7 +155,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                           setAdvanceCheckUp(false);
                         }}
                       >
-                        Add new SOAP Note
+                        Add new Encounter Note
                       </button>
                     </>
                   ) : (
@@ -278,7 +278,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
               // on the SOAP Notes tab so the doctor sees their new note.
               setSoapNoteEntry(false);
               setAdvanceCheckUp(true);
-              setOutpatientDetailsTab("SOAP Notes");
+              setOutpatientDetailsTab("Encounter Notes");
             }}
           />
         </>

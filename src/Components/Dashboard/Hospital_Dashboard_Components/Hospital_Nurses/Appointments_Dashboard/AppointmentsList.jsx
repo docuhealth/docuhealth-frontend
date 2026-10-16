@@ -531,7 +531,7 @@ const AppointmentsList = ({ setCaseNoteHistory, setUpdateVitals, setVitalSignsHi
                         setSelectedPatientForSharedSoap(appointment);
                       }}
                     >
-                      View Shared SOAP Notes
+                      View Shared Encounter Notes
                     </p>
                     <p
                       className="text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
@@ -633,7 +633,7 @@ const AppointmentsList = ({ setCaseNoteHistory, setUpdateVitals, setVitalSignsHi
                           setSelectedPatientForSharedSoap(appointment);
                         }}
                       >
-                        View Shared SOAP Notes
+                        View Shared Encounter Notes
                       </button>
                       <button
                         className="w-full text-left text-sm text-slate-700 hover:bg-slate-50 p-2.5 rounded-lg transition-colors"

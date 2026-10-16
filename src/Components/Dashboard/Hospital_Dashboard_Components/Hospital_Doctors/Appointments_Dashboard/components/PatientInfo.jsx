@@ -540,7 +540,7 @@ PatientInfo.propTypes = {
   setSeePatientDetails: PropTypes.func,
   hideCreateOrder: PropTypes.bool,
   isOutpatient: PropTypes.bool,
-  // Tab title to open on for the first render (e.g. "SOAP Notes" after a
+  // Tab title to open on for the first render (e.g. "Encounter Notes" after a
   // note is created). Matched against getTabs() titles.
   initialTabTitle: PropTypes.string,
 };

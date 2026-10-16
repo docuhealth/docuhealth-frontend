@@ -8,7 +8,7 @@ import { fetchEncounterRecords } from "../../queries/Hospital/encounterRecords";
 const TYPES = {
   vital_signs: { label: "Vitals", chip: "bg-teal-50 text-teal-700", group: "vitals" },
   nursing_assessment: { label: "Nursing Assessment", chip: "bg-green-50 text-green-700", group: "vitals" },
-  soap_note: { label: "SOAP note", chip: "bg-blue-50 text-blue-700", group: "soap" },
+  soap_note: { label: "Encounter note", chip: "bg-blue-50 text-blue-700", group: "soap" },
   progress_note: { label: "Progress Note", chip: "bg-green-50 text-green-700", group: "soap" },
   lab_test_result: { label: "Lab result", chip: "bg-amber-50 text-amber-700", group: "labs" },
   scan_result: { label: "Radiology result", chip: "bg-violet-50 text-violet-700", group: "radiology" },
@@ -36,7 +36,7 @@ const DOT_STYLES = {
 
 const FILTERS = [
   ["all", "All"],
-  ["soap", "SOAP"],
+  ["soap", "Encounter notes"],
   ["vitals", "Vitals"],
   ["labs", "Labs"],
   ["radiology", "Radiology"],

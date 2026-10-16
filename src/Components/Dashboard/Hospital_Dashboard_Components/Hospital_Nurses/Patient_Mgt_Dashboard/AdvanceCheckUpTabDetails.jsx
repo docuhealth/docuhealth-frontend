@@ -335,7 +335,7 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
             )
         },
         {
-            title: "Shared soap notes",
+            title: "Shared encounter notes",
             status: "soap",
             content: withScope(
                 <SharedSoapNotes 

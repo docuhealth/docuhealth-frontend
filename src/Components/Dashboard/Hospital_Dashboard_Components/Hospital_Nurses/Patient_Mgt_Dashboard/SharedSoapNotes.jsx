@@ -12,7 +12,7 @@ import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
 
 // Mirrors a loaded note row (date/patient/doctor/complaint tiles + kebab).
 const SoapNoteRowsSkeleton = () => (
-  <div role="status" aria-label="Loading shared SOAP notes" className="flex flex-col gap-4 mt-4">
+  <div role="status" aria-label="Loading shared encounter notes" className="flex flex-col gap-4 mt-4">
     {Array.from({ length: 3 }, (_, i) => (
       <div key={i} className="flex flex-col-reverse lg:flex-row lg:items-center justify-between border rounded-lg p-4">
         <div className="flex flex-row flex-wrap gap-4 lg:gap-10">
@@ -78,7 +78,7 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, stayWindow = null
   useEffect(() => {
     if (isError) {
       toast.error(
-        error?.response?.data?.message || "Error fetching shared SOAP notes",
+        error?.response?.data?.message || "Error fetching shared encounter notes",
       );
       console.error(error);
     }
@@ -124,7 +124,7 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, stayWindow = null
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search shared SOAP notes..."
+          placeholder="Search shared encounter notes..."
         />
         {isRefreshing && !loading && (
           <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
@@ -198,13 +198,13 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, stayWindow = null
                 </defs>
               </svg>
 
-              <h2 className="font-medium pb-1">No Shared SOAP Notes!</h2>
+              <h2 className="font-medium pb-1">No Shared Encounter Notes!</h2>
               <div className="max-w-md text-center">
                 <p className="text-[12px] text-gray-500">
                   {" "}
                   {stayWindow
-                    ? "No shared SOAP notes were recorded during this admission."
-                    : "There are currently no shared SOAP notes available for this patient."}
+                    ? "No shared encounter notes were recorded during this admission."
+                    : "There are currently no shared encounter notes available for this patient."}
                 </p>
               </div>
             </div>

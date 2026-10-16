@@ -12,7 +12,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
   const [soapNoteEntry, setSoapNoteEntry] = useState(false);
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
-  // Tab title the patient-details view should open on. Set to "SOAP Notes"
+  // Tab title the patient-details view should open on. Set to "Encounter Notes"
   // right after a SOAP note is created; cleared when a different patient is
   // selected so it doesn't carry over.
   const [detailsTab, setDetailsTab] = useState(null);
@@ -33,7 +33,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
             <DynamicDate />
             {/* An appointment is not a visit: SOAP notes, bed requests and orders need a check-in. */}
             <p className="text-[13px] text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 w-full lg:w-auto">
-              To write a SOAP note, request a bed or place orders, check this patient in first.
+              To write an encounter note, request a bed or place orders, check this patient in first.
             </p>
           </div>
           <div className="my-5">
@@ -57,7 +57,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
                   setSeePatientDetails(true);
                 }}
               >
-                + close SOAP Note
+                + close Encounter Note
               </button>
             </div>
           </div>
@@ -77,7 +77,7 @@ const Hospital_Doctors_Appointments_Dashboard = () => {
                 // SOAP Notes tab so the doctor sees their new note.
                 setSoapNoteEntry(false);
                 setSeePatientDetails(true);
-                setDetailsTab("SOAP Notes");
+                setDetailsTab("Encounter Notes");
               }}
             />
           </div>

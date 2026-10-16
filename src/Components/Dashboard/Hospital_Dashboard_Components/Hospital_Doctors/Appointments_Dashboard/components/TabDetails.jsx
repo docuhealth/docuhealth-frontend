@@ -357,7 +357,7 @@ const PatientSOAPNotes = ({
   setSoapCurrentPage
 }) => {
   if (soapNotesLoading) {
-    return <RecordRowsSkeleton label="Loading SOAP notes" tiles={4} />;
+    return <RecordRowsSkeleton label="Loading encounter notes" tiles={4} />;
   }
 
   if (!patientSoapNotes || patientSoapNotes.length === 0) {
@@ -417,11 +417,11 @@ const PatientSOAPNotes = ({
           </defs>
         </svg>
 
-        <h2 className="font-medium pb-1">No soap notes!</h2>
+        <h2 className="font-medium pb-1">No encounter notes!</h2>
         <div className="max-w-md text-center">
           <p className="text-[12px] text-gray-500">
             {" "}
-            This patient does not have any soap notes
+            This patient does not have any encounter notes
           </p>
         </div>
       </div>
@@ -510,7 +510,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                 />
               </svg>
 
-              <span className=" text-sm">SOAP Note Overview</span>
+              <span className=" text-sm">Encounter Note Overview</span>
             </button>
             <div className=" flex flex-col sm:flex-row justify-end items-center gap-3 w-full sm:w-auto">
               <button type="button" className="flex justify-center items-center gap-1 border border-docuhealth-primary py-1.5 px-4 rounded-full w-full sm:w-auto text-docuhealth-primary cursor-pointer" onClick={() => setCreateAdditionalNotes(true)}>
@@ -828,7 +828,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
 
                         <button
                           type="button"
-                          aria-label="SOAP note actions"
+                          aria-label="Encounter note actions"
                           aria-haspopup="true"
                           aria-expanded={openPopover === index}
                           onClick={() => {
@@ -860,7 +860,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                                 setOpenPopover(null);
                               }}
                             >
-                              See full SOAP Note
+                              See full Encounter Note
                             </button>
                           </div>
                         )}
@@ -917,7 +917,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                                 setOpenPopover(null);
                               }}
                             >
-                              See full SOAP Note
+                              See full Encounter Note
                             </button>
                           </div>
                         )}
@@ -972,7 +972,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
               />
             </>
           ) : (
-            <p className="text-center">No soap notes found.</p>
+            <p className="text-center">No encounter notes found.</p>
           )}
         </>
       )}
@@ -1081,7 +1081,7 @@ const getTabs = ({
     //   ),
     // },
     {
-      title: "SOAP Notes",
+      title: "Encounter Notes",
       content: (
         <PatientSOAPNotes
           soapNotesLoading={soapNotesLoading}

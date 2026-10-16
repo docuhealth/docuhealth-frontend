@@ -117,7 +117,7 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
   const getRecordTitle = (type, action) => {
     switch (type) {
       case "SoapNote":
-        return "SOAP note recorded for this patient!";
+        return "Encounter note recorded for this patient!";
       case "LabTestResult":
         return "Lab result recorded for this patient!";
       case "ScanResult":
@@ -146,7 +146,7 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
   const getRecordLinkText = (type, action) => {
     switch (type) {
       case "SoapNote":
-        return "View SOAP note";
+        return "View encounter note";
       case "LabTestResult":
         return "View Lab result";
       case "ScanResult":
@@ -176,7 +176,7 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
 
     // Customize text based on record type
     if (recordType === "SoapNote") {
-      actionText = "created a SOAP note";
+      actionText = "created an encounter note";
     } else if (recordType === "LabTestResult") {
       actionText = "recorded a lab result";
     } else if (recordType === "ScanResult") {
