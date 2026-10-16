@@ -10,6 +10,98 @@ import CarePlanHistory from "./CarePlanHistory";
 import AdmissionNotesHistory from "./AdmissionNotesHistory";
 import VitalSignsHistory from "./VitalSignsHistory";
 import EncounterRecordsTimeline from "../../../../ui/EncounterRecordsTimeline";
+import { formatFrequency } from "../../../../../utils/careTaskConstants";
+import Skeleton, { SkeletonText, SkeletonBox } from "../../../../ui/Skeleton";
+
+// A read-only form field (label + bordered input) with a bar where the value goes.
+const FieldSkeleton = ({ w = "w-32", className = "" }) => (
+    <div className={`flex flex-col gap-1.5 ${className}`}>
+        <SkeletonText textClassName="text-sm" className="h-3 w-24" />
+        <div className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm">
+            <SkeletonText className={`h-3.5 ${w}`} />
+        </div>
+    </div>
+);
+
+// Mirrors the "Patient's information" tab (general + admission cards) while the
+// patient record loads.
+export const PatientInfoSkeleton = () => (
+    <div role="status" aria-label="Loading patient information" className="space-y-6">
+        <div className="bg-gray-50 rounded-xl border p-6">
+            <div className="flex justify-between items-center mb-5">
+                <SkeletonText className="h-4 w-40" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                {["w-24", "w-28", "w-36", "w-44", "w-28", "w-52"].map((w, i) => <FieldSkeleton key={i} w={w} />)}
+            </div>
+        </div>
+        <div className="bg-gray-50 rounded-xl border p-6">
+            <SkeletonText textClassName="mb-5" className="h-4 w-44" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                {["w-32", "w-44", "w-20", "w-12"].map((w, i) => <FieldSkeleton key={i} w={w} />)}
+                <div className="flex flex-col gap-1.5 md:col-span-2">
+                    <SkeletonText textClassName="text-sm" className="h-3 w-36" />
+                    <div className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm">
+                        <SkeletonText className="h-3.5 w-64" />
+                        <SkeletonText className="h-3.5 w-40" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
+// Mirrors the "latest facility vitals" tab (9 vitals tiles, the full-width notes tile,
+// then ongoing medication cards).
+export const LatestVitalsSkeleton = () => (
+    <div role="status" aria-label="Loading latest vitals" className="space-y-6">
+        <div className="bg-white rounded-xl border p-6">
+            <SkeletonText textClassName="mb-4" className="h-4 w-44" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[12px]">
+                {Array.from({ length: 9 }, (_, i) => (
+                    <div key={i} className="bg-white border rounded-md p-3">
+                        <div className="flex items-center gap-1 pb-2">
+                            <Skeleton className="h-4 w-4" />
+                            <SkeletonText className="h-3 w-24" />
+                        </div>
+                        <SkeletonText className="h-3 w-20" />
+                    </div>
+                ))}
+                <div className="col-span-1 sm:col-span-2 lg:col-span-3 bg-white border rounded-md p-3">
+                    <div className="flex items-center gap-1.5 pb-1.5">
+                        <Skeleton className="h-3.5 w-3.5" />
+                        <SkeletonText className="h-3 w-12" />
+                    </div>
+                    <SkeletonText textClassName="text-[13px] leading-relaxed" className="h-3 w-48" />
+                </div>
+            </div>
+        </div>
+        <div className="bg-white rounded-xl border p-6">
+            <SkeletonText textClassName="mb-5" className="h-4 w-48" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Array.from({ length: 2 }, (_, i) => (
+                    <div key={i} className="border border-gray-100 p-4 rounded-lg bg-white shadow-sm">
+                        <div className="flex justify-between items-center mb-4">
+                            <div className="flex items-center gap-2">
+                                <Skeleton className="h-3.5 w-3.5" />
+                                <SkeletonText textClassName="text-[13px]" className="h-3 w-28" />
+                            </div>
+                            <SkeletonBox className="px-3 py-0.5 rounded-full text-[11px] w-16" />
+                        </div>
+                        <div className="space-y-2 text-[12px]">
+                            {["w-14", "w-24", "w-16", "w-28"].map((w, j) => (
+                                <div key={j} className={`flex justify-between ${j === 3 ? "pt-1 border-t border-gray-50" : ""}`}>
+                                    <SkeletonText className="h-3 w-20" />
+                                    <SkeletonText className={`h-3 ${w}`} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+);
 
 const PatientInfoContent = ({ patient, admission, patientFullInfo, formatDate, formatDateTime, isOutPatient }) => {
     const isDischargedInpatient = !isOutPatient && (Boolean(admission?.discharge_date) || admission?.status === "inpatient_discharge");
