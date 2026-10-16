@@ -1,7 +1,44 @@
 import React, { useState, useRef, useEffect } from "react";
-import { MoreVertical, Loader2 } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import Skeleton, { SkeletonText, SkeletonBox } from "../../../../ui/Skeleton";
+
+// Mirrors a loaded task card (priority badge + kebab, clipboard art, details, progress).
+const TaskCardsSkeleton = () => (
+  <div role="status" aria-label="Loading tasks" className="mt-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pb-6">
+    {Array.from({ length: 6 }, (_, i) => (
+      <div key={i} className="border border-gray-200 rounded-xl bg-white relative flex flex-col p-5">
+        <div className="flex justify-between items-start mb-6">
+          <SkeletonBox className="text-xs px-3 py-1 rounded-full w-28" />
+          <div className="relative">
+            <button type="button" disabled tabIndex={-1} className="text-gray-200">
+              <MoreVertical size={20} />
+            </button>
+          </div>
+        </div>
+        <div className="flex justify-center items-center py-6 mb-4">
+          <Skeleton className="h-[72px] w-[72px] rounded-xl" />
+        </div>
+        <div className="flex flex-col flex-grow text-sm space-y-2.5">
+          <div className="border-b border-gray-100 pb-3 mb-2">
+            <SkeletonText textClassName="text-[15px]" className="h-3.5 w-44" />
+          </div>
+          <div>
+            <SkeletonText className="h-3 w-20" />
+            <SkeletonText className="h-3.5 w-40" />
+          </div>
+          <SkeletonText className="h-3.5 w-36" />
+          <SkeletonText className="h-3.5 w-32" />
+          <SkeletonText className="h-3.5 w-28" />
+          <div className="mt-auto pt-4">
+            <Skeleton className="w-full h-1.5 rounded-full" />
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 const PriorityBadge = ({ priority }) => {
   let bgColor = "bg-blue-100";
@@ -108,11 +145,7 @@ const MyTasksTab = ({ tasks, loading, type }) => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <Loader2 className="animate-spin h-8 w-8 text-docuhealth-primary" />
-      </div>
-    );
+    return <TaskCardsSkeleton />;
   }
 
   return (

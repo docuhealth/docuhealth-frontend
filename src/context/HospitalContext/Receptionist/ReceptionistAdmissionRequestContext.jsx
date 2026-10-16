@@ -1,6 +1,6 @@
 import React, { useEffect, useState, createContext } from "react";
 import { getHospitalToken } from "../../../services/authService";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   ADMISSION_REQUESTS_PAGE_SIZE,
   fetchAdmissionRequests,
@@ -22,7 +22,9 @@ const ReceptionistAdmissionRequestProvider = (props) => {
     queryKey: ["hospital-admission-requests", currentPage, debouncedSearch, status],
     queryFn: fetchAdmissionRequests,
     enabled: isUserLoggedIn,
-    placeholderData: keepPreviousData,
+    // Keep the old page on screen while paging or searching, but not across a status
+    // switch: that would show the previous status's rows until the new ones land.
+    placeholderData: (prev, prevQuery) => (prevQuery?.queryKey[3] === status ? prev : undefined),
   });
 
   useEffect(() => {

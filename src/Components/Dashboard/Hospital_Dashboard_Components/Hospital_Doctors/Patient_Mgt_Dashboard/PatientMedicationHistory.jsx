@@ -6,19 +6,8 @@ import Skeleton from "../../../../ui/Skeleton";
 import EmptyState from "../../../../ui/EmptyState";
 import { fetchMedicationHistory } from "../../../../../queries/Hospital/doctor/medicationHistory";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
+import { formatFrequency } from "../../../../../utils/careTaskConstants";
 
-// Dosing codes the API stores in `frequency.rate` (FrequencyEnum).
-const FREQUENCY_CODES = new Set([
-  "stat", "once", "od", "bd", "tds", "qid", "q1h", "q2h", "q3h", "q4h", "q6h", "q8h",
-  "q12h", "q24h", "prn", "mane", "nocte", "alt_days", "weekly", "monthly",
-]);
-
-const formatFrequency = (f) => {
-  if (!f) return "-";
-  if (typeof f === "string") return f.toUpperCase();
-  if (FREQUENCY_CODES.has(f.rate)) return f.rate.replace("_", " ").toUpperCase();
-  return [f.value != null ? `${Number(f.value)}×` : null, f.rate].filter(Boolean).join(" ") || "-";
-};
 
 const formatDuration = (d) => {
   if (!d) return "-";
@@ -48,26 +37,16 @@ const encounterOf = (event) => {
   return null;
 };
 
-const STATUS_STYLES = {
-  ongoing: "text-emerald-700 bg-emerald-50 border border-emerald-200",
-  completed: "text-gray-600 bg-gray-100",
-  stopped: "text-rose-700 bg-rose-50 border border-rose-200",
-};
-
-// Same layout as the loaded tab: filter pills + search, then the medication table.
+// Same layout as the loaded tab: search, then the medication table.
 const MedicationHistorySkeleton = () => (
   <div role="status" aria-label="Loading medication history" className="space-y-5">
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-      <div className="flex items-center gap-2">
-        <Skeleton className="h-7 w-16 rounded-full" />
-        <Skeleton className="h-7 w-24 rounded-full" />
-      </div>
+    <div className="flex justify-end">
       <Skeleton className="h-8 w-full md:w-64 rounded-full" />
     </div>
     <div className="overflow-x-auto bg-white border rounded-xl">
       <div className="min-w-[820px]">
         <div className="border-b bg-gray-50/80 px-4 py-3.5 flex gap-6">
-          {[96, 40, 44, 64, 56, 44, 80, 40].map((w, i) => (
+          {[96, 40, 44, 64, 56, 80, 40].map((w, i) => (
             <Skeleton key={i} className="h-2.5" style={{ width: w, flex: i === 0 ? "1 1 0" : undefined }} />
           ))}
         </div>
@@ -83,7 +62,6 @@ const MedicationHistorySkeleton = () => (
             {[48, 40, 36, 48].map((w, j) => (
               <Skeleton key={j} className="h-3 mt-1" style={{ width: w }} />
             ))}
-            <Skeleton className="h-5 w-16 rounded-full" />
             <div className="flex flex-col gap-1.5">
               <Skeleton className="h-3 w-28" />
               <Skeleton className="h-2.5 w-12" />
@@ -110,7 +88,7 @@ const OngoingDrugsStrip = ({ drugs }) =>
             <Pill size={12} className="text-emerald-600" />
             <span className="font-medium text-gray-800">{drug.name}</span>
             <span className="text-gray-500">
-              {formatDose(drug)} · {formatFrequency(drug.frequency)} · {formatDuration(drug.duration)}
+              {formatDose(drug)} · {formatFrequency(drug.frequency, "-")} · {formatDuration(drug.duration)}
             </span>
           </span>
         ))}
@@ -121,7 +99,6 @@ const OngoingDrugsStrip = ({ drugs }) =>
 const PatientMedicationHistory = ({ patientFullInfo, admissionSqid }) => {
   const hin = patientFullInfo?.patient_info?.hin;
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all");
 
   const { data: records = [], isLoading, isError, error } = useQuery({
     queryKey: ["patient-medication-history", hin],
@@ -131,24 +108,15 @@ const PatientMedicationHistory = ({ patientFullInfo, admissionSqid }) => {
 
   const ongoingDrugs = patientFullInfo?.ongoing_drugs || [];
 
-  const counts = useMemo(() => {
-    const c = { all: records.length, ongoing: 0, completed: 0, stopped: 0 };
-    records.forEach(({ drug }) => {
-      if (c[drug.status] !== undefined) c[drug.status] += 1;
-    });
-    return c;
-  }, [records]);
-
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return records.filter((rec) => {
-      if (activeFilter !== "all" && rec.drug.status !== activeFilter) return false;
       if (!q) return true;
       return [rec.drug.name, rec.drug.route, staffName(rec.event.staff_info)]
         .filter(Boolean)
         .some((v) => v.toLowerCase().includes(q));
     });
-  }, [records, activeFilter, searchQuery]);
+  }, [records, searchQuery]);
 
   if (!hin || isLoading) {
     return (
@@ -181,32 +149,11 @@ const PatientMedicationHistory = ({ patientFullInfo, admissionSqid }) => {
     );
   }
 
-  const filters = [
-    { key: "all", label: "All" },
-    { key: "ongoing", label: "Ongoing" },
-    { key: "completed", label: "Completed" },
-    { key: "stopped", label: "Stopped" },
-  ].filter((f) => f.key === "all" || counts[f.key] > 0);
-
   return (
     <div className="space-y-5">
       <OngoingDrugsStrip drugs={ongoingDrugs} />
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-        <div className="flex items-center gap-2 flex-wrap">
-          {filters.map((f) => (
-            <button
-              key={f.key}
-              type="button"
-              onClick={() => setActiveFilter(f.key)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
-                activeFilter === f.key ? "bg-docuhealth-primary text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              {f.label} ({counts[f.key]})
-            </button>
-          ))}
-        </div>
+      <div className="flex justify-end">
         <div className="relative w-full md:w-64">
           <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -237,7 +184,6 @@ const PatientMedicationHistory = ({ patientFullInfo, admissionSqid }) => {
                 <th className="py-3 px-3">Route</th>
                 <th className="py-3 px-3">Frequency</th>
                 <th className="py-3 px-3">Duration</th>
-                <th className="py-3 px-3">Status</th>
                 <th className="py-3 px-3">Recorded by</th>
                 <th className="py-3 px-4">Date</th>
               </tr>
@@ -274,13 +220,8 @@ const PatientMedicationHistory = ({ patientFullInfo, admissionSqid }) => {
                     </td>
                     <td className="py-3.5 px-3 text-gray-700 whitespace-nowrap">{formatDose(drug)}</td>
                     <td className="py-3.5 px-3 text-gray-700 whitespace-nowrap capitalize">{drug.route || "-"}</td>
-                    <td className="py-3.5 px-3 text-gray-700 whitespace-nowrap">{formatFrequency(drug.frequency)}</td>
+                    <td className="py-3.5 px-3 text-gray-700 whitespace-nowrap">{formatFrequency(drug.frequency, "-")}</td>
                     <td className="py-3.5 px-3 text-gray-700 whitespace-nowrap">{formatDuration(drug.duration)}</td>
-                    <td className="py-3.5 px-3 whitespace-nowrap">
-                      <span className={`inline-flex text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize ${STATUS_STYLES[drug.status] || STATUS_STYLES.completed}`}>
-                        {drug.status || "-"}
-                      </span>
-                    </td>
                     <td className="py-3.5 px-3">
                       <p className="font-medium text-gray-800 text-[11px]">{staffName(event.staff_info)}</p>
                       <p className="text-[10px] text-gray-400 capitalize">{event.staff_info?.role || ""}</p>

@@ -3,6 +3,76 @@ import { ReceptionistRecentPatientsContext } from '../../../../../../context/Hos
 import Pagination2 from '../../../../Patient_Dashboard_Components/Pagination/Pagination2';
 import { formatFullDate, formatTime } from '../../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter';
 import SearchBar from '../../../../../SearchBar/SearchBar';
+import Skeleton, { SkeletonText } from '../../../../../ui/Skeleton';
+
+// Mirrors the loaded markup (search box, 8-column table on desktop, patient cards on
+// mobile) with each text line swapped for a bar of the same line height.
+const RecentPatientsSkeleton = () => (
+    <div role="status" aria-label="Loading recent patients">
+        <div className="mb-4 w-full h-[38px] rounded-md border border-gray-300 bg-white flex items-center pl-3">
+            <Skeleton className="h-4 w-4" />
+            <Skeleton className="h-3 w-44 ml-3" />
+        </div>
+        <div className="hidden lg:flex lg:flex-col">
+            <div className="h-[60px] bg-gray-100 rounded-md" />
+            {Array.from({ length: 5 }, (_, i) => (
+                <div key={i} className="grid grid-cols-8 items-center text-[12px] border-b border-b-gray-200">
+                    <div className="col-span-2 py-6 pl-5 flex items-center gap-1">
+                        <Skeleton className="h-3.5 w-3.5 rounded-full" />
+                        <SkeletonText className="h-3 w-28" />
+                    </div>
+                    <SkeletonText textClassName="col-span-2" className="h-3 w-40" />
+                    <SkeletonText className="h-3 w-20" />
+                    <div className="flex items-center gap-1">
+                        <Skeleton className="h-3.5 w-3.5 rounded-full" />
+                        <SkeletonText className="h-3 w-24" />
+                    </div>
+                    <SkeletonText className="h-3 w-12" />
+                    <Skeleton className="h-[26px] w-20" />
+                </div>
+            ))}
+        </div>
+        <div className="lg:hidden flex flex-col gap-4">
+            {Array.from({ length: 3 }, (_, i) => (
+                <div key={i} className="bg-white border border-gray-200 rounded-md p-5">
+                    <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-3">
+                            <Skeleton className="h-10 w-10 rounded-full" />
+                            <div>
+                                <SkeletonText textClassName="text-[14px] leading-tight" className="h-3.5 w-32" />
+                                <SkeletonText textClassName="text-[11px]" className="h-2.5 w-12" />
+                            </div>
+                        </div>
+                        <Skeleton className="h-[25px] w-11" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-y-4 pt-3 border-t border-gray-50">
+                        {[0, 1].map((j) => (
+                            <div key={j}>
+                                <SkeletonText textClassName="text-[10px] mb-0.5" className="h-2 w-20" />
+                                <div className="flex items-center gap-1.5">
+                                    <i className="bx bx-calendar text-[14px] text-gray-200"></i>
+                                    <SkeletonText textClassName="text-[11.5px] leading-none" className="h-2.5 w-24" />
+                                </div>
+                                <SkeletonText textClassName="text-[10px] mt-1 pl-5" className="h-2 w-16" />
+                            </div>
+                        ))}
+                        <div>
+                            <SkeletonText textClassName="text-[10px] mb-0.5" className="h-2 w-12" />
+                            <div className="flex items-center gap-1.5">
+                                <i className="bx bx-check-circle text-[14px] text-gray-200"></i>
+                                <SkeletonText textClassName="text-[11.5px] leading-none" className="h-2.5 w-16" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-4 bg-gray-100 rounded-lg p-2.5 flex justify-between items-center">
+                        <SkeletonText textClassName="text-[10px]" className="h-2 w-20 bg-gray-200" />
+                        <SkeletonText textClassName="text-[12px]" className="h-3 w-24 bg-gray-200" />
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+);
 
 const RecentPatients = () => {
 
@@ -32,11 +102,7 @@ const RecentPatients = () => {
     const getHin = (patient) => patient.patient_info?.hin || patient.patient?.hin || "";
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-full text-sm">
-                Loading...
-            </div>
-        );
+        return <RecentPatientsSkeleton />;
     }
 
     if (recentPatients.length === 0 && !searchQuery) {

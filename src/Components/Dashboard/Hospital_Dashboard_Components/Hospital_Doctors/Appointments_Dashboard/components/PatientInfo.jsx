@@ -4,6 +4,7 @@ import { ArrowLeft, X, Check, ChevronDown, Image, FileText, Eye, ArrowDownToLine
 import TabComponent from "./TabComponent";
 import getTabs from "./TabDetails";
 import OrderLabModal from "./OrderLabModal";
+import { useCheckInOwnership } from "../../../../../../hooks/useCheckInOwnership";
 import formatRecordDate, {
   formatFullDateTime,
   getAge,
@@ -23,6 +24,7 @@ import ClinicalSummaryCard from "../../../../../ui/ClinicalSummaryCard";
 import Select from "../../../../../ui/Select";
 import Modal from "../../../../../ui/Modal";
 import PatientDetailSkeleton from "../../../../../ui/PatientDetailSkeleton";
+import EmptyState from "../../../../../ui/EmptyState";
 
 const DUMMY_PATIENT_INFO = {
   patient_info: {
@@ -70,6 +72,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
       ? { appointment: selectedPatientDetails.sqid }
       : null;
   const appointmentAlreadyClosed = !orderContext.checkIn && isAppointmentClosed(selectedPatientDetails);
+  const { isOtherDoctors } = useCheckInOwnership(orderContext.checkIn);
 
   const handleConfirmCheckout = () => {
     if (!checkoutTarget) {
@@ -92,14 +95,13 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const hin = orderContext.hin;
   const pageSize = 6;
 
-  const { data: patientFullInfo, isLoading: loadingInfo } = useQuery({
+  const { data: patientFullInfo, isLoading: loadingInfo, isError: infoError, error: infoErrorDetail } = useQuery({
     queryKey: ["patient-info", hin],
     queryFn: async () => {
       const res = await axiosInstanceHos.get(`api/doctors/patient/info/${hin}`);
       return res.data;
     },
     enabled: !!hin,
-    onError: () => toast.error("Error fetching patient's details"),
   });
 
   const { data: medRecordsData, isLoading: medLoading } = useQuery({
@@ -342,7 +344,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     {selectedPatientDetails?.status || "Pending"}
                   </span>
                 </p> */}
-                {!hideCreateOrder && (
+                {!hideCreateOrder && !isOtherDoctors && (
                   <button
                     onClick={() => setShowOrderModal(true)}
                     className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary text-sm rounded-full px-5 py-1.5 hover:bg-blue-50 transition-colors cursor-pointer"
@@ -367,6 +369,17 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
 
             {loadingInfo ? (
               <PatientDetailSkeleton tabs={5} />
+            ) : infoError ? (
+              <div className="py-16 text-center">
+                <EmptyState
+                  title="Couldn't load this patient's details"
+                  description={
+                    infoErrorDetail?.response?.status >= 500
+                      ? "The server hit an error loading this patient. Please try again later."
+                      : extractApiErrorMessage(infoErrorDetail, "Please try again in a moment.")
+                  }
+                />
+              </div>
             ) : (
               <>
                 <div className="py-5 border-b">

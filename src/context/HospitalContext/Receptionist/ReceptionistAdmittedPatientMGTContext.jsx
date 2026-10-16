@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext } from "react";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axiosInstanceHos from "../../../lib/axios/hospital";
 import { getHospitalToken } from "../../../services/authService";
 import useDebounce from "../../../hooks/useDebounce";
@@ -24,7 +24,9 @@ const ReceptionistAdmittedPatientMGTProvider = (props) => {
       return res.data;
     },
     enabled: isUserLoggedIn,
-    placeholderData: keepPreviousData,
+    // Keep the old page on screen while paging or searching, but not across a tab
+    // switch: that would show the previous tab's rows until the new ones land.
+    placeholderData: (prev, prevQuery) => (prevQuery?.queryKey[1] === tab ? prev : undefined),
   });
 
   useEffect(() => {

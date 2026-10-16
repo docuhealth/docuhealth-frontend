@@ -1,47 +1,33 @@
 import React from "react";
 
+// Same look as the doctor's TabComponent2, but the active tab is controlled by the parent
 const AdvanceCheckUpTabComponent = ({ tabs, activeTab, setActiveTab }) => {
     return (
-        <div>
-            {/* Mobile/Tablet Tabs (Grid Layout) */}
-            <div className="grid grid-cols-2 gap-3 mb-8 lg:grid-cols-3 xl:hidden">
-                {tabs.map((t, index) => (
+        <div className="w-full py-3 mx-auto">
+            {/* Scrolls sideways when the tabs don't fit, with the scrollbar hidden. */}
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2 sm:overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b-0 sm:border-b border-gray-200 pb-4 sm:pb-0 sm:mb-5">
+                {tabs.map((t) => (
                     <button
-                        key={`mobile-${index}`}
-                        onClick={() => setActiveTab(t.status)}
-                        className={`px-3 py-2.5 text-[13px] sm:text-sm font-medium rounded-lg transition-all ${
+                        key={t.status}
+                        type="button"
+                        onClick={(e) => {
+                            setActiveTab(t.status);
+                            // Bring a half-hidden tab fully into view, since there is no scrollbar to drag.
+                            e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+                        }}
+                        className={`text-[13px] px-2 sm:px-6 py-2 sm:py-3 font-medium transition-colors duration-200 cursor-pointer text-center sm:whitespace-nowrap sm:shrink-0 rounded-lg sm:rounded-none ${
                             activeTab === t.status
-                                ? "bg-docuhealth-primary text-white shadow-sm"
-                                : "bg-white text-gray-500 border border-transparent hover:border-gray-200 hover:bg-gray-50"
+                                ? "bg-docuhealth-primary text-white sm:bg-transparent sm:text-docuhealth-primary sm:border-b-2 sm:border-docuhealth-primary font-semibold"
+                                : "text-gray-600 hover:bg-gray-100 hover:text-gray-800 sm:hover:bg-transparent sm:border-b-2 sm:border-transparent"
                         }`}
                     >
                         {t.title}
-                    </button>
-                ))}
-            </div>
-
-            {/* Desktop Tabs (Underline Layout) */}
-            <div className="hidden xl:flex gap-6 border-b border-gray-200 mb-6">
-                {tabs.map((t, index) => (
-                    <button
-                        key={`desktop-${index}`}
-                        onClick={() => setActiveTab(t.status)}
-                        className={`pb-3 text-sm font-medium transition-colors relative ${
-                            activeTab === t.status
-                                ? "text-docuhealth-primary"
-                                : "text-gray-500 hover:text-gray-700"
-                        }`}
-                    >
-                        {t.title}
-                        {activeTab === t.status && (
-                            <span className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-docuhealth-primary"></span>
-                        )}
                     </button>
                 ))}
             </div>
 
             {/* Tab Content */}
-            <div>
+            <div className="py-4">
                 {tabs.find((t) => t.status === activeTab)?.content}
             </div>
         </div>

@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import HospitalLoader from "../../../../../ui/HospitalLoader";
 
 /**
@@ -79,22 +80,8 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
         "Error assigning patient to nurse for vitals checkup:",
         err,
       );
-      const data = err.response?.data;
-      let errorMsg = "Nurse vitals checkUp failed.";
-      if (data) {
-        if (data.detail && typeof data.detail === "string") {
-          errorMsg = data.detail;
-        } else if (data.message && typeof data.message === "string") {
-          errorMsg = data.message;
-        } else if (typeof data === "object") {
-          const firstKey = Object.keys(data)[0];
-          if (firstKey) {
-            const firstVal = data[firstKey];
-            errorMsg = Array.isArray(firstVal) ? `${firstKey}: ${firstVal[0]}` : `${firstKey}: ${firstVal}`;
-          }
-        }
-      }
-      toast.error(errorMsg);
+      // Errors arrive as lists under `detail` or a field (e.g. `check_in: ["This consultation is not yours."]`).
+      toast.error(extractApiErrorMessage(err, "Nurse vitals checkUp failed."));
     },
   });
 

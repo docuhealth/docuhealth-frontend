@@ -15,6 +15,8 @@ import ReferOutModal from "../../../Components/Dashboard/Hospital_Dashboard_Comp
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useContext } from "react";
 import { DoctorsAdmittedPatientMGTContext } from "../../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
+import { useCheckInOwnership } from "../../../hooks/useCheckInOwnership";
+import { resolveOrderContext } from "../../../utils/careOrderContext";
 
 const Hospital_Doctors_Patients_Dashboard = () => {
   const [advanceCheckUp, setAdvanceCheckUp] = useState(false);
@@ -59,6 +61,10 @@ const Hospital_Doctors_Patients_Dashboard = () => {
   // right after a SOAP note is created so the doctor lands on their new note;
   // cleared whenever a different patient is opened.
   const [outpatientDetailsTab, setOutpatientDetailsTab] = useState(null);
+
+  const outpatientCheckIn =
+    advanceCheckUp && advanceCheckUpSource === "outpatient" ? resolveOrderContext(selected).checkIn : null;
+  const { isOtherDoctors, ownerName } = useCheckInOwnership(outpatientCheckIn);
 
   useEffect(() => {
     setDischargedView("tabs");
@@ -107,7 +113,15 @@ const Hospital_Doctors_Patients_Dashboard = () => {
             ) : (
               !selected.discharge_date && (
                 <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
-                  {advanceCheckUpSource === "outpatient" ? (
+                  {advanceCheckUpSource === "outpatient" && isOtherDoctors ? (
+                    <span
+                      className="inline-flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-full text-gray-500 border border-gray-200 bg-gray-50 select-none w-full lg:w-auto"
+                      title="Only the doctor running this consultation can add a SOAP note, order, request vitals or a bed, or refer out."
+                    >
+                      <i className="bx bx-user-check text-base"></i>
+                      {ownerName || "Another doctor"} is running this consultation
+                    </span>
+                  ) : advanceCheckUpSource === "outpatient" ? (
                     <>
                       {selected?.admission_request_status === "pending" ||
                       selected?.admission_request_status === "confirmed" ? (
@@ -146,12 +160,15 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                     </>
                   ) : (
                     <>
-                      <button
-                        className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
-                        onClick={() => setReferOut(true)}
-                      >
-                        Refer out
-                      </button>
+                      {/* Refer-out is refused once the doctor discharge is recorded. */}
+                      {selected?.status !== "awaiting_nurse_discharge" && (
+                        <button
+                          className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                          onClick={() => setReferOut(true)}
+                        >
+                          Refer out
+                        </button>
+                      )}
                       <button
                         className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
                         onClick={() => {
@@ -197,6 +214,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
               admissionSqid={
                 advanceCheckUpSource === "outpatient" ? null : selected?.sqid
               }
+              admissionStatus={selected?.status}
               onOrderPharmacy={() => {
                 setPrescribeMedication(true);
                 setAdvanceCheckUp(false);

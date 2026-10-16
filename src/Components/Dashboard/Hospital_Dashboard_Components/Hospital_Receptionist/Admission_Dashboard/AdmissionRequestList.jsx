@@ -12,6 +12,8 @@ import {
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import SearchBar from "../../../../SearchBar/SearchBar";
 import Modal from "../../../../ui/Modal";
+import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
+import HospitalLoader from "../../../../ui/HospitalLoader";
 import toast from "react-hot-toast";
 
 const STATUS_TABS = [
@@ -25,6 +27,42 @@ const EMPTY_TEXT = {
   accepted: "No bed requests have been accepted yet.",
   rejected: "No bed requests have been rejected yet.",
 };
+
+// Mirrors the loaded markup (search box + request cards) with each text line swapped
+// for a bar of the same line height, so nothing shifts when the requests land.
+const AdmissionRequestsSkeleton = () => (
+  <div role="status" aria-label="Loading admission requests">
+    <div className="mb-4 w-full h-[38px] rounded-md border border-gray-300 bg-white flex items-center pl-3">
+      <Skeleton className="h-4 w-4" />
+      <Skeleton className="h-3 w-36 ml-3" />
+    </div>
+    <div className="my-4 text-[12px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {Array.from({ length: 6 }, (_, i) => (
+        <div key={i} className="border p-3 rounded-xl">
+          <div className="flex justify-between items-center">
+            <SkeletonText className="h-3 w-28" />
+            <SkeletonText className="h-[18px] w-11 rounded-full" />
+          </div>
+          <div className="border-b py-2">
+            <SkeletonText className="h-3 w-28" />
+          </div>
+          <div className="flex items-center gap-1 pt-3">
+            <Skeleton className="h-[15px] w-[15px]" />
+            <SkeletonText className="h-3 w-28" />
+          </div>
+          <div className="flex items-center gap-1 pt-1 pb-3 border-b">
+            <Skeleton className="h-[15px] w-[15px]" />
+            <SkeletonText className="h-3 w-48" />
+          </div>
+          <div className="flex gap-2 mt-3">
+            <Skeleton className="h-9 w-full rounded-full" />
+            <Skeleton className="h-9 w-full rounded-full" />
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const staffName = (s) =>
   s ? `${s.role === "doctor" ? "Dr. " : ""}${s.firstname} ${s.lastname}` : null;
@@ -136,9 +174,7 @@ const AdmissionRequestList = () => {
     return (
       <>
         {statusTabs}
-        <div className="flex justify-center items-center h-full text-sm">
-          Loading...
-        </div>
+        <AdmissionRequestsSkeleton />
       </>
     );
   }
@@ -376,6 +412,7 @@ const AdmissionRequestList = () => {
       )}
 
       <Modal isOpen={Boolean(rejecting)} onClose={closeRejectModal}>
+        {rejectMutation.isPending && <HospitalLoader variant="overlay" label="Rejecting bed request..." />}
         <div className="flex flex-col gap-5">
           <div className="text-center pr-6">
             <h3 className="text-base font-semibold text-gray-900">Reject bed request</h3>
