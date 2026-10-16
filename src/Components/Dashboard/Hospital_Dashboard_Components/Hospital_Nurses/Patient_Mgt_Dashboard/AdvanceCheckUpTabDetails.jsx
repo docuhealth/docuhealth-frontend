@@ -9,6 +9,7 @@ import PatientVitalsAndMeds from "./PatientVitalsAndMeds";
 import CarePlanHistory from "./CarePlanHistory";
 import AdmissionNotesHistory from "./AdmissionNotesHistory";
 import VitalSignsHistory from "./VitalSignsHistory";
+import EncounterRecordsTimeline from "../../../../ui/EncounterRecordsTimeline";
 
 const PatientInfoContent = ({ patient, admission, patientFullInfo, formatDate, formatDateTime, isOutPatient }) => {
     const isDischargedInpatient = !isOutPatient && (Boolean(admission?.discharge_date) || admission?.status === "inpatient_discharge");
@@ -254,6 +255,18 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
                 />
             )
         },
+        {
+            title: isOutPatient ? "Visit Records" : "Encounter Records",
+            status: "visit_records",
+            content: (
+                <EncounterRecordsTimeline
+                    kind={isOutPatient ? "check_in" : "admission"}
+                    sqid={admission?.sqid}
+                    isOngoing={!admission?.closed_at && !admission?.discharge_date}
+                    title={isOutPatient ? "Visit Care Record" : "Care Record Timeline"}
+                />
+            )
+        },
     
         {
             title: "Care plan history",
@@ -288,12 +301,12 @@ export const getAdvanceCheckUpTabs = (patient, admission, patientFullInfo, forma
     // Discharged patients get read-only history; active ones reach vitals history via the header dropdown
     if (isOutPatient) {
         const isDischargedOutpatient = Boolean(admission?.closed_at || admission?.discharge_date);
-        return tabs.filter(t => t.status === "info" || t.status === "soap" || (isDischargedOutpatient && t.status === "vitals_history"));
+        return tabs.filter(t => t.status === "info" || t.status === "soap" || t.status === "visit_records" || (isDischargedOutpatient && t.status === "vitals_history"));
     }
 
     const isDischargedInpatient = Boolean(admission?.discharge_date) || admission?.status === "inpatient_discharge";
     if (isDischargedInpatient) {
-        return tabs.filter(t => ["info", "soap", "vitals_history", "admission_notes_history"].includes(t.status));
+        return tabs.filter(t => ["info", "soap", "visit_records", "vitals_history", "admission_notes_history"].includes(t.status));
     }
 
     return tabs.filter(t => t.status !== "vitals_history");

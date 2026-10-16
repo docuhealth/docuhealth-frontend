@@ -28,8 +28,8 @@ const PharmacistProfileProvider = ({ children }) => {
     queryKey: ["pharmacists-dashboard-metrics"],
     queryFn: fetchPharmacistDashboardMetrics,
     enabled: isUserLoggedIn,
-    staleTime: 1000 * 5, 
-    refetchInterval: 15000,
+    staleTime: 60 * 1000, 
+    refetchInterval: 60000,
     refetchOnWindowFocus: true,
   });
 

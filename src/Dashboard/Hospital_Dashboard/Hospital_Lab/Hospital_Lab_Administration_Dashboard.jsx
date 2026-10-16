@@ -10,7 +10,7 @@ import WorkflowReportSettings from "../../../Components/Dashboard/Hospital_Dashb
 import AuditLogsView from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/AuditLogsView";
 
 const Hospital_Lab_Administration_Dashboard = () => {
-  const { isLabAdmin, isLoading } = useContext(LabAppContext);
+  const { isLabAdmin = false, isLoading = false } = useContext(LabAppContext) || {};
   const navigate = useNavigate();
 
   const [activeView, setActiveView] = useState("catalogue"); // "catalogue" | "reports_settings" | "audit_logs"

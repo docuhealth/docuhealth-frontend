@@ -1,25 +1,7 @@
 import ReactECharts from "echarts-for-react";
 import CustomDropdown from "../../../Admin_Dashboard_Components/Home_Dashboard/CustomDropdown";
-import { Download } from "lucide-react";
 
 const AttendanceOverviewChart = ({ data = [], filter = "Monthly", onFilterChange }) => {
-
-  const handleDownload = () => {
-    if (!data || data.length === 0) return;
-    const csvContent = [
-      "Month,Value",
-      ...data.map((row) => `${row.label},${row.value}`),
-    ].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `attendance_overview_${filter}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   if (!data || data.length === 0) {
     return (
       <div className="bg-white p-6 rounded-md border border-gray-200 w-full h-[380px] flex flex-col">
@@ -28,13 +10,6 @@ const AttendanceOverviewChart = ({ data = [], filter = "Monthly", onFilterChange
             Patient's Attendance overview
           </h3>
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleDownload}
-              className="p-1.5 text-gray-500 hover:text-docuhealth-primary bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-              title="Download CSV"
-            >
-              <Download size={16} />
-            </button>
             <CustomDropdown
               options={["Daily", "Last 24hrs", "Weekly", "Monthly", "Yearly"]}
               value={filter}
@@ -104,13 +79,6 @@ const AttendanceOverviewChart = ({ data = [], filter = "Monthly", onFilterChange
           Patient's Attendance overview
         </h3>
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleDownload}
-            className="p-1.5 text-gray-500 hover:text-docuhealth-primary bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-            title="Download CSV"
-          >
-            <Download size={16} />
-          </button>
           <CustomDropdown
             options={["Daily", "Last 24hrs", "Weekly", "Monthly", "Yearly"]}
             value={filter}

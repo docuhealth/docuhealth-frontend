@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { FlaskConical, Building2, CalendarClock } from "lucide-react";
+import Skeleton from "../../../ui/Skeleton";
 
 const getPatientName = (order) => {
   const p = order.patient_info;
@@ -107,5 +108,37 @@ const LabOrderCard = ({ order, badge, activeTab }) => {
     </div>
   );
 };
+
+export const LabOrderCardSkeleton = () => (
+  <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-4 justify-between h-full shadow-xs">
+    <div className="flex flex-col gap-4">
+      <div className="flex justify-between items-start">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+          <div className="space-y-1.5">
+            <Skeleton className="h-2.5 w-12" />
+            <Skeleton className="h-4 w-28" />
+          </div>
+        </div>
+        <Skeleton className="h-5 w-20 rounded-full" />
+      </div>
+      <div className="space-y-2.5 border-t border-gray-100 pt-3">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-3.5 w-3.5 rounded-full shrink-0" />
+          <Skeleton className="h-3 w-40" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-3.5 w-3.5 rounded-full shrink-0" />
+          <Skeleton className="h-3 w-32" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-3.5 w-3.5 rounded-full shrink-0" />
+          <Skeleton className="h-3 w-28" />
+        </div>
+      </div>
+    </div>
+    <Skeleton className="h-9 w-full rounded-full mt-2" />
+  </div>
+);
 
 export default LabOrderCard;

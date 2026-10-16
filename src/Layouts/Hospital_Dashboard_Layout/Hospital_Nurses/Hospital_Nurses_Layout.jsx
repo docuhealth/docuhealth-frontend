@@ -2,10 +2,11 @@ import React, { useContext, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../Components/ui/DashboardLayout";
 import ComingSoonModal from "../../../Components/ui/ComingSoonModal";
+import HospitalLoader from "../../../Components/ui/HospitalLoader";
 import { NursesAppContext } from "../../../context/HospitalContext/Nurses/NursesAppContext";
 
 const Hospital_Nurses_Layout = () => {
-  const { profile, hospitalLogo, hospitalName } = useContext(NursesAppContext);
+  const { profile, hospitalLogo, hospitalName, isLoading } = useContext(NursesAppContext);
   const navigate = useNavigate();
   const [comingSoonFeature, setComingSoonFeature] = useState(null);
 
@@ -188,6 +189,10 @@ const Hospital_Nurses_Layout = () => {
       ),
     },
   ];
+
+  if (isLoading && !profile) {
+    return <HospitalLoader variant="fullscreen" logo={hospitalLogo} label="Setting up your workspace..." />;
+  }
 
   return (
     <DashboardLayout

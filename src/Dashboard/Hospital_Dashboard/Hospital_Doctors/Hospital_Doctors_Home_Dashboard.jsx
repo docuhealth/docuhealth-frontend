@@ -45,8 +45,8 @@ const Hospital_Doctors_Home_Dashboard = () => {
     queryKey: ["doctors-dashboard-metrics", admittedRange],
     queryFn: fetchHospitalDoctorDashboardMetrics,
     enabled: isUserLoggedIn,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
+    staleTime: 60 * 1000,
+    refetchInterval: 60000,
     refetchOnWindowFocus: true,
   });
 
@@ -54,8 +54,8 @@ const Hospital_Doctors_Home_Dashboard = () => {
     queryKey: ["doctors-dashboard-metrics", dischargedRange],
     queryFn: fetchHospitalDoctorDashboardMetrics,
     enabled: isUserLoggedIn,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
+    staleTime: 60 * 1000,
+    refetchInterval: 60000,
     refetchOnWindowFocus: true,
   });
 
@@ -63,8 +63,8 @@ const Hospital_Doctors_Home_Dashboard = () => {
     queryKey: ["doctors-dashboard-metrics", attendanceRange],
     queryFn: fetchHospitalDoctorDashboardMetrics,
     enabled: isUserLoggedIn,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
+    staleTime: 60 * 1000,
+    refetchInterval: 60000,
     refetchOnWindowFocus: true,
   });
 
@@ -117,7 +117,7 @@ const Hospital_Doctors_Home_Dashboard = () => {
         </div>
       </div>
 
-      {dashboardMetricsLoading && (
+      {dashboardMetricsLoading && !dashboardMetrics && (
         <div role="status" aria-label="Loading dashboard">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-6">
             {Array.from({ length: 3 }, (_, i) => (
@@ -135,7 +135,7 @@ const Hospital_Doctors_Home_Dashboard = () => {
       )}
 
       {/* Stat Cards */}
-      {!dashboardMetricsLoading && (
+      {(dashboardMetrics || !dashboardMetricsLoading) && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-6">
           {statCards.map((stat, index) => (
             <div
@@ -164,9 +164,9 @@ const Hospital_Doctors_Home_Dashboard = () => {
       )}
 
       {/* Charts Row */}
-      {!dashboardMetricsLoading && (
+      {(dashboardMetrics || !dashboardMetricsLoading) && (
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-          {admittedLoading ? (
+          {admittedLoading && !admittedMetrics ? (
             <ChartSkeleton title="Admitted patients" withControls />
           ) : (
             <AdmittedPatientsChart
@@ -175,7 +175,7 @@ const Hospital_Doctors_Home_Dashboard = () => {
               onFilterChange={setAdmittedFilter}
             />
           )}
-          {dischargedLoading ? (
+          {dischargedLoading && !dischargedMetrics ? (
             <ChartSkeleton title="Discharged patients" withControls />
           ) : (
             <DischargedPatientsChart
@@ -187,9 +187,9 @@ const Hospital_Doctors_Home_Dashboard = () => {
         </div>
       )}
 
-      {!dashboardMetricsLoading && (
+      {(dashboardMetrics || !dashboardMetricsLoading) && (
         <div className="mt-6 w-full">
-          {attendanceLoading ? (
+          {attendanceLoading && !attendanceMetrics ? (
             <ChartSkeleton title="Patient's Attendance overview" withControls />
           ) : (
             <AttendanceOverviewChart

@@ -31,6 +31,7 @@ import Input from "../../../../../ui/Input";
 import PatientLabRecords from "../../Patient_Mgt_Dashboard/PatientLabRecords";
 import PatientRadiologyRecords from "../../Patient_Mgt_Dashboard/PatientRadiologyRecords";
 import PatientMedicationHistory from "../../Patient_Mgt_Dashboard/PatientMedicationHistory";
+import EncounterRecordsTimeline from "../../../../../ui/EncounterRecordsTimeline";
 import EmptyState from "../../../../../ui/EmptyState";
 import RecordRowsSkeleton from "../../../../../ui/RecordRowsSkeleton";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
@@ -1097,29 +1098,31 @@ const getTabs = ({
     },
     {
       title: "Lab Result",
-      // content: (
-      //   <PatientLabRecords
-      //     labloading={labloading}
-      //     patientLabRecords={patientLabRecords}
-      //     count={labCount}
-      //     currentPage={labCurrentPage}
-      //     totalPages={labTotalPages}
-      //     setCurrentPage={setLabCurrentPage}
-      //   />
-      // ),
       content: (
-        <div className="py-16 text-center">
-          <EmptyState
-            icon="document"
-            title="Coming Soon"
-            description="Lab results will be available soon."
-          />
-        </div>
+        <PatientLabRecords
+          labloading={labloading}
+          patientLabRecords={patientLabRecords}
+          count={labCount}
+          currentPage={labCurrentPage}
+          totalPages={labTotalPages}
+          setCurrentPage={setLabCurrentPage}
+        />
       ),
     },
     {
       title: "Medication History",
       content: <PatientMedicationHistory patientFullInfo={patientFullInfo} />,
+    },
+    {
+      title: "Visit Records",
+      content: (
+        <EncounterRecordsTimeline
+          kind="check_in"
+          sqid={selectedPatientDetails?.sqid}
+          isOngoing={!selectedPatientDetails?.closed_at && !selectedPatientDetails?.discharge_date}
+          title="Visit Care Record"
+        />
+      ),
     },
   ];
 

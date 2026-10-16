@@ -29,8 +29,8 @@ const DoctorProfileProvider = ({ children }) => {
     queryKey: ["doctors-dashboard-metrics"],
     queryFn: fetchHospitalDoctorDashboardMetrics,
     enabled: isUserLoggedIn,
-    staleTime: 1000 * 5, 
-    refetchInterval: 15000,
+    staleTime: 60 * 1000, 
+    refetchInterval: 60000,
     refetchOnWindowFocus: true,
   });
 

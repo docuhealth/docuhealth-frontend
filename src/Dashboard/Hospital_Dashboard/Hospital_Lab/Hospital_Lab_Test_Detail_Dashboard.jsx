@@ -1,8 +1,8 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, Printer, Download } from "lucide-react";
 import RejectModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/RejectModal";
 import toast from "react-hot-toast";
 import {
@@ -12,8 +12,8 @@ import {
   logSpecimenCollectionTime,
   approveLabTestResultByLabAdmin,
   approveLabTestResultByDoctor,
-  rejectLabTestResultByLabAdmin,
   rejectLabTestResultByDoctor,
+  rejectLabTestResultByLabAdmin,
 } from "../../../queries/Hospital/lab/requests";
 import DoctorReviewModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/DoctorReviewModal";
 import AcceptApprovalModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/AcceptApprovalModal";
@@ -21,18 +21,22 @@ import ApprovalSuccessModal from "../../../Components/Dashboard/Hospital_Dashboa
 import RejectApprovalModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/RejectApprovalModal";
 import { LabAppContext } from "../../../context/HospitalContext/Lab/LabAppContext";
 import { extractApiErrorMessage } from "../../../utils/apiError";
+import { printElement, downloadElementAsPdf } from "../../../utils/exportElement";
+import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
 
 const STATUS_STYLES = {
-  pending:          { label: "Pending",     color: "text-green-600" },
-  sample_collected: { label: "Sample Collected", color: "text-blue-600" },
-  in_progress:      { label: "In Progress", color: "text-amber-600" },
-  result_ready:     { label: "Result Ready", color: "text-green-600" },
-  result_accepted_by_lab_admin: { label: "Lab Admin Approved", color: "text-indigo-600" },
-  result_accepted_by_doctor:    { label: "Doctor Approved", color: "text-green-600" },
-  completed:        { label: "Completed",   color: "text-green-600" },
-  rejected:         { label: "Rejected",    color: "text-red-500"   },
-  approved:         { label: "Approved",    color: "text-green-600" },
-  accepted:         { label: "Accepted",    color: "text-green-600" },
+  pending:                      { label: "Pending",                  color: "text-amber-600" },
+  sample_collected:             { label: "Sample Collected",         color: "text-blue-600" },
+  in_progress:                  { label: "In Progress",              color: "text-amber-600" },
+  result_ready:                 { label: "Result Ready",             color: "text-blue-600" },
+  lab_admin_approved:           { label: "Awaiting Doctor Approval", color: "text-amber-600" },
+  lab_admin_rejected:           { label: "Rejected by Lab Admin",    color: "text-red-500" },
+  result_accepted_by_lab_admin: { label: "Lab Admin Approved",       color: "text-indigo-600" },
+  result_accepted_by_doctor:    { label: "Doctor Approved",          color: "text-green-600" },
+  completed:                    { label: "Completed",                color: "text-green-600" },
+  rejected:                     { label: "Rejected",                 color: "text-red-500" },
+  approved:                     { label: "Approved",                 color: "text-green-600" },
+  accepted:                     { label: "Accepted",                 color: "text-green-600" },
 };
 
 const calcAge = (dob) => {
@@ -107,7 +111,10 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   const isPending    = item.status === "pending";
   const isSampleCollected = item.status === "sample_collected";
   const isInProgress = item.status === "in_progress";
-  const isResultReady  = item.status === "result_ready" || item.status === "completed";
+  const isResultReady =
+    item.status === "result_ready" ||
+    item.status === "result_accepted_by_lab_admin" ||
+    item.status === "completed";
   const isRejected   = item.status === "rejected";
 
   // On the doctor's "Reviewed" tab an already-actioned result comes back with
@@ -212,7 +219,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   };
 
   return (
-    <div className="mt-6 border border-gray-200 rounded-xl overflow-hidden">
+    <div className="mt-6 border border-gray-200 rounded-xl overflow-hidden" data-pdf-unit>
       <div className="bg-gray-50 border-b border-gray-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h3 className="text-base font-bold text-docuhealth-dark">{item.test_info?.name || "Unknown Test"}</h3>
@@ -221,7 +228,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto" data-print-hide>
           {isPending && !isDoctorView && (
             <>
               <button
@@ -571,11 +578,13 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
 } = {}) => {
   const navigate      = useNavigate();
   const queryClient   = useQueryClient();
-  const { isLabAdmin } = useContext(LabAppContext);
+  const { isLabAdmin = false, hospitalName = "" } = useContext(LabAppContext) || {};
   const { state }     = useLocation() || {};
   const isDirectOrder = typeof orderIdProp === "object" && orderIdProp !== null;
   const sqid          = isDirectOrder ? orderIdProp.sqid : (orderIdProp || state?.sqid || state?.order?.sqid || state?.order?.id);
 
+  const printRef = useRef(null);
+  const [downloading, setDownloading] = useState(false);
   const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
@@ -591,9 +600,65 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
   const rawOrder = rawData?.results ? rawData.results[0] : rawData;
   const order = rawOrder ? normalizeOrder(rawOrder, state?.order?.tab || state?.tab) : {};
 
+  const sanitizeForFilename = (str) =>
+    String(str || "")
+      .trim()
+      .replace(/[^a-zA-Z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+
+  const patientNameSlug = sanitizeForFilename(order.name || "Patient");
+  const testNameSlug = sanitizeForFilename(
+    order.items?.[0]?.test_info?.name ||
+    order.items?.[0]?.name ||
+    "Lab_Test"
+  );
+  const hospitalNameSlug = sanitizeForFilename(order.hospital || hospitalName || "Hospital");
+  const downloadFileName = `${patientNameSlug}_${testNameSlug}_${hospitalNameSlug}.pdf`;
+
+  const handlePrint = () => {
+    printElement(printRef.current, `Lab Record - ${order.name || "Patient"}`).catch(() =>
+      toast.error("Could not open the print dialog")
+    );
+  };
+
+  const handleDownload = async () => {
+    if (downloading || !printRef.current) return;
+    setDownloading(true);
+    const toastId = toast.loading("Preparing PDF...");
+    try {
+      await downloadElementAsPdf(printRef.current, downloadFileName, { singleBlock: true, scale: 1.75 });
+      toast.success("PDF downloaded", { id: toastId });
+    } catch (error) {
+      console.error("PDF generation failed:", error);
+      toast.error("Could not generate the PDF", { id: toastId });
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const isApprovalView =
     !isDoctorView &&
     (state?.tab === "Result Approval" || (isLabAdmin && isCompletelyResultReadyOrder(order)));
+
+  const orderItemsList = order.items_info || order.items || [];
+  const exportableStatuses = [
+    "result_ready",
+    "result_accepted_by_lab_admin",
+    "result_accepted_by_doctor",
+    "completed",
+    "accepted",
+    "approved",
+  ];
+  const orderStatus = (order.aggregate_status || order.status || "")?.toLowerCase();
+  const hasResultToExport =
+    Boolean(order.result_info) ||
+    exportableStatuses.includes(orderStatus) ||
+    orderItemsList.some(
+      (i) =>
+        Boolean(i.result_info) ||
+        exportableStatuses.includes(i.status?.toLowerCase()) ||
+        exportableStatuses.includes(i.result_info?.status?.toLowerCase())
+    );
 
   const approveMutation = useMutation({
     mutationFn: async () => {
@@ -658,22 +723,52 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
     },
   });
 
-  if (orderLoading && !isDirectOrder) {
+  const hasOrderData = !!(order.name || (order.items && order.items.length > 0));
+  if (orderLoading && !isDirectOrder && !hasOrderData) {
     return (
-      <div className="flex items-center justify-center py-24 text-gray-400 text-sm">
-        <div className="w-5 h-5 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin mr-3" />
-        Loading order...
-      </div>
+      <>
+        <div className="py-2">
+          <DynamicDate />
+        </div>
+        <div className="mt-4 bg-white border border-gray-200 rounded-xl px-5 py-4 flex items-center justify-between animate-pulse">
+          <div className="h-4 w-36 bg-gray-200 rounded" />
+          <div className="h-8 w-24 bg-gray-100 rounded-full" />
+        </div>
+        <div className="mt-4 bg-white border border-gray-200 rounded-xl px-6 py-5 animate-pulse">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="space-y-2">
+                <div className="h-3 w-16 bg-gray-200 rounded" />
+                <div className="h-4 w-28 bg-gray-200 rounded" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-6 space-y-4 animate-pulse">
+          <div className="h-5 w-28 bg-gray-200 rounded mb-3" />
+          <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
+            <div className="flex justify-between items-center border-b pb-4">
+              <div className="h-4 w-36 bg-gray-200 rounded" />
+              <div className="h-6 w-20 bg-gray-200 rounded-full" />
+            </div>
+            <div className="space-y-3">
+              <div className="h-4 w-full bg-gray-100 rounded" />
+              <div className="h-4 w-5/6 bg-gray-100 rounded" />
+              <div className="h-4 w-2/3 bg-gray-100 rounded" />
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 
   return (
     <>
-      <div className="py-2">
+      <div className="py-2" data-print-hide>
         <DynamicDate />
       </div>
 
-      <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div data-print-hide className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <button
           onClick={() => onBackProp ? onBackProp() : navigate(-1)}
           className="flex items-center gap-2 text-sm text-gray-600 hover:text-docuhealth-primary transition-colors w-fit cursor-pointer"
@@ -682,82 +777,127 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
           Lab Order Details
         </button>
 
-        {isApprovalView && (
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <button
-              onClick={() => { setRejectReason(""); setIsRejectModalOpen(true); }}
-              disabled={approveMutation.isPending || rejectMutation.isPending}
-              className="w-full sm:w-auto border border-red-500 text-red-500 hover:bg-red-50 text-xs font-semibold px-8 py-2 rounded-full transition-colors disabled:opacity-50 cursor-pointer text-center"
-            >
-              Reject
-            </button>
-            <button
-              onClick={() => setIsAcceptModalOpen(true)}
-              disabled={approveMutation.isPending || rejectMutation.isPending}
-              className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary hover:bg-indigo-50 text-xs font-semibold px-8 py-2 rounded-full transition-colors disabled:opacity-50 cursor-pointer text-center"
-            >
-              Accept
-            </button>
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+          {/* Print & Download buttons (available once result is ready/available, only on Lab dashboard) */}
+          {hasResultToExport && !isDoctorView && (
+            <>
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="flex items-center justify-center gap-1.5 border border-docuhealth-primary text-docuhealth-primary hover:bg-indigo-50/60 rounded-full py-1.5 px-4 text-xs font-semibold cursor-pointer transition-colors"
+              >
+                <Printer size={14} />
+                Print out
+              </button>
+              <button
+                type="button"
+                onClick={handleDownload}
+                disabled={downloading}
+                className="flex items-center justify-center gap-1.5 border border-docuhealth-primary bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 rounded-full py-1.5 px-4 text-xs font-semibold cursor-pointer transition-colors disabled:opacity-60"
+              >
+                <Download size={14} />
+                {downloading ? "Downloading..." : "Download"}
+              </button>
+            </>
+          )}
+
+          {isApprovalView && (
+            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <button
+                onClick={() => { setRejectReason(""); setIsRejectModalOpen(true); }}
+                disabled={approveMutation.isPending || rejectMutation.isPending}
+                className="w-full sm:w-auto border border-red-500 text-red-500 hover:bg-red-50 text-xs font-semibold px-6 py-1.5 rounded-full transition-colors disabled:opacity-50 cursor-pointer text-center"
+              >
+                Reject
+              </button>
+              <button
+                onClick={() => setIsAcceptModalOpen(true)}
+                disabled={approveMutation.isPending || rejectMutation.isPending}
+                className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary hover:bg-indigo-50 text-xs font-semibold px-6 py-1.5 rounded-full transition-colors disabled:opacity-50 cursor-pointer text-center"
+              >
+                Accept
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {order.hin && order.hin !== "—" && (
-        <div className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
-          {/* At lg the content column is only ~720px (256px sidebar + padding),
-              so 4 tracks get cramped — hold the 4th back to xl, matching
-              PatientInfoCard. */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            <div className="flex flex-col gap-1">
-              <p className="text-xs text-gray-400">Patient</p>
-              <p className="text-sm font-bold text-docuhealth-dark">{order.name || "—"}</p>
-              <p className="text-xs text-gray-500">HIN: {maskHin(order.hin)}</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-xs text-gray-400">Age / Gender</p>
-              <p className="text-sm font-semibold text-docuhealth-dark capitalize">
-                {[calcAge(order.dob), order.gender].filter(Boolean).join(" · ") || "—"}
-              </p>
-            </div>
-            {order.requestedBy && (
-              <div className="flex flex-col gap-1">
-                <p className="text-xs text-gray-400">
-                  {isDoctorView ? "Result submitted by" : "Requested by"}
-                </p>
-                <p className="text-sm font-semibold text-docuhealth-dark">{order.requestedBy}</p>
+      {/* Printable Area with ref and DocuHealth Logo Header */}
+      <div ref={printRef} className="printable-lab-record">
+        {/* Print-only DocuHealth Logo & Hospital Header */}
+        <div data-print-only className="hidden mb-6 pb-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img src={docuhealth_logo} alt="DocuHealth Logo" className="w-9 h-9 object-contain" />
+              <div>
+                <h1 className="text-lg font-bold text-gray-900 tracking-tight">DocuHealth Laboratory Report</h1>
+                <p className="text-xs text-gray-500">{order.hospital || hospitalName || "DocuHealth Partner Hospital"}</p>
               </div>
-            )}
-            {order.datetime && order.datetime !== "—" && (
-              <div className="flex flex-col gap-1">
-                <p className="text-xs text-gray-400">
-                  {isDoctorView ? "Result date" : "Requested"}
-                </p>
-                <p className="text-sm font-semibold text-docuhealth-dark">{order.datetime}</p>
-              </div>
-            )}
+            </div>
+            <div className="text-right text-xs text-gray-500">
+              <p className="font-semibold text-gray-700">Official Laboratory Record</p>
+              <p>{new Date().toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })}</p>
+            </div>
           </div>
         </div>
-      )}
 
-      <div className="mt-6">
-        <h2 className="text-lg font-bold text-gray-800 mb-2">Test Items</h2>
-        {order.items?.map((item) => (
-          <LabTestItem 
-            key={item.sqid} 
-            order={order} 
-            item={item} 
-            isDoctorView={isDoctorView} 
-            queryClient={queryClient} 
-          />
-        ))}
-        {orderLoading ? (
-          <div className="flex items-center gap-2 py-6 text-sm text-gray-500">
-            <div className="w-4 h-4 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin" />
-            <span>Loading test items...</span>
+        {order.hin && order.hin !== "—" && (
+          <div data-pdf-unit className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
+            {/* At lg the content column is only ~720px (256px sidebar + padding),
+                so 4 tracks get cramped — hold the 4th back to xl, matching
+                PatientInfoCard. */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              <div className="flex flex-col gap-1">
+                <p className="text-xs text-gray-400">Patient</p>
+                <p className="text-sm font-bold text-docuhealth-dark">{order.name || "—"}</p>
+                <p className="text-xs text-gray-500">HIN: {maskHin(order.hin)}</p>
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="text-xs text-gray-400">Age / Gender</p>
+                <p className="text-sm font-semibold text-docuhealth-dark capitalize">
+                  {[calcAge(order.dob), order.gender].filter(Boolean).join(" · ") || "—"}
+                </p>
+              </div>
+              {order.requestedBy && (
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-gray-400">
+                    {isDoctorView ? "Result submitted by" : "Requested by"}
+                  </p>
+                  <p className="text-sm font-semibold text-docuhealth-dark">{order.requestedBy}</p>
+                </div>
+              )}
+              {order.datetime && order.datetime !== "—" && (
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-gray-400">
+                    {isDoctorView ? "Result date" : "Requested"}
+                  </p>
+                  <p className="text-sm font-semibold text-docuhealth-dark">{order.datetime}</p>
+                </div>
+              )}
+            </div>
           </div>
-        ) : (!order.items || order.items.length === 0) ? (
-          <p className="text-sm text-gray-500 py-4">No test items found for this order.</p>
-        ) : null}
+        )}
+
+        <div className="mt-6">
+          <h2 className="text-lg font-bold text-gray-800 mb-2">Test Items</h2>
+          {order.items?.map((item) => (
+            <LabTestItem 
+              key={item.sqid} 
+              order={order} 
+              item={item} 
+              isDoctorView={isDoctorView} 
+              queryClient={queryClient} 
+            />
+          ))}
+          {orderLoading ? (
+            <div className="flex items-center gap-2 py-6 text-sm text-gray-500" data-print-hide>
+              <div className="w-4 h-4 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin" />
+              <span>Loading test items...</span>
+            </div>
+          ) : (!order.items || order.items.length === 0) ? (
+            <p className="text-sm text-gray-500 py-4">No test items found for this order.</p>
+          ) : null}
+        </div>
       </div>
 
       {/* Accept Confirmation Modal */}

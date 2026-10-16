@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import GeneralPatientInfoForm from "../../../../../ui/GeneralPatientInfoForm";
+import EncounterRecordsTimeline from "../../../../../ui/EncounterRecordsTimeline";
 
 const NursePatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
+  const [activeTab, setActiveTab] = useState("info");
   const hin = selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin;
 
   const { data: patientFullInfo, isLoading, isError } = useQuery({
@@ -70,14 +72,44 @@ const NursePatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
       <div className="border-b border-gray-200 mb-6">
         <ul className="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500">
           <li className="mr-2">
-            <span className="inline-block p-4 text-docuhealth-primary border-b-2 border-docuhealth-primary rounded-t-lg active">
+            <button
+              type="button"
+              onClick={() => setActiveTab("info")}
+              className={`inline-block p-4 border-b-2 rounded-t-lg transition-colors cursor-pointer ${
+                activeTab === "info"
+                  ? "text-docuhealth-primary border-docuhealth-primary font-semibold"
+                  : "border-transparent hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
               Patient's information
-            </span>
+            </button>
+          </li>
+          <li className="mr-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab("visit_records")}
+              className={`inline-block p-4 border-b-2 rounded-t-lg transition-colors cursor-pointer ${
+                activeTab === "visit_records"
+                  ? "text-docuhealth-primary border-docuhealth-primary font-semibold"
+                  : "border-transparent hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              Visit Records
+            </button>
           </li>
         </ul>
       </div>
 
-      <GeneralPatientInfoForm patient={patientFullInfo?.patient_info}>
+      {activeTab === "visit_records" ? (
+        <EncounterRecordsTimeline
+          kind="check_in"
+          sqid={selectedPatientDetails?.sqid || selectedPatientDetails?.check_in_sqid || selectedPatientDetails?.id}
+          isOngoing={!selectedPatientDetails?.closed_at && !selectedPatientDetails?.discharge_date}
+          title="Visit Care Record"
+        />
+      ) : (
+        <>
+          <GeneralPatientInfoForm patient={patientFullInfo?.patient_info}>
         <div>
           <p className="text-sm font-medium text-gray-500 mb-1">Date/time of admission</p>
           <input
@@ -182,6 +214,8 @@ const NursePatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
           ))}
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };

@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { LabRequestsContext } from "../../../context/HospitalContext/Lab/LabRequestsContext";
 import { LabAppContext } from "../../../context/HospitalContext/Lab/LabAppContext";
-import LabOrderCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabOrderCard";
+import LabOrderCard, { LabOrderCardSkeleton } from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabOrderCard";
 import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 
 const baseTabs = [
@@ -118,7 +118,7 @@ const resolveOrderStatus = (order, activeTab) => {
 };
 
 const Hospital_Lab_Requests_Dashboard = () => {
-  const { isLabAdmin } = useContext(LabAppContext);
+  const { isLabAdmin = false } = useContext(LabAppContext) || {};
   const {
     requests,
     activeTab,
@@ -212,11 +212,11 @@ const Hospital_Lab_Requests_Dashboard = () => {
         </div>
 
         {/* Cards Grid */}
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-            <div className="w-6 h-6 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin mb-3" />
-            <p className="text-sm font-medium text-slate-700">Loading test orders...</p>
-            <p className="text-xs text-gray-400 mt-1">Please wait while requests load</p>
+        {loading && displayedRequests.length === 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }, (_, i) => (
+              <LabOrderCardSkeleton key={i} />
+            ))}
           </div>
         ) : displayedRequests.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-gray-400">

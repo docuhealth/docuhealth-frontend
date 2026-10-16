@@ -76,10 +76,15 @@ const AdvanceCheckUp = ({
   const { data: labRecordsData, isLoading: labLoading } = useQuery({
     queryKey: ["patient-lab-records", hin, labCurrentPage],
     queryFn: async () => {
-      const res = await axiosInstanceHos.get(
-        `api/lab/test-orders/patient/${hin}?page=${labCurrentPage}&size=${pageSize}`,
-      );
-      return res.data;
+      try {
+        const res = await axiosInstanceHos.get(
+          `api/lab/test-orders/patient/${hin}?page=${labCurrentPage}&size=${pageSize}`,
+        );
+        return res.data;
+      } catch (err) {
+        if (err?.response?.status === 404) return { results: [], count: 0 };
+        throw err;
+      }
     },
     enabled: !!hin,
     keepPreviousData: true,
