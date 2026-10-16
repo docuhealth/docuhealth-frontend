@@ -31,7 +31,6 @@ import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 import SoapClinicalDetailsCard from "../../../../ui/SoapClinicalDetailsCard";
 import SoapAdditionalNotesCard from "../../../../ui/SoapAdditionalNotesCard";
-import SoapNoteEntry from "../Appointments_Dashboard/components/SoapNoteEntry";
 import Input from "../../../../ui/Input";
 import PatientHandoverTab from "./PatientHandoverTab";
 import DoctorIssuedTasksHistory from "./DoctorIssuedTasksHistory";
@@ -44,7 +43,6 @@ import { createProgressNote } from "../../../../../queries/Hospital/doctor/progr
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import CardGridSkeleton from "../../../../ui/CardGridSkeleton";
 import RecordRowsSkeleton from "../../../../ui/RecordRowsSkeleton";
-import Skeleton from "../../../../ui/Skeleton";
 import { formatFrequency } from "../../../../../utils/careTaskConstants";
 
 export const PatientInfo = ({ patientFullInfo, selected }) => {
@@ -393,6 +391,13 @@ export const PatientMedicalRecord = ({
   );
 };
 
+// A SOAP note is only created during the check-in; once admitted, the doctor adds additional notes to it or writes progress notes.
+const InpatientSoapHint = () => (
+  <p className="text-[12px] text-gray-500 my-4">
+    SOAP notes are created during the check-in. To add to one, open it and use Create additional notes. For ongoing care, use the Progress Note tab.
+  </p>
+);
+
 export const PatientSOAPNotes = ({
   soapNotesLoading,
   patientSoapNotes,
@@ -402,8 +407,6 @@ export const PatientSOAPNotes = ({
   setSoapCurrentPage,
   selected
 }) => {
-  const [showSoapEntryForm, setShowSoapEntryForm] = useState(false);
-
   // These are declared unconditionally (before any early return below) so
   // the hook count stays stable across renders — see Rules of Hooks.
   const [seePatientDetails, setSeePatientDetails] = useState(false);
@@ -462,24 +465,10 @@ export const PatientSOAPNotes = ({
     mutate(payload)
   }
 
-  if (showSoapEntryForm) {
-    return (
-      <SoapNoteEntry
-        setSoapNoteEntry={setShowSoapEntryForm}
-        selectedPatientDetails={selected}
-      />
-    );
-  }
-
   if (soapNotesLoading) {
     return (
       <>
-        {/* Holds the "Create new SOAP Note" button's space so the rows don't drop when data lands. */}
-        {!selected?.discharge_date && (
-          <div className="flex justify-end">
-            <Skeleton className="h-[42px] w-full lg:w-60 rounded-full" />
-          </div>
-        )}
+        {!selected?.discharge_date && <InpatientSoapHint />}
         <RecordRowsSkeleton label="Loading SOAP notes" tiles={4} />
       </>
     );
@@ -488,17 +477,7 @@ export const PatientSOAPNotes = ({
   if (!patientSoapNotes || patientSoapNotes.length === 0) {
     return (
       <>
-        {
-          !selected.discharge_date && (
-            <div className="flex justify-end my-5">
-              <button className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
-                onClick={() => setShowSoapEntryForm(true)}
-              >
-                Create new SOAP Note
-              </button>
-            </div>
-          )
-        }
+        {!selected.discharge_date && <InpatientSoapHint />}
         <div className="flex flex-col justify-center items-center text-center  h-full">
           <svg
             width="200"
@@ -836,17 +815,7 @@ export const PatientSOAPNotes = ({
         </div>
       ) : (
         <>
-          {
-            !selected.discharge_date && (
-              <div className="flex justify-end">
-                <button className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
-                  onClick={() => setShowSoapEntryForm(true)}
-                >
-                  Create new SOAP Note
-                </button>
-              </div>
-            )
-          }
+          {!selected.discharge_date && <InpatientSoapHint />}
 
 
           {Array.isArray(patientSoapNotes) && patientSoapNotes.length > 0 ? (
