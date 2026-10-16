@@ -19,7 +19,7 @@ const ULP = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phone_num, setPhone_Num] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [step, setStep] = useState(1); // To manage steps
+  const [step, setStep] = useState(3); // To manage steps
 
   const isPasswordValid = checkPasswordValid(getPasswordRequirements(password));
 

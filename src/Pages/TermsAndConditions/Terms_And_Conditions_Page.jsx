@@ -1,14 +1,44 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
+import { User, Building2 } from 'lucide-react'
 import BackgroundTemplate2 from '../Components/ui/BackgroundTemplate2'
 
 const Terms_And_Conditions_Page = () => {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tabParam = searchParams.get('tab')
+  const [activeTab, setActiveTab] = useState(
+    tabParam === 'hospital' ? 'hospital' : 'patient'
+  )
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab === 'hospital' || tab === 'patient') {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab)
+    setSearchParams(tab === 'hospital' ? { tab: 'hospital' } : {})
+  }
+
   return (
     <BackgroundTemplate2>
       <Helmet>
-        <title>Hospital Terms & Conditions | DocuHealth</title>
-        <meta name="description" content="Terms and Conditions for hospitals using the DocuHealth platform for secure medical record management." />
+        <title>
+          {activeTab === 'hospital'
+            ? 'Hospital Terms & Conditions | DocuHealth'
+            : 'Patient Terms & Conditions | DocuHealth'}
+        </title>
+        <meta
+          name="description"
+          content={
+            activeTab === 'hospital'
+              ? 'Terms and Conditions for hospitals using the DocuHealth platform for secure medical record management.'
+              : 'Terms and Conditions for patients using the DocuHealth platform for secure medical record management.'
+          }
+        />
         <link rel="canonical" href="https://docuhealthservices.net/terms-and-conditions" />
       </Helmet>
       <div className='min-h-screen text-docuhealth-primary text-sm px-5 lg:px-16 pt-8 lg:pt-0'>
@@ -33,7 +63,145 @@ const Terms_And_Conditions_Page = () => {
         </div>
 
         <div className=' mx-auto'>
+          {/* Toggle Tabs */}
+          <div className='flex justify-center sm:justify-start mb-8'>
+            <div
+              className='inline-flex p-1 bg-docuhealth-light-blue border border-docuhealth-border-light rounded-full shadow-xs'
+              role="tablist"
+              aria-label="Terms and Conditions categories"
+            >
+              <button
+                type='button'
+                role="tab"
+                aria-selected={activeTab === 'patient'}
+                onClick={() => handleTabChange('patient')}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 cursor-pointer ${
+                  activeTab === 'patient'
+                    ? 'bg-docuhealth-primary text-white shadow-sm'
+                    : 'text-docuhealth-primary hover:text-blue-900 hover:bg-white/50'
+                }`}
+              >
+                <User className='w-4 h-4' />
+                <span>Patient</span>
+              </button>
+              <button
+                type='button'
+                role="tab"
+                aria-selected={activeTab === 'hospital'}
+                onClick={() => handleTabChange('hospital')}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 cursor-pointer ${
+                  activeTab === 'hospital'
+                    ? 'bg-docuhealth-primary text-white shadow-sm'
+                    : 'text-docuhealth-primary hover:text-blue-900 hover:bg-white/50'
+                }`}
+              >
+                <Building2 className='w-4 h-4' />
+                <span>Hospital</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Patient Terms Section */}
+          {activeTab === 'patient' && (
+            <div className='mb-20'>
+              <h2 className='text-2xl font-bold text-docuhealth-primary mb-3 border-b-2 border-docuhealth-primary pb-2 inline-block'>
+                PATIENT TERMS & CONDITIONS
+              </h2>
+              <p className='text-base font-semibold text-docuhealth-primary mb-8'>
+                Medical Records, After-Visit Summaries, Lab Results and Medication Use
+              </p>
+              <div className="space-y-8 text-sm text-docuhealth-gray leading-relaxed">
+                <section>
+                  <h3 className="text-lg font-bold text-docuhealth-primary mb-3">1. Purpose of DocuHealth</h3>
+                  <p>
+                    DocuHealth is designed to make essential health information accessible to patients and authorized healthcare professionals, support continuity of care, and improve the coordination and quality of healthcare services. DocuHealth does not independently diagnose medical conditions, prescribe medication, recommend treatment, or make clinical decisions on behalf of a patient or healthcare professional.
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="text-lg font-bold text-docuhealth-primary mb-3">2. Medical Records and Clinical Decisions</h3>
+                  <p className="mb-3">
+                    Clinical decisions, including diagnosis, treatment, prescription, medication changes, additional investigations, and other medical interventions, remain the responsibility of the healthcare professional and healthcare facility providing your care.
+                  </p>
+                  <p>
+                    Information displayed through DocuHealth, including your medical record summary, diagnosis, medication history, laboratory results, test results, vital signs, discharge summary, and After-Visit Summary (AVS), is provided for continuity of care and informational purposes and should not be interpreted as an independent medical recommendation from DocuHealth.
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="text-lg font-bold text-docuhealth-primary mb-3">3. Medication Use and Self-Medication</h3>
+                  <p className="mb-3">
+                    Patients must not assume that because a medication was previously prescribed or used successfully, it is appropriate to use the same medication again for a new or recurring health condition.
+                  </p>
+                  <p className="mb-3">
+                    Medical conditions may have different causes, and the same symptoms may require different treatments. Previous prescriptions, medication records, or drug information displayed on My DocuHealth must not be used as a basis for self-prescribing, changing dosage, restarting medication, sharing medication with another person, or purchasing and using medication without appropriate professional guidance.
+                  </p>
+                  <p className="mb-3">
+                    Always follow the instructions of your doctor, nurse, pharmacist, or other appropriately qualified healthcare professional regarding the use of medication.
+                  </p>
+                  <p>
+                    Where a healthcare professional recommends an additional test, investigation, review, referral, or follow-up appointment, patients are strongly encouraged to comply with such recommendations unless otherwise advised by a qualified healthcare professional.
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="text-lg font-bold text-docuhealth-primary mb-3">4. Laboratory and Test Results</h3>
+                  <p className="mb-3">
+                    Laboratory results, diagnostic test results, imaging reports, and other clinical information made available through My DocuHealth should be reviewed and interpreted in the appropriate clinical context.
+                  </p>
+                  <p>
+                    A test result on its own may not provide a complete picture of a patient’s health. Patients should consult an appropriately qualified healthcare professional for interpretation, diagnosis, and advice regarding any result, particularly where a result is abnormal or unclear.
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="text-lg font-bold text-docuhealth-primary mb-3">5. Access to Medical Information</h3>
+                  <p className="mb-3">
+                    Patients may have access through DocuHealth to information they are entitled to receive in connection with their care. Depending on the healthcare service provided, this may include:
+                  </p>
+                  <ul className="list-disc pl-6 space-y-1.5 my-3">
+                    <li>Medical or visit summaries;</li>
+                    <li>After-Visit Summaries (AVS);</li>
+                    <li>Discharge summaries;</li>
+                    <li>Diagnosis and clinical impressions;</li>
+                    <li>Medication and prescription records;</li>
+                    <li>Laboratory and test results;</li>
+                    <li>Vital signs and other recorded observations; and</li>
+                    <li>Other essential information relating to the patient’s care.</li>
+                  </ul>
+                  <p className="mt-3">
+                    The healthcare facility remains responsible for maintaining its applicable internal clinical and medical records in accordance with its legal and professional obligations. Access to a summary or information through DocuHealth does not necessarily constitute access to the healthcare facility’s complete internal medical record.
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="text-lg font-bold text-docuhealth-primary mb-3">6. Patient Responsibility</h3>
+                  <p className="mb-3">
+                    Patients are responsible for providing accurate information about their health, medications, allergies, previous treatments, and other relevant medical history and for informing healthcare professionals of any changes.
+                  </p>
+                  <p>
+                    Patients should seek appropriate professional medical care when experiencing new, worsening, persistent, or emergency symptoms and should not rely solely on information available through My DocuHealth to make decisions about their health.
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="text-lg font-bold text-docuhealth-primary mb-3">7. No Substitution for Professional Medical Care</h3>
+                  <p className="mb-3">
+                    DocuHealth provides technology and access to health information to support patients and healthcare professionals. It does not replace consultation, examination, diagnosis, treatment, or other professional medical services.
+                  </p>
+                  <p className="mb-3">
+                    The availability of information through My DocuHealth should not be understood as an endorsement, confirmation, or recommendation by DocuHealth that a particular medication, treatment, test, diagnosis, or course of action is appropriate for the patient.
+                  </p>
+                  <p>
+                    By using DocuHealth, you acknowledge that healthcare decisions should be made in consultation with an appropriately qualified healthcare professional and that information contained in your DocuHealth account should be used responsibly and primarily to support continuity of care.
+                  </p>
+                </section>
+              </div>
+            </div>
+          )}
+
           {/* Hospital Terms Section */}
+          {activeTab === 'hospital' && (
           <div className='mb-20'>
             <h2 className='text-2xl  font-bold text-docuhealth-primary mb-8 border-b-2 border-docuhealth-primary pb-2 inline-block'>HOSPITAL TERMS & CONDITIONS</h2>
             <div className="space-y-8 text-sm text-docuhealth-gray leading-relaxed">
@@ -153,8 +321,8 @@ const Terms_And_Conditions_Page = () => {
                 <div className='bg-docuhealth-light-blue p-6 border-l-4 border-docuhealth-primary rounded-r-md mt-10 shadow-sm'>
                     <h3 className='text-md font-bold text-docuhealth-primary mb-2'>Agreement Statement</h3>
                     <p className='text-sm font-medium italic text-docuhealth-gray'>
-                        "I agree to the Terms & Conditions and understand that internal clinical documentation remains
-                        restricted to hospital use, while patients will only access summarized medical records."
+                        &ldquo;I agree to the Terms &amp; Conditions and understand that internal clinical documentation remains
+                        restricted to hospital use, while patients will only access summarized medical records.&rdquo;
                     </p>
                 </div>
 
@@ -174,6 +342,7 @@ const Terms_And_Conditions_Page = () => {
 
             </div>
           </div>
+          )}
 
         </div>
       </div>
