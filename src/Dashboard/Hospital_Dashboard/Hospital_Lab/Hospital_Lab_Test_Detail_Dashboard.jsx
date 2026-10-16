@@ -209,7 +209,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
         toast.success("Request accepted");
       }
       await specimenMutation.mutateAsync({ order_sqid: order.id, item_sqid: actualItemSqid, specimen_collected_at });
-      toast.success(fromAccept ? "Sample collection logged" : "Sample collection updated");
+      toast.success("Sample collection logged");
       setShowSampleModal(false);
       setSampleLogged(true);
       invalidateAllLabQueries();
@@ -250,12 +250,15 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
 
           {(isSampleCollected || isInProgress) && !isDoctorView && (
             <>
-              <button
-                onClick={() => setShowSampleModal(true)}
-                className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary text-xs font-medium px-4 py-2 rounded-full hover:bg-indigo-50 transition-colors"
-              >
-                {sampleLogged ? "Edit sample" : "Log sample"}
-              </button>
+              {/* specimen time is one-shot: backend only accepts it while in_progress */}
+              {isInProgress && !sampleLogged && (
+                <button
+                  onClick={() => setShowSampleModal(true)}
+                  className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary text-xs font-medium px-4 py-2 rounded-full hover:bg-indigo-50 transition-colors"
+                >
+                  Log sample
+                </button>
+              )}
               <button
                 onClick={() => navigate("/hospital-lab-upload-result", { state: { order, item } })}
                 disabled={!sampleLogged}
@@ -439,11 +442,6 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
                 </p>
               </div>
             </div>
-            {isInProgress && !isDoctorView && (
-              <button onClick={() => setShowSampleModal(true)} className="text-blue-600 text-xs font-medium hover:underline">
-                Edit
-              </button>
-            )}
           </div>
         )}
 
@@ -492,7 +490,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
           <div className="bg-white rounded-md shadow-xl w-full max-w-md p-6 flex flex-col gap-5">
             <div className="relative flex items-start justify-center">
               <div className="text-center">
-                <h3 className="text-base font-semibold text-gray-900">{fromAccept ? "Sample Collection Info" : "Edit Sample Collection Info"}</h3>
+                <h3 className="text-base font-semibold text-gray-900">Sample Collection Info</h3>
                 <p className="text-sm text-gray-500 mt-1">Kindly fill up to proceed!</p>
               </div>
               <button onClick={() => setShowSampleModal(false)} className="absolute right-0 top-0 text-gray-400 hover:text-gray-600">
