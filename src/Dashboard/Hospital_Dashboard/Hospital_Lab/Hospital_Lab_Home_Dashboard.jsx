@@ -9,7 +9,7 @@ import LabStatCard from "../../../Components/Dashboard/Hospital_Dashboard_Compon
 const PAGE_SIZE = 8;
 
 const Hospital_Lab_Home_Dashboard = () => {
-  const { backgroundImage, hospitalName, stats, recentPatients, isLoading } = useContext(LabAppContext);
+  const { backgroundImage, hospitalName, stats, recentPatients, isLoading } = useContext(LabAppContext) || {};
   const [currentPage, setCurrentPage] = useState(1);
 
   const statCards = [
@@ -104,8 +104,61 @@ const Hospital_Lab_Home_Dashboard = () => {
         <div className="border rounded-lg p-4 lg:p-6">
           <h2 className="mb-4 pb-2 border-b font-medium">Recent Patients attended to</h2>
 
-          {isLoading ? (
-            <div className="py-12 text-center text-gray-400 text-sm">Loading...</div>
+          {isLoading && recentPatients.length === 0 ? (
+            <div className="py-2">
+              {/* Desktop shimmer rows */}
+              <div className="hidden lg:block overflow-x-auto">
+                <div className="flex flex-col min-w-[720px]">
+                  <div className="grid grid-cols-7 text-left text-sm bg-gray-100 py-5 rounded-md">
+                    <div className="col-span-2 w-full pl-5 flex items-center gap-2">
+                      <p>Patient's Name</p>
+                    </div>
+                    <p className="col-span-2">Date / Time</p>
+                    <p>HIN</p>
+                    <p>Staff</p>
+                    <p>Sex</p>
+                  </div>
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="grid grid-cols-7 items-center py-5 border-b border-gray-100 animate-pulse">
+                      <div className="col-span-2 pl-5 flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-gray-200" />
+                        <div className="h-4 w-32 bg-gray-200 rounded" />
+                      </div>
+                      <div className="col-span-2">
+                        <div className="h-4 w-28 bg-gray-200 rounded" />
+                      </div>
+                      <div>
+                        <div className="h-4 w-16 bg-gray-200 rounded" />
+                      </div>
+                      <div>
+                        <div className="h-4 w-24 bg-gray-200 rounded" />
+                      </div>
+                      <div>
+                        <div className="h-4 w-12 bg-gray-200 rounded" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Mobile shimmer cards */}
+              <div className="lg:hidden flex flex-col gap-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="bg-white border border-gray-200 rounded-md p-5 animate-pulse space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gray-200" />
+                      <div className="space-y-1.5 flex-1">
+                        <div className="h-4 bg-gray-200 rounded w-1/2" />
+                        <div className="h-3 bg-gray-100 rounded w-1/4" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
+                      <div className="h-8 bg-gray-100 rounded" />
+                      <div className="h-8 bg-gray-100 rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           ) : recentPatients.length === 0 ? (
             <div className="py-12 text-center text-gray-400 text-sm">No recent patients</div>
           ) : (

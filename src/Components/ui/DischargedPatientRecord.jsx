@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ChevronDown, ChevronUp, Clock, Download, Lock, Paperclip, User } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Clock, Lock, Paperclip, User } from "lucide-react";
 import {
   fetchEncounterRecords,
   fetchPatientDischargedEncounters,
@@ -915,24 +915,6 @@ const DischargedPatientRecord = ({ patient: patientProp, admission, isOutPatient
                 ))}
                 {loadingEncounters && <p className="px-3 py-2 text-xs text-gray-400">Loading other visits...</p>}
               </>
-            )}
-          </Dropdown>
-          <Dropdown
-            trigger={(open, toggle) => (
-              <button onClick={toggle} className="flex items-center gap-2 bg-docuhealth-primary hover:bg-docuhealth-primary-hover text-white rounded-md px-3.5 py-2 text-[13px] font-medium cursor-pointer">
-                <Download className="w-4 h-4" /> Download
-                <ChevronDown className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`} />
-              </button>
-            )}
-          >
-            {(close) => (
-              <button
-                disabled={isLoading}
-                onClick={() => { close(); setPrinting(true); }}
-                className="block w-full text-left px-3 py-2 rounded-md cursor-pointer hover:bg-gray-50 text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed"
-              >
-                {isLoading ? "Loading record..." : "Download as PDF"}
-              </button>
             )}
           </Dropdown>
         </div>

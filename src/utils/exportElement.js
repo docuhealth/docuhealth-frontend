@@ -134,7 +134,7 @@ const flattenModernColors = (clonedDoc, clonedRoot) => {
 // placed whole where they fit; a child taller than a page is sliced across
 // pages. `skip(child)` can leave a child out. html2canvas and jsPDF are heavy,
 // so load them on use.
-const renderElementToPdf = async (node, { skip } = {}) => {
+const renderElementToPdf = async (node, { skip, singleBlock = false, scale = 1.75 } = {}) => {
   if (!node) throw new Error("Nothing to export");
 
   const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas"), import("jspdf")]);
@@ -150,19 +150,22 @@ const renderElementToPdf = async (node, { skip } = {}) => {
   await document.fonts?.ready;
 
   let cursorY = margin;
+  const blocks = singleBlock ? [node] : Array.from(node.children);
 
-  for (const block of node.children) {
+  for (const block of blocks) {
     if (block.hasAttribute(HIDE_ATTR) || skip?.(block)) continue;
 
     // Canvas-pixel offsets where slicing this block across pages is safe.
     // Measured on the clone, since that's where print-only content is shown.
     let safeCutsPx = [];
 
+    const effectiveScale = scale || PDF_SCALE;
     const canvas = await html2canvas(block, {
-      scale: PDF_SCALE,
+      scale: effectiveScale,
       backgroundColor: "#ffffff",
       useCORS: true,
       logging: false,
+      imageTimeout: 5000,
       ignoreElements: (el) => el.hasAttribute?.(HIDE_ATTR),
       onclone: (clonedDoc, clonedBlock) => {
         flattenModernColors(clonedDoc, clonedBlock);

@@ -47,8 +47,8 @@ const Hospital_Admin_Home_Dashboard = () => {
     queryKey: ["hospital-dashboard-metrics", admittedRange],
     queryFn: fetchHospitalDashboardMetrics,
     enabled: isUserLoggedIn,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
+    staleTime: 60 * 1000,
+    refetchInterval: 60000,
     refetchOnWindowFocus: true,
   });
 
@@ -56,8 +56,8 @@ const Hospital_Admin_Home_Dashboard = () => {
     queryKey: ["hospital-dashboard-metrics", dischargedRange],
     queryFn: fetchHospitalDashboardMetrics,
     enabled: isUserLoggedIn,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
+    staleTime: 60 * 1000,
+    refetchInterval: 60000,
     refetchOnWindowFocus: true,
   });
 
@@ -65,8 +65,8 @@ const Hospital_Admin_Home_Dashboard = () => {
     queryKey: ["hospital-dashboard-metrics", attendanceRange],
     queryFn: fetchHospitalDashboardMetrics,
     enabled: isUserLoggedIn,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
+    staleTime: 60 * 1000,
+    refetchInterval: 60000,
     refetchOnWindowFocus: true,
   });
 
@@ -143,14 +143,23 @@ const Hospital_Admin_Home_Dashboard = () => {
 
       </div>
 
-      {dashboardMetricsLoading && (
-        <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-docuhealth-primary"></div>
+      {dashboardMetricsLoading && !dashboardMetrics && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+          {Array.from({ length: 3 }, (_, i) => (
+            <div key={i} className="bg-white border border-gray-200 rounded-md p-5 flex flex-col justify-between animate-pulse">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gray-200 rounded-sm" />
+                <div className="h-4 w-32 bg-gray-200 rounded" />
+              </div>
+              <div className="h-8 w-20 bg-gray-200 rounded mb-3" />
+              <div className="h-3 w-36 bg-gray-100 rounded" />
+            </div>
+          ))}
         </div>
       )}
 
       {/* Stat Cards */}
-      {!dashboardMetricsLoading && (
+      {(dashboardMetrics || !dashboardMetricsLoading) && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {
             statCards.map((stat, index) => (
@@ -194,9 +203,9 @@ const Hospital_Admin_Home_Dashboard = () => {
       )}
 
       {/* Charts Section */}
-      {!dashboardMetricsLoading && (
+      {(dashboardMetrics || !dashboardMetricsLoading) && (
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-          {admittedLoading ? (
+          {admittedLoading && !admittedMetrics ? (
             <ChartLoadingPlaceholder title="Admitted patients" />
           ) : (
             <AdmittedPatientsChart
@@ -205,7 +214,7 @@ const Hospital_Admin_Home_Dashboard = () => {
               onFilterChange={setAdmittedFilter}
             />
           )}
-          {dischargedLoading ? (
+          {dischargedLoading && !dischargedMetrics ? (
             <ChartLoadingPlaceholder title="Discharged patients" />
           ) : (
             <DischargedPatientsChart
@@ -218,9 +227,9 @@ const Hospital_Admin_Home_Dashboard = () => {
       )}
 
 
-      {!dashboardMetricsLoading && (
+      {(dashboardMetrics || !dashboardMetricsLoading) && (
         <div className="mt-6 w-full">
-          {attendanceLoading ? (
+          {attendanceLoading && !attendanceMetrics ? (
             <ChartLoadingPlaceholder title="Patient's Attendance overview" />
           ) : (
             <AttendanceOverviewChart

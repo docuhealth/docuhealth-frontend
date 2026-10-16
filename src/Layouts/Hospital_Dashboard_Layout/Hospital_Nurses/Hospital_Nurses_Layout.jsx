@@ -190,7 +190,7 @@ const Hospital_Nurses_Layout = () => {
     },
   ];
 
-  if (isLoading) {
+  if (isLoading && !profile) {
     return <HospitalLoader variant="fullscreen" logo={hospitalLogo} label="Setting up your workspace..." />;
   }
 

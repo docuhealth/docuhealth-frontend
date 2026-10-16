@@ -5,7 +5,7 @@ import AddLabScientistModal from "../../../Components/Dashboard/Hospital_Dashboa
 import { LabAppContext } from "../../../context/HospitalContext/Lab/LabAppContext";
 
 const Hospital_Lab_HealthPersonnel_Dashboard = () => {
-  const { isLabAdmin } = useContext(LabAppContext);
+  const { isLabAdmin = false } = useContext(LabAppContext) || {};
   const [createNewStaff, setCreateNewStaff] = useState(false);
 
   return (

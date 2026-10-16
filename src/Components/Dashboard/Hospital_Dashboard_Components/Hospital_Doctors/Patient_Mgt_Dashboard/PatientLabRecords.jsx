@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Hospital_Lab_Test_Detail_Dashboard from "../../../../../Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Test_Detail_Dashboard";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import CardGridSkeleton from "../../../../ui/CardGridSkeleton";
+import { formatOrderStatus, formatApprovalStatus } from "../Scan_Lab_Results/scanLabResults";
 
 const PatientLabRecords = ({
   patientLabRecords = [],
@@ -13,7 +14,7 @@ const PatientLabRecords = ({
 }) => {
   const [selectedRecord, setSelectedRecord] = useState(null);
 
-  if (labloading) {
+  if (labloading && patientLabRecords.length === 0) {
     return <CardGridSkeleton label="Loading lab records" />;
   }
 
@@ -21,7 +22,7 @@ const PatientLabRecords = ({
     return (
       <div>
         <Hospital_Lab_Test_Detail_Dashboard
-          orderIdProp={selectedRecord}
+          orderIdProp={selectedRecord?.sqid || selectedRecord?.id || selectedRecord}
           onBackProp={() => setSelectedRecord(null)}
           isDoctorView={true}
         />
@@ -82,25 +83,18 @@ const PatientLabRecords = ({
             <div className="flex flex-col gap-1.5 mb-3">
               <div className="flex items-center gap-1">
                 <p className="text-gray-400 text-xs">Test Order Status: </p>
-                <p className="text-docuhealth-green text-xs font-semibold capitalize">
-                  {record?.status ? record.status.replace("_", " ") : "Ready"}
+                <p className={`text-xs font-semibold capitalize ${formatOrderStatus(record?.status).className}`}>
+                  {formatOrderStatus(record?.status).label}
                 </p>
               </div>
               <div className="flex items-center gap-1">
                 <p className="text-gray-400 text-xs">Approval Status: </p>
                 <p
                   className={`text-xs font-semibold capitalize ${
-                    record?.result_info?.status === "approved" ||
-                    record?.result_info?.status === "accepted"
-                      ? "text-docuhealth-green"
-                      : record?.result_info?.status === "rejected"
-                      ? "text-red-500"
-                      : record?.result_info?.status === "pending"
-                      ? "text-amber-500"
-                      : "text-gray-500"
+                    formatApprovalStatus(record?.result_info?.status, record?.status).className
                   }`}
                 >
-                  {record?.result_info?.status || "N/A"}
+                  {formatApprovalStatus(record?.result_info?.status, record?.status).label}
                 </p>
               </div>
             </div>

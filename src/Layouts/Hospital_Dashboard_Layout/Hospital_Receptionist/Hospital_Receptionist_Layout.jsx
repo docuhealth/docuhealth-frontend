@@ -6,7 +6,7 @@ import HospitalLoader from "../../../Components/ui/HospitalLoader";
 import { ReceptionistAppContext } from "../../../context/HospitalContext/Receptionist/ReceptionistAppContext";
 
 const Hospital_Receptionist_Layout = () => {
-  const { profile, hospitalLogo, hospitalName, isLoading } = useContext(ReceptionistAppContext);
+  const { profile, hospitalLogo, hospitalName, loading } = useContext(ReceptionistAppContext);
   const navigate = useNavigate();
   const [comingSoonFeature, setComingSoonFeature] = useState(null);
 
@@ -156,7 +156,7 @@ const Hospital_Receptionist_Layout = () => {
     },
   ];
 
-  if (isLoading) {
+  if (loading && !profile) {
     return <HospitalLoader variant="fullscreen" logo={hospitalLogo} label="Setting up your workspace..." />;
   }
 

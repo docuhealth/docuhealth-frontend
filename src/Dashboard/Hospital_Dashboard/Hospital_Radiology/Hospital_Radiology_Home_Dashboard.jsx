@@ -19,8 +19,8 @@ const Hospital_Radiology_Home_Dashboard = () => {
     queryKey: ["radiology-trend-metrics"],
     queryFn: fetchRadiologyTrend,
     enabled: isUserLoggedIn,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
+    staleTime: 60 * 1000,
+    refetchInterval: 60000,
     refetchOnWindowFocus: true,
     retry: false,
   });
@@ -49,7 +49,7 @@ const Hospital_Radiology_Home_Dashboard = () => {
 
       {/* Chart */}
       <div className="mt-6 w-full">
-        {trendLoading ? (
+        {trendLoading && trendArray.length === 0 ? (
           <ChartSkeleton title="Total scan carried out" />
         ) : (
           <TotalScansChart data={trendArray} />

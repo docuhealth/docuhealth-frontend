@@ -6,15 +6,9 @@ import Hospital_Lab_Test_Detail_Dashboard from "../../../../../Dashboard/Hospita
 import useDebounce from "../../../../../hooks/useDebounce";
 import ScanLabResultsShell from "./ScanLabResultsShell";
 import ScanLabResultCard, { ScanLabResultGridSkeleton } from "./ScanLabResultCard";
+import { formatOrderStatus, formatApprovalStatus } from "./scanLabResults";
 
 const PAGE_SIZE = 9;
-
-const approvalClass = (status) => {
-  if (status === "approved" || status === "accepted") return "text-docuhealth-green";
-  if (status === "rejected") return "text-red-500";
-  if (status === "pending") return "text-amber-500";
-  return "text-gray-500";
-};
 
 const Hospital_Doctors_Lab_Results_Tab = ({ activeTab, onTabChange }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -75,7 +69,7 @@ const Hospital_Doctors_Lab_Results_Tab = ({ activeTab, onTabChange }) => {
       totalPages={totalPages}
       setCurrentPage={setCurrentPage}
     >
-      {labLoading ? (
+      {labLoading && patientLabRecords.length === 0 ? (
         <ScanLabResultGridSkeleton label="Loading lab results" />
       ) : patientLabRecords.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-gray-400">
@@ -101,8 +95,16 @@ const Hospital_Doctors_Lab_Results_Tab = ({ activeTab, onTabChange }) => {
                   }
                 }
                 statusRows={[
-                  { label: "Test Order Status", value: record.status ? record.status.replace("_", " ") : "Ready", className: "text-docuhealth-green" },
-                  { label: "Approval Status", value: approvalStatus || "N/A", className: approvalClass(approvalStatus) },
+                  {
+                    label: "Test Order Status",
+                    value: formatOrderStatus(record.status).label,
+                    className: formatOrderStatus(record.status).className,
+                  },
+                  {
+                    label: "Approval Status",
+                    value: formatApprovalStatus(approvalStatus, record.status).label,
+                    className: formatApprovalStatus(approvalStatus, record.status).className,
+                  },
                 ]}
                 reporter={submittedBy ? `${submittedBy.firstname} ${submittedBy.lastname}` : "N/A"}
                 dateTime={

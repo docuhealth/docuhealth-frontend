@@ -31,7 +31,7 @@ const NursesProfileProvider = (props) => {
 
 
   return (
-    <NursesAppContext.Provider value={{ profile, isLoading: !profile && isUserLoggedIn && isPending, wardInfo, backgroundImage, hospitalName, hospitalLogo }}>
+    <NursesAppContext.Provider value={{ profile, wardInfo, backgroundImage, hospitalName, hospitalLogo, isLoading: !profile && isUserLoggedIn && isPending }}>
         {props.children}
     </NursesAppContext.Provider>
   )

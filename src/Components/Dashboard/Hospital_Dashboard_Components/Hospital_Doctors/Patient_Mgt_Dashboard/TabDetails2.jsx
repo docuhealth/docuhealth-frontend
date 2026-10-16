@@ -38,6 +38,7 @@ import DoctorIssuedTasksHistory from "./DoctorIssuedTasksHistory";
 import PatientRadiologyRecords from "./PatientRadiologyRecords";
 import PatientMedicationHistory from "./PatientMedicationHistory";
 import AdmissionNotesHistory from "../../Hospital_Nurses/Patient_Mgt_Dashboard/AdmissionNotesHistory";
+import EncounterRecordsTimeline from "../../../../ui/EncounterRecordsTimeline";
 import EmptyState from "../../../../ui/EmptyState";
 import { createProgressNote } from "../../../../../queries/Hospital/doctor/progressNotes";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
@@ -1146,7 +1147,7 @@ const PatientLabRecords = ({
     return (
       <div className="">
         <Hospital_Lab_Test_Detail_Dashboard 
-          orderIdProp={selectedRecord} 
+          orderIdProp={selectedRecord?.sqid || selectedRecord?.id || selectedRecord} 
           onBackProp={() => setSelectedRecord(null)} 
           isDoctorView={true} 
         />
@@ -1872,24 +1873,15 @@ const getTabs = ({
     },
     {
       title: "Lab Result",
-      // content: (
-      //   <PatientLabRecords
-      //     labloading={labloading}
-      //     patientLabRecords={patientLabRecords}
-      //     count={labCount}
-      //     currentPage={labCurrentPage}
-      //     totalPages={labTotalPages}
-      //     setCurrentPage={setLabCurrentPage}
-      //   />
-      // ),
       content: (
-        <div className="py-16 text-center">
-          <EmptyState
-            icon="document"
-            title="Coming Soon"
-            description="Lab results will be available soon."
-          />
-        </div>
+        <PatientLabRecords
+          labloading={labloading}
+          patientLabRecords={patientLabRecords}
+          count={labCount}
+          currentPage={labCurrentPage}
+          totalPages={labTotalPages}
+          setCurrentPage={setLabCurrentPage}
+        />
       ),
     },
     {
@@ -1899,6 +1891,17 @@ const getTabs = ({
         <PatientMedicationHistory
           patientFullInfo={patientFullInfo}
           admissionSqid={advanceCheckUpSource === "active" ? selected?.sqid : null}
+        />
+      ),
+    },
+    {
+      title: "Encounter Records",
+      content: (
+        <EncounterRecordsTimeline
+          kind="admission"
+          sqid={selected?.sqid}
+          isOngoing={!selected?.discharge_date}
+          title="Care Record Timeline"
         />
       ),
     },

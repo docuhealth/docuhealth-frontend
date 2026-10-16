@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -11,6 +11,7 @@ import { printElement, downloadElementAsPdf, slugify } from "../../../utils/expo
 import { acceptScanOrderItem, rejectScanOrderItem, logImageCollection } from "../../../queries/Hospital/radiology/scan_requests";
 import { extractApiErrorMessage } from "../../../utils/apiError";
 import HospitalLoader from "../../../Components/ui/HospitalLoader";
+import { RadiologyAppContext } from "../../../context/HospitalContext/Radiology/RadiologyAppContext";
 
 
 // Same layout format as the doctor's patient-record detail view (PatientInfo.jsx's "viewDetailMedicalRecord").
@@ -57,6 +58,7 @@ const pillFilled =
 const Hospital_Radiology_Scan_Detail_Dashboard = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { hospitalName = "" } = useContext(RadiologyAppContext) || {};
   const { state } = useLocation() || {};
   const order = state?.order;
 
@@ -158,16 +160,28 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
   const canUpload = status === "image_collected" && !awaitingApproval;
   const showReport = !!report && (status === "completed" || awaitingApproval);
 
-  const exportLabel = status === "completed" ? "Imaging result" : "Rejected scan order";
+  const exportLabel = status === "rejected" ? "Rejected scan order" : "Imaging result";
+
+  const sanitizeForFilename = (str) =>
+    String(str || "")
+      .trim()
+      .replace(/[^a-zA-Z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+
+  const patientNameSlug = sanitizeForFilename(patientName || "Patient");
+  const scanNameSlug = sanitizeForFilename(order.scan_type || "Scan_Result");
+  const hospitalNameSlug = sanitizeForFilename(order.hospital_info?.name || order.hospital || hospitalName || "Hospital");
+  const downloadFileName = `${patientNameSlug}_${scanNameSlug}_${hospitalNameSlug}.pdf`;
+
   const handlePrint = () => {
     printElement(printRef.current, `${exportLabel} - ${patientName}`).catch(() => toast.error("Could not open the print dialog"));
   };
   const handleDownload = async () => {
-    if (downloading) return;
+    if (downloading || !printRef.current) return;
     setDownloading(true);
     const toastId = toast.loading("Preparing PDF...");
     try {
-      await downloadElementAsPdf(printRef.current, `${slugify(exportLabel)}-${slugify(patientName)}.pdf`);
+      await downloadElementAsPdf(printRef.current, downloadFileName, { singleBlock: true, scale: 1.75 });
       toast.success("PDF downloaded", { id: toastId });
     } catch (error) {
       console.error("PDF export failed", error);
@@ -268,7 +282,7 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
               </div>
             )}
 
-            {isDecided && (
+            {(showReport || isDecided) && (
               <div className="flex gap-3 w-full sm:w-auto">
                 <button type="button" onClick={handlePrint} className={pillOutline + " flex-1 sm:flex-none"}>
                   <Printer size={14} />

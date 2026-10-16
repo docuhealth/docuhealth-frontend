@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../Components/ui/DashboardLayout";
 import ComingSoonModal from "../../../Components/ui/ComingSoonModal";
+import HospitalLoader from "../../../Components/ui/HospitalLoader";
 import { LabAppContext } from "../../../context/HospitalContext/Lab/LabAppContext";
 
 const LAB_ADMIN_ROUTES = [
@@ -20,7 +21,7 @@ const APPOINTMENT_ROUTES = [
 ];
 
 const Hospital_Lab_Layout = () => {
-  const { profile, isLabAdmin, hospitalLogo, hospitalName } = useContext(LabAppContext);
+  const { profile, isLabAdmin = false, hospitalLogo, hospitalName, isLoading } = useContext(LabAppContext) || {};
   const navigate = useNavigate();
   const [comingSoonFeature, setComingSoonFeature] = useState(null);
 
@@ -175,6 +176,10 @@ const Hospital_Lab_Layout = () => {
       ),
     },
   ];
+
+  if (isLoading && !profile) {
+    return <HospitalLoader variant="fullscreen" logo={hospitalLogo} label="Setting up your workspace..." />;
+  }
 
   return (
     <DashboardLayout

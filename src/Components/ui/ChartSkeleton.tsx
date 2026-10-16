@@ -7,7 +7,7 @@ export interface ChartSkeletonProps {
 }
 
 // Smooth area-line placeholder matching the ECharts line charts (y labels on the
-// left, x labels below). `withControls` adds the download + period dropdown stubs
+// left, x labels below). `withControls` adds the period dropdown stub
 // and switches to the 300px plot those charts use; otherwise it fills the
 // fixed h-[380px] frame, so nothing shifts when data lands.
 const ChartSkeleton = ({ title, withControls = false }: ChartSkeletonProps) => (
@@ -20,7 +20,6 @@ const ChartSkeleton = ({ title, withControls = false }: ChartSkeletonProps) => (
       <h3 className="text-xs lg:text-lg lg:font-semibold text-gray-800">{title}</h3>
       {withControls && (
         <div className="flex items-center gap-2">
-          <Skeleton className="h-[30px] w-[30px]" />
           <Skeleton className="h-8 w-24" />
         </div>
       )}

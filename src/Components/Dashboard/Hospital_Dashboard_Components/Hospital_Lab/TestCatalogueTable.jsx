@@ -200,11 +200,61 @@ const TestCatalogueTable = ({ extraTests = [], onOpenAddTest, onConfigureTest })
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="py-24 flex flex-col items-center justify-center text-gray-400 text-sm">
-          <div className="w-7 h-7 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin mb-3" />
-          <span className="font-semibold text-slate-700">Loading laboratory tests...</span>
-          <span className="text-xs text-gray-400 mt-1">Please wait while the test catalogue loads</span>
+      {isLoading && apiTests.length === 0 ? (
+        <div className="mt-4">
+          {/* Desktop Table Shimmer */}
+          <div className="hidden md:block overflow-x-auto">
+            <div className="bg-[#F8F9FB] border border-gray-100/80 rounded-full px-6 py-3.5 grid grid-cols-12 items-center text-xs font-semibold text-slate-600 select-none">
+              <div className="col-span-3">Test Name</div>
+              <div className="col-span-3">Department</div>
+              <div className="col-span-2">Unit / Format</div>
+              <div className="col-span-2">Turnaround / Status</div>
+              <div className="col-span-2 text-right">Actions</div>
+            </div>
+            <div className="divide-y divide-gray-100 mt-1">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="px-6 py-4 grid grid-cols-12 items-center animate-pulse">
+                  <div className="col-span-3 pr-2 space-y-1.5">
+                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-100 rounded w-1/3" />
+                  </div>
+                  <div className="col-span-3 pr-2">
+                    <div className="h-6 bg-gray-200 rounded-full w-24" />
+                  </div>
+                  <div className="col-span-2 pr-2 space-y-1">
+                    <div className="h-3.5 bg-gray-200 rounded w-16" />
+                    <div className="h-2.5 bg-gray-100 rounded w-12" />
+                  </div>
+                  <div className="col-span-2 space-y-1">
+                    <div className="h-3.5 bg-gray-200 rounded w-20" />
+                    <div className="h-2.5 bg-gray-100 rounded w-14" />
+                  </div>
+                  <div className="col-span-2 flex justify-end">
+                    <div className="h-8 w-8 bg-gray-200 rounded-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile Shimmer Cards */}
+          <div className="md:hidden flex flex-col gap-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white border border-gray-100 rounded-xl p-4 shadow-xs animate-pulse space-y-3">
+                <div className="flex justify-between items-start pb-2 border-b border-gray-50">
+                  <div className="space-y-1.5 flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-3/5" />
+                    <div className="h-3 bg-gray-100 rounded w-1/3" />
+                  </div>
+                  <div className="h-5 bg-gray-200 rounded-full w-16" />
+                </div>
+                <div className="flex justify-between items-center pt-1">
+                  <div className="h-4 bg-gray-200 rounded w-28" />
+                  <div className="h-7 bg-gray-200 rounded-full w-16" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ) : isError ? (
         <div className="py-14 text-center text-red-500 text-sm flex flex-col items-center gap-2">

@@ -7,7 +7,7 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { LabAppContext } from "../../../../../../context/HospitalContext/Lab/LabAppContext";
 
 const AccountSettingsTab = () => {
-  const { profile } = useContext(LabAppContext);
+  const { profile } = useContext(LabAppContext) || {};
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
