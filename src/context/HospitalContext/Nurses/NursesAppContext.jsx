@@ -1,7 +1,8 @@
-import React, { useEffect, useState, createContext } from "react";
+import React, { useEffect, createContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getHospitalToken } from "../../../services/authService";
 import { fetchNurseProfile } from "../../../queries/Hospital/nurse/profile";
+import { rememberHospitalLogo } from "../../../utils/hospitalBranding";
 
 
 export const NursesAppContext = createContext()
@@ -23,6 +24,10 @@ const NursesProfileProvider = (props) => {
       const backgroundImage = data?.theme?.bg_image;
       const hospitalName = data?.theme?.name;
       const hospitalLogo = data?.theme?.profile_image;
+
+      useEffect(() => {
+        rememberHospitalLogo(hospitalLogo);
+      }, [hospitalLogo]);
 
 
   return (

@@ -7,6 +7,57 @@ import { NursesAdmittedPatientMGTContext } from "../../../../../context/Hospital
 import SearchBar from "../../../../SearchBar/SearchBar";
 import Modal from "../../../../ui/Modal";
 import Button from "../../../../ui/Button";
+import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
+
+const DETAIL_LINE_WIDTHS = ["w-28", "w-36", "w-12", "w-40"];
+
+// Mirrors the loaded markup (search box + patient cards) with each text line swapped
+// for a bar of the same line height. Admitted/discharged cards have 4 icon rows
+// (doctor, ward, bed, date); outpatient cards have phone + date. `buttonClass` is the
+// card button's height, which differs per tab. `flexColumn` matches the discharged
+// tab, whose flex-col wrapper keeps the search box and grid margins from collapsing.
+const PatientCardGridSkeleton = ({ label, outpatient = false, admittedLine = false, buttonClass = "h-9", flexColumn = false }) => (
+  <div role="status" aria-label={label} className={flexColumn ? "flex flex-col" : ""}>
+    <div className="mb-4 h-[38px] rounded-md border border-gray-300 bg-white flex items-center pl-3">
+      <Skeleton className="h-4 w-4" />
+      <Skeleton className="h-3 w-40 ml-3" />
+    </div>
+    <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {Array.from({ length: 6 }, (_, i) => (
+        <div key={i} className="border p-3 rounded-xl">
+          <div className="flex justify-between items-center">
+            <SkeletonText className="h-3 w-28" />
+            <SkeletonText className="h-[18px] w-14 rounded-full" />
+          </div>
+          <div className="border-b py-2">
+            <SkeletonText className="h-3 w-28" />
+            {admittedLine && <SkeletonText textClassName="pt-1" className="h-3 w-32" />}
+          </div>
+          {outpatient ? (
+            <>
+              <div className="flex items-center gap-1 pt-3">
+                <i className="bx bx-phone text-[15px] text-gray-200"></i>
+                <SkeletonText className="h-3 w-24" />
+              </div>
+              <div className="flex items-center gap-1 pt-1 pb-3 border-b">
+                <Skeleton className="h-[15px] w-[15px]" />
+                <SkeletonText className="h-3 w-40" />
+              </div>
+            </>
+          ) : (
+            DETAIL_LINE_WIDTHS.map((w, j) => (
+              <div key={w} className={`flex items-center gap-1 ${j === 0 ? "pt-3" : "pt-1"} ${j === 3 ? "pb-3 border-b" : ""}`}>
+                <Skeleton className="h-[15px] w-[15px]" />
+                <SkeletonText className={`h-3 ${w}`} />
+              </div>
+            ))
+          )}
+          <Skeleton className={`mt-3 w-full rounded-full ${buttonClass}`} />
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 
 const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected }) => {
@@ -35,11 +86,7 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
     }, [admittedPatients]);
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-full text-sm">
-                Loading...
-            </div>
-        );
+        return <PatientCardGridSkeleton label="Loading admitted patients" buttonClass="h-[38px]" />;
     }
 
     if (admittedPatients.length === 0 && !searchQuery) {
@@ -303,11 +350,7 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
     }, [admittedPatients]);
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-full text-sm">
-                Loading...
-            </div>
-        );
+        return <PatientCardGridSkeleton label="Loading discharged patients" admittedLine flexColumn />;
     }
 
     if (admittedPatients.length === 0 && !searchQuery) {
@@ -536,11 +579,7 @@ const OutPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected }) => {
     }, [outPatients]);
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-full text-sm">
-                Loading...
-            </div>
-        );
+        return <PatientCardGridSkeleton label="Loading outpatients" outpatient buttonClass="h-10" />;
     }
 
     if (outPatients.length === 0 && !searchQuery) {

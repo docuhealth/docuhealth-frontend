@@ -7,7 +7,7 @@ import { NursingEncounterContext } from "../../../../../context/HospitalContext/
 import { NursesAppContext } from "../../../../../context/HospitalContext/Nurses/NursesAppContext";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../../ui/Table";
 import EmptyState from "../../../../ui/EmptyState";
-import Spinner from "../../../../ui/Spinner";
+import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
 import Modal from "../../../../ui/Modal";
 import Input from "../../../../ui/Input";
 import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
@@ -82,6 +82,99 @@ const calculateBmi = (w, h) => {
   const val = (weightNum / (heightNum * heightNum)).toFixed(1);
   return isNaN(val) ? "" : val;
 };
+
+// Mirrors the loaded rows (desktop) and cards (mobile) for the active tab, with each
+// text line swapped for a bar of the same line height.
+const EncounterSkeleton = ({ tableHeader, callUp }) => (
+  <div role="status" aria-label="Loading nursing encounters">
+    <div className="hidden lg:block w-full">
+      <Table className="w-full [&_table]:border-separate [&_table]:border-spacing-0">
+        {tableHeader}
+        <TableBody>
+          {Array.from({ length: 4 }, (_, i) => (
+            <TableRow key={i}>
+              <TableCell className="border-b border-gray-200 pl-10">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="w-8 h-8 rounded-full" />
+                  <SkeletonText className="h-3.5 w-28" />
+                </div>
+              </TableCell>
+              <TableCell className="border-b border-gray-200">
+                <SkeletonText className={`h-3.5 ${callUp ? "w-36" : "w-24"}`} />
+              </TableCell>
+              {callUp ? (
+                <>
+                  <TableCell className="border-b border-gray-200"><SkeletonText className="h-3.5 w-16" /></TableCell>
+                  <TableCell className="border-b border-gray-200"><Skeleton className="h-6 w-24" /></TableCell>
+                  <TableCell className="border-b border-gray-200">
+                    <SkeletonText className="h-3.5 w-24" />
+                    <SkeletonText textClassName="text-xs" className="h-2.5 w-20" />
+                  </TableCell>
+                  <TableCell className="border-b border-gray-200"><Skeleton className="h-10 w-40 rounded-full" /></TableCell>
+                </>
+              ) : (
+                <>
+                  <TableCell className="border-b border-gray-200"><SkeletonText className="h-3.5 w-20" /></TableCell>
+                  <TableCell className="border-b border-gray-200"><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
+                  <TableCell className="border-b border-gray-200">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-10 w-36 rounded-full" />
+                      <Skeleton className="h-10 w-40 rounded-full" />
+                    </div>
+                  </TableCell>
+                </>
+              )}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+    <div className="lg:hidden flex flex-col gap-4 mt-2">
+      {Array.from({ length: 2 }, (_, i) => (
+        <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 flex flex-col gap-4 shadow-xs">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-3">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div>
+                <SkeletonText textClassName="text-[14px] leading-tight mb-0.5" className="h-3.5 w-32" />
+                <SkeletonText textClassName="text-xs" className="h-2.5 w-24" />
+              </div>
+            </div>
+            {callUp ? <SkeletonText textClassName="text-[11px]" className="h-2.5 w-12" /> : <Skeleton className="h-[25px] w-16 rounded-full" />}
+          </div>
+          <div className="grid grid-cols-2 gap-2 mt-1">
+            {callUp ? (
+              <>
+                <div className="flex flex-col bg-gray-50 rounded-lg p-2 border border-gray-100">
+                  <SkeletonText textClassName="text-[10px] mb-1" className="h-2 w-20" />
+                  <Skeleton className="h-[23px] w-16 bg-gray-200" />
+                </div>
+                <div className="flex flex-col bg-gray-50 rounded-lg p-2 border border-gray-100">
+                  <SkeletonText textClassName="text-[10px] mb-1" className="h-2 w-24" />
+                  {/* the real "Claimed at" line sits inside the text-xs name span and inherits its line height */}
+                  <div className="text-xs">
+                    <SkeletonText className="h-2.5 w-20" />
+                    <SkeletonText textClassName="text-[10px]" className="h-2 w-16" />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex justify-between items-center bg-gray-50 rounded-lg p-3 border border-gray-100 col-span-2">
+                <SkeletonText textClassName="text-[11px]" className="h-2.5 w-20" />
+                <SkeletonText textClassName="text-sm" className="h-3.5 w-20" />
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col gap-2.5 mt-2">
+            {Array.from({ length: callUp ? 1 : 2 }, (_, j) => (
+              <Skeleton key={j} className="w-full h-9 rounded-full" />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const NursingEncounterTable = () => {
   const { encounters, loading, activeTab, claimEncounter, submitAssessment } = useContext(NursingEncounterContext);
@@ -225,12 +318,32 @@ const NursingEncounterTable = () => {
     );
   }
 
+  // Depends only on the tab, so the loading skeleton shows the real header too.
+  const tableHeader = (
+    <TableHeader className="!bg-transparent !border-none">
+      {activeTab === "Doctor’s call-up/consultation" ? (
+        <tr>
+          <TableHead className="w-[20%] rounded-l-full border-y border-l border-gray-200 normal-case text-gray-700 pl-10">Patient</TableHead>
+          <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Date and Time</TableHead>
+          <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Triage Priority</TableHead>
+          <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Call up status</TableHead>
+          <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Doctor Involved</TableHead>
+          <TableHead className="w-[20%] rounded-r-full border-y border-r border-gray-200 normal-case text-gray-700">Action</TableHead>
+        </tr>
+      ) : (
+        <tr>
+          <TableHead className="w-[25%] rounded-l-full border-y border-l border-gray-200 normal-case text-gray-700 pl-10">Patient</TableHead>
+          <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">{activeTab === "Closed" ? "Date and Time" : "Date"}</TableHead>
+          <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">{activeTab === "Closed" ? "Nurse Encountered" : "Wait time"}</TableHead>
+          <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">{activeTab === "Closed" ? "Triage Priority" : "Status"}</TableHead>
+          <TableHead className="w-[30%] rounded-r-full border-y border-r border-gray-200 normal-case text-gray-700">Nursing actions</TableHead>
+        </tr>
+      )}
+    </TableHeader>
+  );
+
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <Spinner className="w-8 h-8 text-docuhealth-primary" />
-      </div>
-    );
+    return <EncounterSkeleton tableHeader={tableHeader} callUp={activeTab === "Doctor’s call-up/consultation"} />;
   }
 
   if (!encounters || encounters.length === 0) {
@@ -249,26 +362,7 @@ const NursingEncounterTable = () => {
       {/* Desktop View */}
       <div className="hidden lg:block w-full">
         <Table className="w-full [&_table]:border-separate [&_table]:border-spacing-0">
-      <TableHeader className="!bg-transparent !border-none">
-        {activeTab === "Doctor’s call-up/consultation" ? (
-          <tr>
-            <TableHead className="w-[20%] rounded-l-full border-y border-l border-gray-200 normal-case text-gray-700 pl-10">Patient</TableHead>
-            <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Date and Time</TableHead>
-            <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Triage Priority</TableHead>
-            <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Call up status</TableHead>
-            <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Doctor Involved</TableHead>
-            <TableHead className="w-[20%] rounded-r-full border-y border-r border-gray-200 normal-case text-gray-700">Action</TableHead>
-          </tr>
-        ) : (
-          <tr>
-            <TableHead className="w-[25%] rounded-l-full border-y border-l border-gray-200 normal-case text-gray-700 pl-10">Patient</TableHead>
-            <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">{activeTab === "Closed" ? "Date and Time" : "Date"}</TableHead>
-            <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">{activeTab === "Closed" ? "Nurse Encountered" : "Wait time"}</TableHead>
-            <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">{activeTab === "Closed" ? "Triage Priority" : "Status"}</TableHead>
-            <TableHead className="w-[30%] rounded-r-full border-y border-r border-gray-200 normal-case text-gray-700">Nursing actions</TableHead>
-          </tr>
-        )}
-      </TableHeader>
+      {tableHeader}
       <TableBody>
         {encounters.map((encounter) => {
           const patientName = encounter.patient_info

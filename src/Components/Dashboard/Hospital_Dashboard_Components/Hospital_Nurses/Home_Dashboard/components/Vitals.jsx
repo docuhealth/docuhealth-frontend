@@ -8,6 +8,35 @@ import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import useDebounce from "../../../../../../hooks/useDebounce";
+import Skeleton, { SkeletonText, SkeletonBox } from "../../../../../ui/Skeleton";
+
+// Mirrors the loaded request cards (name + date pill, HIN, gender/staff/time, status, Open).
+const VitalsCardsSkeleton = () => (
+  <div role="status" aria-label="Loading patients assigned for vitals">
+    <div className="my-4 h-[38px] rounded-md border border-gray-300 bg-white flex items-center pl-3">
+      <Skeleton className="h-4 w-4" />
+      <Skeleton className="h-3 w-40 ml-3" />
+    </div>
+    <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {Array.from({ length: 6 }, (_, i) => (
+        <div key={i} className="border p-3 rounded-xl">
+          <div className="flex justify-between items-center">
+            <SkeletonText className="h-3 w-28" />
+            <SkeletonBox className="px-2 rounded-full w-14" />
+          </div>
+          <div className="border-b py-2">
+            <SkeletonText className="h-3 w-28" />
+          </div>
+          <SkeletonText textClassName="pt-3" className="h-3 w-12" />
+          <SkeletonText textClassName="pt-1" className="h-3 w-28" />
+          <SkeletonText textClassName="pt-1" className="h-3 w-36" />
+          <SkeletonText textClassName="pt-1 pb-3 border-b" className="h-3 w-24" />
+          <SkeletonBox className="mt-3 py-2 border border-transparent w-full rounded-full" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const Vitals = ({ setVitals, setSelectedPatient }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,8 +75,14 @@ const Vitals = ({ setVitals, setSelectedPatient }) => {
 
   if (isPending) {
     return (
-      <div className="flex justify-center items-center h-full text-sm">
-        Loading...
+      <div className="bg-white rounded-xl border mt-3 p-5 text-sm">
+        <div className="flex items-center gap-1 cursor-pointer border-b pb-3">
+          <div onClick={() => setVitals(false)}>
+            <ArrowLeft className="w-4 h-4 text-gray-800" />
+          </div>
+          <p>Assigned Patients for Vitals</p>
+        </div>
+        <VitalsCardsSkeleton />
       </div>
     );
   }
@@ -138,7 +173,7 @@ const Vitals = ({ setVitals, setSelectedPatient }) => {
                   : "NIL";
 
                 return (
-                  <div key={vital?.id || index} className="border p-3 rounded-xl">
+                  <div key={vital?.sqid || index} className="border p-3 rounded-xl">
                     <div className="flex justify-between items-center">
                       <p className="font-medium">
                         {patient?.firstname} {patient?.lastname}{" "}

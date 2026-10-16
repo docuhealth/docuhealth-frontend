@@ -246,6 +246,8 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                         >
                           Vital signs history
                         </button>
+                        {/* Vitals on an admission awaiting nurse discharge are refused. */}
+                        {selected?.status !== "awaiting_nurse_discharge" && (
                         <button
                           className="w-full text-left px-3  py-2.5 hover:bg-gray-100 text-gray-700 transition-colors"
                           onClick={() => {
@@ -258,6 +260,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                         >
                           Update Vitals
                         </button>
+                        )}
                       </div>
                     )}
                   </div>

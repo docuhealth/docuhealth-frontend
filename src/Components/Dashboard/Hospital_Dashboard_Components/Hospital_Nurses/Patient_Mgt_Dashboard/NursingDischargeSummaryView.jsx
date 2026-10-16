@@ -231,9 +231,11 @@ const NursingDischargeSummaryView = ({
   const age = dob ? Math.floor((new Date() - new Date(dob)) / 31557600000) : null;
   const gender = patient?.gender || initialPatient?.gender;
 
+  // discharged-patients renamed `admitted_by` to `admitted_by_info`.
+  const admittedBy = data?.admitted_by_info || data?.admitted_by;
   const primaryDoctor =
-    data?.admitted_by
-      ? staffLabel(data.admitted_by)
+    admittedBy
+      ? staffLabel(admittedBy)
       : targetRow?.requested_by_info
         ? `Dr. ${targetRow.requested_by_info.firstname ?? ""} ${targetRow.requested_by_info.lastname ?? ""}`.trim()
         : null;

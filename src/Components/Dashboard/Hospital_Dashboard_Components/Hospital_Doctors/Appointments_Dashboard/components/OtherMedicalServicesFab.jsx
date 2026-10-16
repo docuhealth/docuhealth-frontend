@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { prefetchCommonRadiologyScans } from "../../../../../../queries/Hospital/radiology/scan_requests";
-import { ACTIVE_CHECK_INS_KEY, fetchActiveCheckIns } from "../../../../../../queries/Hospital/doctor/checkIns";
+import { useCheckInOwnership } from "../../../../../../hooks/useCheckInOwnership";
 import { resolveOrderContext, NO_VISIT_MESSAGE } from "../../../../../../utils/careOrderContext";
 import OrderLabModal from "./OrderLabModal";
 import OrderScanModal from "./OrderScanModal";
@@ -32,7 +32,7 @@ const QUICK_SERVICES = [
 ];
 
 // Each item opens its own modal directly; "Order pharmacy" instead hands off via onOrderPharmacy to the Prescribe Medication screen.
-const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, onOrderPharmacy }) => {
+const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, admissionStatus, onOrderPharmacy }) => {
   const [open, setOpen] = useState(false);
   const [activeModal, setActiveModal] = useState(null); // "lab" | "scan" | "vitals" | "vitals-task" | "input-output" | "procedure" | "glucose" | "drug-task" | "iv-fluid" | "seizure" | null
   const containerRef = useRef(null);
@@ -45,14 +45,9 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, onOrde
 
   // The patient object handed to this page can predate the claim, so read the check-in's live status instead.
   const checkInSqid = admissionSqid ? null : resolveOrderContext(selectedPatientDetails).checkIn;
-  const { data: activeCheckIns } = useQuery({
-    queryKey: ACTIVE_CHECK_INS_KEY,
-    queryFn: fetchActiveCheckIns,
-    enabled: !!checkInSqid,
-  });
-  // Unknown (still loading / failed) counts as open; the API refuses the action anyway.
-  const isConsultationClosed =
-    !!checkInSqid && Array.isArray(activeCheckIns) && !activeCheckIns.some((c) => c.sqid === checkInSqid);
+  const { isConsultationClosed, isOtherDoctors } = useCheckInOwnership(checkInSqid);
+  // Orders on an admission the doctor has already discharged (awaiting the nurse) are refused; care tasks still work.
+  const isAwaitingNurseDischarge = !!admissionSqid && admissionStatus === "awaiting_nurse_discharge";
 
   useEffect(() => {
     if (!open) return;
@@ -143,8 +138,14 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, onOrde
     if (isAdmitted && item.id === "vitals") {
       return false;
     }
+    if (isAwaitingNurseDischarge && item.needsConsultation) {
+      return false;
+    }
     return true;
   });
+
+  // Another doctor is running this consultation, so nothing here would be accepted from this doctor.
+  if (isOtherDoctors) return null;
 
   return (
     <>

@@ -127,7 +127,7 @@ const MedicalRecords = ({
       </h2>
       <div className="-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {sortedRecords.map((record) => (
-          <div key={record.id} className="bg-docuhealth-bg-light border rounded-lg p-4">
+          <div key={record.sqid ?? record.id} className="bg-docuhealth-bg-light border rounded-lg p-4">
             <div className="flex justify-between items-center ">
               <div className="flex items-center gap-1">
                 <svg

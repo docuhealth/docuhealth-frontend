@@ -23,8 +23,17 @@ const NursePatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-40">
-        <p className="text-sm text-gray-500">Loading patient data...</p>
+      <div className="bg-white my-5 rounded-lg border p-4 lg:p-6 text-sm">
+        <div className="flex justify-between items-center border-b pb-4 mb-4">
+          <div
+            className="flex items-center gap-2 cursor-pointer text-gray-700 hover:text-black font-medium"
+            onClick={() => setSeePatientDetails(false)}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Patient's details</span>
+          </div>
+        </div>
+        <PatientInfoBodySkeleton />
       </div>
     );
   }
@@ -192,7 +201,7 @@ const NursePatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
                 <div className="flex justify-between">
                   <p>Frequency:</p>
                   <p className="font-medium text-gray-800">
-                    {drug.frequency ? `${drug.frequency.value}× ${drug.frequency.rate}` : "NIL"}
+                    {formatFrequency(drug.frequency, "NIL")}
                   </p>
                 </div>
                 <div className="flex justify-between">

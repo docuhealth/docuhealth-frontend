@@ -4,6 +4,7 @@ import { Image, FileText, Eye, ArrowDownToLine } from "lucide-react";
 import PatientInfoCard from "./PatientInfoCard";
 import VitalSignsCard from "./VitalSignsCard";
 import SoapClinicalDetailsCard from "./SoapClinicalDetailsCard";
+import SoapAdditionalNotesCard from "./SoapAdditionalNotesCard";
 import {
   renderListOrString,
   renderLabTests,
@@ -48,7 +49,6 @@ const SoapNoteDetailView = ({ soapNote }) => {
         drugHistoryAllergies={soapNote?.drug_history_allergies}
         problemsList={soapNote?.problems_list}
         patientEducation={soapNote?.patient_education}
-        additionalNotes={soapNote?.additional_notes}
       />
 
       {/* Uploaded Documents / Images */}
@@ -134,6 +134,8 @@ const SoapNoteDetailView = ({ soapNote }) => {
           {renderListOrString(soapNote?.treatment_plan)}
         </div>
       </div>
+
+      <SoapAdditionalNotesCard additionalNotes={soapNote?.additional_notes} />
 
       {renderLabTests(soapNote?.lab_tests_info)}
 

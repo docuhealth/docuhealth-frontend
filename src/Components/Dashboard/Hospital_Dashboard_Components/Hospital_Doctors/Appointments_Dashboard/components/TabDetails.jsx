@@ -27,6 +27,7 @@ import PatientInfoCard from "../../../../../ui/PatientInfoCard";
 import GeneralPatientInfoForm from "../../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import SoapClinicalDetailsCard from "../../../../../ui/SoapClinicalDetailsCard";
+import SoapAdditionalNotesCard from "../../../../../ui/SoapAdditionalNotesCard";
 import Input from "../../../../../ui/Input";
 import PatientLabRecords from "../../Patient_Mgt_Dashboard/PatientLabRecords";
 import PatientRadiologyRecords from "../../Patient_Mgt_Dashboard/PatientRadiologyRecords";
@@ -35,6 +36,7 @@ import EncounterRecordsTimeline from "../../../../../ui/EncounterRecordsTimeline
 import EmptyState from "../../../../../ui/EmptyState";
 import RecordRowsSkeleton from "../../../../../ui/RecordRowsSkeleton";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
+import { formatFrequency } from "../../../../../../utils/careTaskConstants";
 
 const PatientInfo = ({ patientFullInfo }) => {
   console.log(patientFullInfo);
@@ -90,9 +92,7 @@ const PatientInfo = ({ patientFullInfo }) => {
               <div className="flex justify-between mt-2">
                 <p>Frequency:</p>
                 <p className="text-right font-medium">
-                  {drug.frequency
-                    ? `${drug.frequency.value}× ${drug.frequency.rate}`
-                    : "NIL"}
+                  {formatFrequency(drug.frequency, "NIL")}
                 </p>
               </div>
 
@@ -477,9 +477,9 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
       return
     }
 
-    // SOAP lists now return only `sqid`; `id` is kept for older responses.
+    // additional-notes takes the SOAP note sqid; a numeric id is refused.
     const payload = {
-      soap_note : selectedPatientDetails.id ?? selectedPatientDetails.sqid, 
+      soap_note : selectedPatientDetails.sqid, 
       note : noteDescription
     }
     
@@ -582,7 +582,6 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
             drugHistoryAllergies={selectedPatientDetails?.drug_history_allergies}
             problemsList={selectedPatientDetails?.problems_list}
             patientEducation={selectedPatientDetails?.patient_education}
-            additionalNotes={selectedPatientDetails?.additional_notes}
           />
 
           {/* 6. Uploaded Documents / Images */}
@@ -679,6 +678,8 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
               {renderListOrString(selectedPatientDetails?.treatment_plan)}
             </div>
           </div>
+
+          <SoapAdditionalNotesCard additionalNotes={selectedPatientDetails?.additional_notes} />
 
           {renderLabTests(selectedPatientDetails?.lab_tests_info)}
 

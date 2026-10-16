@@ -3,6 +3,26 @@ import toast from "react-hot-toast";
 import { User, X } from "lucide-react";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import { NursesAppContext } from "../../../../../context/HospitalContext/Nurses/NursesAppContext";
+import Skeleton, { SkeletonText, SkeletonBox } from "../../../../ui/Skeleton";
+
+// Mirrors the nurse picker (radio cards + Proceed) while the list loads.
+const NursePickerSkeleton = () => (
+  <div role="status" aria-label="Loading nurses">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-5">
+      {Array.from({ length: 3 }, (_, i) => (
+        <div key={i} className="relative border border-gray-200 rounded-xl p-4 flex items-center gap-3">
+          <span className="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-200" />
+          <Skeleton className="w-14 h-14 rounded-full shrink-0" />
+          <div>
+            <SkeletonText className="h-3.5 w-28" />
+            <SkeletonText textClassName="text-[13px]" className="h-3 w-12" />
+          </div>
+        </div>
+      ))}
+    </div>
+    <SkeletonBox className="w-full py-3.5 rounded-full font-medium" />
+  </div>
+);
 
 const SelectHandoverNurseModal = ({ onClose, onProceed }) => {
   const { profile } = useContext(NursesAppContext);
@@ -56,12 +76,7 @@ const SelectHandoverNurseModal = ({ onClose, onProceed }) => {
         </div>
 
         {loadingNurses ? (
-          <div className="flex items-center justify-center py-16">
-            <svg className="animate-spin h-6 w-6 text-docuhealth-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-            </svg>
-          </div>
+          <NursePickerSkeleton />
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-5">

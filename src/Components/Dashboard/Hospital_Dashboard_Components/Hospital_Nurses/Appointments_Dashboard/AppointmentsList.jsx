@@ -12,6 +12,87 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SearchBar from "../../../../SearchBar/SearchBar";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import Modal from "../../../../ui/Modal";
+import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
+
+const ROW_TILE_WIDTHS = ["w-40", "w-24", "w-24"];
+
+// Mirrors the loaded markup (search box, From/To dates, icon-tile rows with a kebab
+// on desktop, appointment cards on mobile) with each text line swapped for a bar.
+const AppointmentRowsSkeleton = () => (
+  <div role="status" aria-label="Loading appointments" className="w-full text-left">
+    <div className="mb-4 w-full space-y-3">
+      <div className="h-[38px] rounded-md border border-gray-300 bg-white flex items-center pl-3">
+        <Skeleton className="h-4 w-4" />
+        <Skeleton className="h-3 w-56 ml-3" />
+      </div>
+      <div className="flex flex-wrap gap-3">
+        {["From:", "To:"].map((label) => (
+          <div key={label} className="flex items-center gap-2">
+            <span className="text-xs text-gray-500 whitespace-nowrap">{label}</span>
+            <Skeleton className="h-[34px] w-[142px]" />
+          </div>
+        ))}
+      </div>
+    </div>
+    <div className="text-[12px] my-4">
+      <div className="hidden lg:block">
+        {Array.from({ length: 4 }, (_, i) => (
+          <div key={i} className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10">
+            {ROW_TILE_WIDTHS.map((w, j) => (
+              <div key={j} className="flex items-center gap-3">
+                <Skeleton className="h-8 w-8" />
+                <div>
+                  <SkeletonText textClassName="text-[10px]" className="h-2 w-16" />
+                  <SkeletonText textClassName="text-sm" className={`h-3.5 ${w}`} />
+                </div>
+              </div>
+            ))}
+            <div className="flex items-center justify-between flex-1">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-8 w-8" />
+                <div>
+                  <SkeletonText textClassName="text-[10px]" className="h-2 w-10" />
+                  <SkeletonText textClassName="text-sm" className="h-3.5 w-28" />
+                </div>
+              </div>
+              <Skeleton className="h-8 w-9 rounded-full" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="block lg:hidden space-y-4 px-1">
+        {Array.from({ length: 2 }, (_, i) => (
+          <div key={i} className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="flex justify-between items-start mb-4">
+              <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-16" />
+                <SkeletonText textClassName="text-[13px]" className="h-3 w-40" />
+              </div>
+              <Skeleton className="h-9 w-9 rounded-full" />
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div>
+                  <SkeletonText textClassName="text-[10px]" className="h-2 w-12" />
+                  <SkeletonText textClassName="text-sm" className="h-3.5 w-32" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-50">
+                {["w-24", "w-28"].map((w) => (
+                  <div key={w}>
+                    <SkeletonText textClassName="text-[10px]" className="h-2 w-16" />
+                    <SkeletonText textClassName="text-[13px]" className={`h-3 ${w}`} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 const AppointmentsList = ({ setCaseNoteHistory, setUpdateVitals, setVitalSignsHistory, setSelectedPatientForVitals, setSelectedPatientForCASE, setSharedSoapNoteHistory, setSelectedPatientForSharedSoap, setSeePatientDetails, setDashboardSelectedPatientDetails }) => {
   const {
@@ -158,59 +239,57 @@ const AppointmentsList = ({ setCaseNoteHistory, setUpdateVitals, setVitalSignsHi
     assignDoctorMutation.mutate(payload);
   };
 
+  const tabsRow = (
+    <div className="w-full mb-8 md:border-b md:border-gray-200">
+      <div className="grid grid-cols-2 gap-3 md:flex md:flex-row md:gap-8">
+        <button
+          onClick={() => setAppointmentType('today')}
+          className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
+            appointmentType === 'today'
+              ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
+              : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
+          }`}
+        >
+          Today's Appointments
+        </button>
+        <button
+          onClick={() => setAppointmentType('upcoming')}
+          className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
+            appointmentType === 'upcoming'
+              ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
+              : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
+          }`}
+        >
+          Upcoming Appointments
+        </button>
+        <button
+          onClick={() => setAppointmentType('history')}
+          className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
+            appointmentType === 'history'
+              ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
+              : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
+          }`}
+        >
+          Past Appointments
+        </button>
+      </div>
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full text-sm">
-        Loading...
-      </div>
+      <>
+        {tabsRow}
+        <AppointmentRowsSkeleton />
+      </>
     );
   }
   if (appointments.length === 0 && !searchQuery && !dateFrom && !dateTo) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full pb-10">
-        <div className="w-full mb-8 md:border-b md:border-gray-200">
-          <div className="grid grid-cols-2 gap-3 md:flex md:flex-row md:gap-8">
-            <button
-              onClick={() => setAppointmentType('today')}
-              className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
-                appointmentType === 'today'
-                  ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
-                  : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
-              }`}
-            >
-              Today's Appointments
-            </button>
-            <button
-              onClick={() => setAppointmentType('upcoming')}
-              className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
-                appointmentType === 'upcoming'
-                  ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
-                  : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
-              }`}
-            >
-              Upcoming Appointments
-            </button>
-            <button
-              onClick={() => setAppointmentType('history')}
-              className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
-                appointmentType === 'history'
-                  ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
-                  : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
-              }`}
-            >
-              Past Appointments
-            </button>
-          </div>
-        </div>
-        
+        {tabsRow}
         {isRefreshing ? (
-          <div className="flex justify-center items-center h-40 text-sm text-gray-500 mt-10">
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-docuhealth-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Loading appointments...
-          </div>
+          <AppointmentRowsSkeleton />
         ) : (
           <div className="flex flex-col items-center">
             <svg
@@ -289,40 +368,8 @@ const AppointmentsList = ({ setCaseNoteHistory, setUpdateVitals, setVitalSignsHi
 
   return (
     <>
-      <div className="w-full mb-8 md:border-b md:border-gray-200">
-        <div className="grid grid-cols-2 gap-3 md:flex md:flex-row md:gap-8">
-          <button
-            onClick={() => setAppointmentType('today')}
-            className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
-              appointmentType === 'today'
-                ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
-                : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
-            }`}
-          >
-            Today's Appointments
-          </button>
-          <button
-            onClick={() => setAppointmentType('upcoming')}
-            className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
-              appointmentType === 'upcoming'
-                ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
-                : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
-            }`}
-          >
-            Upcoming Appointments
-          </button>
-          <button
-            onClick={() => setAppointmentType('history')}
-            className={`px-2 sm:px-4 py-2 text-center text-[13px] sm:text-sm font-medium transition-colors md:-mb-[1px] ${
-              appointmentType === 'history'
-                ? 'bg-docuhealth-primary text-white rounded-md md:bg-transparent md:text-docuhealth-primary md:border-b-2 md:border-docuhealth-primary md:rounded-none'
-                : 'text-gray-500 hover:text-gray-700 md:border-b-2 md:border-transparent'
-            }`}
-          >
-            Past Appointments
-          </button>
-        </div>
-      </div>
+      {tabsRow}
+
       <div className="mb-4 w-full space-y-3">
         <SearchBar
           value={searchQuery}

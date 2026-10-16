@@ -4,10 +4,7 @@ const DynamicDate = () => {
   // Get the current date
   const currentDate = new Date();
 
-  // Format the date as "Monday 25th, 2024"
-  const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-  const formattedDate = currentDate.toLocaleDateString("en-US", options);
-
+  // Format the date as "Thursday, October 15th, 2026"
   // Format day with ordinal suffix (e.g., 25th, 3rd, 1st)
   const getOrdinal = (day) => {
     if (day > 3 && day < 21) return `${day}th`;
@@ -24,7 +21,9 @@ const DynamicDate = () => {
   };
 
   const dayWithOrdinal = getOrdinal(currentDate.getDate());
-  const dynamicDate = `${formattedDate.split(" ")[0]} ${dayWithOrdinal}, ${currentDate.getFullYear()}`;
+  const weekday = currentDate.toLocaleDateString("en-US", { weekday: "long" });
+  const month = currentDate.toLocaleDateString("en-US", { month: "long" });
+  const dynamicDate = `${weekday}, ${month} ${dayWithOrdinal}, ${currentDate.getFullYear()}`;
 
   return <p className="text-gray-500 text-sm">{dynamicDate}</p>;
 };

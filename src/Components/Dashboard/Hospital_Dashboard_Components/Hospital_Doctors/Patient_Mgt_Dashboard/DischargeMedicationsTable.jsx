@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Check, X, Pencil } from "lucide-react";
 import Input from "../../../../ui/Input";
 import Skeleton from "../../../../ui/Skeleton";
+import Select from "../../../../ui/Select";
+import { FREQUENCY_OPTIONS, formatFrequency } from "../../../../../utils/careTaskConstants";
 
 // Renders the medications the patient is currently on (pulled from their
 // most recent drug record) so the discharging doctor can Stop, Continue, or
@@ -117,13 +119,13 @@ const DischargeMedicationsTable = ({ medications, setMedications, loading = fals
                 </td>
                 <td className="py-3 text-gray-600">
                   {isEditing ? (
-                    <Input
+                    <Select
                       value={draft.frequency}
-                      onChange={(e) => setDraft({ ...draft, frequency: e.target.value })}
-                      className="text-[12px] py-1.5"
+                      onChange={(value) => setDraft({ ...draft, frequency: value })}
+                      options={FREQUENCY_OPTIONS}
                     />
                   ) : (
-                    med.frequency || "—"
+                    formatFrequency(med.frequency, "—")
                   )}
                 </td>
                 <td className="py-3">

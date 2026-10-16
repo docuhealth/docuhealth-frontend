@@ -20,7 +20,7 @@ const DoctorsAdmittedPatientMGTProvider = ({ children }) => {
     setCurrentPage(1);
   }, [debouncedSearch]);
 
-  const { data, isLoading: loading, isFetching, refetch } = useQuery({
+  const { data, isLoading: loading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ["hospital-patients-doctor", tab, currentPage, debouncedSearch],
     queryFn: async () => {
       const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : '';
@@ -51,6 +51,8 @@ const DoctorsAdmittedPatientMGTProvider = ({ children }) => {
       value={{
         admittedPatients: data?.results || [],
         loading,
+        isError,
+        error,
         count: data?.count || 0,
         currentPage,
         totalPages: Math.ceil((data?.count || 0) / pageSize),

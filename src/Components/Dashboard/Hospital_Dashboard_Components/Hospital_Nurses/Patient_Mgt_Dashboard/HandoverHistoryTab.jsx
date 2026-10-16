@@ -1,9 +1,37 @@
 import React, { useState, useEffect } from "react";
-import { User, Loader2 } from "lucide-react";
+import { User } from "lucide-react";
 import HandoverNoteDetail from "./HandoverNoteDetail";
 import EmptyState from "../../../../ui/EmptyState";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
+import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
+
+// Mirrors a loaded handover card (notebook art, patient, HIN, nurse, condition, button).
+const HandoverCardsSkeleton = () => (
+  <div role="status" aria-label="Loading handover notes" className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+    {Array.from({ length: 3 }, (_, i) => (
+      <div key={i} className="border border-gray-200 rounded-xl bg-white relative flex flex-col p-5">
+        <div className="flex justify-center items-center py-6 mb-2">
+          <Skeleton className="h-16 w-16 rounded-xl" />
+        </div>
+        <div className="flex flex-col flex-grow text-sm space-y-2.5">
+          <div className="border-b border-gray-100 pb-3 mb-1">
+            <SkeletonText textClassName="text-[15px]" className="h-3.5 w-44" />
+          </div>
+          <SkeletonText textClassName="mt-2" className="h-3.5 w-36" />
+          <SkeletonText className="h-3.5 w-48" />
+          <div>
+            <SkeletonText className="h-3 w-28" />
+            <SkeletonText className="h-3.5 w-40" />
+          </div>
+          <div className="mt-auto pt-5">
+            <Skeleton className="w-full h-[42px] rounded-full" />
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 const HandoverHistoryTab = ({ type }) => {
   const [selectedNote, setSelectedNote] = useState(null);
@@ -70,9 +98,7 @@ const HandoverHistoryTab = ({ type }) => {
   return (
     <div className="mt-6 ">
       {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="animate-spin h-8 w-8 text-docuhealth-primary" />
-        </div>
+        <HandoverCardsSkeleton />
       ) : (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">

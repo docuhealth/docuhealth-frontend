@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatFrequency } from "./careTaskConstants";
 
 export const renderListOrString = (content) => {
     if (!content) return <p>NIL</p>;
@@ -343,9 +344,7 @@ export const renderDrugRecords = (drugOrdersInfo) => {
                   <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
                   <td className="py-3 text-gray-600">{drug.quantity}</td>
                   <td className="py-3 text-gray-600">
-                    {typeof drug.frequency === 'object'
-                      ? `${drug.frequency.value || ''} ( ${drug.frequency.rate || ''} )`
-                      : drug.frequency || "N/A"}
+                    {formatFrequency(drug.frequency, "N/A")}
                   </td>
                   <td className="py-3 text-gray-600">
                     {typeof drug.duration === 'object'

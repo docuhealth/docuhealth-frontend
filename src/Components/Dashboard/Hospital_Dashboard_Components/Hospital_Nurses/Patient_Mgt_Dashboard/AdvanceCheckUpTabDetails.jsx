@@ -148,7 +148,7 @@ const PatientInfoContent = ({ patient, admission, patientFullInfo, formatDate, f
                             <div className="flex justify-between">
                                 <p>Frequency:</p>
                                 <p className="font-medium text-gray-800">
-                                {drug.frequency ? `${drug.frequency.value}x ${drug.frequency.rate}` : "N/A"}
+                                {formatFrequency(drug.frequency, "N/A")}
                                 </p>
                             </div>
                             <div className="flex justify-between">

@@ -3,9 +3,9 @@ import PropTypes from "prop-types";
 import { renderListOrString } from "../../utils/soapNoteHelpers";
 
 // Renders the full clinical body of a SOAP note (history, exam findings,
-// diagnosis, drug history/allergies, problems list, education, additional
-// notes) — everything beyond vitals, documents, care instructions, treatment
-// plan and referral, which the callers render separately.
+// diagnosis, drug history/allergies, problems list, education) — everything
+// beyond vitals, documents, care instructions, treatment plan, additional
+// notes and referral, which the callers render separately.
 //
 // This mirrors the shape the SOAP note API actually returns (see
 // api/records/soap-note/{hin}), unlike ClinicalSummaryCard, which
@@ -29,7 +29,6 @@ const SoapClinicalDetailsCard = ({
   drugHistoryAllergies,
   problemsList,
   patientEducation,
-  additionalNotes,
 }) => {
   return (
     <>
@@ -165,23 +164,6 @@ const SoapClinicalDetailsCard = ({
           </h4>
           <p className="font-medium">{patientEducation || "NIL"}</p>
         </div>
-
-        {additionalNotes?.length > 0 ? (
-          <div className="text-[12px] pt-3 mt-3 border-t">
-            <h4 className="text-gray-400 font-normal mb-1">
-              Additional Notes:
-            </h4>
-            <ul className="list-disc list-outside pl-5 font-medium">
-              {additionalNotes.map((note, index) => (
-                <li key={index}>
-                  {typeof note === "object" ? note.note : note}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <p className="text-sm pt-4 font-medium">No additional notes...</p>
-        )}
       </div>
     </>
   );
@@ -203,7 +185,6 @@ SoapClinicalDetailsCard.propTypes = {
   drugHistoryAllergies: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
   problemsList: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
   patientEducation: PropTypes.string,
-  additionalNotes: PropTypes.array,
 };
 
 export default SoapClinicalDetailsCard;
