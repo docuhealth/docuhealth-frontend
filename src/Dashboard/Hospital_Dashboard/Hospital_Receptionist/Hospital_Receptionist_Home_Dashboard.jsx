@@ -13,6 +13,7 @@ import { HosWardContext } from "../../../context/HospitalContext/HosWardContext"
 import { ReceptionistAppContext } from "../../../context/HospitalContext/Receptionist/ReceptionistAppContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Modal from "../../../Components/ui/Modal";
+import HospitalLoader from "../../../Components/ui/HospitalLoader";
 import SearchableSelect from "../../../Components/ui/SearchableSelect";
 import {
   fetchPaymentProviders,
@@ -584,6 +585,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
         title=""
         maxWidth="md"
       >
+        {savePaymentCategoryMutation.isPending && <HospitalLoader variant="overlay" label="Saving payment category..." />}
         <div className="flex flex-col text-sm">
           <div className="flex justify-end -mt-2 -mr-2 mb-1">
             <button
@@ -639,6 +641,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
         title=""
         maxWidth="md"
       >
+        {savePaymentCategoryMutation.isPending && <HospitalLoader variant="overlay" label="Saving payment category..." />}
         <div className="flex flex-col text-sm">
           <div className="flex justify-end -mt-2 -mr-2 mb-1">
             <button
@@ -703,6 +706,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
         title=""
         maxWidth="md"
       >
+        {savePaymentCategoryMutation.isPending && <HospitalLoader variant="overlay" label="Saving payment category..." />}
         <div className="flex flex-col text-sm">
           <div className="flex justify-end -mt-2 -mr-2 mb-1">
             <button

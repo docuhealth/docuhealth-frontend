@@ -1,7 +1,7 @@
 import React, { useEffect, useState, createContext } from "react";
 import { fetchAppointments } from "../../../queries/Hospital/receptionist/appointments";
 import { getHospitalToken } from "../../../services/authService";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import useDebounce from "../../../hooks/useDebounce";
 import toast from "react-hot-toast";
 
@@ -22,7 +22,9 @@ const ReceptionistAppointmentsListProvider = (props) => {
     queryKey: ["receptionist-appointments", currentPage, appointmentType, debouncedSearch, dateFrom, dateTo],
     queryFn: fetchAppointments,
     enabled: isUserLoggedIn,
-    placeholderData: keepPreviousData,
+    // Keep the old page on screen while paging or searching, but not across a appointmentType
+    // switch: that would show the previous appointmentType's rows until the new ones land.
+    placeholderData: (prev, prevQuery) => (prevQuery?.queryKey[2] === appointmentType ? prev : undefined),
   });
 
   useEffect(() => {

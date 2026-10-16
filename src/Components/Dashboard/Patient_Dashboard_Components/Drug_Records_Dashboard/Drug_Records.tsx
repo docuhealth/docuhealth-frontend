@@ -7,6 +7,7 @@ import Pagination2 from "../Pagination/Pagination2";
 import SearchBar from "../../../../Components/SearchBar/SearchBar";
 import EmptyState from "../../../../Components/ui/EmptyState";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../../Components/ui/Table";
+import { formatFrequency } from "../../../../utils/careTaskConstants";
 
 const Drug_Records = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -94,10 +95,7 @@ const Drug_Records = () => {
                               <TableCell className="py-3 text-gray-600">{drug.route || "Oral"}</TableCell>
                               <TableCell className="py-3 text-gray-600">{drug.quantity}</TableCell>
                               <TableCell className="py-3 text-gray-600">
-                                {/* Handling nested frequency object */}
-                                {typeof drug.frequency === 'object'
-                                  ? `${drug.frequency.value || ''} ( ${drug.frequency.rate || ''} )`
-                                  : drug.frequency || "N/A"}
+                                {formatFrequency(drug.frequency, "N/A")}
                               </TableCell>
                               <TableCell className="py-3 text-gray-600">
                                 {/* Handling nested duration object */}

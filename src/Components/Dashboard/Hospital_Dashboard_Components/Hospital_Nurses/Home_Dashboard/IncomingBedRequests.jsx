@@ -3,6 +3,25 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchWardAdmissionRequests } from "../../../../../queries/Hospital/nurse/admissionRequests";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
+import { SkeletonText, SkeletonBox } from "../../../../ui/Skeleton";
+
+// Mirrors a loaded request row (name, bed + doctor line, time + status badge).
+const BedRequestRowsSkeleton = () => (
+  <ul role="status" aria-label="Loading bed requests" className="divide-y divide-gray-200">
+    {Array.from({ length: 3 }, (_, i) => (
+      <li key={i} className="py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-1">
+        <div>
+          <SkeletonText className="h-3.5 w-32" />
+          <SkeletonText textClassName="text-xs" className="h-2.5 w-56" />
+        </div>
+        <div className="flex items-center gap-3">
+          <SkeletonText textClassName="text-xs" className="h-2.5 w-40" />
+          <SkeletonBox className="text-[11px] px-2 py-0.5 rounded-full w-32" />
+        </div>
+      </li>
+    ))}
+  </ul>
+);
 
 const STATUSES = [
   { value: "pending", label: "Pending", badge: "Awaiting reception", badgeClass: "bg-amber-100 text-amber-700" },
@@ -45,7 +64,7 @@ const IncomingBedRequests = () => {
   );
 
   let body;
-  if (isLoading) body = <p className="text-sm text-gray-500 py-4 text-center">Loading...</p>;
+  if (isLoading) body = <BedRequestRowsSkeleton />;
   // The API errors when the nurse has no ward assigned.
   else if (isError)
     body = (
@@ -59,7 +78,7 @@ const IncomingBedRequests = () => {
         No {current.label.toLowerCase()} bed requests for your ward.
       </p>
     );
-  if (body) return <div>{switcher}{body}</div>;
+  if (body) return <div className="text-sm">{switcher}{body}</div>;
 
   return (
     <div className="text-sm">

@@ -11,6 +11,7 @@ import DischargeProceduresMedicationsStep from "./DischargeProceduresMedications
 import DischargeFollowUpStep from "./DischargeFollowUpStep";
 import ConfirmDischargeModal from "./ConfirmDischargeModal";
 import DischargeSuccessModal from "./DischargeSuccessModal";
+import { DEFAULT_FREQUENCY, isFrequencyCode, toFrequencyCode } from "../../../../../utils/careTaskConstants";
 
 const COMPLETED_LAB_STATUSES = ["completed", "accepted", "result_ready", "approved"];
 const pageSize = 20;
@@ -188,10 +189,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
 
     const seeded = flatDrugs.map((drugItem) => {
       const drug = drugItem.drug_record || drugItem;
-      const frequency =
-        typeof drug.frequency === "object"
-          ? `${drug.frequency?.value ?? ""} ${drug.frequency?.rate ?? ""}`.trim()
-          : drug.frequency;
+      const frequency = toFrequencyCode(drug.frequency);
       return {
         name: drug.name,
         dosage: drug.quantity ?? "",
@@ -218,17 +216,13 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
 
   const buildDischargeMedication = (med, { seeded }) => {
     if (seeded) {
-      // Seeded rows carry frequency as a display string ("1 od" or "od").
-      const [lead, ...rest] = String(med.frequency || "").trim().split(" ");
-      const hasNumericLead = rest.length > 0 && !Number.isNaN(Number(lead));
       return {
         name: med.name,
         route: med.route || "Oral",
         quantity: Number(med.dosage) || 1,
         unit: med.unit || null,
-        frequency: hasNumericLead
-          ? { value: Number(lead) || 1, rate: rest.join(" ") }
-          : { value: 1, rate: String(med.frequency || "od").trim() || "od" },
+        // `frequency` is a code ("bd"); anything else is refused by the API.
+        frequency: isFrequencyCode(med.frequency) ? med.frequency : DEFAULT_FREQUENCY,
         duration: { value: 1, rate: "days" },
         allergies: [],
       };
@@ -238,7 +232,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       route: med.route || "Oral",
       quantity: Number(med.dosage) || 1,
       unit: med.dosageUnit || null,
-      frequency: { value: 1, rate: med.frequency },
+      frequency: med.frequency,
       duration: {
         value: Number(med.duration) || 1,
         rate: med.durationUnit ? med.durationUnit.toLowerCase() : "days",

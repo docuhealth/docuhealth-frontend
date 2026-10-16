@@ -8,6 +8,7 @@ import { FileText, Eye, ArrowDownToLine, Image, ArrowLeft } from "lucide-react";
 import { renderListOrString, renderLabTests, renderDrugRecords, renderScans } from "../../../../../utils/soapNoteHelpers";
 import PatientInfoCard from "../../../../ui/PatientInfoCard";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
+import SoapAdditionalNotesCard from "../../../../ui/SoapAdditionalNotesCard";
 
 const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail }) => {
 
@@ -81,6 +82,8 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
         </div>
       </div>
 
+      <SoapAdditionalNotesCard additionalNotes={sharedSoapNoteDetail?.additional_notes} />
+
       {/* Uploaded Documents */}
       <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
         <p className="font-medium mb-4 text-docuhealth-dark">
@@ -147,25 +150,6 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
             })
           ) : (
             <p className="text-[12px] text-gray-500">NIL</p>
-          )}
-        </div>
-      </div>
-
-      {/* Additional Notes */}
-      <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
-        <p className="font-medium mb-4 text-docuhealth-dark">Additional Notes</p>
-        <div className="text-[12px] text-gray-700">
-          {sharedSoapNoteDetail?.additional_notes?.length > 0 ? (
-            <ul className="list-disc pl-5 space-y-1">
-              {sharedSoapNoteDetail.additional_notes.map((noteObj, index) => (
-                <li key={index}>
-                  {noteObj.note}
-                  <span className="text-gray-400 text-[10px] ml-2">({formatFullDateTime(noteObj.created_at)})</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>NIL</p>
           )}
         </div>
       </div>

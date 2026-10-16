@@ -32,6 +32,27 @@ export const FREQUENCY_OPTIONS = [
 ];
 export const DEFAULT_FREQUENCY = "od";
 
+const FREQUENCY_LABELS = Object.fromEntries(
+  FREQUENCY_OPTIONS.map((o) => [o.value, o.label.split(" - ")[1]]),
+);
+
+export const isFrequencyCode = (value) => Object.hasOwn(FREQUENCY_LABELS, value);
+
+// A drug's `frequency` is a code ("bd"); records saved before the change may still hold `{ value, rate }`.
+export const toFrequencyCode = (frequency) => {
+  if (typeof frequency === "string") return frequency.trim();
+  if (frequency && typeof frequency === "object") return String(frequency.rate ?? "").trim();
+  return "";
+};
+
+// "bd" -> "Twice daily"; unknown codes are shown as-is.
+export const formatFrequency = (frequency, fallback = "") => {
+  const code = toFrequencyCode(frequency);
+  if (!code) return fallback;
+  if (isFrequencyCode(code)) return FREQUENCY_LABELS[code];
+  return typeof frequency === "object" && frequency.value != null ? `${frequency.value}× ${code}` : code;
+};
+
 export const PRIORITY_OPTIONS = [
   { value: "low", label: "Low priority task" },
   { value: "medium", label: "Medium priority task" },

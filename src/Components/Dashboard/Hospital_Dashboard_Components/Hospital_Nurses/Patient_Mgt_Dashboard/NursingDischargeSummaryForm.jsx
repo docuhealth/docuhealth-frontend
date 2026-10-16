@@ -3,6 +3,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import Modal from "../../../../ui/Modal";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import { toast } from "react-toastify";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
 
 const initialFormState = {
   final_vital_signs: {
@@ -163,8 +164,8 @@ const NursingDischargeSummaryForm = ({ admission, patientFullInfo, activeTask, t
       setSuccessModalOpen(true);
     } catch (err) {
       console.error("Error executing nursing discharge:", err);
-      const errMsg = err.response?.data?.doctor || err.response?.data?.nurse || err.response?.data?.detail || "Failed to execute discharge task";
-      toast.error(typeof errMsg === 'string' ? errMsg : JSON.stringify(errMsg));
+      // Errors arrive as lists (e.g. `detail: ["..."]`) or nested under `doctor` / `nurse`.
+      toast.error(extractApiErrorMessage(err, "Failed to execute discharge task"));
     } finally {
       setIsSubmitting(false);
     }

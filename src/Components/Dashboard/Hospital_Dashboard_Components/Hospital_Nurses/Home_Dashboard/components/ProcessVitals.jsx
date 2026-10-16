@@ -3,6 +3,7 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 
 const painScoreOptions = [
   "0 (No pain)",
@@ -42,7 +43,7 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
 
   const bmi = calculateBmi(weight, height);
 
-  const requestSqid = selectedPatient?.sqid || selectedPatient?.id;
+  const requestSqid = selectedPatient?.sqid;
 
   const { mutate, isPending } = useMutation({
     mutationFn: (payload) =>
@@ -61,22 +62,8 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
     },
     onError: (err) => {
       console.error("Error processing vitals:", err);
-      const data = err.response?.data;
-      let errorMsg = "Failed to process vitals.";
-      if (data) {
-        if (typeof data.detail === "string") {
-          errorMsg = data.detail;
-        } else if (typeof data.message === "string") {
-          errorMsg = data.message;
-        } else if (typeof data === "object") {
-          const firstKey = Object.keys(data)[0];
-          if (firstKey) {
-            const firstVal = data[firstKey];
-            errorMsg = Array.isArray(firstVal) ? `${firstKey}: ${firstVal[0]}` : `${firstKey}: ${firstVal}`;
-          }
-        }
-      }
-      toast.error(errorMsg);
+      // Errors arrive as lists under `detail` or a field (e.g. `admission: ["This admission is not active."]`).
+      toast.error(extractApiErrorMessage(err, "Failed to process vitals."));
     },
   });
 

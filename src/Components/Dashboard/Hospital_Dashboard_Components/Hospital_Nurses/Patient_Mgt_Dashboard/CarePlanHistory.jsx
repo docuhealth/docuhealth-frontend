@@ -1,10 +1,57 @@
 import React, { useState, useEffect } from "react";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
-import { Loader2, Calendar, Clock, User } from "lucide-react";
+import { Calendar, Clock, User } from "lucide-react";
 import CarePlanDetail from "./CarePlanDetail";
 import AddCarePlanForm from "./AddCarePlanForm";
+import EmptyState from "../../../../ui/EmptyState";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
+import Skeleton, { SkeletonText, SkeletonBox } from "../../../../ui/Skeleton";
+
+// Mirrors the loaded rows (date/time/patient tiles + kebab on desktop, cards on mobile).
+const CarePlanRowsSkeleton = () => (
+  <div role="status" aria-label="Loading care plans">
+    <div className="hidden lg:block">
+      {Array.from({ length: 3 }, (_, i) => (
+        <div key={i} className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10">
+          {["w-28", "w-16", "w-28"].map((w, j) => (
+            <div key={j} className="flex items-center gap-3">
+              <Skeleton className="h-8 w-8" />
+              <div>
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-20" />
+                <SkeletonText textClassName="text-sm" className={`h-3.5 ${w}`} />
+              </div>
+            </div>
+          ))}
+          <Skeleton className="ml-auto h-9 w-9 rounded-full" />
+        </div>
+      ))}
+    </div>
+    <div className="block lg:hidden space-y-4 my-4">
+      {Array.from({ length: 2 }, (_, i) => (
+        <div key={i} className="bg-white border border-gray-200 rounded-md p-4">
+          <div className="flex items-center gap-2 pb-3 border-b border-gray-50 mb-3">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <div>
+              <SkeletonText textClassName="text-[10px]" className="h-2 w-28" />
+              <SkeletonText textClassName="text-sm" className="h-3.5 w-44" />
+            </div>
+          </div>
+          <div className="space-y-3 mb-4">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <div>
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-12" />
+                <SkeletonText textClassName="text-[13px]" className="h-3 w-28" />
+              </div>
+            </div>
+          </div>
+          <SkeletonBox className="w-full border border-transparent rounded-full py-2.5 text-[13px]" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 // activeAdmissionSqid: care plans can only be written against an active admission, so adding is hidden without one.
 const CarePlanHistory = ({ patient, patientFullInfo, activeAdmissionSqid }) => {
@@ -145,12 +192,13 @@ const CarePlanHistory = ({ patient, patientFullInfo, activeAdmissionSqid }) => {
       {/* List */}
       <div className="space-y-4">
         {loading ? (
-          <div className="flex justify-center items-center py-10">
-            <Loader2 className="w-6 h-6 animate-spin text-docuhealth-primary" />
-          </div>
+          <CarePlanRowsSkeleton />
         ) : plans.length === 0 ? (
-          <div className="py-10 text-center text-gray-500 text-sm">
-            No care plans found.
+          <div className="py-10">
+            <EmptyState
+              title="No care plans"
+              description="No care plans have been recorded for this patient yet."
+            />
           </div>
         ) : (
           <>

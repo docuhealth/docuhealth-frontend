@@ -5,7 +5,46 @@ import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboa
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { ReceptionistAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Receptionist/ReceptionistAdmittedPatientMGTContext";
 import SearchBar from "../../../../SearchBar/SearchBar";
+import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
 
+const DETAIL_LINE_WIDTHS = ["w-28", "w-36", "w-12", "w-40"];
+
+// Mirrors the loaded markup (search box + patient cards) with each text line swapped
+// for a bar of the same line height. `lines` is the icon rows: 4 on admitted and
+// discharged cards (doctor, ward, bed, date), 2 on outpatient cards (phone, date).
+// `flexColumn` matches the discharged tab, whose flex-col wrapper keeps the search
+// box and grid margins from collapsing.
+const PatientCardGridSkeleton = ({ label, lines = 4, flexColumn = false }) => (
+  <div role="status" aria-label={label} className={flexColumn ? "flex flex-col" : ""}>
+    <div className="mb-3 h-[38px] rounded-md border border-gray-300 bg-white flex items-center pl-3">
+      <Skeleton className="h-4 w-4" />
+      <Skeleton className="h-3 w-40 ml-3" />
+    </div>
+    <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {Array.from({ length: 6 }, (_, i) => (
+        <div key={i} className="border p-4 rounded-lg">
+          <div className="flex justify-between items-center">
+            <SkeletonText className="h-3 w-28" />
+            <SkeletonText className="h-[18px] w-14 rounded-full" />
+          </div>
+          <div className="border-b py-2">
+            <SkeletonText className="h-3 w-28" />
+          </div>
+          {DETAIL_LINE_WIDTHS.slice(-lines).map((w, j) => (
+            <div
+              key={w}
+              className={`flex items-center gap-1 ${j === 0 ? "pt-3" : "pt-1"} ${j === lines - 1 ? "pb-3 border-b" : ""}`}
+            >
+              <Skeleton className="h-[15px] w-[15px]" />
+              <SkeletonText className={`h-3 ${w}`} />
+            </div>
+          ))}
+          <Skeleton className="mt-3 h-9 w-full rounded-full" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const AdmittedPatientsTab = () => {
   const {
@@ -28,11 +67,7 @@ const AdmittedPatientsTab = () => {
 
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-full text-sm my-5">
-                Loading...
-            </div>
-        );
+        return <PatientCardGridSkeleton label="Loading admitted patients" />;
     }
 
     if (admittedPatients.length === 0 && !searchQuery) {
@@ -341,11 +376,7 @@ const DischargedPatientsTab = () => {
     });
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-full text-sm my-5">
-                Loading...
-            </div>
-        );
+        return <PatientCardGridSkeleton label="Loading discharged patients" flexColumn />;
     }
 
     if (admittedPatients.length === 0 && !searchQuery) {
@@ -662,11 +693,7 @@ const OutPatientsTab = () => {
     }, [outPatients]);
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-full text-sm my-5">
-                Loading...
-            </div>
-        );
+        return <PatientCardGridSkeleton label="Loading outpatients" lines={2} />;
     }
 
     if (outPatients.length === 0 && !searchQuery) {

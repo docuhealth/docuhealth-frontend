@@ -30,6 +30,7 @@ import PatientInfoCard from "../../../../ui/PatientInfoCard";
 import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 import SoapClinicalDetailsCard from "../../../../ui/SoapClinicalDetailsCard";
+import SoapAdditionalNotesCard from "../../../../ui/SoapAdditionalNotesCard";
 import SoapNoteEntry from "../Appointments_Dashboard/components/SoapNoteEntry";
 import Input from "../../../../ui/Input";
 import PatientHandoverTab from "./PatientHandoverTab";
@@ -43,6 +44,7 @@ import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import CardGridSkeleton from "../../../../ui/CardGridSkeleton";
 import RecordRowsSkeleton from "../../../../ui/RecordRowsSkeleton";
 import Skeleton from "../../../../ui/Skeleton";
+import { formatFrequency } from "../../../../../utils/careTaskConstants";
 
 export const PatientInfo = ({ patientFullInfo, selected }) => {
   console.log(selected);
@@ -132,9 +134,7 @@ export const PatientInfo = ({ patientFullInfo, selected }) => {
               <div className="flex justify-between mt-2">
                 <p>Frequency:</p>
                 <p className="text-right font-medium">
-                  {drug.frequency
-                    ? `${drug.frequency.value}× ${drug.frequency.rate}`
-                    : "NIL"}
+                  {formatFrequency(drug.frequency, "NIL")}
                 </p>
               </div>
 
@@ -452,9 +452,9 @@ export const PatientSOAPNotes = ({
       return
     }
 
-    // SOAP lists now return only `sqid`; `id` is kept for older responses.
+    // additional-notes takes the SOAP note sqid; a numeric id is refused.
     const payload = {
-      soap_note: selectedPatientDetails.id ?? selectedPatientDetails.sqid,
+      soap_note: selectedPatientDetails.sqid,
       note: noteDescription
     }
 
@@ -660,7 +660,6 @@ export const PatientSOAPNotes = ({
             drugHistoryAllergies={selectedPatientDetails?.drug_history_allergies}
             problemsList={selectedPatientDetails?.problems_list}
             patientEducation={selectedPatientDetails?.patient_education}
-            additionalNotes={selectedPatientDetails?.additional_notes}
           />
 
           {/* 6. Uploaded Documents / Images */}
@@ -757,6 +756,8 @@ export const PatientSOAPNotes = ({
               {renderListOrString(selectedPatientDetails?.treatment_plan)}
             </div>
           </div>
+
+          <SoapAdditionalNotesCard additionalNotes={selectedPatientDetails?.additional_notes} />
 
           {renderLabTests(selectedPatientDetails?.lab_tests_info)}
 

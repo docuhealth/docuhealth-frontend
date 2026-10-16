@@ -4,6 +4,87 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import GeneralPatientInfoForm from "../../../../../ui/GeneralPatientInfoForm";
+import { formatFrequency } from "../../../../../../utils/careTaskConstants";
+import Skeleton, { SkeletonText, SkeletonBox } from "../../../../../ui/Skeleton";
+
+// The page chrome (back link, tab strip) doesn't depend on the record, so it stays real
+// while the header, general-information form and medication cards are placeholders.
+const PatientInfoBodySkeleton = () => (
+  <div role="status" aria-label="Loading patient data">
+    <div className="flex items-center gap-4 mb-6">
+      <Skeleton className="w-14 h-14 rounded-full" />
+      <div>
+        <SkeletonText textClassName="text-lg" className="h-4 w-40" />
+        <SkeletonText textClassName="text-[14px] mt-0.5" className="h-3 w-14" />
+      </div>
+    </div>
+    <div className="border-b border-gray-200 mb-6">
+      <ul className="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500">
+        <li className="mr-2">
+          <span className="inline-block p-4 text-docuhealth-primary border-b-2 border-docuhealth-primary rounded-t-lg">
+            Patient's information
+          </span>
+        </li>
+      </ul>
+    </div>
+    <div className="my-5 bg-docuhealth-light-gray rounded-xl border p-4">
+      <SkeletonText className="h-4 w-40" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        {["w-24", "w-28", "w-24", "w-44", "w-28"].map((w, i) => (
+          <div key={i} className="w-full">
+            <SkeletonText textClassName="pb-1" className="h-3.5 w-24" />
+            <div className="px-4 py-3 border border-gray-300 rounded-lg bg-white">
+              <SkeletonText className={`h-3.5 ${w}`} />
+            </div>
+          </div>
+        ))}
+        <div>
+          <SkeletonText textClassName="text-sm mb-1" className="h-3 w-28" />
+          {/* An empty textarea keeps the real box's inline baseline spacing; the bars sit on top. */}
+          <div className="relative">
+            <textarea readOnly rows={3} tabIndex={-1} aria-hidden="true" className="w-full text-sm bg-white border rounded-lg px-3 py-2 resize-none" />
+            <div className="absolute inset-x-3 top-2 text-sm pointer-events-none">
+              <SkeletonText className="h-3.5 w-56" />
+              <SkeletonText className="h-3.5 w-40" />
+            </div>
+          </div>
+        </div>
+        {["w-36", "w-10", "w-20", "w-10", "w-28", "w-12"].map((w, i) => (
+          <div key={i}>
+            <SkeletonText textClassName="text-sm mb-1" className="h-3 w-32" />
+            <div className="w-full py-2 text-sm bg-white border rounded-lg px-3">
+              <SkeletonText className={`h-3.5 ${w}`} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    <div className="my-5 bg-docuhealth-light-gray rounded-xl border p-4">
+      <SkeletonText className="h-4 w-44" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-[12px] mt-5">
+        {Array.from({ length: 2 }, (_, i) => (
+          <div key={i} className="border border-gray-200 p-4 rounded-lg bg-white shadow-sm">
+            <div className="flex justify-between items-center border-b pb-3 mb-3">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-3.5 w-3.5" />
+                <SkeletonText textClassName="text-sm" className="h-3.5 w-28" />
+              </div>
+              <SkeletonBox className="px-3 py-1 rounded-full text-[10px] w-14" />
+            </div>
+            <div className="space-y-2">
+              {["w-12", "w-24", "w-16", "w-24"].map((w, j) => (
+                <div key={j} className="flex justify-between">
+                  <SkeletonText className="h-3 w-16" />
+                  <SkeletonText className={`h-3 ${w}`} />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 const NursePatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
   const hin = selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin;
@@ -21,8 +102,17 @@ const NursePatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-40">
-        <p className="text-sm text-gray-500">Loading patient data...</p>
+      <div className="bg-white my-5 rounded-lg border p-4 lg:p-6 text-sm">
+        <div className="flex justify-between items-center border-b pb-4 mb-4">
+          <div
+            className="flex items-center gap-2 cursor-pointer text-gray-700 hover:text-black font-medium"
+            onClick={() => setSeePatientDetails(false)}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Patient's details</span>
+          </div>
+        </div>
+        <PatientInfoBodySkeleton />
       </div>
     );
   }
@@ -160,7 +250,7 @@ const NursePatientInfo = ({ selectedPatientDetails, setSeePatientDetails }) => {
                 <div className="flex justify-between">
                   <p>Frequency:</p>
                   <p className="font-medium text-gray-800">
-                    {drug.frequency ? `${drug.frequency.value}× ${drug.frequency.rate}` : "NIL"}
+                    {formatFrequency(drug.frequency, "NIL")}
                   </p>
                 </div>
                 <div className="flex justify-between">

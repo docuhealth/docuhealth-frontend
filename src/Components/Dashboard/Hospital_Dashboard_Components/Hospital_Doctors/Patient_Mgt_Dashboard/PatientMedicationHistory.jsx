@@ -6,19 +6,8 @@ import Skeleton from "../../../../ui/Skeleton";
 import EmptyState from "../../../../ui/EmptyState";
 import { fetchMedicationHistory } from "../../../../../queries/Hospital/doctor/medicationHistory";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
+import { formatFrequency } from "../../../../../utils/careTaskConstants";
 
-// Dosing codes the API stores in `frequency.rate` (FrequencyEnum).
-const FREQUENCY_CODES = new Set([
-  "stat", "once", "od", "bd", "tds", "qid", "q1h", "q2h", "q3h", "q4h", "q6h", "q8h",
-  "q12h", "q24h", "prn", "mane", "nocte", "alt_days", "weekly", "monthly",
-]);
-
-const formatFrequency = (f) => {
-  if (!f) return "-";
-  if (typeof f === "string") return f.toUpperCase();
-  if (FREQUENCY_CODES.has(f.rate)) return f.rate.replace("_", " ").toUpperCase();
-  return [f.value != null ? `${Number(f.value)}×` : null, f.rate].filter(Boolean).join(" ") || "-";
-};
 
 const formatDuration = (d) => {
   if (!d) return "-";
@@ -99,7 +88,7 @@ const OngoingDrugsStrip = ({ drugs }) =>
             <Pill size={12} className="text-emerald-600" />
             <span className="font-medium text-gray-800">{drug.name}</span>
             <span className="text-gray-500">
-              {formatDose(drug)} · {formatFrequency(drug.frequency)} · {formatDuration(drug.duration)}
+              {formatDose(drug)} · {formatFrequency(drug.frequency, "-")} · {formatDuration(drug.duration)}
             </span>
           </span>
         ))}
@@ -231,7 +220,7 @@ const PatientMedicationHistory = ({ patientFullInfo, admissionSqid }) => {
                     </td>
                     <td className="py-3.5 px-3 text-gray-700 whitespace-nowrap">{formatDose(drug)}</td>
                     <td className="py-3.5 px-3 text-gray-700 whitespace-nowrap capitalize">{drug.route || "-"}</td>
-                    <td className="py-3.5 px-3 text-gray-700 whitespace-nowrap">{formatFrequency(drug.frequency)}</td>
+                    <td className="py-3.5 px-3 text-gray-700 whitespace-nowrap">{formatFrequency(drug.frequency, "-")}</td>
                     <td className="py-3.5 px-3 text-gray-700 whitespace-nowrap">{formatDuration(drug.duration)}</td>
                     <td className="py-3.5 px-3">
                       <p className="font-medium text-gray-800 text-[11px]">{staffName(event.staff_info)}</p>

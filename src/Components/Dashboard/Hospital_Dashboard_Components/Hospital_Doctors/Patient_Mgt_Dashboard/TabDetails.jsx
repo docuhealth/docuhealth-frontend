@@ -7,6 +7,20 @@ import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_D
 import { DoctorsAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
 import SearchBar from "../../../../SearchBar/SearchBar";
 import Skeleton from "../../../../ui/Skeleton";
+import EmptyState from "../../../../ui/EmptyState";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
+
+// A failed list load used to fall through to "no patients"; a 5xx body is Django's HTML page, so don't show it.
+const PatientListError = ({ error, label }) => (
+  <EmptyState
+    title={`Couldn't load ${label}`}
+    description={
+      error?.response?.status >= 500
+        ? "The server hit an error loading this list. Please try again later."
+        : extractApiErrorMessage(error, "Please try again in a moment.")
+    }
+  />
+);
 
 // Same box model as a patient card so the grid doesn't shift when the list lands.
 const DETAIL_LINE_WIDTHS = ["w-28", "w-36", "w-16", "w-40"];
@@ -51,6 +65,8 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
   const {
     admittedPatients,
     loading,
+    isError,
+    error,
     count,
     currentPage,
     totalPages,
@@ -71,6 +87,10 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
 
   if (loading) {
     return <PatientCardGridSkeleton label="Loading admitted patients" buttons={2} />;
+  }
+
+  if (isError) {
+    return <PatientListError error={error} label="admitted patients" />;
   }
 
   if (admittedPatients.length === 0 && !searchQuery) {
@@ -327,6 +347,8 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
   const {
     admittedPatients: outPatients,
     loading,
+    isError,
+    error,
     count,
     currentPage,
     totalPages,
@@ -347,6 +369,10 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
 
   if (loading) {
     return <PatientCardGridSkeleton label="Loading outpatients" lines={2} />;
+  }
+
+  if (isError) {
+    return <PatientListError error={error} label="outpatients" />;
   }
 
   if (outPatients.length === 0 && !searchQuery) {
@@ -467,6 +493,8 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
   const {
     admittedPatients,
     loading,
+    isError,
+    error,
     count,
     currentPage,
     totalPages,
@@ -488,6 +516,10 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
 
   if (loading) {
     return <PatientCardGridSkeleton label="Loading discharged patients" headerLines={2} />;
+  }
+
+  if (isError) {
+    return <PatientListError error={error} label="discharged patients" />;
   }
 
   if (admittedPatients.length === 0 && !searchQuery) {

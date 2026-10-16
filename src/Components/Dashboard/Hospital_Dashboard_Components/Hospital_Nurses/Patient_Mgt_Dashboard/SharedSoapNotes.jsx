@@ -8,6 +8,33 @@ import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagina
 import useDebounce from "../../../../../hooks/useDebounce";
 import SharedSoapNoteDetail from "./SharedSoapNoteDetail";
 import { fetchAllSharedSoapNotes, isWithinStay } from "../../../../../queries/Hospital/nurse/patientHistory";
+import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
+
+// Mirrors a loaded note row (date/patient/doctor/complaint tiles + kebab).
+const SoapNoteRowsSkeleton = () => (
+  <div role="status" aria-label="Loading shared SOAP notes" className="flex flex-col gap-4 mt-4">
+    {Array.from({ length: 3 }, (_, i) => (
+      <div key={i} className="flex flex-col-reverse lg:flex-row lg:items-center justify-between border rounded-lg p-4">
+        <div className="flex flex-row flex-wrap gap-4 lg:gap-10">
+          {["w-32", "w-28", "w-28", "w-24"].map((w, j) => (
+            <div key={j} className="flex items-start gap-3">
+              <Skeleton className="h-8 w-8" />
+              <div>
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-20" />
+                <SkeletonText textClassName="text-sm" className={`h-3.5 ${w}`} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="relative flex justify-end lg:mt-0">
+          <button type="button" disabled tabIndex={-1} className="p-2 rounded-full text-gray-200">
+            <MoreVertical size={16} />
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, stayWindow = null }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -99,7 +126,7 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, stayWindow = null
           onChange={setSearchQuery}
           placeholder="Search shared SOAP notes..."
         />
-        {isRefreshing && (
+        {isRefreshing && !loading && (
           <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
             <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
             Searching...
@@ -110,11 +137,9 @@ const SharedSoapNotes = ({ selected, setSharedSoapNoteHistory, stayWindow = null
       <div className=" my-5">
         {loading ? (
           <>
-            <div className="flex justify-center items-center gap-3 px-2 py-3">
-              <p className="text-sm text-gray-500 pt-3">
-                loading shared SOAP notes...
-              </p>
-            </div>
+            <SoapNoteRowsSkeleton />
+            {/* the loaded list ends with an mt-6 pagination wrapper; keep its spacing */}
+            <div className="mt-6" />
           </>
         ) : caseNotes?.length === 0 && !loading ? (
           <>

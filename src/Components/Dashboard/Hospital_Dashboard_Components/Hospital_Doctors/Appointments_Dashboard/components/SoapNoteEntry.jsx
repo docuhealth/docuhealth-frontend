@@ -385,7 +385,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
     const payload = {
       staff: profile?.staff_id || "",
       patient: patientHin || "",
-      ...(selectedPatientFetchedInfo?.latest_vitals?.id && { vital_signs: selectedPatientFetchedInfo.latest_vitals.id }),
+      ...(selectedPatientFetchedInfo?.latest_vitals?.sqid && { vital_signs: selectedPatientFetchedInfo.latest_vitals.sqid }),
       referred_docuhealth_hosp: soapNoteData.referred_docuhealth_hosp,
       referred_hosp: soapNoteData.referred_hosp,
       investigations: soapNoteData.investigations,
@@ -435,10 +435,10 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
     formData.append("chief_complaint", soapNoteData.chief_complaint);
     formData.append("primary_diagnosis", soapNoteData.primary_diagnosis);
 
-    if (selectedPatientFetchedInfo?.latest_vitals?.id) {
+    if (selectedPatientFetchedInfo?.latest_vitals?.sqid) {
       formData.append(
         "vital_signs",
-        selectedPatientFetchedInfo.latest_vitals.id,
+        selectedPatientFetchedInfo.latest_vitals.sqid,
       );
     }
 
