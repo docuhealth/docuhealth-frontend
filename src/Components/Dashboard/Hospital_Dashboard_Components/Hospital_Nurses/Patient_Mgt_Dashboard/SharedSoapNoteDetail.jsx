@@ -26,7 +26,7 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
           onClick={() => setSharedSoapNoteDetail(null)}
         >
           <ArrowLeft size={16} />
-          <h2 className=" text-sm">Detailed Shared SOAP Note</h2>
+          <h2 className=" text-sm">Detailed Shared Encounter Note</h2>
         </div>
       </div>
       

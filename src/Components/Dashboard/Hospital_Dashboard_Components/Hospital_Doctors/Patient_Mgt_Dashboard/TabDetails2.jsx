@@ -391,13 +391,6 @@ export const PatientMedicalRecord = ({
   );
 };
 
-// A SOAP note is only created during the check-in; once admitted, the doctor adds additional notes to it or writes progress notes.
-const InpatientSoapHint = () => (
-  <p className="text-[12px] text-gray-500 my-4">
-    SOAP notes are created during the check-in. To add to one, open it and use Create additional notes. For ongoing care, use the Progress Note tab.
-  </p>
-);
-
 export const PatientSOAPNotes = ({
   soapNotesLoading,
   patientSoapNotes,
@@ -468,8 +461,7 @@ export const PatientSOAPNotes = ({
   if (soapNotesLoading) {
     return (
       <>
-        {!selected?.discharge_date && <InpatientSoapHint />}
-        <RecordRowsSkeleton label="Loading SOAP notes" tiles={4} />
+        <RecordRowsSkeleton label="Loading encounter notes" tiles={4} />
       </>
     );
   }
@@ -477,7 +469,6 @@ export const PatientSOAPNotes = ({
   if (!patientSoapNotes || patientSoapNotes.length === 0) {
     return (
       <>
-        {!selected.discharge_date && <InpatientSoapHint />}
         <div className="flex flex-col justify-center items-center text-center  h-full">
           <svg
             width="200"
@@ -533,11 +524,11 @@ export const PatientSOAPNotes = ({
             </defs>
           </svg>
 
-          <h2 className="font-medium pb-1">No soap notes!</h2>
+          <h2 className="font-medium pb-1">No encounter notes!</h2>
           <div className="max-w-md text-center">
             <p className="text-[12px] text-gray-500">
               {" "}
-              This patient does not have any soap notes
+              This patient does not have any encounter notes
             </p>
           </div>
         </div>
@@ -568,7 +559,7 @@ export const PatientSOAPNotes = ({
                 />
               </svg>
 
-              <span className=" text-sm">SOAP Note Overview</span>
+              <span className=" text-sm">Encounter Note Overview</span>
             </button>
             <div className=" flex flex-col sm:flex-row justify-end items-center gap-3 w-full sm:w-auto">
               <button type="button" className="flex justify-center items-center gap-1 border border-docuhealth-primary py-1.5 px-4 rounded-full w-full sm:w-auto text-docuhealth-primary cursor-pointer" onClick={() => setCreateAdditionalNotes(true)}>
@@ -815,7 +806,6 @@ export const PatientSOAPNotes = ({
         </div>
       ) : (
         <>
-          {!selected.discharge_date && <InpatientSoapHint />}
 
 
           {Array.isArray(patientSoapNotes) && patientSoapNotes.length > 0 ? (
@@ -889,7 +879,7 @@ export const PatientSOAPNotes = ({
 
                         <button
                           type="button"
-                          aria-label="SOAP note actions"
+                          aria-label="Encounter note actions"
                           aria-haspopup="true"
                           aria-expanded={openPopover === index}
                           onClick={() => {
@@ -921,7 +911,7 @@ export const PatientSOAPNotes = ({
                                 setOpenPopover(null);
                               }}
                             >
-                              See full SOAP Note
+                              See full Encounter Note
                             </button>
                           </div>
                         )}
@@ -978,7 +968,7 @@ export const PatientSOAPNotes = ({
                                 setOpenPopover(null);
                               }}
                             >
-                              See full SOAP Note
+                              See full Encounter Note
                             </button>
                           </div>
                         )}
@@ -1033,7 +1023,7 @@ export const PatientSOAPNotes = ({
               />
             </>
           ) : (
-            <p className="text-center">No soap notes found.</p>
+            <p className="text-center">No encounter notes found.</p>
           )}
         </>
       )}
@@ -1787,7 +1777,7 @@ const getTabs = ({
     },
     // { ...medRecordsTab, title: "Med Records" },
     {
-      title: "SOAP Notes",
+      title: "Encounter Notes",
       content: (
         <PatientSOAPNotes
           soapNotesLoading={soapNotesLoading}

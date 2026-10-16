@@ -212,7 +212,7 @@ const SubscriptionPlans = () => {
                 ))}
                 {[
                   "No access to appointments management (all dashboards).",
-                  "No access to upload SOAP Notes (doctors).",
+                  "No access to upload Encounter Notes (doctors).",
                   "Cannot upload nurses’ clinical notes.",
                   "No access to upload Medical Record Summaries.",
                   "No Emergency Mode access to view patient medical summaries from other hospitals (even when patient turn emergency mode on)",

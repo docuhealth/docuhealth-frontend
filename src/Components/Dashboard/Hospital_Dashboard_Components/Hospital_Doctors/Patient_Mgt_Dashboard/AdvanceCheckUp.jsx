@@ -112,7 +112,7 @@ const AdvanceCheckUp = ({
             onClick={() => setDischargedView("tabs")}
           >
             <ArrowLeft className="w-4 h-4 text-gray-800" />
-            <span>{dischargedView === "soap-history" ? "SOAP Note History" : "Discharge Summary"}</span>
+            <span>{dischargedView === "soap-history" ? "Encounter Note History" : "Discharge Summary"}</span>
           </button>
           <div className="pt-5">
             {dischargedView === "soap-history" ? (

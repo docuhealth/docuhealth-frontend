@@ -291,7 +291,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
     onSuccess: () => {
       // The confirm modal stays open while uploading so its loader shows; close it here.
       setConfirmationModal(false);
-      toast.success("SOAP Note created successfully !");
+      toast.success("Encounter note created successfully!");
 
       const hin = patientHin
 
@@ -315,7 +315,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
 
       setStep(1);
       // `onSubmitted` lets the parent decide where to land (e.g. reopen the
-      // patient-details view on the "SOAP Notes" tab). Fall back to just
+      // patient-details view on the "Encounter Notes" tab). Fall back to just
       // closing the form when no handler is passed.
       if (onSubmitted) {
         onSubmitted();
@@ -362,7 +362,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       // e.g. `{ check_in: ["Check-in must be in doctor_active status to
       // create a SOAP note."] }` when the encounter hasn't been claimed.
       // Surface that instead of a generic "Failed to upload" string.
-      toast.error(extractApiErrorMessage(error, "Failed to upload soap note"));
+      toast.error(extractApiErrorMessage(error, "Failed to upload encounter note"));
     },
   });
 
@@ -370,7 +370,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
     const orderContext = resolveOrderContext(selectedPatientDetails);
     if (!orderContext.checkIn) {
       setConfirmationModal(false);
-      toast.error("A SOAP note can only be saved for a checked-in patient during a consultation.");
+      toast.error("An encounter note can only be saved for a checked-in patient during a consultation.");
       return;
     }
     // Only care_instructions is required by POST /api/records/soap-note
@@ -555,7 +555,7 @@ useEffect(() => {
           }}
         >
           <ArrowLeft className="w-4 h-4 text-gray-800" />
-          <span>SOAP Note Entry</span>
+          <span>Encounter Note Entry</span>
         </button>
         {step === 1 && (
           <div className="my-5">
@@ -1014,8 +1014,8 @@ useEffect(() => {
 
             <div className="flex items-center justify-between border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
               <div>
-                <p className="font-medium text-docuhealth-dark">Share SOAP Note (Optional)</p>
-                <p className="text-[12px] text-gray-500 mt-1">Allow other healthcare personnel (e.g. NURSES) in this hospital to access this SOAP Note.</p>
+                <p className="font-medium text-docuhealth-dark">Share Encounter Note (Optional)</p>
+                <p className="text-[12px] text-gray-500 mt-1">Allow other healthcare personnel (e.g. NURSES) in this hospital to access this Encounter Note.</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input 
@@ -1083,7 +1083,7 @@ useEffect(() => {
         // handleSubmit();
         confirmationModal && (
           <Modal isOpen={true} onClose={() => setConfirmationModal(false)} title="">
-            {isPending && <HospitalLoader variant="overlay" label="Uploading SOAP note..." />}
+            {isPending && <HospitalLoader variant="overlay" label="Uploading encounter note..." />}
             <button
               type="button"
               aria-label="Close"
@@ -1110,8 +1110,8 @@ useEffect(() => {
             </div>
             <div className="bg-gray-50 border border-gray-100 rounded-md p-6 mb-6">
               <p className="text-gray-500 text-center text-xs leading-relaxed">
-                You're about to upload the SOAP Note and the After Visit
-                Summary (AVS) for patients is generated for this. This SOAP
+                You're about to upload the Encounter Note and the After Visit
+                Summary (AVS) for patients is generated for this. This Encounter
                 Note can't be edited or deleted.
               </p>
             </div>
@@ -1121,7 +1121,7 @@ useEffect(() => {
               onClick={handleSubmit}
               disabled={isPending}
             >
-              Upload SOAP Note
+              Upload Encounter Note
             </Button>
             <button
               className="w-full mt-3 text-gray-500 text-[12px] hover:text-red-500 transition-colors cursor-pointer"
@@ -1149,11 +1149,11 @@ useEffect(() => {
             <div className="bg-amber-100 p-3 rounded-full mb-3">
               <AlertTriangle className="w-6 h-6 text-docuhealth-amber-600" />
             </div>
-            <h2 className="font-medium text-gray-800 text-lg">Share SOAP Note</h2>
+            <h2 className="font-medium text-gray-800 text-lg">Share Encounter Note</h2>
           </div>
           <div className="bg-gray-50 border border-gray-100 rounded-md p-6 mb-6">
             <p className="text-gray-600 text-center text-[13px] leading-relaxed">
-              Other healthcare personnel ( NURSES ) in this hospital would have access to some part of the SOAP note of this patient.
+              Other healthcare personnel ( NURSES ) in this hospital would have access to some part of the encounter note of this patient.
             </p>
           </div>
           <Button
