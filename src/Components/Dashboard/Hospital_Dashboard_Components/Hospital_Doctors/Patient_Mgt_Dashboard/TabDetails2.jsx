@@ -25,7 +25,6 @@ import {
   formatTime,
 } from "../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
 import toast from "react-hot-toast";
-import Hospital_Lab_Test_Detail_Dashboard from "../../../../../Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Test_Detail_Dashboard";
 import PatientInfoCard from "../../../../ui/PatientInfoCard";
 import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
@@ -42,6 +41,7 @@ import EmptyState from "../../../../ui/EmptyState";
 import { createProgressNote } from "../../../../../queries/Hospital/doctor/progressNotes";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import CardGridSkeleton from "../../../../ui/CardGridSkeleton";
+import PatientLabRecords from "./PatientLabRecords";
 import RecordRowsSkeleton from "../../../../ui/RecordRowsSkeleton";
 import { formatFrequency } from "../../../../../utils/careTaskConstants";
 
@@ -1085,179 +1085,6 @@ export const PatientSOAPNotes = ({
         </>
       )}
     </div>
-  );
-};
-
-const PatientLabRecords = ({
-  patientLabRecords,
-  count,
-  currentPage,
-  totalPages,
-  setCurrentPage,
-  labloading,
-}) => {
-  const [selectedRecord, setSelectedRecord] = useState(null);
-
-  if (labloading) {
-    return <CardGridSkeleton label="Loading lab records" className="pt-4" />;
-  }
-
-  if (selectedRecord) {
-    return (
-      <div className="">
-        <Hospital_Lab_Test_Detail_Dashboard 
-          orderIdProp={selectedRecord?.sqid || selectedRecord?.id || selectedRecord} 
-          onBackProp={() => setSelectedRecord(null)} 
-          isDoctorView={true} 
-        />
-      </div>
-    );
-  }
-
-  if (!patientLabRecords || patientLabRecords.length === 0) {
-    return (
-      <div className="flex flex-col justify-center items-center text-center  h-full">
-        <svg
-          width="200"
-          height="200"
-          viewBox="0 0 366 366"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <g filter="url(#filter0_d_1501_46523)">
-            <circle cx="183" cy="171" r="159" fill="#DBDBDB" />
-          </g>
-          <circle cx="183" cy="171" r="132" fill="#F6F6F6" />
-          <path
-            d="M183 233.5C148.482 233.5 120.5 205.518 120.5 171C120.5 136.482 148.482 108.5 183 108.5C217.518 108.5 245.5 136.482 245.5 171C245.5 205.518 217.518 233.5 183 233.5ZM183 221C210.614 221 233 198.614 233 171C233 143.386 210.614 121 183 121C155.386 121 133 143.386 133 171C133 198.614 155.386 221 183 221ZM176.75 139.75H189.25V152.25H176.75V139.75ZM176.75 164.75H189.25V202.25H176.75V164.75Z"
-            fill="#929AA3"
-          />
-          <defs>
-            <filter
-              id="filter0_d_1501_46523"
-              x="0"
-              y="0"
-              width="366"
-              height="366"
-              filterUnits="userSpaceOnUse"
-              color-interpolation-filters="sRGB"
-            >
-              <feFlood flood-opacity="0" result="BackgroundImageFix" />
-              <feColorMatrix
-                in="SourceAlpha"
-                type="matrix"
-                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                result="hardAlpha"
-              />
-              <feOffset dy="12" />
-              <feGaussianBlur stdDeviation="12" />
-              <feComposite in2="hardAlpha" operator="out" />
-              <feColorMatrix
-                type="matrix"
-                values="0 0 0 0 0.927885 0 0 0 0 0.927885 0 0 0 0 0.927885 0 0 0 0.15 0"
-              />
-              <feBlend
-                mode="normal"
-                in2="BackgroundImageFix"
-                result="effect1_dropShadow_1501_46523"
-              />
-              <feBlend
-                mode="normal"
-                in="SourceGraphic"
-                in2="effect1_dropShadow_1501_46523"
-                result="shape"
-              />
-            </filter>
-          </defs>
-        </svg>
-
-        <h2 className="font-medium pb-1">No lab results!</h2>
-        <div className="max-w-md text-center">
-          <p className="text-[12px] text-gray-500">
-            {" "}
-            This patient does not have any lab results
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      {Array.isArray(patientLabRecords) && patientLabRecords.length > 0 ? (
-        <>
-          <div className=" text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {patientLabRecords.map((record) => (
-              <div key={record.sqid || record.id} className="bg-white border rounded-xl p-4">
-                <div className="flex justify-between items-center mb-1">
-                  <p className="font-bold text-docuhealth-dark text-[15px]">
-                    {record?.patient_info?.firstname} {record?.patient_info?.lastname}
-                  </p>
-                  <div className="bg-docuhealth-primary-muted px-3 py-1 rounded-full">
-                    <p className="text-docuhealth-primary text-[11px] font-medium">
-                      Lab result
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5 mb-3">
-                  <div className="flex items-center gap-1">
-                    <p className="text-gray-400 text-xs">Test Order Status: </p>
-                    <p className="text-docuhealth-green text-xs font-semibold capitalize">{record?.status || "Ready"}</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <p className="text-gray-400 text-xs">Approval Status: </p>
-                    <p className={`text-xs font-semibold capitalize ${
-                      record?.result_info?.status === 'approved' || record?.result_info?.status === 'accepted' ? 'text-docuhealth-green' : 
-                      record?.result_info?.status === 'rejected' ? 'text-red-500' : 
-                      record?.result_info?.status === 'pending' ? 'text-amber-500' : 'text-gray-500'
-                    }`}>
-                      {record?.result_info?.status || "N/A"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="border-t border-gray-100 my-3"></div>
-
-                <div className="flex items-center gap-2 mb-3">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                  <p className="text-gray-500 text-[12px]">
-                    {record?.ordered_by_info ? `Dr. ${record.ordered_by_info.firstname} ${record.ordered_by_info.lastname}` : "Dr. Raphael Jonnas"}
-                  </p>
-                </div>
-
-                <div className="flex items-start gap-2">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500 mt-0.5"><path d="M3 21h18"></path><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path><path d="M10 9h4"></path><path d="M12 7v4"></path></svg>
-                  <p className="text-gray-500 text-[12px] leading-snug">
-                    {record?.hospital_info?.name} Hospital
-                  </p>
-                </div>
-
-                <div className="border-t border-gray-100 my-3"></div>
-
-                <button 
-                  onClick={() => setSelectedRecord(record)}
-                  className="w-full bg-docuhealth-primary hover:bg-docuhealth-dark-primary text-white text-[12px] font-medium py-2 rounded-full transition-colors cursor-pointer"
-                >
-                  Open
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4">
-            <Pagination2
-              count={count}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              setCurrentPage={setCurrentPage}
-            />
-          </div>
-        </>
-      ) : (
-        <p className="text-center">No lab records found.</p>
-      )}
-    </>
   );
 };
 

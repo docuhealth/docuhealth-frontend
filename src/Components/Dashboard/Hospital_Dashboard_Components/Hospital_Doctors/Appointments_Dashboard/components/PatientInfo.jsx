@@ -10,6 +10,7 @@ import formatRecordDate, {
   getAge,
 } from "../../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { usePatientDoctorLabResults } from "../../../../../../hooks/usePatientDoctorLabResults";
 import { fetchTestCategories, fetchLabTests } from "../../../../../../queries/Hospital/lab/requests";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
@@ -127,22 +128,8 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
     enabled: !!hin,
   });
 
-  const { data: labRecordsData, isLoading: labLoading } = useQuery({
-    queryKey: ["patient-lab-records", hin, labCurrentPage],
-    queryFn: async () => {
-      try {
-        const res = await axiosInstanceHos.get(
-          `api/lab/test-orders/patient/${hin}?page=${labCurrentPage}&size=${pageSize}`
-        );
-        return res.data;
-      } catch (err) {
-        if (err?.response?.status === 404) return { results: [], count: 0 };
-        throw err;
-      }
-    },
-    enabled: !!hin,
-    keepPreviousData: true,
-  });
+  const labRecordsData = usePatientDoctorLabResults(hin, labCurrentPage, pageSize);
+  const labLoading = labRecordsData.isLoading;
 
 
   return (

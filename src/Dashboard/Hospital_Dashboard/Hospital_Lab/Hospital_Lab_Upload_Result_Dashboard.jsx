@@ -7,6 +7,7 @@ import ConfirmUploadModal from "../../../Components/Dashboard/Hospital_Dashboard
 import SuccessModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/SuccessModal";
 import toast from "react-hot-toast";
 import { submitTestResult } from "../../../queries/Hospital/lab/requests";
+import { extractApiErrorMessage } from "../../../utils/apiError";
 
 const getRefRange = (p) => {
   if (p.ref_text) return p.ref_text;
@@ -57,8 +58,8 @@ const Hospital_Lab_Upload_Result_Dashboard = () => {
       queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
       setShowConfirm(false);
       setShowSuccess(true);
-    } catch {
-      toast.error("Failed to upload result. Please try again.");
+    } catch (err) {
+      toast.error(extractApiErrorMessage(err, "Failed to upload result. Please try again."));
       setShowConfirm(false);
     }
   };

@@ -8,6 +8,7 @@ import getTabs, { PatientSOAPNotes } from "./TabDetails2";
 import PatientMedicalRecordDetail from "./PatientMedicalRecordDetail";
 import DoctorDischargeSummaryView from "./DoctorDischargeSummaryView";
 import { useQuery } from "@tanstack/react-query";
+import { usePatientDoctorLabResults } from "../../../../../hooks/usePatientDoctorLabResults";
 import { fetchProgressNotes } from "../../../../../queries/Hospital/doctor/progressNotes";
 import PatientDetailSkeleton from "../../../../ui/PatientDetailSkeleton";
 
@@ -73,22 +74,8 @@ const AdvanceCheckUp = ({
     enabled: !!hin,
   });
 
-  const { data: labRecordsData, isLoading: labLoading } = useQuery({
-    queryKey: ["patient-lab-records", hin, labCurrentPage],
-    queryFn: async () => {
-      try {
-        const res = await axiosInstanceHos.get(
-          `api/lab/test-orders/patient/${hin}?page=${labCurrentPage}&size=${pageSize}`,
-        );
-        return res.data;
-      } catch (err) {
-        if (err?.response?.status === 404) return { results: [], count: 0 };
-        throw err;
-      }
-    },
-    enabled: !!hin,
-    keepPreviousData: true,
-  });
+  const labRecordsData = usePatientDoctorLabResults(hin, labCurrentPage, pageSize);
+  const labLoading = labRecordsData.isLoading;
 
   // Discharged patients can drill from "Discharge Summary" into a specific
   // medical record; that record's own detail view already has a complete

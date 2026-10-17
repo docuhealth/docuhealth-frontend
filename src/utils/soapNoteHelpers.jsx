@@ -56,7 +56,11 @@ export const renderLabTests = (labTests) => {
         const resultInfo = labTest.result_info;
         const resultParams = resultInfo?.parameters_info || [];
         const isCompleted = labTest.status === "completed" || labTest.status === "accepted" || labTest.status === "result_ready" || labTest.status === "approved";
-        const hasResults = resultParams.length > 0;
+        // Values only show once the lab admin has approved; before that the result is still under lab review
+        const labAdminApproved = ["lab_admin_approved", "accepted", "approved"].includes(resultInfo?.status);
+        const awaitingLabAdmin = resultInfo?.status === "pending";
+        const sentBack = ["lab_admin_rejected", "rejected"].includes(resultInfo?.status);
+        const hasResults = resultParams.length > 0 && labAdminApproved;
         
         return (
           <div key={idx} className="w-full">
@@ -180,7 +184,9 @@ export const renderLabTests = (labTests) => {
             ) : (
                <div className="bg-white border border-dashed border-gray-200 rounded-2xl p-8 text-center flex flex-col items-center justify-center gap-2">
                  <p className="text-[13px] font-semibold text-gray-500">
-                   {labTest.status === "rejected" ? "Lab result was rejected." : 
+                   {labTest.status === "rejected" ? "Lab result was rejected." :
+                     awaitingLabAdmin ? "Lab result is awaiting lab admin approval." :
+                     sentBack ? "Lab result was sent back to the lab and is being redone." :
                      (labTest.status === "result_ready" && !resultInfo ? "Lab result is ready, but yet to be approved by a doctor." :
                      (isCompleted ? "Lab result is ready." : "Lab result is pending..."))}
                  </p>
