@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 import ReactECharts from "echarts-for-react";
 import * as echarts from "echarts";
+import { formatFrequency } from "../../../../../utils/careTaskConstants";
 
 const PatientVitalsAndMeds = ({ patientFullInfo, formatDateTime }) => {
   const [trendType, setTrendType] = useState("Blood pressure");
@@ -182,7 +183,7 @@ const PatientVitalsAndMeds = ({ patientFullInfo, formatDateTime }) => {
                   <div className="flex justify-between">
                     <p>Frequency:</p>
                     <p className="font-medium text-gray-800">
-                      {drug.frequency ? `${drug.frequency.value}x ${drug.frequency.rate}` : "N/A"}
+                      {formatFrequency(drug.frequency, "N/A")}
                     </p>
                   </div>
                   <div className="flex justify-between">

@@ -22,16 +22,21 @@ import {
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import {useMutation, useQueryClient } from "@tanstack/react-query";
-import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../../../utils/soapNoteHelpers";
+import { renderListOrString, renderLabTests, renderDrugRecords, renderScans } from "../../../../../../utils/soapNoteHelpers";
 import PatientInfoCard from "../../../../../ui/PatientInfoCard";
 import GeneralPatientInfoForm from "../../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import SoapClinicalDetailsCard from "../../../../../ui/SoapClinicalDetailsCard";
+import SoapAdditionalNotesCard from "../../../../../ui/SoapAdditionalNotesCard";
 import Input from "../../../../../ui/Input";
 import PatientLabRecords from "../../Patient_Mgt_Dashboard/PatientLabRecords";
 import PatientRadiologyRecords from "../../Patient_Mgt_Dashboard/PatientRadiologyRecords";
 import PatientMedicationHistory from "../../Patient_Mgt_Dashboard/PatientMedicationHistory";
+import EncounterRecordsTimeline from "../../../../../ui/EncounterRecordsTimeline";
 import EmptyState from "../../../../../ui/EmptyState";
+import RecordRowsSkeleton from "../../../../../ui/RecordRowsSkeleton";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
+import { formatFrequency } from "../../../../../../utils/careTaskConstants";
 
 const PatientInfo = ({ patientFullInfo }) => {
   console.log(patientFullInfo);
@@ -87,9 +92,7 @@ const PatientInfo = ({ patientFullInfo }) => {
               <div className="flex justify-between mt-2">
                 <p>Frequency:</p>
                 <p className="text-right font-medium">
-                  {drug.frequency
-                    ? `${drug.frequency.value}× ${drug.frequency.rate}`
-                    : "NIL"}
+                  {formatFrequency(drug.frequency, "NIL")}
                 </p>
               </div>
 
@@ -354,11 +357,7 @@ const PatientSOAPNotes = ({
   setSoapCurrentPage
 }) => {
   if (soapNotesLoading) {
-    return (
-      <div className="flex justify-center items-center h-full text-sm pt-10">
-        Loading...
-      </div>
-    );
+    return <RecordRowsSkeleton label="Loading encounter notes" tiles={4} />;
   }
 
   if (!patientSoapNotes || patientSoapNotes.length === 0) {
@@ -418,11 +417,11 @@ const PatientSOAPNotes = ({
           </defs>
         </svg>
 
-        <h2 className="font-medium pb-1">No soap notes!</h2>
+        <h2 className="font-medium pb-1">No encounter notes!</h2>
         <div className="max-w-md text-center">
           <p className="text-[12px] text-gray-500">
             {" "}
-            This patient does not have any soap notes
+            This patient does not have any encounter notes
           </p>
         </div>
       </div>
@@ -440,14 +439,14 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
     setOpenPopover(openPopover === index ? null : index);
   };
 
-  const selectedPatientDetails = patientSoapNotes?.find(soapNote => soapNote.id === selectedNoteId);
+  const selectedPatientDetails = patientSoapNotes?.find(soapNote => (soapNote.sqid || soapNote.id) === selectedNoteId);
   const queryClient = useQueryClient()
 
 
 
     const { mutate, isPending } = useMutation({
       mutationFn: (payload) =>
-        axiosInstanceHos.post("api/medical-records/soap-note/additional-notes", payload),
+        axiosInstanceHos.post("api/records/soap-note/additional-notes", payload),
       onSuccess: () => {
         toast.success("Additional Note created successfully !");
 
@@ -467,18 +466,20 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
       onError: (error) => {
         console.error("Upload error:", error);
         toast.error(
-          error.response?.data?.message || "Failed to create additional note",
+          extractApiErrorMessage(error, "Failed to create additional note"),
         );
       },
     });
 
   const handleCreateAdditionalNote = () => {
-    if(!noteDescription) {
+    if(!noteDescription.trim()) {
       toast.error('Please enter a note.')
+      return
     }
 
+    // additional-notes takes the SOAP note sqid; a numeric id is refused.
     const payload = {
-      soap_note : selectedPatientDetails.id, 
+      soap_note : selectedPatientDetails.sqid, 
       note : noteDescription
     }
     
@@ -509,7 +510,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                 />
               </svg>
 
-              <span className=" text-sm">SOAP Note Overview</span>
+              <span className=" text-sm">Encounter Note Overview</span>
             </button>
             <div className=" flex flex-col sm:flex-row justify-end items-center gap-3 w-full sm:w-auto">
               <button type="button" className="flex justify-center items-center gap-1 border border-docuhealth-primary py-1.5 px-4 rounded-full w-full sm:w-auto text-docuhealth-primary cursor-pointer" onClick={() => setCreateAdditionalNotes(true)}>
@@ -581,7 +582,6 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
             drugHistoryAllergies={selectedPatientDetails?.drug_history_allergies}
             problemsList={selectedPatientDetails?.problems_list}
             patientEducation={selectedPatientDetails?.patient_education}
-            additionalNotes={selectedPatientDetails?.additional_notes}
           />
 
           {/* 6. Uploaded Documents / Images */}
@@ -679,7 +679,11 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
             </div>
           </div>
 
+          <SoapAdditionalNotesCard additionalNotes={selectedPatientDetails?.additional_notes} />
+
           {renderLabTests(selectedPatientDetails?.lab_tests_info)}
+
+          {renderScans(selectedPatientDetails?.scans_info)}
 
           {/* 7. Follow Up / Appointment — appointment_info was removed from
               the SOAP note response; only render this if it's actually
@@ -759,7 +763,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                 <div className="hidden lg:block">
                   {patientSoapNotes.map((soapNote, index) => (
                     <div
-                      key={soapNote.id}
+                      key={soapNote.sqid || soapNote.id}
                       className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10 "
                     >
                       <div className="flex items-center gap-3">
@@ -824,12 +828,12 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
 
                         <button
                           type="button"
-                          aria-label="SOAP note actions"
+                          aria-label="Encounter note actions"
                           aria-haspopup="true"
                           aria-expanded={openPopover === index}
                           onClick={() => {
                             togglePopover(index);
-                          setSelectedNoteId(soapNote.id);
+                          setSelectedNoteId(soapNote.sqid || soapNote.id);
                           }}
                           className={` hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer
         ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
@@ -851,12 +855,12 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                               type="button"
                               className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
-                                setSelectedNoteId(soapNote.id);
+                                setSelectedNoteId(soapNote.sqid || soapNote.id);
                                 setSeePatientDetails(true);
                                 setOpenPopover(null);
                               }}
                             >
-                              See full SOAP Note
+                              See full Encounter Note
                             </button>
                           </div>
                         )}
@@ -869,7 +873,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
               <div className="block lg:hidden space-y-4 px-1">
                 {patientSoapNotes.map((soapNote, index) => (
                   <div
-                    key={soapNote.id}
+                    key={soapNote.sqid || soapNote.id}
                     className="bg-white border border-gray-200 rounded-lg p-4"
                   >
                     <div className="flex justify-between items-start mb-4">
@@ -886,7 +890,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                         <button
                           onClick={() => {
                             togglePopover(index);
-                      setSelectedNoteId(soapNote.id);
+                      setSelectedNoteId(soapNote.sqid || soapNote.id);
                           }}
                           className={`h-9 w-9 flex items-center justify-center rounded-full ${openPopover === index ? "bg-slate-200" : "bg-gray-50"}`}
                         >
@@ -908,12 +912,12 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
                               type="button"
                               className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
-                          setSelectedNoteId(soapNote.id);
+                          setSelectedNoteId(soapNote.sqid || soapNote.id);
                                 setSeePatientDetails(true);
                                 setOpenPopover(null);
                               }}
                             >
-                              See full SOAP Note
+                              See full Encounter Note
                             </button>
                           </div>
                         )}
@@ -968,7 +972,7 @@ const [selectedNoteId, setSelectedNoteId] = useState(null);
               />
             </>
           ) : (
-            <p className="text-center">No soap notes found.</p>
+            <p className="text-center">No encounter notes found.</p>
           )}
         </>
       )}
@@ -1077,7 +1081,7 @@ const getTabs = ({
     //   ),
     // },
     {
-      title: "SOAP Notes",
+      title: "Encounter Notes",
       content: (
         <PatientSOAPNotes
           soapNotesLoading={soapNotesLoading}
@@ -1095,44 +1099,30 @@ const getTabs = ({
     },
     {
       title: "Lab Result",
-      // content: (
-      //   <PatientLabRecords
-      //     labloading={labloading}
-      //     patientLabRecords={patientLabRecords}
-      //     count={labCount}
-      //     currentPage={labCurrentPage}
-      //     totalPages={labTotalPages}
-      //     setCurrentPage={setLabCurrentPage}
-      //   />
-      // ),
       content: (
-        <div className="py-16 text-center">
-          <EmptyState
-            icon="document"
-            title="Coming Soon"
-            description="Lab results will be available soon."
-          />
-        </div>
+        <PatientLabRecords
+          labloading={labloading}
+          patientLabRecords={patientLabRecords}
+          count={labCount}
+          currentPage={labCurrentPage}
+          totalPages={labTotalPages}
+          setCurrentPage={setLabCurrentPage}
+        />
       ),
     },
     {
       title: "Medication History",
-      // content: (
-      //   <PatientMedicationHistory
-      //     patientFullInfo={patientFullInfo}
-      //     patientMedRecords={patientMedRecords}
-      //     patientSoapNotes={patientSoapNotes}
-      //     selected={selectedPatientDetails}
-      //   />
-      // ),
+      content: <PatientMedicationHistory patientFullInfo={patientFullInfo} />,
+    },
+    {
+      title: "Visit Records",
       content: (
-        <div className="py-16 text-center">
-          <EmptyState
-            icon="document"
-            title="Coming Soon"
-            description="Medication history will be available soon."
-          />
-        </div>
+        <EncounterRecordsTimeline
+          kind="check_in"
+          sqid={selectedPatientDetails?.sqid}
+          isOngoing={!selectedPatientDetails?.closed_at && !selectedPatientDetails?.discharge_date}
+          title="Visit Care Record"
+        />
       ),
     },
   ];

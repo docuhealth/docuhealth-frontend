@@ -1,28 +1,74 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstanceHos from "../../../../../lib/axios/hospital";
-import toast from "react-hot-toast";
-import { Loader2, Calendar, Clock, User, Building, FileText, ChevronRight, Bed } from "lucide-react";
+import { fetchPatientAdmissionNotes } from "../../../../../queries/Hospital/nurse/patientHistory";
+import { Calendar, Clock, User, Building, FileText, ChevronRight, Bed } from "lucide-react";
 import AdmissionNoteDetail from "./AdmissionNoteDetail";
+import Skeleton from "../../../../ui/Skeleton";
 
-const AdmissionNotesHistory = ({ patient, patientFullInfo }) => {
+// Same box model as the note rows (desktop) and cards (mobile) below.
+const AdmissionNotesSkeleton = () => (
+  <div role="status" aria-label="Loading admission notes">
+    <div className="hidden lg:block space-y-3">
+      {Array.from({ length: 3 }, (_, i) => (
+        <div key={i} className="p-4 border border-gray-200 rounded-xl flex items-center justify-between gap-6">
+          <div className="flex items-center gap-8">
+            {[170, 150, 150].map((w, j) => (
+              <div key={j} className="flex items-center gap-3" style={{ minWidth: w }}>
+                <Skeleton className="h-9 w-9 rounded-lg" />
+                <div className="flex flex-col gap-1.5">
+                  <Skeleton className="h-2.5 w-20" />
+                  <Skeleton className="h-3.5 w-24" />
+                  {j !== 1 && <Skeleton className="h-3 w-12" />}
+                </div>
+              </div>
+            ))}
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-6 w-24 rounded-full" />
+              <Skeleton className="h-6 w-28 rounded-full" />
+            </div>
+          </div>
+          <Skeleton className="h-8 w-32 rounded-full shrink-0" />
+        </div>
+      ))}
+    </div>
+    <div className="block lg:hidden space-y-4">
+      {Array.from({ length: 2 }, (_, i) => (
+        <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
+          <div className="flex items-center gap-2 pb-3 border-b border-gray-100 mb-3">
+            <Skeleton className="h-4 w-4" />
+            <Skeleton className="h-3.5 w-40" />
+          </div>
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            {[0, 1].map((j) => (
+              <div key={j} className="flex flex-col gap-1.5">
+                <Skeleton className="h-2.5 w-16" />
+                <Skeleton className="h-3.5 w-24" />
+              </div>
+            ))}
+          </div>
+          <Skeleton className="h-9 w-full rounded-full" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const AdmissionNotesHistory = ({ patient, patientFullInfo, admissionSqid = null }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [view, setView] = useState("list"); // 'list', 'detail'
   const [selectedNote, setSelectedNote] = useState(null);
 
   const patientHin = patient?.hin || patientFullInfo?.hin || patientFullInfo?.patient?.hin || patientFullInfo?.patient_info?.hin;
 
-  const { data, isLoading: loading } = useQuery({
+  const { data, isLoading: loading, isError, refetch } = useQuery({
     queryKey: ["patient-admission-notes", patientHin],
-    queryFn: async () => {
-      const res = await axiosInstanceHos.get(`api/records/patients/${patientHin}/admission-notes`);
-      return res.data?.results || res.data || [];
-    },
+    queryFn: () => fetchPatientAdmissionNotes(patientHin),
     enabled: !!patientHin,
     staleTime: 5 * 60 * 1000,
   });
 
-  const notes = data || [];
+  // Scoped to one stay, a note only counts if it was written for that admission
+  const notes = (data || []).filter((note) => !admissionSqid || note?.admission_info?.sqid === admissionSqid);
 
   const toggleDropdown = (index) => {
     if (openDropdown === index) {
@@ -81,14 +127,29 @@ const AdmissionNotesHistory = ({ patient, patientFullInfo }) => {
       {/* List */}
       <div className="space-y-4">
         {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-docuhealth-primary" />
+          <AdmissionNotesSkeleton />
+        ) : isError ? (
+          // Without this a failed request would read as "no notes".
+          <div className="py-12 text-center text-gray-500 text-sm bg-gray-50/50 rounded-xl border border-gray-100">
+            <FileText className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+            <p className="font-medium text-gray-700">Couldn&apos;t load admission notes</p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="mt-3 px-5 py-2 text-xs font-semibold text-docuhealth-primary border border-docuhealth-primary rounded-full hover:bg-docuhealth-primary hover:text-white transition-colors cursor-pointer"
+            >
+              Try again
+            </button>
           </div>
         ) : notes.length === 0 ? (
           <div className="py-12 text-center text-gray-500 text-sm bg-gray-50/50 rounded-xl border border-gray-100">
             <FileText className="w-8 h-8 text-gray-300 mx-auto mb-2" />
             <p className="font-medium text-gray-700">No admission notes found</p>
-            <p className="text-xs text-gray-400 mt-1">This patient does not have any recorded admission notes at this hospital.</p>
+            <p className="text-xs text-gray-400 mt-1">
+              {admissionSqid
+                ? "No nursing admission note was recorded for this admission."
+                : "This patient does not have any recorded admission notes at this hospital."}
+            </p>
           </div>
         ) : (
           <>

@@ -8,7 +8,7 @@ import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_D
 import { fetchPendingScanResults, acceptScanResult, rejectScanResult } from "../../../../../queries/Hospital/radiology/scan_results";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import ScanLabResultsShell from "./ScanLabResultsShell";
-import ScanLabResultCard from "./ScanLabResultCard";
+import ScanLabResultCard, { ScanLabResultGridSkeleton } from "./ScanLabResultCard";
 import { maskHIN } from "./scanLabResults";
 
 const PAGE_SIZE = 9;
@@ -98,12 +98,12 @@ const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
               <span>Radiology result approval</span>
             </button>
 
-            <div className="flex gap-3 w-full sm:w-auto">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => setShowRejectModal(true)}
                 disabled={decisionPending}
-                className="flex-1 sm:flex-none border border-red-400 text-red-500 rounded-full py-1.5 px-4 disabled:opacity-60"
+                className="border border-red-400 text-red-500 rounded-full py-1.5 px-4 disabled:opacity-60 text-xs font-semibold cursor-pointer hover:bg-red-50 transition-colors"
               >
                 Reject result
               </button>
@@ -111,32 +111,34 @@ const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
                 type="button"
                 onClick={() => setShowApproveModal(true)}
                 disabled={decisionPending}
-                className="flex-1 sm:flex-none border border-docuhealth-primary text-white bg-docuhealth-primary rounded-full py-1.5 px-4 disabled:opacity-60"
+                className="border border-docuhealth-primary text-white bg-docuhealth-primary rounded-full py-1.5 px-4 disabled:opacity-60 text-xs font-semibold cursor-pointer hover:bg-docuhealth-dark-primary transition-colors"
               >
                 Approve result
               </button>
             </div>
           </div>
 
-          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-            <div className="flex flex-col gap-1">
-              <p className="text-sm font-bold text-docuhealth-dark">{patientName(selected)}</p>
-              <p className="text-xs text-gray-500">Patient HIN: {maskHIN(selected.patient_info?.hin)}</p>
-              <p className="text-xs text-gray-500">
-                Gender: <span className="capitalize">{selected.patient_info?.sex || "—"}</span>
-              </p>
+          <div>
+            <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+              <div className="flex flex-col gap-1">
+                <p className="text-sm font-bold text-docuhealth-dark">{patientName(selected)}</p>
+                <p className="text-xs text-gray-500">Patient HIN: {maskHIN(selected.patient_info?.hin)}</p>
+                <p className="text-xs text-gray-500">
+                  Gender: <span className="capitalize">{selected.patient_info?.sex || "—"}</span>
+                </p>
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="text-xs text-gray-400">Imaging order:</p>
+                <p className="text-sm font-bold text-docuhealth-dark">{selected.scan_type}</p>
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="text-xs text-gray-400">Date/Time of scan request:</p>
+                <p className="text-sm font-semibold text-docuhealth-dark">{formatFullDateTime(selected.created_at) || "—"}</p>
+              </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-xs text-gray-400">Imaging order:</p>
-              <p className="text-sm font-bold text-docuhealth-dark">{selected.scan_type}</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-xs text-gray-400">Date/Time of scan request:</p>
-              <p className="text-sm font-semibold text-docuhealth-dark">{formatFullDateTime(selected.created_at) || "—"}</p>
-            </div>
-          </div>
 
-          <ScanResultReport report={selected.report} attachments={selected.attachments} />
+            <ScanResultReport report={selected.report} attachments={selected.attachments} />
+          </div>
         </div>
 
         {showApproveModal && (
@@ -227,8 +229,8 @@ const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
       totalPages={totalPages}
       setCurrentPage={setCurrentPage}
     >
-      {isLoading ? (
-        <div className="flex justify-center items-center h-40 text-sm">Loading...</div>
+      {isLoading && rows.length === 0 ? (
+        <ScanLabResultGridSkeleton label="Loading scan results" />
       ) : rows.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-gray-400">
           <ScanLine size={36} className="opacity-25 mb-2" />

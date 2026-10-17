@@ -6,11 +6,67 @@ import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboa
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { DoctorsAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
 import SearchBar from "../../../../SearchBar/SearchBar";
+import Skeleton from "../../../../ui/Skeleton";
+import EmptyState from "../../../../ui/EmptyState";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
+
+// A failed list load used to fall through to "no patients"; a 5xx body is Django's HTML page, so don't show it.
+const PatientListError = ({ error, label }) => (
+  <EmptyState
+    title={`Couldn't load ${label}`}
+    description={
+      error?.response?.status >= 500
+        ? "The server hit an error loading this list. Please try again later."
+        : extractApiErrorMessage(error, "Please try again in a moment.")
+    }
+  />
+);
+
+// Same box model as a patient card so the grid doesn't shift when the list lands.
+const DETAIL_LINE_WIDTHS = ["w-28", "w-36", "w-16", "w-40"];
+
+// Search box + card grid, matching the loaded list so the cards don't jump down.
+// `headerLines` is the HIN line, plus "Admitted : ..." on discharged cards.
+const PatientCardGridSkeleton = ({ label, lines = 4, buttons = 1, headerLines = 1 }) => (
+  <div role="status" aria-label={label}>
+    <div className="mb-4 h-[38px] rounded-md border border-gray-300 bg-white flex items-center pl-3">
+      <Skeleton className="h-4 w-4" />
+      <Skeleton className="h-3 w-40 ml-3" />
+    </div>
+    <div className="my-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+    {Array.from({ length: 6 }, (_, i) => (
+      <div key={i} className="border p-3 rounded-xl">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-3.5 w-24" />
+            <Skeleton className="h-4 w-14 rounded-full" />
+          </div>
+          <Skeleton className="h-4 w-16 rounded-full" />
+        </div>
+        <div className="border-b py-2 flex flex-col gap-2">
+          <Skeleton className="h-3 w-24" />
+          {headerLines > 1 && <Skeleton className="h-3 w-32" />}
+        </div>
+        <div className="flex flex-col gap-2.5 pt-3 pb-3 border-b">
+          {DETAIL_LINE_WIDTHS.slice(0, lines).map((w) => (
+            <Skeleton key={w} className={`h-3 ${w}`} />
+          ))}
+        </div>
+        {Array.from({ length: buttons }, (_, j) => (
+          <Skeleton key={j} className="mt-3 h-10 w-full rounded-full" />
+        ))}
+      </div>
+    ))}
+    </div>
+  </div>
+);
 
 const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSource, onDischargePatient }) => {
   const {
     admittedPatients,
     loading,
+    isError,
+    error,
     count,
     currentPage,
     totalPages,
@@ -30,11 +86,11 @@ const AdmittedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUp
   }, [admittedPatients]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-full text-sm">
-        Loading...
-      </div>
-    );
+    return <PatientCardGridSkeleton label="Loading admitted patients" buttons={2} />;
+  }
+
+  if (isError) {
+    return <PatientListError error={error} label="admitted patients" />;
   }
 
   if (admittedPatients.length === 0 && !searchQuery) {
@@ -291,6 +347,8 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
   const {
     admittedPatients: outPatients,
     loading,
+    isError,
+    error,
     count,
     currentPage,
     totalPages,
@@ -310,11 +368,11 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
   }, [outPatients]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-full text-sm">
-        Loading...
-      </div>
-    );
+    return <PatientCardGridSkeleton label="Loading outpatients" lines={2} />;
+  }
+
+  if (isError) {
+    return <PatientListError error={error} label="outpatients" />;
   }
 
   if (outPatients.length === 0 && !searchQuery) {
@@ -435,6 +493,8 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
   const {
     admittedPatients,
     loading,
+    isError,
+    error,
     count,
     currentPage,
     totalPages,
@@ -455,11 +515,11 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
   }, [admittedPatients]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-full text-sm">
-        Loading...
-      </div>
-    );
+    return <PatientCardGridSkeleton label="Loading discharged patients" headerLines={2} />;
+  }
+
+  if (isError) {
+    return <PatientListError error={error} label="discharged patients" />;
   }
 
   if (admittedPatients.length === 0 && !searchQuery) {
@@ -587,7 +647,8 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
                 </p>
               )}
             </div>
-            {admittedPatient?.discharged_by && (
+            {/* In-patient discharge rows carry `discharged_by_info`, out-patient ones `closed_by_info`. */}
+            {(admittedPatient?.discharged_by_info || admittedPatient?.closed_by_info) && (
               <div className="flex items-center gap-1 text-gray-600 pt-3">
                 <svg
                   width="15"
@@ -602,8 +663,10 @@ const DischargedPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheck
                   />
                 </svg>
                 <p className="">
-                  Discharged by Dr. {admittedPatient.discharged_by.firstname}{" "}
-                  {admittedPatient.discharged_by.lastname}
+                  {(() => {
+                    const closer = admittedPatient.discharged_by_info || admittedPatient.closed_by_info;
+                    return `${admittedPatient.discharged_by_info ? "Discharged" : "Closed"} by ${closer.role === "doctor" ? "Dr. " : ""}${closer.firstname} ${closer.lastname}`;
+                  })()}
                 </p>
               </div>
             )}

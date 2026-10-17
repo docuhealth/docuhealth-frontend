@@ -1,6 +1,4 @@
 import React, { useContext } from "react";
-import toast from "react-hot-toast";
-import { Printer, Download } from "lucide-react";
 import {
   formatFullDateTime,
   getAge,
@@ -37,13 +35,6 @@ const HandoverNoteDetailPage = ({
   const doctorName =
     [profile?.firstname, profile?.lastname].filter(Boolean).join(" ") || "—";
 
-  const handlePrint = () => window.print();
-  const handleDownload = () =>
-    toast(
-      "Downloading as PDF isn't wired up yet — this is a UI preview for now.",
-      { icon: "🛠️" },
-    );
-
   return (
     <div className="bg-white my-5 border rounded-lg pt-5 lg:pt-8 px-4 lg:px-6 pb-8 text-sm">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 border-b pb-4 w-full">
@@ -66,23 +57,6 @@ const HandoverNoteDetailPage = ({
           </svg>
           <span className="text-sm">Handover note information</span>
         </button>
-
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <button
-            onClick={handlePrint}
-            className="flex items-center justify-center gap-1.5 border border-gray-300 py-1.5 px-4 rounded-full w-full sm:w-auto text-docuhealth-dark hover:bg-gray-50 transition-colors"
-          >
-            <Printer size={14} />
-            <p>Print case note</p>
-          </button>
-          <button
-            onClick={handleDownload}
-            className="flex items-center justify-center gap-1.5 border border-gray-300 py-1.5 px-4 rounded-full w-full sm:w-auto text-docuhealth-dark hover:bg-gray-50 transition-colors"
-          >
-            <Download size={14} />
-            <p>Download PDF</p>
-          </button>
-        </div>
       </div>
 
       {/* Identity summary */}

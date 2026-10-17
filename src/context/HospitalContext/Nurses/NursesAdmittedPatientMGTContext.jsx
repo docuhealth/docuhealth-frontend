@@ -27,7 +27,8 @@ const NursesAdmittedPatientMGTProvider = (props) => {
       return res.data;
     },
     enabled: isUserLoggedIn,
-    placeholderData: (previousData) => previousData, // Smooth transition between pages
+    // Keep the old page while paging/searching, but never show another tab's rows under this tab
+    placeholderData: (previousData, previousQuery) => (previousQuery?.queryKey?.[1] === tab ? previousData : undefined), // Smooth transition between pages
   });
 
   const admittedPatients = data?.results || [];

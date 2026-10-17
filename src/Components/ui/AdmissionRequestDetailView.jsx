@@ -11,7 +11,7 @@ const STATUS_STYLES = {
 const staffName = (s) =>
   s ? `${s.role === "doctor" ? "Dr. " : ""}${s.firstname ?? ""} ${s.lastname ?? ""}`.trim() : null;
 
-// One bed request from Recent Care Activities (GET /api/medical-records/events/<event_sqid>).
+// One bed request from Recent Care Activities (GET /api/records/events/<event_sqid>).
 // `processed_by_info` is the receptionist who accepted or rejected it.
 const AdmissionRequestDetailView = ({ request }) => {
   if (!request) return null;

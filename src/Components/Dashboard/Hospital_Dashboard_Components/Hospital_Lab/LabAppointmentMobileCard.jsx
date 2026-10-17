@@ -7,7 +7,17 @@ const getPatientName = (appt) =>
   appt.name ||
   "Unknown";
 
-const getTestName = (appt) => appt.test_name || appt.test || "Test request";
+// Appointments carry a type ("lab_test", "consultation"), not a test name
+const getTypeLabel = (appt) => {
+  const t = appt.type || "";
+  return t ? t.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase()) : "Lab test";
+};
+
+const getTime = (appt) => {
+  const d = new Date(appt.scheduled_time || appt.scheduled_at || appt.datetime);
+  if (Number.isNaN(d.getTime())) return "Not set";
+  return d.toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+};
 
 const getNote = (appt) => appt.note || appt.doctor_note || appt.description || "—";
 
@@ -75,14 +85,18 @@ const LabAppointmentMobileCard = ({ appt, onOpen, onSeeDetails, onCreateOrder, h
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 pt-1">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-3 pt-1">
         <div>
-          <p className="text-[10px] text-gray-400 uppercase font-medium">Test Request</p>
-          <p className="text-[13px] text-gray-600">{getTestName(appt)}</p>
+          <p className="text-[10px] text-gray-400 uppercase font-medium">Time</p>
+          <p className="text-[13px] text-gray-600 whitespace-nowrap">{getTime(appt)}</p>
         </div>
         <div>
+          <p className="text-[10px] text-gray-400 uppercase font-medium">Type</p>
+          <p className="text-[13px] text-gray-600">{getTypeLabel(appt)}</p>
+        </div>
+        <div className="col-span-2 min-w-0">
           <p className="text-[10px] text-gray-400 uppercase font-medium">Note</p>
-          <p className="text-[13px] text-gray-600 truncate italic">&ldquo;{getNote(appt)}&rdquo;</p>
+          <p className="text-[13px] text-gray-600 italic line-clamp-2 break-words">&ldquo;{getNote(appt)}&rdquo;</p>
         </div>
       </div>
     </div>

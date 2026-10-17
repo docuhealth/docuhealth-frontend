@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { isAppointmentClosed, useCloseAppointment } from "../../../../queries/Hospital/appointments";
-import { UserIcon, FlaskConical, FileText } from "lucide-react";
+import { UserIcon, FlaskConical, FileText, Clock } from "lucide-react";
 
 const getPatientName = (appt) =>
   appt.patient_name ||
@@ -8,7 +8,17 @@ const getPatientName = (appt) =>
   appt.name ||
   "Unknown";
 
-const getTestName = (appt) => appt.test_name || appt.test || "Test request";
+// Appointments carry a type ("lab_test", "consultation"), not a test name
+const getTypeLabel = (appt) => {
+  const t = appt.type || "";
+  return t ? t.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase()) : "Lab test";
+};
+
+const getTime = (appt) => {
+  const d = new Date(appt.scheduled_time || appt.scheduled_at || appt.datetime);
+  if (Number.isNaN(d.getTime())) return "Not set";
+  return d.toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+};
 
 const getNote = (appt) => appt.note || appt.doctor_note || appt.description || "—";
 
@@ -30,11 +40,21 @@ const LabAppointmentRow = ({ appt, onOpen, onSeeDetails, onCreateOrder, hideCrea
 
       <div className="flex items-center gap-3 min-w-[140px]">
         <div className="p-2 bg-gray-100 rounded-md shrink-0">
+          <Clock className="w-4 h-4 text-gray-600" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-[10px] text-gray-500 uppercase font-semibold">Time</p>
+          <p className="text-sm font-medium whitespace-nowrap">{getTime(appt)}</p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 min-w-[120px]">
+        <div className="p-2 bg-gray-100 rounded-md shrink-0">
           <FlaskConical className="w-4 h-4 text-gray-600" />
         </div>
         <div className="min-w-0">
-          <p className="text-[10px] text-gray-500 uppercase font-semibold">Test Request</p>
-          <p className="text-sm font-medium truncate">{getTestName(appt)}</p>
+          <p className="text-[10px] text-gray-500 uppercase font-semibold">Type</p>
+          <p className="text-sm font-medium truncate">{getTypeLabel(appt)}</p>
         </div>
       </div>
 
@@ -44,7 +64,7 @@ const LabAppointmentRow = ({ appt, onOpen, onSeeDetails, onCreateOrder, hideCrea
         </div>
         <div className="min-w-0">
           <p className="text-[10px] text-gray-500 uppercase font-semibold">Note</p>
-          <p className="text-sm font-medium truncate">{getNote(appt)}</p>
+          <p className="text-sm font-medium truncate" title={getNote(appt)}>{getNote(appt)}</p>
         </div>
       </div>
 

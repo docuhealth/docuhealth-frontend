@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
@@ -6,10 +6,36 @@ import { CalendarIcon, ClockIcon, UserIcon, MoreVertical } from "lucide-react";
 import { NursesCaseNotesContext } from "../../../../../context/HospitalContext/Nurses/NursesCaseNotesContext";
 import SearchBar from "../../../../SearchBar/SearchBar";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
+import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
+
+// Mirrors a loaded case note row (date/time/patient tiles + kebab).
+const CaseNoteRowsSkeleton = () => (
+  <div role="status" aria-label="Loading case notes" className="flex flex-col gap-4 mt-4">
+    {Array.from({ length: 3 }, (_, i) => (
+      <div key={i} className="flex flex-col-reverse lg:flex-row lg:items-center justify-between border rounded-lg p-4">
+        <div className="flex flex-row flex-wrap gap-4 lg:gap-10">
+          {["w-32", "w-16", "w-28"].map((w, j) => (
+            <div key={j} className="flex items-start gap-3">
+              <Skeleton className="h-8 w-8" />
+              <div>
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-20" />
+                <SkeletonText textClassName="text-sm" className={`h-3.5 ${w}`} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="relative flex justify-end lg:mt-0">
+          <button type="button" disabled tabIndex={-1} className="p-2 rounded-full text-gray-200">
+            <MoreVertical size={16} />
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 const CaseNote = ({ selected, setCaseNoteHistory, setCaseNoteDetail }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
-  const menuRef = useRef(null);
   const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
 
   const {
@@ -37,7 +63,8 @@ const CaseNote = ({ selected, setCaseNoteHistory, setCaseNoteDetail }) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      // One ref can't cover every row's menu; ignore clicks inside any of them.
+      if (!event.target.closest?.("[data-row-menu]")) {
         setOpenMenuId(null);
       }
     };
@@ -73,7 +100,7 @@ const CaseNote = ({ selected, setCaseNoteHistory, setCaseNoteDetail }) => {
           onChange={setSearchQuery}
           placeholder="Search case notes..."
         />
-        {isRefreshing && (
+        {isRefreshing && !loading && (
           <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
             <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
             Searching...
@@ -84,11 +111,9 @@ const CaseNote = ({ selected, setCaseNoteHistory, setCaseNoteDetail }) => {
       <div className=" my-5">
         {loading ? (
           <>
-            <div className="flex justify-center items-center gap-3 px-2 py-3">
-              <p className="text-sm text-gray-500 pt-3">
-                loading patient's case note...
-              </p>
-            </div>
+            <CaseNoteRowsSkeleton />
+            {/* the loaded list ends with an mt-6 pagination wrapper; keep its spacing */}
+            <div className="mt-6" />
           </>
         ) : caseNotes?.length === 0 && !loading ? (
           <>
@@ -162,7 +187,7 @@ const CaseNote = ({ selected, setCaseNoteHistory, setCaseNoteDetail }) => {
             <div className="flex flex-col gap-4 mt-4">
               {caseNotes?.map((note) => (
                 <div
-                  key={note.id}
+                  key={note.sqid || note.id}
                   className="flex flex-col-reverse lg:flex-row lg:items-center justify-between border rounded-lg p-4 transition-colors"
                 >
                   <div className="flex flex-row flex-wrap gap-4 lg:gap-10">
@@ -220,11 +245,11 @@ const CaseNote = ({ selected, setCaseNoteHistory, setCaseNoteDetail }) => {
                   </div>
 
                   {/* Actions Menu */}
-                  <div className="relative flex justify-end  lg:mt-0" ref={menuRef}>
+                  <div className="relative flex justify-end  lg:mt-0" data-row-menu>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setOpenMenuId(openMenuId === note.id ? null : note.id);
+                        setOpenMenuId(openMenuId === (note.sqid || note.id) ? null : (note.sqid || note.id));
                       }}
                       className="p-2 hover:bg-gray-200 rounded-full transition-all"
                     >
@@ -238,7 +263,7 @@ const CaseNote = ({ selected, setCaseNoteHistory, setCaseNoteDetail }) => {
                       </svg>
                     </button>
 
-                    {openMenuId === note.id && (
+                    {openMenuId === (note.sqid || note.id) && (
                       <div className="absolute right-0 top-10 z-10 w-40 bg-white rounded-md shadow text-sm border border-gray-100  animate-in fade-in zoom-in duration-200">
                         <button
                           onClick={() => {

@@ -9,9 +9,10 @@ import {
   searchLabTests,
 } from "../../../../../../queries/Hospital/lab/requests";
 import useDebounce from "../../../../../../hooks/useDebounce";
-import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { resolveOrderContext, visitPayload, NO_VISIT_MESSAGE } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import Modal from "../../../../../ui/Modal";
+import HospitalLoader from "../../../../../ui/HospitalLoader";
 import Select from "../../../../../ui/Select";
 import MultiSelect from "../../../../../ui/MultiSelect";
 
@@ -97,17 +98,15 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
         .filter(Boolean)
         .join("\n\n");
 
+      // Exactly one of check_in / admission; there is no visit-free order any more.
       const requestPayload = {
         patient: payload.patient_hin,
-        order_source: orderContext.orderSource,
+        ...visitPayload(orderContext),
         items: payload.test_type.map((testSqid) => ({
           test: testSqid,
           note: fullNote || undefined,
         })),
       };
-      if (orderContext.checkIn) {
-        requestPayload.check_in = orderContext.checkIn;
-      }
       if (payload.ignore_duplicate_warning) {
         requestPayload.ignore_duplicate_warning = true;
       }
@@ -121,6 +120,8 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
       setShowSuccess(true);
       queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
       queryClient.invalidateQueries({ queryKey: ["doctor-lab-records"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-dashboard"] });
     },
     onError: (err) => {
       if (
@@ -141,6 +142,10 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
   });
 
   const handleLabRequest = () => {
+    if (!orderContext.hasVisit) {
+      toast.error(NO_VISIT_MESSAGE);
+      return;
+    }
     if (!formData.category || formData.test_type.length === 0) {
       toast.error("Please select a category and at least one test.");
       return;
@@ -159,6 +164,7 @@ const OrderLabModal = ({ selectedPatientDetails, onClose, isOpen = true }) => {
       maxWidth={showSuccess || duplicateWarning ? "md" : "2xl"}
       className="max-h-[88vh] flex flex-col p-2"
     >
+      {isLabPending && <HospitalLoader variant="overlay" label="Sending lab order..." />}
       <div className="relative">
         {/* Close Button */}
         <button

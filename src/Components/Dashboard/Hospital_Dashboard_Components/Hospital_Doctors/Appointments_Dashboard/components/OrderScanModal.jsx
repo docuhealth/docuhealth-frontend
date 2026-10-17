@@ -6,21 +6,14 @@ import {
   createScanOrder,
   radiologyScanSearchQuery,
 } from "../../../../../../queries/Hospital/radiology/scan_requests";
-import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { resolveOrderContext, visitPayload } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import SearchableSelect from "../../../../../ui/SearchableSelect";
+import HospitalLoader from "../../../../../ui/HospitalLoader";
 
-// Each scan order source belongs to one role: a radiologist can only order against an appointment booked with them, a doctor against their appointment, admission or check-in.
-const resolveScanOrderContext = (details, orderedBy) =>
-  orderedBy === "radiologist"
-    ? {
-        hin: details?.patient?.hin || details?.patient_info?.hin || "",
-        orderSource: "radiologist_appointment_order",
-        appointment: details?.sqid || null,
-        checkIn: null,
-        admission: null,
-      }
-    : resolveOrderContext(details, { fallbackOrderSource: "doctor_appointment_order" });
+// Doctors and radiologists both order against the patient's check-in or admission; a radiologist's
+// result is approved as soon as it is submitted. An appointment is no longer a visit.
+const resolveScanOrderContext = (details) => resolveOrderContext(details);
 
 // Preloaded common scans filter instantly on every word typed ("chest xr" finds "XR Chest 2 Views"); the server's catalog-wide matches are appended once they arrive.
 const mergeScanOptions = (term, commonScans, searchResults = []) => {
@@ -36,9 +29,9 @@ const mergeScanOptions = (term, commonScans, searchResults = []) => {
 
 // Patient(HIN)-based like OrderLabModal. "Imaging order" searches the scans catalog server-side as you type and the order references the picked scan by sqid.
 const OrderScanModal = ({ selectedPatientDetails, onClose, orderedBy = "doctor" }) => {
-  const orderContext = resolveScanOrderContext(selectedPatientDetails, orderedBy);
-  // Every source needs exactly one linked record now that walk-in is gone.
-  const missingRecord = !orderContext.appointment && !orderContext.checkIn && !orderContext.admission;
+  const orderContext = resolveScanOrderContext(selectedPatientDetails);
+  // Every scan order needs exactly one of check_in / admission.
+  const missingRecord = !orderContext.hasVisit;
 
   const [selectedScanSqid, setSelectedScanSqid] = useState("");
   const [searchInput, setSearchInput] = useState("");
@@ -80,10 +73,7 @@ const OrderScanModal = ({ selectedPatientDetails, onClose, orderedBy = "doctor" 
     if (!selectedScanSqid || missingRecord) return;
     createOrderMutation.mutate({
       patient: orderContext.hin,
-      order_source: orderContext.orderSource,
-      check_in: orderContext.checkIn || undefined,
-      admission: orderContext.admission || undefined,
-      appointment: orderContext.appointment || undefined,
+      ...visitPayload(orderContext),
       items: [{ scan: selectedScanSqid }],
     });
   };
@@ -91,6 +81,7 @@ const OrderScanModal = ({ selectedPatientDetails, onClose, orderedBy = "doctor" 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-3">
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
+        {createOrderMutation.isPending && <HospitalLoader variant="overlay" label="Sending scan order..." />}
         {showSuccess ? (
           <div className="flex flex-col items-center text-center py-4">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
@@ -140,8 +131,8 @@ const OrderScanModal = ({ selectedPatientDetails, onClose, orderedBy = "doctor" 
             {missingRecord && (
               <p className="mb-2 text-[12px] text-red-500">
                 {orderedBy === "radiologist"
-                  ? "This patient needs an appointment booked with you by the reception desk before you can order a scan."
-                  : "Open this patient from an appointment, admission or check-in to order a scan."}
+                  ? "Scans can only be ordered for a checked-in or admitted patient. Ask the reception desk to check this patient in."
+                  : "Scans can only be ordered for a checked-in or admitted patient. Check the patient in first."}
               </p>
             )}
 

@@ -5,43 +5,39 @@ import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doct
 import { createReferOut } from "../../../../../../queries/Hospital/doctor/referOut";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import SearchableSelect from "../../../../../ui/SearchableSelect";
+import HospitalLoader from "../../../../../ui/HospitalLoader";
+import { resolveOrderContext, NO_VISIT_MESSAGE } from "../../../../../../utils/careOrderContext";
 
-/**
- * "Refer Out" — opened from the row actions on the doctor's Appointments list.
- * Sends the appointment's patient to another DocuHealth hospital via
- * POST /api/doctors/refer-out. Destination hospitals come from the shared
- * DoctorAppContext list (api/hospitals/hospitals); we send the hospital `sqid`
- * as `hospital_to_id` (the `hin` is rejected) and the appointment `sqid` as
- * `appointment_id`.
- */
-const ReferOutModal = ({ appointment, onClose }) => {
+// "Refer out" from a check-in or an admission. Destination hospitals come from the shared
+// DoctorAppContext list; the hospital `sqid` goes out as `hospital_to_id` (the `hin` is rejected).
+const ReferOutModal = ({ patientRecord, onClose }) => {
   const queryClient = useQueryClient();
-  const { hospitals } = useContext(DoctorAppContext);
+  const { hospitals, hospitalName } = useContext(DoctorAppContext);
 
   const [hospitalTo, setHospitalTo] = useState(null); // { value: sqid, label: name, hin }
   const [reason, setReason] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const appointmentSqid = appointment?.sqid || "";
-  const fromHospitalSqid = appointment?.hospital_info?.sqid;
-  const patientName = [appointment?.patient?.firstname, appointment?.patient?.lastname]
-    .filter(Boolean)
-    .join(" ");
+  const visit = resolveOrderContext(patientRecord);
+  const fromHospitalSqid = patientRecord?.hospital_info?.sqid;
+  const patientInfo = patientRecord?.patient_info || patientRecord?.patient || {};
+  const patientName = [patientInfo.firstname, patientInfo.lastname].filter(Boolean).join(" ");
 
-  // Named hospitals that have an sqid, minus the appointment's own hospital
+  // Named hospitals that have an sqid, minus our own hospital
   // (the backend rejects that with "Cannot refer to the same hospital.").
   const hospitalOptions = useMemo(
     () =>
       (hospitals || [])
-        .filter((h) => h?.sqid && h?.name?.trim() && h.sqid !== fromHospitalSqid)
+        .filter((h) => h?.sqid && h?.name?.trim())
+        .filter((h) => (fromHospitalSqid ? h.sqid !== fromHospitalSqid : h.name !== hospitalName))
         .map((h) => ({ value: h.sqid, label: h.name, hin: h.hin })),
-    [hospitals, fromHospitalSqid],
+    [hospitals, fromHospitalSqid, hospitalName],
   );
 
   const { mutate, isPending } = useMutation({
     mutationFn: createReferOut,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["doctor-appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["hospital-patients-doctor"] });
       setShowSuccess(true);
     },
     onError: (err) => {
@@ -50,11 +46,11 @@ const ReferOutModal = ({ appointment, onClose }) => {
     },
   });
 
-  const canSubmit = !!(appointmentSqid && hospitalTo?.value && reason.trim() && !isPending);
+  const canSubmit = !!(visit.hasVisit && hospitalTo?.value && reason.trim() && !isPending);
 
   const handleSubmit = () => {
-    if (!appointmentSqid) {
-      toast.error("This appointment is missing an id — reopen the list and try again.");
+    if (!visit.hasVisit) {
+      toast.error(NO_VISIT_MESSAGE);
       return;
     }
     if (!hospitalTo?.value || !reason.trim()) {
@@ -62,7 +58,8 @@ const ReferOutModal = ({ appointment, onClose }) => {
       return;
     }
     mutate({
-      appointment_id: appointmentSqid,
+      check_in: visit.checkIn,
+      admission: visit.admission,
       hospital_to_id: hospitalTo.value,
       reason: reason.trim(),
     });
@@ -71,6 +68,7 @@ const ReferOutModal = ({ appointment, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-3">
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative text-sm">
+        {isPending && <HospitalLoader variant="overlay" label="Referring patient out..." />}
         {showSuccess ? (
           <div className="flex flex-col items-center text-center py-4">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">

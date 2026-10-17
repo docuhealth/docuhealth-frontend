@@ -2,10 +2,11 @@ import React, { useContext, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../Components/ui/DashboardLayout";
 import ComingSoonModal from "../../../Components/ui/ComingSoonModal";
+import HospitalLoader from "../../../Components/ui/HospitalLoader";
 import { HosAppContext } from "../../../context/HospitalContext/Admin/HosAppContext";
 
 const Hospital_Admin_Layout = () => {
-  const { profile } = useContext(HosAppContext);
+  const { profile, loading } = useContext(HosAppContext);
   const navigate = useNavigate();
   const [comingSoonFeature, setComingSoonFeature] = useState(null);
 
@@ -131,6 +132,25 @@ const Hospital_Admin_Layout = () => {
       ),
     },
     {
+      name: "Audit Logs",
+      path: "/hospital-admin-audit-logs-dashboard",
+      icon: (isActive) => (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className={`group-hover:fill-white ${isActive ? "fill-white" : "fill-docuhealth-secondary"}`}
+        >
+          <path
+            d="M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V4H5V20H19ZM7 6H11V10H7V6ZM7 12H17V14H7V12ZM7 16H17V18H7V16ZM13 7H17V9H13V7Z"
+            className={`group-hover:fill-white ${isActive ? "fill-white" : "fill-docuhealth-secondary"}`}
+          />
+        </svg>
+      ),
+    },
+    {
       name: "Wallet",
       path: "/hospital-admin-wallet-dashboard",
       onClick: () => setComingSoonFeature("Wallet"),
@@ -194,6 +214,10 @@ const Hospital_Admin_Layout = () => {
       ),
     },
   ];
+
+  if (loading && !profile) {
+    return <HospitalLoader variant="fullscreen" logo={profile?.theme?.profile_image} label="Setting up your workspace..." />;
+  }
 
   return (
     <DashboardLayout

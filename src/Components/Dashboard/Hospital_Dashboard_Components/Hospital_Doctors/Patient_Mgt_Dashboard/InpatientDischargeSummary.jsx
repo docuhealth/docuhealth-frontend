@@ -11,6 +11,7 @@ import DischargeProceduresMedicationsStep from "./DischargeProceduresMedications
 import DischargeFollowUpStep from "./DischargeFollowUpStep";
 import ConfirmDischargeModal from "./ConfirmDischargeModal";
 import DischargeSuccessModal from "./DischargeSuccessModal";
+import { DEFAULT_FREQUENCY, isFrequencyCode, toFrequencyCode } from "../../../../../utils/careTaskConstants";
 
 const COMPLETED_LAB_STATUSES = ["completed", "accepted", "result_ready", "approved"];
 const pageSize = 20;
@@ -38,14 +39,14 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
     enabled: !!hin,
   });
 
-  const { data: medRecordsData } = useQuery({
+  const { data: medRecordsData, isLoading: medRecordsLoading } = useQuery({
     queryKey: ["patient-med-records", hin, 1],
     queryFn: async () =>
       (await axiosInstanceHos.get(`api/doctors/patient/records/${hin}?page=1&size=6`)).data,
     enabled: !!hin,
   });
 
-  const { data: labRecordsData } = useQuery({
+  const { data: labRecordsData, isLoading: labRecordsLoading } = useQuery({
     queryKey: ["patient-lab-records", hin, 1],
     queryFn: async () =>
       (await axiosInstanceHos.get(`api/lab/test-orders/patient/${hin}?page=1&size=${pageSize}`)).data,
@@ -182,16 +183,13 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
     const drugOrdersInfo = latestRecord?.drug_orders_info || latestRecord?.drug_records;
     if (!drugOrdersInfo || drugOrdersInfo.length === 0) return;
 
-    const flatDrugs = drugOrdersInfo[0]?.drugs
-      ? drugOrdersInfo.flatMap((order) => order.drugs || [])
+    const flatDrugs = drugOrdersInfo[0]?.drugs_info
+      ? drugOrdersInfo.flatMap((order) => order.drugs_info || [])
       : drugOrdersInfo;
 
     const seeded = flatDrugs.map((drugItem) => {
       const drug = drugItem.drug_record || drugItem;
-      const frequency =
-        typeof drug.frequency === "object"
-          ? `${drug.frequency?.value ?? ""} ${drug.frequency?.rate ?? ""}`.trim()
-          : drug.frequency;
+      const frequency = toFrequencyCode(drug.frequency);
       return {
         name: drug.name,
         dosage: drug.quantity ?? "",
@@ -218,17 +216,13 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
 
   const buildDischargeMedication = (med, { seeded }) => {
     if (seeded) {
-      // Seeded rows carry frequency as a display string ("1 od" or "od").
-      const [lead, ...rest] = String(med.frequency || "").trim().split(" ");
-      const hasNumericLead = rest.length > 0 && !Number.isNaN(Number(lead));
       return {
         name: med.name,
         route: med.route || "Oral",
         quantity: Number(med.dosage) || 1,
         unit: med.unit || null,
-        frequency: hasNumericLead
-          ? { value: Number(lead) || 1, rate: rest.join(" ") }
-          : { value: 1, rate: String(med.frequency || "od").trim() || "od" },
+        // `frequency` is a code ("bd"); anything else is refused by the API.
+        frequency: isFrequencyCode(med.frequency) ? med.frequency : DEFAULT_FREQUENCY,
         duration: { value: 1, rate: "days" },
         allergies: [],
       };
@@ -238,7 +232,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       route: med.route || "Oral",
       quantity: Number(med.dosage) || 1,
       unit: med.dosageUnit || null,
-      frequency: { value: 1, rate: med.frequency },
+      frequency: med.frequency,
       duration: {
         value: Number(med.duration) || 1,
         rate: med.durationUnit ? med.durationUnit.toLowerCase() : "days",
@@ -420,6 +414,8 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       {currentStep === 2 && (
         <DischargeProceduresMedicationsStep
           completedInvestigationOptions={completedInvestigationOptions}
+          investigationsLoading={labRecordsLoading}
+          medicationsLoading={medRecordsLoading}
           formData={formData}
           onFieldChange={handleFieldChange}
           onToggleCompletedInvestigation={toggleSelection("completed_investigations")}
@@ -438,6 +434,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
           onFieldChange={handleFieldChange}
           hospitalName={hospitalName}
           pendingInvestigationOptions={pendingInvestigationOptions}
+          investigationsLoading={labRecordsLoading}
           onTogglePendingInvestigation={toggleSelection("pending_investigations")}
         />
       )}

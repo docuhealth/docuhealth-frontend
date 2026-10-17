@@ -20,8 +20,8 @@ const HosProfileProvider = ({ children }) => {
     queryKey: ["hospital-dashboard-metrics"],
     queryFn: fetchHospitalDashboardMetrics,
     enabled: isUserLoggedIn,
-    staleTime: 1000 * 5, 
-    refetchInterval: 15000,
+    staleTime: 60 * 1000, 
+    refetchInterval: 60000,
     refetchOnWindowFocus: true,
   });
 

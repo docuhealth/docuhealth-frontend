@@ -1,7 +1,10 @@
 import React, { useEffect, useState, createContext } from "react";
 import { getHospitalToken } from "../../../services/authService";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { fetchAdmissionRequests } from "../../../queries/Hospital/receptionist/admissionRequest";
+import { useQuery } from "@tanstack/react-query";
+import {
+  ADMISSION_REQUESTS_PAGE_SIZE,
+  fetchAdmissionRequests,
+} from "../../../queries/Hospital/receptionist/admissionRequest";
 import useDebounce from "../../../hooks/useDebounce";
 import toast from "react-hot-toast";
 
@@ -10,26 +13,29 @@ export const ReceptionistAdmissionRequestContext = createContext();
 const ReceptionistAdmissionRequestProvider = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const pageSize = 6;
+  const [status, setStatus] = useState("pending");
 
   const debouncedSearch = useDebounce(searchQuery, 300);
   const isUserLoggedIn = !!getHospitalToken();
 
   const { data, isPending, isFetching, isError, error } = useQuery({
-    queryKey: ["hospital-admission-requests", currentPage, debouncedSearch],
+    queryKey: ["hospital-admission-requests", currentPage, debouncedSearch, status],
     queryFn: fetchAdmissionRequests,
     enabled: isUserLoggedIn,
-    placeholderData: keepPreviousData,
+    // Keep the old page on screen while paging or searching, but not across a status
+    // switch: that would show the previous status's rows until the new ones land.
+    placeholderData: (prev, prevQuery) => (prevQuery?.queryKey[3] === status ? prev : undefined),
   });
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, status]);
 
   useEffect(() => {
     if (isError) {
       toast.error(
-        error?.response?.data?.message ||
+        error?.response?.data?.status ||
+          error?.response?.data?.message ||
           "Error fetching hospital admission requests",
       );
       console.error(error);
@@ -38,7 +44,7 @@ const ReceptionistAdmissionRequestProvider = (props) => {
 
   const admissionRequests = data?.results || [];
   const count = data?.count || 0;
-  const totalPages = Math.ceil(count / pageSize);
+  const totalPages = Math.ceil(count / ADMISSION_REQUESTS_PAGE_SIZE);
 
   return (
     <ReceptionistAdmissionRequestContext.Provider
@@ -52,6 +58,8 @@ const ReceptionistAdmissionRequestProvider = (props) => {
         totalPages,
         searchQuery,
         setSearchQuery,
+        status,
+        setStatus,
       }}
     >
       {props.children}

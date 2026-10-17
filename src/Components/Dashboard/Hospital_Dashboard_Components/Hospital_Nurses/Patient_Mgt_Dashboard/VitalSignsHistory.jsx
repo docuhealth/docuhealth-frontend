@@ -1,10 +1,112 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import useDebounce from "../../../../../hooks/useDebounce";
+import { fetchAllPatientVitalSigns, isWithinStay } from "../../../../../queries/Hospital/nurse/patientHistory";
 import toast from "react-hot-toast";
 import { Activity, ChevronLeft, ChevronRight, FileText, User, Calendar, Clock } from "lucide-react";
 import { NursesVitalSignsContext } from "../../../../../context/HospitalContext/Nurses/NursesVitalSignsContext";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import SearchBar from "../../../../SearchBar/SearchBar";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../../../Components/ui/Table";
+import Skeleton, { SkeletonText, SkeletonBox } from "../../../../ui/Skeleton";
+
+// Static, so the loading skeleton can show the real column headings.
+const VitalsTableHeader = () => (
+    <TableHeader>
+        <TableRow className="bg-slate-50/90 text-slate-700 border-b border-slate-200">
+            <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase border-r border-slate-200 last:border-r-0">Recorded Date & Time</TableHead>
+            <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center border-r border-slate-200 last:border-r-0">Blood Pressure</TableHead>
+            <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center border-r border-slate-200 last:border-r-0">Temperature</TableHead>
+            <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center border-r border-slate-200 last:border-r-0">Heart Rate</TableHead>
+            <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center border-r border-slate-200 last:border-r-0">Resp Rate</TableHead>
+            <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center border-r border-slate-200 last:border-r-0">Height</TableHead>
+            <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center border-r border-slate-200 last:border-r-0">Weight</TableHead>
+            <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center">BMI</TableHead>
+        </TableRow>
+    </TableHeader>
+);
+
+const VALUE_CELLS = 7;
+const MOBILE_TILES = 9;
+
+// Mirrors a loaded reading: measurement row + notes/badges sub-row on desktop, the
+// date header / vitals grid / clinical note card on mobile.
+const VitalsHistorySkeleton = () => (
+    <div role="status" aria-label="Loading vital signs history">
+        <div className="overflow-x-auto hidden lg:block rounded-xl border border-slate-200">
+            <Table>
+                <VitalsTableHeader />
+                <TableBody>
+                    {Array.from({ length: 3 }, (_, i) => (
+                        <React.Fragment key={i}>
+                            <TableRow className="border-t-2 border-slate-200/90 bg-white">
+                                <TableCell className="py-3.5 px-4 border-r border-slate-100">
+                                    <div className="flex flex-col gap-0.5">
+                                        <SkeletonText textClassName="text-xs" className="h-2.5 w-20" />
+                                        <SkeletonText textClassName="text-[11px]" className="h-2.5 w-12" />
+                                    </div>
+                                </TableCell>
+                                {Array.from({ length: VALUE_CELLS }, (_, j) => (
+                                    <TableCell key={j} className={`py-3.5 px-4 text-center ${j < VALUE_CELLS - 1 ? "border-r border-slate-100" : ""}`}>
+                                        <SkeletonText textClassName="justify-center" className="h-3.5 w-10" />
+                                        <SkeletonText textClassName="text-[10px] justify-center" className="h-2 w-8" />
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                            <TableRow className="border-b border-slate-200 bg-slate-50/50">
+                                <TableCell colSpan={8} className="py-2.5 px-4">
+                                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 bg-white p-3.5 rounded-lg border border-slate-200/80">
+                                        <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                                            <Skeleton className="mt-0.5 h-[22px] w-[22px] shrink-0" />
+                                            <div className="flex flex-col flex-1 min-w-0">
+                                                <SkeletonText textClassName="text-[11px]" className="h-2.5 w-24" />
+                                                <SkeletonText textClassName="text-xs mt-1 leading-relaxed" className="h-2.5 w-72" />
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-2 shrink-0 md:pt-0.5">
+                                            {["w-20", "w-20", "w-28"].map((w, j) => (
+                                                <SkeletonBox key={j} className={`px-2.5 py-1 rounded-full text-xs border border-transparent ${w}`} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        </React.Fragment>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
+        <div className="lg:hidden flex flex-col gap-4">
+            {Array.from({ length: 2 }, (_, i) => (
+                <div key={i} className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+                    <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
+                        <div className="flex items-center gap-2">
+                            <Skeleton className="h-3.5 w-3.5" />
+                            <SkeletonText textClassName="text-xs" className="h-2.5 w-20" />
+                            <SkeletonBox className="text-xs px-2 py-0.5 rounded-md border border-transparent w-14 bg-white" />
+                        </div>
+                        <SkeletonBox className="text-[11px] px-2 py-0.5 rounded-full border border-transparent w-24 bg-white" />
+                    </div>
+                    <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {Array.from({ length: MOBILE_TILES }, (_, j) => (
+                            <div key={j} className="bg-slate-50/80 p-2.5 rounded-lg border border-slate-100 flex flex-col">
+                                <SkeletonText textClassName="text-[10px]" className="h-2 w-20" />
+                                <SkeletonText textClassName="text-sm mt-0.5" className="h-3.5 w-16" />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="px-4 py-3 bg-slate-50 border-t border-slate-200 flex flex-col gap-1">
+                        <div className="flex items-center gap-1.5 text-xs">
+                            <Skeleton className="h-[13px] w-[13px] shrink-0" />
+                            <SkeletonText className="h-2.5 w-20" />
+                        </div>
+                        <SkeletonText textClassName="text-xs mt-1 leading-relaxed" className="h-2.5 w-56" />
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+);
 
 const getPainBadgeClass = (score) => {
     const num = parseInt(score, 10);
@@ -15,8 +117,44 @@ const getPainBadgeClass = (score) => {
     return "bg-rose-50 text-rose-700 border-rose-200";
 };
 
-const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
+const VitalSignsHistory = ({ selected, setVitalSignsHistory, embedded = false, stayWindow = null }) => {
     const hin = (selected?.patient_info?.hin || selected?.patient?.hin);
+    const shared = useContext(NursesVitalSignsContext);
+    const { setPatientHin, setCurrentPage: setSharedPage } = shared;
+
+    useEffect(() => {
+        if (hin && !stayWindow) {
+            setPatientHin(hin);
+        }
+        return () => {
+            setPatientHin(null);
+            setSharedPage(1);
+        };
+    }, [hin, stayWindow, setPatientHin, setSharedPage]);
+
+    // One discharged stay: the API can't filter by admission, so fetch everything and filter by the stay's dates
+    const [stayPage, setStayPage] = useState(1);
+    const [staySearch, setStaySearch] = useState("");
+    const debouncedStaySearch = useDebounce(staySearch, 300);
+    const stayQuery = useQuery({
+        queryKey: ["nurse-patient-vitals-all", hin],
+        queryFn: () => fetchAllPatientVitalSigns(hin),
+        enabled: !!hin && !!stayWindow,
+    });
+
+    useEffect(() => {
+        setStayPage(1);
+    }, [debouncedStaySearch, stayWindow?.start, stayWindow?.end]);
+
+    const stayPageSize = 7;
+    const stayVitals = (stayQuery.data || []).filter((v) => {
+        if (!isWithinStay(v.created_at, stayWindow)) return false;
+        const q = debouncedStaySearch.trim().toLowerCase();
+        if (!q) return true;
+        return [v.notes, v.staff_info?.firstname, v.staff_info?.lastname, new Date(v.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })]
+            .some((x) => String(x || "").toLowerCase().includes(q));
+    });
+
     const {
         vitals,
         count,
@@ -25,23 +163,30 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
         totalPages,
         loading,
         isRefreshing,
-        setPatientHin,
         searchQuery,
         setSearchQuery,
-    } = useContext(NursesVitalSignsContext);
+    } = stayWindow
+        ? {
+            vitals: stayVitals.slice((stayPage - 1) * stayPageSize, stayPage * stayPageSize),
+            count: stayVitals.length,
+            currentPage: stayPage,
+            setCurrentPage: setStayPage,
+            totalPages: Math.ceil(stayVitals.length / stayPageSize),
+            loading: stayQuery.isPending,
+            isRefreshing: false,
+            searchQuery: staySearch,
+            setSearchQuery: setStaySearch,
+        }
+        : shared;
 
     useEffect(() => {
-        if (hin) {
-            setPatientHin(hin);
-        }
-        return () => {
-            setPatientHin(null);
-            setCurrentPage(1);
-        };
-    }, [hin, setPatientHin, setCurrentPage]);
+        if (stayQuery.isError) toast.error("Error fetching vitals history");
+    }, [stayQuery.isError]);
 
     return (
-        <div className="bg-white my-5 border border-slate-200 rounded-xl pt-5 lg:pt-8 px-4 lg:px-6 text-sm shadow-xs">
+        <div className={embedded ? "text-sm" : "bg-white my-5 border border-slate-200 rounded-xl pt-5 lg:pt-8 px-4 lg:px-6 text-sm shadow-xs"}>
+            {/* Embedded as a patient-details tab: the tab bar already provides navigation */}
+            {!embedded && (
             <div
                 className="flex justify-start items-center gap-2 cursor-pointer border-b border-slate-200 pb-4 text-slate-700 hover:text-docuhealth-primary transition-colors"
                 onClick={() => setVitalSignsHistory(false)}
@@ -60,6 +205,7 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
                 </svg>
                 <h2 className="text-base font-semibold text-slate-800">Vital Signs History</h2>
             </div>
+            )}
 
             <div className="my-5">
                 <SearchBar
@@ -67,7 +213,7 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
                     onChange={setSearchQuery}
                     placeholder="Search vitals by date, notes, or nurse..."
                 />
-                {isRefreshing && (
+                {isRefreshing && !loading && (
                     <p className="text-xs text-slate-400 mt-2 flex items-center gap-1.5 w-full">
                         <span className="inline-block w-3 h-3 border-2 border-slate-300 border-t-docuhealth-primary rounded-full animate-spin"></span>
                         Searching records...
@@ -77,10 +223,11 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
 
             <div className="my-5">
                 {loading ? (
-                    <div className="flex flex-col justify-center items-center gap-3 py-16 text-slate-500">
-                        <span className="inline-block w-6 h-6 border-2 border-slate-200 border-t-docuhealth-primary rounded-full animate-spin"></span>
-                        <p className="text-sm font-medium">Loading patient's vitals history...</p>
-                    </div>
+                    <>
+                        <VitalsHistorySkeleton />
+                        {/* the loaded list ends with an mt-6 pagination wrapper; keep its spacing */}
+                        <div className="mt-6" />
+                    </>
                 ) : vitals?.length === 0 ? (
                     <div className="flex flex-col justify-center items-center text-center py-16">
                         <svg
@@ -100,7 +247,9 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
                         <h2 className="font-semibold text-slate-800 text-base pb-1">No Vital Signs Records</h2>
                         <div className="max-w-sm text-center">
                             <p className="text-xs text-slate-500 leading-relaxed">
-                                This patient does not have any recorded vital signs yet.
+                                {stayWindow
+                                    ? "No vital signs were recorded during this admission."
+                                    : "This patient does not have any recorded vital signs yet."}
                             </p>
                         </div>
                     </div>
@@ -109,18 +258,7 @@ const VitalSignsHistory = ({ selected, setVitalSignsHistory }) => {
                         {/* Desktop Table View */}
                         <div className="overflow-x-auto hidden lg:block rounded-xl border border-slate-200">
                             <Table>
-                                <TableHeader>
-                                    <TableRow className="bg-slate-50/90 text-slate-700 border-b border-slate-200">
-                                        <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase border-r border-slate-200 last:border-r-0">Recorded Date & Time</TableHead>
-                                        <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center border-r border-slate-200 last:border-r-0">Blood Pressure</TableHead>
-                                        <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center border-r border-slate-200 last:border-r-0">Temperature</TableHead>
-                                        <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center border-r border-slate-200 last:border-r-0">Heart Rate</TableHead>
-                                        <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center border-r border-slate-200 last:border-r-0">Resp Rate</TableHead>
-                                        <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center border-r border-slate-200 last:border-r-0">Height</TableHead>
-                                        <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center border-r border-slate-200 last:border-r-0">Weight</TableHead>
-                                        <TableHead className="py-3.5 px-4 font-semibold text-xs tracking-wider uppercase text-center">BMI</TableHead>
-                                    </TableRow>
-                                </TableHeader>
+                                <VitalsTableHeader />
                                 <TableBody>
                                     {vitals?.map((record, index) => (
                                         <React.Fragment key={record.id || record.sqid || index}>

@@ -3,21 +3,34 @@ import PropTypes from "prop-types";
 import { useQuery } from "@tanstack/react-query";
 import { fetchLabProfile } from "../../../queries/Hospital/lab/profile";
 
-export const LabAppContext = createContext();
+export const LabAppContext = createContext({
+  profile: null,
+  isLabAdmin: false,
+  isLoading: false,
+  backgroundImage: null,
+  hospitalName: null,
+  hospitalLogo: null,
+  stats: null,
+  recentPatients: [],
+});
 
 const LabProfileProvider = (props) => {
   const { data, isLoading } = useQuery({
     queryKey: ["lab-dashboard"],
     queryFn:  fetchLabProfile,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
+    staleTime: 60 * 1000,
+    refetchInterval: 60000,
     refetchOnWindowFocus: true,
   });
+
+  const profile = data?.lab_admin ?? data?.lab_scientist ?? null;
+  const isLabAdmin = profile?.role === "lab_admin" || !!data?.lab_admin;
 
   return (
     <LabAppContext.Provider
       value={{
-        profile:         data?.lab_scientist ?? null,
+        profile,
+        isLabAdmin,
         isLoading,
         backgroundImage: data?.theme?.bg_image ?? null,
         hospitalName:    data?.theme?.name ?? null,

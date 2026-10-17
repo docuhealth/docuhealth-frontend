@@ -4,6 +4,7 @@ import type { DrugRecordDetail } from "./drugs";
 
 export interface MedicalRecord {
   id?: string | number;
+  sqid?: string;
   created_at?: string;
   subaccount?: string;
   patient_info?: PatientInfo;
@@ -17,6 +18,7 @@ export interface MedicalRecord {
   drug_records?: DrugRecordDetail[];
   lab_tests_info?: any[];
   lab_tests?: any[];
+  scans_info?: any[];
   care_instructions?: string[];
   treatment_plan?: string[];
   appointment?: AppointmentDetail;

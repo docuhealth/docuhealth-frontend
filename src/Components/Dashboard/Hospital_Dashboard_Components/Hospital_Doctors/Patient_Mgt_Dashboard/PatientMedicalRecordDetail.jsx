@@ -1,7 +1,7 @@
 import React from "react";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { formatFullDateTime, getAge } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
-import { renderDrugRecords, renderLabTests } from "../../../../../utils/soapNoteHelpers";
+import { renderDrugRecords, renderLabTests, renderScans } from "../../../../../utils/soapNoteHelpers";
 import { Image, FileText, Eye, ArrowDownToLine } from "lucide-react";
 import PatientInfoCard from "../../../../ui/PatientInfoCard";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
@@ -157,6 +157,11 @@ const PatientMedicalRecordDetail = ({
         {/* Lab Tests */}
         <div className="mb-5">
           {renderLabTests(selectedMedicalRecord?.lab_tests_info || selectedMedicalRecord?.lab_tests)}
+        </div>
+
+        {/* Scans */}
+        <div className="mb-5">
+          {renderScans(selectedMedicalRecord?.scans_info)}
         </div>
 
         {/* Care Instructions */}

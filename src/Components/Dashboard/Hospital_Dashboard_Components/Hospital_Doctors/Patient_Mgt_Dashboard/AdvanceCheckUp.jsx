@@ -8,7 +8,9 @@ import getTabs, { PatientSOAPNotes } from "./TabDetails2";
 import PatientMedicalRecordDetail from "./PatientMedicalRecordDetail";
 import DoctorDischargeSummaryView from "./DoctorDischargeSummaryView";
 import { useQuery } from "@tanstack/react-query";
+import { usePatientDoctorLabResults } from "../../../../../hooks/usePatientDoctorLabResults";
 import { fetchProgressNotes } from "../../../../../queries/Hospital/doctor/progressNotes";
+import PatientDetailSkeleton from "../../../../ui/PatientDetailSkeleton";
 
 const AdvanceCheckUp = ({
   selected,
@@ -47,7 +49,7 @@ const AdvanceCheckUp = ({
     queryKey: ["patient-med-records", hin, currentPage],
     queryFn: async () => {
       const res = await axiosInstanceHos.get(
-        `api/medical-records/all?patient=${hin}&page=${currentPage}&size=${pageSize}`,
+        `api/doctors/patient/records/${hin}?page=${currentPage}&size=${pageSize}`,
       );
       return res.data;
     },
@@ -72,17 +74,8 @@ const AdvanceCheckUp = ({
     enabled: !!hin,
   });
 
-  const { data: labRecordsData, isLoading: labLoading } = useQuery({
-    queryKey: ["patient-lab-records", hin, labCurrentPage],
-    queryFn: async () => {
-      const res = await axiosInstanceHos.get(
-        `api/lab/test-orders/patient/${hin}?page=${labCurrentPage}&size=${pageSize}`,
-      );
-      return res.data;
-    },
-    enabled: !!hin,
-    keepPreviousData: true,
-  });
+  const labRecordsData = usePatientDoctorLabResults(hin, labCurrentPage, pageSize);
+  const labLoading = labRecordsData.isLoading;
 
   // Discharged patients can drill from "Discharge Summary" into a specific
   // medical record; that record's own detail view already has a complete
@@ -106,7 +99,7 @@ const AdvanceCheckUp = ({
             onClick={() => setDischargedView("tabs")}
           >
             <ArrowLeft className="w-4 h-4 text-gray-800" />
-            <span>{dischargedView === "soap-history" ? "SOAP Note History" : "Discharge Summary"}</span>
+            <span>{dischargedView === "soap-history" ? "Encounter Note History" : "Discharge Summary"}</span>
           </button>
           <div className="pt-5">
             {dischargedView === "soap-history" ? (
@@ -158,10 +151,7 @@ const AdvanceCheckUp = ({
             <span>Patient's Details</span>
           </button>
           {loadingInfo ? (
-            /* Basic Loading State */
-            <div className="flex justify-center items-center gap-3 px-2 py-3">
-              <p className="text-sm text-gray-500 pt-2">Loading patient data...</p>
-            </div>
+            <PatientDetailSkeleton tabs={9} />
           ) : (
             <>
               <div className="py-5 border-b">

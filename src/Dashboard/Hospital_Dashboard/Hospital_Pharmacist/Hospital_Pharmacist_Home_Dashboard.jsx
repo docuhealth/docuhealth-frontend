@@ -34,8 +34,8 @@ const Hospital_Pharmacist_Home_Dashboard = () => {
     queryKey: ["pharmacist-trend-metrics", trendFilter],
     queryFn: fetchPharmacistTrend,
     enabled: isUserLoggedIn,
-    staleTime: 1000 * 5,
-    refetchInterval: 15000,
+    staleTime: 60 * 1000,
+    refetchInterval: 60000,
     refetchOnWindowFocus: true,
   });
 
@@ -103,7 +103,7 @@ const Hospital_Pharmacist_Home_Dashboard = () => {
 
       {/* Chart */}
       <div className="mt-6 w-full">
-        {trendLoading ? (
+        {trendLoading && trendArray.length === 0 ? (
           <ChartLoadingPlaceholder title="Total dispensed drugs" />
         ) : (
           <TotalDispensedDrugsChart

@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatFrequency } from "./careTaskConstants";
 
 export const renderListOrString = (content) => {
     if (!content) return <p>NIL</p>;
@@ -53,9 +54,13 @@ export const renderLabTests = (labTests) => {
       {flatItems.map((labTest, idx) => {
         const testInfo = labTest.test_info;
         const resultInfo = labTest.result_info;
-        const resultParams = resultInfo?.parameters || [];
+        const resultParams = resultInfo?.parameters_info || [];
         const isCompleted = labTest.status === "completed" || labTest.status === "accepted" || labTest.status === "result_ready" || labTest.status === "approved";
-        const hasResults = resultParams.length > 0;
+        // Values only show once the lab admin has approved; before that the result is still under lab review
+        const labAdminApproved = ["lab_admin_approved", "accepted", "approved"].includes(resultInfo?.status);
+        const awaitingLabAdmin = resultInfo?.status === "pending";
+        const sentBack = ["lab_admin_rejected", "rejected"].includes(resultInfo?.status);
+        const hasResults = resultParams.length > 0 && labAdminApproved;
         
         return (
           <div key={idx} className="w-full">
@@ -179,7 +184,9 @@ export const renderLabTests = (labTests) => {
             ) : (
                <div className="bg-white border border-dashed border-gray-200 rounded-2xl p-8 text-center flex flex-col items-center justify-center gap-2">
                  <p className="text-[13px] font-semibold text-gray-500">
-                   {labTest.status === "rejected" ? "Lab result was rejected." : 
+                   {labTest.status === "rejected" ? "Lab result was rejected." :
+                     awaitingLabAdmin ? "Lab result is awaiting lab admin approval." :
+                     sentBack ? "Lab result was sent back to the lab and is being redone." :
                      (labTest.status === "result_ready" && !resultInfo ? "Lab result is ready, but yet to be approved by a doctor." :
                      (isCompleted ? "Lab result is ready." : "Lab result is pending..."))}
                  </p>
@@ -192,6 +199,92 @@ export const renderLabTests = (labTests) => {
             )}
           </div>
         )
+      })}
+    </div>
+  );
+};
+
+// `scans_info`: scan orders from the note's consultation. `result_info` stays null until the doctor accepts the result.
+export const renderScans = (scansInfo) => {
+  if (!Array.isArray(scansInfo) || scansInfo.length === 0) return null;
+
+  const scanItems = scansInfo.flatMap((order) => order.items_info || []);
+  if (scanItems.length === 0) return null;
+
+  const resultSection = (label, value) => {
+    const lines = Array.isArray(value) ? value.filter(Boolean) : value ? [value] : [];
+    if (lines.length === 0) return null;
+    return (
+      <div>
+        <p className="text-[12px] text-gray-500 mb-1 uppercase font-semibold">{label}</p>
+        {lines.length === 1 ? (
+          <p className="text-[13px] font-medium text-gray-800 whitespace-pre-line leading-relaxed">{lines[0]}</p>
+        ) : (
+          <ul className="list-disc pl-5 space-y-1 text-[13px] font-medium text-gray-800">
+            {lines.map((line, i) => <li key={i}>{line}</li>)}
+          </ul>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="my-8 flex flex-col gap-8">
+      {scanItems.map((item, idx) => {
+        const result = item.result_info;
+        const isCompleted = item.status === "completed";
+        return (
+          <div key={item.sqid || idx} className="w-full">
+            <div className="flex justify-between items-center mb-4">
+              <p className="text-[16px] font-bold text-docuhealth-dark">{item.scan_info?.name || "Scan"}</p>
+              <span className={`text-[10px] px-3 py-1.5 rounded-md border font-bold uppercase tracking-wider ${
+                isCompleted ? 'bg-green-50 text-green-600 border-green-100' :
+                item.status === 'rejected' ? 'bg-red-50 text-red-500 border-red-100' :
+                'bg-yellow-50 text-yellow-600 border-yellow-100'
+              }`}>
+                {item.status?.replace(/_/g, ' ')}
+              </span>
+            </div>
+
+            {result ? (
+              <div className="bg-white border border-gray-200 rounded-xl px-5 py-5 flex flex-col gap-4">
+                {resultSection("Clinical indication", result.clinical_indication)}
+                {resultSection("Findings", result.findings)}
+                {resultSection("Impression", result.impression)}
+                {resultSection("Recommendation", result.recommendation)}
+                {resultSection("Comment", result.extra_comment)}
+                {result.attachments?.length > 0 && (
+                  <div>
+                    <p className="text-[12px] text-gray-500 mb-1 uppercase font-semibold">Attachments</p>
+                    <ul className="space-y-1 text-[13px]">
+                      {result.attachments.map((file, i) => (
+                        <li key={i}>
+                          <a href={file.url} target="_blank" rel="noreferrer" className="text-docuhealth-primary hover:underline">
+                            {file.filename || `Attachment ${i + 1}`}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {(result.reporter_name || result.reported_at) && (
+                  <p className="text-[11px] text-gray-400">
+                    Reported{result.reporter_name ? ` by ${result.reporter_name}` : ""}
+                    {result.reported_at ? ` on ${new Date(result.reported_at).toLocaleString()}` : ""}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="bg-white border border-dashed border-gray-200 rounded-2xl p-8 text-center">
+                <p className="text-[13px] font-semibold text-gray-500">
+                  {item.status === "rejected"
+                    ? `Scan was rejected${item.rejection_reason ? `: ${item.rejection_reason}` : "."}`
+                    : "Scan result is pending..."}
+                </p>
+              </div>
+            )}
+          </div>
+        );
       })}
     </div>
   );
@@ -212,8 +305,8 @@ export const renderDrugRecords = (drugOrdersInfo) => {
   }
 
   // Support both new `drug_orders_info` structure and old `drug_records` flat array.
-  const flatDrugs = drugOrdersInfo[0]?.drugs 
-    ? drugOrdersInfo.flatMap(order => order.drugs || [])
+  const flatDrugs = drugOrdersInfo[0]?.drugs_info 
+    ? drugOrdersInfo.flatMap(order => order.drugs_info || [])
     : drugOrdersInfo;
 
   if (flatDrugs.length === 0) {
@@ -257,9 +350,7 @@ export const renderDrugRecords = (drugOrdersInfo) => {
                   <td className="py-3 text-gray-600">{drug.route || "Oral"}</td>
                   <td className="py-3 text-gray-600">{drug.quantity}</td>
                   <td className="py-3 text-gray-600">
-                    {typeof drug.frequency === 'object'
-                      ? `${drug.frequency.value || ''} ( ${drug.frequency.rate || ''} )`
-                      : drug.frequency || "N/A"}
+                    {formatFrequency(drug.frequency, "N/A")}
                   </td>
                   <td className="py-3 text-gray-600">
                     {typeof drug.duration === 'object'

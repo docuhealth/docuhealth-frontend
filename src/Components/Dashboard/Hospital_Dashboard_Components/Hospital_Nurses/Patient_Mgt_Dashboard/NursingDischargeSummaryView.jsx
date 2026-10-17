@@ -125,9 +125,9 @@ const OutpatientDischargeSummary = ({ row, fallbackPatient }) => {
             </p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Discharged by</p>
+            <p className="text-xs text-gray-500 mb-1">Closed by</p>
             <p className="font-medium text-sm text-gray-800">
-              {staffLabel(row?.discharged_by) || "Closed automatically"}
+              {staffLabel(row?.closed_by_info) || "Closed automatically"}
             </p>
           </div>
         </div>
@@ -231,9 +231,11 @@ const NursingDischargeSummaryView = ({
   const age = dob ? Math.floor((new Date() - new Date(dob)) / 31557600000) : null;
   const gender = patient?.gender || initialPatient?.gender;
 
+  // discharged-patients renamed `admitted_by` to `admitted_by_info`.
+  const admittedBy = data?.admitted_by_info || data?.admitted_by;
   const primaryDoctor =
-    data?.admitted_by
-      ? staffLabel(data.admitted_by)
+    admittedBy
+      ? staffLabel(admittedBy)
       : targetRow?.requested_by_info
         ? `Dr. ${targetRow.requested_by_info.firstname ?? ""} ${targetRow.requested_by_info.lastname ?? ""}`.trim()
         : null;
@@ -344,8 +346,8 @@ const NursingDischargeSummaryView = ({
           <div>
             <p className="text-xs text-gray-500 mb-1">Discharged by nurse</p>
             <p className="font-medium text-sm text-gray-800">
-              {nurse.discharged_by
-                ? `${nurse.discharged_by.firstname ?? ""} ${nurse.discharged_by.lastname ?? ""}`.trim()
+              {nurse.discharged_by_info
+                ? `${nurse.discharged_by_info.firstname ?? ""} ${nurse.discharged_by_info.lastname ?? ""}`.trim()
                 : "—"}
             </p>
             {providerInfo && (
@@ -361,10 +363,10 @@ const NursingDischargeSummaryView = ({
       </div>
 
       {/* Final discharge vitals */}
-      {nurse.final_vital_signs && (
+      {nurse.final_vital_signs_info && (
         <VitalSignsCard
           title="Final discharge vitals"
-          vitalSigns={nurse.final_vital_signs}
+          vitalSigns={nurse.final_vital_signs_info}
           className="bg-gray-50 rounded-xl border border-gray-100 p-5 mb-6"
         />
       )}
@@ -373,9 +375,9 @@ const NursingDischargeSummaryView = ({
       <Section
         title="Nurse's discharge summary"
         right={
-          nurse.discharged_by && (
+          nurse.discharged_by_info && (
             <span className="text-xs text-gray-500 text-right">
-              {`${nurse.discharged_by.firstname ?? ""} ${nurse.discharged_by.lastname ?? ""}`.trim()}
+              {`${nurse.discharged_by_info.firstname ?? ""} ${nurse.discharged_by_info.lastname ?? ""}`.trim()}
               {nurse.created_at ? ` · ${formatFullDateTime(nurse.created_at)}` : ""}
             </span>
           )

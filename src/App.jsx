@@ -81,6 +81,7 @@ import Hospital_Admin_Patients_Dashboard from "./Dashboard/Hospital_Dashboard/Ho
 import Hospital_Admin_Ward_Management_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Ward_Management_Dashboard";
 import Hospital_Admin_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Messages_Dashboard";
 import Hospital_Admin_Appointments_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Appointments_Dashboard";
+import Hospital_Admin_Audit_Logs_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Audit_Logs_Dashboard";
 import Hospital_Admin_Wallet_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Wallet_Dashboard";
 import Hospital_Admin_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Settings_Dashboard";
 import Hospital_Admin_Subscriptions_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Subscriptions_Dashboard";
@@ -133,6 +134,7 @@ import Hospital_Pharmacist_Prescription_Detail_Dashboard from "./Dashboard/Hospi
 
 import Hospital_Lab_Layout from "./Layouts/Hospital_Dashboard_Layout/Hospital_Lab/Hospital_Lab_Layout";
 import Hospital_Lab_Home_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Home_Dashboard";
+import Hospital_Lab_Administration_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Administration_Dashboard";
 import Hospital_Lab_Requests_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Requests_Dashboard";
 import Hospital_Lab_Patients_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Patients_Dashboard";
 import Hospital_Lab_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Settings_Dashboard";
@@ -308,6 +310,25 @@ function App() {
                   <HospitalProtectedRoute>
                     <HospitalAdminProviders>
                       <Hospital_Admin_Appointments_Dashboard />
+                    </HospitalAdminProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-admin-audit-logs-dashboard"
+              element={
+                <HospitalAdminProviders>
+                  <Hospital_Admin_Layout />
+                </HospitalAdminProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalAdminProviders>
+                      <Hospital_Admin_Audit_Logs_Dashboard />
                     </HospitalAdminProviders>
                   </HospitalProtectedRoute>
                 }
@@ -578,6 +599,25 @@ function App() {
                   <HospitalProtectedRoute>
                     <HospitalLabProviders>
                       <Hospital_Lab_Home_Dashboard />
+                    </HospitalLabProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-lab-administration-dashboard"
+              element={
+                <HospitalLabProviders>
+                  <Hospital_Lab_Layout />
+                </HospitalLabProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalLabProviders>
+                      <Hospital_Lab_Administration_Dashboard />
                     </HospitalLabProviders>
                   </HospitalProtectedRoute>
                 }

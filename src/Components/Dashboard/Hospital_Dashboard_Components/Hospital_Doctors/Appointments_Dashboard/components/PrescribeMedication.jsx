@@ -5,7 +5,8 @@ import MedicationSection from "./MedicationSection";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { DoctorAppContext } from "../../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { resolveOrderContext, visitPayload, NO_VISIT_MESSAGE } from "../../../../../../utils/careOrderContext";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import { DEFAULT_FREQUENCY } from "../../../../../../utils/careTaskConstants";
 import Input from "../../../../../ui/Input";
 
@@ -148,9 +149,7 @@ const PrescribeMedication = ({
     },
     onError: (error) => {
       console.error("Prescription error:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to prescribe medication",
-      );
+      toast.error(extractApiErrorMessage(error, "Failed to prescribe medication"));
     },
   });
 
@@ -165,9 +164,15 @@ const PrescribeMedication = ({
       return;
     }
 
+    if (!orderContext.hasVisit) {
+      toast.error(NO_VISIT_MESSAGE);
+      return;
+    }
+
+    // Exactly one of check_in / admission; there is no visit-free order any more.
     const payload = {
       patient: orderContext.hin,
-      order_source: orderContext.orderSource,
+      ...visitPayload(orderContext),
       drugs: validMedications.map(med => {
         let drugData = {};
         if (med.catalog_drug) {
@@ -197,10 +202,6 @@ const PrescribeMedication = ({
         };
       })
     };
-
-    if (orderContext.checkIn) {
-      payload.check_in = orderContext.checkIn;
-    }
 
     mutate(payload);
   };

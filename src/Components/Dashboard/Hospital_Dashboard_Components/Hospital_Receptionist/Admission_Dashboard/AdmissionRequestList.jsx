@@ -2,7 +2,9 @@ import { useContext, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ReceptionistAdmissionRequestContext } from "../../../../../context/HospitalContext/Receptionist/ReceptionistAdmissionRequestContext";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
-import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
+import formatRecordDate, {
+  formatFullDateTime,
+} from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import {
   acceptAdmissionRequest,
   rejectAdmissionRequest,
@@ -10,7 +12,60 @@ import {
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import SearchBar from "../../../../SearchBar/SearchBar";
 import Modal from "../../../../ui/Modal";
+import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
+import HospitalLoader from "../../../../ui/HospitalLoader";
 import toast from "react-hot-toast";
+
+const STATUS_TABS = [
+  { value: "pending", label: "Pending" },
+  { value: "accepted", label: "Accepted" },
+  { value: "rejected", label: "Rejected" },
+];
+
+const EMPTY_TEXT = {
+  pending: "You currently don’t have any admission request.",
+  accepted: "No bed requests have been accepted yet.",
+  rejected: "No bed requests have been rejected yet.",
+};
+
+// Mirrors the loaded markup (search box + request cards) with each text line swapped
+// for a bar of the same line height, so nothing shifts when the requests land.
+const AdmissionRequestsSkeleton = () => (
+  <div role="status" aria-label="Loading admission requests">
+    <div className="mb-4 w-full h-[38px] rounded-md border border-gray-300 bg-white flex items-center pl-3">
+      <Skeleton className="h-4 w-4" />
+      <Skeleton className="h-3 w-36 ml-3" />
+    </div>
+    <div className="my-4 text-[12px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {Array.from({ length: 6 }, (_, i) => (
+        <div key={i} className="border p-3 rounded-xl">
+          <div className="flex justify-between items-center">
+            <SkeletonText className="h-3 w-28" />
+            <SkeletonText className="h-[18px] w-11 rounded-full" />
+          </div>
+          <div className="border-b py-2">
+            <SkeletonText className="h-3 w-28" />
+          </div>
+          <div className="flex items-center gap-1 pt-3">
+            <Skeleton className="h-[15px] w-[15px]" />
+            <SkeletonText className="h-3 w-28" />
+          </div>
+          <div className="flex items-center gap-1 pt-1 pb-3 border-b">
+            <Skeleton className="h-[15px] w-[15px]" />
+            <SkeletonText className="h-3 w-48" />
+          </div>
+          <div className="flex gap-2 mt-3">
+            <Skeleton className="h-9 w-full rounded-full" />
+            <Skeleton className="h-9 w-full rounded-full" />
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const staffName = (s) =>
+  s ? `${s.role === "doctor" ? "Dr. " : ""}${s.firstname} ${s.lastname}` : null;
 
 const AdmissionRequestList = () => {
   const {
@@ -23,6 +78,8 @@ const AdmissionRequestList = () => {
     setCurrentPage,
     searchQuery,
     setSearchQuery,
+    status,
+    setStatus,
   } = useContext(ReceptionistAdmissionRequestContext);
 
   const queryClient = useQueryClient();
@@ -33,7 +90,11 @@ const AdmissionRequestList = () => {
   // Hide a request as soon as it is processed so it cannot be clicked again before the refetch lands.
   const [processedSqids, setProcessedSqids] = useState(() => new Set());
   const markProcessed = (sqid) => setProcessedSqids((prev) => new Set(prev).add(sqid));
-  const visibleRequests = admissionRequests.filter((r) => !processedSqids.has(r.sqid));
+  // Only the pending tab hides them; they belong on the accepted/rejected tabs.
+  const visibleRequests =
+    status === "pending"
+      ? admissionRequests.filter((r) => !processedSqids.has(r.sqid))
+      : admissionRequests;
 
   const admissionMutation = useMutation({
     mutationFn: acceptAdmissionRequest,
@@ -46,7 +107,14 @@ const AdmissionRequestList = () => {
     },
     onError: (err) => {
       console.error("Error admitting patient:", err);
+      // Two doctors can request one bed; once one is accepted the other 400s
+      // and stays pending. Refetch so the list and bed show the current state.
+      queryClient.invalidateQueries({ queryKey: ["hospital-admission-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
       toast.error(extractApiErrorMessage(err, "Error admitting patient"));
+      // A 400 here can mean another request already took the bed; refetch so the list and bed states are current.
+      queryClient.invalidateQueries({ queryKey: ["hospital-admission-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
     },
   });
 
@@ -84,15 +152,36 @@ const AdmissionRequestList = () => {
     rejectMutation.mutate({ sqid: rejecting.sqid, rejection_reason: reason });
   };
 
+  const statusTabs = (
+    <div className="flex gap-4 border-b border-gray-200 mb-4">
+      {STATUS_TABS.map((t) => (
+        <button
+          key={t.value}
+          className={`py-2 px-2 text-sm font-medium border-b-2 cursor-pointer ${
+            status === t.value
+              ? "border-docuhealth-primary text-docuhealth-primary"
+              : "border-transparent text-gray-500 hover:text-gray-700"
+          }`}
+          onClick={() => setStatus(t.value)}
+        >
+          {t.label}
+        </button>
+      ))}
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full text-sm">
-        Loading...
-      </div>
+      <>
+        {statusTabs}
+        <AdmissionRequestsSkeleton />
+      </>
     );
   }
   if (visibleRequests.length === 0 && !searchQuery) {
     return (
+      <>
+      {statusTabs}
       <div className="flex flex-col justify-center items-center text-center  h-full">
         <svg
           width="180"
@@ -152,15 +241,17 @@ const AdmissionRequestList = () => {
         <div className="max-w-md text-center">
           <p className="text-[12px] text-gray-500">
             {" "}
-            You currently don’t have any admission request.
+            {EMPTY_TEXT[status]}
           </p>
         </div>
       </div>
+      </>
     );
   }
 
   return (
     <>
+      {statusTabs}
       <div className="mb-4 w-full">
         <SearchBar
           value={searchQuery}
@@ -189,7 +280,7 @@ const AdmissionRequestList = () => {
             admissionMutation.variables === admissionRequest.sqid;
 
           return (
-            <div key={index} className="border p-3 rounded-xl">
+            <div key={admissionRequest.sqid ?? index} className="border p-3 rounded-xl">
               <div className="flex justify-between items-center">
                 <p>
                   {admissionRequest.patient_info?.firstname}{" "}
@@ -274,8 +365,35 @@ const AdmissionRequestList = () => {
                   </button>
                 </div>
               ) : (
-                <div className="mt-3 py-2 text-center text-gray-500 bg-gray-50 border border-gray-100 rounded-full text-[13px] font-medium capitalize">
-                  {admissionRequest.status}
+                <div className="mt-3 flex flex-col gap-1.5">
+                  <div
+                    className={`py-2 text-center border rounded-full text-[13px] font-medium capitalize ${
+                      admissionRequest.status === "rejected"
+                        ? "text-red-600 bg-red-50 border-red-100"
+                        : "text-docuhealth-green bg-docuhealth-light-green border-transparent"
+                    }`}
+                  >
+                    {admissionRequest.status}
+                  </div>
+                  {/* Requests processed before mid-2026 have no processed_by_info (and some no processed_at). */}
+                  {(admissionRequest.processed_by_info || admissionRequest.processed_at) && (
+                    <p className="text-gray-500">
+                      {staffName(admissionRequest.processed_by_info)
+                        ? `By ${staffName(admissionRequest.processed_by_info)}`
+                        : "Processed"}
+                      {admissionRequest.processed_at
+                        ? ` · ${formatFullDateTime(admissionRequest.processed_at)}`
+                        : ""}
+                    </p>
+                  )}
+                  {admissionRequest.status === "rejected" && (
+                    <p className="text-gray-600">
+                      Reason:{" "}
+                      {admissionRequest.rejection_reason || (
+                        <span className="text-gray-400">No reason recorded</span>
+                      )}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -294,6 +412,7 @@ const AdmissionRequestList = () => {
       )}
 
       <Modal isOpen={Boolean(rejecting)} onClose={closeRejectModal}>
+        {rejectMutation.isPending && <HospitalLoader variant="overlay" label="Rejecting bed request..." />}
         <div className="flex flex-col gap-5">
           <div className="text-center pr-6">
             <h3 className="text-base font-semibold text-gray-900">Reject bed request</h3>

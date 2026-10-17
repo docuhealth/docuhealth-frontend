@@ -1,6 +1,7 @@
 import React from "react";
 import { CalendarDays, User } from "lucide-react";
 import { maskHIN } from "./scanLabResults";
+import Skeleton from "../../../../ui/Skeleton";
 
 // One awaiting-approval result, laid out the same for lab and scan rows. `statusRows` is [{ label, value, className }].
 const ScanLabResultCard = ({ title, badge, patient, statusRows, reporter, dateTime, onOpen }) => (
@@ -49,6 +50,35 @@ const ScanLabResultCard = ({ title, badge, patient, statusRows, reporter, dateTi
     >
       Open
     </button>
+  </div>
+);
+
+// Same box model as the card so the grid doesn't shift when results land.
+export const ScanLabResultCardSkeleton = () => (
+  <div className="bg-white border rounded-xl p-4">
+    <div className="flex justify-between items-center mb-2 gap-2">
+      <Skeleton className="h-4 w-32" />
+      <Skeleton className="h-5 w-20 rounded-full" />
+    </div>
+    <Skeleton className="h-3 w-36 mb-3" />
+    <div className="flex flex-col gap-2 mb-3">
+      <Skeleton className="h-3 w-40" />
+      <Skeleton className="h-3 w-32" />
+    </div>
+    <div className="border-t border-gray-100 my-3"></div>
+    <Skeleton className="h-3 w-28 mb-3" />
+    <Skeleton className="h-3 w-36" />
+    <div className="border-t border-gray-100 my-3"></div>
+    <Skeleton className="h-8 w-full rounded-full" />
+  </div>
+);
+
+// Six placeholder cards in the results grid.
+export const ScanLabResultGridSkeleton = ({ label }) => (
+  <div role="status" aria-label={label} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+    {Array.from({ length: 6 }, (_, i) => (
+      <ScanLabResultCardSkeleton key={i} />
+    ))}
   </div>
 );
 

@@ -19,26 +19,31 @@ import {
   ArrowDownToLine,
   ArrowLeft,
 } from "lucide-react";
-import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../../utils/soapNoteHelpers";
+import { renderListOrString, renderLabTests, renderDrugRecords, renderScans } from "../../../../../utils/soapNoteHelpers";
 import {
   formatFullDate,
   formatTime,
 } from "../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
 import toast from "react-hot-toast";
-import Hospital_Lab_Test_Detail_Dashboard from "../../../../../Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Test_Detail_Dashboard";
 import PatientInfoCard from "../../../../ui/PatientInfoCard";
 import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 import SoapClinicalDetailsCard from "../../../../ui/SoapClinicalDetailsCard";
-import SoapNoteEntry from "../Appointments_Dashboard/components/SoapNoteEntry";
+import SoapAdditionalNotesCard from "../../../../ui/SoapAdditionalNotesCard";
 import Input from "../../../../ui/Input";
 import PatientHandoverTab from "./PatientHandoverTab";
 import DoctorIssuedTasksHistory from "./DoctorIssuedTasksHistory";
 import PatientRadiologyRecords from "./PatientRadiologyRecords";
 import PatientMedicationHistory from "./PatientMedicationHistory";
+import AdmissionNotesHistory from "../../Hospital_Nurses/Patient_Mgt_Dashboard/AdmissionNotesHistory";
+import EncounterRecordsTimeline from "../../../../ui/EncounterRecordsTimeline";
 import EmptyState from "../../../../ui/EmptyState";
 import { createProgressNote } from "../../../../../queries/Hospital/doctor/progressNotes";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
+import CardGridSkeleton from "../../../../ui/CardGridSkeleton";
+import PatientLabRecords from "./PatientLabRecords";
+import RecordRowsSkeleton from "../../../../ui/RecordRowsSkeleton";
+import { formatFrequency } from "../../../../../utils/careTaskConstants";
 
 export const PatientInfo = ({ patientFullInfo, selected }) => {
   console.log(selected);
@@ -128,9 +133,7 @@ export const PatientInfo = ({ patientFullInfo, selected }) => {
               <div className="flex justify-between mt-2">
                 <p>Frequency:</p>
                 <p className="text-right font-medium">
-                  {drug.frequency
-                    ? `${drug.frequency.value}× ${drug.frequency.rate}`
-                    : "NIL"}
+                  {formatFrequency(drug.frequency, "NIL")}
                 </p>
               </div>
 
@@ -174,11 +177,7 @@ export const PatientMedicalRecord = ({
 
   console.log(patientMedRecords)
   if (medloading) {
-    return (
-      <div className="flex justify-center items-center h-full text-sm pt-10">
-        Loading...
-      </div>
-    );
+    return <CardGridSkeleton label="Loading medical records" className="pt-4" />;
   }
 
   if (!patientMedRecords || patientMedRecords.length === 0) {
@@ -255,7 +254,7 @@ export const PatientMedicalRecord = ({
         <>
           <div className=" -4 text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {patientMedRecords.map((record) => (
-              <div key={record.id} className="bg-docuhealth-bg-light border rounded-lg p-4">
+              <div key={record.sqid || record.id} className="bg-docuhealth-bg-light border rounded-lg p-4">
                 <div className="flex justify-between items-center ">
                   <div className="flex items-center gap-1">
                     <svg
@@ -401,8 +400,6 @@ export const PatientSOAPNotes = ({
   setSoapCurrentPage,
   selected
 }) => {
-  const [showSoapEntryForm, setShowSoapEntryForm] = useState(false);
-
   // These are declared unconditionally (before any early return below) so
   // the hook count stays stable across renders — see Rules of Hooks.
   const [seePatientDetails, setSeePatientDetails] = useState(false);
@@ -416,12 +413,12 @@ export const PatientSOAPNotes = ({
     setOpenPopover(openPopover === index ? null : index);
   };
 
-  const selectedPatientDetails = patientSoapNotes?.find(soapNote => soapNote.id === selectedNoteId);
+  const selectedPatientDetails = patientSoapNotes?.find(soapNote => (soapNote.sqid || soapNote.id) === selectedNoteId);
   const queryClient = useQueryClient()
 
   const { mutate, isPending } = useMutation({
     mutationFn: (payload) =>
-      axiosInstanceHos.post("api/medical-records/soap-note/additional-notes", payload),
+      axiosInstanceHos.post("api/records/soap-note/additional-notes", payload),
     onSuccess: () => {
       toast.success("Additional Note created successfully !");
 
@@ -441,7 +438,7 @@ export const PatientSOAPNotes = ({
     onError: (error) => {
       console.error("Upload error:", error);
       toast.error(
-        error.response?.data?.message || "Failed to create additional note",
+        extractApiErrorMessage(error, "Failed to create additional note"),
       );
     },
   });
@@ -452,45 +449,26 @@ export const PatientSOAPNotes = ({
       return
     }
 
+    // additional-notes takes the SOAP note sqid; a numeric id is refused.
     const payload = {
-      soap_note: selectedPatientDetails.id,
+      soap_note: selectedPatientDetails.sqid,
       note: noteDescription
     }
 
     mutate(payload)
   }
 
-  if (showSoapEntryForm) {
-    return (
-      <SoapNoteEntry
-        setSoapNoteEntry={setShowSoapEntryForm}
-        selectedPatientDetails={selected}
-      />
-    );
-  }
-
   if (soapNotesLoading) {
     return (
-      <div className="flex justify-center items-center h-full text-sm pt-10">
-        Loading...
-      </div>
+      <>
+        <RecordRowsSkeleton label="Loading encounter notes" tiles={4} />
+      </>
     );
   }
 
   if (!patientSoapNotes || patientSoapNotes.length === 0) {
     return (
       <>
-        {
-          !selected.discharge_date && (
-            <div className="flex justify-end my-5">
-              <button className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
-                onClick={() => setShowSoapEntryForm(true)}
-              >
-                Create new SOAP Note
-              </button>
-            </div>
-          )
-        }
         <div className="flex flex-col justify-center items-center text-center  h-full">
           <svg
             width="200"
@@ -546,11 +524,11 @@ export const PatientSOAPNotes = ({
             </defs>
           </svg>
 
-          <h2 className="font-medium pb-1">No soap notes!</h2>
+          <h2 className="font-medium pb-1">No encounter notes!</h2>
           <div className="max-w-md text-center">
             <p className="text-[12px] text-gray-500">
               {" "}
-              This patient does not have any soap notes
+              This patient does not have any encounter notes
             </p>
           </div>
         </div>
@@ -581,7 +559,7 @@ export const PatientSOAPNotes = ({
                 />
               </svg>
 
-              <span className=" text-sm">SOAP Note Overview</span>
+              <span className=" text-sm">Encounter Note Overview</span>
             </button>
             <div className=" flex flex-col sm:flex-row justify-end items-center gap-3 w-full sm:w-auto">
               <button type="button" className="flex justify-center items-center gap-1 border border-docuhealth-primary py-1.5 px-4 rounded-full w-full sm:w-auto text-docuhealth-primary cursor-pointer" onClick={() => setCreateAdditionalNotes(true)}>
@@ -653,7 +631,6 @@ export const PatientSOAPNotes = ({
             drugHistoryAllergies={selectedPatientDetails?.drug_history_allergies}
             problemsList={selectedPatientDetails?.problems_list}
             patientEducation={selectedPatientDetails?.patient_education}
-            additionalNotes={selectedPatientDetails?.additional_notes}
           />
 
           {/* 6. Uploaded Documents / Images */}
@@ -751,7 +728,11 @@ export const PatientSOAPNotes = ({
             </div>
           </div>
 
+          <SoapAdditionalNotesCard additionalNotes={selectedPatientDetails?.additional_notes} />
+
           {renderLabTests(selectedPatientDetails?.lab_tests_info)}
+
+          {renderScans(selectedPatientDetails?.scans_info)}
 
           {/* 7. Follow Up / Appointment — appointment_info was removed from
               the SOAP note response; only render this if it's actually
@@ -825,17 +806,6 @@ export const PatientSOAPNotes = ({
         </div>
       ) : (
         <>
-          {
-            !selected.discharge_date && (
-              <div className="flex justify-end">
-                <button className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
-                  onClick={() => setShowSoapEntryForm(true)}
-                >
-                  Create new SOAP Note
-                </button>
-              </div>
-            )
-          }
 
 
           {Array.isArray(patientSoapNotes) && patientSoapNotes.length > 0 ? (
@@ -844,7 +814,7 @@ export const PatientSOAPNotes = ({
                 <div className="hidden lg:block">
                   {patientSoapNotes.map((soapNote, index) => (
                     <div
-                      key={soapNote.id}
+                      key={soapNote.sqid || soapNote.id}
                       className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10 "
                     >
                       <div className="flex items-center gap-3">
@@ -909,12 +879,12 @@ export const PatientSOAPNotes = ({
 
                         <button
                           type="button"
-                          aria-label="SOAP note actions"
+                          aria-label="Encounter note actions"
                           aria-haspopup="true"
                           aria-expanded={openPopover === index}
                           onClick={() => {
                             togglePopover(index);
-                            setSelectedNoteId(soapNote.id);
+                            setSelectedNoteId(soapNote.sqid || soapNote.id);
                           }}
                           className={` hidden h-8 w-9 lg:flex justify-center items-center rounded-full cursor-pointer
         ${openPopover === index ? "bg-slate-300" : "hover:bg-gray-200"}
@@ -936,12 +906,12 @@ export const PatientSOAPNotes = ({
                               type="button"
                               className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
-                                setSelectedNoteId(soapNote.id);
+                                setSelectedNoteId(soapNote.sqid || soapNote.id);
                                 setSeePatientDetails(true);
                                 setOpenPopover(null);
                               }}
                             >
-                              See full SOAP Note
+                              See full Encounter Note
                             </button>
                           </div>
                         )}
@@ -954,7 +924,7 @@ export const PatientSOAPNotes = ({
               <div className="block lg:hidden space-y-4 px-1">
                 {patientSoapNotes.map((soapNote, index) => (
                   <div
-                    key={soapNote.id}
+                    key={soapNote.sqid || soapNote.id}
                     className="bg-white border border-gray-200 rounded-lg p-4"
                   >
                     <div className="flex justify-between items-start mb-4">
@@ -971,7 +941,7 @@ export const PatientSOAPNotes = ({
                         <button
                           onClick={() => {
                             togglePopover(index);
-                            setSelectedNoteId(soapNote.id);
+                            setSelectedNoteId(soapNote.sqid || soapNote.id);
                           }}
                           className={`h-9 w-9 flex items-center justify-center rounded-full ${openPopover === index ? "bg-slate-200" : "bg-gray-50"}`}
                         >
@@ -993,12 +963,12 @@ export const PatientSOAPNotes = ({
                               type="button"
                               className="w-full text-left text-[12px] text-gray-700 hover:bg-gray-200 p-2 rounded-sm cursor-pointer"
                               onClick={() => {
-                                setSelectedNoteId(soapNote.id);
+                                setSelectedNoteId(soapNote.sqid || soapNote.id);
                                 setSeePatientDetails(true);
                                 setOpenPopover(null);
                               }}
                             >
-                              See full SOAP Note
+                              See full Encounter Note
                             </button>
                           </div>
                         )}
@@ -1053,7 +1023,7 @@ export const PatientSOAPNotes = ({
               />
             </>
           ) : (
-            <p className="text-center">No soap notes found.</p>
+            <p className="text-center">No encounter notes found.</p>
           )}
         </>
       )}
@@ -1118,183 +1088,41 @@ export const PatientSOAPNotes = ({
   );
 };
 
-const PatientLabRecords = ({
-  patientLabRecords,
-  count,
-  currentPage,
-  totalPages,
-  setCurrentPage,
-  labloading,
-}) => {
-  const [selectedRecord, setSelectedRecord] = useState(null);
+// Progress notes only carry patient_info (no author/hospital yet), so the shared
+// PatientInfoCard printed NIL for those; author/hospital rows render once sent.
+const ProgressNoteInfoCard = ({ note, fallbackPatient }) => {
+  const patient = note?.patient_info || fallbackPatient || {};
+  const author = note?.staff_info || note?.doctor_info;
+  const hospital = note?.hospital_info;
 
-  if (labloading) {
-    return (
-      <div className="flex justify-center items-center h-full text-sm pt-10">
-        Loading...
-      </div>
-    );
-  }
-
-  if (selectedRecord) {
-    return (
-      <div className="">
-        <Hospital_Lab_Test_Detail_Dashboard 
-          orderIdProp={selectedRecord} 
-          onBackProp={() => setSelectedRecord(null)} 
-          isDoctorView={true} 
-        />
-      </div>
-    );
-  }
-
-  if (!patientLabRecords || patientLabRecords.length === 0) {
-    return (
-      <div className="flex flex-col justify-center items-center text-center  h-full">
-        <svg
-          width="200"
-          height="200"
-          viewBox="0 0 366 366"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <g filter="url(#filter0_d_1501_46523)">
-            <circle cx="183" cy="171" r="159" fill="#DBDBDB" />
-          </g>
-          <circle cx="183" cy="171" r="132" fill="#F6F6F6" />
-          <path
-            d="M183 233.5C148.482 233.5 120.5 205.518 120.5 171C120.5 136.482 148.482 108.5 183 108.5C217.518 108.5 245.5 136.482 245.5 171C245.5 205.518 217.518 233.5 183 233.5ZM183 221C210.614 221 233 198.614 233 171C233 143.386 210.614 121 183 121C155.386 121 133 143.386 133 171C133 198.614 155.386 221 183 221ZM176.75 139.75H189.25V152.25H176.75V139.75ZM176.75 164.75H189.25V202.25H176.75V164.75Z"
-            fill="#929AA3"
-          />
-          <defs>
-            <filter
-              id="filter0_d_1501_46523"
-              x="0"
-              y="0"
-              width="366"
-              height="366"
-              filterUnits="userSpaceOnUse"
-              color-interpolation-filters="sRGB"
-            >
-              <feFlood flood-opacity="0" result="BackgroundImageFix" />
-              <feColorMatrix
-                in="SourceAlpha"
-                type="matrix"
-                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                result="hardAlpha"
-              />
-              <feOffset dy="12" />
-              <feGaussianBlur stdDeviation="12" />
-              <feComposite in2="hardAlpha" operator="out" />
-              <feColorMatrix
-                type="matrix"
-                values="0 0 0 0 0.927885 0 0 0 0 0.927885 0 0 0 0 0.927885 0 0 0 0.15 0"
-              />
-              <feBlend
-                mode="normal"
-                in2="BackgroundImageFix"
-                result="effect1_dropShadow_1501_46523"
-              />
-              <feBlend
-                mode="normal"
-                in="SourceGraphic"
-                in2="effect1_dropShadow_1501_46523"
-                result="shape"
-              />
-            </filter>
-          </defs>
-        </svg>
-
-        <h2 className="font-medium pb-1">No lab results!</h2>
-        <div className="max-w-md text-center">
-          <p className="text-[12px] text-gray-500">
-            {" "}
-            This patient does not have any lab results
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const rows = [
+    ["Patient's HIN", patient.hin],
+    ["Patient's Age", getAge(patient.dob)],
+    ["Patient's Gender", patient.gender],
+    author && ["Written by", `Dr. ${author.firstname} ${author.lastname}`],
+    author?.specialization && ["Specialisation", author.specialization],
+    hospital?.name && ["Hospital", hospital.name],
+    ["Date / Time Uploaded", formatFullDateTime(note?.created_at)],
+  ].filter(Boolean);
 
   return (
-    <>
-      {Array.isArray(patientLabRecords) && patientLabRecords.length > 0 ? (
-        <>
-          <div className=" text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {patientLabRecords.map((record) => (
-              <div key={record.sqid || record.id} className="bg-white border rounded-xl p-4">
-                <div className="flex justify-between items-center mb-1">
-                  <p className="font-bold text-docuhealth-dark text-[15px]">
-                    {record?.patient_info?.firstname} {record?.patient_info?.lastname}
-                  </p>
-                  <div className="bg-docuhealth-primary-muted px-3 py-1 rounded-full">
-                    <p className="text-docuhealth-primary text-[11px] font-medium">
-                      Lab result
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5 mb-3">
-                  <div className="flex items-center gap-1">
-                    <p className="text-gray-400 text-xs">Test Order Status: </p>
-                    <p className="text-docuhealth-green text-xs font-semibold capitalize">{record?.status || "Ready"}</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <p className="text-gray-400 text-xs">Approval Status: </p>
-                    <p className={`text-xs font-semibold capitalize ${
-                      record?.result_info?.status === 'approved' || record?.result_info?.status === 'accepted' ? 'text-docuhealth-green' : 
-                      record?.result_info?.status === 'rejected' ? 'text-red-500' : 
-                      record?.result_info?.status === 'pending' ? 'text-amber-500' : 'text-gray-500'
-                    }`}>
-                      {record?.result_info?.status || "N/A"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="border-t border-gray-100 my-3"></div>
-
-                <div className="flex items-center gap-2 mb-3">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                  <p className="text-gray-500 text-[12px]">
-                    {record?.ordered_by ? `Dr. ${record.ordered_by.firstname} ${record.ordered_by.lastname}` : "Dr. Raphael Jonnas"}
-                  </p>
-                </div>
-
-                <div className="flex items-start gap-2">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500 mt-0.5"><path d="M3 21h18"></path><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path><path d="M10 9h4"></path><path d="M12 7v4"></path></svg>
-                  <p className="text-gray-500 text-[12px] leading-snug">
-                    {record?.hospital_info?.name} Hospital
-                  </p>
-                </div>
-
-                <div className="border-t border-gray-100 my-3"></div>
-
-                <button 
-                  onClick={() => setSelectedRecord(record)}
-                  className="w-full bg-docuhealth-primary hover:bg-docuhealth-dark-primary text-white text-[12px] font-medium py-2 rounded-full transition-colors cursor-pointer"
-                >
-                  Open
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4">
-            <Pagination2
-              count={count}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              setCurrentPage={setCurrentPage}
-            />
-          </div>
-        </>
-      ) : (
-        <p className="text-center">No lab records found.</p>
-      )}
-    </>
+    <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
+      <p className="text-[12px] mb-4">
+        Patient's name :{" "}
+        <span className="font-medium text-sm">
+          {[patient.firstname, patient.lastname].filter(Boolean).join(" ") || "NIL"}
+        </span>
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        {rows.map(([label, value]) => (
+          <p key={label} className="text-[12px]">
+            {label} : <span className="font-medium capitalize">{value || "NIL"}</span>
+          </p>
+        ))}
+      </div>
+    </div>
   );
 };
-
 
 const PROGRESS_NOTE_FORM_FIELDS = [
   { key: "subjective", label: "Subjective", placeholder: "Add note" },
@@ -1473,9 +1301,9 @@ const ProgressNote = ({
             <span className="text-sm">Progress Note Overview</span>
           </button>
 
-          <PatientInfoCard
-            className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg"
-            selectedMedicalRecord={selectedNote}
+          <ProgressNoteInfoCard
+            note={selectedNote}
+            fallbackPatient={patientFullInfo?.patient_info || selected?.patient_info}
           />
 
           <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
@@ -1518,9 +1346,7 @@ const ProgressNote = ({
           )}
 
           {progressNotesLoading ? (
-            <div className="flex justify-center items-center h-full text-sm pt-10">
-              Loading...
-            </div>
+            <RecordRowsSkeleton label="Loading progress notes" />
           ) : notes.length === 0 ? (
             <p className="text-center py-10 text-sm text-gray-500">
               No progress notes found.
@@ -1778,7 +1604,7 @@ const getTabs = ({
     },
     // { ...medRecordsTab, title: "Med Records" },
     {
-      title: "SOAP Notes",
+      title: "Encounter Notes",
       content: (
         <PatientSOAPNotes
           soapNotesLoading={soapNotesLoading}
@@ -1807,6 +1633,16 @@ const getTabs = ({
       ),
     },
     {
+      title: "Admission Note",
+      // The nurse's notes for this patient at this hospital, newest first (doctors can read them).
+      content: (
+        <AdmissionNotesHistory
+          patient={patientFullInfo?.patient_info || selected?.patient_info}
+          patientFullInfo={patientFullInfo}
+        />
+      ),
+    },
+    {
       title: "Handover",
       content: <PatientHandoverTab selected={selected} patientFullInfo={patientFullInfo} />,
     },
@@ -1823,44 +1659,36 @@ const getTabs = ({
     },
     {
       title: "Lab Result",
-      // content: (
-      //   <PatientLabRecords
-      //     labloading={labloading}
-      //     patientLabRecords={patientLabRecords}
-      //     count={labCount}
-      //     currentPage={labCurrentPage}
-      //     totalPages={labTotalPages}
-      //     setCurrentPage={setLabCurrentPage}
-      //   />
-      // ),
       content: (
-        <div className="py-16 text-center">
-          <EmptyState
-            icon="document"
-            title="Coming Soon"
-            description="Lab results will be available soon."
-          />
-        </div>
+        <PatientLabRecords
+          labloading={labloading}
+          patientLabRecords={patientLabRecords}
+          count={labCount}
+          currentPage={labCurrentPage}
+          totalPages={labTotalPages}
+          setCurrentPage={setLabCurrentPage}
+        />
       ),
     },
     {
       title: "Medication History",
-      // content: (
-      //   <PatientMedicationHistory
-      //     patientFullInfo={patientFullInfo}
-      //     patientMedRecords={patientMedRecords}
-      //     patientSoapNotes={patientSoapNotes}
-      //     selected={selected}
-      //   />
-      // ),
+      // `selected` is the admission for admitted patients ("active") and the check-in for outpatients.
       content: (
-        <div className="py-16 text-center">
-          <EmptyState
-            icon="document"
-            title="Coming Soon"
-            description="Medication history will be available soon."
-          />
-        </div>
+        <PatientMedicationHistory
+          patientFullInfo={patientFullInfo}
+          admissionSqid={advanceCheckUpSource === "active" ? selected?.sqid : null}
+        />
+      ),
+    },
+    {
+      title: "Encounter Records",
+      content: (
+        <EncounterRecordsTimeline
+          kind="admission"
+          sqid={selected?.sqid}
+          isOngoing={!selected?.discharge_date}
+          title="Care Record Timeline"
+        />
       ),
     },
   ];

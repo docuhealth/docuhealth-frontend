@@ -4,6 +4,58 @@ import { formatFullDate, formatTime } from '../../../Patient_Dashboard_Component
 import Pagination2 from '../../../Patient_Dashboard_Components/Pagination/Pagination2'
 import SearchBar from '../../../../SearchBar/SearchBar'
 import toast from 'react-hot-toast'
+import Skeleton, { SkeletonText } from '../../../../ui/Skeleton'
+
+const WARD_CELL_WIDTHS = ["w-24", "w-14", "w-20", "w-24", "w-12"];
+
+// Mirrors the loaded markup (search box, 7-column table on desktop, patient cards on
+// mobile) with each text line swapped for a bar of the same line height.
+const WardPatientsSkeleton = () => (
+  <div role="status" aria-label="Loading patients in your ward">
+    <div className="mb-4 w-full h-[38px] rounded-md border border-gray-300 bg-white flex items-center pl-3">
+      <Skeleton className="h-4 w-4" />
+      <Skeleton className="h-3 w-48 ml-3" />
+    </div>
+    <div className="hidden lg:flex flex-col">
+      <div className="h-[60px] bg-gray-100 rounded-md" />
+      {Array.from({ length: 5 }, (_, i) => (
+        <div key={i} className="grid grid-cols-7 items-center text-[12px] border-b border-b-gray-200">
+          <div className="col-span-2 py-6 pl-5 flex items-center gap-1">
+            <Skeleton className="h-3.5 w-3.5 rounded-full" />
+            <SkeletonText className="h-3 w-28" />
+          </div>
+          {WARD_CELL_WIDTHS.map((w, j) => (
+            <SkeletonText key={j} className={`h-3 ${w}`} />
+          ))}
+        </div>
+      ))}
+    </div>
+    <div className="lg:hidden flex flex-col gap-4">
+      {Array.from({ length: 3 }, (_, i) => (
+        <div key={i} className="bg-white border border-gray-200 rounded-md p-4">
+          <div className="flex justify-between items-start border-b border-gray-50 pb-3 mb-3">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <div>
+                <SkeletonText textClassName="text-sm" className="h-3.5 w-32" />
+                <SkeletonText textClassName="text-[11px]" className="h-2.5 w-20" />
+              </div>
+            </div>
+            <Skeleton className="h-[23px] w-14" />
+          </div>
+          <div className="grid grid-cols-2 gap-y-4">
+            {["w-24", "w-16", "w-24", "w-28"].map((w, j) => (
+              <div key={j}>
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-20" />
+                <SkeletonText textClassName="text-[12px]" className={`h-3 ${w}`} />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)
 
 const PatientsAssignedToMyWard = () => {
 
@@ -22,11 +74,7 @@ const PatientsAssignedToMyWard = () => {
   console.log(assignedPatientsToWard)
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-full text-sm">
-        Loading...
-      </div>
-    );
+    return <WardPatientsSkeleton />;
   }
 
   if (assignedPatientsToWard.length === 0 && !searchQuery) {
@@ -158,7 +206,7 @@ const PatientsAssignedToMyWard = () => {
                         {patient?.patient_info?.email || patient?.user?.email ||"NIL"} 
                     </p>
                     <p>
-                        {patient?.patient?.gender || patient?.user?.gender || 'N/A'}
+                        {patient?.patient_info?.gender || patient?.patient?.gender || patient?.user?.gender || 'N/A'}
                     </p>
 
                 </div>

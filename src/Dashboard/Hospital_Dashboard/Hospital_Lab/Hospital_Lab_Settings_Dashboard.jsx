@@ -4,7 +4,7 @@ import Settings from "../../../Components/Dashboard/Hospital_Dashboard_Component
 import { LabAppContext } from "../../../context/HospitalContext/Lab/LabAppContext";
 
 const Hospital_Lab_Settings_Dashboard = () => {
-  const { profile } = useContext(LabAppContext);
+  const { profile } = useContext(LabAppContext) || {};
 
   return (
     <>

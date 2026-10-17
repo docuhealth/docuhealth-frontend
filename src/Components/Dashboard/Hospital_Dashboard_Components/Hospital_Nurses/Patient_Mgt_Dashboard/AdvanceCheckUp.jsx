@@ -3,10 +3,12 @@ import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import AdvanceCheckUpTabComponent from "./AdvanceCheckUpTabComponent";
-import { getAdvanceCheckUpTabs } from "./AdvanceCheckUpTabDetails";
+import { getAdvanceCheckUpTabs, PatientInfoSkeleton, LatestVitalsSkeleton } from "./AdvanceCheckUpTabDetails";
+import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
 import { NursesAdmittedPatientMGTContext } from "../../../../../context/HospitalContext/Nurses/NursesAdmittedPatientMGTContext";
 import Modal from "../../../../ui/Modal";
 import NursingDischargeSummaryView from "./NursingDischargeSummaryView";
+import DischargedPatientRecord from "../../../../ui/DischargedPatientRecord";
 
 const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, loadingAdmission }) => {
   const context = useContext(NursesAdmittedPatientMGTContext);
@@ -14,6 +16,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
   const hin = (selected?.patient_info?.hin || selected?.patient?.hin || selected?.patient_hin);
   const [activeTab, setActiveTab] = useState("info");
   const [showDischargeSummaryModal, setShowDischargeSummaryModal] = useState(false);
+  const [historyScope, setHistoryScope] = useState("stay");
 
   const { data: patientFullInfo, isLoading, isError } = useQuery({
     queryKey: ["patient-info", hin],
@@ -60,6 +63,39 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
     });
   };
 
+  const isDischarged = context?.tab === "inpatient_discharge" ||
+    context?.tab === "outpatient_discharge" ||
+    Boolean(selected?.discharge_date || selected?.closed_at) ||
+    selected?.status === "inpatient_discharge" ||
+    selected?.status === "outpatient_discharge";
+
+  // The patient record loads in the background: the header and tab strip come from the
+  // list row, and only the tabs that read the full record show a skeleton meanwhile.
+  const loadingRecord = isLoading || loadingAdmission;
+  const allTabs = getAdvanceCheckUpTabs(patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail, isOutPatient, setAdvanceCheckUp, historyScope, setHistoryScope);
+  const tabs = loadingRecord
+    ? allTabs.map((t) =>
+        t.status === "info" ? { ...t, content: <PatientInfoSkeleton /> }
+        : t.status === "latest_vitals" ? { ...t, content: <LatestVitalsSkeleton /> }
+        : t)
+    : allTabs;
+
+  if (isDischarged) {
+    // DischargedPatientRecord fetches the same patient record itself (shared query), so
+    // like the doctor view it opens straight away; only wait while the row is unknown.
+    if (loadingAdmission) {
+      return <PatientInfoSkeleton />;
+    }
+    return (
+      <DischargedPatientRecord
+        patient={patient}
+        admission={admission}
+        isOutPatient={isOutPatient}
+        onBack={() => setAdvanceCheckUp(false)}
+      />
+    );
+  }
+
   return (
     <div>
       {showDischargeSummaryModal ? (
@@ -95,10 +131,10 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
         </>
       ) : (
         <>
-          <div className="mb-6">
+          <div className="border-b pb-3">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div
-                className="flex items-center gap-2 cursor-pointer text-gray-800 hover:text-black font-semibold text-[17px] shrink-0 whitespace-nowrap"
+                className="flex items-center gap-1 cursor-pointer shrink-0 whitespace-nowrap"
                 onClick={() => {
                   setAdvanceCheckUp(false);
                 }}
@@ -115,7 +151,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
                     fill="currentColor"
                   />
                 </svg>
-                <p>Patient's details</p>
+                <span>Patient's Details</span>
               </div>
               {(context?.tab === "inpatient_discharge" ||
                 context?.tab === "outpatient_discharge" ||
@@ -133,23 +169,27 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
             </div>
           </div>
 
-      {isLoading || loadingAdmission ? (
-        <div className="flex justify-center items-center py-20">
-          <p className="text-sm text-gray-500">Loading patient data...</p>
-        </div>
-      ) : (
-        <>
+      <>
           {/* Header Profile */}
-          <div className="flex items-center border-b pb-6 mb-6">
-            <div className="w-16 h-16 rounded-full bg-gray-200 text-gray-600 flex justify-center items-center text-2xl font-medium shrink-0">
+          {!patient?.firstname && loadingRecord ? (
+            <div role="status" aria-label="Loading patient" className="flex items-center py-5 border-b">
+              <Skeleton className="w-14 h-14 rounded-full shrink-0" />
+              <div className="ml-2">
+                <SkeletonText textClassName="text-sm" className="h-3.5 w-32" />
+                <SkeletonText textClassName="text-[12px]" className="h-3 w-14" />
+              </div>
+            </div>
+          ) : (
+          <div className="flex items-center py-5 border-b">
+            <div className="w-14 h-14 rounded-full bg-gray-300 flex justify-center items-center text-xl font-semibold shrink-0">
               {`${patient?.firstname?.[0] ?? ""}${patient?.lastname?.[0] ?? ""}`.toUpperCase()}
             </div>
-            <div className="ml-4 flex flex-col">
-              <h2 className="text-xl font-semibold text-gray-900">
+            <div className="ml-2 flex flex-col items-start">
+              <p className="text-sm font-medium">
                 {patient?.firstname} {patient?.lastname}
-              </h2>
-              <div className="flex items-center gap-2 mt-1">
-                <p className="text-sm text-gray-500 font-medium">patient</p>
+              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-[12px] text-gray-500">patient</p>
                 {(selected?.patient_info?.payment_provider?.type || patientFullInfo?.patient_info?.payment_provider?.type) && (
                   <span className="text-[10px] font-bold uppercase bg-docuhealth-light-green text-docuhealth-green px-2 py-0.5 rounded-full">
                     {selected?.patient_info?.payment_provider?.type || patientFullInfo.patient_info.payment_provider.type}
@@ -158,14 +198,14 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
               </div>
             </div>
           </div>
+          )}
 
           <AdvanceCheckUpTabComponent 
-            tabs={getAdvanceCheckUpTabs(patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail, isOutPatient, setAdvanceCheckUp)}
+            tabs={tabs}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
           />
         </>
-      )}
       </>
     )}
     </div>

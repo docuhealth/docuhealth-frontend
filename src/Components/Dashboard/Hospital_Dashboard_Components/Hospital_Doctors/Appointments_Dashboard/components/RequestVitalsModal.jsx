@@ -3,6 +3,8 @@ import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
+import HospitalLoader from "../../../../../ui/HospitalLoader";
 
 /**
  * Standalone "Vitals" flow opened directly from the OtherMedicalServicesFab
@@ -78,36 +80,22 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
         "Error assigning patient to nurse for vitals checkup:",
         err,
       );
-      const data = err.response?.data;
-      let errorMsg = "Nurse vitals checkUp failed.";
-      if (data) {
-        if (data.detail && typeof data.detail === "string") {
-          errorMsg = data.detail;
-        } else if (data.message && typeof data.message === "string") {
-          errorMsg = data.message;
-        } else if (typeof data === "object") {
-          const firstKey = Object.keys(data)[0];
-          if (firstKey) {
-            const firstVal = data[firstKey];
-            errorMsg = Array.isArray(firstVal) ? `${firstKey}: ${firstVal[0]}` : `${firstKey}: ${firstVal}`;
-          }
-        }
-      }
-      toast.error(errorMsg);
+      // Errors arrive as lists under `detail` or a field (e.g. `check_in: ["This consultation is not yours."]`).
+      toast.error(extractApiErrorMessage(err, "Nurse vitals checkUp failed."));
     },
   });
 
   const handleSubmitRequest = () => {
     const orderCtx = resolveOrderContext(selectedPatientDetails);
     const hin = orderCtx.hin || selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin || selectedPatientDetails?.patient_hin;
+    // A vitals request always needs a check-in now; appointments are no longer a visit.
     const checkInSqid = orderCtx.checkIn || selectedPatientDetails?.check_in_sqid || selectedPatientDetails?.check_in;
-    const appointmentSqid = (!checkInSqid ? (orderCtx.appointment || selectedPatientDetails?.appointment_sqid || selectedPatientDetails?.appointment) : null);
 
     const payload = {
       patient_hin: hin,
       note: formData.note?.trim(),
       ...(selectedStaffId ? { staff: selectedStaffId } : {}),
-      ...(checkInSqid ? { check_in: checkInSqid } : (appointmentSqid ? { appointment: appointmentSqid } : {})),
+      ...(checkInSqid ? { check_in: checkInSqid } : {}),
     };
 
     if (!payload.patient_hin) {
@@ -115,8 +103,8 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
       return;
     }
 
-    if (!payload.check_in && !payload.appointment) {
-      toast.error("Could not resolve check-in or appointment for this patient.");
+    if (!payload.check_in) {
+      toast.error("A vitals request needs a check-in. Check the patient in first.");
       return;
     }
 
@@ -149,30 +137,12 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
           </div>
         </div>
       ) : loadingStaff ? (
-        <div className="bg-white rounded-lg shadow-lg p-10 max-w-md w-full flex items-center justify-center">
-          <svg
-            className="animate-spin h-6 w-6 text-docuhealth-primary"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            ></path>
-          </svg>
+        <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+          <HospitalLoader label="Loading nurses..." />
         </div>
       ) : selectedStaffId || generalRequest ? (
         <div className="bg-white rounded-lg shadow-lg p-5 max-w-md w-full relative text-sm">
+          {isPending && <HospitalLoader variant="overlay" label="Sending vitals request..." />}
           <div className="flex justify-end">
             <button
               onClick={onClose}

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { FlaskConical, Building2, CalendarClock } from "lucide-react";
+import Skeleton from "../../../ui/Skeleton";
 
 const getPatientName = (order) => {
   const p = order.patient_info;
@@ -45,46 +46,46 @@ const LabOrderCard = ({ order, badge, activeTab }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-4">
-      <div className="flex justify-between items-start">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs border border-indigo-100 uppercase">
-            {getPatientName(order).charAt(0)}
+    <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-4 justify-between h-full shadow-xs hover:shadow-sm transition-shadow">
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between items-start">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs border border-indigo-100 uppercase">
+              {getPatientName(order).charAt(0)}
+            </div>
+            <div>
+               <p className="text-[10px] text-slate-400 uppercase font-bold">
+                  Patient
+               </p>
+               <p className="text-sm font-semibold text-slate-800">
+                  {getPatientName(order)}
+               </p>
+            </div>
           </div>
-          <div>
-             <p className="text-[10px] text-slate-400 uppercase font-bold">
-                Patient
-             </p>
-             <p className="text-sm font-semibold text-slate-800">
-                {getPatientName(order)}
-             </p>
-          </div>
-        </div>
-        <span className={`text-[10px] font-semibold px-2 py-1 rounded-full whitespace-nowrap shrink-0 ${badge.cls}`}>
-          {badge.label}
-        </span>
-      </div>
-
-      <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-50">
-          <div>
-            <p className="text-[10px] text-slate-400 uppercase font-medium">HIN</p>
-            <p className="text-[13px] text-slate-600">{getHIN(order)}</p>
-          </div>
-          <div>
-            <p className="text-[10px] text-slate-400 uppercase font-medium">Date / Time</p>
-            <p className="text-[13px] text-slate-600">{getDatetime(order)}</p>
-          </div>
+          <span className={`text-[10px] font-semibold px-2 py-1 rounded-full whitespace-nowrap shrink-0 ${badge.cls}`}>
+            {badge.label}
+          </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-[10px] text-slate-400 uppercase font-medium">Test</p>
-            <p className="text-[13px] text-slate-600 truncate" title={getTestName(order)}>{getTestName(order)}</p>
-          </div>
-          <div>
-            <p className="text-[10px] text-slate-400 uppercase font-medium">Hospital</p>
-            <p className="text-[13px] text-slate-600 truncate" title={getHospital(order)}>{getHospital(order)}</p>
+        <div className="space-y-3">
+          {/* Test gets the full width so names are not cut off; date/time gets its own row so the time never breaks */}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3 pt-2 border-t border-slate-50">
+            <div className="col-span-2 min-w-0">
+              <p className="text-[10px] text-slate-400 uppercase font-medium">Test</p>
+              <p className="text-[13px] font-medium text-slate-700 line-clamp-2 break-words" title={getTestName(order)}>{getTestName(order)}</p>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] text-slate-400 uppercase font-medium">HIN</p>
+              <p className="text-[13px] text-slate-600 whitespace-nowrap">{getHIN(order)}</p>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] text-slate-400 uppercase font-medium">Hospital</p>
+              <p className="text-[13px] text-slate-600 truncate" title={getHospital(order)}>{getHospital(order)}</p>
+            </div>
+            <div className="col-span-2">
+              <p className="text-[10px] text-slate-400 uppercase font-medium">Date / Time</p>
+              <p className="text-[13px] text-slate-600">{getDatetime(order)}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -98,12 +99,39 @@ const LabOrderCard = ({ order, badge, activeTab }) => {
             },
           })
         }
-        className="mt-2 w-full border border-docuhealth-primary text-docuhealth-primary text-xs font-medium py-2 rounded-full hover:bg-indigo-50 transition-colors"
+        className="mt-2 w-full border border-docuhealth-primary text-docuhealth-primary text-xs font-medium py-2 rounded-full hover:bg-indigo-50 transition-colors cursor-pointer"
       >
         View details
       </button>
     </div>
   );
 };
+
+export const LabOrderCardSkeleton = () => (
+  <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-4 justify-between h-full shadow-xs">
+    <div className="flex flex-col gap-4">
+      <div className="flex justify-between items-start">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+          <div className="space-y-1.5">
+            <Skeleton className="h-2.5 w-12" />
+            <Skeleton className="h-4 w-28" />
+          </div>
+        </div>
+        <Skeleton className="h-5 w-20 rounded-full" />
+      </div>
+      {/* Mirrors the card: test (full row), HIN + hospital, date/time (full row) */}
+      <div className="grid grid-cols-2 gap-x-4 gap-y-3 border-t border-gray-100 pt-3">
+        {[["col-span-2", "w-40"], ["", "w-20"], ["", "w-24"], ["col-span-2", "w-36"]].map(([span, w], i) => (
+          <div key={i} className={`${span} space-y-1.5`}>
+            <Skeleton className="h-2.5 w-10" />
+            <Skeleton className={`h-3.5 ${w}`} />
+          </div>
+        ))}
+      </div>
+    </div>
+    <Skeleton className="h-9 w-full rounded-full mt-2" />
+  </div>
+);
 
 export default LabOrderCard;

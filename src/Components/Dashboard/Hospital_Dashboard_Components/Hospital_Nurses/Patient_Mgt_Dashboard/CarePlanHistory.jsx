@@ -1,11 +1,60 @@
 import React, { useState, useEffect } from "react";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
-import { Loader2, Calendar, Clock, User } from "lucide-react";
+import { Calendar, Clock, User } from "lucide-react";
 import CarePlanDetail from "./CarePlanDetail";
 import AddCarePlanForm from "./AddCarePlanForm";
+import EmptyState from "../../../../ui/EmptyState";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
+import Skeleton, { SkeletonText, SkeletonBox } from "../../../../ui/Skeleton";
 
-const CarePlanHistory = ({ patient, patientFullInfo }) => {
+// Mirrors the loaded rows (date/time/patient tiles + kebab on desktop, cards on mobile).
+const CarePlanRowsSkeleton = () => (
+  <div role="status" aria-label="Loading care plans">
+    <div className="hidden lg:block">
+      {Array.from({ length: 3 }, (_, i) => (
+        <div key={i} className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10">
+          {["w-28", "w-16", "w-28"].map((w, j) => (
+            <div key={j} className="flex items-center gap-3">
+              <Skeleton className="h-8 w-8" />
+              <div>
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-20" />
+                <SkeletonText textClassName="text-sm" className={`h-3.5 ${w}`} />
+              </div>
+            </div>
+          ))}
+          <Skeleton className="ml-auto h-9 w-9 rounded-full" />
+        </div>
+      ))}
+    </div>
+    <div className="block lg:hidden space-y-4 my-4">
+      {Array.from({ length: 2 }, (_, i) => (
+        <div key={i} className="bg-white border border-gray-200 rounded-md p-4">
+          <div className="flex items-center gap-2 pb-3 border-b border-gray-50 mb-3">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <div>
+              <SkeletonText textClassName="text-[10px]" className="h-2 w-28" />
+              <SkeletonText textClassName="text-sm" className="h-3.5 w-44" />
+            </div>
+          </div>
+          <div className="space-y-3 mb-4">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <div>
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-12" />
+                <SkeletonText textClassName="text-[13px]" className="h-3 w-28" />
+              </div>
+            </div>
+          </div>
+          <SkeletonBox className="w-full border border-transparent rounded-full py-2.5 text-[13px]" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// activeAdmissionSqid: care plans can only be written against an active admission, so adding is hidden without one.
+const CarePlanHistory = ({ patient, patientFullInfo, activeAdmissionSqid }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [view, setView] = useState("list"); // 'list', 'detail', 'add'
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -37,12 +86,13 @@ const CarePlanHistory = ({ patient, patientFullInfo }) => {
   }, [patientHin]);
 
   const handleUpload = async (formData) => {
-    if (!patientHin) return;
+    if (!patientHin || !activeAdmissionSqid) return;
     setIsSubmitting(true);
     try {
       const payload = {
         ...formData,
-        patient: patientHin
+        patient: patientHin,
+        admission: activeAdmissionSqid,
       };
       await axiosInstanceHos.post(`api/nurses/care-plans`, payload);
       toast.success("Care plan added successfully");
@@ -50,7 +100,7 @@ const CarePlanHistory = ({ patient, patientFullInfo }) => {
       setView("list");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to add care plan");
+      toast.error(extractApiErrorMessage(err, "Failed to add care plan"));
     } finally {
       setIsSubmitting(false);
     }
@@ -106,7 +156,7 @@ const CarePlanHistory = ({ patient, patientFullInfo }) => {
     );
   }
 
-  if (view === "add") {
+  if (view === "add" && activeAdmissionSqid) {
     return (
       <AddCarePlanForm 
         onBack={() => setView("list")}
@@ -122,12 +172,14 @@ const CarePlanHistory = ({ patient, patientFullInfo }) => {
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8 gap-4 md:gap-0">
         <h2 className="text-xl font-semibold text-gray-800">Care plan history</h2>
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-          <button 
-            onClick={() => setView("add")}
-            className="w-full sm:w-auto text-docuhealth-primary border border-docuhealth-primary font-medium rounded-full px-5 py-2 text-sm hover:bg-blue-50 transition-colors"
-          >
-            Add new care plan
-          </button>
+          {activeAdmissionSqid && (
+            <button 
+              onClick={() => setView("add")}
+              className="w-full sm:w-auto text-docuhealth-primary border border-docuhealth-primary font-medium rounded-full px-5 py-2 text-sm hover:bg-blue-50 transition-colors"
+            >
+              Add new care plan
+            </button>
+          )}
           <button className="w-full sm:w-auto flex justify-center items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-black whitespace-nowrap">
             Filter 
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -140,12 +192,13 @@ const CarePlanHistory = ({ patient, patientFullInfo }) => {
       {/* List */}
       <div className="space-y-4">
         {loading ? (
-          <div className="flex justify-center items-center py-10">
-            <Loader2 className="w-6 h-6 animate-spin text-docuhealth-primary" />
-          </div>
+          <CarePlanRowsSkeleton />
         ) : plans.length === 0 ? (
-          <div className="py-10 text-center text-gray-500 text-sm">
-            No care plans found.
+          <div className="py-10">
+            <EmptyState
+              title="No care plans"
+              description="No care plans have been recorded for this patient yet."
+            />
           </div>
         ) : (
           <>

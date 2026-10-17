@@ -3,6 +3,7 @@ import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import TabComponent from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/TabComponent";
 import getTabs from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/TabDetails";
 import AdvanceCheckUp from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/AdvanceCheckUp";
+import DischargedPatientRecord from "../../../Components/ui/DischargedPatientRecord";
 import OtherMedicalServicesFab from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/OtherMedicalServicesFab";
 import TransferToAnotherWard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/TransferToAnotherWard";
 import InpatientDischargeSummary from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Patient_Mgt_Dashboard/InpatientDischargeSummary";
@@ -10,9 +11,12 @@ import SoapNoteEntry from "../../../Components/Dashboard/Hospital_Dashboard_Comp
 import PrescribeMedication from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PrescribeMedication";
 import PatientInfo from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/PatientInfo";
 import RequestAdmission from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/RequestAdmission";
+import ReferOutModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Appointments_Dashboard/components/ReferOutModal";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useContext } from "react";
 import { DoctorsAdmittedPatientMGTContext } from "../../../context/HospitalContext/Doctors/DoctorsAdmittedPatientMGTContext";
+import { useCheckInOwnership } from "../../../hooks/useCheckInOwnership";
+import { resolveOrderContext } from "../../../utils/careOrderContext";
 
 const Hospital_Doctors_Patients_Dashboard = () => {
   const [advanceCheckUp, setAdvanceCheckUp] = useState(false);
@@ -39,6 +43,8 @@ const Hospital_Doctors_Patients_Dashboard = () => {
   const [prescribeMedication, setPrescribeMedication] = useState(false);
   const [transferRequest, setTransferRequest] = useState(false);
   const [requestAdmission, setRequestAdmission] = useState(false);
+  // Refer-out works from both the check-in (outpatient) and the admission screens.
+  const [referOut, setReferOut] = useState(false);
 
   const [soapNoteEntry, setSoapNoteEntry] = useState(false);
 
@@ -51,10 +57,14 @@ const Hospital_Doctors_Patients_Dashboard = () => {
   // is opened so it doesn't carry over between patients.
   const [dischargedView, setDischargedView] = useState("tabs");
 
-  // Tab title the outpatient details view should open on. Set to "SOAP Notes"
+  // Tab title the outpatient details view should open on. Set to "Encounter Notes"
   // right after a SOAP note is created so the doctor lands on their new note;
   // cleared whenever a different patient is opened.
   const [outpatientDetailsTab, setOutpatientDetailsTab] = useState(null);
+
+  const outpatientCheckIn =
+    advanceCheckUp && advanceCheckUpSource === "outpatient" ? resolveOrderContext(selected).checkIn : null;
+  const { isOtherDoctors, ownerName } = useCheckInOwnership(outpatientCheckIn);
 
   useEffect(() => {
     setDischargedView("tabs");
@@ -73,6 +83,14 @@ const Hospital_Doctors_Patients_Dashboard = () => {
             setDischargePatient={setDischargePatient}
           />
         </>
+      ) : advanceCheckUp && advanceCheckUpSource === "discharged" ? (
+        <div className="my-5 text-sm">
+          <DischargedPatientRecord
+            key={selected?.sqid}
+            admission={selected}
+            onBack={() => setAdvanceCheckUp(false)}
+          />
+        </div>
       ) : advanceCheckUp ? (
         <>
           <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start gap-3 lg:gap-0 lg:items-center">
@@ -89,13 +107,21 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                   className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
                   onClick={() => setDischargedView("soap-history")}
                 >
-                  View soap note history
+                  View encounter note history
                 </button>
               </div>
             ) : (
               !selected.discharge_date && (
                 <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
-                  {advanceCheckUpSource === "outpatient" ? (
+                  {advanceCheckUpSource === "outpatient" && isOtherDoctors ? (
+                    <span
+                      className="inline-flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-full text-gray-500 border border-gray-200 bg-gray-50 select-none w-full lg:w-auto"
+                      title="Only the doctor running this consultation can add an encounter note, order, request vitals or a bed, or refer out."
+                    >
+                      <i className="bx bx-user-check text-base"></i>
+                      {ownerName || "Another doctor"} is running this consultation
+                    </span>
+                  ) : advanceCheckUpSource === "outpatient" ? (
                     <>
                       {selected?.admission_request_status === "pending" ||
                       selected?.admission_request_status === "confirmed" ? (
@@ -117,17 +143,32 @@ const Hospital_Doctors_Patients_Dashboard = () => {
                         </button>
                       )}
                       <button
+                        className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                        onClick={() => setReferOut(true)}
+                      >
+                        Refer out
+                      </button>
+                      <button
                         className="py-2.5 px-10 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white cursor-pointer w-full lg:w-auto"
                         onClick={() => {
                           setSoapNoteEntry(true);
                           setAdvanceCheckUp(false);
                         }}
                       >
-                        Add new SOAP Note
+                        Add new Encounter Note
                       </button>
                     </>
                   ) : (
                     <>
+                      {/* Refer-out is refused once the doctor discharge is recorded. */}
+                      {selected?.status !== "awaiting_nurse_discharge" && (
+                        <button
+                          className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
+                          onClick={() => setReferOut(true)}
+                        >
+                          Refer out
+                        </button>
+                      )}
                       <button
                         className="py-2.5 px-10 rounded-full text-docuhealth-primary border border-docuhealth-primary cursor-pointer w-full lg:w-auto"
                         onClick={() => {
@@ -173,6 +214,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
               admissionSqid={
                 advanceCheckUpSource === "outpatient" ? null : selected?.sqid
               }
+              admissionStatus={selected?.status}
               onOrderPharmacy={() => {
                 setPrescribeMedication(true);
                 setAdvanceCheckUp(false);
@@ -215,6 +257,10 @@ const Hospital_Doctors_Patients_Dashboard = () => {
               }
             />
           )}
+
+          {referOut && (
+            <ReferOutModal patientRecord={selected} onClose={() => setReferOut(false)} />
+          )}
         </>
       ) : soapNoteEntry ? (
         <>
@@ -232,7 +278,7 @@ const Hospital_Doctors_Patients_Dashboard = () => {
               // on the SOAP Notes tab so the doctor sees their new note.
               setSoapNoteEntry(false);
               setAdvanceCheckUp(true);
-              setOutpatientDetailsTab("SOAP Notes");
+              setOutpatientDetailsTab("Encounter Notes");
             }}
           />
         </>

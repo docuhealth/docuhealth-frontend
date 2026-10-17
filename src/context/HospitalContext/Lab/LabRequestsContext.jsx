@@ -1,16 +1,17 @@
 import React, { useState, useEffect, createContext } from "react";
 import PropTypes from "prop-types";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchLabRequests, fetchTestCategories } from "../../../queries/Hospital/lab/requests";
 
 export const LabRequestsContext = createContext();
 
 const TAB_STATUS_MAP = {
   "Pending Test": "pending",
-  "Sample Collected": "sample_collected",
   "In-progress": "in_progress",
+  "Sample Collected": "sample_collected",
   "Result Ready": "result_ready",
   "Rejected test": "rejected",
+  "Result Approval": "result_ready",
 };
 
 const LabRequestsProvider = (props) => {
@@ -27,9 +28,10 @@ const LabRequestsProvider = (props) => {
   const statusFilter = TAB_STATUS_MAP[activeTab];
 
   const { data, isLoading } = useQuery({
-    queryKey: ["lab-requests", statusFilter, currentPage, searchQuery, selectedCategory, ordering],
+    queryKey: ["lab-requests", statusFilter, currentPage, searchQuery, selectedCategory, ordering, activeTab],
     queryFn:  fetchLabRequests,
-    placeholderData: keepPreviousData,
+    placeholderData: (previousData, previousQuery) =>
+      previousQuery?.queryKey?.[6] === activeTab ? previousData : undefined,
   });
 
   const { data: categoriesData } = useQuery({

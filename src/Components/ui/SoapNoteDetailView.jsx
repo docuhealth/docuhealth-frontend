@@ -4,10 +4,12 @@ import { Image, FileText, Eye, ArrowDownToLine } from "lucide-react";
 import PatientInfoCard from "./PatientInfoCard";
 import VitalSignsCard from "./VitalSignsCard";
 import SoapClinicalDetailsCard from "./SoapClinicalDetailsCard";
+import SoapAdditionalNotesCard from "./SoapAdditionalNotesCard";
 import {
   renderListOrString,
   renderLabTests,
   renderDrugRecords,
+  renderScans,
 } from "../../utils/soapNoteHelpers";
 import { formatFullDateTime } from "../Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 
@@ -47,7 +49,6 @@ const SoapNoteDetailView = ({ soapNote }) => {
         drugHistoryAllergies={soapNote?.drug_history_allergies}
         problemsList={soapNote?.problems_list}
         patientEducation={soapNote?.patient_education}
-        additionalNotes={soapNote?.additional_notes}
       />
 
       {/* Uploaded Documents / Images */}
@@ -134,7 +135,11 @@ const SoapNoteDetailView = ({ soapNote }) => {
         </div>
       </div>
 
+      <SoapAdditionalNotesCard additionalNotes={soapNote?.additional_notes} />
+
       {renderLabTests(soapNote?.lab_tests_info)}
+
+      {renderScans(soapNote?.scans_info)}
 
       {/* Follow Up / Next appointment — note the field is `next_appointment_info`
           on the current API, not `appointment_info` (TabDetails2.jsx /

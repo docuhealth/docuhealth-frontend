@@ -7,6 +7,57 @@ import { NursesAdmittedPatientMGTContext } from "../../../../../context/Hospital
 import SearchBar from "../../../../SearchBar/SearchBar";
 import Modal from "../../../../ui/Modal";
 import Button from "../../../../ui/Button";
+import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
+
+const DETAIL_LINE_WIDTHS = ["w-28", "w-36", "w-12", "w-40"];
+
+// Mirrors the loaded markup (search box + patient cards) with each text line swapped
+// for a bar of the same line height. Admitted/discharged cards have 4 icon rows
+// (doctor, ward, bed, date); outpatient cards have phone + date. `buttonClass` is the
+// card button's height, which differs per tab. `flexColumn` matches the discharged
+// tab, whose flex-col wrapper keeps the search box and grid margins from collapsing.
+const PatientCardGridSkeleton = ({ label, outpatient = false, admittedLine = false, buttonClass = "h-9", flexColumn = false }) => (
+  <div role="status" aria-label={label} className={flexColumn ? "flex flex-col" : ""}>
+    <div className="mb-4 h-[38px] rounded-md border border-gray-300 bg-white flex items-center pl-3">
+      <Skeleton className="h-4 w-4" />
+      <Skeleton className="h-3 w-40 ml-3" />
+    </div>
+    <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {Array.from({ length: 6 }, (_, i) => (
+        <div key={i} className="border p-3 rounded-xl">
+          <div className="flex justify-between items-center">
+            <SkeletonText className="h-3 w-28" />
+            <SkeletonText className="h-[18px] w-14 rounded-full" />
+          </div>
+          <div className="border-b py-2">
+            <SkeletonText className="h-3 w-28" />
+            {admittedLine && <SkeletonText textClassName="pt-1" className="h-3 w-32" />}
+          </div>
+          {outpatient ? (
+            <>
+              <div className="flex items-center gap-1 pt-3">
+                <i className="bx bx-phone text-[15px] text-gray-200"></i>
+                <SkeletonText className="h-3 w-24" />
+              </div>
+              <div className="flex items-center gap-1 pt-1 pb-3 border-b">
+                <Skeleton className="h-[15px] w-[15px]" />
+                <SkeletonText className="h-3 w-40" />
+              </div>
+            </>
+          ) : (
+            DETAIL_LINE_WIDTHS.map((w, j) => (
+              <div key={w} className={`flex items-center gap-1 ${j === 0 ? "pt-3" : "pt-1"} ${j === 3 ? "pb-3 border-b" : ""}`}>
+                <Skeleton className="h-[15px] w-[15px]" />
+                <SkeletonText className={`h-3 ${w}`} />
+              </div>
+            ))
+          )}
+          <Skeleton className={`mt-3 w-full rounded-full ${buttonClass}`} />
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 
 const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected }) => {
@@ -35,11 +86,7 @@ const AdmittedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected })
     }, [admittedPatients]);
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-full text-sm">
-                Loading...
-            </div>
-        );
+        return <PatientCardGridSkeleton label="Loading admitted patients" buttonClass="h-[38px]" />;
     }
 
     if (admittedPatients.length === 0 && !searchQuery) {
@@ -303,11 +350,7 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
     }, [admittedPatients]);
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-full text-sm">
-                Loading...
-            </div>
-        );
+        return <PatientCardGridSkeleton label="Loading discharged patients" admittedLine flexColumn />;
     }
 
     if (admittedPatients.length === 0 && !searchQuery) {
@@ -444,13 +487,16 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
                                     />
                                 </svg>
                                 <p className="">
-                                    {admittedPatient?.discharged_by
-                                        ? `Discharged by ${admittedPatient.discharged_by.role === "doctor" ? "Dr. " : ""}${admittedPatient.discharged_by.firstname} ${admittedPatient.discharged_by.lastname}`
-                                        : admittedPatient?.requested_by_info
-                                            ? `Dr. ${admittedPatient.requested_by_info.firstname} ${admittedPatient.requested_by_info.lastname}`
-                                            : "Unassigned Staff"}
+                                    {admittedPatient?.discharged_by_info
+                                        ? `Discharged by ${admittedPatient.discharged_by_info.role === "doctor" ? "Dr. " : ""}${admittedPatient.discharged_by_info.firstname} ${admittedPatient.discharged_by_info.lastname}`
+                                        : admittedPatient?.closed_by_info
+                                            ? `Closed by ${admittedPatient.closed_by_info.role === "doctor" ? "Dr. " : ""}${admittedPatient.closed_by_info.firstname} ${admittedPatient.closed_by_info.lastname}`
+                                            : admittedPatient?.closed_at
+                                                ? "Encounter closed"
+                                                : "Unassigned Staff"}
                                 </p>
                             </div>
+                            {admittedPatient?.discharge_date && (<>
                             <div className="flex items-center gap-1 text-gray-600 pt-1 ">
                                 <svg width="15" height="15" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M4.66634 11.666V8.16602H9.33301V11.666H11.083V2.33268H2.91634V11.666H4.66634ZM5.83301 11.666H8.16634V9.33268H5.83301V11.666ZM12.2497 11.666H13.4163V12.8327H0.583008V11.666H1.74967V1.74935C1.74967 1.42719 2.01084 1.16602 2.33301 1.16602H11.6663C11.9885 1.16602 12.2497 1.42719 12.2497 1.74935V11.666ZM6.41634 4.66602V3.49935H7.58301V4.66602H8.74967V5.83268H7.58301V6.99935H6.41634V5.83268H5.24967V4.66602H6.41634Z" fill="var(--color-docuhealth-dark)" />
@@ -478,6 +524,7 @@ const DischargedPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected 
                                         : "Unassigned Bed"}
                                 </p>
                             </div>
+                            </>)}
                             <div className="flex items-center gap-1 text-gray-600 pt-1 pb-3 border-b">
                                 <svg width="15" height="15" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M4.08366 1.7487V0.582031H5.25033V1.7487H8.75033V0.582031H9.91699V1.7487H12.2503C12.5725 1.7487 12.8337 2.00987 12.8337 2.33203V5.2487H11.667V2.91536H9.91699V4.08203H8.75033V2.91536H5.25033V4.08203H4.08366V2.91536H2.33366V11.082H5.83366V12.2487H1.75033C1.42816 12.2487 1.16699 11.9875 1.16699 11.6654V2.33203C1.16699 2.00987 1.42816 1.7487 1.75033 1.7487H4.08366ZM9.91699 6.9987C8.62835 6.9987 7.58366 8.04339 7.58366 9.33203C7.58366 10.6207 8.62835 11.6654 9.91699 11.6654C11.2056 11.6654 12.2503 10.6207 12.2503 9.33203C12.2503 8.04339 11.2056 6.9987 9.91699 6.9987ZM6.41699 9.33203C6.41699 7.39904 7.984 5.83203 9.91699 5.83203C11.85 5.83203 13.417 7.39904 13.417 9.33203C13.417 11.265 11.85 12.832 9.91699 12.832C7.984 12.832 6.41699 11.265 6.41699 9.33203ZM9.33366 7.58203V9.57365L10.6712 10.9112L11.4961 10.0862L10.5003 9.09041V7.58203H9.33366Z" fill="var(--color-docuhealth-dark)" />
@@ -532,11 +579,7 @@ const OutPatientsTab = ({ advanceCheckUp, setAdvanceCheckUp, setSelected }) => {
     }, [outPatients]);
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-full text-sm">
-                Loading...
-            </div>
-        );
+        return <PatientCardGridSkeleton label="Loading outpatients" outpatient buttonClass="h-10" />;
     }
 
     if (outPatients.length === 0 && !searchQuery) {

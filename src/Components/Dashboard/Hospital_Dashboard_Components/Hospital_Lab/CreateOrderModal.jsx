@@ -1,14 +1,19 @@
 import { useState } from "react";
 import { X } from "lucide-react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { fetchTestCategories, fetchLabTests, createLabTestOrder } from "../../../../queries/Hospital/lab/requests";
 import { extractApiErrorMessage } from "../../../../utils/apiError";
 import axiosInstanceHos from "../../../../lib/axios/hospital";
 import Button from "../../../ui/Button";
 import Modal from "../../../ui/Modal";
+import { resolveOrderContext, visitPayload } from "../../../../utils/careOrderContext";
 
-const CreateOrderModal = ({ isOpen, onClose, patientHin }) => {
+// visitSource is the record the order is for; lab orders need a check-in or admission, which an appointment is not
+const CreateOrderModal = ({ isOpen, onClose, patientHin, visitSource }) => {
+  const queryClient = useQueryClient();
+  const orderContext = resolveOrderContext(visitSource);
+  const missingVisit = !orderContext.hasVisit;
   const [showSuccess, setShowSuccess] = useState(false);
   const [isTestTypeDropdownOpen, setIsTestTypeDropdownOpen] = useState(false);
   const [form, setForm] = useState({ category: "", test_type: [], note: "" });
@@ -34,11 +39,8 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: (payload) => {
       const requestPayload = {
-        patient: patientHin,
-        // `POST api/lab/test-orders/create` requires `order_source` and the
-        // line-items key is `items` (not `items_data`). This modal is opened
-        // from a lab appointment row, so the order is fulfilling that request.
-        order_source: "staff_appointment_order",
+        patient: patientHin || orderContext.hin,
+        ...visitPayload(orderContext),
         items: payload.test_type.map((testSqid) => ({
           test: testSqid,
           note: payload.note,
@@ -47,15 +49,16 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin }) => {
       if (payload.ignore_duplicate_warning) {
         requestPayload.ignore_duplicate_warning = true;
       }
-      // Note: the `appointment` field has been removed from the lab order
-      // serializer — this modal is only ever given a bare patientHin by
-      // its caller, so there's nothing here to link an order to.
       return createLabTestOrder(requestPayload);
     },
     onSuccess: () => {
       setForm({ category: "", test_type: [], note: "", ignore_duplicate_warning: false });
       setDuplicateWarning(null);
       setShowSuccess(true);
+      queryClient.invalidateQueries({ queryKey: ["lab-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["lab-appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-lab-records"] });
     },
     onError: (err) => {
       if (err.response?.status === 400 && err.response?.data?.duplicate_warning) {
@@ -67,6 +70,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin }) => {
   });
 
   const handleSubmit = () => {
+    if (missingVisit) return;
     if (!form.category || form.test_type.length === 0) {
       toast.error("Please select a category and at least one test type.");
       return;
@@ -102,7 +106,7 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin }) => {
             </div>
           </div>
           <p className="text-base font-semibold text-gray-800 mb-6 leading-snug">
-            You have successfully created/<br />accepted a patient&apos;s test request!
+            Lab test order created
           </p>
           <Button onClick={handleClose} fullWidth>
             Done
@@ -176,7 +180,8 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin }) => {
                 <svg className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${isTestTypeDropdownOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
               </button>
               {isTestTypeDropdownOpen && fetchedTestTypes.length > 0 && (
-                <div className="absolute top-full mt-2 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto overflow-x-hidden">
+                                <div className="mt-2 bg-white border border-gray-200 rounded-lg max-h-60 overflow-y-auto overflow-x-hidden">
+                  {/* Inline, not floating: a floating list covered the Proceed button and never closed on its own */}
                   {fetchedTestTypes.map((test, index) => {
                     const id = test.sqid || test.name;
                     const checked = form.test_type.includes(id);
@@ -209,14 +214,16 @@ const CreateOrderModal = ({ isOpen, onClose, patientHin }) => {
             <textarea
               value={form.note}
               onChange={(e) => setForm({ ...form, note: e.target.value })}
-              placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
-              className="border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-500 bg-white outline-none focus:border-docuhealth-primary transition-colors resize-none h-28"
+              placeholder="Optional: anything the lab should know about this order"
+              className="border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-docuhealth-primary transition-colors resize-none h-28"
             />
           </div>
 
+          {missingVisit && <p className="-mt-3 text-[12px] text-red-500">Lab tests can only be ordered for a checked-in or admitted patient. Ask the reception desk to check this patient in.</p>}
+
           <Button
             onClick={handleSubmit}
-            disabled={isPending}
+            disabled={isPending || missingVisit}
             loading={isPending}
             loadingText="Creating..."
             fullWidth

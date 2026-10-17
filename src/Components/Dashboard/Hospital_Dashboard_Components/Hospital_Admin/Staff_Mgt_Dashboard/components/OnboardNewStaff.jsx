@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HosAppContext } from "../../../../../../context/HospitalContext/Admin/HosAppContext";
 import { HosWardContext } from "../../../../../../context/HospitalContext/HosWardContext";
 import Modal from "../../../../../ui/Modal";
@@ -13,9 +13,24 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 
-const OnboardNewStaff = ({ setCreateNewStaff }) => {
+const OnboardNewStaff = ({ 
+  setCreateNewStaff, 
+  defaultRole = "", 
+  lockRole = false 
+}) => {
   const [step, setStep] = useState(1);
   const queryClient = useQueryClient();
+
+  const { data: labAdminData } = useQuery({
+    queryKey: ["hospital-staffs-lab-admin-check"],
+    queryFn: async () => {
+      const res = await axiosInstanceHos.get("api/hospitals/team-members?role=lab_admin");
+      return res.data;
+    },
+    staleTime: 1000 * 30,
+  });
+
+  const hasLabAdmin = (labAdminData?.count || labAdminData?.results?.length || 0) > 0;
 
   const [form, setForm] = useState({
     firstname: "",
@@ -23,15 +38,17 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     phone: "",
     gender: "",
     role: "",
-    personnel: "",
+    personnel: defaultRole || "",
     specialization: "",
     ward: "",
     email: "",
     password: "",
   });
 
-  const { profile } = useContext(HosAppContext);
-  const { wards } = useContext(HosWardContext);
+  const hosAppContext = useContext(HosAppContext);
+  const hosWardContext = useContext(HosWardContext);
+  const profile = hosAppContext?.profile;
+  const wards = hosWardContext?.wards || [];
 
   console.log(wards);
 
@@ -40,16 +57,21 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
   const [passwordStrength, setPasswordStrength] = useState({ strength: 0 });
 
   const personnelOptions = [
-    "doctor",
-    "nurse",
-    "receptionist",
-    "lab_scientist",
-    "pharmacist",
-    "radiologist",
+    { value: "doctor", label: "Doctor" },
+    { value: "nurse", label: "Nurse" },
+    { value: "receptionist", label: "Receptionist" },
+    { value: "pharmacist", label: "Pharmacist" },
+    { value: "lab_scientist", label: "Lab Scientist" },
+    {
+      value: "lab_admin",
+      label: hasLabAdmin ? "Lab Admin (Already assigned)" : "Lab Admin",
+      disabled: hasLabAdmin,
+    },
+    { value: "radiologist", label: "Radiologist" },
   ];
 
   // Personnel types that are not assigned to a ward during staff creation.
-  const noWardRoles = ["receptionist", "lab_scientist", "pharmacist", "radiologist"];
+  const noWardRoles = ["receptionist", "lab_scientist", "lab_admin", "pharmacist", "radiologist"];
 
   const doctorSpecializations = [
     "Anesthesiologist",
@@ -135,7 +157,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
       ? doctorSpecializations
       : form.personnel === "nurse"
         ? nurseSpecializations
-        : form.personnel === "lab_scientist"
+        : form.personnel === "lab_scientist" || form.personnel === "lab_admin"
           ? labScientistSpecializations
           : form.personnel === "pharmacist"
             ? pharmacistSpecializations
@@ -237,6 +259,11 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
       return;
     }
 
+    if (form.personnel === "lab_admin" && hasLabAdmin) {
+      toast.error("A Lab Admin already exists in this hospital. Only one Lab Admin is allowed.");
+      return;
+    }
+
     const isReceptionist = form.personnel.toLowerCase() === "receptionist";
     const isNoWardRole = noWardRoles.includes(form.personnel.toLowerCase());
 
@@ -262,7 +289,8 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
       toast.success("Team member added successfully");
 
       // 🔹 THIS INVALIDATES THE STAFF LIST
-      queryClient.invalidateQueries(["hospital-staffs"]);
+      queryClient.invalidateQueries({ queryKey: ["hospital-staffs"] });
+      queryClient.invalidateQueries({ queryKey: ["hospital-staffs-lab-admin-check"] });
 
       // Reset and Close
       setForm({
@@ -313,7 +341,7 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
     <Modal
       isOpen={true}
       onClose={() => setCreateNewStaff(false)}
-      title="Add a new team member"
+      title={lockRole ? "Add a new Lab Scientist" : "Add a new team member"}
     >
       <div className="p-2">
         <div className="mb-5">
@@ -359,12 +387,10 @@ const OnboardNewStaff = ({ setCreateNewStaff }) => {
 
               {/* Personnel Dropdown */}
               <Select
+                disabled={lockRole}
                 value={form.personnel}
                 onChange={(value) => handleChange("personnel", value)}
-                options={personnelOptions.map((p) => ({
-                  value: p,
-                  label: p.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-                }))}
+                options={lockRole ? [{ value: "lab_scientist", label: "Lab Scientist" }] : personnelOptions}
                 placeholder="Healthcare personnel"
                 className="col-span-2"
               />

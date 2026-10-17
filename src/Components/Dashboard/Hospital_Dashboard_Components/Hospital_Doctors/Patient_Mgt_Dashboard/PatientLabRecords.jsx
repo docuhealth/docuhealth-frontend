@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { User, Building2 } from "lucide-react";
 import Hospital_Lab_Test_Detail_Dashboard from "../../../../../Dashboard/Hospital_Dashboard/Hospital_Lab/Hospital_Lab_Test_Detail_Dashboard";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
+import CardGridSkeleton from "../../../../ui/CardGridSkeleton";
+import { formatOrderStatus, formatApprovalStatus } from "../Scan_Lab_Results/scanLabResults";
 
 const PatientLabRecords = ({
   patientLabRecords = [],
@@ -10,17 +13,11 @@ const PatientLabRecords = ({
   setCurrentPage,
   labloading = false,
 }) => {
-  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [selectedSqid, setSelectedSqid] = useState(null);
+  const selectedRecord = selectedSqid ? (patientLabRecords || []).find((r) => r.sqid === selectedSqid) : null;
 
-  if (labloading) {
-    return (
-      <div className="flex justify-center items-center h-40 text-sm">
-        <div className="flex items-center gap-2 text-gray-500">
-          <div className="w-5 h-5 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin"></div>
-          <span>Loading lab records...</span>
-        </div>
-      </div>
-    );
+  if (labloading && patientLabRecords.length === 0) {
+    return <CardGridSkeleton label="Loading lab records" />;
   }
 
   if (selectedRecord) {
@@ -28,7 +25,7 @@ const PatientLabRecords = ({
       <div>
         <Hospital_Lab_Test_Detail_Dashboard
           orderIdProp={selectedRecord}
-          onBackProp={() => setSelectedRecord(null)}
+          onBackProp={() => setSelectedSqid(null)}
           isDoctorView={true}
         />
       </div>
@@ -64,112 +61,65 @@ const PatientLabRecords = ({
   }
 
   return (
-    <>
-      <div className="text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-        {patientLabRecords.map((record) => (
-          <div
-            key={record.sqid || record.id}
-            className="bg-white border rounded-xl p-4 hover:shadow-sm transition-shadow"
-          >
-            <div className="flex justify-between items-center mb-1">
-              <p className="font-bold text-docuhealth-dark text-[15px] truncate mr-2">
-                {record?.test_info?.name ||
-                  (record?.patient_info
-                    ? `${record.patient_info.firstname || ""} ${record.patient_info.lastname || ""}`
-                    : "Lab Test Order")}
-              </p>
-              <div className="bg-docuhealth-primary-muted px-3 py-1 rounded-full shrink-0">
-                <p className="text-docuhealth-primary text-[11px] font-medium">
-                  Lab result
-                </p>
-              </div>
-            </div>
+    // bottom padding keeps the pagination clear of the floating "+" button
+    <div className="pb-20">
+      <div className="text-[12px] grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+        {patientLabRecords.map((record) => {
+          const title =
+            record?.test_info?.name ||
+            (record?.patient_info
+              ? `${record.patient_info.firstname || ""} ${record.patient_info.lastname || ""}`
+              : "Lab Test Order");
+          const orderStatus = formatOrderStatus(record?.status);
+          const approvalStatus = formatApprovalStatus(record?.result_info?.status, record?.status);
+          const orderedBy = record?.ordered_by_info
+            ? `Dr. ${record.ordered_by_info.firstname || ""} ${record.ordered_by_info.lastname || ""}`.trim()
+            : "N/A";
 
-            <div className="flex flex-col gap-1.5 mb-3">
-              <div className="flex items-center gap-1">
-                <p className="text-gray-400 text-xs">Test Order Status: </p>
-                <p className="text-docuhealth-green text-xs font-semibold capitalize">
-                  {record?.status ? record.status.replace("_", " ") : "Ready"}
-                </p>
-              </div>
-              <div className="flex items-center gap-1">
-                <p className="text-gray-400 text-xs">Approval Status: </p>
-                <p
-                  className={`text-xs font-semibold capitalize ${
-                    record?.result_info?.status === "approved" ||
-                    record?.result_info?.status === "accepted"
-                      ? "text-docuhealth-green"
-                      : record?.result_info?.status === "rejected"
-                      ? "text-red-500"
-                      : record?.result_info?.status === "pending"
-                      ? "text-amber-500"
-                      : "text-gray-500"
-                  }`}
-                >
-                  {record?.result_info?.status || "N/A"}
-                </p>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-100 my-3"></div>
-
-            <div className="flex items-center gap-2 mb-3">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-gray-500 shrink-0"
-              >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              <p className="text-gray-500 text-[12px] truncate">
-                {record?.ordered_by
-                  ? `Dr. ${record.ordered_by.firstname || ""} ${record.ordered_by.lastname || ""}`
-                  : "Dr. Medical Officer"}
-              </p>
-            </div>
-
-            <div className="flex items-start gap-2">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-gray-500 mt-0.5 shrink-0"
-              >
-                <path d="M3 21h18"></path>
-                <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path>
-                <path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path>
-                <path d="M10 9h4"></path>
-                <path d="M12 7v4"></path>
-              </svg>
-              <p className="text-gray-500 text-[12px] leading-snug truncate">
-                {record?.hospital_info?.name
-                  ? `${record.hospital_info.name} Hospital`
-                  : "DocuHealth Hospital"}
-              </p>
-            </div>
-
-            <div className="border-t border-gray-100 my-3"></div>
-
-            <button
-              onClick={() => setSelectedRecord(record)}
-              className="w-full bg-docuhealth-primary hover:bg-docuhealth-dark-primary text-white text-[12px] font-medium py-2 rounded-full transition-colors cursor-pointer"
+          return (
+            <div
+              key={record.sqid || record.id}
+              className="bg-white border rounded-xl p-4 flex flex-col h-full min-w-0 hover:shadow-sm transition-shadow"
             >
-              Open
-            </button>
-          </div>
-        ))}
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <p className="font-bold text-docuhealth-dark text-[15px] leading-snug min-w-0 break-words line-clamp-2" title={title}>
+                  {title}
+                </p>
+                <span className="shrink-0 whitespace-nowrap bg-docuhealth-primary-muted text-docuhealth-primary text-[11px] font-medium px-3 py-1 rounded-full">
+                  Lab result
+                </span>
+              </div>
+
+              <dl className="grid grid-cols-[auto_1fr] gap-x-1.5 gap-y-1.5 text-xs">
+                <dt className="text-gray-400">Test Order Status:</dt>
+                <dd className={`font-semibold min-w-0 ${orderStatus.className}`}>{orderStatus.label}</dd>
+                <dt className="text-gray-400">Approval Status:</dt>
+                <dd className={`font-semibold min-w-0 ${approvalStatus.className}`}>{approvalStatus.label}</dd>
+              </dl>
+
+              <div className="flex flex-col gap-2 border-t border-gray-100 mt-3 pt-3 text-gray-500 text-[12px]">
+                <p className="flex items-center gap-2 min-w-0">
+                  <User size={14} className="shrink-0" />
+                  <span className="truncate">{orderedBy}</span>
+                </p>
+                <p className="flex items-center gap-2 min-w-0">
+                  <Building2 size={14} className="shrink-0" />
+                  <span className="truncate">{record?.hospital_info?.name || "N/A"}</span>
+                </p>
+              </div>
+
+              {/* mt-auto pins the button to the bottom so buttons line up across a row */}
+              <div className="mt-auto pt-3">
+                <button
+                  onClick={() => setSelectedSqid(record.sqid)}
+                  className="w-full bg-docuhealth-primary hover:bg-docuhealth-dark-primary text-white text-[12px] font-medium py-2 rounded-full transition-colors cursor-pointer"
+                >
+                  Open
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {totalPages > 1 && setCurrentPage && (
@@ -182,7 +132,7 @@ const PatientLabRecords = ({
           />
         </div>
       )}
-    </>
+    </div>
   );
 };
 

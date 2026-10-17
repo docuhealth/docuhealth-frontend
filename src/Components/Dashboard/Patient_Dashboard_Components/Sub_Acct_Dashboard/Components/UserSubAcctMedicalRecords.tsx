@@ -101,7 +101,7 @@ const UserSubAcctMedicalRecords = ({
         <h1 className="mb-4 font-medium">Sub Account Medical Records</h1>
         <div className="my-4 text-[12px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {subAcctMedicalRecords.map((record) => (
-            <div key={record.id} className="bg-docuhealth-bg-light border rounded-xl p-5">
+            <div key={record.sqid ?? record.id} className="bg-docuhealth-bg-light border rounded-xl p-5">
               <div className="flex justify-between items-center ">
                 <div className="flex items-center gap-1">
                   <svg

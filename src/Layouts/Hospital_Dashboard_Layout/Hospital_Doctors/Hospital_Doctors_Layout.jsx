@@ -2,10 +2,11 @@ import React, { useContext, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../Components/ui/DashboardLayout";
 import ComingSoonModal from "../../../Components/ui/ComingSoonModal";
+import HospitalLoader from "../../../Components/ui/HospitalLoader";
 import { DoctorAppContext } from "../../../context/HospitalContext/Doctors/DoctorAppContext";
 
 const Hospital_Doctors_Layout = () => {
-  const { profile, hospitalLogo, hospitalName } = useContext(DoctorAppContext);
+  const { profile, hospitalLogo, hospitalName, isLoading } = useContext(DoctorAppContext);
   const navigate = useNavigate();
   const [comingSoonFeature, setComingSoonFeature] = useState(null);
 
@@ -190,6 +191,10 @@ const Hospital_Doctors_Layout = () => {
       ),
     },
   ];
+
+  if (isLoading) {
+    return <HospitalLoader variant="fullscreen" logo={hospitalLogo} label="Setting up your workspace..." />;
+  }
 
   return (
     <DashboardLayout

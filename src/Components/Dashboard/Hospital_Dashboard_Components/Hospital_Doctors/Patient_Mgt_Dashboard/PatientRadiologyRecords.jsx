@@ -4,13 +4,18 @@ import { ArrowLeft, Search, ScanLine } from "lucide-react";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { fetchPatientApprovedScanResults } from "../../../../../queries/Hospital/radiology/scan_results";
 import ScanResultReport from "../../Hospital_Radiology/Scan_Requests/ScanResultReport";
-import ScanLabResultCard from "../Scan_Lab_Results/ScanLabResultCard";
+import ScanLabResultCard, { ScanLabResultGridSkeleton } from "../Scan_Lab_Results/ScanLabResultCard";
+import { maskHIN } from "../Scan_Lab_Results/scanLabResults";
 
 // Approved radiology results for one patient; results still awaiting the doctor's approval stay on the Scan/Lab Results page.
 const PatientRadiologyRecords = ({ patientFullInfo }) => {
   const patient = patientFullInfo?.patient_info;
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedScan, setSelectedScan] = useState(null);
+
+  const patientDisplayName = patient
+    ? `${patient.firstname || ""} ${patient.lastname || ""}`.trim() || "Patient"
+    : "Patient";
 
   const { data: records = [], isLoading, isError } = useQuery({
     queryKey: ["patient-approved-scan-results", patient?.hin, patient?.lastname],
@@ -41,35 +46,35 @@ const PatientRadiologyRecords = ({ patientFullInfo }) => {
           <span>Radiology results</span>
         </button>
 
-        <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-          <div className="flex flex-col gap-1">
-            <p className="text-xs text-gray-400">Imaging order:</p>
-            <p className="text-sm font-bold text-docuhealth-dark">{selectedScan.scan_type}</p>
+        <div>
+          <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-bold text-docuhealth-dark">{patientDisplayName}</p>
+              {patient?.hin && <p className="text-xs text-gray-500">Patient HIN: {maskHIN(patient.hin)}</p>}
+              {patient?.sex && (
+                <p className="text-xs text-gray-500">
+                  Gender: <span className="capitalize">{patient.sex}</span>
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-gray-400">Imaging order:</p>
+              <p className="text-sm font-bold text-docuhealth-dark">{selectedScan.scan_type}</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-gray-400">Date/Time of scan request:</p>
+              <p className="text-sm font-semibold text-docuhealth-dark">{formatFullDateTime(selectedScan.created_at) || "—"}</p>
+            </div>
           </div>
-          <div className="flex flex-col gap-1">
-            <p className="text-xs text-gray-400">Requested by:</p>
-            <p className="text-sm font-semibold text-docuhealth-dark">{selectedScan.requested_by}</p>
-          </div>
-          <div className="flex flex-col gap-1">
-            <p className="text-xs text-gray-400">Date/Time of scan request:</p>
-            <p className="text-sm font-semibold text-docuhealth-dark">{formatFullDateTime(selectedScan.created_at) || "—"}</p>
-          </div>
-        </div>
 
-        <ScanResultReport report={selectedScan.report} attachments={selectedScan.attachments} />
+          <ScanResultReport report={selectedScan.report} attachments={selectedScan.attachments} />
+        </div>
       </div>
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-40 text-sm">
-        <div className="flex items-center gap-2 text-gray-500">
-          <div className="w-5 h-5 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin"></div>
-          <span>Loading radiology results...</span>
-        </div>
-      </div>
-    );
+  if (isLoading && records.length === 0) {
+    return <ScanLabResultGridSkeleton label="Loading radiology results" />;
   }
 
   if (isError || records.length === 0) {

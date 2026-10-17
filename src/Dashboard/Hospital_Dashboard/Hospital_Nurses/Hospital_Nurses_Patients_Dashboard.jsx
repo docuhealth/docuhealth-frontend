@@ -19,10 +19,12 @@ import toast from "react-hot-toast";
 import AddHandoverNoteForm from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Patient_Mgt_Dashboard/AddHandoverNoteForm";
 import Modal from "../../../Components/ui/Modal";
 import axiosInstanceHos from "../../../lib/axios/hospital";
+import { fetchPatientAdmissionNotes } from "../../../queries/Hospital/nurse/patientHistory";
 import { ChevronDown, Check } from "lucide-react";
 
 const Hospital_Nurses_Patients_Dashboard = () => {
   const { tab, admittedPatients } = useContext(NursesAdmittedPatientMGTContext);
+  const isDischargedTab = tab === "inpatient_discharge" || tab === "outpatient_discharge";
   const [updateVitals, setUpdateVitals] = useState(false);
   const [caseNoteHistory, setCaseNoteHistory] = useState(false);
   const [vitalSignsHistory, setVitalSignsHistory] = useState(false);
@@ -54,10 +56,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
 
   const { data: admissionNotesData } = useQuery({
     queryKey: ["patient-admission-notes", patientHin],
-    queryFn: async () => {
-      const res = await axiosInstanceHos.get(`api/records/patients/${patientHin}/admission-notes`);
-      return res.data?.results || res.data || [];
-    },
+    queryFn: () => fetchPatientAdmissionNotes(patientHin),
     enabled: !!patientHin,
     staleTime: 5 * 60 * 1000,
   });
@@ -189,13 +188,15 @@ const Hospital_Nurses_Patients_Dashboard = () => {
     <>
       {advanceCheckUp ? (
         <>
-          <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start gap-3 lg:gap-0 lg:items-center">
+          {!(isDischargedTab && !sharedSoapNoteDetail) && <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start gap-3 lg:gap-0 lg:items-center">
             <DynamicDate />
             <div className="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto">
               {updateVitals ? (
                 <></>
               ) : (caseNoteHistory || vitalSignsHistory) && !caseNoteDetail ? (
                 <>
+                  {/* Case notes need an active admission. */}
+                  {selected?.ward_info && selected?.status === "active" && (
                   <button
                     className="py-2.5 px-10 w-full lg:w-60 rounded-full bg-docuhealth-primary text-white cursor-pointer"
                     onClick={() => {
@@ -208,6 +209,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                   >
                     Add New Case Note
                   </button>
+                  )}
                 </>
               ) : (tab === "inpatient_discharge" || tab === "outpatient_discharge") ? null : (
                 <>
@@ -244,6 +246,8 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                         >
                           Vital signs history
                         </button>
+                        {/* Vitals on an admission awaiting nurse discharge are refused. */}
+                        {selected?.status !== "awaiting_nurse_discharge" && (
                         <button
                           className="w-full text-left px-3  py-2.5 hover:bg-gray-100 text-gray-700 transition-colors"
                           onClick={() => {
@@ -256,6 +260,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                         >
                           Update Vitals
                         </button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -320,7 +325,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                 </>
               )}
             </div>
-          </div>
+          </div>}
           {updateVitals ? (
             <UpdateVitals
               selectedPatient={selected}
@@ -398,7 +403,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
               }}
             />
           ) : (
-            <div className="bg-white my-5 border rounded-lg p-5 text-sm">
+            <div className={isDischargedTab ? "my-5 text-sm" : "bg-white my-5 border rounded-lg p-5 text-sm"}>
               <AdvanceCheckUp
                 selected={selected}
                 setAdvanceCheckUp={setAdvanceCheckUp}

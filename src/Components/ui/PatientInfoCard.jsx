@@ -5,8 +5,12 @@ import formatRecordDate, {
   getAge,
 } from "../Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 
-const PatientInfoCard = ({ selectedMedicalRecord, className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl" }) => {
+// staffLabel / dateLabel let non-record callers (e.g. lab appointments) rename those rows; defaults keep the medical-record wording
+const PatientInfoCard = ({ selectedMedicalRecord, className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl", staffLabel, dateLabel = "Date / Time Uploaded" }) => {
   if (!selectedMedicalRecord) return null;
+  const staff = selectedMedicalRecord?.staff_info;
+  const nonDoctorStaff = !!staffLabel && !!staff;
+  const roleLabel = (r = "") => r.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
 
   return (
     <div className={className}>
@@ -44,10 +48,12 @@ const PatientInfoCard = ({ selectedMedicalRecord, className="p-5 my-5 bg-docuhea
         
         <div className="space-y-2">
           <p className="text-[12px]">
-            Patient's Doctor :{" "}
+            {nonDoctorStaff ? staffLabel : "Patient's Doctor"} :{" "}
             <span className="font-medium ">
-              {selectedMedicalRecord?.staff_info
-                ? `Dr. ${selectedMedicalRecord.staff_info.firstname} ${selectedMedicalRecord.staff_info.lastname}`
+              {nonDoctorStaff
+                ? `${staff.firstname} ${staff.lastname}${staff.role ? ` (${roleLabel(staff.role)})` : ""}`
+                : selectedMedicalRecord?.staff_info
+                ? `Dr.${selectedMedicalRecord.staff_info.firstname} ${selectedMedicalRecord.staff_info.lastname}`
                 : selectedMedicalRecord?.doctor_info
                 ? `Dr. ${selectedMedicalRecord.doctor_info.firstname} ${selectedMedicalRecord.doctor_info.lastname}`
                 : "NIL"}
@@ -103,7 +109,7 @@ const PatientInfoCard = ({ selectedMedicalRecord, className="p-5 my-5 bg-docuhea
             </span>
           </p>
           <p className="text-[12px]">
-            Date / Time Uploaded :{" "}
+            {dateLabel} :{" "}
             <span className="font-medium ">
               {formatFullDateTime(selectedMedicalRecord?.created_at) || "NIL"}
             </span>
@@ -129,6 +135,9 @@ const PatientInfoCard = ({ selectedMedicalRecord, className="p-5 my-5 bg-docuhea
 
 PatientInfoCard.propTypes = {
   selectedMedicalRecord: PropTypes.object,
+  className: PropTypes.string,
+  staffLabel: PropTypes.string,
+  dateLabel: PropTypes.string,
 };
 
 export default PatientInfoCard;

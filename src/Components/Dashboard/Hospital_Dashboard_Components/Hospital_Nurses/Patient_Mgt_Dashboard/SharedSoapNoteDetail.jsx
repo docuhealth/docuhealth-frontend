@@ -5,9 +5,10 @@ import {
 } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import formatRecordDate from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import { FileText, Eye, ArrowDownToLine, Image, ArrowLeft } from "lucide-react";
-import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../../utils/soapNoteHelpers";
+import { renderListOrString, renderLabTests, renderDrugRecords, renderScans } from "../../../../../utils/soapNoteHelpers";
 import PatientInfoCard from "../../../../ui/PatientInfoCard";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
+import SoapAdditionalNotesCard from "../../../../ui/SoapAdditionalNotesCard";
 
 const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail }) => {
 
@@ -25,7 +26,7 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
           onClick={() => setSharedSoapNoteDetail(null)}
         >
           <ArrowLeft size={16} />
-          <h2 className=" text-sm">Detailed Shared SOAP Note</h2>
+          <h2 className=" text-sm">Detailed Shared Encounter Note</h2>
         </div>
       </div>
       
@@ -80,6 +81,8 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
           </div>
         </div>
       </div>
+
+      <SoapAdditionalNotesCard additionalNotes={sharedSoapNoteDetail?.additional_notes} />
 
       {/* Uploaded Documents */}
       <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
@@ -151,26 +154,9 @@ const SharedSoapNoteDetail = ({ sharedSoapNoteDetail, setSharedSoapNoteDetail })
         </div>
       </div>
 
-      {/* Additional Notes */}
-      <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">
-        <p className="font-medium mb-4 text-docuhealth-dark">Additional Notes</p>
-        <div className="text-[12px] text-gray-700">
-          {sharedSoapNoteDetail?.additional_notes?.length > 0 ? (
-            <ul className="list-disc pl-5 space-y-1">
-              {sharedSoapNoteDetail.additional_notes.map((noteObj, index) => (
-                <li key={index}>
-                  {noteObj.note}
-                  <span className="text-gray-400 text-[10px] ml-2">({formatFullDateTime(noteObj.created_at)})</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>NIL</p>
-          )}
-        </div>
-      </div>
-
       {renderLabTests(sharedSoapNoteDetail?.lab_tests_info)}
+
+      {renderScans(sharedSoapNoteDetail?.scans_info)}
 
       {/* Follow Up / Appointment — appointment_info was removed from the
           SOAP note response; only render this if it's actually present

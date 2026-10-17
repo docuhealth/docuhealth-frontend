@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { ArrowLeft, X, Plus, UploadCloud, FileText, AlertTriangle } from "lucide-react";
 import { truncateWords } from "../../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import toast from "react-hot-toast";
@@ -7,11 +7,13 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Modal from "../../../../../ui/Modal";
 import Button from "../../../../../ui/Button";
+import HospitalLoader from "../../../../../ui/HospitalLoader";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import Input from "../../../../../ui/Input";
 import Select from "../../../../../ui/Select";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
+import { ACTIVE_CHECK_INS_KEY } from "../../../../../../queries/Hospital/doctor/checkIns";
 
 
 const NoteSection = ({
@@ -25,12 +27,46 @@ const NoteSection = ({
   handleRemoveItem,
   activeInput,
   setActiveInput,
-}) => (
-  <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3 bg-gray-50/30">
-    <p className="font-medium text-docuhealth-dark mb-2">{title}</p>
+}) => {
+  const items = soapNoteData[field];
+  const listRef = useRef(null);
+  const prevCount = useRef(items.length);
+  const [moreBelow, setMoreBelow] = useState(false);
 
-    <div className="space-y-2 max-h-[200px] overflow-y-auto mb-2">
-      {soapNoteData[field].map((item, idx) => (
+  const updateMoreBelow = () => {
+    const el = listRef.current;
+    if (!el) return;
+    setMoreBelow(el.scrollHeight - el.scrollTop - el.clientHeight > 4);
+  };
+
+  // Bring a newly added item into view so the doctor sees it landed
+  useEffect(() => {
+    const el = listRef.current;
+    if (el && items.length > prevCount.current) {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    }
+    prevCount.current = items.length;
+    updateMoreBelow();
+  }, [items.length]);
+
+  return (
+  <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3 bg-gray-50/30">
+    <p className="font-medium text-docuhealth-dark mb-2">
+      {title}
+      {items.length > 0 && (
+        <span className="ml-2 text-[11px] font-normal text-gray-500">
+          ({items.length} {items.length === 1 ? "item" : "items"})
+        </span>
+      )}
+    </p>
+
+    <div className="relative mb-2">
+    <div
+      ref={listRef}
+      onScroll={updateMoreBelow}
+      className="space-y-2 max-h-[200px] overflow-y-auto scrollbar-visible pr-1"
+    >
+      {items.map((item, idx) => (
         <div
           key={idx}
           className="bg-white border border-gray-200 rounded p-2 text-[12px] flex justify-between items-center"
@@ -45,6 +81,16 @@ const NoteSection = ({
           </button>
         </div>
       ))}
+    </div>
+    {moreBelow && (
+      <button
+        type="button"
+        onClick={() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" })}
+        className="absolute inset-x-0 bottom-0 flex items-end justify-center h-10 pb-1 bg-linear-to-t from-white via-white/90 to-transparent text-[11px] font-medium text-docuhealth-primary"
+      >
+        Scroll for more ↓
+      </button>
+    )}
     </div>
 
     {activeInput === field ? (
@@ -82,7 +128,8 @@ const NoteSection = ({
       </button>
     )}
   </div>
-);
+  );
+};
 
 const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBack, onSubmitted }) => {
   const { profile, hospitals } = useContext(DoctorAppContext);
@@ -240,9 +287,11 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
 
   const { mutate, isPending } = useMutation({
     mutationFn: (formData) =>
-      axiosInstanceHos.post("api/medical-records/soap-note", formData),
+      axiosInstanceHos.post("api/records/soap-note", formData),
     onSuccess: () => {
-      toast.success("SOAP Note created successfully !");
+      // The confirm modal stays open while uploading so its loader shows; close it here.
+      setConfirmationModal(false);
+      toast.success("Encounter note created successfully!");
 
       const hin = patientHin
 
@@ -256,16 +305,17 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       queryClient.invalidateQueries({
         queryKey: ["doctor-appointments"],
       });
-      // A note from the outpatient flow can move the check-in
-      // doctor_idle -> doctor_active, which changes its row in the
-      // Patient Mgt "OutPatients" list.
+      // Saving the note ends the consultation (doctor_active -> doctor_idle),
+      // which changes its row in the Patient Mgt "OutPatients" list and
+      // closes ordering against the check-in until the patient is re-claimed.
       queryClient.invalidateQueries({
         queryKey: ["hospital-patients-doctor"],
       });
+      queryClient.invalidateQueries({ queryKey: ACTIVE_CHECK_INS_KEY });
 
       setStep(1);
       // `onSubmitted` lets the parent decide where to land (e.g. reopen the
-      // patient-details view on the "SOAP Notes" tab). Fall back to just
+      // patient-details view on the "Encounter Notes" tab). Fall back to just
       // closing the form when no handler is passed.
       if (onSubmitted) {
         onSubmitted();
@@ -306,28 +356,36 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       });
     },
     onError: (error) => {
+      setConfirmationModal(false);
       console.error("Upload error:", error);
       // The API rejects with DRF field-keyed errors, not `{ message }` —
       // e.g. `{ check_in: ["Check-in must be in doctor_active status to
       // create a SOAP note."] }` when the encounter hasn't been claimed.
       // Surface that instead of a generic "Failed to upload" string.
-      toast.error(extractApiErrorMessage(error, "Failed to upload soap note"));
+      toast.error(extractApiErrorMessage(error, "Failed to upload encounter note"));
     },
   });
 
   const handleSubmit = async () => {
-    // Only care_instructions is required by POST /api/medical-records/soap-note
+    const orderContext = resolveOrderContext(selectedPatientDetails);
+    if (!orderContext.checkIn) {
+      setConfirmationModal(false);
+      toast.error("An encounter note can only be saved for a checked-in patient during a consultation.");
+      return;
+    }
+    // Only care_instructions is required by POST /api/records/soap-note
     // (alongside patient / chief_complaint / primary_diagnosis, already gated in
     // the step flow). treatment_plan and the follow-up appointment are optional.
     if (soapNoteData.care_instructions.length === 0) {
       toast.error("Care Instructions is required");
+      setConfirmationModal(false);
       return;
     }
 
     const payload = {
       staff: profile?.staff_id || "",
       patient: patientHin || "",
-      ...(selectedPatientFetchedInfo?.latest_vitals?.id && { vital_signs: selectedPatientFetchedInfo.latest_vitals.id }),
+      ...(selectedPatientFetchedInfo?.latest_vitals?.sqid && { vital_signs: selectedPatientFetchedInfo.latest_vitals.sqid }),
       referred_docuhealth_hosp: soapNoteData.referred_docuhealth_hosp,
       referred_hosp: soapNoteData.referred_hosp,
       investigations: soapNoteData.investigations,
@@ -377,10 +435,10 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
     formData.append("chief_complaint", soapNoteData.chief_complaint);
     formData.append("primary_diagnosis", soapNoteData.primary_diagnosis);
 
-    if (selectedPatientFetchedInfo?.latest_vitals?.id) {
+    if (selectedPatientFetchedInfo?.latest_vitals?.sqid) {
       formData.append(
         "vital_signs",
-        selectedPatientFetchedInfo.latest_vitals.id,
+        selectedPatientFetchedInfo.latest_vitals.sqid,
       );
     }
 
@@ -416,21 +474,8 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       }
     }
 
-    const orderContext = resolveOrderContext(selectedPatientDetails, {
-      fallbackOrderSource:
-        source === "appointments" ? "staff_appointment_order" : undefined,
-    });
-
-    if (source === "appointments" || orderContext.appointment) {
-      const apptSqid = orderContext.appointment || selectedPatientDetails?.sqid;
-      if (apptSqid) {
-        formData.append("appointment", apptSqid);
-      }
-    } else if (orderContext.admission) {
-      formData.append("admission", orderContext.admission);
-    } else if (orderContext.checkIn) {
-      formData.append("check_in", orderContext.checkIn);
-    }
+    // A SOAP note is saved against the check-in only (the API refuses admission and appointment).
+    formData.append("check_in", orderContext.checkIn);
 
     attachments.forEach((fileObj) => {
       formData.append("investigation_docs", fileObj.file);
@@ -510,7 +555,7 @@ useEffect(() => {
           }}
         >
           <ArrowLeft className="w-4 h-4 text-gray-800" />
-          <span>SOAP Note Entry</span>
+          <span>Encounter Note Entry</span>
         </button>
         {step === 1 && (
           <div className="my-5">
@@ -969,8 +1014,8 @@ useEffect(() => {
 
             <div className="flex items-center justify-between border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
               <div>
-                <p className="font-medium text-docuhealth-dark">Share SOAP Note (Optional)</p>
-                <p className="text-[12px] text-gray-500 mt-1">Allow other healthcare personnel (e.g. NURSES) in this hospital to access this SOAP Note.</p>
+                <p className="font-medium text-docuhealth-dark">Share Encounter Note (Optional)</p>
+                <p className="text-[12px] text-gray-500 mt-1">Allow other healthcare personnel (e.g. NURSES) in this hospital to access this Encounter Note.</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input 
@@ -1038,6 +1083,7 @@ useEffect(() => {
         // handleSubmit();
         confirmationModal && (
           <Modal isOpen={true} onClose={() => setConfirmationModal(false)} title="">
+            {isPending && <HospitalLoader variant="overlay" label="Uploading encounter note..." />}
             <button
               type="button"
               aria-label="Close"
@@ -1064,20 +1110,18 @@ useEffect(() => {
             </div>
             <div className="bg-gray-50 border border-gray-100 rounded-md p-6 mb-6">
               <p className="text-gray-500 text-center text-xs leading-relaxed">
-                You're about to upload the SOAP Note and the After Visit
-                Summary (AVS) for patients is generated for this. This SOAP
+                You're about to upload the Encounter Note and the After Visit
+                Summary (AVS) for patients is generated for this. This Encounter
                 Note can't be edited or deleted.
               </p>
             </div>
 
             <Button
               fullWidth
-              onClick={() => {
-                setConfirmationModal(false);
-                handleSubmit();
-              }}
+              onClick={handleSubmit}
+              disabled={isPending}
             >
-              Upload SOAP Note
+              Upload Encounter Note
             </Button>
             <button
               className="w-full mt-3 text-gray-500 text-[12px] hover:text-red-500 transition-colors cursor-pointer"
@@ -1105,11 +1149,11 @@ useEffect(() => {
             <div className="bg-amber-100 p-3 rounded-full mb-3">
               <AlertTriangle className="w-6 h-6 text-docuhealth-amber-600" />
             </div>
-            <h2 className="font-medium text-gray-800 text-lg">Share SOAP Note</h2>
+            <h2 className="font-medium text-gray-800 text-lg">Share Encounter Note</h2>
           </div>
           <div className="bg-gray-50 border border-gray-100 rounded-md p-6 mb-6">
             <p className="text-gray-600 text-center text-[13px] leading-relaxed">
-              Other healthcare personnel ( NURSES ) in this hospital would have access to some part of the SOAP note of this patient.
+              Other healthcare personnel ( NURSES ) in this hospital would have access to some part of the encounter note of this patient.
             </p>
           </div>
           <Button

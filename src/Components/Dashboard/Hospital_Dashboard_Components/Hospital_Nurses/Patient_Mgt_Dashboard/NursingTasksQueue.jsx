@@ -7,6 +7,75 @@ import toast from "react-hot-toast";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import NursingDischargeSummaryForm from "./NursingDischargeSummaryForm";
+import { formatFrequency } from "../../../../../utils/careTaskConstants";
+import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
+
+// Mirrors a loaded task row (status/date/instruction tiles + task tile and kebab) on
+// desktop and the task card on mobile.
+const TaskQueueSkeleton = () => (
+  <div role="status" aria-label="Loading tasks">
+    <div className="hidden lg:block">
+      {Array.from({ length: 3 }, (_, i) => (
+        <div key={i} className="mb-4 p-4 border rounded-md flex flex-wrap gap-4 lg:gap-10 bg-white">
+          {["w-16", "w-36", "w-32"].map((w, j) => (
+            <div key={j} className="flex items-center gap-3">
+              <Skeleton className="h-8 w-8" />
+              <div>
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-20" />
+                <SkeletonText textClassName="text-sm" className={`h-3.5 ${w}`} />
+              </div>
+            </div>
+          ))}
+          <div className="flex items-center justify-between flex-1 min-w-[200px]">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-8 w-8 shrink-0" />
+              <div>
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-10" />
+                <SkeletonText textClassName="text-sm" className="h-3.5 w-32" />
+              </div>
+            </div>
+            <Skeleton className="h-8 w-9 rounded-full" />
+          </div>
+        </div>
+      ))}
+    </div>
+    <div className="block lg:hidden space-y-4 px-1">
+      {Array.from({ length: 2 }, (_, i) => (
+        <div key={i} className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="flex justify-between items-start mb-4">
+            <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+              <SkeletonText textClassName="text-[10px]" className="h-2 w-24" />
+              <SkeletonText textClassName="text-[13px]" className="h-3 w-36" />
+            </div>
+            <Skeleton className="h-9 w-9 rounded-full" />
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <div>
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-12" />
+                <SkeletonText textClassName="text-sm" className="h-3.5 w-16" />
+              </div>
+            </div>
+            {/* "Ordering instruction" wraps to two lines in the narrow column, and so does a typical instruction. */}
+            <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-50">
+              <div>
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-20" />
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-24" />
+                <SkeletonText textClassName="text-[13px]" className="h-3 w-28" />
+                <SkeletonText textClassName="text-[13px]" className="h-3 w-16" />
+              </div>
+              <div>
+                <SkeletonText textClassName="text-[10px]" className="h-2 w-10" />
+                <SkeletonText textClassName="text-[13px]" className="h-3 w-24" />
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 
 const intakeSources = [
@@ -745,9 +814,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
       </div>
 
       {loadingTasks ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="animate-spin h-8 w-8 text-docuhealth-primary" />
-        </div>
+        <TaskQueueSkeleton />
       ) : tasks?.length === 0 ? (
         <div className="py-10">
           <EmptyState 
@@ -1393,9 +1460,9 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                <tbody>
                  {chartData.map((med) => {
                    const dosageStr = [med.quantity, med.unit].filter(Boolean).join(' ') || med.strength || '-';
-                   const freqStr = med.frequency?.rate ? med.frequency.rate.toUpperCase() : (typeof med.frequency === 'string' ? med.frequency.toUpperCase() : '-');
+                   const freqStr = formatFrequency(med.frequency, '-');
                    return (
-                     <tr key={med.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
+                     <tr key={med.sqid || med.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
                        <td className="py-6 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {med.created_at ? new Date(med.created_at).toLocaleDateString() : (med.date || '-')}</td>
                        <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{med.created_at ? new Date(med.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : (med.time || '-')}</td>
                        <td className="py-6 px-3 font-semibold text-gray-800 whitespace-nowrap">{med.name || med.drug || '-'}</td>
@@ -1414,9 +1481,9 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
           <div className="block lg:hidden space-y-4 mb-4">
                 {chartData.map((med) => {
                   const dosageStr = [med.quantity, med.unit].filter(Boolean).join(' ') || med.strength || '-';
-                  const freqStr = med.frequency?.rate ? med.frequency.rate.toUpperCase() : (typeof med.frequency === 'string' ? med.frequency.toUpperCase() : '-');
+                  const freqStr = formatFrequency(med.frequency, '-');
                   return (
-                    <div key={med.id} className="bg-white border border-gray-200 rounded-lg p-5 space-y-4">
+                    <div key={med.sqid || med.id} className="bg-white border border-gray-200 rounded-lg p-5 space-y-4">
                       <div className="flex justify-between items-center border-b border-gray-100 pb-3">
                           <span className="flex items-center gap-2 text-gray-500 text-[12px] font-medium uppercase"><Calendar className="w-3 h-3" /> {med.created_at ? new Date(med.created_at).toLocaleDateString() : (med.date || '-')} • {med.created_at ? new Date(med.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : (med.time || '-')}</span>
                           <span className={`text-[12px] font-bold ${getMedStatusColor(med.status)}`}>{formatLabel(med.status)}</span>
@@ -1465,7 +1532,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                </thead>
                <tbody>
                  {chartData.map((rec) => (
-                   <tr key={rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
+                   <tr key={rec.sqid || rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
                      <td className="py-6 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {rec.created_at ? new Date(rec.created_at).toLocaleDateString() : '-'}</td>
                      <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.created_at ? new Date(rec.created_at).toLocaleTimeString() : '-'}</td>
                      <td className="py-6 px-3 font-semibold text-gray-800 whitespace-nowrap">{rec.value} {rec.unit}</td>
@@ -1481,7 +1548,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
           {/* Mobile View */}
           <div className="block lg:hidden space-y-4 mb-4">
                 {chartData.map((rec) => (
-                  <div key={rec.id} className="bg-white border border-gray-200 rounded-lg p-5 space-y-4">
+                  <div key={rec.sqid || rec.id} className="bg-white border border-gray-200 rounded-lg p-5 space-y-4">
                     <div className="flex justify-between items-center border-b border-gray-100 pb-3">
                         <span className="flex items-center gap-2 text-gray-500 text-[12px] font-medium uppercase"><Calendar className="w-3 h-3" /> {rec.created_at ? new Date(rec.created_at).toLocaleDateString() : '-'} • {rec.created_at ? new Date(rec.created_at).toLocaleTimeString() : '-'}</span>
                         <span className={`text-[12px] font-bold ${getMedStatusColor(rec.status)}`}>{rec.status}</span>
@@ -1961,7 +2028,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                </thead>
                <tbody>
                  {chartData.map((rec) => (
-                   <tr key={rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
+                   <tr key={rec.sqid || rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
                      <td className="py-6 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {rec.created_at ? new Date(rec.created_at).toLocaleDateString() : '-'}</td>
                      <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.created_at ? new Date(rec.created_at).toLocaleTimeString() : '-'}</td>
                      <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.blood_pressure || '-'}</td>
@@ -1982,7 +2049,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
           {/* Mobile View */}
           <div className="block lg:hidden space-y-4 mb-4">
             {chartData.map((rec) => (
-              <div key={rec.id} className="bg-white border border-gray-200 rounded-xl p-4 ">
+              <div key={rec.sqid || rec.id} className="bg-white border border-gray-200 rounded-xl p-4 ">
                 <div className="flex justify-between items-start mb-4 pb-3 border-b border-gray-100">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Calendar className="w-4 h-4 text-gray-400" />
@@ -2178,7 +2245,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                </thead>
                <tbody>
                  {chartData.map((rec) => (
-                   <tr key={rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
+                   <tr key={rec.sqid || rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
                      <td className="py-6 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {rec.created_at ? new Date(rec.created_at).toLocaleDateString() : '-'}</td>
                      <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.motor_movement || '-'}</td>
                      <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.physical_signs || '-'}</td>
@@ -2194,7 +2261,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
           {/* Mobile View */}
           <div className="block lg:hidden space-y-4 mb-4">
             {chartData.map((rec) => (
-              <div key={rec.id} className="bg-white border border-gray-200 rounded-xl p-4 ">
+              <div key={rec.sqid || rec.id} className="bg-white border border-gray-200 rounded-xl p-4 ">
                 <div className="flex justify-between items-start mb-4 pb-3 border-b border-gray-100">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Calendar className="w-4 h-4 text-gray-400" />
@@ -2367,7 +2434,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                </thead>
                <tbody>
                  {chartData.map((rec) => (
-                   <tr key={rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
+                   <tr key={rec.sqid || rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
                      <td className="py-6 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {rec.created_at ? new Date(rec.created_at).toLocaleDateString() : '-'}</td>
                      <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.procedureName}</td>
                      <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.performingClinician}</td>
@@ -2384,7 +2451,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
           {/* Mobile View */}
           <div className="lg:hidden space-y-4 mb-6">
             {chartData.map((rec) => (
-              <div key={rec.id} className="border border-gray-200 rounded-xl p-4 bg-white hover:border-blue-300 transition-colors">
+              <div key={rec.sqid || rec.id} className="border border-gray-200 rounded-xl p-4 bg-white hover:border-blue-300 transition-colors">
                 <div className="flex justify-between items-start mb-3 border-b border-gray-50 pb-3">
                   <div className="flex items-center gap-2 text-gray-600">
                     <Calendar className="w-4 h-4" />
@@ -2548,7 +2615,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
                </thead>
                <tbody>
                  {chartData.map((rec) => (
-                   <tr key={rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
+                   <tr key={rec.sqid || rec.id} className="border-b border-gray-100 last:border-b-0 hover:bg-slate-50 transition-colors text-[13px]">
                      <td className="py-6 px-4 flex items-center gap-2 text-gray-600 whitespace-nowrap"><Calendar className="w-3.5 h-3.5" /> {rec.created_at ? new Date(rec.created_at).toLocaleDateString() : '-'}</td>
                      <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.created_at ? new Date(rec.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-'}</td>
                      <td className="py-6 px-3 text-gray-600 whitespace-nowrap">{rec.additives?.length ? rec.additives.join(', ') : '-'}</td>
@@ -2569,7 +2636,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
           <div className="lg:hidden space-y-4 mb-6">
             <h2 className="text-[16px] font-bold text-gray-800 mb-4 px-1">IV Fluid administration chart</h2>
             {chartData.map((rec) => (
-              <div key={rec.id} className="border border-gray-200 rounded-xl p-4 bg-white hover:border-blue-300 transition-colors">
+              <div key={rec.sqid || rec.id} className="border border-gray-200 rounded-xl p-4 bg-white hover:border-blue-300 transition-colors">
                 <div className="flex justify-between items-start mb-3 border-b border-gray-50 pb-3">
                   <div className="flex items-center gap-2 text-gray-600">
                     <Calendar className="w-4 h-4" />
