@@ -16,17 +16,47 @@ import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import { ACTIVE_CHECK_INS_KEY } from "../../../../../../queries/Hospital/doctor/checkIns";
 
 
+const textareaClass =
+  "w-full mt-1 rounded-sm border focus:outline-none focus:border-docuhealth-primary p-3 text-[12px] min-h-[64px] max-h-[300px]";
+
+const TextField = ({ label, name, value, onChange, placeholder, required, className = "" }) => (
+  <div className={className}>
+    <p className="font-medium text-docuhealth-dark">
+      {label}
+      {required && <span className="text-red-500"> *</span>}
+    </p>
+    <textarea
+      name={name}
+      value={value}
+      onChange={onChange}
+      rows={2}
+      className={textareaClass}
+      placeholder={placeholder}
+    />
+  </div>
+);
+
+const SectionCard = ({ title, children }) => (
+  <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
+    <p className="font-semibold text-docuhealth-dark mb-3">{title}</p>
+    <div className="space-y-4">{children}</div>
+  </div>
+);
+
+const STEPS = ["History & Examination", "Assessment & Plan"];
+
+// List field: type and press Enter (or +) to add. Text left in the box is
+// added automatically when the doctor moves on, so nothing typed is lost.
 const NoteSection = ({
   title,
   field,
   placeholder,
+  required,
   soapNoteData,
   inputs,
   setInputs,
   handleAddListItem,
   handleRemoveItem,
-  activeInput,
-  setActiveInput,
 }) => {
   const items = soapNoteData[field];
   const listRef = useRef(null);
@@ -49,10 +79,13 @@ const NoteSection = ({
     updateMoreBelow();
   }, [items.length]);
 
+  const value = inputs[field] || "";
+
   return (
-  <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3 bg-gray-50/30">
-    <p className="font-medium text-docuhealth-dark mb-2">
+  <div>
+    <p className="font-medium text-docuhealth-dark">
       {title}
+      {required && <span className="text-red-500"> *</span>}
       {items.length > 0 && (
         <span className="ml-2 text-[11px] font-normal text-gray-500">
           ({items.length} {items.length === 1 ? "item" : "items"})
@@ -60,7 +93,8 @@ const NoteSection = ({
       )}
     </p>
 
-    <div className="relative mb-2">
+    {items.length > 0 && (
+    <div className="relative mt-1">
     <div
       ref={listRef}
       onScroll={updateMoreBelow}
@@ -74,6 +108,7 @@ const NoteSection = ({
           <span>{item}</span>
           <button
             type="button"
+            aria-label="Remove"
             className="text-red-500 font-bold ml-2 cursor-pointer"
             onClick={() => handleRemoveItem(field, idx)}
           >
@@ -92,41 +127,33 @@ const NoteSection = ({
       </button>
     )}
     </div>
+    )}
 
-    {activeInput === field ? (
-      <div className="flex gap-2">
-        <Input
-          autoFocus
-          value={inputs[field]}
-          onChange={(e) => setInputs({ ...inputs, [field]: e.target.value })}
-          placeholder={placeholder}
-          containerClassName="flex-1"
-          className="text-[12px]"
-        />
-        <button
-          type="button"
-          onClick={() => handleAddListItem(field)}
-          className="bg-docuhealth-primary text-white px-3 py-1 rounded text-[12px]"
-        >
-          Add
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveInput(null)}
-          className="text-gray-500 text-[12px]"
-        >
-          Cancel
-        </button>
-      </div>
-    ) : (
+    <div className="flex gap-2 mt-2">
+      <Input
+        value={value}
+        onChange={(e) => setInputs({ ...inputs, [field]: e.target.value })}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            handleAddListItem(field);
+          }
+        }}
+        placeholder={placeholder}
+        containerClassName="flex-1"
+        className="text-[12px] py-2"
+      />
       <button
         type="button"
-        onClick={() => setActiveInput(field)}
-        className="flex items-center gap-1 text-docuhealth-primary font-medium text-[12px]"
+        aria-label={`Add to ${title}`}
+        title="Add (or press Enter)"
+        disabled={!value.trim()}
+        onClick={() => handleAddListItem(field)}
+        className="shrink-0 w-10 rounded-lg flex items-center justify-center bg-docuhealth-primary text-white disabled:bg-gray-200 disabled:text-gray-400 cursor-pointer disabled:cursor-not-allowed"
       >
-        <span className="text-lg">+</span> Add Entry
+        <Plus size={16} />
       </button>
-    )}
+    </div>
   </div>
   );
 };
@@ -222,14 +249,30 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
   };
 
   const handleAddListItem = (field) => {
-    if (!inputs[field].trim()) return;
+    if (!inputs[field]?.trim()) return;
     setSoapNoteData((prev) => ({
       ...prev,
-      [field]: [...prev[field], inputs[field]],
+      [field]: [...prev[field], inputs[field].trim()],
     }));
     setInputs((prev) => ({ ...prev, [field]: "" }));
-    setActiveInput(null);
   };
+
+  // Commit text still sitting in any list box so the doctor doesn't have to hit + first
+  const flushPendingInputs = () => {
+    setSoapNoteData((prev) => {
+      const next = { ...prev };
+      Object.entries(inputs).forEach(([field, value]) => {
+        if (value?.trim() && Array.isArray(next[field])) {
+          next[field] = [...next[field], value.trim()];
+        }
+      });
+      return next;
+    });
+    setInputs((prev) => Object.fromEntries(Object.keys(prev).map((key) => [key, ""])));
+  };
+
+  const hasEntries = (field) =>
+    soapNoteData[field].length > 0 || !!inputs[field]?.trim();
 
   const handleRemoveItem = (field, index) => {
     setSoapNoteData((prev) => ({
@@ -238,39 +281,29 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
     }));
   };
 
-  const [activeInput, setActiveInput] = useState(null);
+  const topRef = useRef(null);
+
+  const goToStep = (next) => {
+    setStep(next);
+    topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const handleNextStep = () => {
-    switch (step) {
-      case 1:
-        if (!soapNoteData.chief_complaint?.trim()) {
-          toast.error("Chief Complaint is compulsory before proceeding");
-          return;
-        }
-
-        break;
-
-      case 2:
-        break;
-
-      case 3:
-        // Compulsory: Primary Diagnosis
-        // Note: primary_diagnosis is usually an array in the payload
-        if (
-          !soapNoteData.primary_diagnosis ||
-          soapNoteData.primary_diagnosis.length === 0
-        ) {
-          toast.error("At least one Primary Diagnosis is compulsory");
-          return;
-        }
-        break;
-
-      default:
-        break;
+    if (!soapNoteData.chief_complaint?.trim()) {
+      toast.error("Chief Complaint is compulsory before proceeding");
+      return;
     }
+    flushPendingInputs();
+    goToStep(2);
+  };
 
-    // If validation passes, move to the next step
-    setStep((prev) => prev + 1);
+  const handleReview = () => {
+    if (!soapNoteData.primary_diagnosis?.trim()) {
+      toast.error("Primary Diagnosis is compulsory");
+      return;
+    }
+    flushPendingInputs();
+    setConfirmationModal(true);
   };
 
   const { data: selectedPatientFetchedInfo, isLoading } = useQuery({
@@ -338,7 +371,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
         drug_history_allergies: [],
         general_exam: [],
         systemic_exam: [],
-        besides_tests: [],
+        bedside_tests: [],
         investigations: [],
         problems_list: [],
         treatment_plan: [],
@@ -348,7 +381,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
         drug_history_allergies: "",
         general_exam: "",
         systemic_exam: "",
-        besides_tests: "",
+        bedside_tests: "",
         investigations: "",
         problems_list: "",
         treatment_plan: "",
@@ -365,6 +398,9 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       toast.error(extractApiErrorMessage(error, "Failed to upload encounter note"));
     },
   });
+
+  const canSubmit =
+    !isPending && hasEntries("care_instructions") && hasEntries("treatment_plan");
 
   const handleSubmit = async () => {
     const orderContext = resolveOrderContext(selectedPatientDetails);
@@ -495,7 +531,7 @@ useEffect(() => {
   if (!isRestored) return;
 
   const soapDraft = {
-    step,
+    page: step,
     soapNoteData,
     selectedDay,
     selectedMonth,
@@ -522,7 +558,9 @@ useEffect(() => {
     if (savedDraft) {
       const data = JSON.parse(savedDraft);
       
-      if (data.step) setStep(data.step);
+      // `step` is from the old 4-page form: Subjective/Objective -> 1, Assessment/Plan -> 2
+      if (data.page) setStep(data.page);
+      else if (data.step) setStep(data.step >= 3 ? 2 : 1);
       if (data.soapNoteData) setSoapNoteData(data.soapNoteData);
       if (data.selectedDay) setSelectedDay(data.selectedDay);
       if (data.selectedMonth) setSelectedMonth(data.selectedMonth);
@@ -538,7 +576,7 @@ useEffect(() => {
 
   return (
     <>
-      <div className="bg-white rounded-lg border mt-3 px-3 lg:px-5 py-5 text-sm">
+      <div ref={topRef} className="bg-white rounded-lg border mt-3 px-3 lg:px-5 py-5 text-sm scroll-mt-4">
         <button
           type="button"
           className="flex items-center gap-1 cursor-pointer border-b pb-3 w-full"
@@ -557,513 +595,406 @@ useEffect(() => {
           <ArrowLeft className="w-4 h-4 text-gray-800" />
           <span>Encounter Note Entry</span>
         </button>
+
+        <div className="flex items-center gap-2 mt-4 text-[12px]">
+          {STEPS.map((label, i) => (
+            <React.Fragment key={label}>
+              {i > 0 && <div className="h-px w-6 sm:w-10 bg-gray-300" />}
+              <div
+                className={`flex items-center gap-2 ${
+                  step === i + 1 ? "text-docuhealth-primary font-medium" : "text-gray-500"
+                }`}
+              >
+                <span
+                  className={`w-5 h-5 shrink-0 rounded-full flex items-center justify-center text-[11px] ${
+                    step >= i + 1 ? "bg-docuhealth-primary text-white" : "bg-gray-200 text-gray-600"
+                  }`}
+                >
+                  {i + 1}
+                </span>
+                {label}
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
+
         {step === 1 && (
-          <div className="my-5">
-            <div className="mb-2 font-medium">
-              <p>Subjective</p>
-            </div>
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5">
-              <p className="font-medium">Chief complaint<span className="text-red-500"> *</span></p>
-              <textarea
+          <div className="my-4">
+            <SectionCard title="Subjective">
+              <TextField
+                label="Chief complaint"
                 name="chief_complaint"
+                required
                 value={soapNoteData.chief_complaint}
                 onChange={handleTextChange}
-                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
                 placeholder="Enter chief complaint..."
-              ></textarea>
-            </div>
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium">History of Presenting Complain</p>
-              <textarea
+              />
+              <TextField
+                label="History of Presenting Complain"
                 name="history_of_presenting_complain"
                 value={soapNoteData.history_of_presenting_complain}
                 onChange={handleTextChange}
-                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
                 placeholder="Enter history of presenting complaint..."
-              ></textarea>
-            </div>
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium">Past Medical History</p>
-              <textarea
-                name="past_med_history"
-                value={soapNoteData.past_med_history}
-                onChange={handleTextChange}
-                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
-                placeholder="Enter past medical history..."
-              ></textarea>
-            </div>
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium">Family History</p>
-              <textarea
-                name="family_history"
-                value={soapNoteData.family_history}
-                onChange={handleTextChange}
-                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
-                placeholder="Enter family history..."
-              ></textarea>
-            </div>
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium">Social History</p>
-              <textarea
-                name="social_history"
-                value={soapNoteData.social_history}
-                onChange={handleTextChange}
-                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
-                placeholder="Enter social history..."
-              ></textarea>
-            </div>
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium">Other History</p>
-              <textarea
-                name="other_history"
-                value={soapNoteData.other_history}
-                onChange={handleTextChange}
-                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
-                placeholder="Enter other history..."
-              ></textarea>
-            </div>
-
-            <NoteSection
-              title="Drug History / Allergies"
-              field="drug_history_allergies"
-              placeholder="e.g. Patient used Amoxicillin but developed rash"
-              soapNoteData={soapNoteData}
-              inputs={inputs}
-              setInputs={setInputs}
-              handleAddListItem={handleAddListItem}
-              handleRemoveItem={handleRemoveItem}
-              activeInput={activeInput}
-              setActiveInput={setActiveInput}
-            />
-
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium">Review of System</p>
-              <textarea
-                name="review_of_system"
-                value={soapNoteData.review_of_system}
-                onChange={handleTextChange}
-                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
-                placeholder="Enter review of system..."
-              ></textarea>
-            </div>
-
-            <div className="flex justify-end cursor-pointer">
-              <button
-                className="py-2.5 text-white bg-docuhealth-primary rounded-full text-sm px-20 mt-5 cursor-pointer w-full lg:w-auto"
-                onClick={() => {
-                  handleNextStep();
-                }}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
-        {step === 2 && (
-          <div className="my-5">
-            <div className="mb-2 font-medium">
-              <p>Subjective</p>
-            </div>
-
-            <VitalSignsCard
-              title="Vital Signs (auto uploaded)"
-              className="border rounded-md px-3 lg:px-5 py-4 lg:py-5"
-              vitalSigns={selectedPatientFetchedInfo?.latest_vitals}
-            />
-
-            <NoteSection
-              title="General Examinations"
-              field="general_exam"
-              placeholder="e.g. Patient is stable but reports mild headache"
-              soapNoteData={soapNoteData}
-              inputs={inputs}
-              setInputs={setInputs}
-              handleAddListItem={handleAddListItem}
-              handleRemoveItem={handleRemoveItem}
-              activeInput={activeInput}
-              setActiveInput={setActiveInput}
-            />
-
-            <NoteSection
-              title="Systemic Examinations"
-              field="systemic_exam"
-              placeholder="e.g. Patient is stable but reports mild headache"
-              soapNoteData={soapNoteData}
-              inputs={inputs}
-              setInputs={setInputs}
-              handleAddListItem={handleAddListItem}
-              handleRemoveItem={handleRemoveItem}
-              activeInput={activeInput}
-              setActiveInput={setActiveInput}
-            />
-
-            <NoteSection
-              title="Relevant Bedside Tests"
-              field="bedside_tests"
-              placeholder="e.g. Patient is stable but reports mild headache"
-              soapNoteData={soapNoteData}
-              inputs={inputs}
-              setInputs={setInputs}
-              handleAddListItem={handleAddListItem}
-              handleRemoveItem={handleRemoveItem}
-              activeInput={activeInput}
-              setActiveInput={setActiveInput}
-            />
-
-            <NoteSection
-              title="Investigations (Scan and Test result images / documents)"
-              field="investigations"
-              placeholder="e.g. Patient reports mild headache"
-              soapNoteData={soapNoteData}
-              inputs={inputs}
-              setInputs={setInputs}
-              handleAddListItem={handleAddListItem}
-              handleRemoveItem={handleRemoveItem}
-              activeInput={activeInput}
-              setActiveInput={setActiveInput}
-            />
-
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium">
-                Investigation (Scan and Test result images / documents){" "}
-              </p>
-
-              {/* Click + Drag Area */}
-              <label
-                htmlFor="file-upload"
-                className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-400 rounded-lg p-16 cursor-pointer hover:bg-gray-50 transition my-3"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  const files = Array.from(e.dataTransfer.files);
-                  handleFiles(files);
-                }}
-              >
-                <UploadCloud className="w-5 h-5 text-docuhealth-primary" />
-                <span className="text-docuhealth-primary font-medium">
-                  Drag & drop or click to upload
-                </span>
-              </label>
-
-              {/* Hidden Input */}
-              <input
-                id="file-upload"
-                type="file"
-                multiple
-                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                onChange={(e) => handleFiles(Array.from(e.target.files))}
-                className="hidden"
               />
-
-              {/* Preview Section */}
-              {attachments.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 mt-3">
-                  {attachments.map((doc, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        {doc.preview ? (
-                          <img
-                            src={doc.preview}
-                            alt="Preview"
-                            className="w-10 h-10 object-cover rounded-md border"
-                          />
-                        ) : (
-                          <FileText className="w-8 h-8 text-gray-500" />
-                        )}
-                        <span className="truncate text-sm">
-                          {truncateWords(doc.file.name, 10)}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeAttachments(index)}
-                        className="text-gray-500 hover:text-red-600 transition cursor-pointer"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center lg:justify-end cursor-pointer gap-4 mt-5 sm:mt-0">
-              <button
-                className={`py-2 ${
-                  isPending
-                    ? "border border-gray-400 text-gray-400 cursor-not-allowed"
-                    : "text-docuhealth-primary border border-docuhealth-primary "
-                } rounded-full text-sm px-16 sm:mt-5 w-full lg:w-auto`}
-                disabled={isPending}
-                onClick={() => {
-                  setStep(step - 1);
-                }}
-              >
-                Previous
-              </button>
-
-              <button
-                className="py-2.5 text-white bg-docuhealth-primary rounded-full text-sm px-20  cursor-pointer lg:w-auto w-full sm:mt-5"
-                onClick={() => {
-                  handleNextStep();
-                }}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
-        {step === 3 && (
-          <div className="my-5">
-            <div className="mb-2 font-medium">
-              <p>Assessment</p>
-            </div>
-
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5">
-              <p className="font-medium text-docuhealth-dark">Primary diagnosis<span className="text-red-500"> *</span></p>
-              <textarea
-                name="primary_diagnosis"
-                value={soapNoteData.primary_diagnosis}
-                onChange={handleTextChange}
-                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
-                placeholder="Enter primary diagnosis..."
-              ></textarea>
-            </div>
-
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium">Differential diagnosis</p>
-              <textarea
-                name="differential_diagnosis"
-                id="differentialDiagnosis"
-                value={soapNoteData.differential_diagnosis}
-                onChange={handleTextChange}
-                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
-                placeholder="Enter differential diagnosis..."
-              ></textarea>
-            </div>
-
-            <NoteSection
-              title="Problems List"
-              field="problems_list"
-              placeholder="e.g. Patient has mild headache"
-              soapNoteData={soapNoteData}
-              inputs={inputs}
-              setInputs={setInputs}
-              handleAddListItem={handleAddListItem}
-              handleRemoveItem={handleRemoveItem}
-              activeInput={activeInput}
-              setActiveInput={setActiveInput}
-            />
-
-            <div className="flex flex-col sm:flex-row items-center lg:justify-end cursor-pointer gap-4 mt-5 sm:mt-0">
-              <button
-                className={`py-2 ${
-                  isPending
-                    ? "border border-gray-400 text-gray-400 cursor-not-allowed"
-                    : "text-docuhealth-primary border border-docuhealth-primary "
-                } rounded-full text-sm px-16 sm:mt-5 w-full lg:w-auto`}
-                disabled={isPending}
-                onClick={() => {
-                  setStep(step - 1);
-                }}
-              >
-                Previous
-              </button>
-
-              <button
-                className="py-2.5 text-white bg-docuhealth-primary rounded-full text-sm px-20  cursor-pointer lg:w-auto w-full sm:mt-5"
-                onClick={() => {
-                  handleNextStep();
-                }}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
-        {step === 4 && (
-          <div className="my-5">
-            <div className="mb-2 font-medium">
-              <p>Plan</p>
-            </div>
-
-            <NoteSection
-              title="Treatment Plan"
-              field="treatment_plan"
-              placeholder="e.g. Patient to take prescribed medication"
-              soapNoteData={soapNoteData}
-              inputs={inputs}
-              setInputs={setInputs}
-              handleAddListItem={handleAddListItem}
-              handleRemoveItem={handleRemoveItem}
-              activeInput={activeInput}
-              setActiveInput={setActiveInput}
-            />
-
-            <NoteSection
-              title="Care Instructions *"
-              field="care_instructions"
-              placeholder="e.g. Patient to take prescribed medication"
-              soapNoteData={soapNoteData}
-              inputs={inputs}
-              setInputs={setInputs}
-              handleAddListItem={handleAddListItem}
-              handleRemoveItem={handleRemoveItem}
-              activeInput={activeInput}
-              setActiveInput={setActiveInput}
-            />
-
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium text-docuhealth-dark">Follow up / Next appointment</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 mt-3 gap-3">
-                <Select
-                  label="Day"
-                  value={String(selectedDay)}
-                  onChange={(value) => setSelectedDay(value)}
-                  options={[...Array(31)].map((_, i) => ({ value: String(i + 1), label: String(i + 1) }))}
-                />
-                <Select
-                  label="Month"
-                  value={selectedMonth}
-                  onChange={(value) => setSelectedMonth(value)}
-                  options={[
-                    "January", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November", "December",
-                  ].map((month) => ({ value: month, label: month }))}
-                />
-                <Select
-                  label="Year"
-                  value={String(selectedYear)}
-                  onChange={(value) => setSelectedYear(value)}
-                  options={["2024", "2025", "2026", "2027"].map((year) => ({ value: year, label: year }))}
-                />
-                <Select
-                  label="Select time"
-                  value={selectedTime}
-                  onChange={(value) => setSelectedTime(value)}
-                  options={[
-                    { value: "08:00", label: "08:00 AM" },
-                    { value: "09:00", label: "09:00 AM" },
-                    { value: "10:00", label: "10:00 AM" },
-                    { value: "11:00", label: "11:00 AM" },
-                    { value: "12:00", label: "12:00 PM" },
-                    { value: "13:00", label: "01:00 PM" },
-                    { value: "14:00", label: "02:00 PM" },
-                    { value: "15:00", label: "03:00 PM" },
-                    { value: "16:00", label: "04:00 PM" },
-                    { value: "17:00", label: "05:00 PM" },
-                  ]}
-                />
-                <div className="relative col-span-1 sm:col-span-2 lg:col-span-4">
-                  <label className="block text-[12px] ">Note</label>
-                  <textarea
-                    name="note"
-                    id="note"
-                    value={note}
-                    onChange={(e) => {
-                      setNote(e.target.value);
-                    }}
-                    className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px] "
-                    placeholder="Enter patient's education..."
-                  ></textarea>
-                </div>
-              </div>
-            </div>
-
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium">Referral (optional) </p>
-              <div className="mt-3">
-                <Select
-                  label="Refer to (DocuHealth Hospital) :"
-                  value={soapNoteData.referred_docuhealth_hosp}
-                  onChange={(value) =>
-                    setSoapNoteData((prev) => ({ ...prev, referred_docuhealth_hosp: value }))
-                  }
-                  options={(hospitals || [])
-                    .filter((hospital) => hospital.name && hospital.name.trim() !== "")
-                    .map((hospital) => ({ value: hospital.hin, label: hospital.name }))}
-                  placeholder="Select Hospital"
-                />
-              </div>
-              <div className="relative mt-2">
-                <Input
-                  label="Other hospitals outside Docuhealth"
-                  name="referred_hosp" // Matches key in state
-                  placeholder="Enter the hospital details (including Name and Address)..."
-                  value={soapNoteData.referred_hosp}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <TextField
+                  label="Past Medical History"
+                  name="past_med_history"
+                  value={soapNoteData.past_med_history}
                   onChange={handleTextChange}
-                  className="text-[12px]"
+                  placeholder="Enter past medical history..."
+                />
+                <TextField
+                  label="Family History"
+                  name="family_history"
+                  value={soapNoteData.family_history}
+                  onChange={handleTextChange}
+                  placeholder="Enter family history..."
+                />
+                <TextField
+                  label="Social History"
+                  name="social_history"
+                  value={soapNoteData.social_history}
+                  onChange={handleTextChange}
+                  placeholder="Enter social history..."
+                />
+                <TextField
+                  label="Other History"
+                  name="other_history"
+                  value={soapNoteData.other_history}
+                  onChange={handleTextChange}
+                  placeholder="Enter other history..."
                 />
               </div>
-            </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <NoteSection
+                  title="Drug History / Allergies"
+                  field="drug_history_allergies"
+                  placeholder="e.g. Patient used Amoxicillin but developed rash"
+                  soapNoteData={soapNoteData}
+                  inputs={inputs}
+                  setInputs={setInputs}
+                  handleAddListItem={handleAddListItem}
+                  handleRemoveItem={handleRemoveItem}
+                />
+                <TextField
+                  label="Review of System"
+                  name="review_of_system"
+                  value={soapNoteData.review_of_system}
+                  onChange={handleTextChange}
+                  placeholder="Enter review of system..."
+                />
+              </div>
+            </SectionCard>
 
-            <div className="border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
-              <p className="font-medium">Patient's Education</p>
-              <textarea
+            <SectionCard title="Objective">
+              <VitalSignsCard
+                title="Vital Signs (auto uploaded)"
+                className="border rounded-md px-3 lg:px-4 py-3 bg-gray-50/40"
+                vitalSigns={selectedPatientFetchedInfo?.latest_vitals}
+              />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <NoteSection
+                  title="General Examinations"
+                  field="general_exam"
+                  placeholder="e.g. Patient is stable but reports mild headache"
+                  soapNoteData={soapNoteData}
+                  inputs={inputs}
+                  setInputs={setInputs}
+                  handleAddListItem={handleAddListItem}
+                  handleRemoveItem={handleRemoveItem}
+                />
+                <NoteSection
+                  title="Systemic Examinations"
+                  field="systemic_exam"
+                  placeholder="e.g. Chest clear, no added sounds"
+                  soapNoteData={soapNoteData}
+                  inputs={inputs}
+                  setInputs={setInputs}
+                  handleAddListItem={handleAddListItem}
+                  handleRemoveItem={handleRemoveItem}
+                />
+                <NoteSection
+                  title="Relevant Bedside Tests"
+                  field="bedside_tests"
+                  placeholder="e.g. RBS 6.2 mmol/L"
+                  soapNoteData={soapNoteData}
+                  inputs={inputs}
+                  setInputs={setInputs}
+                  handleAddListItem={handleAddListItem}
+                  handleRemoveItem={handleRemoveItem}
+                />
+                <NoteSection
+                  title="Investigations"
+                  field="investigations"
+                  placeholder="e.g. FBC, chest X-ray"
+                  soapNoteData={soapNoteData}
+                  inputs={inputs}
+                  setInputs={setInputs}
+                  handleAddListItem={handleAddListItem}
+                  handleRemoveItem={handleRemoveItem}
+                />
+              </div>
+
+              <div>
+                <p className="font-medium text-docuhealth-dark">
+                  Investigation results (scan and test images / documents)
+                </p>
+                <label
+                  htmlFor="file-upload"
+                  className="flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-5 cursor-pointer hover:bg-gray-50 transition mt-2"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const files = Array.from(e.dataTransfer.files);
+                    handleFiles(files);
+                  }}
+                >
+                  <UploadCloud className="w-5 h-5 text-docuhealth-primary" />
+                  <span className="text-docuhealth-primary font-medium">
+                    Drag & drop or click to upload
+                  </span>
+                </label>
+                <input
+                  id="file-upload"
+                  type="file"
+                  multiple
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  onChange={(e) => handleFiles(Array.from(e.target.files))}
+                  className="hidden"
+                />
+                {attachments.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 mt-3">
+                    {attachments.map((doc, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded-lg"
+                      >
+                        <div className="flex items-center gap-3">
+                          {doc.preview ? (
+                            <img
+                              src={doc.preview}
+                              alt="Preview"
+                              className="w-10 h-10 object-cover rounded-md border"
+                            />
+                          ) : (
+                            <FileText className="w-8 h-8 text-gray-500" />
+                          )}
+                          <span className="truncate text-sm">
+                            {truncateWords(doc.file.name, 10)}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeAttachments(index)}
+                          className="text-gray-500 hover:text-red-600 transition cursor-pointer"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </SectionCard>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                className="py-2.5 text-white bg-docuhealth-primary rounded-full text-sm px-20 mt-5 cursor-pointer w-full lg:w-auto"
+                onClick={handleNextStep}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="my-4">
+            <SectionCard title="Assessment">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <TextField
+                  label="Primary diagnosis"
+                  name="primary_diagnosis"
+                  required
+                  value={soapNoteData.primary_diagnosis}
+                  onChange={handleTextChange}
+                  placeholder="Enter primary diagnosis..."
+                />
+                <TextField
+                  label="Differential diagnosis"
+                  name="differential_diagnosis"
+                  value={soapNoteData.differential_diagnosis}
+                  onChange={handleTextChange}
+                  placeholder="Enter differential diagnosis..."
+                />
+              </div>
+              <NoteSection
+                title="Problems List"
+                field="problems_list"
+                placeholder="e.g. Patient has mild headache"
+                soapNoteData={soapNoteData}
+                inputs={inputs}
+                setInputs={setInputs}
+                handleAddListItem={handleAddListItem}
+                handleRemoveItem={handleRemoveItem}
+              />
+            </SectionCard>
+
+            <SectionCard title="Plan">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <NoteSection
+                  title="Treatment Plan"
+                  field="treatment_plan"
+                  required
+                  placeholder="e.g. Tab Paracetamol 1g 8 hourly x 3 days"
+                  soapNoteData={soapNoteData}
+                  inputs={inputs}
+                  setInputs={setInputs}
+                  handleAddListItem={handleAddListItem}
+                  handleRemoveItem={handleRemoveItem}
+                />
+                <NoteSection
+                  title="Care Instructions"
+                  field="care_instructions"
+                  required
+                  placeholder="e.g. Patient to take prescribed medication"
+                  soapNoteData={soapNoteData}
+                  inputs={inputs}
+                  setInputs={setInputs}
+                  handleAddListItem={handleAddListItem}
+                  handleRemoveItem={handleRemoveItem}
+                />
+              </div>
+
+              <TextField
+                label="Patient's Education"
                 name="patient_education"
-                id="patientEducation"
                 value={soapNoteData.patient_education}
                 onChange={handleTextChange}
-                className="w-full my-2 rounded-sm border focus:outline-none p-3 text-[12px]  h-auto max-h-[300px]"
                 placeholder="Enter patient's education..."
-              ></textarea>
-            </div>
+              />
 
-            <div className="flex items-center justify-between border rounded-md px-3 lg:px-5 py-4 lg:py-5 mt-3">
               <div>
-                <p className="font-medium text-docuhealth-dark">Share Encounter Note (Optional)</p>
-                <p className="text-[12px] text-gray-500 mt-1">Allow other healthcare personnel (e.g. NURSES) in this hospital to access this Encounter Note.</p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  className="sr-only peer" 
-                  checked={isShared} 
-                  onChange={() => {
-                    if (!isShared) {
-                      setShareModal(true);
-                    } else {
-                      setIsShared(false);
-                    }
-                  }} 
+                <p className="font-medium text-docuhealth-dark">Follow up / Next appointment</p>
+                <div className="grid grid-cols-2 xl:grid-cols-4 mt-2 gap-3">
+                  <Select
+                    label="Day"
+                    value={String(selectedDay)}
+                    onChange={(value) => setSelectedDay(value)}
+                    options={[...Array(31)].map((_, i) => ({ value: String(i + 1), label: String(i + 1) }))}
+                  />
+                  <Select
+                    label="Month"
+                    value={selectedMonth}
+                    onChange={(value) => setSelectedMonth(value)}
+                    options={monthNames.map((month) => ({ value: month, label: month }))}
+                  />
+                  <Select
+                    label="Year"
+                    value={String(selectedYear)}
+                    onChange={(value) => setSelectedYear(value)}
+                    options={["2024", "2025", "2026", "2027"].map((year) => ({ value: year, label: year }))}
+                  />
+                  <Select
+                    label="Select time"
+                    value={selectedTime}
+                    onChange={(value) => setSelectedTime(value)}
+                    options={[
+                      { value: "08:00", label: "08:00 AM" },
+                      { value: "09:00", label: "09:00 AM" },
+                      { value: "10:00", label: "10:00 AM" },
+                      { value: "11:00", label: "11:00 AM" },
+                      { value: "12:00", label: "12:00 PM" },
+                      { value: "13:00", label: "01:00 PM" },
+                      { value: "14:00", label: "02:00 PM" },
+                      { value: "15:00", label: "03:00 PM" },
+                      { value: "16:00", label: "04:00 PM" },
+                      { value: "17:00", label: "05:00 PM" },
+                    ]}
+                  />
+                </div>
+                <label className="block text-[12px] mt-3">Note</label>
+                <textarea
+                  name="note"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  rows={2}
+                  className={textareaClass}
+                  placeholder="Enter a note for the follow-up..."
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-docuhealth-primary"></div>
-              </label>
-            </div>
+              </div>
 
-            <div className="flex flex-col sm:flex-row items-center lg:justify-end cursor-pointer gap-4 mt-5 sm:mt-0">
+              <div>
+                <p className="font-medium text-docuhealth-dark">Referral (optional)</p>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-2">
+                  <Select
+                    label="Refer to (DocuHealth Hospital) :"
+                    value={soapNoteData.referred_docuhealth_hosp}
+                    onChange={(value) =>
+                      setSoapNoteData((prev) => ({ ...prev, referred_docuhealth_hosp: value }))
+                    }
+                    options={(hospitals || [])
+                      .filter((hospital) => hospital.name && hospital.name.trim() !== "")
+                      .map((hospital) => ({ value: hospital.hin, label: hospital.name }))}
+                    placeholder="Select Hospital"
+                  />
+                  <Input
+                    label="Other hospitals outside Docuhealth"
+                    name="referred_hosp"
+                    placeholder="Hospital name and address..."
+                    value={soapNoteData.referred_hosp}
+                    onChange={handleTextChange}
+                    className="text-[12px]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-4 border-t pt-4">
+                <div>
+                  <p className="font-medium text-docuhealth-dark">Share Encounter Note (Optional)</p>
+                  <p className="text-[12px] text-gray-500 mt-1">Allow other healthcare personnel (e.g. NURSES) in this hospital to access this Encounter Note.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={isShared}
+                    onChange={() => {
+                      if (!isShared) {
+                        setShareModal(true);
+                      } else {
+                        setIsShared(false);
+                      }
+                    }}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-docuhealth-primary"></div>
+                </label>
+              </div>
+            </SectionCard>
+
+            <div className="flex flex-col-reverse sm:flex-row items-center sm:justify-end gap-3 mt-5">
               <button
+                type="button"
                 className={`py-2 ${
                   isPending
                     ? "border border-gray-400 text-gray-400 cursor-not-allowed"
-                    : "text-docuhealth-primary border border-docuhealth-primary "
-                } rounded-full text-sm px-16 sm:mt-5 w-full lg:w-auto`}
+                    : "text-docuhealth-primary border border-docuhealth-primary cursor-pointer"
+                } rounded-full text-sm px-16 w-full sm:w-auto`}
                 disabled={isPending}
-                onClick={() => {
-                  setStep(step - 1);
-                }}
+                onClick={() => goToStep(1)}
               >
-                Previous
+                Back
               </button>
               <button
-                disabled={
-                  isPending ||
-                  soapNoteData.care_instructions.length === 0 ||
-                  soapNoteData.treatment_plan.length === 0
-                }
-                className={`py-2.5  rounded-full text-sm px-20 sm:mt-5 text-white lg:w-auto w-full ${
-                  isPending ||
-                  soapNoteData.care_instructions.length === 0 ||
-                  soapNoteData.treatment_plan.length === 0
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-docuhealth-primary cursor-pointer"
+                type="button"
+                disabled={!canSubmit}
+                title={canSubmit ? undefined : "Add a Treatment Plan and Care Instructions to submit"}
+                className={`py-2.5 rounded-full text-sm px-20 text-white w-full sm:w-auto ${
+                  canSubmit ? "bg-docuhealth-primary cursor-pointer" : "bg-gray-400 cursor-not-allowed"
                 }`}
-                onClick={() => {
-                  setConfirmationModal(true);
-                }}
+                onClick={handleReview}
               >
                 {isPending ? (
                   <div className="flex items-center justify-center gap-2">
