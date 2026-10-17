@@ -81,6 +81,7 @@ import Hospital_Admin_Patients_Dashboard from "./Dashboard/Hospital_Dashboard/Ho
 import Hospital_Admin_Ward_Management_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Ward_Management_Dashboard";
 import Hospital_Admin_Messages_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Messages_Dashboard";
 import Hospital_Admin_Appointments_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Appointments_Dashboard";
+import Hospital_Admin_Audit_Logs_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Audit_Logs_Dashboard";
 import Hospital_Admin_Wallet_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Wallet_Dashboard";
 import Hospital_Admin_Settings_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Settings_Dashboard";
 import Hospital_Admin_Subscriptions_Dashboard from "./Dashboard/Hospital_Dashboard/Hospital_Admin/Hospital_Admin_Subscriptions_Dashboard";
@@ -309,6 +310,25 @@ function App() {
                   <HospitalProtectedRoute>
                     <HospitalAdminProviders>
                       <Hospital_Admin_Appointments_Dashboard />
+                    </HospitalAdminProviders>
+                  </HospitalProtectedRoute>
+                }
+              />
+            </Route>
+            <Route
+              path="/hospital-admin-audit-logs-dashboard"
+              element={
+                <HospitalAdminProviders>
+                  <Hospital_Admin_Layout />
+                </HospitalAdminProviders>
+              }
+            >
+              <Route
+                index
+                element={
+                  <HospitalProtectedRoute>
+                    <HospitalAdminProviders>
+                      <Hospital_Admin_Audit_Logs_Dashboard />
                     </HospitalAdminProviders>
                   </HospitalProtectedRoute>
                 }

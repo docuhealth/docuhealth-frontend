@@ -52,30 +52,33 @@ const Hospital_Lab_Administration_Dashboard = () => {
 
   return (
     <>
-      <div className="py-2 text-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 lg:gap-0 mb-4">
-        <DynamicDate />
+      {/* Date and actions share a row only from xl; below that (sidebar takes 256px) the buttons drop under the date */}
+      <div className="py-2 text-sm flex flex-col xl:flex-row justify-between items-start xl:items-center gap-3 mb-4">
+        <div className="whitespace-nowrap">
+          <DynamicDate />
+        </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
+        {/* Phones: the long settings button gets its own row, the two short ones share the row below */}
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-end items-stretch sm:items-center gap-2 sm:gap-3 w-full xl:w-auto">
+          <button
+            onClick={() => setActiveView("reports_settings")}
+            className="col-span-2 sm:order-last py-2.5 px-6 sm:px-8 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white hover:bg-docuhealth-dark-primary transition-colors cursor-pointer text-sm font-medium text-center whitespace-nowrap"
+          >
+            Reports and workflow settings
+          </button>
+
           <button
             onClick={() => setActiveView("audit_logs")}
-            className="py-2.5 px-6 sm:px-8 rounded-full text-docuhealth-primary border border-docuhealth-primary hover:bg-indigo-50 transition-colors cursor-pointer text-sm font-medium w-full sm:w-auto text-center whitespace-nowrap"
+            className="py-2.5 px-4 sm:px-8 rounded-full text-docuhealth-primary border border-docuhealth-primary hover:bg-indigo-50 transition-colors cursor-pointer text-sm font-medium text-center whitespace-nowrap"
           >
             Audit Logs
           </button>
 
           <button
             onClick={() => handleOpenAddTest(null)}
-            className="py-2.5 px-6 sm:px-8 rounded-full text-docuhealth-primary border border-docuhealth-primary hover:bg-indigo-50 transition-colors cursor-pointer text-sm font-medium w-full sm:w-auto text-center whitespace-nowrap"
+            className="py-2.5 px-4 sm:px-8 rounded-full text-docuhealth-primary border border-docuhealth-primary hover:bg-indigo-50 transition-colors cursor-pointer text-sm font-medium text-center whitespace-nowrap"
           >
             Add new test
-          </button>
-
-          <button
-            onClick={() => setActiveView("reports_settings")}
-            className="py-2.5 px-6 sm:px-8 rounded-full bg-docuhealth-primary border border-docuhealth-primary text-white hover:bg-docuhealth-dark-primary transition-colors cursor-pointer text-sm font-medium w-full sm:w-auto text-center whitespace-nowrap"
-          >
-            Reports and workflow settings
           </button>
         </div>
       </div>

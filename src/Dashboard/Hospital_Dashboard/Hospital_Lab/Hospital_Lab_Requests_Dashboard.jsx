@@ -154,15 +154,16 @@ const Hospital_Lab_Requests_Dashboard = () => {
 
       <div className="mt-4 bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
         {/* Tabs */}
-        <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-0 sm:overflow-x-auto border-b-0 sm:border-b border-gray-200 mb-5">
+        {/* One underline row at every size; on phones it scrolls sideways instead of wrapping into a grid */}
+        <div className="flex overflow-x-auto border-b border-gray-200 mb-5 -mx-4 px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`text-sm px-2 sm:px-4 py-2 font-medium transition-colors duration-200 cursor-pointer text-center sm:whitespace-nowrap sm:shrink-0 rounded-lg sm:rounded-none ${
+              className={`text-sm px-3 sm:px-4 py-2 font-medium transition-colors duration-200 cursor-pointer text-center whitespace-nowrap shrink-0 border-b-2 -mb-px outline-none focus-visible:ring-2 focus-visible:ring-docuhealth-primary/40 rounded-t ${
                 activeTab === tab
-                  ? "bg-docuhealth-primary text-white sm:bg-transparent sm:text-docuhealth-primary sm:border-b-2 sm:border-docuhealth-primary font-semibold"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-800 sm:hover:bg-transparent sm:border-b-2 sm:border-transparent"
+                  ? "text-docuhealth-primary border-docuhealth-primary font-semibold"
+                  : "text-gray-600 hover:text-gray-800 border-transparent"
               }`}
             >
               {tab}
@@ -171,8 +172,9 @@ const Hospital_Lab_Requests_Dashboard = () => {
         </div>
 
         {/* Search + Category + Sort row */}
-        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 mb-6">
-          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 w-full sm:w-auto">
+        {/* Phones: search on its own row, category and sort side by side */}
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end sm:gap-3 mb-6">
+          <div className="col-span-2 flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 sm:py-1.5 w-full sm:w-auto">
             <Search size={14} className="text-gray-400 shrink-0" />
             <input
               type="text"
@@ -187,7 +189,7 @@ const Hospital_Lab_Requests_Dashboard = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 bg-gray-50 outline-none focus:border-docuhealth-primary appearance-none cursor-pointer"
+              className="w-full sm:w-auto min-w-0 border border-gray-200 rounded-lg px-3 py-2 sm:py-1.5 text-xs text-gray-600 bg-gray-50 outline-none focus:border-docuhealth-primary appearance-none cursor-pointer"
             >
               <option value="">All categories</option>
               {categories.map((cat) => (
@@ -198,11 +200,11 @@ const Hospital_Lab_Requests_Dashboard = () => {
             </select>
           )}
 
-          <div className="relative inline-block">
+          <div className={`relative ${categories.length > 0 ? "" : "col-span-2 justify-self-end"}`}>
             <select
               value={ordering}
               onChange={(e) => setOrdering(e.target.value)}
-              className="flex items-center border border-docuhealth-primary text-docuhealth-primary text-xs font-medium pl-4 pr-10 py-2 rounded-full hover:bg-indigo-50 transition-colors whitespace-nowrap appearance-none outline-none cursor-pointer bg-transparent"
+              className="w-full sm:w-auto flex items-center border border-docuhealth-primary text-docuhealth-primary text-xs font-medium pl-4 pr-10 py-2 rounded-full hover:bg-indigo-50 transition-colors whitespace-nowrap appearance-none outline-none cursor-pointer bg-transparent"
             >
               <option value="-created_at">Sort by: Latest</option>
               <option value="created_at">Sort by: Oldest</option>

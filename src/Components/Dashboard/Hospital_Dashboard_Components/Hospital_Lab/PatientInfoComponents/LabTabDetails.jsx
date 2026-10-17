@@ -23,17 +23,14 @@ import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import {useMutation, useQueryClient } from "@tanstack/react-query";
 import PatientInfoCard from "../../../../ui/PatientInfoCard";
-const PatientInfo = ({ patientFullInfo }) => {
-  console.log(patientFullInfo);
-  return (
-    <>
-      <PatientInfoCard 
-        selectedMedicalRecord={patientFullInfo} 
-        className="my-5 bg-docuhealth-light-gray rounded-lg border p-4"
-      />
-    </>
-  );
-};
+const PatientInfo = ({ patientFullInfo }) => (
+  <PatientInfoCard
+    selectedMedicalRecord={patientFullInfo}
+    staffLabel="Booked with"
+    dateLabel="Appointment time"
+    className="my-5 bg-docuhealth-light-gray rounded-lg border p-4"
+  />
+);
 
 const getTabs = ({ patientFullInfo }) => [
   {

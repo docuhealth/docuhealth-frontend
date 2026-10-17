@@ -8,10 +8,11 @@ import { formatFullDateTime } from "../../../Components/Dashboard/Patient_Dashbo
 import TimeInput from "../../../Components/ui/TimeInput";
 import ScanResultReport from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Radiology/Scan_Requests/ScanResultReport";
 import { printElement, downloadElementAsPdf, slugify } from "../../../utils/exportElement";
-import { acceptScanOrderItem, rejectScanOrderItem, logImageCollection } from "../../../queries/Hospital/radiology/scan_requests";
+import { acceptScanOrderItem, rejectScanOrderItem, logImageCollection, logScanResultDownload } from "../../../queries/Hospital/radiology/scan_requests";
 import { extractApiErrorMessage } from "../../../utils/apiError";
 import HospitalLoader from "../../../Components/ui/HospitalLoader";
 import { RadiologyAppContext } from "../../../context/HospitalContext/Radiology/RadiologyAppContext";
+import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
 
 
 // Same layout format as the doctor's patient-record detail view (PatientInfo.jsx's "viewDetailMedicalRecord").
@@ -183,6 +184,8 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
     try {
       await downloadElementAsPdf(printRef.current, downloadFileName, { singleBlock: true, scale: 1.75 });
       toast.success("PDF downloaded", { id: toastId });
+      // Audit the download; never blocks or fails the download itself
+      if (report?.sqid) logScanResultDownload(report.sqid).catch((err) => console.warn("Download audit log failed", err));
     } catch (error) {
       console.error("PDF export failed", error);
       toast.error("Could not generate the PDF", { id: toastId });
@@ -298,6 +301,23 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
         </div>
 
         <div ref={printRef} className="text-sm">
+          {/* Print-only DocuHealth header, same as the lab report PDF */}
+          <div data-print-only className="hidden mb-6 pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <img src={docuhealth_logo} alt="DocuHealth Logo" className="w-9 h-9 object-contain" />
+                <div>
+                  <h1 className="text-lg font-bold text-gray-900 tracking-tight">DocuHealth Radiology Report</h1>
+                  <p className="text-xs text-gray-500">{order.hospital_info?.name || hospitalName || "DocuHealth Partner Hospital"}</p>
+                </div>
+              </div>
+              <div className="text-right text-xs text-gray-500">
+                <p className="font-semibold text-gray-700">Official Radiology Record</p>
+                <p>{new Date().toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })}</p>
+              </div>
+            </div>
+          </div>
+
           {/* Patient / order info */}
           <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl">
             <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 ${showImagingRow ? "xl:grid-cols-[1.2fr_1fr_1.4fr_1.3fr_1fr]" : "xl:grid-cols-4"}`}>

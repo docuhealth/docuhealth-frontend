@@ -208,3 +208,9 @@ export const fetchRadiologyScanRequests = async ({ queryKey }) => {
 
   return { results, count };
 };
+
+// Records a scan report download in the audit log (radiologist, doctor)
+export const logScanResultDownload = async (resultSqid) => {
+  const res = await axiosInstanceHos.post(`api/radiology/audit-logs/${resultSqid}/downloads`);
+  return res.data;
+};

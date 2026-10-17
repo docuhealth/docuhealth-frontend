@@ -28,7 +28,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
   const [seePatientDetails, setSeePatientDetails] = useState(false);
   const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
-  const [orderPatientHin, setOrderPatientHin] = useState(null);
+  const [orderAppointment, setOrderAppointment] = useState(null);
 
   const {
     appointments,
@@ -91,7 +91,7 @@ const Hospital_Lab_Appointments_Dashboard = () => {
   };
 
   const handleCreateOrder = (appt) => {
-    setOrderPatientHin(getPatientHin(appt));
+    setOrderAppointment(appt);
     setShowOrderModal(true);
   };
 
@@ -233,7 +233,8 @@ const Hospital_Lab_Appointments_Dashboard = () => {
       <CreateOrderModal
         isOpen={showOrderModal}
         onClose={() => setShowOrderModal(false)}
-        patientHin={orderPatientHin}
+        patientHin={orderAppointment ? getPatientHin(orderAppointment) : null}
+        visitSource={orderAppointment}
       />
     </>
   );
