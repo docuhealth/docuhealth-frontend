@@ -90,7 +90,7 @@ const normalizeOrder = (raw, tab) => ({
     : undefined,
 });
 
-const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
+const LabTestItem = ({ order, item, isDoctorView, isLabAdmin, queryClient }) => {
   const navigate = useNavigate();
   
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
@@ -100,7 +100,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [showSampleModal, setShowSampleModal] = useState(false);
   const [fromAccept, setFromAccept] = useState(false);
-  const [sampleLogged, setSampleLogged] = useState(!!item.specimen_collected_at);
+  const [justLoggedSample, setJustLoggedSample] = useState(false);
   const [sampleDate, setSampleDate] = useState("");
   const [sampleTime, setSampleTime] = useState("");
   const [rejectReason, setRejectReason] = useState("");
@@ -117,13 +117,21 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
     item.status === "result_accepted_by_lab_admin" ||
     item.status === "completed";
   const isRejected   = item.status === "rejected";
+  // Gate on status, not specimen_collected_at: a rejected result drops the item back to in_progress with the old time kept, and the backend wants the sample logged again
+  const sampleLogged = isSampleCollected || justLoggedSample;
+  const resultSentBack = ["lab_admin_rejected", "rejected"].includes(item.result_info?.status);
+  // approve/reject-by-doctor 400 until the lab admin has approved the result
+  const awaitingLabAdmin = isDoctorView && item.status === "result_ready" && item.result_info?.status === "pending";
+  // Lab admin reviews each test on its own, so one test can be sent back without touching the others
+  const labAdminCanReview = isLabAdmin && !isDoctorView && item.status === "result_ready";
 
   // On the doctor's "Reviewed" tab an already-actioned result comes back with
   // `item.status` bumped off `result_ready` (approve keeps it, reject drops it
   // to `in_progress`). Still render its result table + outcome, read-only.
   const reviewedResultStatus = isDoctorView ? item.result_info?.status : null;
   const isReviewedResult = ["accepted", "approved", "rejected"].includes(reviewedResultStatus);
-  const showResultBody = isResultReady || isReviewedResult;
+  // Doctors only see values after the lab admin approves
+  const showResultBody = (isResultReady || isReviewedResult) && !awaitingLabAdmin;
 
   const specimens    = item.test_info?.specimens ?? [];
   const preferredSpecimen = specimens.find((s) => s.is_preferred) ?? specimens[0];
@@ -131,7 +139,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
     ? `${preferredSpecimen.name}${preferredSpecimen.container ? ` (${preferredSpecimen.container})` : ""}`
     : "—";
 
-  const resultParams = item.result_info?.parameters ?? (item.test_info?.parameters || []).map(p => ({
+  const resultParams = item.result_info?.parameters_info ?? item.result_info?.parameters ?? (item.test_info?.parameters || []).map(p => ({
     parameter_info: p,
     value: null,
     status: null
@@ -178,7 +186,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   });
 
   const approveMutation = useMutation({
-    mutationFn: () => approveLabTestResultByDoctor({ item_sqid: actualItemSqid }),
+    mutationFn: () => (isDoctorView ? approveLabTestResultByDoctor : approveLabTestResultByLabAdmin)({ item_sqid: actualItemSqid }),
     onSuccess: () => {
       toast.success("Result approved successfully!");
       setIsDoctorReviewModalOpen(false);
@@ -190,7 +198,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   });
 
   const rejectDoctorMutation = useMutation({
-    mutationFn: () => rejectLabTestResultByDoctor({ item_sqid: actualItemSqid, rejection_reason: doctorReviewReason.trim() }),
+    mutationFn: () => (isDoctorView ? rejectLabTestResultByDoctor : rejectLabTestResultByLabAdmin)({ item_sqid: actualItemSqid, rejection_reason: doctorReviewReason.trim() }),
     onSuccess: () => {
       toast.success("Result rejected successfully!");
       setIsDoctorReviewModalOpen(false);
@@ -209,14 +217,15 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
       if (fromAccept) {
         await acceptMutation.mutateAsync();
         toast.success("Request accepted");
+        setFromAccept(false);
       }
       await specimenMutation.mutateAsync({ order_sqid: order.id, item_sqid: actualItemSqid, specimen_collected_at });
       toast.success("Sample collection logged");
       setShowSampleModal(false);
-      setSampleLogged(true);
+      setJustLoggedSample(true);
       invalidateAllLabQueries();
-    } catch {
-      toast.error("Something went wrong. Please try again.");
+    } catch (err) {
+      toast.error(extractApiErrorMessage(err, "Something went wrong. Please try again."));
     }
   };
 
@@ -252,7 +261,7 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
 
           {(isSampleCollected || isInProgress) && !isDoctorView && (
             <>
-              {/* specimen time is one-shot: backend only accepts it while in_progress */}
+              {/* backend only accepts specimen time while in_progress (first time or after a rejected result) */}
               {isInProgress && !sampleLogged && (
                 <button
                   onClick={() => setShowSampleModal(true)}
@@ -271,7 +280,13 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
             </>
           )}
 
-          {isResultReady && isDoctorView && (
+          {awaitingLabAdmin && (
+            <span className="text-xs font-medium text-amber-600 bg-amber-50 border border-amber-100 px-3 py-2 rounded-full text-center">
+              Waiting for lab admin approval
+            </span>
+          )}
+
+          {((isResultReady && isDoctorView && !awaitingLabAdmin) || labAdminCanReview) && (
             <>
               <button
                 onClick={() => { setDoctorReviewType("reject"); setDoctorReviewReason(""); setIsDoctorReviewModalOpen(true); }}
@@ -447,6 +462,15 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
           </div>
         )}
 
+        {isInProgress && !isDoctorView && resultSentBack && (
+          <div className="bg-red-50 p-3 rounded-lg border border-red-100">
+            <p className="text-xs font-semibold text-red-500 mb-1">
+              Result sent back by {item.result_info.status === "lab_admin_rejected" ? "the lab admin" : "the doctor"}. Log the sample again, then upload a new result.
+            </p>
+            {item.rejection_reason && <p className="text-sm text-red-800">{item.rejection_reason}</p>}
+          </div>
+        )}
+
         {isRejected && (
           <div className="bg-red-50 p-3 rounded-lg border border-red-100 mt-2">
             <p className="text-xs font-semibold text-red-500 mb-1">Reason for rejection:</p>
@@ -560,17 +584,6 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   );
 };
 
-const isCompletelyResultReadyOrder = (ord) => {
-  const items = ord?.items_info || ord?.items;
-  if (Array.isArray(items) && items.length > 0) {
-    return items.every((i) =>
-      ["result_ready", "all_ready", "completed", "ready"].includes(i.status?.toLowerCase())
-    );
-  }
-  const st = (ord?.aggregate_status || ord?.status || "").toLowerCase();
-  return st === "result_ready" || st === "all_ready" || st === "completed";
-};
-
 const Hospital_Lab_Test_Detail_Dashboard = ({ 
   orderIdProp, 
   onBackProp, 
@@ -649,9 +662,10 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
     }
   };
 
-  const isApprovalView =
-    !isDoctorView &&
-    (state?.tab === "Result Approval" || (isLabAdmin && isCompletelyResultReadyOrder(order)));
+  // Tests still waiting for the lab admin; approving/rejecting already-reviewed ones would 400
+  const itemsAwaitingLabAdmin = (order.items || []).filter((i) => i.status === "result_ready");
+  // Single tests are reviewed on their own card; the order-level buttons only batch several
+  const isApprovalView = !isDoctorView && isLabAdmin && itemsAwaitingLabAdmin.length > 1;
 
   const orderItemsList = order.items_info || order.items || [];
   const exportableStatuses = [
@@ -675,7 +689,7 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
 
   const approveMutation = useMutation({
     mutationFn: async () => {
-      const items = order.items_info || order.items;
+      const items = itemsAwaitingLabAdmin;
       if (Array.isArray(items) && items.length > 0) {
         await Promise.all(
           items.map((i) => approveLabTestResultByLabAdmin({ item_sqid: i.sqid || i.id }))
@@ -701,7 +715,7 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
 
   const rejectMutation = useMutation({
     mutationFn: async (reason) => {
-      const items = order.items_info || order.items;
+      const items = itemsAwaitingLabAdmin;
       if (Array.isArray(items) && items.length > 0) {
         await Promise.all(
           items.map((i) =>
@@ -821,14 +835,14 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
                 disabled={approveMutation.isPending || rejectMutation.isPending}
                 className="w-full sm:w-auto border border-red-500 text-red-500 hover:bg-red-50 text-xs font-semibold px-6 py-1.5 rounded-full transition-colors disabled:opacity-50 cursor-pointer text-center"
               >
-                Reject
+                Reject all
               </button>
               <button
                 onClick={() => setIsAcceptModalOpen(true)}
                 disabled={approveMutation.isPending || rejectMutation.isPending}
                 className="w-full sm:w-auto border border-docuhealth-primary text-docuhealth-primary hover:bg-indigo-50 text-xs font-semibold px-6 py-1.5 rounded-full transition-colors disabled:opacity-50 cursor-pointer text-center"
               >
-                Accept
+                Accept all
               </button>
             </div>
           )}
@@ -899,6 +913,7 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
               order={order} 
               item={item} 
               isDoctorView={isDoctorView} 
+              isLabAdmin={isLabAdmin}
               queryClient={queryClient} 
             />
           ))}

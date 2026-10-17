@@ -58,3 +58,25 @@ export const formatApprovalStatus = (resultStatus, orderStatus) => {
     className: "text-amber-500",
   };
 };
+
+// lab_admin_approved = waiting for the doctor; accepted / rejected = already reviewed by the doctor.
+// Results still with the lab (pending, lab_admin_rejected) never reach the doctor.
+export const DOCTOR_RESULT_STATUSES = ["lab_admin_approved", "accepted", "rejected"];
+
+// Flattens doctor-test-orders into one row per test the doctor can see, awaiting-doctor first
+export const flattenDoctorLabResults = (orders = []) => {
+  const rows = orders.flatMap((order) =>
+    (order.items_info || [])
+      .filter((item) => DOCTOR_RESULT_STATUSES.includes(item.result_info?.status))
+      .map((item) => ({
+        ...item,
+        order_sqid: order.sqid,
+        patient_info: order.patient_info,
+        hospital_info: order.hospital_info,
+        ordered_by_info: order.ordered_by_info,
+      }))
+  );
+  const awaiting = rows.filter((r) => r.result_info.status === "lab_admin_approved");
+  const reviewed = rows.filter((r) => r.result_info.status !== "lab_admin_approved");
+  return [...awaiting, ...reviewed];
+};
