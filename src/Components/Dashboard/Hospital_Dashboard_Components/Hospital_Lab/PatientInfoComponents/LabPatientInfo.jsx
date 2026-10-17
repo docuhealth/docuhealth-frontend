@@ -14,6 +14,7 @@ import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import AppointmentCloseControl from "../../../../ui/AppointmentCloseControl";
+import { resolveOrderContext, visitPayload } from "../../../../../utils/careOrderContext";
 
 const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateOrder }) => {
   const queryClient = useQueryClient();
@@ -24,6 +25,9 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const [duplicateWarning, setDuplicateWarning] = useState(null);
 
   const p = selectedPatientDetails?.patient ?? {};
+  // Lab orders need a check-in or admission; an appointment is neither, so ordering is blocked with a hint
+  const orderContext = resolveOrderContext(selectedPatientDetails);
+  const missingVisit = !orderContext.hasVisit;
 
   const { data: categoriesData } = useQuery({
     queryKey: ["lab-test-categories"],
@@ -45,7 +49,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
     mutationFn: (payload) => {
       const requestPayload = {
         patient: (selectedPatientDetails?.patient_info?.hin || selectedPatientDetails?.patient?.hin) || selectedPatientDetails?.patient_hin,
-        order_source: "walk_in",
+        ...visitPayload(orderContext),
         // `POST api/lab/test-orders/create` expects `items`, not `items_data`.
         items: payload.test_type.map((testSqid) => ({
           test: testSqid,
@@ -76,6 +80,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   });
 
   const handleCreateOrder = () => {
+    if (missingVisit) return;
     if (!orderForm.category || orderForm.test_type.length === 0) {
       toast.error("Please select a category and at least one test type.");
       return;
@@ -137,7 +142,16 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
 
             <div>
               <LabTabComponent
-                tabs={getTabs({ patientFullInfo: { patient_info: selectedPatientDetails?.patient || {} } })}
+                tabs={getTabs({
+                  // An appointment, not a medical record: map its hospital, booked staff, status and time onto the card
+                  patientFullInfo: {
+                    patient_info: selectedPatientDetails?.patient || {},
+                    hospital_info: selectedPatientDetails?.hospital_info,
+                    staff_info: selectedPatientDetails?.staff,
+                    status: selectedPatientDetails?.closed_at ? "Done" : selectedPatientDetails?.status,
+                    created_at: selectedPatientDetails?.scheduled_time,
+                  },
+                })}
               />
             </div>
           </div>
@@ -201,7 +215,8 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                   <svg className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${isTestTypeDropdownOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {isTestTypeDropdownOpen && fetchedTestTypes.length > 0 && (
-                  <div className="absolute top-full mt-2 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto overflow-x-hidden">
+                                    <div className="mt-2 bg-white border border-gray-200 rounded-lg max-h-60 overflow-y-auto overflow-x-hidden">
+                    {/* Inline, not floating: a floating list covered the Proceed button */}
                     {fetchedTestTypes.map((test, index) => {
                       const id = test.sqid || test.name;
                       const checked = orderForm.test_type.includes(id);
@@ -235,15 +250,21 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
               <textarea
                 value={orderForm.note}
                 onChange={(e) => setOrderForm({ ...orderForm, note: e.target.value })}
-                placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
+                placeholder="Optional: anything the lab should know about this order"
                 className="border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-500 bg-white outline-none focus:border-docuhealth-primary transition-colors resize-none h-28"
               />
             </div>
 
+            {missingVisit && (
+              <p className="text-[12px] text-red-500">
+                Lab tests can only be ordered for a checked-in or admitted patient. Ask the reception desk to check this patient in.
+              </p>
+            )}
+
             {/* Submit */}
             <button
               onClick={handleCreateOrder}
-              disabled={isOrderPending}
+              disabled={isOrderPending || missingVisit}
               className="w-full bg-docuhealth-primary text-white text-sm font-medium py-2.5 rounded-full transition-colors disabled:opacity-50 hover:bg-docuhealth-dark-primary"
             >
               {isOrderPending ? (
@@ -304,7 +325,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
               </div>
             </div>
             <p className="text-base font-normal text-gray-800 mb-6 leading-snug">
-              You have successfully created/<br />accepted a patient&apos;s test request!
+              Lab test order created
             </p>
             <button
               onClick={() => setShowSuccessModal(false)}

@@ -186,7 +186,7 @@ const Hospital_Lab_Layout = () => {
       profile={profile}
       hospitalLogo={hospitalLogo}
       hospitalName={hospitalName}
-      roleLabel="Hospital Laboratory"
+      roleLabel={isLabAdmin ? "Hospital Laboratory Admin" : "Hospital Laboratory"}
       navItems={navItems}
       bottomNavItems={bottomNavItems}
       handleLogout={handleLogout}

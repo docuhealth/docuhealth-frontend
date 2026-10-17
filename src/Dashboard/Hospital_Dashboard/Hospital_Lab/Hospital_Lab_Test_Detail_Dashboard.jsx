@@ -14,6 +14,7 @@ import {
   approveLabTestResultByDoctor,
   rejectLabTestResultByDoctor,
   rejectLabTestResultByLabAdmin,
+  logLabResultDownload,
 } from "../../../queries/Hospital/lab/requests";
 import DoctorReviewModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/DoctorReviewModal";
 import AcceptApprovalModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/AcceptApprovalModal";
@@ -202,7 +203,8 @@ const LabTestItem = ({ order, item, isDoctorView, queryClient }) => {
   });
 
   const handleSampleSubmit = async () => {
-    const specimen_collected_at = `${sampleDate}T${sampleTime}:00`;
+    // Send UTC like the radiology pages do; a bare local time was stored as UTC, so times showed an hour late
+    const specimen_collected_at = new Date(`${sampleDate}T${sampleTime}`).toISOString();
     try {
       if (fromAccept) {
         await acceptMutation.mutateAsync();
@@ -619,6 +621,18 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
     );
   };
 
+  // The PDF holds every result in the order, so log one audit entry per result; never blocks the download
+  const logDownloads = () => {
+    // Only lab staff may log downloads; the backend 403s doctors since 2026-10-17
+    if (isDoctorView) return;
+    const resultSqids = [...new Set((order.items || []).map((it) => it.result_info?.sqid).filter(Boolean))];
+    if (!resultSqids.length) return;
+    Promise.allSettled(resultSqids.map((sqid) => logLabResultDownload(sqid))).then((outcomes) => {
+      outcomes.filter((o) => o.status === "rejected").forEach((o) => console.warn("Download audit log failed", o.reason));
+      queryClient.invalidateQueries({ queryKey: ["lab-audit-logs"] });
+    });
+  };
+
   const handleDownload = async () => {
     if (downloading || !printRef.current) return;
     setDownloading(true);
@@ -626,6 +640,7 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
     try {
       await downloadElementAsPdf(printRef.current, downloadFileName, { singleBlock: true, scale: 1.75 });
       toast.success("PDF downloaded", { id: toastId });
+      logDownloads();
     } catch (error) {
       console.error("PDF generation failed:", error);
       toast.error("Could not generate the PDF", { id: toastId });

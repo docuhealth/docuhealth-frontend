@@ -108,9 +108,9 @@ export const createLabTestOrder = async (payload) => {
   return res.data;
 };
 
-// Audit Logs (Lab Admin only)
-export const fetchLabAuditLogs = async ({ page = 1, pageSize = 10 } = {}) => {
-  const res = await axiosInstanceHos.get(`api/lab/audit-logs?page=${page}&size=${pageSize}`);
+// Records a result download in the audit log (lab admin, lab scientist, doctor)
+export const logLabResultDownload = async (resultSqid) => {
+  const res = await axiosInstanceHos.post(`api/lab/audit-logs/${resultSqid}/downloads`);
   return res.data;
 };
 
@@ -123,6 +123,12 @@ export const createLabScientist = async (payload) => {
 // Lab Test Details (Create)
 export const createLabTestDetails = async (payload) => {
   const res = await axiosInstanceHos.post("api/lab/lab-tests-details/create", payload);
+  return res.data;
+};
+
+// Lab Test Details (Update, Lab Admin only). Partial; sending `references` replaces every saved range
+export const updateLabTestDetails = async (detailsSqid, payload) => {
+  const res = await axiosInstanceHos.patch(`api/lab/lab-tests-details/${detailsSqid}`, payload);
   return res.data;
 };
 
