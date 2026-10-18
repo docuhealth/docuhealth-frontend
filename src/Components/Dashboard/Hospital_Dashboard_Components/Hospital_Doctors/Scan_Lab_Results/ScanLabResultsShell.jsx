@@ -22,6 +22,7 @@ const ScanLabResultsShell = ({
   currentPage,
   totalPages,
   setCurrentPage,
+  filters,
   children,
 }) => {
   const [searchOpen, setSearchOpen] = useState(Boolean(searchQuery));
@@ -56,7 +57,8 @@ const ScanLabResultsShell = ({
           ))}
         </div>
 
-        <div className="flex items-center justify-end gap-2 sm:gap-3 mb-6">
+        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 mb-6">
+          {filters && <div className="mr-auto">{filters}</div>}
           {searchOpen && (
             <input
               type="text"

@@ -1,19 +1,26 @@
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { ArrowLeft, ScanLine, X, Info } from "lucide-react";
 import DynamicDate from "../../../../DynamicDate/DynamicDate";
 import ScanResultReport from "../../Hospital_Radiology/Scan_Requests/ScanResultReport";
 import { formatFullDateTime } from "../../../Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
-import { fetchPendingScanResults, acceptScanResult, rejectScanResult } from "../../../../../queries/Hospital/radiology/scan_results";
+import { fetchPendingScanResults, fetchDoctorApprovedScanResults, acceptScanResult, rejectScanResult } from "../../../../../queries/Hospital/radiology/scan_results";
+import { DoctorAppContext } from "../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import ScanLabResultsShell from "./ScanLabResultsShell";
 import ScanLabResultCard, { ScanLabResultGridSkeleton } from "./ScanLabResultCard";
-import { maskHIN } from "./scanLabResults";
+import ResultFilterTabs from "./ResultFilterTabs";
+import { maskHIN, RESULT_FILTERS } from "./scanLabResults";
 
 const PAGE_SIZE = 9;
 // The pending endpoint only takes page/size (no search or ordering), so pull the whole queue and search, sort and page it here.
 const FETCH_ALL_SIZE = 100;
+
+const EMPTY_MESSAGES = {
+  awaiting: "There are no scan results to approve at the moment.",
+  approved: "You have not approved any scan results yet.",
+};
 
 const patientName = (order) => `${order.patient_info?.firstname || ""} ${order.patient_info?.lastname || ""}`.trim() || "Unknown patient";
 
@@ -27,6 +34,8 @@ const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [filterKey, setFilterKey] = useState(RESULT_FILTERS[0].key);
+  const staffId = useContext(DoctorAppContext)?.profile?.staff_id;
 
   const { data, isLoading } = useQuery({
     queryKey: ["radiology-pending-results", 1, FETCH_ALL_SIZE],
@@ -37,16 +46,28 @@ const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
     refetchOnWindowFocus: true,
   });
 
+  const { data: approvedData, isLoading: approvedLoading } = useQuery({
+    queryKey: ["doctor-approved-scan-results", staffId],
+    queryFn: fetchDoctorApprovedScanResults,
+    enabled: Boolean(staffId),
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
+  });
+
+  const sourceRows = filterKey === "approved" ? approvedData : data?.results;
+  const filterCounts = { awaiting: data?.count ?? data?.results?.length ?? 0, approved: approvedData?.length ?? 0 };
+  const listLoading = filterKey === "approved" ? approvedLoading || !staffId : isLoading;
+
   const filteredRows = useMemo(() => {
     const term = searchQuery.trim().toLowerCase();
-    const matching = (data?.results || []).filter(
+    const matching = (sourceRows || []).filter(
       (row) =>
         !term ||
         [patientName(row), row.patient_info?.hin, row.scan_type].some((field) => field?.toLowerCase().includes(term))
     );
     const direction = ordering === "created_at" ? 1 : -1;
     return matching.sort((a, b) => direction * (new Date(a.created_at) - new Date(b.created_at)));
-  }, [data, searchQuery, ordering]);
+  }, [sourceRows, searchQuery, ordering]);
 
   const count = filteredRows.length;
   const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
@@ -65,6 +86,7 @@ const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
     toast.success(message);
     queryClient.invalidateQueries({ queryKey: ["radiology-pending-results"] });
     queryClient.invalidateQueries({ queryKey: ["patient-approved-scan-results"] });
+    queryClient.invalidateQueries({ queryKey: ["doctor-approved-scan-results"] });
     closeDetail();
   };
 
@@ -84,6 +106,7 @@ const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
   });
 
   if (selected) {
+    const isApproved = selected.report?.status === "approved";
     const decisionPending = approveMutation.isPending || rejectMutation.isPending;
     return (
       <>
@@ -95,27 +118,31 @@ const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-3 gap-4 sm:gap-0">
             <button type="button" onClick={closeDetail} className="flex items-center gap-1 cursor-pointer">
               <ArrowLeft size={14} />
-              <span>Radiology result approval</span>
+              <span>{isApproved ? "Approved radiology result" : "Radiology result approval"}</span>
             </button>
 
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={() => setShowRejectModal(true)}
-                disabled={decisionPending}
-                className="border border-red-400 text-red-500 rounded-full py-1.5 px-4 disabled:opacity-60 text-xs font-semibold cursor-pointer hover:bg-red-50 transition-colors"
-              >
-                Reject result
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowApproveModal(true)}
-                disabled={decisionPending}
-                className="border border-docuhealth-primary text-white bg-docuhealth-primary rounded-full py-1.5 px-4 disabled:opacity-60 text-xs font-semibold cursor-pointer hover:bg-docuhealth-dark-primary transition-colors"
-              >
-                Approve result
-              </button>
-            </div>
+            {isApproved ? (
+              <span className="inline-flex items-center rounded-full bg-green-100 text-green-700 text-xs font-semibold px-3 py-1">Approved</span>
+            ) : (
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setShowRejectModal(true)}
+                  disabled={decisionPending}
+                  className="border border-red-400 text-red-500 rounded-full py-1.5 px-4 disabled:opacity-60 text-xs font-semibold cursor-pointer hover:bg-red-50 transition-colors"
+                >
+                  Reject result
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowApproveModal(true)}
+                  disabled={decisionPending}
+                  className="border border-docuhealth-primary text-white bg-docuhealth-primary rounded-full py-1.5 px-4 disabled:opacity-60 text-xs font-semibold cursor-pointer hover:bg-docuhealth-dark-primary transition-colors"
+                >
+                  Approve result
+                </button>
+              </div>
+            )}
           </div>
 
           <div>
@@ -228,24 +255,39 @@ const Hospital_Doctors_Scan_Results_Tab = ({ activeTab, onTabChange }) => {
       currentPage={page}
       totalPages={totalPages}
       setCurrentPage={setCurrentPage}
+      filters={
+        <ResultFilterTabs
+          value={filterKey}
+          onChange={(key) => {
+            setFilterKey(key);
+            setCurrentPage(1);
+          }}
+          counts={filterCounts}
+          loading={isLoading || approvedLoading || !staffId}
+        />
+      }
     >
-      {isLoading && rows.length === 0 ? (
+      {listLoading && rows.length === 0 ? (
         <ScanLabResultGridSkeleton label="Loading scan results" />
       ) : rows.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-gray-400">
           <ScanLine size={36} className="opacity-25 mb-2" />
           <h2 className="font-medium pb-1 text-gray-800">No scan results!</h2>
-          <p className="text-[12px] text-gray-500 max-w-md text-center">There are no scan results to approve at the moment.</p>
+          <p className="text-[12px] text-gray-500 max-w-md text-center">{EMPTY_MESSAGES[filterKey]}</p>
         </div>
       ) : (
         <div className="text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {rows.map((row) => (
             <ScanLabResultCard
-              key={row.result_sqid}
+              key={row.result_sqid || row.sqid}
               title={row.scan_type}
               badge="Imaging result"
               patient={{ name: patientName(row), hin: row.patient_info?.hin }}
-              statusRows={[{ label: "Approval Status", value: "Pending", className: "text-amber-500" }]}
+              statusRows={[
+                filterKey === "approved"
+                  ? { label: "Approval Status", value: "Approved", className: "text-docuhealth-green" }
+                  : { label: "Approval Status", value: "Pending", className: "text-amber-500" },
+              ]}
               reporter={row.report?.reporter || "N/A"}
               dateTime={formatFullDateTime(row.report?.reported_at) || "N/A"}
               onOpen={() => setSelected(row)}

@@ -40,3 +40,14 @@ export const fetchPatientApprovedScanResults = async ({ queryKey }) => {
     .filter((row) => row.report?.status === "approved")
     .sort((a, b) => new Date(b.report.reported_at || b.created_at) - new Date(a.report.reported_at || a.created_at));
 };
+
+// Approved results for scans this doctor ordered (completed items whose result is approved), newest first.
+// No doctor-scoped endpoint exists, so pull the hospital's completed items and keep the doctor's own by staff_id.
+export const fetchDoctorApprovedScanResults = async ({ queryKey }) => {
+  const [, staffId] = queryKey;
+  const res = await axiosInstanceHos.get("api/radiology/orders/items?status=completed&size=100");
+  return (res.data?.results || [])
+    .filter((item) => item.order_info?.ordered_by_info?.staff_id === staffId)
+    .map(mapScanOrderItem)
+    .filter((row) => row.report?.status === "approved");
+};

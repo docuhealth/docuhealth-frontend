@@ -6,7 +6,13 @@ import Hospital_Lab_Test_Detail_Dashboard from "../../../../../Dashboard/Hospita
 import useDebounce from "../../../../../hooks/useDebounce";
 import ScanLabResultsShell from "./ScanLabResultsShell";
 import ScanLabResultCard, { ScanLabResultGridSkeleton } from "./ScanLabResultCard";
-import { formatOrderStatus, formatApprovalStatus, flattenDoctorLabResults } from "./scanLabResults";
+import ResultFilterTabs from "./ResultFilterTabs";
+import { formatOrderStatus, formatApprovalStatus, flattenDoctorLabResults, RESULT_FILTERS, LAB_FILTER_STATUSES } from "./scanLabResults";
+
+const EMPTY_MESSAGES = {
+  awaiting: "No lab results are waiting for your approval.",
+  approved: "You have not approved any lab results yet.",
+};
 
 const PAGE_SIZE = 9;
 const FETCH_SIZE = 200;
@@ -17,6 +23,7 @@ const Hospital_Doctors_Lab_Results_Tab = ({ activeTab, onTabChange }) => {
   const [ordering, setOrdering] = useState("-created_at");
   const debouncedSearch = useDebounce(searchQuery, 300);
   const [selectedSqid, setSelectedSqid] = useState(null);
+  const [filterKey, setFilterKey] = useState(RESULT_FILTERS[0].key);
 
   // results-for-review only returns results still waiting on the lab admin, so build the
   // doctor's list from their own orders: lab-admin-approved (awaiting the doctor) first, then reviewed ones
@@ -39,9 +46,15 @@ const Hospital_Doctors_Lab_Results_Tab = ({ activeTab, onTabChange }) => {
 
   const doctorResults = useMemo(() => flattenDoctorLabResults(labOrdersData?.results), [labOrdersData]);
 
-  const count = doctorResults.length;
+  const filterCounts = useMemo(
+    () => Object.fromEntries(RESULT_FILTERS.map((f) => [f.key, doctorResults.filter((r) => LAB_FILTER_STATUSES[f.key].includes(r.result_info.status)).length])),
+    [doctorResults]
+  );
+  const filteredResults = doctorResults.filter((r) => LAB_FILTER_STATUSES[filterKey].includes(r.result_info.status));
+
+  const count = filteredResults.length;
   const totalPages = Math.ceil(count / PAGE_SIZE);
-  const patientLabRecords = doctorResults.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const patientLabRecords = filteredResults.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
   // Re-read from the latest fetch so the detail updates after the doctor approves or rejects
   const selectedRecord = selectedSqid ? doctorResults.find((r) => r.sqid === selectedSqid) : null;
 
@@ -74,6 +87,17 @@ const Hospital_Doctors_Lab_Results_Tab = ({ activeTab, onTabChange }) => {
       currentPage={currentPage}
       totalPages={totalPages}
       setCurrentPage={setCurrentPage}
+      filters={
+        <ResultFilterTabs
+          value={filterKey}
+          onChange={(key) => {
+            setFilterKey(key);
+            setCurrentPage(1);
+          }}
+          counts={filterCounts}
+          loading={labLoading && !labOrdersData}
+        />
+      }
     >
       {labLoading && patientLabRecords.length === 0 ? (
         <ScanLabResultGridSkeleton label="Loading lab results" />
@@ -81,7 +105,7 @@ const Hospital_Doctors_Lab_Results_Tab = ({ activeTab, onTabChange }) => {
         <div className="flex flex-col items-center justify-center py-16 text-gray-400">
           <FlaskConical size={36} className="opacity-25 mb-2" />
           <h2 className="font-medium pb-1 text-gray-800">No lab results!</h2>
-          <p className="text-[12px] text-gray-500 max-w-md text-center">There are no lab results approved by the lab admin yet.</p>
+          <p className="text-[12px] text-gray-500 max-w-md text-center">{EMPTY_MESSAGES[filterKey]}</p>
         </div>
       ) : (
         <div className="text-[12px] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
