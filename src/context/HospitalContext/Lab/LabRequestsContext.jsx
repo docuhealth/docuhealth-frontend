@@ -10,6 +10,8 @@ const TAB_STATUS_MAP = {
   "In-progress": "in_progress",
   "Sample Collected": "sample_collected",
   "Result Ready": "result_ready",
+  "Lab Admin Approved": "result_accepted_by_lab_admin",
+  "Doctor Approved": "result_accepted_by_doctor",
   "Rejected test": "rejected",
   "Result Approval": "result_ready",
 };
