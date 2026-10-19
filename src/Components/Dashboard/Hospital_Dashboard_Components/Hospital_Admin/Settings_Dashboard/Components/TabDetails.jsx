@@ -99,7 +99,7 @@ const AccountSettingsTab = () => {
     onSuccess: () => {
       toast.success("Profile name updated!");
       // This is where the magic happens:
-      queryClient.invalidateQueries(["hospital-profile"]);
+      queryClient.invalidateQueries({ queryKey: ["hospital-profile"] });
       setFormData((prev) => ({ ...prev, name: "" }));
     },
     onError: (err) => {
@@ -144,7 +144,7 @@ const handleRequestEmailOTP = (e) => {
     onSuccess: () => {
       toast.success("Email updated successfully!");
       // Invalidate profile because email has now changed
-      queryClient.invalidateQueries(["hospital-profile"]);
+      queryClient.invalidateQueries({ queryKey: ["hospital-profile"] });
       setShowOtpModal(false);
       setFormData((prev) => ({ ...prev, email: "", otp: "" }));
     },

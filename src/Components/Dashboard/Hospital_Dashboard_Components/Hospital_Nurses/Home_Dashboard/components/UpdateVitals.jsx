@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 import Modal from "../../../../../ui/Modal";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
+import { invalidateVitals } from "../../../../../../lib/queryInvalidations";
 
 const painScoreOptions = [
   "0 (No pain)",
@@ -77,11 +78,7 @@ const UpdateVitals = ({ selectedPatient, setUpdateVitals }) => {
     mutationFn: (payload) =>
       axiosInstanceHos.post(`api/nurses/${patientHin}/vital-signs/record`, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["patient-info"] });
-      queryClient.invalidateQueries({ queryKey: ["hospital-patients-nurse"] });
-      queryClient.invalidateQueries({ queryKey: ["vitals-history"] });
-      queryClient.invalidateQueries({ queryKey: ["nurse-patient-vitals-history"] });
-      queryClient.invalidateQueries({ queryKey: ["inpatient-tasks"] });
+      invalidateVitals(queryClient, { hin: patientHin });
       resetForm();
       setIsSuccessModalOpen(true);
     },

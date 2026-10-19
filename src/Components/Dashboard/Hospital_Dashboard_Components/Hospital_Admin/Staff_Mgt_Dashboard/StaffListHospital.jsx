@@ -5,6 +5,7 @@ import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagina
 import SearchBar from "../../../../SearchBar/SearchBar";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { invalidateStaffManagement } from "../../../../../lib/queryInvalidations";
 
 const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
   const {
@@ -183,9 +184,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       }),
     onSuccess: () => {
       toast.success("Staff member(s) removed successfully");
-      // Invalidate the specific page of the staff list to trigger a refetch
-      queryClient.invalidateQueries(["hospital-staffs", currentPage]);
-      queryClient.invalidateQueries(["hospital-staffs-lab-admin-check"]);
+      invalidateStaffManagement(queryClient);
       setSelectedStaff([]); // Clear checkboxes after bulk removal
     },
     onError: (err) => {
@@ -201,9 +200,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       }),
     onSuccess: () => {
       toast.success("Staff member account deactivated successfully");
-      // Invalidate the specific page of the staff list to trigger a refetch
-      queryClient.invalidateQueries(["hospital-staffs", currentPage]);
-      queryClient.invalidateQueries(["hospital-staffs-lab-admin-check"]);
+      invalidateStaffManagement(queryClient);
       setSelectedStaff([]); // Clear checkboxes after bulk removal
     },
     onError: (err) => {
@@ -246,8 +243,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       ),
     onSuccess: () => {
       toast.success("Role updated successfully");
-      queryClient.invalidateQueries(["hospital-staffs", currentPage]);
-      queryClient.invalidateQueries(["hospital-staffs-lab-admin-check"]);
+      invalidateStaffManagement(queryClient);
       setSelectedStaffForRole(null);
     },
     onError: (err) => {

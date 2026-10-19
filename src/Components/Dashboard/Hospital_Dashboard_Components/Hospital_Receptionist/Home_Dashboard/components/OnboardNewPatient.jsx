@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { getAllCountries, getStatesForCountry, getLgasOrCities, isNigeria } from "../../../../../../utils/locationHelper";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { invalidateCheckIn } from "../../../../../../lib/queryInvalidations";
 import Modal from "../../../../../ui/Modal";
 import Button from "../../../../../ui/Button";
 import Input from "../../../../../ui/Input";
@@ -224,8 +225,7 @@ const OnboardNewPatient = ({ setNewPatient }) => {
         house_no: "",
       });
 
-   
-      queryClient.invalidateQueries(['receptionist-recent-patients']);
+      invalidateCheckIn(queryClient);
     },
     onError: (err) => {
       const errorMsg =

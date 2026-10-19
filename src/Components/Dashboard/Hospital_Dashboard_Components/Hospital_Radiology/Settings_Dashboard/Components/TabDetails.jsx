@@ -103,7 +103,7 @@ const AccountSettingsTab = () => {
     },
     onSuccess: () => {
       toast.success("Profile name updated!");
-      queryClient.invalidateQueries(["radiology-profile"]);
+      queryClient.invalidateQueries({ queryKey: ["radiology-profile"] });
       setFormData((prev) => ({ ...prev, firstname: "", lastname: "" }));
     },
     onError: (err) => {
@@ -153,7 +153,7 @@ const AccountSettingsTab = () => {
     onSuccess: () => {
       toast.success("Email updated successfully!");
       // Invalidate profile because email has now changed
-      queryClient.invalidateQueries(["radiology-profile"]);
+      queryClient.invalidateQueries({ queryKey: ["radiology-profile"] });
       setShowOtpModal(false);
       setFormData((prev) => ({ ...prev, email: "", otp: "" }));
     },

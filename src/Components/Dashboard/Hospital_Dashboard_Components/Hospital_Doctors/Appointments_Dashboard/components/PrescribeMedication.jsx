@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { resolveOrderContext, visitPayload, NO_VISIT_MESSAGE } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import { DEFAULT_FREQUENCY } from "../../../../../../utils/careTaskConstants";
+import { invalidatePrescription } from "../../../../../../lib/queryInvalidations";
 import Input from "../../../../../ui/Input";
 
 const NoteSection = ({
@@ -140,12 +141,7 @@ const PrescribeMedication = ({
       toast.success("Prescription sent to pharmacist successfully!");
       setPrescribeMedication(false);
       setSeePatientDetails(true);
-      queryClient.invalidateQueries({
-        queryKey: ["patient-med-records"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["patient-prescriptions"],
-      });
+      invalidatePrescription(queryClient, { hin: orderContext.hin });
     },
     onError: (error) => {
       console.error("Prescription error:", error);

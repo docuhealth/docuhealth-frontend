@@ -19,6 +19,7 @@ import {
   fetchPaymentProviders,
   savePatientPaymentCategory,
 } from "../../../queries/Hospital/receptionist/paymentCategory";
+import { invalidateCheckIn } from "../../../lib/queryInvalidations";
 
 const Hospital_Receptionist_Home_Dashboard = () => {
   const queryClient = useQueryClient();
@@ -122,7 +123,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
       setPatientDetails(result.data);
       setCheckHIN(true);
       setPatientHIN("");
-      queryClient.invalidateQueries(["receptionist-recent-patients"]);
+      queryClient.invalidateQueries({ queryKey: ["receptionist-recent-patients"] });
     } else if (result.isError) {
       toast.error(
         result.error?.response?.data?.message ||
@@ -144,7 +145,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
     mutationFn: checkInPatientApi,
     onSuccess: () => {
       setCheckPatientIn(true);
-      queryClient.invalidateQueries(["receptionist-recent-patients"]);
+      invalidateCheckIn(queryClient, { hin: patientDetails?.hin });
     },
     onError: (err) => {
       const errorMsg =

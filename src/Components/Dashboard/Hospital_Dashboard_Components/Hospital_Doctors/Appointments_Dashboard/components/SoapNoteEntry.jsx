@@ -14,6 +14,7 @@ import Select from "../../../../../ui/Select";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import { ACTIVE_CHECK_INS_KEY } from "../../../../../../queries/Hospital/doctor/checkIns";
+import { invalidateSoapNote } from "../../../../../../lib/queryInvalidations";
 
 
 const textareaClass =
@@ -329,21 +330,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
       const hin = patientHin
 
       sessionStorage.removeItem(`soap_draft_${patientHin}`);
-      queryClient.invalidateQueries({
-        queryKey: ["patient-med-records", hin],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["patient-soap-notes", hin],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["doctor-appointments"],
-      });
-      // Saving the note ends the consultation (doctor_active -> doctor_idle),
-      // which changes its row in the Patient Mgt "OutPatients" list and
-      // closes ordering against the check-in until the patient is re-claimed.
-      queryClient.invalidateQueries({
-        queryKey: ["hospital-patients-doctor"],
-      });
+      invalidateSoapNote(queryClient, { hin });
       queryClient.invalidateQueries({ queryKey: ACTIVE_CHECK_INS_KEY });
 
       setStep(1);

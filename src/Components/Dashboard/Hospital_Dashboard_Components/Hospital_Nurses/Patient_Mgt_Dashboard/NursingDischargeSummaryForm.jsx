@@ -4,6 +4,7 @@ import Modal from "../../../../ui/Modal";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import { toast } from "react-toastify";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
+import { invalidatePatientDischarge } from "../../../../../lib/queryInvalidations";
 
 const initialFormState = {
   final_vital_signs: {
@@ -158,6 +159,7 @@ const NursingDischargeSummaryForm = ({ admission, patientFullInfo, activeTask, t
     try {
       setIsSubmitting(true);
       await axiosInstanceHos.post(`/api/inpatients/task-occurrences/${taskSqid}/execute`, payload);
+      invalidatePatientDischarge(null, { hin: patientHin, admissionSqid });
       toast.success("Nursing discharge completed successfully!");
       
       resetForm();

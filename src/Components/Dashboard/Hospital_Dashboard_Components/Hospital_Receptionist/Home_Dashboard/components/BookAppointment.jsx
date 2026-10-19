@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
+import { invalidateAppointment } from "../../../../../../lib/queryInvalidations";
 import CustomTimePicker from "./CustomTimePicker";
 import Modal from "../../../../../ui/Modal";
 import Button from "../../../../../ui/Button";
@@ -212,10 +213,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["receptionist-appointments"],
-      });
-
+      invalidateAppointment(queryClient);
       setBookingSuccessful(true);
     },
     onError: (err) => {
@@ -269,7 +267,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                 onChange={(e) =>
                   setFormData({ ...formData, note: e.target.value })
                 }
-                placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
+                placeholder="Add note..."
               ></textarea>
             </div>
 

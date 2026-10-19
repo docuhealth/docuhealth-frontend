@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   COMMON_SCAN_QUERIES,
   createScanOrder,
@@ -8,6 +8,7 @@ import {
 } from "../../../../../../queries/Hospital/radiology/scan_requests";
 import { resolveOrderContext, visitPayload } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
+import { invalidateRadiologyScan } from "../../../../../../lib/queryInvalidations";
 import SearchableSelect from "../../../../../ui/SearchableSelect";
 import HospitalLoader from "../../../../../ui/HospitalLoader";
 
@@ -29,6 +30,7 @@ const mergeScanOptions = (term, commonScans, searchResults = []) => {
 
 // Patient(HIN)-based like OrderLabModal. "Imaging order" searches the scans catalog server-side as you type and the order references the picked scan by sqid.
 const OrderScanModal = ({ selectedPatientDetails, onClose, orderedBy = "doctor" }) => {
+  const queryClient = useQueryClient();
   const orderContext = resolveScanOrderContext(selectedPatientDetails);
   // Every scan order needs exactly one of check_in / admission.
   const missingRecord = !orderContext.hasVisit;
@@ -63,7 +65,10 @@ const OrderScanModal = ({ selectedPatientDetails, onClose, orderedBy = "doctor" 
 
   const createOrderMutation = useMutation({
     mutationFn: createScanOrder,
-    onSuccess: () => setShowSuccess(true),
+    onSuccess: () => {
+      invalidateRadiologyScan(queryClient, { hin: orderContext.hin });
+      setShowSuccess(true);
+    },
     onError: (err) => {
       toast.error(extractApiErrorMessage(err, "Failed to create scan order."));
     },

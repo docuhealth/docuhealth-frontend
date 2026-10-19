@@ -5,6 +5,7 @@ import Modal from "../../../../ui/Modal";
 import Button from "../../../../ui/Button";
 import Input from "../../../../ui/Input";
 import { fetchWardBeds, updateWard, deleteWard } from "../../../../../queries/Hospital/fetchWards";
+import { invalidateWardManagement } from "../../../../../lib/queryInvalidations";
 import { Bed } from "lucide-react";
 
 const ManageWardModal = ({ ward, isOpen, onClose }) => {
@@ -43,8 +44,7 @@ const ManageWardModal = ({ ward, isOpen, onClose }) => {
     mutationFn: (payload) => updateWard({ ward_sqid: wardSqid, ...payload }),
     onSuccess: () => {
       toast.success("Ward updated successfully!");
-      queryClient.invalidateQueries(["hospital-wards"]);
-      queryClient.invalidateQueries(["ward-beds", wardSqid]);
+      invalidateWardManagement(queryClient, { wardSqid });
       onClose();
     },
     onError: (err) => {
@@ -57,7 +57,7 @@ const ManageWardModal = ({ ward, isOpen, onClose }) => {
     mutationFn: () => deleteWard(wardSqid),
     onSuccess: () => {
       toast.success("Ward deleted successfully!");
-      queryClient.invalidateQueries(["hospital-wards"]);
+      invalidateWardManagement(queryClient, { wardSqid });
       setIsConfirmingDelete(false);
       onClose();
     },

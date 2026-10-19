@@ -21,7 +21,7 @@ const RemoveBrandingModal = ({ onClose, type }) => {
       return await axiosInstanceHos.post("/api/hospitals/remove-branding",payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["hospital-profile"]);
+      queryClient.invalidateQueries({ queryKey: ["hospital-profile"] });
       toast.success(`${formattedType} removed successfully`);
       onClose();
     },

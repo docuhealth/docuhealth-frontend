@@ -5,6 +5,7 @@ import { toast } from "react-hot-toast";
 import { HosAppContext } from "../../../../../context/HospitalContext/Admin/HosAppContext";
 import { HosWardContext } from "../../../../../context/HospitalContext/HosWardContext";
 import { deleteWard } from "../../../../../queries/Hospital/fetchWards";
+import { invalidateWardManagement } from "../../../../../lib/queryInvalidations";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import ManageWardModal from "./ManageWardModal";
 
@@ -21,7 +22,7 @@ const Wards = () => {
     mutationFn: (wardSqid) => deleteWard(wardSqid),
     onSuccess: () => {
       toast.success("Ward deleted successfully!");
-      queryClient.invalidateQueries(["hospital-wards"]);
+      invalidateWardManagement(queryClient);
       setWardToDelete(null);
     },
     onError: (err) => {

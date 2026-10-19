@@ -24,7 +24,7 @@ const ImageCustomization = ({ onClose }) => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["hospital-profile"]);
+      queryClient.invalidateQueries({ queryKey: ["hospital-profile"] });
       toast.success('Cover Image changed successfully')
       onClose();
     },

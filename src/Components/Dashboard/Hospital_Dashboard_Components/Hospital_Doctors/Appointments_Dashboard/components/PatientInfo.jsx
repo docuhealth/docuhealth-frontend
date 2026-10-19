@@ -19,6 +19,7 @@ import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 import { closeCheckIn } from "../../../../../../queries/Hospital/doctor/checkIns";
 import { closeAppointment, isAppointmentClosed } from "../../../../../../queries/Hospital/appointments";
+import { invalidateCheckIn, invalidateAppointment } from "../../../../../../lib/queryInvalidations";
 import PatientInfoCard from "../../../../../ui/PatientInfoCard";
 import VitalSignsCard from "../../../../../ui/VitalSignsCard";
 import ClinicalSummaryCard from "../../../../../ui/ClinicalSummaryCard";
@@ -57,6 +58,8 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const checkoutMutation = useMutation({
     mutationFn: ({ checkIn, appointment }) => (checkIn ? closeCheckIn(checkIn) : closeAppointment(appointment)),
     onSuccess: () => {
+      invalidateCheckIn(queryClient, { hin });
+      invalidateAppointment(queryClient);
       setShowCheckoutModal(false);
       setShowCheckoutSuccessModal(true);
     },
@@ -86,8 +89,8 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
 
   const handleDoneCheckout = () => {
     setShowCheckoutSuccessModal(false);
-    queryClient.invalidateQueries({ queryKey: ["doctor-appointments"] });
-    queryClient.invalidateQueries({ queryKey: ["hospital-patients-doctor"] });
+    invalidateCheckIn(queryClient, { hin });
+    invalidateAppointment(queryClient);
     if (setSeePatientDetails) {
       setSeePatientDetails(false);
     }

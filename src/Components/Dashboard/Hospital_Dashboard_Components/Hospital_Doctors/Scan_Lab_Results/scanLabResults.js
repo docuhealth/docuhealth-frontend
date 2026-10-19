@@ -63,6 +63,18 @@ export const formatApprovalStatus = (resultStatus, orderStatus) => {
 // Results still with the lab (pending, lab_admin_rejected) never reach the doctor.
 export const DOCTOR_RESULT_STATUSES = ["lab_admin_approved", "accepted", "rejected"];
 
+// Awaiting approval / Approved sub-tabs shared by the Scan and Lab result tabs
+export const RESULT_FILTERS = [
+  { key: "awaiting", label: "Awaiting approval" },
+  { key: "approved", label: "Approved" },
+];
+
+// Lab result_info.status for each sub-tab; doctor-rejected results go back to the lab and sit in neither
+export const LAB_FILTER_STATUSES = {
+  awaiting: ["lab_admin_approved"],
+  approved: ["accepted"],
+};
+
 // Flattens doctor-test-orders into one row per test the doctor can see, awaiting-doctor first
 export const flattenDoctorLabResults = (orders = []) => {
   const rows = orders.flatMap((order) =>

@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HosWardContext } from "../../../../../context/HospitalContext/HosWardContext";
 import { transferAdmission } from "../../../../../queries/Hospital/doctor/admissions";
 import { extractApiErrorMessage } from "../../../../../utils/apiError";
+import { invalidateWardTransfer } from "../../../../../lib/queryInvalidations";
 import Modal from "../../../../ui/Modal";
 import Button from "../../../../ui/Button";
 import Select from "../../../../ui/Select";
@@ -46,10 +47,7 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
     mutationFn: transferAdmission,
     onSuccess: (res) => {
       toast.success(res?.detail || "Transfer successful");
-      if (patientHin) {
-        queryClient.invalidateQueries({ queryKey: ["patient-info", patientHin] });
-      }
-      queryClient.invalidateQueries({ queryKey: ["hospital-patients-doctor"] });
+      invalidateWardTransfer(queryClient, { hin: patientHin });
       setRequestAdmission(false);
     },
     onError: (err) => {
