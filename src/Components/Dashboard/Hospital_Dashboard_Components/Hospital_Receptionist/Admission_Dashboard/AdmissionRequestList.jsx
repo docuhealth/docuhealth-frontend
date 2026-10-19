@@ -15,6 +15,7 @@ import Modal from "../../../../ui/Modal";
 import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
 import HospitalLoader from "../../../../ui/HospitalLoader";
 import toast from "react-hot-toast";
+import { invalidatePatientAdmission } from "../../../../../lib/queryInvalidations";
 
 const STATUS_TABS = [
   { value: "pending", label: "Pending" },
@@ -100,21 +101,13 @@ const AdmissionRequestList = () => {
     mutationFn: acceptAdmissionRequest,
     onSuccess: (res, sqid) => {
       markProcessed(sqid);
-      queryClient.invalidateQueries({ queryKey: ["hospital-admission-requests"] });
-      queryClient.invalidateQueries({ queryKey: ["hospital-patients-receptionist"] });
-      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
+      invalidatePatientAdmission(queryClient);
       toast.success(res?.detail || "Patient admitted successfully");
     },
     onError: (err) => {
       console.error("Error admitting patient:", err);
-      // Two doctors can request one bed; once one is accepted the other 400s
-      // and stays pending. Refetch so the list and bed show the current state.
-      queryClient.invalidateQueries({ queryKey: ["hospital-admission-requests"] });
-      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
+      invalidatePatientAdmission(queryClient);
       toast.error(extractApiErrorMessage(err, "Error admitting patient"));
-      // A 400 here can mean another request already took the bed; refetch so the list and bed states are current.
-      queryClient.invalidateQueries({ queryKey: ["hospital-admission-requests"] });
-      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
     },
   });
 
@@ -122,8 +115,7 @@ const AdmissionRequestList = () => {
     mutationFn: rejectAdmissionRequest,
     onSuccess: (res, { sqid }) => {
       markProcessed(sqid);
-      queryClient.invalidateQueries({ queryKey: ["hospital-admission-requests"] });
-      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
+      invalidatePatientAdmission(queryClient);
       toast.success(res?.detail || "Admission request rejected");
       closeRejectModal();
     },

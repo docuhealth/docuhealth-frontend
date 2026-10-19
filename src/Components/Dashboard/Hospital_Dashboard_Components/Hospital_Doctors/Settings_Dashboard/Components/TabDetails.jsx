@@ -104,7 +104,7 @@ const AccountSettingsTab = () => {
     onSuccess: () => {
       toast.success("Profile name updated!");
       // This is where the magic happens:
-      queryClient.invalidateQueries(["doctor-profile"]);
+      queryClient.invalidateQueries({ queryKey: ["doctor-profile"] });
       setFormData((prev) => ({ ...prev, firstname: "", lastname: "" }));
     },
     onError: (err) => {
@@ -154,7 +154,7 @@ const AccountSettingsTab = () => {
     onSuccess: () => {
       toast.success("Email updated successfully!");
       // Invalidate profile because email has now changed
-      queryClient.invalidateQueries(["doctor-profile"]);
+      queryClient.invalidateQueries({ queryKey: ["doctor-profile"] });
       setShowOtpModal(false);
       setFormData((prev) => ({ ...prev, email: "", otp: "" }));
     },

@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
+import { invalidateVitals } from "../../../../../../lib/queryInvalidations";
 
 const painScoreOptions = [
   "0 (No pain)",
@@ -50,13 +51,9 @@ const ProcessVitals = ({ selectedPatient, setProcessVitals }) => {
       axiosInstanceHos.post(`api/nurses/vital-signs/requests/${requestSqid}/process`, payload),
     onSuccess: () => {
       toast.success("Vitals processed successfully!");
-      queryClient.invalidateQueries({ queryKey: ["assigned-for-vitals"] });
-      queryClient.invalidateQueries({ queryKey: ["patient-info"] });
-      queryClient.invalidateQueries({ queryKey: ["hospital-patients-nurse"] });
-      queryClient.invalidateQueries({ queryKey: ["vitals-history"] });
-      queryClient.invalidateQueries({ queryKey: ["nurse-patient-vitals-history"] });
-      queryClient.invalidateQueries({ queryKey: ["inpatient-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["doctor-vitals-requests"] });
+      invalidateVitals(queryClient, {
+        hin: selectedPatient?.patient?.hin || selectedPatient?.patient_hin || selectedPatient?.hin,
+      });
       resetForm();
       setProcessVitals(false);
     },

@@ -5,6 +5,7 @@ import { fetchPrescriptionDetail, updateDrugDispenseStatus } from "../../../quer
 import { PharmacistPrescriptionsContext } from "../../../context/HospitalContext/Pharmacist/PharmacistPrescriptionsContext";
 import toast from "react-hot-toast";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../../../Components/ui/Table";
+import { invalidatePrescription } from "../../../lib/queryInvalidations";
 
 const calcAge = (dob) => {
   if (!dob) return null;
@@ -46,8 +47,7 @@ const Hospital_Pharmacist_Prescription_Detail_Dashboard = ({ sqid, onBack, isSet
     mutationFn: (payload) => updateDrugDispenseStatus(payload),
     onSuccess: () => {
       toast.success("Prescription status updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["prescription-detail", sqid] });
-      // Invalidate the main dashboard list by calling the context's fetchOrders
+      invalidatePrescription(queryClient, { sqid, hin: order?.patient_info?.hin });
       if (fetchOrders) {
         fetchOrders();
       }

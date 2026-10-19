@@ -41,7 +41,7 @@ const AdminSubscriptionsProvider = ({ children }) => {
     mutationFn: createSubscriptionPlan,
     onSuccess: () => {
       toast.success("Subscription plan created successfully!");
-      queryClient.invalidateQueries(["admin-subscription-plans-all"]);
+      queryClient.invalidateQueries({ queryKey: ["admin-subscription-plans-all"] });
     },
     onError: (err) => {
       const msg = err?.response?.data?.message || err?.response?.data?.detail || "Failed to create plan";
@@ -55,7 +55,7 @@ const AdminSubscriptionsProvider = ({ children }) => {
     mutationFn: updateSubscriptionPlan,
     onSuccess: () => {
       toast.success("Subscription plan updated successfully!");
-      queryClient.invalidateQueries(["admin-subscription-plans-all"]);
+      queryClient.invalidateQueries({ queryKey: ["admin-subscription-plans-all"] });
     },
     onError: (err) => {
       const msg = err?.response?.data?.message || err?.response?.data?.detail || "Failed to update plan";

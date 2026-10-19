@@ -6,6 +6,7 @@ import axiosInstanceHos from "../../../lib/axios/hospital";
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { invalidateWardManagement } from "../../../lib/queryInvalidations";
 
 const Hospital_Admin_Ward_Management_Dashboard = () => {
   const [showOverlay, setShowOverlay] = useState(false);
@@ -21,10 +22,9 @@ const Hospital_Admin_Ward_Management_Dashboard = () => {
       }),
     onSuccess: () => {
       toast.success("Ward created successfully!");
-      queryClient.invalidateQueries(["hospital-wards"])
+      invalidateWardManagement(queryClient);
       setShowOverlay(false);
       setFormData({ name: "", total_beds: "" });
-
     },
     onError : (err) => {
          console.error("Error creating ward:", err);

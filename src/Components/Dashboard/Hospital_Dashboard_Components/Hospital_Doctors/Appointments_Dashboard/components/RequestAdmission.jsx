@@ -9,6 +9,7 @@ import Button from "../../../../../ui/Button";
 import Select from "../../../../../ui/Select";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
+import { invalidatePatientAdmission } from "../../../../../../lib/queryInvalidations";
 
 const RequestAdmission = ({
   setRequestAdmission,
@@ -71,20 +72,13 @@ const RequestAdmission = ({
     },
     onSuccess: () => {
       toast.success("Admission request successful");
-      // The outpatient row now carries `admission_request_status: "pending"`
-      // server-side; refetch so a later list render / re-open reflects it.
-      queryClient.invalidateQueries({ queryKey: ["hospital-patients-doctor"] });
-      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
+      invalidatePatientAdmission(queryClient);
       onRequested?.();
       setRequestAdmission(false);
     },
     onError: (err) => {
       console.error("Error submitting admission request:", err);
-      // e.g. "Bed X is occupied" after someone else filled it: refresh the bed list.
-      queryClient.invalidateQueries({ queryKey: ["hospital-wards"] });
-      // The API returns the reason as `{ detail: ["Patient already has a
-      // pending admission request"] }` (array), not `{ message }`, so read
-      // through the shared extractor or the toast is just the generic fallback.
+      invalidatePatientAdmission(queryClient);
       toast.error(
         extractApiErrorMessage(err, "Error submitting admission request."),
       );

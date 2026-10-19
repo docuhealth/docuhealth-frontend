@@ -4,6 +4,7 @@ import axiosInstanceHos from '../../../../../lib/axios/hospital';
 import toast from 'react-hot-toast'; // or your preferred toast library
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { extractApiErrorMessage } from '../../../../../utils/apiError';
+import { invalidateCaseNotes } from '../../../../../lib/queryInvalidations';
 
 const NoteSection = ({ title, field, placeholder, caseNoteData, inputs, setInputs, handleAddListItem, handleRemoveItem, activeInput, setActiveInput }) => (
     <div className="border rounded-md p-4 mt-3 bg-gray-50/30">
@@ -134,13 +135,11 @@ const AddNewCaseNote = ({ setNewCaseNote, selected }) => {
 
     setIsRestored(false);
 
-            // 2. Invalidate the specific patient's case notes list
-            queryClient.invalidateQueries({
-                queryKey: ["patient-case-notes", (selected?.patient_info?.hin || selected?.patient?.hin)]
-            });
+    const hin = selected?.patient_info?.hin || selected?.patient?.hin;
+    invalidateCaseNotes(queryClient, { hin });
 
-            // 3. Reset and Close
-            setNewCaseNote(false);
+    // 3. Reset and Close
+    setNewCaseNote(false);
         },
         onError: (error) => {
             console.error("Upload error:", error);

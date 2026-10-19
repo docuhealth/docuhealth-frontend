@@ -12,6 +12,7 @@ import DischargeFollowUpStep from "./DischargeFollowUpStep";
 import ConfirmDischargeModal from "./ConfirmDischargeModal";
 import DischargeSuccessModal from "./DischargeSuccessModal";
 import { DEFAULT_FREQUENCY, isFrequencyCode, toFrequencyCode } from "../../../../../utils/careTaskConstants";
+import { invalidatePatientDischarge } from "../../../../../lib/queryInvalidations";
 
 const COMPLETED_LAB_STATUSES = ["completed", "accepted", "result_ready", "approved"];
 const pageSize = 20;
@@ -322,7 +323,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
   const dischargeMutation = useMutation({
     mutationFn: createDoctorInpatientDischarge,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["hospital-patients-doctor"] });
+      invalidatePatientDischarge(queryClient, { hin: patientHin, admissionSqid });
       setShowConfirmModal(false);
       setShowSuccessModal(true);
     },

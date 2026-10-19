@@ -4,6 +4,7 @@ import axiosInstanceHos from "../../../../../../lib/axios/hospital";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
+import { invalidateVitals } from "../../../../../../lib/queryInvalidations";
 import HospitalLoader from "../../../../../ui/HospitalLoader";
 
 /**
@@ -70,9 +71,7 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
     mutationFn: (payload) =>
       axiosInstanceHos.post("api/doctors/vital-signs/request", payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["inpatient-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["doctor-vitals-requests"] });
-      queryClient.invalidateQueries({ queryKey: ["assigned-for-vitals"] });
+      invalidateVitals(queryClient);
       setShowSuccess(true);
     },
     onError: (err) => {
@@ -167,7 +166,7 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
               onChange={(e) =>
                 setFormData({ ...formData, note: e.target.value })
               }
-              placeholder="Please do note that this account will be on read-only-mode. This will change once the account is upgraded once the owner is 18 years old."
+              placeholder="Add note..."
             ></textarea>
           </div>
           <button

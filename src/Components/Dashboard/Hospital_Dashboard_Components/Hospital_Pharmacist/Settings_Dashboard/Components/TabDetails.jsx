@@ -86,7 +86,7 @@ const AccountSettingsTab = () => {
     },
     onSuccess: () => {
       toast.success("Profile name updated!");
-      queryClient.invalidateQueries(["pharmacist-profile"]);
+      queryClient.invalidateQueries({ queryKey: ["pharmacist-profile"] });
       setFormData((prev) => ({ ...prev, firstname: "", lastname: "" }));
     },
     onError: (err) => {
@@ -124,7 +124,7 @@ const AccountSettingsTab = () => {
       axiosInstanceHos.patch("api/auth/email/verify-otp", otpData),
     onSuccess: () => {
       toast.success("Email updated successfully!");
-      queryClient.invalidateQueries(["pharmacist-profile"]);
+      queryClient.invalidateQueries({ queryKey: ["pharmacist-profile"] });
       setShowOtpModal(false);
       setFormData((prev) => ({ ...prev, email: "", otp: "" }));
     },

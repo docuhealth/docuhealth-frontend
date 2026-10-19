@@ -66,7 +66,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
     mutationFn: (hinsList) => deactivateAdminHospital(hinsList),
     onSuccess: () => {
       toast.success("Hospital(s) deactivated successfully");
-      queryClient.invalidateQueries(["admin-users", "hospital"]);
+      queryClient.invalidateQueries({ queryKey: ["admin-users", "hospital"] });
       setUserToDeactivate(null);
       setSelectedUsers([]);
       setActiveMenu(null);
@@ -80,7 +80,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
     mutationFn: (idsList) => deactivateAdminPatient(idsList),
     onSuccess: () => {
       toast.success("User(s) deactivated successfully");
-      queryClient.invalidateQueries(["admin-users", "patient"]);
+      queryClient.invalidateQueries({ queryKey: ["admin-users", "patient"] });
       setUserToDeactivate(null);
       setSelectedUsers([]);
       setActiveMenu(null);
@@ -110,7 +110,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
     mutationFn: (hinsList) => activateAdminHospital(hinsList),
     onSuccess: () => {
       toast.success("Hospital(s) activated successfully");
-      queryClient.invalidateQueries(["admin-users", "hospital"]);
+      queryClient.invalidateQueries({ queryKey: ["admin-users", "hospital"] });
       setUserToActivate(null);
       setSelectedUsers([]);
       setActiveMenu(null);
@@ -124,7 +124,7 @@ const UsersListAdmin = ({ selectedUsers, setSelectedUsers }) => {
     mutationFn: (idsList) => activateAdminPatient(idsList),
     onSuccess: () => {
       toast.success("User(s) activated successfully");
-      queryClient.invalidateQueries(["admin-users", "patient"]);
+      queryClient.invalidateQueries({ queryKey: ["admin-users", "patient"] });
       setUserToActivate(null);
       setSelectedUsers([]);
       setActiveMenu(null);
