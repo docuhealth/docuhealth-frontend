@@ -17,6 +17,24 @@ import { invalidatePatientDischarge } from "../../../../../lib/queryInvalidation
 const COMPLETED_LAB_STATUSES = ["completed", "accepted", "result_ready", "approved"];
 const pageSize = 20;
 
+const INITIAL_FORM_DATA = {
+  chief_complaint: "",
+  primary_diagnosis: "",
+  secondary_diagnosis: "",
+  comorbidities: "",
+  treatment_plan: "",
+  hospital_course_note: "",
+  completed_investigations: [],
+  condition_at_discharge: "",
+  follow_up_plan: "this_hospital",
+  follow_up_clinic: "",
+  follow_up_date: "",
+  follow_up_time: "",
+  pending_investigations: [],
+  care_instructions: "",
+  follow_up_instructions: "",
+};
+
 // In-patient discharge as a 3-step wizard (Admission Summary → Procedures &
 // Medications → Follow-up). "Complete Discharge" submits to createDoctorInpatientDischarge,
 // which records the discharge summary and raises a nurse discharge task; the bed is
@@ -105,23 +123,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
   //                      follow_up_clinic name; date + time required.
   //   "none"          -> continue_followup_at_curr_hospital: false, no follow-up
   //                      fields sent (bar the follow_up_clinic: null workaround).
-  const [formData, setFormData] = useState({
-    chief_complaint: "",
-    primary_diagnosis: "",
-    secondary_diagnosis: "",
-    comorbidities: "",
-    treatment_plan: "",
-    hospital_course_note: "",
-    completed_investigations: [],
-    condition_at_discharge: "",
-    follow_up_plan: "this_hospital",
-    follow_up_clinic: "",
-    follow_up_date: "",
-    follow_up_time: "",
-    pending_investigations: [],
-    care_instructions: "",
-    follow_up_instructions: "",
-  });
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
 
   const handleFieldChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -320,23 +322,70 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
     };
   };
 
+  // Reset all wizard form states
+  const resetForm = () => {
+    setFormData(INITIAL_FORM_DATA);
+    setExistingMedications([]);
+    setNewMedications([]);
+    setShowAddMedication(false);
+    setCurrentStep(1);
+    seededMedicationsRef.current = false;
+  };
+
+  const handleExit = () => {
+    resetForm();
+    setDischargePatient(false);
+  };
+
+  // Reset form when switching patient or admission
+  useEffect(() => {
+    resetForm();
+  }, [admissionSqid]);
+
   const dischargeMutation = useMutation({
     mutationFn: createDoctorInpatientDischarge,
-    onSuccess: () => {
-      invalidatePatientDischarge(queryClient, { hin: patientHin, admissionSqid });
+    onSuccess: (data) => {
+      try {
+        invalidatePatientDischarge(queryClient, { hin, admissionSqid });
+      } catch (err) {
+        console.error("Failed to invalidate queries on discharge:", err);
+      }
       setShowConfirmModal(false);
       setShowSuccessModal(true);
+      resetForm();
+      if (data?.detail) {
+        toast.success(data.detail);
+      }
     },
     onError: (err) => {
       setShowConfirmModal(false);
       const data = err.response?.data;
+
+      // In case the backend response indicates success despite an error status code or unexpected rejection
+      if (
+        typeof data?.detail === "string" &&
+        data.detail.toLowerCase().includes("success")
+      ) {
+        try {
+          invalidatePatientDischarge(queryClient, { hin, admissionSqid });
+        } catch (e) {
+          console.error("Failed to invalidate queries on discharge:", e);
+        }
+        toast.success(data.detail);
+        setShowSuccessModal(true);
+        resetForm();
+        return;
+      }
+
       const firstError =
         data && typeof data === "object" ? Object.values(data).flat()[0] : null;
-      toast.error(
+      const errorMessage =
         (typeof firstError === "string" && firstError) ||
-          data?.detail ||
-          "Could not complete the discharge.",
-      );
+        data?.detail ||
+        data?.message ||
+        err?.message ||
+        "Could not complete the discharge.";
+      toast.error(errorMessage);
     },
   });
 
@@ -385,7 +434,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       <button
         type="button"
         className="flex items-center gap-2 cursor-pointer border-b pb-3 mb-6 w-fit"
-        onClick={() => setDischargePatient(false)}
+        onClick={handleExit}
       >
         <ArrowLeft size={16} className="text-docuhealth-primary" />
         <span className="font-medium text-docuhealth-primary">Discharge summary</span>
@@ -444,7 +493,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       <div className="flex justify-between items-center mt-10">
         <button
           type="button"
-          onClick={currentStep === 1 ? () => setDischargePatient(false) : prevStep}
+          onClick={currentStep === 1 ? handleExit : prevStep}
           className="text-docuhealth-primary hover:bg-gray-50 font-medium px-10 py-2.5 border border-docuhealth-primary rounded-full transition-colors"
         >
           {currentStep === 1 ? "Cancel" : "Previous"}
@@ -482,7 +531,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       message="The discharge summary has been recorded. A nurse will complete the discharge and free the bed."
       onDone={() => {
         setShowSuccessModal(false);
-        setDischargePatient(false);
+        handleExit();
       }}
     />
     </>

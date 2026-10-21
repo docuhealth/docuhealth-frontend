@@ -61,13 +61,15 @@ export const printElement = (node, title = document.title) =>
     <title>${escapeHtml(title)}</title>
     ${styles}
     <style>
-      @page { size: A4; margin: 12mm; }
-      html, body { background: #fff !important; margin: 0; padding: 0; }
-      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      li, p, [${UNIT_ATTR}] { break-inside: avoid; }
+      @page { size: A4 portrait; margin: 0; }
+      html, body { background: #fff !important; margin: 0; padding: 0; width: 100% !important; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; -webkit-box-shadow: none !important; text-shadow: none !important; }
+      li, p, [${UNIT_ATTR}] { break-inside: avoid !important; page-break-inside: avoid !important; }
+      .official-test-card { break-inside: auto !important; page-break-inside: auto !important; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
       img { max-width: 100%; }
       [${HIDE_ATTR}] { display: none !important; }
       [${PRINT_ONLY_ATTR}] { display: block !important; }
+      .lab-official-report-template, .radiology-official-report-template, body > div { position: static !important; left: auto !important; top: auto !important; width: 100% !important; max-width: 100% !important; margin: 0 auto !important; box-shadow: none !important; }
     </style>
   </head>
   <body>${node.outerHTML}</body>
@@ -134,7 +136,7 @@ const flattenModernColors = (clonedDoc, clonedRoot) => {
 // placed whole where they fit; a child taller than a page is sliced across
 // pages. `skip(child)` can leave a child out. html2canvas and jsPDF are heavy,
 // so load them on use.
-const renderElementToPdf = async (node, { skip, singleBlock = false, scale = 1.75 } = {}) => {
+const renderElementToPdf = async (node, { skip, singleBlock = false, scale = 1.75, margin: customMargin } = {}) => {
   if (!node) throw new Error("Nothing to export");
 
   const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas"), import("jspdf")]);
@@ -142,7 +144,7 @@ const renderElementToPdf = async (node, { skip, singleBlock = false, scale = 1.7
   const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-  const margin = 12;
+  const margin = customMargin !== undefined ? customMargin : 8;
   const gap = 4;
   const contentWidth = pageWidth - margin * 2;
   const contentHeight = pageHeight - margin * 2;
@@ -169,16 +171,75 @@ const renderElementToPdf = async (node, { skip, singleBlock = false, scale = 1.7
       ignoreElements: (el) => el.hasAttribute?.(HIDE_ATTR),
       onclone: (clonedDoc, clonedBlock) => {
         flattenModernColors(clonedDoc, clonedBlock);
-        for (const el of clonedBlock.querySelectorAll(`[${PRINT_ONLY_ATTR}]`)) el.style.display = "block";
+        clonedBlock.style.boxShadow = "none";
+        clonedBlock.style.textShadow = "none";
+        for (const el of clonedBlock.querySelectorAll(`*`)) {
+          el.style.boxShadow = "none";
+          el.style.textShadow = "none";
+        }
+        for (const el of clonedBlock.querySelectorAll(`.official-status-badge`)) {
+          el.style.display = "inline-block";
+          el.style.verticalAlign = "middle";
+          el.style.background = "transparent";
+          el.style.backgroundColor = "transparent";
+          el.style.border = "none";
+          el.style.borderRadius = "0";
+          el.style.padding = "0";
+          el.style.lineHeight = "normal";
+          el.style.boxSizing = "border-box";
+        }
+        for (const el of clonedBlock.querySelectorAll(`.official-report-footer-brand`)) {
+          el.style.display = "inline-table";
+          el.style.verticalAlign = "middle";
+          el.style.borderCollapse = "collapse";
+        }
+        for (const el of clonedBlock.querySelectorAll(`.official-pill`)) {
+          el.style.display = "inline-block";
+          el.style.verticalAlign = "middle";
+          el.style.textAlign = "center";
+          el.style.lineHeight = "14px";
+          el.style.padding = "3px 12px 4px 12px";
+          el.style.borderRadius = "9999px";
+          el.style.boxSizing = "border-box";
+        }
+        for (const el of clonedBlock.querySelectorAll(`[${PRINT_ONLY_ATTR}]`)) {
+          el.style.setProperty("display", "block", "important");
+          el.classList.remove("hidden");
+        }
         const top = clonedBlock.getBoundingClientRect().top;
         safeCutsPx = [...clonedBlock.querySelectorAll(`[${UNIT_ATTR}]`)].map(
-          (unit) => (unit.getBoundingClientRect().bottom - top) * PDF_SCALE
+          (unit) => Math.round((unit.getBoundingClientRect().bottom - top) * effectiveScale)
         );
+        safeCutsPx.sort((a, b) => a - b);
       },
     });
 
     const blockHeight = (canvas.height * contentWidth) / canvas.width;
     // addImage's "FAST" is Flate compression; the default embeds raw bitmaps (~10 MB per card).
+
+    // If singleBlock is requested, only force single-page fit if the document actually fits
+    // on a single page or is within 8% of fitting (to avoid orphaning a small footer).
+    // If it's significantly taller (> 1.08x of page height), it's a multi-page document and should slice cleanly!
+    const canFitSinglePage = singleBlock && blockHeight <= contentHeight * 1.08;
+
+    if (canFitSinglePage) {
+      let drawWidth = contentWidth;
+      let drawHeight = blockHeight;
+      let drawX = margin;
+      let drawY = cursorY;
+
+      if (blockHeight > contentHeight) {
+        // Fit proportionally inside contentHeight so single-page documents never slice or cut off footers
+        const fitScale = contentHeight / blockHeight;
+        drawWidth = contentWidth * fitScale;
+        drawHeight = contentHeight;
+        drawX = margin + (contentWidth - drawWidth) / 2;
+        drawY = margin;
+      }
+
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", drawX, drawY, drawWidth, drawHeight, undefined, "FAST");
+      continue;
+    }
 
     if (blockHeight <= contentHeight) {
       if (cursorY + blockHeight > pageHeight - margin) {
@@ -190,19 +251,23 @@ const renderElementToPdf = async (node, { skip, singleBlock = false, scale = 1.7
       continue;
     }
 
-    // Taller than a page: start on a fresh page and slice it, ending each
-    // slice at the last unit boundary that fits so no row/image is cut in half.
+    // Taller than a page: start on a fresh page and slice it across pages,
+    // ending each slice at the last safe unit boundary that fits so rows and
+    // cards are never cut in half horizontally.
     if (cursorY > margin) {
       pdf.addPage();
       cursorY = margin;
     }
     const pxPerMm = canvas.width / contentWidth;
-    const pagePx = Math.floor(contentHeight * pxPerMm);
     let offset = 0;
     while (offset < canvas.height) {
+      // Page 1 starts at margin (e.g. 0 for full-bleed header); continued pages get 10mm top margin for breathing room
+      const pageMarginTop = offset === 0 ? margin : (margin > 0 ? margin : 10);
+      const availHeightMm = pageHeight - pageMarginTop - (margin > 0 ? margin : 8);
+      const pagePx = Math.floor(availHeightMm * pxPerMm);
       let end = Math.min(offset + pagePx, canvas.height);
       if (end < canvas.height) {
-        const safeCut = safeCutsPx.filter((cut) => cut > offset && cut <= end).pop();
+        const safeCut = safeCutsPx.filter((cut) => cut > offset + 40 * effectiveScale && cut <= end).pop();
         if (safeCut) end = Math.round(safeCut);
       }
       const sliceHeightPx = end - offset;
@@ -211,8 +276,8 @@ const renderElementToPdf = async (node, { skip, singleBlock = false, scale = 1.7
       slice.height = sliceHeightPx;
       slice.getContext("2d").drawImage(canvas, 0, offset, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
       if (offset > 0) pdf.addPage();
-      pdf.addImage(slice.toDataURL("image/png"), "PNG", margin, margin, contentWidth, sliceHeightPx / pxPerMm, undefined, "FAST");
-      cursorY = margin + sliceHeightPx / pxPerMm + gap;
+      pdf.addImage(slice.toDataURL("image/png"), "PNG", margin, pageMarginTop, contentWidth, sliceHeightPx / pxPerMm, undefined, "FAST");
+      cursorY = pageMarginTop + sliceHeightPx / pxPerMm + gap;
       offset = end;
     }
   }

@@ -51,7 +51,23 @@ const PatientInfo = ({ patientFullInfo }) => {
       <VitalSignsCard
         className="my-5 bg-docuhealth-light-gray rounded-lg border p-4"
         title={`Latest Facility Vitals (Created : ${formatFullDateTime(patientFullInfo?.latest_vitals?.created_at)})`}
-        vitalSigns={patientFullInfo?.latest_vitals}
+        vitalSigns={
+          patientFullInfo?.latest_vitals
+            ? {
+                ...patientFullInfo.latest_vitals,
+                notes:
+                  patientFullInfo.latest_vitals.notes ||
+                  patientFullInfo.latest_vitals.note ||
+                  patientFullInfo.latest_vitals.additional_note ||
+                  patientFullInfo.latest_vitals.additional_notes ||
+                  patientFullInfo.notes ||
+                  patientFullInfo.note ||
+                  patientFullInfo.nursing_assessment?.notes ||
+                  patientFullInfo.assessment_info?.notes ||
+                  "",
+              }
+            : null
+        }
       />
       <div className="my-5 bg-docuhealth-light-gray rounded-lg border p-4">
         <h2 className="font-medium">

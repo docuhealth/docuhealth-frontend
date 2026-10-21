@@ -2,17 +2,17 @@ import React, { useRef, useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { ArrowLeft, Pencil, Printer, Download, X, Info, CalendarDays } from "lucide-react";
+import { ArrowLeft, Pencil, Download, X, Info, CalendarDays, Eye } from "lucide-react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { formatFullDateTime } from "../../../Components/Dashboard/Patient_Dashboard_Components/Home_Dashboard/Components/formatRecordDate";
 import TimeInput from "../../../Components/ui/TimeInput";
 import ScanResultReport from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Radiology/Scan_Requests/ScanResultReport";
+import RadiologyOfficialReportTemplate from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Radiology/RadiologyOfficialReportTemplate";
 import { printElement, downloadElementAsPdf, slugify } from "../../../utils/exportElement";
 import { acceptScanOrderItem, rejectScanOrderItem, logImageCollection, logScanResultDownload } from "../../../queries/Hospital/radiology/scan_requests";
 import { extractApiErrorMessage } from "../../../utils/apiError";
 import HospitalLoader from "../../../Components/ui/HospitalLoader";
 import { RadiologyAppContext } from "../../../context/HospitalContext/Radiology/RadiologyAppContext";
-import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
 
 
 // Same layout format as the doctor's patient-record detail view (PatientInfo.jsx's "viewDetailMedicalRecord").
@@ -59,10 +59,26 @@ const pillFilled =
 const Hospital_Radiology_Scan_Detail_Dashboard = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { hospitalName = "" } = useContext(RadiologyAppContext) || {};
+  const {
+    hospitalName = "",
+    hospitalLogo = null,
+    hospitalAddress = "",
+    hospitalEmail = "",
+  } = useContext(RadiologyAppContext) || {};
   const { state } = useLocation() || {};
   const order = state?.order;
+  const fromStatus =
+    state?.fromStatus ||
+    sessionStorage.getItem("radiology_active_status") ||
+    "pending";
 
+  const handleBack = () => {
+    navigate(`/hospital-radiology-requests-dashboard?status=${fromStatus}`, {
+      state: { activeStatus: fromStatus },
+    });
+  };
+
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [status, setStatus] = useState(order?.status || "pending");
   const [imageCollectedAt, setImageCollectedAt] = useState(order?.image_collected_at || null);
   const [rejectionReason, setRejectionReason] = useState(order?.rejection_reason || null);
@@ -139,8 +155,8 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
           <p className="text-gray-500">No scan request selected.</p>
           <button
             type="button"
-            onClick={() => navigate("/hospital-radiology-requests-dashboard")}
-            className="flex items-center gap-1 text-docuhealth-primary font-medium"
+            onClick={handleBack}
+            className="flex items-center gap-1 text-docuhealth-primary font-medium cursor-pointer"
           >
             <ArrowLeft size={14} />
             Back to Scan Orders
@@ -161,6 +177,22 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
   const canUpload = status === "image_collected" && !awaitingApproval;
   const showReport = !!report && (status === "completed" || awaitingApproval);
 
+  // Only scan results that are completed or approved can be downloaded or previewed.
+  // Pending, in-progress, image-collected, or rejected requests CANNOT be downloaded or previewed!
+  const isBlockedRadiologyStatus =
+    status === "pending" ||
+    status === "in_progress" ||
+    status === "image_collected" ||
+    status === "rejected";
+
+  const hasRadiologyResultToExport =
+    Boolean(report) &&
+    !isBlockedRadiologyStatus &&
+    (status === "completed" ||
+      status === "approved" ||
+      resultStatus === "approved" ||
+      resultStatus === "completed");
+
   const exportLabel = status === "rejected" ? "Rejected scan order" : "Imaging result";
 
   const sanitizeForFilename = (str) =>
@@ -175,17 +207,33 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
   const downloadFileName = `${patientNameSlug}_${scanNameSlug}_${hospitalNameSlug}.pdf`;
 
   const handlePrint = () => {
+    if (!hasRadiologyResultToExport) {
+      toast.error("Radiology result is not ready for printing.");
+      return;
+    }
     printElement(printRef.current, `${exportLabel} - ${patientName}`).catch(() => toast.error("Could not open the print dialog"));
   };
   const handleDownload = async () => {
     if (downloading || !printRef.current) return;
+    if (!hasRadiologyResultToExport) {
+      toast.error("Radiology result is not ready for download.");
+      return;
+    }
+
+    // Option 1: Audit the download immediately upon user trigger so mobile canvas limitations never omit audit logs
+    if (report?.sqid) {
+      logScanResultDownload(report.sqid)
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ["radiology-scan-requests"] });
+        })
+        .catch((err) => console.warn("Download audit log failed", err));
+    }
+
     setDownloading(true);
     const toastId = toast.loading("Preparing PDF...");
     try {
-      await downloadElementAsPdf(printRef.current, downloadFileName, { singleBlock: true, scale: 1.75 });
+      await downloadElementAsPdf(printRef.current, downloadFileName, { scale: 1.75 });
       toast.success("PDF downloaded", { id: toastId });
-      // Audit the download; never blocks or fails the download itself
-      if (report?.sqid) logScanResultDownload(report.sqid).catch((err) => console.warn("Download audit log failed", err));
     } catch (error) {
       console.error("PDF export failed", error);
       toast.error("Could not generate the PDF", { id: toastId });
@@ -231,7 +279,7 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
   // report/attachments back in when it returns here.
   const handleUploadClick = () => {
     navigate("/hospital-radiology-upload-result", {
-      state: { order: { ...order, status, image_collected_at: imageCollectedAt } },
+      state: { order: { ...order, status, image_collected_at: imageCollectedAt }, fromStatus },
     });
   };
 
@@ -239,6 +287,31 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
 
   return (
     <>
+      {/* Dedicated Export Container: Rendered at exact 794px A4 pixel width off-screen so html2canvas and print dialog capture full A4 width without shrinking */}
+      <div
+        style={{
+          position: "fixed",
+          left: "-99999px",
+          top: 0,
+          width: "794px",
+          zIndex: -9999,
+          pointerEvents: "none",
+        }}
+        aria-hidden="true"
+      >
+        <div ref={printRef} className="w-[794px] bg-white text-slate-900 p-0 m-0">
+          <RadiologyOfficialReportTemplate
+            order={order}
+            report={report}
+            attachments={attachments}
+            hospitalName={hospitalName}
+            hospitalLogo={hospitalLogo}
+            hospitalAddress={hospitalAddress}
+            hospitalEmail={hospitalEmail}
+          />
+        </div>
+      </div>
+
       <div className="py-2">
         <DynamicDate />
       </div>
@@ -246,7 +319,7 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
       <div className="bg-white rounded-xl border mt-3 p-5 text-sm">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-3 gap-4 sm:gap-0">
-          <button type="button" onClick={() => navigate(-1)} className="flex items-center gap-1 cursor-pointer">
+          <button type="button" onClick={handleBack} className="flex items-center gap-1 cursor-pointer">
             <ArrowLeft size={14} />
             <span>{backLabel}</span>
           </button>
@@ -285,38 +358,31 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
               </div>
             )}
 
-            {(showReport || isDecided) && (
-              <div className="flex gap-3 w-full sm:w-auto">
-                <button type="button" onClick={handlePrint} className={pillOutline + " flex-1 sm:flex-none"}>
-                  <Printer size={14} />
-                  Print out
+            {hasRadiologyResultToExport && (
+              <div className="flex flex-wrap gap-2.5 sm:gap-3 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setIsPreviewOpen(true)}
+                  className={pillOutline + " flex-1 sm:flex-none"}
+                >
+                  <Eye size={14} />
+                  Preview Record
                 </button>
-                <button type="button" onClick={handleDownload} disabled={downloading} className={pillFilled + " flex-1 sm:flex-none disabled:opacity-60"}>
+                <button
+                  type="button"
+                  onClick={handleDownload}
+                  disabled={downloading}
+                  className={pillFilled + " flex-1 sm:flex-none disabled:opacity-60"}
+                >
                   <Download size={14} />
-                  Download
+                  {downloading ? "Downloading..." : "Download"}
                 </button>
               </div>
             )}
           </div>
         </div>
 
-        <div ref={printRef} className="text-sm">
-          {/* Print-only DocuHealth header, same as the lab report PDF */}
-          <div data-print-only className="hidden mb-6 pb-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <img src={docuhealth_logo} alt="DocuHealth Logo" className="w-9 h-9 object-contain" />
-                <div>
-                  <h1 className="text-lg font-bold text-gray-900 tracking-tight">DocuHealth Radiology Report</h1>
-                  <p className="text-xs text-gray-500">{order.hospital_info?.name || hospitalName || "DocuHealth Partner Hospital"}</p>
-                </div>
-              </div>
-              <div className="text-right text-xs text-gray-500">
-                <p className="font-semibold text-gray-700">Official Radiology Record</p>
-                <p>{new Date().toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })}</p>
-              </div>
-            </div>
-          </div>
+        <div className="text-sm">
 
           {/* Patient / order info */}
           <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl">
@@ -560,6 +626,63 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
             >
               Submit entry!
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Full A4 Scrollable Preview Modal */}
+      {isPreviewOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-2 sm:p-4 overflow-hidden"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-slate-100 rounded-2xl w-full max-w-4xl h-[94vh] flex flex-col overflow-hidden shadow-2xl border border-gray-300">
+            {/* Modal header toolbar */}
+            <div className="flex items-center justify-between px-5 py-3.5 bg-white border-b border-gray-200 shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                <h3 className="text-sm font-bold text-gray-900">
+                  Official Radiology Record Preview
+                </h3>
+                <span className="text-xs text-gray-500 hidden sm:inline">
+                  (Standard A4 Sheet Format)
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleDownload}
+                  disabled={downloading}
+                  className="flex items-center gap-1.5 bg-docuhealth-primary text-white hover:bg-docuhealth-dark-primary px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-colors disabled:opacity-60"
+                >
+                  <Download size={13} /> {downloading ? "Downloading..." : "Download PDF"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsPreviewOpen(false)}
+                  className="w-8 h-8 rounded-full bg-white text-gray-500 hover:text-gray-800 border border-gray-200 flex items-center justify-center ml-1 cursor-pointer transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable preview body: flex-1 min-h-0 guarantees smooth vertical scrolling across all screen heights */}
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto p-4 sm:p-6 bg-slate-200/90 flex justify-center">
+              {/* Authentic A4 Paper Sheet: EXACT 794px width matching download export container */}
+              <div className="w-[794px] min-w-[794px] bg-white border border-gray-300 p-0 m-0 shrink-0 select-text my-auto sm:my-2 shadow-sm">
+                <RadiologyOfficialReportTemplate
+                  order={order}
+                  report={report}
+                  attachments={attachments}
+                  hospitalName={hospitalName}
+                  hospitalLogo={hospitalLogo}
+                  hospitalAddress={hospitalAddress}
+                  hospitalEmail={hospitalEmail}
+                />
+              </div>
+            </div>
           </div>
         </div>
       )}

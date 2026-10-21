@@ -95,6 +95,10 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
   const queryClient = useQueryClient();
   const { state } = useLocation() || {};
   const order = state?.order;
+  const fromStatus =
+    state?.fromStatus ||
+    sessionStorage.getItem("radiology_active_status") ||
+    "pending";
   const fileInputRef = useRef(null);
 
   const [clinicalIndication, setClinicalIndication] = useState([]);
@@ -163,8 +167,12 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
           <p className="text-gray-500">No scan request selected.</p>
           <button
             type="button"
-            onClick={() => navigate("/hospital-radiology-requests-dashboard")}
-            className="flex items-center gap-1 text-docuhealth-primary font-medium"
+            onClick={() =>
+              navigate(`/hospital-radiology-requests-dashboard?status=${fromStatus}`, {
+                state: { activeStatus: fromStatus },
+              })
+            }
+            className="flex items-center gap-1 text-docuhealth-primary font-medium cursor-pointer"
           >
             <ArrowLeft size={14} />
             Back to Scan Orders
@@ -261,7 +269,7 @@ const Hospital_Radiology_Upload_Result_Dashboard = () => {
 
   const handleSuccessDone = () => {
     navigate("/hospital-radiology-scan-detail", {
-      state: { order: finalOrderRef.current },
+      state: { order: finalOrderRef.current, fromStatus },
       replace: true,
     });
     toast.success("Imaging result uploaded");

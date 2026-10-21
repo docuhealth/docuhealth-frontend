@@ -172,9 +172,20 @@ const VitalSignsCard = ({ vitalSigns, title = "Vital Signs", className = "p-5 my
             </svg>
             Notes
           </p>
-          <p className={`text-[13px] leading-relaxed whitespace-pre-wrap ${vitalSigns?.notes || vitalSigns?.note ? "text-gray-700 font-normal" : "text-gray-400 italic"}`}>
-            {vitalSigns?.notes || vitalSigns?.note || "No note added"}
-          </p>
+          {(() => {
+            const displayNotes =
+              vitalSigns?.notes ||
+              vitalSigns?.note ||
+              vitalSigns?.additional_notes ||
+              vitalSigns?.additional_note ||
+              vitalSigns?.comment ||
+              vitalSigns?.comments;
+            return (
+              <p className={`text-[13px] leading-relaxed whitespace-pre-wrap ${displayNotes ? "text-gray-700 font-normal" : "text-gray-400 italic"}`}>
+                {displayNotes || "No note added"}
+              </p>
+            );
+          })()}
         </div>
       </div>
     </div>

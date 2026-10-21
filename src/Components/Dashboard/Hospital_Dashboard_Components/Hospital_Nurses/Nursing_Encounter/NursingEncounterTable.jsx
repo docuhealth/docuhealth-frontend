@@ -205,7 +205,35 @@ const NursingEncounterTable = () => {
 
   useEffect(() => {
     if (selectedPatientForEncounter) {
-      setEncounterFormData(initialEncounterFormData);
+      const v =
+        selectedPatientForEncounter.latest_vitals ||
+        selectedPatientForEncounter.vital_signs ||
+        selectedPatientForEncounter.vitals ||
+        {};
+      const existingNotes =
+        selectedPatientForEncounter.notes ||
+        selectedPatientForEncounter.note ||
+        selectedPatientForEncounter.additional_note ||
+        selectedPatientForEncounter.additional_notes ||
+        selectedPatientForEncounter.assessment_info?.notes ||
+        selectedPatientForEncounter.latest_assessment?.notes ||
+        v.notes ||
+        v.note ||
+        "";
+
+      setEncounterFormData({
+        blood_pressure: v.blood_pressure || v.bp || "",
+        temp: v.temp || v.temperature || "",
+        heart_rate: v.heart_rate || v.pulse || "",
+        resp_rate: v.resp_rate || v.respiratory_rate || "",
+        height: v.height || "",
+        weight: v.weight || "",
+        bmi: v.bmi || calculateBmi(v.weight, v.height),
+        pain_score: v.pain_score != null ? `${v.pain_score} (${v.pain_score === 0 ? "No pain" : v.pain_score <= 3 ? "Mild Pain" : v.pain_score <= 6 ? "Moderate Pain" : "Severe Pain"})` : "0 (No pain)",
+        sp02: v.spo2 ?? v.sp02 ?? "",
+        triage_priority: selectedPatientForEncounter.triage_priority || "routine",
+        notes: existingNotes
+      });
     }
   }, [selectedPatientForEncounter]);
 
@@ -225,6 +253,10 @@ const NursingEncounterTable = () => {
     return {
       triage_priority: encounterFormData.triage_priority,
       notes: encounterFormData.notes,
+      ...(encounterFormData.notes && {
+        additional_notes: encounterFormData.notes,
+        additional_note: encounterFormData.notes,
+      }),
       vital_signs: {
         ...(encounterFormData.blood_pressure && { blood_pressure: encounterFormData.blood_pressure }),
         ...(encounterFormData.temp && { temp: parseFloat(encounterFormData.temp) }),
@@ -234,7 +266,13 @@ const NursingEncounterTable = () => {
         ...(encounterFormData.weight && { weight: parseFloat(encounterFormData.weight) }),
         // Note: BMI is auto-calculated by the backend from height and weight. Do not send bmi.
         ...(encounterFormData.pain_score && { pain_score: parseInt(encounterFormData.pain_score.split(" ")[0], 10) }),
-        ...(encounterFormData.sp02 && { spo2: parseInt(encounterFormData.sp02, 10) })
+        ...(encounterFormData.sp02 && { spo2: parseInt(encounterFormData.sp02, 10) }),
+        ...(encounterFormData.notes && {
+          notes: encounterFormData.notes,
+          note: encounterFormData.notes,
+          additional_notes: encounterFormData.notes,
+          additional_note: encounterFormData.notes,
+        }),
       }
     };
   };
@@ -290,6 +328,24 @@ const NursingEncounterTable = () => {
     };
 
     const vitalsData = viewEncounterDetails.latest_vitals || viewEncounterDetails.vital_signs || viewEncounterDetails.vitals || {};
+    const notesValue =
+      vitalsData.notes ||
+      vitalsData.note ||
+      vitalsData.additional_note ||
+      vitalsData.additional_notes ||
+      viewEncounterDetails.notes ||
+      viewEncounterDetails.note ||
+      viewEncounterDetails.additional_note ||
+      viewEncounterDetails.additional_notes ||
+      viewEncounterDetails.nursing_assessment?.notes ||
+      viewEncounterDetails.nursing_assessment?.note ||
+      viewEncounterDetails.assessment_info?.notes ||
+      viewEncounterDetails.assessment_info?.note ||
+      viewEncounterDetails.latest_assessment?.notes ||
+      viewEncounterDetails.latest_assessment?.note ||
+      viewEncounterDetails.triage_notes ||
+      "";
+
     const mockVitals = {
       blood_pressure: vitalsData.blood_pressure || vitalsData.bp || "N/A",
       temp: vitalsData.temp || vitalsData.temperature || "N/A",
@@ -299,7 +355,11 @@ const NursingEncounterTable = () => {
       weight: vitalsData.weight || "N/A",
       bmi: vitalsData.bmi || "N/A",
       pain_score: vitalsData.pain_score || "N/A",
-      sp02: vitalsData.sp02 || vitalsData.spo2 || vitalsData.oxygen_saturation || "N/A"
+      sp02: vitalsData.sp02 || vitalsData.spo2 || vitalsData.oxygen_saturation || "N/A",
+      notes: notesValue,
+      note: notesValue,
+      additional_notes: notesValue,
+      additional_note: notesValue,
     };
 
     return (

@@ -156,6 +156,24 @@ const DoctorEncounterTable = () => {
     };
 
     const vitalsData = encounter.latest_vitals || encounter.vital_signs || encounter.vitals || {};
+    const notesValue =
+      vitalsData.notes ||
+      vitalsData.note ||
+      vitalsData.additional_note ||
+      vitalsData.additional_notes ||
+      encounter.notes ||
+      encounter.note ||
+      encounter.additional_note ||
+      encounter.additional_notes ||
+      encounter.nursing_assessment?.notes ||
+      encounter.nursing_assessment?.note ||
+      encounter.assessment_info?.notes ||
+      encounter.assessment_info?.note ||
+      encounter.latest_assessment?.notes ||
+      encounter.latest_assessment?.note ||
+      encounter.triage_notes ||
+      "";
+
     const mappedVitals = {
       blood_pressure: vitalsData.blood_pressure || vitalsData.bp || "N/A",
       temp: vitalsData.temp || vitalsData.temperature || "N/A",
@@ -165,7 +183,11 @@ const DoctorEncounterTable = () => {
       weight: vitalsData.weight || "N/A",
       bmi: vitalsData.bmi || "N/A",
       pain_score: vitalsData.pain_score || "N/A",
-      spo2: vitalsData.spo2 || vitalsData.sp02 || vitalsData.oxygen_saturation || "N/A"
+      spo2: vitalsData.spo2 || vitalsData.sp02 || vitalsData.oxygen_saturation || "N/A",
+      notes: notesValue,
+      note: notesValue,
+      additional_notes: notesValue,
+      additional_note: notesValue,
     };
 
     const handleProceedToCall = async () => {

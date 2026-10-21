@@ -2,7 +2,7 @@ import { useState, useContext, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
-import { ArrowLeft, X, Printer, Download } from "lucide-react";
+import { ArrowLeft, X, Download, Eye } from "lucide-react";
 import RejectModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/RejectModal";
 import toast from "react-hot-toast";
 import {
@@ -24,6 +24,7 @@ import { LabAppContext } from "../../../context/HospitalContext/Lab/LabAppContex
 import { extractApiErrorMessage } from "../../../utils/apiError";
 import { printElement, downloadElementAsPdf } from "../../../utils/exportElement";
 import docuhealth_logo from "../../../assets/img/docuhealth_logo.png";
+import LabOfficialReportTemplate from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/LabOfficialReportTemplate";
 
 const STATUS_STYLES = {
   pending:                      { label: "Pending",                  color: "text-amber-600" },
@@ -591,13 +592,14 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
 } = {}) => {
   const navigate      = useNavigate();
   const queryClient   = useQueryClient();
-  const { isLabAdmin = false, hospitalName = "" } = useContext(LabAppContext) || {};
+  const { isLabAdmin = false, hospitalName = "", hospitalLogo = null, profile } = useContext(LabAppContext) || {};
   const { state }     = useLocation() || {};
   const isDirectOrder = typeof orderIdProp === "object" && orderIdProp !== null;
   const sqid          = isDirectOrder ? orderIdProp.sqid : (orderIdProp || state?.sqid || state?.order?.sqid || state?.order?.id);
 
   const printRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
@@ -628,7 +630,98 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
   const hospitalNameSlug = sanitizeForFilename(order.hospital || hospitalName || "Hospital");
   const downloadFileName = `${patientNameSlug}_${testNameSlug}_${hospitalNameSlug}.pdf`;
 
+  const hospitalAddress =
+    order.hospital_info?.address ||
+    order.address ||
+    order.hospital_address ||
+    profile?.hospital_address ||
+    profile?.hospital?.address ||
+    profile?.address ||
+    "";
+
+  const hospitalEmail =
+    order.hospital_info?.email ||
+    order.email ||
+    order.hospital_email ||
+    profile?.hospital_email ||
+    profile?.hospital?.email ||
+    profile?.email ||
+    "";
+
+  // Only results that are ready, lab approved, doctor approved, or completed can be downloaded/printed.
+  // Pending, in-progress, sample-collected, or rejected orders CANNOT be downloaded!
+  const DOWNLOADABLE_STATUSES = [
+    "result_ready",
+    "result_accepted_by_lab_admin",
+    "result_accepted_by_doctor",
+    "completed",
+    "accepted",
+    "approved",
+    "all_ready",
+    "ready",
+  ];
+
+  const BLOCKED_STATUSES = [
+    "pending",
+    "in_progress",
+    "sample_collected",
+    "sample_pending",
+    "rejected",
+    "declined",
+    "cancelled",
+  ];
+
+  const orderAggregateStatus = String(order.aggregate_status || "").toLowerCase().trim();
+  const rawOrderStatus = String(order.status || "").toLowerCase().trim();
+  const orderTab = String(order.tab || state?.order?.tab || state?.tab || "").toLowerCase().trim();
+
+  const isOrderLevelDownloadable =
+    DOWNLOADABLE_STATUSES.includes(orderAggregateStatus) ||
+    DOWNLOADABLE_STATUSES.includes(rawOrderStatus) ||
+    ["result ready", "doctor approved", "lab admin approved", "completed", "result approval"].includes(orderTab);
+
+  const hasDownloadableItem = orderItemsList.some((item) => {
+    const itemStatus = String(item.status || "").toLowerCase().trim();
+    const resultStatus = String(item.result_info?.status || "").toLowerCase().trim();
+
+    // If item status or result status is explicitly in DOWNLOADABLE_STATUSES, it is downloadable
+    if (DOWNLOADABLE_STATUSES.includes(itemStatus) || DOWNLOADABLE_STATUSES.includes(resultStatus)) {
+      return true;
+    }
+
+    // If item is pending, in_progress, or sample_collected, and result status is not ready, block it!
+    if (BLOCKED_STATUSES.includes(itemStatus) || BLOCKED_STATUSES.includes(resultStatus)) {
+      return false;
+    }
+
+    // Check if result_info contains actual entered values and is not in a blocked status
+    if (item.result_info) {
+      const val = item.result_info.value;
+      const hasValue = val != null && String(val).trim() !== "";
+      const hasParams =
+        Array.isArray(item.result_info.parameters) &&
+        item.result_info.parameters.some((p) => p.value != null && String(p.value).trim() !== "");
+      const hasParamsInfo =
+        Array.isArray(item.result_info.parameters_info) &&
+        item.result_info.parameters_info.some((p) => p.value != null && String(p.value).trim() !== "");
+      return hasValue || hasParams || hasParamsInfo;
+    }
+
+    return false;
+  });
+
+  // If order status is explicitly pending or in_progress, it MUST have at least one item ready to download; otherwise strictly blocked!
+  const isOrderBlocked =
+    (rawOrderStatus === "pending" || rawOrderStatus === "in_progress" || rawOrderStatus === "sample_collected") &&
+    !hasDownloadableItem;
+
+  const hasResultToExport = !isOrderBlocked && (isOrderLevelDownloadable || hasDownloadableItem);
+
   const handlePrint = () => {
+    if (!hasResultToExport) {
+      toast.error("Results are not ready for printing.");
+      return;
+    }
     printElement(printRef.current, `Lab Record - ${order.name || "Patient"}`).catch(() =>
       toast.error("Could not open the print dialog")
     );
@@ -648,12 +741,19 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
 
   const handleDownload = async () => {
     if (downloading || !printRef.current) return;
+    if (!hasResultToExport) {
+      toast.error("Results are not ready for download.");
+      return;
+    }
+
+    // Option 1: Fire download audit immediately so mobile canvas limitations never omit audit logs
+    logDownloads();
+
     setDownloading(true);
     const toastId = toast.loading("Preparing PDF...");
     try {
-      await downloadElementAsPdf(printRef.current, downloadFileName, { singleBlock: true, scale: 1.75 });
+      await downloadElementAsPdf(printRef.current, downloadFileName, { scale: 2, margin: 0 });
       toast.success("PDF downloaded", { id: toastId });
-      logDownloads();
     } catch (error) {
       console.error("PDF generation failed:", error);
       toast.error("Could not generate the PDF", { id: toastId });
@@ -666,26 +766,6 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
   const itemsAwaitingLabAdmin = (order.items || []).filter((i) => i.status === "result_ready");
   // Single tests are reviewed on their own card; the order-level buttons only batch several
   const isApprovalView = !isDoctorView && isLabAdmin && itemsAwaitingLabAdmin.length > 1;
-
-  const orderItemsList = order.items_info || order.items || [];
-  const exportableStatuses = [
-    "result_ready",
-    "result_accepted_by_lab_admin",
-    "result_accepted_by_doctor",
-    "completed",
-    "accepted",
-    "approved",
-  ];
-  const orderStatus = (order.aggregate_status || order.status || "")?.toLowerCase();
-  const hasResultToExport =
-    Boolean(order.result_info) ||
-    exportableStatuses.includes(orderStatus) ||
-    orderItemsList.some(
-      (i) =>
-        Boolean(i.result_info) ||
-        exportableStatuses.includes(i.status?.toLowerCase()) ||
-        exportableStatuses.includes(i.result_info?.status?.toLowerCase())
-    );
 
   const approveMutation = useMutation({
     mutationFn: async () => {
@@ -810,11 +890,11 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
             <>
               <button
                 type="button"
-                onClick={handlePrint}
-                className="flex items-center justify-center gap-1.5 border border-docuhealth-primary text-docuhealth-primary hover:bg-indigo-50/60 rounded-full py-1.5 px-4 text-xs font-semibold cursor-pointer transition-colors"
+                onClick={() => setIsPreviewOpen(true)}
+                className="flex items-center justify-center gap-1.5 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-full py-1.5 px-3.5 text-xs font-semibold cursor-pointer transition-colors"
               >
-                <Printer size={14} />
-                Print out
+                <Eye size={14} />
+                Preview Record
               </button>
               <button
                 type="button"
@@ -849,84 +929,90 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
         </div>
       </div>
 
-      {/* Printable Area with ref and DocuHealth Logo Header */}
-      <div ref={printRef} className="printable-lab-record">
-        {/* Print-only DocuHealth Logo & Hospital Header */}
-        <div data-print-only className="hidden mb-6 pb-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img src={docuhealth_logo} alt="DocuHealth Logo" className="w-9 h-9 object-contain" />
-              <div>
-                <h1 className="text-lg font-bold text-gray-900 tracking-tight">DocuHealth Laboratory Report</h1>
-                <p className="text-xs text-gray-500">{order.hospital || hospitalName || "DocuHealth Partner Hospital"}</p>
-              </div>
-            </div>
-            <div className="text-right text-xs text-gray-500">
-              <p className="font-semibold text-gray-700">Official Laboratory Record</p>
-              <p>{new Date().toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })}</p>
-            </div>
-          </div>
-        </div>
-
-        {order.hin && order.hin !== "—" && (
-          <div data-pdf-unit className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
-            {/* At lg the content column is only ~720px (256px sidebar + padding),
-                so 4 tracks get cramped — hold the 4th back to xl, matching
-                PatientInfoCard. */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              <div className="flex flex-col gap-1">
-                <p className="text-xs text-gray-400">Patient</p>
-                <p className="text-sm font-bold text-docuhealth-dark">{order.name || "—"}</p>
-                <p className="text-xs text-gray-500">HIN: {maskHin(order.hin)}</p>
-              </div>
-              <div className="flex flex-col gap-1">
-                <p className="text-xs text-gray-400">Age / Gender</p>
-                <p className="text-sm font-semibold text-docuhealth-dark capitalize">
-                  {[calcAge(order.dob), order.gender].filter(Boolean).join(" · ") || "—"}
-                </p>
-              </div>
-              {order.requestedBy && (
-                <div className="flex flex-col gap-1">
-                  <p className="text-xs text-gray-400">
-                    {isDoctorView ? "Result submitted by" : "Requested by"}
-                  </p>
-                  <p className="text-sm font-semibold text-docuhealth-dark">{order.requestedBy}</p>
-                </div>
-              )}
-              {order.datetime && order.datetime !== "—" && (
-                <div className="flex flex-col gap-1">
-                  <p className="text-xs text-gray-400">
-                    {isDoctorView ? "Result date" : "Requested"}
-                  </p>
-                  <p className="text-sm font-semibold text-docuhealth-dark">{order.datetime}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        <div className="mt-6">
-          <h2 className="text-lg font-bold text-gray-800 mb-2">Test Items</h2>
-          {order.items?.map((item) => (
-            <LabTestItem 
-              key={item.sqid} 
-              order={order} 
-              item={item} 
-              isDoctorView={isDoctorView} 
-              isLabAdmin={isLabAdmin}
-              queryClient={queryClient} 
-            />
-          ))}
-          {orderLoading ? (
-            <div className="flex items-center gap-2 py-6 text-sm text-gray-500" data-print-hide>
-              <div className="w-4 h-4 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin" />
-              <span>Loading test items...</span>
-            </div>
-          ) : (!order.items || order.items.length === 0) ? (
-            <p className="text-sm text-gray-500 py-4">No test items found for this order.</p>
-          ) : null}
+      {/* Dedicated Export Container: Rendered at exact 794px A4 pixel width off-screen so html2canvas and print dialog capture full A4 width without shrinking */}
+      <div
+        style={{
+          position: "fixed",
+          left: "-99999px",
+          top: 0,
+          width: "794px",
+          zIndex: -9999,
+          pointerEvents: "none",
+        }}
+        aria-hidden="true"
+      >
+        <div ref={printRef} className="w-[794px] bg-white text-slate-900 p-0 m-0">
+          <LabOfficialReportTemplate
+            order={order}
+            hospitalName={hospitalName}
+            hospitalLogo={hospitalLogo}
+            hospitalAddress={hospitalAddress}
+            hospitalEmail={hospitalEmail}
+          />
         </div>
       </div>
+
+      {/* On-screen Dashboard View */}
+      <div className="on-screen-lab-dashboard">
+          {order.hin && order.hin !== "—" && (
+            <div data-pdf-unit className="mt-4 bg-white border border-gray-200 rounded-xl px-4 sm:px-6 py-5">
+              {/* At lg the content column is only ~720px (256px sidebar + padding),
+                  so 4 tracks get cramped — hold the 4th back to xl, matching
+                  PatientInfoCard. */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-gray-400">Patient</p>
+                  <p className="text-sm font-bold text-docuhealth-dark">{order.name || "—"}</p>
+                  <p className="text-xs text-gray-500">HIN: {maskHin(order.hin)}</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-gray-400">Age / Gender</p>
+                  <p className="text-sm font-semibold text-docuhealth-dark capitalize">
+                    {[calcAge(order.dob), order.gender].filter(Boolean).join(" · ") || "—"}
+                  </p>
+                </div>
+                {order.requestedBy && (
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xs text-gray-400">
+                      {isDoctorView ? "Result submitted by" : "Requested by"}
+                    </p>
+                    <p className="text-sm font-semibold text-docuhealth-dark">{order.requestedBy}</p>
+                  </div>
+                )}
+                {order.datetime && order.datetime !== "—" && (
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xs text-gray-400">
+                      {isDoctorView ? "Result date" : "Requested"}
+                    </p>
+                    <p className="text-sm font-semibold text-docuhealth-dark">{order.datetime}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-6">
+            <h2 className="text-lg font-bold text-gray-800 mb-2">Test Items</h2>
+            {order.items?.map((item) => (
+              <LabTestItem 
+                key={item.sqid} 
+                order={order} 
+                item={item} 
+                isDoctorView={isDoctorView} 
+                isLabAdmin={isLabAdmin}
+                queryClient={queryClient} 
+              />
+            ))}
+            {orderLoading ? (
+              <div className="flex items-center gap-2 py-6 text-sm text-gray-500" data-print-hide>
+                <div className="w-4 h-4 border-2 border-docuhealth-primary border-t-transparent rounded-full animate-spin" />
+                <span>Loading test items...</span>
+              </div>
+            ) : (!order.items || order.items.length === 0) ? (
+              <p className="text-sm text-gray-500 py-4">No test items found for this order.</p>
+            ) : null}
+          </div>
+        </div>
 
       {/* Accept Confirmation Modal */}
       <AcceptApprovalModal
@@ -960,6 +1046,61 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
         reason={rejectReason}
         onReasonChange={setRejectReason}
       />
+
+      {/* ── Official Record Preview Modal ── */}
+      {isPreviewOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/60 backdrop-blur-xs overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsPreviewOpen(false);
+          }}
+        >
+          <div className="relative w-full max-w-5xl max-h-[92vh] flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-200 z-10 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Header bar (Pinned at top) */}
+            <div className="flex items-center justify-between px-5 sm:px-7 py-3.5 border-b border-gray-200 bg-gray-50/95 shrink-0 z-20">
+              <div className="flex items-center gap-2.5">
+                <span className="font-bold text-sm text-gray-800">
+                  Lab Record Preview
+                </span>
+                <span className="text-[11px] bg-indigo-50 text-docuhealth-primary font-semibold px-2.5 py-0.5 rounded-full border border-indigo-100/60">
+                  A4 Portrait · Exact 1:1 Export Scale
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleDownload}
+                  disabled={downloading}
+                  className="flex items-center gap-1.5 bg-docuhealth-primary text-white hover:bg-docuhealth-dark-primary px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-colors disabled:opacity-60"
+                >
+                  <Download size={13} /> {downloading ? "Downloading..." : "Download PDF"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsPreviewOpen(false)}
+                  className="w-8 h-8 rounded-full bg-white text-gray-500 hover:text-gray-800 border border-gray-200 flex items-center justify-center ml-1 cursor-pointer transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable preview body: flex-1 min-h-0 guarantees smooth vertical scrolling across all screen heights */}
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto p-4 sm:p-6 bg-slate-200/90 flex justify-center">
+              {/* Authentic A4 Paper Sheet: EXACT 794px width matching download export container */}
+              <div className="w-[794px] min-w-[794px] bg-white border border-gray-300 p-0 m-0 shrink-0 select-text my-auto sm:my-2 shadow-sm">
+                <LabOfficialReportTemplate
+                  order={order}
+                  hospitalName={hospitalName}
+                  hospitalLogo={hospitalLogo}
+                  hospitalAddress={hospitalAddress}
+                  hospitalEmail={hospitalEmail}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
