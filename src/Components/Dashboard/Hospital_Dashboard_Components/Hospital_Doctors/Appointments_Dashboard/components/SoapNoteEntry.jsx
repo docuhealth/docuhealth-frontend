@@ -678,7 +678,21 @@ useEffect(() => {
               <VitalSignsCard
                 title="Vital Signs (auto uploaded)"
                 className="border rounded-md px-3 lg:px-4 py-3 bg-gray-50/40"
-                vitalSigns={selectedPatientFetchedInfo?.latest_vitals}
+                vitalSigns={
+                  selectedPatientFetchedInfo?.latest_vitals
+                    ? {
+                        ...selectedPatientFetchedInfo.latest_vitals,
+                        notes:
+                          selectedPatientFetchedInfo.latest_vitals.notes ||
+                          selectedPatientFetchedInfo.latest_vitals.note ||
+                          selectedPatientFetchedInfo.latest_vitals.additional_note ||
+                          selectedPatientFetchedInfo.latest_vitals.additional_notes ||
+                          selectedPatientFetchedInfo.notes ||
+                          selectedPatientFetchedInfo.note ||
+                          "",
+                      }
+                    : null
+                }
               />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <NoteSection

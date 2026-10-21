@@ -56,7 +56,19 @@ const PatientMedicalRecordDetail = ({
         {/* Vital Signs*/}
         <VitalSignsCard
           className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg"
-          vitalSigns={selectedMedicalRecord?.vital_signs_info}
+          vitalSigns={
+            selectedMedicalRecord?.vital_signs_info
+              ? {
+                  ...selectedMedicalRecord.vital_signs_info,
+                  notes:
+                    selectedMedicalRecord.vital_signs_info.notes ||
+                    selectedMedicalRecord.vital_signs_info.note ||
+                    selectedMedicalRecord.notes ||
+                    selectedMedicalRecord.note ||
+                    "",
+                }
+              : null
+          }
         />
 
         <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg">

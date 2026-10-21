@@ -55,7 +55,19 @@ const NursingAssessmentDetailView = ({ nursingAssessment }) => {
 
       <VitalSignsCard
         className="p-5 my-5 bg-docuhealth-light-gray border rounded-lg"
-        vitalSigns={nursingAssessment.vital_signs_info}
+        vitalSigns={
+          nursingAssessment.vital_signs_info
+            ? {
+                ...nursingAssessment.vital_signs_info,
+                notes:
+                  nursingAssessment.vital_signs_info.notes ||
+                  nursingAssessment.vital_signs_info.note ||
+                  nursingAssessment.notes ||
+                  nursingAssessment.note ||
+                  "",
+              }
+            : null
+        }
         title="Vital signs recorded with this assessment"
       />
     </div>

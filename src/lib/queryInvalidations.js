@@ -20,8 +20,9 @@ const getClient = (client) => client || defaultQueryClient;
 /**
  * Invalidate all queries affected when a patient is discharged (by Nurse or Doctor)
  */
-export const invalidatePatientDischarge = (client, { hin, admissionSqid } = {}) => {
+export const invalidatePatientDischarge = (client, { hin, patientHin, admissionSqid } = {}) => {
   const qc = getClient(client);
+  const targetHin = hin || patientHin;
 
   // Inpatient & Discharged Lists across all clinical & administrative roles
   qc.invalidateQueries({ queryKey: ["hospital-patients-nurse"] });
@@ -40,9 +41,19 @@ export const invalidatePatientDischarge = (client, { hin, admissionSqid } = {}) 
 
   // Care tasks and patient info
   qc.invalidateQueries({ queryKey: ["inpatient-tasks"] });
-  if (hin) {
-    qc.invalidateQueries({ queryKey: ["patient-info", hin] });
-    qc.invalidateQueries({ queryKey: ["patient-admission-notes", hin] });
+  if (admissionSqid) {
+    qc.invalidateQueries({ queryKey: ["inpatient-tasks", admissionSqid] });
+    qc.invalidateQueries({ queryKey: ["inpatient-discharge-summary", admissionSqid] });
+  }
+  qc.invalidateQueries({ queryKey: ["inpatient-discharge-summary"] });
+  qc.invalidateQueries({ queryKey: ["discharged-patients"] });
+
+  if (targetHin) {
+    qc.invalidateQueries({ queryKey: ["patient-info", targetHin] });
+    qc.invalidateQueries({ queryKey: ["patient-admission-notes", targetHin] });
+    qc.invalidateQueries({ queryKey: ["patient-med-records", targetHin] });
+    qc.invalidateQueries({ queryKey: ["patient-lab-records", targetHin] });
+    qc.invalidateQueries({ queryKey: ["patient-soap-notes", targetHin] });
   }
 };
 

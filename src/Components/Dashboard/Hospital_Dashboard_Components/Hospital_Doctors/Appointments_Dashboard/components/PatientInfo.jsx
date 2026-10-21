@@ -164,7 +164,21 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
             </div>
 
             <PatientInfoCard selectedMedicalRecord={selectedMedicalRecord} />
-            <VitalSignsCard vitalSigns={selectedMedicalRecord?.vital_signs || selectedMedicalRecord?.vital_signs_info} />
+            <VitalSignsCard
+              vitalSigns={
+                (selectedMedicalRecord?.vital_signs || selectedMedicalRecord?.vital_signs_info)
+                  ? {
+                      ...(selectedMedicalRecord?.vital_signs || selectedMedicalRecord?.vital_signs_info),
+                      notes:
+                        (selectedMedicalRecord?.vital_signs || selectedMedicalRecord?.vital_signs_info)?.notes ||
+                        (selectedMedicalRecord?.vital_signs || selectedMedicalRecord?.vital_signs_info)?.note ||
+                        selectedMedicalRecord?.notes ||
+                        selectedMedicalRecord?.note ||
+                        "",
+                    }
+                  : null
+              }
+            />
             <ClinicalSummaryCard selectedMedicalRecord={selectedMedicalRecord} />
             <div className="p-5 my-5 bg-docuhealth-light-gray border rounded-xl">
               <p className="font-medium mb-4">Uploaded Documents / Images</p>

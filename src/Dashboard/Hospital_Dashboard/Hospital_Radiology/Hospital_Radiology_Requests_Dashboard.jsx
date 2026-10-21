@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ScanLine } from "lucide-react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
@@ -22,6 +22,8 @@ const TABS = [
   { title: "Completed scan", status: "completed" },
   { title: "Rejected scan", status: "rejected" },
 ];
+
+const VALID_STATUSES = ["pending", "in_progress", "completed", "rejected"];
 
 // Pending order shows how fresh each request is (New / X days ago — varies
 // per card). Every other tab just confirms its own status, same color-coded
@@ -48,12 +50,34 @@ const getBadge = (order, activeStatus) => {
 
 const Hospital_Radiology_Requests_Dashboard = () => {
   const navigate = useNavigate();
-  const [activeStatus, setActiveStatus] = useState("pending");
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const getInitialStatus = () => {
+    const urlStatus = searchParams.get("status") || searchParams.get("tab");
+    if (urlStatus && VALID_STATUSES.includes(urlStatus)) return urlStatus;
+    const stateStatus = location.state?.activeStatus || location.state?.fromStatus;
+    if (stateStatus && VALID_STATUSES.includes(stateStatus)) return stateStatus;
+    const stored = sessionStorage.getItem("radiology_active_status");
+    if (stored && VALID_STATUSES.includes(stored)) return stored;
+    return "pending";
+  };
+
+  const [activeStatus, setActiveStatus] = useState(getInitialStatus);
   const [currentPage, setCurrentPage] = useState(1);
   const [ordering, setOrdering] = useState("-created_at");
   const [searchQuery, setSearchQuery] = useState("");
 
   const isUserLoggedIn = !!getHospitalToken();
+
+  // Keep state in sync if browser history (back/forward) updates the query param
+  useEffect(() => {
+    const s = searchParams.get("status") || searchParams.get("tab");
+    if (s && VALID_STATUSES.includes(s) && s !== activeStatus) {
+      setActiveStatus(s);
+      setCurrentPage(1);
+    }
+  }, [searchParams]);
 
   const { data, isLoading: loading } = useQuery({
     queryKey: ["radiology-scan-requests", activeStatus, currentPage, ordering, searchQuery],
@@ -70,6 +94,15 @@ const Hospital_Radiology_Requests_Dashboard = () => {
   const changeTab = (status) => {
     setActiveStatus(status);
     setCurrentPage(1);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("status", status);
+        return next;
+      },
+      { replace: true }
+    );
+    sessionStorage.setItem("radiology_active_status", status);
   };
 
   return (
@@ -139,7 +172,11 @@ const Hospital_Radiology_Requests_Dashboard = () => {
                 key={order.sqid}
                 order={order}
                 badge={getBadge(order, activeStatus)}
-                onViewDetails={() => navigate("/hospital-radiology-scan-detail", { state: { order } })}
+                onViewDetails={() =>
+                  navigate("/hospital-radiology-scan-detail", {
+                    state: { order, fromStatus: activeStatus },
+                  })
+                }
               />
             ))}
           </div>

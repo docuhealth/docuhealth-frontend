@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
-import { ArrowLeft, Printer, Download, X, ChevronDown } from "lucide-react";
+import { ArrowLeft, Download, X, ChevronDown } from "lucide-react";
 import PatientInfoCard from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/PatientInfoCard";
 import RejectModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Lab/RejectModal";
 import { LabRequestsContext } from "../../../context/HospitalContext/Lab/LabRequestsContext";
@@ -220,12 +220,6 @@ const Hospital_Lab_Appointment_Detail_Dashboard = () => {
           {/* Completed / Rejected */}
           {(isCompleted || isRejected) && (
             <>
-              {/* <button className="flex items-center gap-2 border border-gray-300 text-gray-600 text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
-                <Printer size={13} /> Print out
-              </button>
-              <button className="flex items-center gap-2 border border-gray-300 text-gray-600 text-xs font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
-                <Download size={13} /> Download
-              </button> */}
             </>
           )}
         </div>

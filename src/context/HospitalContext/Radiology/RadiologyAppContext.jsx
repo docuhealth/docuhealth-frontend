@@ -21,6 +21,9 @@ const RadiologyProfileProvider = ({ children }) => {
   const hospitalName = data?.hospital_info?.name;
   const hospitalLogo = data?.hospital_theme?.profile_image;
 
+  const hospitalAddress = data?.hospital_info?.address;
+  const hospitalEmail = data?.hospital_info?.email;
+
   useEffect(() => {
     rememberHospitalLogo(hospitalLogo);
   }, [hospitalLogo]);
@@ -33,6 +36,9 @@ const RadiologyProfileProvider = ({ children }) => {
         backgroundImage,
         hospitalName,
         hospitalLogo,
+        hospitalAddress,
+        hospitalEmail,
+        hospitalInfo: data?.hospital_info,
       }}
     >
       {children}
