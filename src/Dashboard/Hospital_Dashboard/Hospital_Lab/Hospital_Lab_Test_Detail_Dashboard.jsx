@@ -680,6 +680,7 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
     DOWNLOADABLE_STATUSES.includes(rawOrderStatus) ||
     ["result ready", "doctor approved", "lab admin approved", "completed", "result approval"].includes(orderTab);
 
+  const orderItemsList = Array.isArray(order.items) ? order.items : [];
   const hasDownloadableItem = orderItemsList.some((item) => {
     const itemStatus = String(item.status || "").toLowerCase().trim();
     const resultStatus = String(item.result_info?.status || "").toLowerCase().trim();
