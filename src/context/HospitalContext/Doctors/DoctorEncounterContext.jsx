@@ -1,7 +1,8 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useMemo, useRef } from "react";
 import axiosInstanceHos from "../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { extractApiErrorMessage } from "../../../utils/apiError";
+import { matchesPatientSearch, SEARCH_PAGE_SIZE } from "../../../utils/matchesPatientSearch";
 
 export const DoctorEncounterContext = createContext();
 
@@ -22,20 +23,36 @@ export const DoctorEncounterProvider = ({ children }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [count, setCount] = useState(0);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const isSearching = searchQuery.trim() !== "";
+
   // Reset page when tab changes
   useEffect(() => {
     setCurrentPage(1);
   }, [activeTab]);
 
+  // Clear the search in the same render as the tab change, so the new tab isn't fetched in search mode first
+  const changeTab = (tab) => {
+    setSearchQuery("");
+    setActiveTab(tab);
+  };
+
+  // Only the newest request may write the list: a full-tab search fetch and a page fetch can land out of order
+  const latestRequest = useRef(0);
+
   // `silent` skips the loading flag and the error toast — used by the
   // 60s background poll so the list doesn't flash a spinner every minute.
   const fetchEncounters = async ({ silent = false } = {}) => {
+    const requestId = ++latestRequest.current;
     if (!silent) setLoading(true);
     try {
       const status = TAB_STATUS_MAP[activeTab];
-      let url = `api/doctors/check-ins?status=${status}&page=${currentPage}`;
+      let url = isSearching
+        ? `api/doctors/check-ins?status=${status}&page=1&size=${SEARCH_PAGE_SIZE}`
+        : `api/doctors/check-ins?status=${status}&page=${currentPage}`;
 
       const response = await axiosInstanceHos.get(url);
+      if (requestId !== latestRequest.current) return;
       const data = response.data;
 
       if (data?.results) {
@@ -49,7 +66,7 @@ export const DoctorEncounterProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Error fetching doctor encounters:", error);
-      if (!silent) {
+      if (!silent && requestId === latestRequest.current) {
         toast.error("Failed to fetch encounters.");
         setEncounters([]);
         setCount(0);
@@ -62,7 +79,13 @@ export const DoctorEncounterProvider = ({ children }) => {
 
   useEffect(() => {
     fetchEncounters();
-  }, [activeTab, currentPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, currentPage, isSearching]);
+
+  const visibleEncounters = useMemo(
+    () => (isSearching ? encounters.filter((e) => matchesPatientSearch(e, searchQuery)) : encounters),
+    [encounters, isSearching, searchQuery]
+  );
 
   // The pending queue fills as nurses finish triage — actions this doctor
   // never triggers, so nothing invalidates it. This list isn't on React
@@ -73,7 +96,7 @@ export const DoctorEncounterProvider = ({ children }) => {
     }, 60 * 1000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, currentPage]);
+  }, [activeTab, currentPage, isSearching]);
 
   const claimPatient = async (sqid) => {
     try {
@@ -91,18 +114,20 @@ export const DoctorEncounterProvider = ({ children }) => {
   return (
     <DoctorEncounterContext.Provider
       value={{
-        encounters,
+        encounters: visibleEncounters,
         activeTab,
-        setActiveTab,
+        setActiveTab: changeTab,
         setEncounters,
         loading,
         setLoading,
         currentPage,
         setCurrentPage,
-        totalPages,
+        totalPages: isSearching ? 1 : totalPages,
         setTotalPages,
-        count,
+        count: isSearching ? visibleEncounters.length : count,
         setCount,
+        searchQuery,
+        setSearchQuery,
         fetchEncounters,
         claimPatient,
         selectedPatientForWall,

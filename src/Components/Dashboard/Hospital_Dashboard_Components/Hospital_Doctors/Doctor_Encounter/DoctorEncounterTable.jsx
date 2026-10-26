@@ -132,7 +132,8 @@ const DoctorEncounterTable = () => {
     selectedPatientForWall,
     setSelectedPatientForWall,
     selectedPatientForActivities,
-    setSelectedPatientForActivities
+    setSelectedPatientForActivities,
+    searchQuery
   } = useContext(DoctorEncounterContext);
   const navigate = useNavigate();
   const [showClaimModal, setShowClaimModal] = useState(false);
@@ -314,8 +315,8 @@ const DoctorEncounterTable = () => {
     return (
       <EmptyState 
         icon="calendar" 
-        title="No encounters found!" 
-        description={`There are currently no patients in the ${activeTab.toLowerCase()} list.`} 
+        title={searchQuery?.trim() ? "No matching patient!" : "No encounters found!"}
+        description={searchQuery?.trim() ? `No patient in the ${activeTab.toLowerCase()} list matches "${searchQuery.trim()}".` : `There are currently no patients in the ${activeTab.toLowerCase()} list.`}
         className="py-10" 
       />
     );

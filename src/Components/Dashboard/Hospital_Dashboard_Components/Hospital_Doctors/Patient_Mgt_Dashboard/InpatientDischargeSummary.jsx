@@ -35,10 +35,12 @@ const INITIAL_FORM_DATA = {
   follow_up_instructions: "",
 };
 
-// In-patient discharge as a 3-step wizard (Admission Summary → Procedures &
-// Medications → Follow-up). "Complete Discharge" submits to createDoctorInpatientDischarge,
+// In-patient discharge as a 2-step wizard (Admission Summary → Procedures,
+// Medications & Follow-up). "Complete Discharge" submits to createDoctorInpatientDischarge,
 // which records the discharge summary and raises a nurse discharge task; the bed is
 // only freed once a nurse completes that task.
+const TOTAL_STEPS = 2;
+
 const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatient }) => {
   const queryClient = useQueryClient();
   const { hospitalName } = useContext(DoctorAppContext);
@@ -210,7 +212,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
 
   // ---- Step navigation ----
   const [currentStep, setCurrentStep] = useState(1);
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 3));
+  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, TOTAL_STEPS));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
   // ---- Complete discharge: validate → confirm → POST → success ----
@@ -445,11 +447,11 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
         <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
           <div
             className="h-full bg-docuhealth-primary transition-all duration-300"
-            style={{ width: `${(currentStep / 3) * 100}%` }}
+            style={{ width: `${(currentStep / TOTAL_STEPS) * 100}%` }}
           ></div>
         </div>
         <p className="text-center text-xs font-semibold text-gray-800 mt-2">
-          Step {currentStep} of 3
+          Step {currentStep} of {TOTAL_STEPS}
         </p>
       </div>
 
@@ -462,6 +464,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       )}
 
       {currentStep === 2 && (
+        <div className="space-y-6">
         <DischargeProceduresMedicationsStep
           completedInvestigationOptions={completedInvestigationOptions}
           investigationsLoading={labRecordsLoading}
@@ -476,9 +479,6 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
           newMedications={newMedications}
           setNewMedications={setNewMedications}
         />
-      )}
-
-      {currentStep === 3 && (
         <DischargeFollowUpStep
           formData={formData}
           onFieldChange={handleFieldChange}
@@ -487,6 +487,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
           investigationsLoading={labRecordsLoading}
           onTogglePendingInvestigation={toggleSelection("pending_investigations")}
         />
+        </div>
       )}
 
       {/* Navigation */}
@@ -499,7 +500,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
           {currentStep === 1 ? "Cancel" : "Previous"}
         </button>
 
-        {currentStep < 3 ? (
+        {currentStep < TOTAL_STEPS ? (
           <button
             type="button"
             onClick={nextStep}

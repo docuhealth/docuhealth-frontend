@@ -1,15 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import moment from "moment";
-import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import {
   X,
-  User,
   Phone,
   Mail,
   Calendar,
   CreditCard,
   ArrowLeft,
+  ChevronRight,
+  FileText,
+  Pill,
+  ClipboardList,
+  HeartPulse,
+  FlaskConical,
+  ScanLine,
+  BedDouble,
+  CalendarDays,
 } from "lucide-react";
 import Modal from "../../../../ui/Modal";
 import Spinner from "../../../../ui/Spinner";
@@ -23,8 +30,7 @@ import {
   fetchMedicalRecordDetail,
 } from "../../../../../queries/Hospital/doctor/activities";
 
-// Record types with a real detail view wired up — everything else still
-// falls back to the "not available yet" toast. Orders and requests
+// Record types with a real detail view wired up. Orders and requests
 // (LabTestOrder, AdmissionRequest, ...) are no longer in the feed.
 const VIEWABLE_RECORD_TYPES = new Set([
   "SoapNote",
@@ -34,6 +40,117 @@ const VIEWABLE_RECORD_TYPES = new Set([
   "LabTestResult",
   "ScanResult",
 ]);
+
+const RECORD_ICONS = {
+  SoapNote: { Icon: FileText, tone: "text-blue-600 bg-blue-50" },
+  DrugRecord: { Icon: Pill, tone: "text-violet-600 bg-violet-50" },
+  NursingAssessment: { Icon: ClipboardList, tone: "text-emerald-600 bg-emerald-50" },
+  VitalSigns: { Icon: HeartPulse, tone: "text-rose-600 bg-rose-50" },
+  LabTestResult: { Icon: FlaskConical, tone: "text-amber-600 bg-amber-50" },
+  ScanResult: { Icon: ScanLine, tone: "text-cyan-600 bg-cyan-50" },
+  Admission: { Icon: BedDouble, tone: "text-indigo-600 bg-indigo-50" },
+  Appointment: { Icon: CalendarDays, tone: "text-sky-600 bg-sky-50" },
+};
+const DEFAULT_RECORD_ICON = { Icon: FileText, tone: "text-gray-600 bg-gray-100" };
+
+const ROLE_STYLES = {
+  doctor: { avatar: "bg-docuhealth-primary text-white", badge: "bg-blue-50 text-docuhealth-primary" },
+  nurse: { avatar: "bg-emerald-500 text-white", badge: "bg-emerald-50 text-emerald-700" },
+};
+const DEFAULT_ROLE_STYLE = { avatar: "bg-orange-400 text-white", badge: "bg-orange-50 text-orange-700" };
+
+const capitalize = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "");
+
+// "NurseInpatientDischargeForm" -> "Nurse inpatient discharge form"; acronyms like "IV" stay uppercase.
+const humanizeType = (type) => {
+  if (!type) return "Record";
+  const words = String(type)
+    .replace(/[_-]+/g, " ")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+    .trim()
+    .split(/\s+/);
+  return words
+    .map((w, i) => {
+      if (w.length > 1 && w === w.toUpperCase()) return w;
+      const lower = w.toLowerCase();
+      return i === 0 ? lower.charAt(0).toUpperCase() + lower.slice(1) : lower;
+    })
+    .join(" ");
+};
+
+const getRecordLabel = (type, action) => {
+  switch (type) {
+    case "SoapNote":
+      return "Encounter note";
+    case "LabTestResult":
+      return "Lab result";
+    case "ScanResult":
+      return "Scan result";
+    case "DrugRecord":
+      return "Medication";
+    case "Admission":
+      // Requesting an admission doesn't admit the patient; the receptionist still has to accept it.
+      return action === "requested" ? "Admission request" : "Admission";
+    case "EncounterCard":
+      return "Encounter card";
+    case "VitalSigns":
+      return "Vital signs";
+    case "NursingAssessment":
+      return "Nursing assessment";
+    case "CaseNote":
+      return "Case note";
+    case "CarePlan":
+      return "Care plan";
+    default:
+      return humanizeType(type);
+  }
+};
+
+const getActionText = (type, action) => {
+  switch (type) {
+    case "SoapNote":
+      return "created an encounter note";
+    case "LabTestResult":
+      return "recorded a lab result";
+    case "ScanResult":
+      return "recorded a scan result";
+    case "CarePlan":
+      return "created a care plan";
+    case "CaseNote":
+      return "wrote a case note";
+    case "DrugRecord":
+      return action === "task_completed" ? "gave a medication" : "recorded a medication";
+    case "Admission":
+      return action === "requested" ? "requested to admit the patient" : "admitted the patient";
+    case "Appointment":
+      return "scheduled an appointment";
+    case "EncounterCard":
+      return "created an encounter card";
+    case "VitalSigns":
+      return "recorded vital signs";
+    case "NursingAssessment":
+      return "recorded a nursing assessment";
+    default:
+      return `recorded ${getRecordLabel(type, action).toLowerCase()}`;
+  }
+};
+
+const formatDayHeading = (day) => {
+  if (day.isSame(moment(), "day")) return "Today";
+  if (day.isSame(moment().subtract(1, "day"), "day")) return "Yesterday";
+  return day.format("ddd, D MMM YYYY");
+};
+
+const PatientField = ({ icon: Icon, label, children }) => (
+  <div className="flex items-start gap-3 min-w-0">
+    <Icon className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+    <div className="min-w-0">
+      <p className="text-xs font-medium text-gray-500">{label}</p>
+      <p className="text-sm text-gray-800 break-words">{children}</p>
+    </div>
+  </div>
+);
 
 const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
   const patientData = encounter?.patient_info || {};
@@ -45,18 +162,29 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
     enabled: !!hin && isOpen,
   });
 
-  const activities = activitiesData?.results || [];
+  const activities = useMemo(() => activitiesData?.results || [], [activitiesData]);
 
-  // Set when a viewable record's "View X" link is clicked — opens the full
-  // record inline instead of the "not available yet" toast. `eventSqid` is
+  // Newest-first feed split into day groups for the timeline headings
+  const activityGroups = useMemo(() => {
+    const groups = [];
+    activities.forEach((activity) => {
+      const day = moment(activity.created_at);
+      const key = day.format("YYYY-MM-DD");
+      const last = groups[groups.length - 1];
+      if (last?.key === key) last.items.push(activity);
+      else groups.push({ key, day, items: [activity] });
+    });
+    return groups;
+  }, [activities]);
+
+  // Set when a viewable record's "View X" link is clicked; `eventSqid` is
   // the activity's own top-level sqid (see fetchMedicalRecordDetail), not
   // the record's sqid.
   const [viewingRecord, setViewingRecord] = useState(null); // { type, eventSqid } | null
 
   // This modal is a single long-lived instance the parent just toggles
-  // `isOpen`/`encounter` on, rather than mounting fresh per patient — so
-  // reset back to the timeline on close (and defensively on patient change)
-  // or the next patient opened would inherit the previous one's detail view.
+  // `isOpen`/`encounter` on, so reset back to the timeline on close (and on
+  // patient change) or the next patient would inherit the previous detail view.
   useEffect(() => {
     setViewingRecord(null);
   }, [isOpen, hin]);
@@ -71,139 +199,144 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
     enabled: !!hin && isOpen && !!viewingRecord?.eventSqid,
   });
 
-  const patientName =
-    `${patientData.firstname || patientData.first_name || ""} ${patientData.lastname || patientData.last_name || ""}`.trim() ||
-    "N/A";
+  // Below lg the patient card and timeline share one scroll, so bring the opened record (or the timeline) to the top
+  const bodyRef = useRef(null);
+  const sectionRef = useRef(null);
+  useEffect(() => {
+    const body = bodyRef.current;
+    const section = sectionRef.current;
+    if (!body || !section || window.matchMedia("(min-width: 1024px)").matches) return;
+    if (viewingRecord || body.scrollTop > section.offsetTop) body.scrollTop = section.offsetTop;
+    // Re-run once the record loads: while the spinner shows, the body is too short to scroll
+  }, [viewingRecord, isLoadingRecordDetail]);
 
-  // Custom header to match the mockup
-  const renderHeader = () => (
-    <div className="flex items-start justify-between p-6 border-b border-gray-100">
-      <div>
-        <h3 className="text-xl font-bold text-gray-900">
-          Recent care activities
-        </h3>
-        <p className="text-sm text-gray-500 mt-1">
-          View all recent care activities performed by you and other care
-          providers.
-        </p>
-      </div>
-      <button
-        onClick={onClose}
-        className="text-gray-400 hover:bg-gray-100 p-2 rounded-full transition-colors"
-      >
-        <X className="w-5 h-5" />
-      </button>
-    </div>
-  );
+  const firstName = patientData.firstname || patientData.first_name || "";
+  const lastName = patientData.lastname || patientData.last_name || "";
+  const patientName = `${firstName} ${lastName}`.trim() || "N/A";
+  const patientInitials = `${firstName[0] || ""}${lastName[0] || ""}`.toUpperCase() || "P";
 
-  // "NurseInpatientDischargeForm" -> "Nurse inpatient discharge form"; acronyms like "IV" stay uppercase.
-  const humanizeType = (type) => {
-    if (!type) return "Record";
-    const words = String(type)
-      .replace(/[_-]+/g, " ")
-      .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
-      .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
-      .trim()
-      .split(/\s+/);
-    return words
-      .map((w, i) => {
-        if (w.length > 1 && w === w.toUpperCase()) return w;
-        const lower = w.toLowerCase();
-        return i === 0 ? lower.charAt(0).toUpperCase() + lower.slice(1) : lower;
-      })
-      .join(" ");
-  };
+  const paymentType = patientData.payment_provider?.type || patientData.payment_category || patientData.patient_category;
+  const paymentLabel = paymentType
+    ? `${paymentType.toLowerCase() === "hmo" ? "HMO" : capitalize(paymentType)} patient`
+    : "N/A";
 
-  const getRecordTitle = (type, action) => {
-    switch (type) {
+  const renderRecordDetail = () => {
+    if (isLoadingRecordDetail) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <Spinner className="w-8 h-8 text-docuhealth-primary" />
+        </div>
+      );
+    }
+    if (!viewingRecordData) {
+      return (
+        <div className="flex flex-col items-center justify-center h-64 text-center">
+          <p className="text-gray-500">Can&apos;t find this record.</p>
+        </div>
+      );
+    }
+    switch (viewingRecord.type) {
       case "SoapNote":
-        return "Encounter note recorded for this patient!";
-      case "LabTestResult":
-        return "Lab result recorded for this patient!";
-      case "ScanResult":
-        return "Scan result recorded for this patient!";
-      case "DrugRecord":
-        return "Medication recorded for this patient!";
-      case "Admission":
-        // Requesting an admission doesn't admit the patient — the
-        // receptionist still has to confirm it before a bed is assigned.
-        return action === "requested"
-          ? "Admission requested for this patient!"
-          : "Patient admitted!";
-      case "Appointment":
-        return "Appointment scheduled!";
-      case "EncounterCard":
-        return "Encounter card created for this patient!";
+        return <SoapNoteDetailView soapNote={viewingRecordData} />;
       case "VitalSigns":
-        return "Vital signs recorded for this patient!";
+        return (
+          <VitalSignsCard
+            vitalSigns={viewingRecordData}
+            title={`Vital signs, recorded ${moment(viewingRecordData.created_at).format("Do MMMM, YYYY, h:mmA")}`}
+          />
+        );
       case "NursingAssessment":
-        return "Nursing Assessment recorded for this patient!";
+        return <NursingAssessmentDetailView nursingAssessment={viewingRecordData} />;
+      case "Admission":
+        return <AdmissionDetailView admission={viewingRecordData} />;
+      case "LabTestResult":
+        // The event returns the lab result itself (`item` is only the order item's sqid); like on SOAP notes, only an accepted result is shown.
+        return renderLabTests([{
+          sqid: viewingRecordData.item,
+          test_info: { name: "Lab result" },
+          status: viewingRecordData.status === "accepted" ? "completed"
+            : viewingRecordData.status?.includes("rejected") ? "rejected" : "result_ready",
+          result_info: viewingRecordData.status === "accepted" ? viewingRecordData : null,
+        }]);
+      case "ScanResult":
+        // The event returns the scan result itself; like on SOAP notes, only an approved result is shown.
+        return renderScans([{
+          items_info: [{
+            sqid: viewingRecordData.sqid,
+            scan_info: { name: "Scan result" },
+            status: viewingRecordData.status === "approved" ? "completed" : viewingRecordData.status,
+            rejection_reason: viewingRecordData.rejection_reason,
+            result_info: viewingRecordData.status === "approved" ? viewingRecordData : null,
+          }],
+        }]);
       default:
-        return `${humanizeType(type)} recorded for this patient!`;
+        return null;
     }
   };
 
-  const getRecordLinkText = (type, action) => {
-    switch (type) {
-      case "SoapNote":
-        return "View encounter note";
-      case "LabTestResult":
-        return "View Lab result";
-      case "ScanResult":
-        return "View Scan result";
-      case "DrugRecord":
-        return "View Medication";
-      case "Admission":
-        return action === "requested" ? "View Admission request" : "View Admission";
-      case "Appointment":
-        return "View Appointment";
-      case "EncounterCard":
-        return "View Encounter card";
-      case "VitalSigns":
-        return "View Vital signs";
-      case "NursingAssessment":
-        return "View Nursing Assessment";
-      default:
-        return `View ${humanizeType(type)}`;
-    }
-  };
+  const renderActivity = (activity, isLastInGroup) => {
+    const staff = activity.staff_info || {};
+    const role = (staff.role || "").toLowerCase();
+    const roleStyle = ROLE_STYLES[role] || DEFAULT_ROLE_STYLE;
+    const fullName = `${staff.firstname || ""} ${staff.lastname || ""}`.trim();
+    const staffName = fullName ? `${role === "doctor" ? "Dr. " : ""}${fullName}` : "A staff member";
+    const staffInitials = `${staff.firstname?.[0] || ""}${staff.lastname?.[0] || ""}`.toUpperCase() || "S";
+    const roleLabel = [capitalize(staff.role), capitalize(staff.specialization)].filter(Boolean).join(" · ");
 
-  const getActionPhrase = (staff, action, recordType) => {
-    const staffName =
-      `${staff.firstname || ""} ${staff.lastname || ""}`.trim() ||
-      "A staff member";
-    let actionText = action || "created";
-
-    // Customize text based on record type
-    if (recordType === "SoapNote") {
-      actionText = "created an encounter note";
-    } else if (recordType === "LabTestResult") {
-      actionText = "recorded a lab result";
-    } else if (recordType === "ScanResult") {
-      actionText = "recorded a scan result";
-    } else if (recordType === "CarePlan") {
-      actionText = "created a care plan";
-    } else if (recordType === "CaseNote") {
-      actionText = "wrote a case note";
-    } else if (recordType === "DrugRecord") {
-      actionText = action === "task_completed" ? "gave a medication" : "recorded a medication";
-    } else if (recordType === "Admission") {
-      // "requested" means the doctor asked for an admission; the patient
-      // isn't actually admitted until the receptionist confirms it.
-      actionText = action === "requested" ? "requested to admit the patient" : "admitted the patient";
-    } else if (recordType === "Appointment") {
-      actionText = "scheduled an appointment";
-    } else if (recordType === "EncounterCard") {
-      actionText = "created an encounter card";
-    } else if (recordType === "VitalSigns") {
-      actionText = "recorded vital signs";
-    }
+    const record = activity.record || {};
+    const label = getRecordLabel(record.type, activity.action);
+    const { Icon, tone } = RECORD_ICONS[record.type] || DEFAULT_RECORD_ICON;
+    const canView = VIEWABLE_RECORD_TYPES.has(record.type) && !!activity.sqid;
+    const time = moment(activity.created_at);
 
     return (
-      <>
-        <span className="font-semibold text-gray-800">{staffName}</span>{" "}
-        <span className="text-gray-500 text-sm">{actionText}</span>
-      </>
+      <li key={activity.sqid || activity.created_at} className={`relative pl-11 sm:pl-12 ${isLastInGroup ? "" : "pb-6"}`}>
+        {!isLastInGroup && <span aria-hidden className="absolute left-4 top-9 bottom-0 w-px bg-gray-200" />}
+        <span
+          className={`absolute left-0 top-0 flex items-center justify-center w-8 h-8 rounded-full text-[11px] font-semibold ring-4 ring-white ${roleStyle.avatar}`}
+        >
+          {staffInitials}
+        </span>
+
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 min-h-8">
+          <span className="font-semibold text-gray-900 text-sm">{staffName}</span>
+          {roleLabel && (
+            <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${roleStyle.badge}`}>{roleLabel}</span>
+          )}
+          <span className="text-sm text-gray-500">{getActionText(record.type, activity.action)}</span>
+          <time
+            dateTime={activity.created_at}
+            title={time.format("Do MMMM YYYY, h:mm A")}
+            className="ml-auto text-xs text-gray-400 whitespace-nowrap"
+          >
+            {time.format("h:mm A")}
+          </time>
+        </div>
+
+        <div className="mt-2 flex flex-col sm:flex-row sm:items-center gap-3 rounded-lg border border-gray-100 bg-gray-50/70 p-3 sm:p-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className={`flex items-center justify-center w-9 h-9 rounded-lg shrink-0 ${tone}`}>
+              <Icon className="w-4 h-4" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-900">{label}</p>
+              <p className="text-xs text-gray-500">Recorded {time.format("D MMM YYYY, h:mm A")}</p>
+            </div>
+          </div>
+          {canView ? (
+            <button
+              type="button"
+              onClick={() => setViewingRecord({ type: record.type, eventSqid: activity.sqid })}
+              className="sm:ml-auto inline-flex items-center justify-center gap-1 w-full sm:w-auto rounded-full border border-docuhealth-primary/30 px-4 py-2 sm:py-1.5 text-sm font-medium text-docuhealth-primary hover:bg-docuhealth-primary/5 transition-colors whitespace-nowrap"
+            >
+              View {label.toLowerCase()}
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          ) : (
+            <span className="sm:ml-auto text-xs text-gray-400">Details not viewable here yet</span>
+          )}
+        </div>
+      </li>
     );
   };
 
@@ -211,196 +344,102 @@ const RecentCareActivitiesModal = ({ isOpen, onClose, encounter }) => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      maxWidth="7xl"
-      className="!p-0 overflow-hidden"
+      maxWidth="6xl"
+      className="overflow-hidden"
     >
-      {renderHeader()}
-
-      <div className="flex flex-col md:flex-row h-[75vh]">
-        {/* Left Sidebar: Patient Info */}
-        <div className="w-full md:w-[30%] bg-gray-50/50 border-r border-gray-100 p-6 flex flex-col gap-6 overflow-y-auto">
-          <div>
-            <div className="flex items-center gap-2 text-gray-600 mb-1">
-              <User className="w-4 h-4" />
-              <span className="text-sm font-semibold">Full name</span>
-            </div>
-            <p className="text-sm text-gray-800 ml-6">{patientName}</p>
-          </div>
-
-          <div>
-            <div className="flex items-center gap-2 text-gray-600 mb-1">
-              <Phone className="w-4 h-4" />
-              <span className="text-sm font-semibold">Phone</span>
-            </div>
-            <p className="text-sm text-gray-800 ml-6">
-              {patientData.phone_number || patientData.phone_num || "N/A"}
+      {/* -m-5 cancels Modal's built-in body padding so the panes reach the edges */}
+      <div className="-m-5 flex flex-col h-[min(88dvh,860px)]">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4 px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-100 shrink-0">
+          <div className="min-w-0">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900">Recent care activities</h3>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+              All recent care activities performed by you and other care providers.
             </p>
           </div>
-
-          <div>
-            <div className="flex items-center gap-2 text-gray-600 mb-1">
-              <Mail className="w-4 h-4" />
-              <span className="text-sm font-semibold">Email</span>
-            </div>
-            <p className="text-sm text-gray-800 ml-6">
-              {patientData.email || "N/A"}
-            </p>
-          </div>
-
-          <div>
-            <div className="flex items-center gap-2 text-gray-600 mb-1">
-              <Calendar className="w-4 h-4" />
-              <span className="text-sm font-semibold">First encounter</span>
-            </div>
-            <p className="text-sm text-gray-800 ml-6">
-              {encounter?.created_at
-                ? moment(encounter.created_at).format("M/D/YYYY, h:mmA")
-                : "N/A"}
-            </p>
-          </div>
-
-          <div>
-            <div className="flex items-center gap-2 text-gray-600 mb-1">
-              <CreditCard className="w-4 h-4" />
-              <span className="text-sm font-semibold">Payment category</span>
-            </div>
-            <p className="text-sm text-gray-800 ml-6 capitalize">
-              {(patientData.payment_provider?.type ||
-                patientData.payment_category ||
-                patientData.patient_category ||
-                "HMO") + " patient"}
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="text-gray-400 hover:bg-gray-100 p-2 -mr-2 rounded-full transition-colors shrink-0"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        {/* Right Sidebar: Timeline (or the record detail, once opened) */}
-        <div className="w-full md:w-[70%] p-6 overflow-y-auto bg-white">
-          {viewingRecord ? (
-            <div>
-              <button
-                type="button"
-                onClick={() => setViewingRecord(null)}
-                className="flex items-center gap-1 text-sm text-gray-600 hover:text-docuhealth-primary mb-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to timeline
-              </button>
-
-              {isLoadingRecordDetail ? (
-                <div className="flex justify-center items-center h-64">
-                  <Spinner className="w-8 h-8 text-docuhealth-primary" />
-                </div>
-              ) : !viewingRecordData ? (
-                <div className="flex flex-col items-center justify-center h-64 text-center">
-                  <p className="text-gray-500">Can&apos;t find this record.</p>
-                </div>
-              ) : viewingRecord.type === "SoapNote" ? (
-                <SoapNoteDetailView soapNote={viewingRecordData} />
-              ) : viewingRecord.type === "VitalSigns" ? (
-                <VitalSignsCard
-                  vitalSigns={viewingRecordData}
-                  title={`Vital signs — recorded ${moment(viewingRecordData.created_at).format("Do MMMM, YYYY, h:mmA")}`}
-                />
-              ) : viewingRecord.type === "NursingAssessment" ? (
-                <NursingAssessmentDetailView
-                  nursingAssessment={viewingRecordData}
-                />
-              ) : viewingRecord.type === "Admission" ? (
-                <AdmissionDetailView admission={viewingRecordData} />
-              ) : viewingRecord.type === "LabTestResult" ? (
-                // The event returns the lab result itself (`item` is only the order item's sqid); like on SOAP notes, only an accepted result is shown.
-                renderLabTests([{
-                  sqid: viewingRecordData.item,
-                  test_info: { name: "Lab result" },
-                  status: viewingRecordData.status === "accepted" ? "completed"
-                    : viewingRecordData.status?.includes("rejected") ? "rejected" : "result_ready",
-                  result_info: viewingRecordData.status === "accepted" ? viewingRecordData : null,
-                }])
-              ) : viewingRecord.type === "ScanResult" ? (
-                // The event returns the scan result itself; like on SOAP notes, only an approved result is shown.
-                renderScans([{
-                  items_info: [{
-                    sqid: viewingRecordData.sqid,
-                    scan_info: { name: "Scan result" },
-                    status: viewingRecordData.status === "approved" ? "completed" : viewingRecordData.status,
-                    rejection_reason: viewingRecordData.rejection_reason,
-                    result_info: viewingRecordData.status === "approved" ? viewingRecordData : null,
-                  }],
-                }])
-              ) : null}
+        {/* Below lg everything scrolls as one column; from lg the two panes scroll on their own */}
+        <div ref={bodyRef} className="relative flex-1 min-h-0 overflow-y-auto lg:overflow-hidden lg:grid lg:grid-cols-[300px_1fr]">
+          <aside className="bg-gray-50/60 border-b lg:border-b-0 lg:border-r border-gray-100 p-4 sm:p-6 lg:overflow-y-auto">
+            <div className="flex items-center gap-3">
+              <span className="flex items-center justify-center w-11 h-11 rounded-full bg-docuhealth-primary/10 text-docuhealth-primary font-semibold shrink-0">
+                {patientInitials}
+              </span>
+              <div className="min-w-0">
+                <p className="font-semibold text-gray-900 truncate">{patientName}</p>
+                {hin && <p className="text-xs text-gray-500">HIN {hin}</p>}
+              </div>
             </div>
-          ) : isLoading ? (
-            <div className="flex justify-center items-center h-full">
-              <Spinner className="w-8 h-8 text-docuhealth-primary" />
-            </div>
-          ) : activities.length > 0 ? (
-            <div className="flex flex-col gap-8 relative before:absolute before:inset-0 before:ml-4 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent">
-              {activities.map((activity, index) => {
-                const staff = activity.staff_info || {};
-                const staffInitials =
-                  `${staff.firstname?.[0] || ""}${staff.lastname?.[0] || ""}`.toUpperCase() ||
-                  "S";
-                const record = activity.record || {};
 
-                return (
-                  <div
-                    key={activity.sqid || index}
-                    className="relative flex items-start gap-4"
+            <div className="mt-4 sm:mt-5 grid grid-cols-2 lg:grid-cols-1 gap-x-4 gap-y-3 sm:gap-y-4">
+              <PatientField icon={Phone} label="Phone">
+                {patientData.phone_number || patientData.phone_num || "N/A"}
+              </PatientField>
+              <div className="col-span-2 sm:col-span-1 order-first sm:order-none">
+                <PatientField icon={Mail} label="Email">
+                  <span className="break-all">{patientData.email || "N/A"}</span>
+                </PatientField>
+              </div>
+              <PatientField icon={Calendar} label="First encounter">
+                {encounter?.created_at ? moment(encounter.created_at).format("D MMM YYYY, h:mm A") : "N/A"}
+              </PatientField>
+              <PatientField icon={CreditCard} label="Payment category">
+                {paymentLabel}
+              </PatientField>
+            </div>
+          </aside>
+
+          <section ref={sectionRef} className="p-4 sm:p-6 lg:overflow-y-auto">
+            {viewingRecord ? (
+              <div>
+                <div className="sticky -top-4 sm:-top-6 z-10 -mx-4 sm:-mx-6 -mt-4 sm:-mt-6 mb-4 px-4 sm:px-6 py-3 bg-white border-b border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => setViewingRecord(null)}
+                    className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-docuhealth-primary"
                   >
-                    {/* Timeline dot/avatar */}
-                    <div className="z-10 flex items-center justify-center w-8 h-8 rounded-full bg-orange-400 text-white font-bold text-xs ring-4 ring-white shrink-0 mt-0.5">
-                      {staffInitials}
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to timeline
+                  </button>
+                </div>
+                {renderRecordDetail()}
+              </div>
+            ) : isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <Spinner className="w-8 h-8 text-docuhealth-primary" />
+              </div>
+            ) : activities.length > 0 ? (
+              <div className="space-y-8">
+                {activityGroups.map((group) => (
+                  <div key={group.key}>
+                    <div className="flex items-baseline justify-between gap-3 mb-4">
+                      <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        {formatDayHeading(group.day)}
+                      </h4>
+                      <span className="text-xs text-gray-400">{group.day.fromNow()}</span>
                     </div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="mb-2">
-                        {getActionPhrase(staff, activity.action, record.type)}
-                        <span className="mx-2 text-gray-300">•</span>
-                        <span className="text-gray-400 text-xs">
-                          {moment(activity.created_at).fromNow()}
-                        </span>
-                      </div>
-
-                      <div className="bg-gray-50 border border-gray-100 rounded-lg p-4">
-                        <p className="text-sm text-gray-800 mb-3">
-                          {getRecordTitle(record.type, activity.action)} Time of order:{" "}
-                          {moment(activity.created_at).format(
-                            "Do MMMM, YYYY [at] h:mm A",
-                          )}
-                        </p>
-                        <button
-                          className="text-docuhealth-primary font-medium text-sm hover:underline"
-                          onClick={() => {
-                            if (
-                              VIEWABLE_RECORD_TYPES.has(record.type) &&
-                              activity.sqid
-                            ) {
-                              setViewingRecord({
-                                type: record.type,
-                                eventSqid: activity.sqid,
-                              });
-                            } else {
-                              toast(
-                                "Opening the full record from here isn't available yet.",
-                                { icon: "🛠️" },
-                              );
-                            }
-                          }}
-                        >
-                          {getRecordLinkText(record.type, activity.action)}
-                        </button>
-                      </div>
-                    </div>
+                    <ol>
+                      {group.items.map((activity, i) => renderActivity(activity, i === group.items.length - 1))}
+                    </ol>
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <p className="text-gray-500">No recent care activities found.</p>
-            </div>
-          )}
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-64 text-center">
+                <ClipboardList className="w-8 h-8 text-gray-300 mb-2" />
+                <p className="text-gray-500 text-sm">No recent care activities found.</p>
+              </div>
+            )}
+          </section>
         </div>
       </div>
     </Modal>
