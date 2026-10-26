@@ -718,17 +718,8 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
 
   const hasResultToExport = !isOrderBlocked && (isOrderLevelDownloadable || hasDownloadableItem);
 
-  const handlePrint = () => {
-    if (!hasResultToExport) {
-      toast.error("Results are not ready for printing.");
-      return;
-    }
-    printElement(printRef.current, `Lab Record - ${order.name || "Patient"}`).catch(() =>
-      toast.error("Could not open the print dialog")
-    );
-  };
-
-  // The PDF holds every result in the order, so log one audit entry per result; never blocks the download
+  // The PDF holds every result in the order, so log one audit entry per result; never blocks the export.
+  // Print outs are logged too: the backend only has a downloads event, and a print is the same record leaving the system.
   const logDownloads = () => {
     // Only lab staff may log downloads; the backend 403s doctors since 2026-10-17
     if (isDoctorView) return;
@@ -738,6 +729,19 @@ const Hospital_Lab_Test_Detail_Dashboard = ({
       outcomes.filter((o) => o.status === "rejected").forEach((o) => console.warn("Download audit log failed", o.reason));
       queryClient.invalidateQueries({ queryKey: ["lab-audit-logs"] });
     });
+  };
+
+  // Logged on tap: mobile browsers often never fire afterprint, so waiting for the dialog to close drops the entry
+  const handlePrint = () => {
+    if (!printRef.current) return;
+    if (!hasResultToExport) {
+      toast.error("Results are not ready for printing.");
+      return;
+    }
+    printElement(printRef.current, `Lab Record - ${order.name || "Patient"}`).catch(() =>
+      toast.error("Could not open the print dialog")
+    );
+    logDownloads();
   };
 
   const handleDownload = async () => {
