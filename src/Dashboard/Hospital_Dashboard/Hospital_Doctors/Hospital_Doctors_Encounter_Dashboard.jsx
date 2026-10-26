@@ -3,11 +3,12 @@ import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { DoctorEncounterContext } from "../../../context/HospitalContext/Doctors/DoctorEncounterContext";
 import DoctorEncounterTable from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Doctors/Doctor_Encounter/DoctorEncounterTable";
 import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
+import SearchBar from "../../../Components/SearchBar/SearchBar";
 
 const tabs = ["Pending", "Active"];
 
 const Hospital_Doctors_Encounter_Dashboard = () => {
-  const { activeTab, setActiveTab, currentPage, totalPages, setCurrentPage, count, selectedPatientForWall } = useContext(DoctorEncounterContext);
+  const { activeTab, setActiveTab, currentPage, totalPages, setCurrentPage, count, selectedPatientForWall, searchQuery, setSearchQuery } = useContext(DoctorEncounterContext);
 
   return (
     <>
@@ -33,6 +34,16 @@ const Hospital_Doctors_Encounter_Dashboard = () => {
             </button>
           ))}
         </div>
+        )}
+
+        {!selectedPatientForWall && (
+          <div className="mb-6">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search patient's name or HIN..."
+            />
+          </div>
         )}
 
         {/* Table Content */}

@@ -177,7 +177,7 @@ const EncounterSkeleton = ({ tableHeader, callUp }) => (
 );
 
 const NursingEncounterTable = () => {
-  const { encounters, loading, activeTab, claimEncounter, submitAssessment } = useContext(NursingEncounterContext);
+  const { encounters, loading, activeTab, claimEncounter, submitAssessment, searchQuery } = useContext(NursingEncounterContext);
   const { profile } = useContext(NursesAppContext);
 
   const [selectedPatientForDetails, setSelectedPatientForDetails] = useState(null);
@@ -406,19 +406,20 @@ const NursingEncounterTable = () => {
     return <EncounterSkeleton tableHeader={tableHeader} callUp={activeTab === "Doctor’s call-up/consultation"} />;
   }
 
-  if (!encounters || encounters.length === 0) {
-    return (
-      <EmptyState 
-        icon="calendar" 
-        title="No nursing encounter!" 
-        description="You currently don't have any nursing encounter." 
-        className="py-10" 
-      />
-    );
-  }
+  // Modals stay mounted when the list is empty: reopening the last closed check-in moves it out of this tab
+  const isEmpty = !encounters || encounters.length === 0;
 
   return (
     <>
+      {isEmpty ? (
+        <EmptyState
+          icon="calendar"
+          title={searchQuery?.trim() ? "No matching patient!" : "No nursing encounter!"}
+          description={searchQuery?.trim() ? `No patient in this list matches "${searchQuery.trim()}".` : "You currently don't have any nursing encounter."}
+          className="py-10"
+        />
+      ) : (
+      <>
       {/* Desktop View */}
       <div className="hidden lg:block w-full">
         <Table className="w-full [&_table]:border-separate [&_table]:border-spacing-0">
@@ -523,11 +524,12 @@ const NursingEncounterTable = () => {
                     <div className="flex items-center gap-2">
                       {activeTab === "Closed" ? (
                         <>
-                          <button 
-                            onClick={() => setSelectedPatientForEncounter(encounter)}
-                            className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors"
+                          <button
+                            onClick={() => handleClaim(encounter.sqid, true, encounter)}
+                            disabled={isClaiming}
+                            className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors disabled:opacity-50"
                           >
-                            Reopen clinical encounter
+                            {isClaiming ? "Reopening..." : "Reopen clinical encounter"}
                           </button>
                           <button 
                             onClick={() => setViewEncounterDetails(encounter)}
@@ -685,11 +687,12 @@ const NursingEncounterTable = () => {
                   </button>
                 ) : activeTab === "Closed" ? (
                   <>
-                    <button 
-                      onClick={() => setSelectedPatientForEncounter(encounter)}
-                      className="w-full bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 py-2.5 rounded-full font-medium text-xs transition-colors"
+                    <button
+                      onClick={() => handleClaim(encounter.sqid, true, encounter)}
+                      disabled={isClaiming}
+                      className="w-full bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 py-2.5 rounded-full font-medium text-xs transition-colors disabled:opacity-50"
                     >
-                      Reopen clinical encounter
+                      {isClaiming ? "Reopening..." : "Reopen clinical encounter"}
                     </button>
                     <button 
                       onClick={() => setViewEncounterDetails(encounter)}
@@ -737,6 +740,8 @@ const NursingEncounterTable = () => {
           );
         })}
       </div>
+      </>
+      )}
 
       {/* Patient Details Modal */}
       <Modal
@@ -817,14 +822,24 @@ const NursingEncounterTable = () => {
                 <div className="w-full flex justify-end mt-8">
                   {activeTab === "Closed" ? (
                     <button 
-                      onClick={() => {
+                      onClick={async () => {
+                        // A closed check-in has no reservation; the backend rejects the assessment until it's reserved again
                         const patient = selectedPatientForDetails;
-                        setSelectedPatientForDetails(null);
-                        setSelectedPatientForEncounter(patient);
+                        setClaimingSqid(patient.sqid);
+                        try {
+                          const success = await claimEncounter(patient.sqid);
+                          if (success) {
+                            setSelectedPatientForDetails(null);
+                            setSelectedPatientForEncounter(patient);
+                          }
+                        } finally {
+                          setClaimingSqid(null);
+                        }
                       }}
-                      className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-8 py-3 rounded-full font-medium text-sm transition-colors"
+                      disabled={isDetailsClaiming}
+                      className="bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 px-8 py-3 rounded-full font-medium text-sm transition-colors disabled:opacity-50"
                     >
-                      Reopen clinical encounter
+                      {isDetailsClaiming ? "Reopening..." : "Reopen clinical encounter"}
                     </button>
                   ) : !isDetailsReserved ? (
                     <button 
