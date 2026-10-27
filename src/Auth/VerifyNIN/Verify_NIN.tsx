@@ -7,6 +7,7 @@ import { authAPI } from "../../utils/authAPI";
 import { FaKey } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { setToken } from "../../services/authService";
+import NinHelpNote from "../../Components/ui/NinHelpNote";
 
 const Verify_NIN = () => {
 
@@ -98,6 +99,7 @@ const Verify_NIN = () => {
                                                 NIN must be 11 digits and contain only numbers.
                                             </p>
                                         )}
+                                        <NinHelpNote className="mt-3" />
                                     </div>
 
                                     {/* Submit Button */}
@@ -159,6 +161,7 @@ const Verify_NIN = () => {
                                                 NIN must be 11 digits and contain only numbers.
                                             </p>
                                         )}
+                                        <NinHelpNote className="mt-3" />
                                     </div>
 
                                     {/* Submit Button */}
