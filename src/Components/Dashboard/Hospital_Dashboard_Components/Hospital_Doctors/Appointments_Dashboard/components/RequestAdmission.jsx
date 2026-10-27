@@ -68,7 +68,7 @@ const RequestAdmission = ({
         bed: form.bed,
         check_in: admissionContext.checkIn,
       };
-      return axiosInstanceHos.post("api/doctors/admissions/request", payload);
+      return axiosInstanceHos.post("api/hospital-ops/admission/requests", payload);
     },
     onSuccess: () => {
       toast.success("Admission request successful");
