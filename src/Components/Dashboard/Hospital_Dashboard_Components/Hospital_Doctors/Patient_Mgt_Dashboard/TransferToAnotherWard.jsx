@@ -9,7 +9,7 @@ import Modal from "../../../../ui/Modal";
 import Button from "../../../../ui/Button";
 import Select from "../../../../ui/Select";
 
-const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) => {
+const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails, onTransferred }) => {
   const queryClient = useQueryClient();
   const { wards, wardsLoading } = useContext(HosWardContext);
 
@@ -45,9 +45,18 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails }) 
 
   const { mutate, isPending } = useMutation({
     mutationFn: transferAdmission,
-    onSuccess: (res) => {
+    onSuccess: (res, { new_bed }) => {
       toast.success(res?.detail || "Transfer successful");
       invalidateWardTransfer(queryClient, { hin: patientHin });
+      // The open details view holds a copy of the row, so hand it the new ward and bed
+      const ward = wardOptions.find((w) => String(w.sqid) === form.new_ward);
+      const bed = availableBeds.find((b) => String(b.sqid) === new_bed);
+      if (ward && bed) {
+        onTransferred?.({
+          ward_info: { sqid: ward.sqid, name: ward.name },
+          bed_info: { sqid: bed.sqid, bed_number: bed.bed_number, status: "occupied" },
+        });
+      }
       setRequestAdmission(false);
     },
     onError: (err) => {
