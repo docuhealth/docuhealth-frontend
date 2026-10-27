@@ -21,7 +21,18 @@ const AdvanceCheckUpTabComponent = ({ tabs, activeTab, setActiveTab }) => {
                                 : "text-gray-600 hover:bg-gray-100 hover:text-gray-800 sm:hover:bg-transparent sm:border-b-2 sm:border-transparent"
                         }`}
                     >
-                        {t.title}
+                        <span className="inline-flex items-center justify-center gap-1.5">
+                            {t.title}
+                            {/* Unread-style count so nurses see waiting tasks without opening the tab */}
+                            {t.badge > 0 && (
+                                <span
+                                    aria-label={`${t.badge} tasks`}
+                                    className="min-w-[20px] h-5 px-1.5 rounded-full bg-green-500 text-white text-[11px] font-semibold leading-5 text-center shrink-0"
+                                >
+                                    {t.badge > 99 ? "99+" : t.badge}
+                                </span>
+                            )}
+                        </span>
                     </button>
                 ))}
             </div>
