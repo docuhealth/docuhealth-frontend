@@ -134,6 +134,11 @@ const AccountSettingsTab = () => {
       return;
     }
 
+    // The API stores any phone text, so check the format here
+    if (filledProfile.phone_num && !/^\+?\d{7,15}$/.test(filledProfile.phone_num.trim())) {
+      toast.error("Enter a valid phone number (7 to 15 digits, optional leading +).");
+      return;
+    }
     // Validate password if it's included
     if (payload.password && !isPasswordValid) {
       toast.error("Password does not meet all requirements.");
@@ -263,7 +268,9 @@ const AccountSettingsTab = () => {
                 <input
                   id="phone_num"
                   name="phone_num"
-                  type="number"
+                  type="tel"
+                  inputMode="tel"
+                  maxLength={16}
                   value={formData.phone_num}
                   onChange={handleChange}
                   className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none "

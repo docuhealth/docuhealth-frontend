@@ -91,11 +91,11 @@ const AccountSettingsTab = () => {
   };
 
   const updateNameMutation = useMutation({
-    mutationFn: (newName) =>{
+    mutationFn: (newName) => {
       const formData = new FormData();
-
-    formData.append("name", newName);
-      axiosInstanceHos.patch("api/auth/hospital-admin-profile", formData)},
+      formData.append("name", newName);
+      return axiosInstanceHos.patch("api/hospitals/profile", formData);
+    },
     onSuccess: () => {
       toast.success("Profile name updated!");
       // This is where the magic happens:

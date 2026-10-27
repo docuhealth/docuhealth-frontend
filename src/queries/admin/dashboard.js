@@ -67,8 +67,3 @@ export const fetchAdminDashboardUsers = async ({ queryKey }) => {
   const res = await axiosInstanceAdmin.get("api/admin/dashboard/users", { params });
   return res.data;
 };
-
-export const fetchAdminProfile = async () => {
-  const res = await axiosInstanceAdmin.get("api/auth/profile"); 
-  return res.data;
-};

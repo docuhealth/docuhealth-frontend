@@ -19,7 +19,7 @@ const ImageCustomization = ({ onClose }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (formData) => {
-      return await axiosInstanceHos.patch("/api/auth/hospital-admin-profile", formData, {
+      return await axiosInstanceHos.patch("api/hospitals/profile", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
     },
@@ -36,6 +36,12 @@ const ImageCustomization = ({ onClose }) => {
 
   const handleFileChange = (e, type) => {
     const file = e.target.files[0];
+    // `accept` is only a picker hint and the API takes any file, so reject non-images here
+    if (file && !file.type.startsWith("image/")) {
+      toast.error("Please choose an image file.");
+      e.target.value = "";
+      return;
+    }
     if (file) {
       setPayload((prev) => ({ ...prev, [type]: file }));
       setPreviews((prev) => ({
