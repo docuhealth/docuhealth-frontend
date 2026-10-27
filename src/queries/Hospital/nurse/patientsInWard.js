@@ -6,7 +6,7 @@ export const fetchPatientsInMyWard = async ({ queryKey }) => {
   
   let url = `api/hospital-ops/admission?page=${page}&size=${pageSize}`;
   if (search) {
-    url += `&search=${search}`;
+    url += `&search=${encodeURIComponent(search)}`;
   }
 
   const res = await axiosInstanceHos.get(url);

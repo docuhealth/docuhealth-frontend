@@ -34,7 +34,12 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails, on
     if (field === "new_ward") {
       const selected = wardOptions.find((w) => String(w.sqid) === value);
       setAvailableBeds(
-        selected ? selected.beds.filter((b) => b.status === "available") : [],
+        // The wards list returns beds unsorted.
+        selected
+          ? selected.beds
+              .filter((b) => b.status === "available")
+              .sort((a, b) => a.bed_number - b.bed_number)
+          : [],
       );
       // Clear the bed whenever the ward changes so a stale bed can't be sent.
       setForm((prev) => ({ ...prev, new_ward: value, new_bed: "" }));
