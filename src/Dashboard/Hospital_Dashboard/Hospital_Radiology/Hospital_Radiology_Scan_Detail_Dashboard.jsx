@@ -206,12 +206,19 @@ const Hospital_Radiology_Scan_Detail_Dashboard = () => {
   const hospitalNameSlug = sanitizeForFilename(order.hospital_info?.name || order.hospital || hospitalName || "Hospital");
   const downloadFileName = `${patientNameSlug}_${scanNameSlug}_${hospitalNameSlug}.pdf`;
 
+  // Audit the export; never blocks or fails it. Print outs use the downloads event too (the only one the backend has)
+  const logDownload = () => {
+    if (report?.sqid) logScanResultDownload(report.sqid).catch((err) => console.warn("Download audit log failed", err));
+  };
+
   const handlePrint = () => {
+    if (!printRef.current) return;
     if (!hasRadiologyResultToExport) {
       toast.error("Radiology result is not ready for printing.");
       return;
     }
     printElement(printRef.current, `${exportLabel} - ${patientName}`).catch(() => toast.error("Could not open the print dialog"));
+    logDownload();
   };
   const handleDownload = async () => {
     if (downloading || !printRef.current) return;

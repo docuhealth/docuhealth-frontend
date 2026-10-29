@@ -43,6 +43,7 @@ export const invalidatePatientDischarge = (client, { hin, patientHin, admissionS
   qc.invalidateQueries({ queryKey: ["inpatient-tasks"] });
   if (admissionSqid) {
     qc.invalidateQueries({ queryKey: ["inpatient-tasks", admissionSqid] });
+    qc.invalidateQueries({ queryKey: ["admission-task-occurrences", admissionSqid] });
     qc.invalidateQueries({ queryKey: ["inpatient-discharge-summary", admissionSqid] });
   }
   qc.invalidateQueries({ queryKey: ["inpatient-discharge-summary"] });

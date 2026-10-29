@@ -243,6 +243,9 @@ const Hospital_Doctors_Patients_Dashboard = () => {
             <TransferToAnotherWard
               setRequestAdmission={setTransferRequest}
               selectedPatientDetails={selected}
+              onTransferred={(placement) =>
+                setSelected((prev) => (prev ? { ...prev, ...placement } : prev))
+              }
             />
           )}
 

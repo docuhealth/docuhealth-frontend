@@ -39,9 +39,10 @@ const RequestAdmission = ({
   // Several doctors may request the same bed; only occupied beds are refused.
   const availableBeds = useMemo(() => {
     const selected = wardOptions.find((w) => w.sqid === form.ward || w.id === Number(form.ward));
-    return (selected?.beds || []).filter(
-      (b) => b.status === "available" || b.status === "requested",
-    );
+    // The wards list returns beds unsorted.
+    return (selected?.beds || [])
+      .filter((b) => b.status === "available" || b.status === "requested")
+      .sort((a, b) => a.bed_number - b.bed_number);
   }, [wardOptions, form.ward]);
 
   // Clear a picked bed that a refetch shows is now occupied.
@@ -68,7 +69,7 @@ const RequestAdmission = ({
         bed: form.bed,
         check_in: admissionContext.checkIn,
       };
-      return axiosInstanceHos.post("api/doctors/admissions/request", payload);
+      return axiosInstanceHos.post("api/hospital-ops/admission/requests", payload);
     },
     onSuccess: () => {
       toast.success("Admission request successful");

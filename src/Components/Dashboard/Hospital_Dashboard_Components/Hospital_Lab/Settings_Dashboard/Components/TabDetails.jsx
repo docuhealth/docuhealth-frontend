@@ -82,7 +82,7 @@ const AccountSettingsTab = () => {
       const payload = {};
       if (data.firstname?.trim()) payload.firstname = data.firstname.trim();
       if (data.lastname?.trim()) payload.lastname = data.lastname.trim();
-      return axiosInstanceHos.patch("api/auth/profile", payload);
+      return axiosInstanceHos.patch("api/hospitals/staff/profile/update", payload);
     },
     onSuccess: () => {
       toast.success("Profile name updated!");

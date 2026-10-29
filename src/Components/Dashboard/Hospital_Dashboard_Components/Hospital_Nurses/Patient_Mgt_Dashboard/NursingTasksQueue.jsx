@@ -9,6 +9,7 @@ import axiosInstanceHos from "../../../../../lib/axios/hospital";
 import NursingDischargeSummaryForm from "./NursingDischargeSummaryForm";
 import { formatFrequency } from "../../../../../utils/careTaskConstants";
 import Skeleton, { SkeletonText } from "../../../../ui/Skeleton";
+import { TASKS_PAGE_SIZE, useAdmissionTaskOccurrences, useInvalidateAdmissionTasks } from "../../../../../queries/Hospital/nurse/taskOccurrences";
 
 // Mirrors a loaded task row (status/date/instruction tiles + task tile and kebab) on
 // desktop and the task card on mobile.
@@ -424,9 +425,10 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
 
   
   const [tasksCurrentPage, setTasksCurrentPage] = useState(1);
-  const [tasks, setTasks] = useState([]);
-  const [loadingTasks, setLoadingTasks] = useState(false);
-  const [tasksTotalCount, setTasksTotalCount] = useState(0);
+  const { data: tasksData, isLoading: loadingTasks } = useAdmissionTaskOccurrences(admission?.sqid, taskStatus, tasksCurrentPage);
+  const tasks = tasksData?.results || [];
+  const tasksTotalCount = tasksData?.count || 0;
+  const invalidateAdmissionTasks = useInvalidateAdmissionTasks();
 
   const [medsCurrentPage, setMedsCurrentPage] = useState(1);
   const [glucoseCurrentPage, setGlucoseCurrentPage] = useState(1);
@@ -463,12 +465,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
         toast.success("Task escalated successfully");
       }
       
-      const admissionSqid = admission?.sqid;
-      if (admissionSqid) {
-        const res = await axiosInstanceHos.get(`/api/inpatients/admissions/${admissionSqid}/task-occurrences?status=${taskStatus}&page=${tasksCurrentPage}&size=8`);
-        setTasks(res.data.results || []);
-        setTasksTotalCount(res.data.count || 0);
-      }
+      if (admission?.sqid) invalidateAdmissionTasks(admission.sqid);
     } catch (err) {
       console.error(err);
       let errorMsg = "Action failed. Please try again.";
@@ -522,25 +519,6 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
   }, [showVitalsRecord, showMedicationRecord, showGlucoseRecord, showIORecord, showSeizureRecord, showProcedureRecord, showIVFluidRecord, admission?.sqid, vitalsCurrentPage, medsCurrentPage, glucoseCurrentPage, ioCurrentPage, seizureCurrentPage, procedureCurrentPage, ivFluidCurrentPage]);
 
 
-  useEffect(() => {
-    const admissionSqid = admission?.sqid;
-    if (admissionSqid) {
-      const fetchTasks = async () => {
-        setLoadingTasks(true);
-        try {
-          const res = await axiosInstanceHos.get(`/api/inpatients/admissions/${admissionSqid}/task-occurrences?status=${taskStatus}&page=${tasksCurrentPage}&size=8`);
-          setTasks(res.data.results || []);
-          setTasksTotalCount(res.data.count || 0);
-        } catch (err) {
-          console.error(err);
-          setTasks([]);
-        } finally {
-          setLoadingTasks(false);
-        }
-      };
-      fetchTasks();
-    }
-  }, [admission?.sqid, taskStatus, tasksCurrentPage]);
 
   
 
@@ -653,12 +631,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
       }
 
       
-      const admissionSqid = admission?.sqid;
-      if (admissionSqid) {
-        const res = await axiosInstanceHos.get(`/api/inpatients/admissions/${admissionSqid}/task-occurrences?status=${taskStatus}&page=${tasksCurrentPage}&size=8`);
-        setTasks(res.data.results || []);
-        setTasksTotalCount(res.data.count || 0);
-      }
+      if (admission?.sqid) invalidateAdmissionTasks(admission.sqid);
       return true;
     } catch (err) {
       console.error(err);
@@ -1423,7 +1396,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
           );
         })}
       </div>
-      <Pagination2 count={tasksTotalCount} currentPage={tasksCurrentPage} totalPages={Math.ceil(tasksTotalCount / 8) || 1} setCurrentPage={setTasksCurrentPage} />
+      <Pagination2 count={tasksTotalCount} currentPage={tasksCurrentPage} totalPages={Math.ceil(tasksTotalCount / TASKS_PAGE_SIZE) || 1} setCurrentPage={setTasksCurrentPage} />
       </>
       )}
       </>

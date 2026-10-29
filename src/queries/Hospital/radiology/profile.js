@@ -5,7 +5,7 @@ import axiosInstanceHos from "../../../lib/axios/hospital";
 // before the backend has radiology-specific endpoints.
 export const fetchRadiologyProfile = async () => {
   try {
-    const res = await axiosInstanceHos.get("api/auth/hospital/staff/profile");
+    const res = await axiosInstanceHos.get("api/hospitals/staff/profile");
     return res.data;
   } catch (error) {
     console.error("Radiology profile endpoint might not exist yet", error);

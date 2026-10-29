@@ -9,6 +9,7 @@ import { NursesAdmittedPatientMGTContext } from "../../../../../context/Hospital
 import Modal from "../../../../ui/Modal";
 import NursingDischargeSummaryView from "./NursingDischargeSummaryView";
 import DischargedPatientRecord from "../../../../ui/DischargedPatientRecord";
+import { useAdmissionTaskCounts } from "../../../../../queries/Hospital/nurse/taskOccurrences";
 
 const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, loadingAdmission }) => {
   const context = useContext(NursesAdmittedPatientMGTContext);
@@ -72,7 +73,12 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
   // The patient record loads in the background: the header and tab strip come from the
   // list row, and only the tabs that read the full record show a skeleton meanwhile.
   const loadingRecord = isLoading || loadingAdmission;
-  const allTabs = getAdvanceCheckUpTabs(patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail, isOutPatient, setAdvanceCheckUp, historyScope, setHistoryScope);
+  const taskCounts = useAdmissionTaskCounts(admission?.sqid, !isOutPatient && !isDischarged);
+  const allTabs = getAdvanceCheckUpTabs(patient, admission, patientFullInfo, formatDate, formatDateTime, setSharedSoapNoteDetail, isOutPatient, setAdvanceCheckUp, historyScope, setHistoryScope)
+    .map((t) =>
+      t.status === "tasks" ? { ...t, badge: taskCounts.pending }
+      : t.status === "in_progress_tasks" ? { ...t, badge: taskCounts.inProgress }
+      : t);
   const tabs = loadingRecord
     ? allTabs.map((t) =>
         t.status === "info" ? { ...t, content: <PatientInfoSkeleton /> }

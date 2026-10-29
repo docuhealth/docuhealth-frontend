@@ -3,11 +3,12 @@ import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import { NursingEncounterContext } from "../../../context/HospitalContext/Nurses/NursingEncounterContext";
 import NursingEncounterTable from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Nursing_Encounter/NursingEncounterTable";
 import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
+import SearchBar from "../../../Components/SearchBar/SearchBar";
 
 const tabs = ["Pending", "Closed", "Doctor’s call-up/consultation"];
 
 const Hospital_Nurses_Nursing_Encounter_Dashboard = () => {
-  const { activeTab, setActiveTab, currentPage, totalPages, setCurrentPage, count } = useContext(NursingEncounterContext);
+  const { activeTab, setActiveTab, currentPage, totalPages, setCurrentPage, count, searchQuery, setSearchQuery } = useContext(NursingEncounterContext);
 
   return (
     <>
@@ -33,6 +34,17 @@ const Hospital_Nurses_Nursing_Encounter_Dashboard = () => {
           ))}
         </div>
 
+        {/* Pending holds both waiting and in-progress (reserved) check-ins */}
+        {activeTab === "Pending" && (
+          <div className="mb-6">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search patient's name or HIN..."
+            />
+          </div>
+        )}
+
         {/* Table Content */}
         <div className="w-full">
           <NursingEncounterTable />
@@ -42,9 +54,10 @@ const Hospital_Nurses_Nursing_Encounter_Dashboard = () => {
         {count > 0 && totalPages > 1 && (
           <div className="mt-6">
             <Pagination2
+              count={count}
               currentPage={currentPage}
               totalPages={totalPages}
-              onPageChange={(page) => setCurrentPage(page)}
+              setCurrentPage={setCurrentPage}
             />
           </div>
         )}

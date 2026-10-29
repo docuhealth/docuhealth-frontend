@@ -189,10 +189,11 @@ const initialFormData = {
   outputVolume: "",
   outputTime: "",
   nursingRemark: "",
-
-  // Step 3
   nursingConcerns: "",
 };
+
+// Page 1: vitals and assessments. Page 2: fluid balance, remark and initial nursing concerns.
+const TOTAL_STEPS = 2;
 
 const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
   const queryClient = useQueryClient();
@@ -223,7 +224,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
     }));
   };
 
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 3));
+  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, TOTAL_STEPS));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
   const handleSubmit = async () => {
@@ -462,11 +463,11 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
         <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
           <div 
             className="h-full bg-docuhealth-primary transition-all duration-300"
-            style={{ width: `${(currentStep / 3) * 100}%` }}
+            style={{ width: `${(currentStep / TOTAL_STEPS) * 100}%` }}
           ></div>
         </div>
         <p className="text-center text-xs font-semibold text-gray-800 mt-2">
-          Step {currentStep} of 3
+          Step {currentStep} of {TOTAL_STEPS}
         </p>
       </div>
 
@@ -750,12 +751,8 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
                 className="w-full bg-white border border-gray-200 rounded-md px-3 py-2.5 text-[13px] text-gray-800 focus:outline-none focus:border-docuhealth-primary focus:ring-1 focus:ring-docuhealth-primary resize-y"
               ></textarea>
             </div>
-          </div>
-        )}
 
-        {currentStep === 3 && (
-          <div className="animate-in fade-in duration-300">
-             <div className="border border-gray-100 rounded-xl p-6 bg-white  mb-6">
+            <div className="border border-gray-100 rounded-xl p-6 bg-white  mb-6">
               <h3 className="font-semibold text-gray-800 mb-4 text-[15px]">Initial Nursing concerns</h3>
               <textarea
                 name="nursingConcerns"
@@ -779,7 +776,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
             {currentStep === 1 ? "Cancel" : "Back"}
           </button>
           
-          {currentStep < 3 ? (
+          {currentStep < TOTAL_STEPS ? (
             <button
               type="button"
               onClick={nextStep}

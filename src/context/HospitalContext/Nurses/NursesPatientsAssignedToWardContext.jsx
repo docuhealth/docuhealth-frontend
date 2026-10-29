@@ -4,6 +4,7 @@ import { fetchPatientsInMyWard } from "../../../queries/Hospital/nurse/patientsI
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import useDebounce from "../../../hooks/useDebounce";
 import toast from "react-hot-toast";
+import { extractApiErrorMessage } from "../../../utils/apiError";
 
 export const NursesPatientsAssignedToWardContext = createContext();
 
@@ -29,10 +30,8 @@ const NursesPatientsAssignedToWardProvider = (props) => {
 
   useEffect(() => {
     if (isError) {
-      toast.error(
-        error?.response?.data?.message ||
-          "Error fetching patients in my ward !",
-      );
+      // A nurse with no ward gets a 400 with a bare array: ["Nurse is not assigned to any ward"].
+      toast.error(extractApiErrorMessage(error, "Error fetching patients in my ward !"));
       console.error(error);
     }
   }, [isError, error]);
