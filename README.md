@@ -62,6 +62,7 @@ src/
   lib/                   http client, request(), query client
   stores/                Zustand stores (auth session)
   assets/fonts/          Self-hosted variable fonts (Space Grotesk, Inter)
+  assets/logos/          DocuHealth logo (also the favicon)
   mocks/                 MSW handlers — shared by dev mode and tests
   test/                  Vitest setup + renderWithProviders
   env.ts                 Validated VITE_* env vars
