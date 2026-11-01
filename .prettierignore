@@ -1,0 +1,10 @@
+/dist
+/coverage
+/playwright-report
+/test-results
+/node_modules
+package-lock.json
+
+# generated — not meant to be hand-edited
+src/routeTree.gen.ts
+public/mockServiceWorker.js

@@ -1,0 +1,13 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "explicit"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "files.readonlyInclude": { "src/routeTree.gen.ts": true },
+  "files.watcherExclude": { "src/routeTree.gen.ts": true },
+  "search.exclude": { "src/routeTree.gen.ts": true },
+  "tailwindCSS.experimental.configFile": "src/index.css",
+  "tailwindCSS.classFunctions": ["cn", "cva"]
+}

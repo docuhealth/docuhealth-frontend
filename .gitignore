@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+*.tsbuildinfo
+
+# tests
+/coverage
+/playwright-report
+/test-results
+/blob-report
+/playwright/.cache
+
+# env files — VITE_* vars are inlined into the bundle; keep real values out of git.
+# .env.test holds only fake test values, so it is committed.
+.env
+.env.*
+!.env.example
+!.env.test
+
+# logs
+*.log
+
+# editor / OS
+.DS_Store
+.idea
