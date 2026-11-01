@@ -156,7 +156,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-fg-body;
+    @apply bg-background type-body text-fg-body;
   }
   h1,
   h2,
@@ -171,34 +171,101 @@
   }
 }
 /*
- * Type roles. Every piece of text picks one of these instead of hand-mixing
- * size + weight classes, e.g. <h1 className="text-h1">.
+ * Type roles from the design's typography guide (name in the guide → utility).
+ * Every piece of text uses one role, e.g. <h1 className="type-h1">, instead of mixing
+ * size/weight/leading classes. `cn` (src/lib/utils.ts) knows a role replaces those classes;
+ * keep its `typeRoles` list in sync with this one.
  */
-@utility text-h1 {
+
+/* Heading/H1 */
+@utility type-h1 {
   font-family: var(--font-heading);
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: 4rem; /* 64px */
+  line-height: 1.1;
+  font-weight: 400;
 }
-@utility text-h2 {
+
+/* Heading/H2 */
+@utility type-h2 {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
-  line-height: 2rem;
-  font-weight: 600;
+  font-size: 3rem; /* 48px */
+  line-height: 1.1;
+  font-weight: 400;
 }
-@utility text-h3 {
+
+/* Header/Quote */
+@utility type-quote {
   font-family: var(--font-heading);
-  font-size: 1.125rem;
-  line-height: 1.75rem;
+  font-size: 2rem; /* 32px */
+  line-height: 1.25;
+  font-weight: 400;
+}
+
+/* Accent/H1 */
+@utility type-accent-h1 {
+  font-family: var(--font-sans);
+  font-size: 2rem; /* 32px */
+  line-height: 1.2;
   font-weight: 600;
+  letter-spacing: -0.025em;
 }
-@utility text-body {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+
+/* Accent/H2 */
+@utility type-accent-h2 {
+  font-family: var(--font-sans);
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.35;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
-@utility text-caption {
-  font-size: 0.75rem;
-  line-height: 1rem;
-  color: var(--muted-foreground);
+
+/* Accent/H3 */
+@utility type-accent-h3 {
+  font-family: var(--font-sans);
+  font-size: 1.25rem; /* 20px */
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+/* Accent/H4 */
+@utility type-accent-h4 {
+  font-family: var(--font-sans);
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.35;
+  font-weight: 400;
+}
+
+/* Body/Medium */
+@utility type-body {
+  font-family: var(--font-sans);
+  font-size: 1rem; /* 16px */
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+/* Body/Small */
+@utility type-body-sm {
+  font-family: var(--font-sans);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* Body/Caption */
+@utility type-caption {
+  font-family: var(--font-sans);
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.35;
+  font-weight: 400;
+}
+
+/* Label */
+@utility type-label {
+  font-family: var(--font-sans);
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.35;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }

@@ -4,8 +4,8 @@ The rebuilt DocuHealth web app (patients, hospitals and their staff roles, partn
 platform admins), built from the React Setup starter for the new design.
 
 Status: foundations only — tooling, API layer, fonts (Space Grotesk for headings and buttons,
-Inter for everything else), the color palette, and a placeholder home page at `/`. No screens
-yet; next come the type scale and components, then auth and the role dashboards.
+Inter for everything else), the color palette and type scale, and a placeholder home page at
+`/`. No screens yet; next come the components, then auth and the role dashboards.
 
 ## Stack
 
@@ -95,9 +95,27 @@ don't edit it.
     (main), `-700` (text on the tint) — e.g. `bg-success-100 text-success-700`.
 - **Fonts**: `font-heading` (Space Grotesk) for headings and buttons; `font-sans` (Inter, the
   default) for body text, labels and links.
-- **Text**: every heading/body text picks a type role (`text-h1`, `text-h2`, `text-h3`,
-  `text-body`, `text-caption`) instead of mixing size + weight classes. The current sizes are
-  placeholders until the design's type scale lands.
+- **Text**: every piece of text uses one type role from the design's typography guide instead
+  of mixing size/weight/leading classes. Body text defaults to `type-body`.
+
+  | Class            | Guide name   | Font · size / line height · tracking     |
+  | ---------------- | ------------ | ---------------------------------------- |
+  | `type-h1`        | Heading/H1   | Space Grotesk · 64px / 110%              |
+  | `type-h2`        | Heading/H2   | Space Grotesk · 48px / 110%              |
+  | `type-quote`     | Header/Quote | Space Grotesk · 32px / 125%              |
+  | `type-accent-h1` | Accent/H1    | Inter Semi Bold · 32px / 120% · -2.5%    |
+  | `type-accent-h2` | Accent/H2    | Inter Semi Bold · 24px / 135% · -2.5%    |
+  | `type-accent-h3` | Accent/H3    | Inter Semi Bold · 20px / 140% · -2.5%    |
+  | `type-accent-h4` | Accent/H4    | Inter Regular · 18px / 135%              |
+  | `type-body`      | Body/Medium  | Inter Regular · 16px / 140%              |
+  | `type-body-sm`   | Body/Small   | Inter Medium · 14px / 150%               |
+  | `type-caption`   | Body/Caption | Inter Regular · 12px / 135%              |
+  | `type-label`     | Label        | Inter Semi Bold · 12px / 135% · 8%, caps |
+
+  Roles set only typography, so add a color class alongside (`type-caption text-fg-caption`).
+  Always write class names in full — Tailwind only generates classes it finds literally in the
+  source, so `type-${size}` won't work.
+
 - **Page titles**: render `<title>` inside the page (React 19 hoists it).
 - **Files** are kebab-case; components PascalCase; hooks `use-*`.
 - **Tests**: next to the code (`*.test.tsx`). Network goes through MSW; unhandled requests fail.

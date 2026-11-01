@@ -8,4 +8,8 @@ Tailwind 4, shadcn (radix-nova), Vitest 5, MSW 3, oxlint. Don't write their APIs
 - Every backend call goes through `request(schema, config)` in `src/lib/api.ts`, from a
   feature's `api/` folder. Never call axios or fetch from a component.
 - Add UI primitives with `npx shadcn@latest add <name>` (icons: Phosphor), don't hand-write them.
+  Then change their `import { cn } from "cn"` to `from "@/lib/utils"` — that `cn` knows the
+  `type-*` text roles.
+- Text styling uses the `type-*` roles in `src/index.css` (see README), never ad-hoc
+  size/weight/leading classes.
 - Before finishing: `npm run typecheck && npm run lint && npm test` must pass.
