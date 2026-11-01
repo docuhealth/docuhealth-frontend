@@ -12,3 +12,12 @@ test("unknown paths show the 404 page", async ({ page }) => {
   await page.getByRole("link", { name: "Go home" }).click();
   await expect(page).toHaveURL(/\/$/);
 });
+
+test("design system page shows the colors and type roles", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "View the design system" }).click();
+  await expect(page).toHaveURL(/\/design-system$/);
+  await expect(page.getByText("Primary/Blue", { exact: true })).toBeVisible();
+  await expect(page.getByText("#3e4095", { exact: true })).toBeVisible();
+  await expect(page.getByText("Heading/H1", { exact: true })).toBeVisible();
+});
