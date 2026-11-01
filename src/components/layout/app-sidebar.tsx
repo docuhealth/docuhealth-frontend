@@ -1,4 +1,4 @@
-import { AddressBookIcon, HouseIcon, ShieldCheckIcon, SignOutIcon } from "@phosphor-icons/react";
+import { HouseIcon, SignOutIcon } from "@phosphor-icons/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, type LinkProps, useNavigate } from "@tanstack/react-router";
 import type { ComponentType } from "react";
@@ -23,11 +23,7 @@ type NavItem = {
   roles?: readonly Role[];
 };
 
-const nav: NavItem[] = [
-  { to: "/dashboard", label: "Dashboard", icon: HouseIcon },
-  { to: "/contacts", label: "Contacts", icon: AddressBookIcon },
-  { to: "/admin", label: "Admin", icon: ShieldCheckIcon, roles: ["admin"] },
-];
+const nav: NavItem[] = [{ to: "/dashboard", label: "Dashboard", icon: HouseIcon }];
 
 export function AppSidebar() {
   const user = useAuthStore((s) => s.session?.user);

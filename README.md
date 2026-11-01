@@ -3,8 +3,9 @@
 The rebuilt DocuHealth web app (patients, hospitals and their staff roles, partners and
 platform admins), built from the React Setup starter for the new design.
 
-Status: project scaffolded. Waiting on the new design's tokens and component specs; auth and
-roles still use the starter's demo `admin` / `member` setup and the mock API.
+Status: foundations in place — fonts set (Space Grotesk for headings and buttons, Inter for
+everything else). Still to come: the design's color/type tokens and components, then real
+DocuHealth auth and roles (sign-in currently runs against the mock API with demo users).
 
 ## Stack
 
@@ -15,12 +16,13 @@ roles still use the starter's demo `admin` / `member` setup and the mock API.
 - **Zod 4** — every API response is validated; forms via **React Hook Form**
 - **Zustand** — client state (session, theme)
 - **shadcn/ui** (Radix, `radix-nova`) + **Tailwind CSS 4** — tokens live in `src/index.css`
-- **TanStack Table 9**, **Sonner** toasts, **Phosphor** icons, **date-fns**
+- **Sonner** toasts, **Phosphor** icons
 - **Sentry** (enabled when `VITE_SENTRY_DSN` is set)
 - **Vitest** + Testing Library + **MSW** (mock API), **Playwright** e2e
 - **oxlint** (type-aware) + **Prettier**, **Husky** + lint-staged, **Knip**, GitHub Actions CI
 
-Add when a screen needs them: `recharts` (via `npx shadcn@latest add chart`), `motion`,
+Add when a screen needs them: `@tanstack/react-table`, `date-fns`, `recharts` (via
+`npx shadcn@latest add chart`), `motion`,
 `@tiptap/react`.
 
 ## Getting started
@@ -32,8 +34,7 @@ npm run dev
 ```
 
 With `VITE_ENABLE_MOCKS=true` the app runs against the MSW fake API in `src/mocks/` — no
-backend needed. Demo logins: `admin@example.com` / `member@example.com`, password
-`password123`.
+backend needed. Demo login: `admin@example.com`, password `password123`.
 
 ## Scripts
 
@@ -56,13 +57,14 @@ src/
     __root.tsx           Outlet, toaster, devtools, 404
     index.tsx            "/" → /dashboard or /sign-in
     _auth/               Signed-out layout: sign-in
-    _app/                Signed-in layout (sidebar) + guard: dashboard, contacts, admin (role-guarded)
+    _app/                Signed-in layout (sidebar) + auth guard: dashboard
   features/<name>/       Domain code: api/ (schemas, requests, query options, mutations),
-                         components/, lib/ — e.g. auth, contacts
+                         components/, lib/ — e.g. auth
   components/ui/         shadcn components = the design system (generated; edit freely)
   components/layout/     App shell pieces (sidebar)
   lib/                   http client, request(), query client
   stores/                Zustand stores (auth session, theme)
+  assets/fonts/          Self-hosted variable fonts (Space Grotesk, Inter)
   mocks/                 MSW handlers — shared by dev mode and tests
   test/                  Vitest setup + renderWithProviders
   env.ts                 Validated VITE_* env vars
@@ -85,28 +87,21 @@ don't edit it.
 - **Queries**: export `queryOptions` per endpoint; one key factory per feature; mutations
   invalidate that feature's keys. Route loaders prefetch with `ensureQueryData`.
 - **Forms**: React Hook Form + `zodResolver`; shadcn `Field` / `FieldError` for markup.
-- **Guards**: `requireAuth` / `requireRole` / `redirectIfSignedIn` in `beforeLoad`.
+- **Guards**: `requireAuth` / `redirectIfSignedIn` in `beforeLoad` (role guards come with the
+  real roles).
 - **Styling**: Tailwind classes using tokens from `src/index.css`; no hex values in components.
+- **Fonts**: `font-heading` (Space Grotesk) for headings and buttons; `font-sans` (Inter, the
+  default) for body text, labels and links.
 - **Text**: every heading/body text picks a type role (`text-h1`, `text-h2`, `text-h3`,
-  `text-body`, `text-caption`) instead of mixing size + weight classes.
+  `text-body`, `text-caption`) instead of mixing size + weight classes. The current sizes are
+  placeholders until the design's type scale lands.
 - **Page titles**: render `<title>` inside the page (React 19 hoists it).
 - **Files** are kebab-case; components PascalCase; hooks `use-*`.
 - **Tests**: next to the code (`*.test.tsx`). Network goes through MSW; unhandled requests fail.
 
-## Per-project setup
-
-1. `package.json` `name`, `<title>` in `index.html`, `public/favicon.svg`.
-2. Design tokens: replace the `:root` / `.dark` variables and fonts in `src/index.css`, and the
-   type roles at its bottom.
-3. Roles: edit `roles` in `src/stores/auth-store.ts`; then the sidebar `nav` and guards.
-4. Point `VITE_API_URL` at the backend, set `VITE_ENABLE_MOCKS=false`, and adjust
-   `src/features/auth/api/auth-api.ts` + the refresh call in `src/lib/http.ts` to its real
-   endpoints and response shapes.
-5. Delete the `contacts` example feature once you have a real one to copy from.
-6. Vercel: `vercel.json` already rewrites all paths to `index.html` for client routing.
-
 ## Notes
 
+- Deploys on Vercel; `vercel.json` rewrites all paths to `index.html` for client routing.
 - The session (including tokens) is persisted in `localStorage`. If the backend can issue
   httpOnly cookies instead, prefer that and drop the token handling in `src/lib/http.ts`.
 - ESLint is not used: typescript-eslint doesn't support TypeScript 7 yet, and oxlint runs

@@ -26,7 +26,7 @@ jobs:
       - run: npm test
       - run: npm run build
         env:
-          VITE_API_URL: https://api.example.com
+          VITE_API_URL: https://api-staging.docuhealthservices.net
 
   e2e:
     runs-on: ubuntu-latest
