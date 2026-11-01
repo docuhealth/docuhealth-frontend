@@ -4,7 +4,7 @@ import { afterAll, afterEach, beforeAll, vi } from "vitest";
 import { server } from "@/mocks/node";
 import { useAuthStore } from "@/stores/auth-store";
 
-// jsdom has no matchMedia; sonner, the theme store and the sidebar need it.
+// jsdom has no matchMedia; sonner and the sidebar need it.
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn((query: string) => ({

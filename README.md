@@ -4,8 +4,8 @@ The rebuilt DocuHealth web app (patients, hospitals and their staff roles, partn
 platform admins), built from the React Setup starter for the new design.
 
 Status: foundations only — tooling, API layer, fonts (Space Grotesk for headings and buttons,
-Inter for everything else) and a placeholder home page at `/`. No screens yet; next come the
-design's color/type tokens and components, then auth and the role dashboards.
+Inter for everything else), the color palette, and a placeholder home page at `/`. No screens
+yet; next come the type scale and components, then auth and the role dashboards.
 
 ## Stack
 
@@ -14,7 +14,7 @@ design's color/type tokens and components, then auth and the role dashboards.
   and Zod-validated URL search params
 - **TanStack Query** — server state; **axios** client with JWT + single-flight token refresh
 - **Zod 4** — every API response is validated; forms via **React Hook Form**
-- **Zustand** — client state (session, theme)
+- **Zustand** — client state (session)
 - **shadcn/ui** (Radix, `radix-nova`) + **Tailwind CSS 4** — tokens live in `src/index.css`
 - **Sonner** toasts, **Phosphor** icons
 - **Sentry** (enabled when `VITE_SENTRY_DSN` is set)
@@ -60,7 +60,7 @@ src/
                          components/, lib/ (none yet)
   components/ui/         shadcn components = the design system (generated; edit freely)
   lib/                   http client, request(), query client
-  stores/                Zustand stores (auth session, theme)
+  stores/                Zustand stores (auth session)
   assets/fonts/          Self-hosted variable fonts (Space Grotesk, Inter)
   mocks/                 MSW handlers — shared by dev mode and tests
   test/                  Vitest setup + renderWithProviders
@@ -86,6 +86,13 @@ don't edit it.
 - **Forms**: React Hook Form + `zodResolver`; shadcn `Field` / `FieldError` for markup.
 - **Guards**: protect routes in `beforeLoad` (throw `redirect(...)`), not in components.
 - **Styling**: Tailwind classes using tokens from `src/index.css`; no hex values in components.
+- **Colors** (from the design's color guide, light only):
+  - Brand: `bg-primary` (= `brand`), `bg-brand-hover`, `bg-brand-pressed`.
+  - Text: headings get `fg-heading` automatically; body text defaults to `fg-body`; captions
+    use `fg-caption` (`text-caption` / `text-muted-foreground`).
+  - Surfaces: page `bg-background` (#FAFAFA), cards/popovers white, borders `border-border`.
+  - Status: `warning` / `success` / `error` / `info`, each `-100` (tint background), `-500`
+    (main), `-700` (text on the tint) — e.g. `bg-success-100 text-success-700`.
 - **Fonts**: `font-heading` (Space Grotesk) for headings and buttons; `font-sans` (Inter, the
   default) for body text, labels and links.
 - **Text**: every heading/body text picks a type role (`text-h1`, `text-h2`, `text-h3`,

@@ -22,6 +22,26 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-pressed: var(--brand-pressed);
+  --color-fg-heading: var(--fg-heading);
+  --color-fg-body: var(--fg-body);
+  --color-fg-caption: var(--fg-caption);
+  --color-line: var(--line);
+  --color-surface: var(--surface);
+  --color-warning-100: var(--warning-100);
+  --color-warning-500: var(--warning-500);
+  --color-warning-700: var(--warning-700);
+  --color-success-100: var(--success-100);
+  --color-success-500: var(--success-500);
+  --color-success-700: var(--success-700);
+  --color-error-100: var(--error-100);
+  --color-error-500: var(--error-500);
+  --color-error-700: var(--error-700);
+  --color-info-100: var(--info-100);
+  --color-info-500: var(--info-500);
+  --color-info-700: var(--info-700);
   --font-heading: "Space Grotesk", sans-serif;
   --font-sans: "Inter", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
@@ -64,73 +84,71 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/*
+ * DocuHealth color guide. Light only — the design has no dark palette yet.
+ * Semantic tokens (what shadcn components read) point at the palette below.
+ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
+  /* Brand */
+  --brand: #3e4095;
+  --brand-hover: #383a88;
+  --brand-pressed: #2c2d6a;
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Neutral */
+  --fg-heading: #1b2b40; /* "Text color" */
+  --fg-body: #454f5b;
+  --fg-caption: #929aa3;
+  --line: #eeeeee; /* "Border color" */
+  --surface: #fafafa; /* "BG color" */
+  --white: #ffffff;
+
+  /* Status: 100 = tint background, 500 = main, 700 = text on tint */
+  --warning-100: #fff6e5;
+  --warning-500: #e59700;
+  --warning-700: #9a6100;
+  --success-100: #e9f7ef;
+  --success-500: #1e9e5a;
+  --success-700: #157043;
+  --error-100: #fdecec;
+  --error-500: #d92d20;
+  --error-700: #a61b12;
+  --info-100: #eaf1fe;
+  --info-500: #2f6feb;
+  --info-700: #1f4fb0;
+
+  /* Semantic */
+  --background: var(--surface);
+  --foreground: var(--fg-heading);
+  --card: var(--white);
+  --card-foreground: var(--fg-heading);
+  --popover: var(--white);
+  --popover-foreground: var(--fg-heading);
+  --primary: var(--brand);
+  --primary-foreground: var(--white);
+  --secondary: var(--line);
+  --secondary-foreground: var(--fg-heading);
+  --muted: var(--surface);
+  --muted-foreground: var(--fg-caption);
+  --accent: var(--line);
+  --accent-foreground: var(--fg-heading);
+  --destructive: var(--error-500);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--brand);
+  --chart-1: var(--brand);
+  --chart-2: var(--info-500);
+  --chart-3: var(--success-500);
+  --chart-4: var(--warning-500);
+  --chart-5: var(--error-500);
+  --radius: 0.625rem;
+  --sidebar: var(--white);
+  --sidebar-foreground: var(--fg-heading);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: var(--white);
+  --sidebar-accent: var(--line);
+  --sidebar-accent-foreground: var(--fg-heading);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--brand);
 }
 
 @layer base {
@@ -138,7 +156,15 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-fg-body;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-fg-heading;
   }
   html {
     @apply font-sans;

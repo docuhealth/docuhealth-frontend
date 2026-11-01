@@ -7,7 +7,6 @@ import { createRoot } from "react-dom/client";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { env } from "@/env";
 import { queryClient, router } from "@/router";
-import { syncTheme } from "@/stores/theme-store";
 
 if (env.VITE_SENTRY_DSN) {
   Sentry.init({
@@ -24,7 +23,6 @@ async function enableMocks() {
   await worker.start({ onUnhandledFrame: "bypass" });
 }
 
-syncTheme();
 await enableMocks();
 
 createRoot(document.getElementById("root")!, {
