@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["src/routes/**/*.tsx"],
+  "project": ["src/**/*.{ts,tsx,css}", "e2e/**/*.ts"],
+  "ignore": [
+    // shadcn-generated design system (and its hook): components are kept even before use.
+    "src/components/ui/**",
+    "src/hooks/use-mobile.ts",
+    // Shared test helper — remove from this list once the first component test uses it.
+    "src/test/render.tsx",
+  ],
+  // Part of the agreed stack but not used by any screen yet — remove each entry once it is.
+  "ignoreDependencies": ["react-hook-form", "@hookform/resolvers", "@testing-library/user-event"],
+}

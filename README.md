@@ -3,9 +3,9 @@
 The rebuilt DocuHealth web app (patients, hospitals and their staff roles, partners and
 platform admins), built from the React Setup starter for the new design.
 
-Status: foundations in place — fonts set (Space Grotesk for headings and buttons, Inter for
-everything else). Still to come: the design's color/type tokens and components, then real
-DocuHealth auth and roles (sign-in currently runs against the mock API with demo users).
+Status: foundations only — tooling, API layer, fonts (Space Grotesk for headings and buttons,
+Inter for everything else) and a placeholder home page at `/`. No screens yet; next come the
+design's color/type tokens and components, then auth and the role dashboards.
 
 ## Stack
 
@@ -33,8 +33,8 @@ cp .env.example .env.local   # mocks are on by default
 npm run dev
 ```
 
-With `VITE_ENABLE_MOCKS=true` the app runs against the MSW fake API in `src/mocks/` — no
-backend needed. Demo login: `admin@example.com`, password `password123`.
+With `VITE_ENABLE_MOCKS=true` the app runs against the MSW fake API in
+`src/mocks/handlers.ts` (empty for now) instead of the backend.
 
 ## Scripts
 
@@ -55,13 +55,10 @@ backend needed. Demo login: `admin@example.com`, password `password123`.
 src/
   routes/                File-based routes — thin; they compose features
     __root.tsx           Outlet, toaster, devtools, 404
-    index.tsx            "/" → /dashboard or /sign-in
-    _auth/               Signed-out layout: sign-in
-    _app/                Signed-in layout (sidebar) + auth guard: dashboard
+    index.tsx            "/" — placeholder home page
   features/<name>/       Domain code: api/ (schemas, requests, query options, mutations),
-                         components/, lib/ — e.g. auth
+                         components/, lib/ (none yet)
   components/ui/         shadcn components = the design system (generated; edit freely)
-  components/layout/     App shell pieces (sidebar)
   lib/                   http client, request(), query client
   stores/                Zustand stores (auth session, theme)
   assets/fonts/          Self-hosted variable fonts (Space Grotesk, Inter)
@@ -87,8 +84,7 @@ don't edit it.
 - **Queries**: export `queryOptions` per endpoint; one key factory per feature; mutations
   invalidate that feature's keys. Route loaders prefetch with `ensureQueryData`.
 - **Forms**: React Hook Form + `zodResolver`; shadcn `Field` / `FieldError` for markup.
-- **Guards**: `requireAuth` / `redirectIfSignedIn` in `beforeLoad` (role guards come with the
-  real roles).
+- **Guards**: protect routes in `beforeLoad` (throw `redirect(...)`), not in components.
 - **Styling**: Tailwind classes using tokens from `src/index.css`; no hex values in components.
 - **Fonts**: `font-heading` (Space Grotesk) for headings and buttons; `font-sans` (Inter, the
   default) for body text, labels and links.

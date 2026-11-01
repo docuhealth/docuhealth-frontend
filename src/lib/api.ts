@@ -33,7 +33,10 @@ export async function request<TSchema extends z.ZodType>(
   return result.data;
 }
 
-/** Best-effort human message for any error thrown by `request`. */
+/**
+ * Best-effort human message for any error thrown by `request`.
+ * @public
+ */
 export function getErrorMessage(error: unknown): string {
   if (isAxiosError<{ message?: string }>(error)) {
     return error.response?.data?.message ?? error.message;

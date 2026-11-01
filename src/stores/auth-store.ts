@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export const roles = ["admin", "member"] as const;
-export type Role = (typeof roles)[number];
+const roles = ["admin", "member"] as const;
+type Role = (typeof roles)[number];
 
 type User = {
   id: string;

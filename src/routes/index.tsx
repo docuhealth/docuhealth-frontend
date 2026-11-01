@@ -1,8 +1,15 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useAuthStore } from "@/stores/auth-store";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-  beforeLoad: () => {
-    throw redirect({ to: useAuthStore.getState().session ? "/dashboard" : "/sign-in" });
-  },
+  component: HomePage,
 });
+
+function HomePage() {
+  return (
+    <main className="grid min-h-svh place-content-center justify-items-center gap-4 p-6 text-center">
+      <title>DocuHealth</title>
+      <img src="/logo.png" alt="" width={84} height={80} />
+      <h1 className="text-h1">DocuHealth</h1>
+    </main>
+  );
+}
