@@ -4,6 +4,9 @@ import { createCn } from "cn/config";
 const typeRoles = [
   "h1",
   "h2",
+  "h3",
+  "heading-sm",
+  "heading-sm-regular",
   "quote",
   "accent-h1",
   "accent-h2",
@@ -11,7 +14,11 @@ const typeRoles = [
   "accent-h4",
   "body",
   "body-sm",
+  "body-sm-regular",
+  "body-sm-tight",
+  "link-sm",
   "caption",
+  "caption-tight",
   "label",
 ];
 

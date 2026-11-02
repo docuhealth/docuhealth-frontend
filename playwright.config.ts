@@ -16,6 +16,6 @@ export default defineConfig({
     command: `npx vite --port ${port} --strictPort`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    env: { VITE_ENABLE_MOCKS: "true", VITE_API_URL: `${baseURL}/api` },
+    env: { VITE_ENABLE_MOCKS: "true", VITE_PREFILL_FORMS: "false", VITE_API_URL: `${baseURL}/api` },
   },
 });

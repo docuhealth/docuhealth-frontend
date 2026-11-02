@@ -156,7 +156,8 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background type-body text-fg-body;
+    /* Grayscale smoothing, as Figma renders: macOS's default draws every weight heavier. */
+    @apply bg-background type-body text-fg-body antialiased;
   }
   h1,
   h2,
@@ -190,6 +191,30 @@
   font-family: var(--font-heading);
   font-size: 3rem; /* 48px */
   line-height: 1.1;
+  font-weight: 400;
+}
+
+/* Heading/H3 */
+@utility type-h3 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+/* Heading/Small */
+@utility type-heading-sm {
+  font-family: var(--font-heading);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+/* Heading/Small Regular */
+@utility type-heading-sm-regular {
+  font-family: var(--font-heading);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.4;
   font-weight: 400;
 }
 
@@ -252,12 +277,47 @@
   font-weight: 500;
 }
 
+/* Body/Small Tight */
+@utility type-body-sm-tight {
+  font-family: var(--font-sans);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.4;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+/* Link/Small: a link inside Body/Small Tight text */
+@utility type-link-sm {
+  font-family: var(--font-sans);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+/* Body/Small Regular */
+@utility type-body-sm-regular {
+  font-family: var(--font-sans);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.4;
+  font-weight: 400;
+}
+
 /* Body/Caption */
 @utility type-caption {
   font-family: var(--font-sans);
   font-size: 0.75rem; /* 12px */
   line-height: 1.35;
   font-weight: 400;
+}
+
+/* Body/Caption Tight */
+@utility type-caption-tight {
+  font-family: var(--font-sans);
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.35;
+  font-weight: 400;
+  letter-spacing: -0.025em;
 }
 
 /* Label */

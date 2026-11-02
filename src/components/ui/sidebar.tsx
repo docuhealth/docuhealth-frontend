@@ -308,7 +308,7 @@ function SidebarInput({ className, ...props }: React.ComponentProps<typeof Input
     <Input
       data-slot="sidebar-input"
       data-sidebar="input"
-      className={cn("h-8 w-full bg-background shadow-none", className)}
+      className={cn("h-8 w-full rounded-lg bg-background px-2.5 py-1 shadow-none", className)}
       {...props}
     />
   );

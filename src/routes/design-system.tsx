@@ -1,7 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
+import { CaretRightIcon, TrashIcon } from "@phosphor-icons/react";
+import { useState } from "react";
+import { SuccessDialog } from "@/components/success-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectCheckboxItem,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/design-system")({
   component: DesignSystemPage,
@@ -101,6 +112,17 @@ const fonts = [
 const typeRoles = [
   { className: "type-h1", name: "Heading/H1", spec: "Space Grotesk · 64px / 110%" },
   { className: "type-h2", name: "Heading/H2", spec: "Space Grotesk · 48px / 110%" },
+  { className: "type-h3", name: "Heading/H3", spec: "Space Grotesk Bold · 24px / 135%" },
+  {
+    className: "type-heading-sm",
+    name: "Heading/Small",
+    spec: "Space Grotesk Medium · 14px / 140%",
+  },
+  {
+    className: "type-heading-sm-regular",
+    name: "Heading/Small Regular",
+    spec: "Space Grotesk Regular · 14px / 140%",
+  },
   { className: "type-quote", name: "Header/Quote", spec: "Space Grotesk · 32px / 125%" },
   { className: "type-accent-h1", name: "Accent/H1", spec: "Inter Semi Bold · 32px / 120% · -2.5%" },
   { className: "type-accent-h2", name: "Accent/H2", spec: "Inter Semi Bold · 24px / 135% · -2.5%" },
@@ -108,7 +130,27 @@ const typeRoles = [
   { className: "type-accent-h4", name: "Accent/H4", spec: "Inter Regular · 18px / 135%" },
   { className: "type-body", name: "Body/Medium", spec: "Inter Regular · 16px / 140% (default)" },
   { className: "type-body-sm", name: "Body/Small", spec: "Inter Medium · 14px / 150%" },
+  {
+    className: "type-body-sm-tight",
+    name: "Body/Small Tight",
+    spec: "Inter Regular · 14px / 140% · -2.5%",
+  },
+  {
+    className: "type-link-sm",
+    name: "Link/Small",
+    spec: "Inter Medium · 14px / 140% · -2.5%",
+  },
+  {
+    className: "type-body-sm-regular",
+    name: "Body/Small Regular",
+    spec: "Inter Regular · 14px / 140%",
+  },
   { className: "type-caption", name: "Body/Caption", spec: "Inter Regular · 12px / 135%" },
+  {
+    className: "type-caption-tight",
+    name: "Body/Caption Tight",
+    spec: "Inter Regular · 12px / 135% · -2.5%",
+  },
   { className: "type-label", name: "Label", spec: "Inter Semi Bold · 12px / 135% · 8%, caps" },
 ];
 
@@ -209,6 +251,10 @@ function DesignSystemPage() {
           <Button variant="destructive">Destructive</Button>
           <Button variant="link">Link</Button>
           <Button disabled>Disabled</Button>
+          <Button loading>
+            Loading
+            <CaretRightIcon data-icon="inline-end" />
+          </Button>
         </div>
         <div className="flex flex-wrap gap-3">
           <Badge>Badge</Badge>
@@ -229,7 +275,102 @@ function DesignSystemPage() {
           <Input placeholder="Input with placeholder" />
           <Input aria-invalid placeholder="Invalid input" />
         </div>
+        <SuccessDialogExamples />
+        <SelectExamples />
       </section>
     </main>
+  );
+}
+
+/** One button per SuccessDialog layout, so each can be checked against the designs. */
+function SuccessDialogExamples() {
+  const [open, setOpen] = useState<"single" | "pair" | "header" | null>(null);
+  const close = () => setOpen(null);
+
+  return (
+    <div className="flex flex-wrap gap-3">
+      <Button variant="outline" onClick={() => setOpen("single")}>
+        Success dialog
+      </Button>
+      <Button variant="outline" onClick={() => setOpen("pair")}>
+        Success dialog with Undo
+      </Button>
+      <Button variant="outline" onClick={() => setOpen("header")}>
+        Success dialog with header
+      </Button>
+
+      <SuccessDialog
+        open={open === "single"}
+        onOpenChange={(next) => !next && close()}
+        title="Hospital Registered!"
+        description="Lagos University Teaching Hospital has been added to DocuHealth. We've emailed Ada at ada@luth.ng to finish setup."
+        primaryAction={{ label: "Done", onClick: close }}
+      />
+      <SuccessDialog
+        open={open === "pair"}
+        onOpenChange={(next) => !next && close()}
+        title="Member added!"
+        description={
+          <>
+            <span className="text-fg-heading">Esther Ike</span> has been added back to the team and
+            can now have access their dashboard.
+          </>
+        }
+        secondaryAction={{ label: "Undo", onClick: close }}
+        primaryAction={{ label: "Done", onClick: close }}
+      />
+      <SuccessDialog
+        open={open === "header"}
+        onOpenChange={(next) => !next && close()}
+        header={{ icon: <TrashIcon />, title: "No staff selected" }}
+        title="Everyone is staying"
+        description="You've kept all 9 people, so no one will be removed."
+        secondaryAction={{ label: "Undo", onClick: close }}
+        primaryAction={{ label: "Close", onClick: close }}
+      />
+    </div>
+  );
+}
+
+const facilityServices = {
+  hospital: "Hospital/Clinic",
+  laboratory: "Laboratory only",
+  radiology: "Radiology only",
+  pharmacy: "Pharmacy/Chemist",
+};
+
+/** Single and multiple select, side by side. */
+function SelectExamples() {
+  const [service, setService] = useState<string | null>(null);
+  const [services, setServices] = useState<string[]>([]);
+
+  return (
+    <div className="grid max-w-2xl gap-3 sm:grid-cols-2">
+      <Select items={facilityServices} value={service} onValueChange={setService}>
+        <SelectTrigger aria-label="Single select" className="w-full bg-card">
+          <SelectValue placeholder="Select" />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.entries(facilityServices).map(([value, label]) => (
+            <SelectItem key={value} value={value}>
+              {label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select multiple items={facilityServices} value={services} onValueChange={setServices}>
+        <SelectTrigger aria-label="Multiple select" className="w-full bg-card">
+          <SelectValue placeholder="Select one or more" />
+        </SelectTrigger>
+        <SelectContent header="Select one or more">
+          {Object.entries(facilityServices).map(([value, label]) => (
+            <SelectCheckboxItem key={value} value={value}>
+              {label}
+            </SelectCheckboxItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }

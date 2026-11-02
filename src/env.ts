@@ -11,6 +11,15 @@ const envSchema = z.object({
     .enum(["true", "false"])
     .default("false")
     .transform((v) => v === "true"),
+  // Main domain, e.g. docuhealthservices.net; its subdomains pick the app section (src/lib/sections.ts).
+  VITE_ROOT_DOMAIN: z
+    .string()
+    .optional()
+    .transform((v) => v || undefined),
+  VITE_PREFILL_FORMS: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((v) => v === "true"),
 });
 
 const parsed = envSchema.safeParse(import.meta.env);

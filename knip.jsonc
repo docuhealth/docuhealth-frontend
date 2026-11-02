@@ -10,5 +10,5 @@
     "src/test/render.tsx",
   ],
   // Part of the agreed stack but not used by any screen yet — remove each entry once it is.
-  "ignoreDependencies": ["react-hook-form", "@hookform/resolvers", "@testing-library/user-event"],
+  "ignoreDependencies": ["@testing-library/user-event"],
 }
