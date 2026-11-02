@@ -21,6 +21,8 @@ import { Route as AgentAuthRouteImport } from './routes/agent/_auth'
 import { Route as HospitalIndexRouteImport } from './routes/hospital/index'
 import { Route as HospitalAuthRouteImport } from './routes/hospital/_auth'
 import { Route as AgentAuthRegisterHospitalRouteImport } from './routes/agent/_auth/register-hospital'
+import { Route as HospitalAuthForgotPasswordRouteImport } from './routes/hospital/_auth/forgot-password'
+import { Route as HospitalAuthLoginRouteImport } from './routes/hospital/_auth/login'
 import { Route as HospitalAuthRegisterRouteImport } from './routes/hospital/_auth/register'
 import { Route as HospitalAuthVerifyRouteImport } from './routes/hospital/_auth/verify'
 
@@ -84,6 +86,17 @@ const AgentAuthRegisterHospitalRoute =
     path: '/register-hospital',
     getParentRoute: () => AgentAuthRoute,
   } as any)
+const HospitalAuthForgotPasswordRoute =
+  HospitalAuthForgotPasswordRouteImport.update({
+    id: '/forgot-password',
+    path: '/forgot-password',
+    getParentRoute: () => HospitalAuthRoute,
+  } as any)
+const HospitalAuthLoginRoute = HospitalAuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => HospitalAuthRoute,
+} as any)
 const HospitalAuthRegisterRoute = HospitalAuthRegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -107,6 +120,8 @@ export interface FileRoutesByFullPath {
   '/agent/': typeof AgentIndexRoute
   '/hospital/': typeof HospitalIndexRoute
   '/agent/register-hospital': typeof AgentAuthRegisterHospitalRoute
+  '/hospital/forgot-password': typeof HospitalAuthForgotPasswordRoute
+  '/hospital/login': typeof HospitalAuthLoginRoute
   '/hospital/register': typeof HospitalAuthRegisterRoute
   '/hospital/verify': typeof HospitalAuthVerifyRoute
 }
@@ -120,6 +135,8 @@ export interface FileRoutesByTo {
   '/agent': typeof AgentIndexRoute
   '/hospital': typeof HospitalIndexRoute
   '/agent/register-hospital': typeof AgentAuthRegisterHospitalRoute
+  '/hospital/forgot-password': typeof HospitalAuthForgotPasswordRoute
+  '/hospital/login': typeof HospitalAuthLoginRoute
   '/hospital/register': typeof HospitalAuthRegisterRoute
   '/hospital/verify': typeof HospitalAuthVerifyRoute
 }
@@ -137,6 +154,8 @@ export interface FileRoutesById {
   '/agent/': typeof AgentIndexRoute
   '/hospital/': typeof HospitalIndexRoute
   '/agent/_auth/register-hospital': typeof AgentAuthRegisterHospitalRoute
+  '/hospital/_auth/forgot-password': typeof HospitalAuthForgotPasswordRoute
+  '/hospital/_auth/login': typeof HospitalAuthLoginRoute
   '/hospital/_auth/register': typeof HospitalAuthRegisterRoute
   '/hospital/_auth/verify': typeof HospitalAuthVerifyRoute
 }
@@ -154,6 +173,8 @@ export interface FileRouteTypes {
     | '/agent/'
     | '/hospital/'
     | '/agent/register-hospital'
+    | '/hospital/forgot-password'
+    | '/hospital/login'
     | '/hospital/register'
     | '/hospital/verify'
   fileRoutesByTo: FileRoutesByTo
@@ -167,6 +188,8 @@ export interface FileRouteTypes {
     | '/agent'
     | '/hospital'
     | '/agent/register-hospital'
+    | '/hospital/forgot-password'
+    | '/hospital/login'
     | '/hospital/register'
     | '/hospital/verify'
   id:
@@ -183,6 +206,8 @@ export interface FileRouteTypes {
     | '/agent/'
     | '/hospital/'
     | '/agent/_auth/register-hospital'
+    | '/hospital/_auth/forgot-password'
+    | '/hospital/_auth/login'
     | '/hospital/_auth/register'
     | '/hospital/_auth/verify'
   fileRoutesById: FileRoutesById
@@ -283,6 +308,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentAuthRegisterHospitalRouteImport
       parentRoute: typeof AgentAuthRoute
     }
+    '/hospital/_auth/forgot-password': {
+      id: '/hospital/_auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/hospital/forgot-password'
+      preLoaderRoute: typeof HospitalAuthForgotPasswordRouteImport
+      parentRoute: typeof HospitalAuthRoute
+    }
+    '/hospital/_auth/login': {
+      id: '/hospital/_auth/login'
+      path: '/login'
+      fullPath: '/hospital/login'
+      preLoaderRoute: typeof HospitalAuthLoginRouteImport
+      parentRoute: typeof HospitalAuthRoute
+    }
     '/hospital/_auth/register': {
       id: '/hospital/_auth/register'
       path: '/register'
@@ -329,11 +368,15 @@ const AgentAuthRouteWithChildren = AgentAuthRoute._addFileChildren(
 )
 
 interface HospitalAuthRouteChildren {
+  HospitalAuthForgotPasswordRoute: typeof HospitalAuthForgotPasswordRoute
+  HospitalAuthLoginRoute: typeof HospitalAuthLoginRoute
   HospitalAuthRegisterRoute: typeof HospitalAuthRegisterRoute
   HospitalAuthVerifyRoute: typeof HospitalAuthVerifyRoute
 }
 
 const HospitalAuthRouteChildren: HospitalAuthRouteChildren = {
+  HospitalAuthForgotPasswordRoute: HospitalAuthForgotPasswordRoute,
+  HospitalAuthLoginRoute: HospitalAuthLoginRoute,
   HospitalAuthRegisterRoute: HospitalAuthRegisterRoute,
   HospitalAuthVerifyRoute: HospitalAuthVerifyRoute,
 }

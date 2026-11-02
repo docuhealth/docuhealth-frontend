@@ -9,7 +9,7 @@ function LoginPage() {
   return (
     <>
       <title>Log in · DocuHealth</title>
-      <LoginForm />
+      <LoginForm audience="individual" />
     </>
   );
 }

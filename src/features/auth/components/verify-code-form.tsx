@@ -1,6 +1,6 @@
 import { CaretRightIcon } from "@phosphor-icons/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "@tanstack/react-router";
+import { Link, type LinkProps } from "@tanstack/react-router";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -13,17 +13,25 @@ import { StepProgress } from "@/features/auth/components/step-progress";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import { OTP_LENGTH, verifyCodeSchema, type VerifyCodeValues } from "@/features/auth/lib/schemas";
 
-/** Sign-up step that confirms the email address with the code we sent to it. */
+/**
+ * Confirms the email address with the code we sent to it — a sign-up step, or the middle of a
+ * password reset. The step bar shows only when `step` and `totalSteps` are given.
+ */
 export function VerifyCodeForm({
   email,
   step,
   totalSteps,
+  title = "Verify account",
+  login = { prompt: "Already have an account?", to: "/login" },
   onChangeEmail,
   onVerified,
 }: {
   email: string;
-  step: number;
-  totalSteps: number;
+  step?: number;
+  totalSteps?: number;
+  title?: string;
+  /** Prompt and target of the "Log in" link under the button. */
+  login?: { prompt: string; to: LinkProps["to"] };
   /** Go back to the step where the email was entered. */
   onChangeEmail: () => void;
   onVerified: () => void;
@@ -49,11 +57,13 @@ export function VerifyCodeForm({
 
   return (
     <div className="flex flex-col gap-10">
-      <StepProgress step={step} total={totalSteps} />
+      {step !== undefined && totalSteps !== undefined && (
+        <StepProgress step={step} total={totalSteps} />
+      )}
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8" noValidate>
         <AuthHeader
-          title="Verify account"
+          title={title}
           description={
             <>
               Enter the {OTP_LENGTH}-digit code we sent to {email}.{" "}
@@ -122,8 +132,8 @@ export function VerifyCodeForm({
             <CaretRightIcon data-icon="inline-end" />
           </Button>
           <p className="text-center type-body-sm-regular text-muted-foreground">
-            Already have an account?{" "}
-            <Link to="/login" className="text-primary underline underline-offset-2">
+            {login.prompt}{" "}
+            <Link to={login.to} className="text-primary underline underline-offset-2">
               Log in
             </Link>
           </p>

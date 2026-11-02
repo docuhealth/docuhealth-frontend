@@ -13,11 +13,6 @@ import { resetPasswordSchema, type ResetPasswordValues } from "@/features/auth/l
 /** `token` comes from the reset link in the email; without one the link is unusable. */
 export function ResetPasswordForm({ token }: { token: string | undefined }) {
   const navigate = useNavigate();
-  const form = useForm<ResetPasswordValues>({
-    resolver: zodResolver(resetPasswordSchema),
-    defaultValues: devPrefill?.resetPassword ?? { password: "", confirmPassword: "" },
-  });
-  const { errors, isSubmitting } = form.formState;
 
   async function onSubmit(_values: ResetPasswordValues) {
     // TODO(api): send the new password with `token` once the v2 auth API is defined.
@@ -40,12 +35,26 @@ export function ResetPasswordForm({ token }: { token: string | undefined }) {
     );
   }
 
+  return <NewPasswordForm title="Set a new password" onSubmit={onSubmit} />;
+}
+
+/** New password + confirmation, the last step of every password reset. */
+export function NewPasswordForm({
+  title,
+  onSubmit,
+}: {
+  title: string;
+  onSubmit: (values: ResetPasswordValues) => Promise<void>;
+}) {
+  const form = useForm<ResetPasswordValues>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: devPrefill?.resetPassword ?? { password: "", confirmPassword: "" },
+  });
+  const { errors, isSubmitting } = form.formState;
+
   return (
     <div className="flex flex-col gap-8">
-      <AuthHeader
-        title="Set a new password"
-        description="Choose a strong password you haven’t used before."
-      />
+      <AuthHeader title={title} description="Choose a strong password you haven’t used before." />
 
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <FieldGroup>

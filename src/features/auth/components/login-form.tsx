@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "@tanstack/react-router";
+import { Link, type LinkProps } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,36 @@ import { PasswordInput } from "@/features/auth/components/password-input";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import { loginSchema, type LoginValues } from "@/features/auth/lib/schemas";
 
-export function LoginForm() {
+const copy = {
+  individual: {
+    title: "Welcome back",
+    description: "Log in to your DocuHealth account.",
+    forgotPasswordTo: "/forgot-password",
+    signUp: { prompt: "Don’t have an account?", linkText: "Create one", to: "/register" },
+  },
+  hospital: {
+    title: "Log in to your facility",
+    description: "Admins and staff, log in to your hospital’s DocuHealth dashboard.",
+    forgotPasswordTo: "/hospital/forgot-password",
+    signUp: {
+      prompt: "New to DocuHealth?",
+      linkText: "Register your facility",
+      to: "/hospital/register",
+    },
+  },
+} satisfies Record<
+  string,
+  {
+    title: string;
+    description: string;
+    forgotPasswordTo: LinkProps["to"];
+    signUp: { prompt: string; linkText: string; to: LinkProps["to"] };
+  }
+>;
+
+/** Email and password login; `audience` picks the copy and where the links go. */
+export function LoginForm({ audience }: { audience: keyof typeof copy }) {
+  const { title, description, forgotPasswordTo, signUp } = copy[audience];
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: devPrefill?.login ?? { email: "", password: "" },
@@ -24,7 +53,7 @@ export function LoginForm() {
 
   return (
     <div className="flex flex-col gap-8">
-      <AuthHeader title="Welcome back" description="Log in to your DocuHealth account." />
+      <AuthHeader title={title} description={description} />
 
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <FieldGroup>
@@ -45,7 +74,7 @@ export function LoginForm() {
           <Field data-invalid={!!errors.password}>
             <div className="flex items-center justify-between">
               <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Link to="/forgot-password" className="type-caption text-primary hover:underline">
+              <Link to={forgotPasswordTo} className="type-caption text-primary hover:underline">
                 Forgot password?
               </Link>
             </div>
@@ -66,7 +95,7 @@ export function LoginForm() {
         </FieldGroup>
       </form>
 
-      <AuthFooter prompt="Don’t have an account?" linkText="Create one" to="/register" />
+      <AuthFooter {...signUp} />
     </div>
   );
 }

@@ -216,3 +216,53 @@ test("field agent registers a hospital in three steps", async ({ page }) => {
     "Havannah Hospital has been added to DocuHealth. We’ve emailed Tunde at tunde@havannah.example.com",
   );
 });
+
+test("hospital login validates the form and links to registration", async ({ page }) => {
+  await page.goto(`${hospital}/`);
+  await expect(page).toHaveURL(`${hospital}/login`);
+  await expect(page).toHaveTitle("Hospital log in · DocuHealth");
+  await expect(page.getByRole("heading", { name: "Log in to your facility" })).toBeVisible();
+  await page.getByRole("button", { name: "Log in" }).click();
+  await expect(page.getByText("Enter a valid email address")).toBeVisible();
+  await expect(page.getByText("Enter your password")).toBeVisible();
+
+  await page.getByRole("link", { name: "Register your facility" }).click();
+  await expect(page).toHaveURL(`${hospital}/register`);
+
+  await page.goto(`${hospital}/login`);
+  await page.getByRole("link", { name: "Switch" }).click();
+  await expect(page).toHaveURL(`${main}/login`);
+});
+
+test("hospital password reset: email, code, then a new password", async ({ page }) => {
+  await page.goto(`${hospital}/login`);
+  await page.getByRole("link", { name: "Forgot password?" }).click();
+  await expect(page).toHaveURL(`${hospital}/forgot-password`);
+  await expect(page.getByRole("heading", { name: "Reset your password" })).toBeVisible();
+
+  await page.getByLabel("Email address").fill("admin@luth.example.com");
+  await page.getByRole("button", { name: "Send code" }).click();
+  await expect(page.getByRole("heading", { name: "Verify your email" })).toBeVisible();
+  await expect(page.getByText("we sent to admin@luth.example.com")).toBeVisible();
+
+  // "Change" goes back to the email with it still filled in.
+  await page.getByRole("button", { name: "Change" }).click();
+  await expect(page.getByLabel("Email address")).toHaveValue("admin@luth.example.com");
+  await page.getByRole("button", { name: "Send code" }).click();
+
+  await page.getByRole("button", { name: "Verify" }).click();
+  await expect(page.getByText("Enter the 6-digit code", { exact: true })).toBeVisible();
+  await page.keyboard.type("123456");
+  await page.getByRole("button", { name: "Verify" }).click();
+
+  await expect(page.getByRole("heading", { name: "Create new password" })).toBeVisible();
+  await page.getByLabel("New password", { exact: true }).fill("Password123!");
+  await page.getByLabel("Confirm new password").fill("Password124!");
+  await page.getByRole("button", { name: "Set new password" }).click();
+  await expect(page.getByText("Passwords do not match")).toBeVisible();
+
+  await page.getByLabel("Confirm new password").fill("Password123!");
+  await page.getByRole("button", { name: "Set new password" }).click();
+  await expect(page).toHaveURL(`${hospital}/login`);
+  await expect(page.getByText("Password updated. Log in with your new password.")).toBeVisible();
+});

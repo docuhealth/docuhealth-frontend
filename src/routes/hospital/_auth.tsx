@@ -8,20 +8,27 @@ export const Route = createFileRoute("/hospital/_auth")({
 
 function HospitalAuthLayout() {
   const registering = useMatch({ from: "/hospital/_auth/register", shouldThrow: false });
+  const loggingIn = useMatch({ from: "/hospital/_auth/login", shouldThrow: false });
 
   return (
     <AuthLayout
       headerAction={
-        registering && (
+        (registering || loggingIn) && (
           <p className="type-body-sm-tight text-fg-body">
             Are you an Individual?{" "}
-            <Link
-              to="/register"
-              search={{ type: "individual" }}
-              className="type-link-sm text-primary underline underline-offset-2"
-            >
-              Switch
-            </Link>
+            {registering ? (
+              <Link
+                to="/register"
+                search={{ type: "individual" }}
+                className="type-link-sm text-primary underline underline-offset-2"
+              >
+                Switch
+              </Link>
+            ) : (
+              <Link to="/login" className="type-link-sm text-primary underline underline-offset-2">
+                Switch
+              </Link>
+            )}
           </p>
         )
       }
