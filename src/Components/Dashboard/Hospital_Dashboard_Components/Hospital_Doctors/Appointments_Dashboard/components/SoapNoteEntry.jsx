@@ -311,7 +311,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
     queryKey: ["patient-details-soap", patientHin],
     queryFn: async () => {
       const res = await axiosInstanceHos.get(
-        `api/doctors/patient/info/${patientHin}`,
+        `api/patients/${patientHin}/info`,
       );
       return res.data;
     },
@@ -406,7 +406,7 @@ const SoapNoteEntry = ({ setSoapNoteEntry, selectedPatientDetails, source, onBac
     }
 
     const payload = {
-      staff: profile?.staff_id || "",
+      staff: profile?.sqid || "",
       patient: patientHin || "",
       ...(selectedPatientFetchedInfo?.latest_vitals?.sqid && { vital_signs: selectedPatientFetchedInfo.latest_vitals.sqid }),
       referred_docuhealth_hosp: soapNoteData.referred_docuhealth_hosp,

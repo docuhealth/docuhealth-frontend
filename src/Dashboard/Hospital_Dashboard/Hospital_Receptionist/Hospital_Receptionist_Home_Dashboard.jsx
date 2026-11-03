@@ -8,7 +8,6 @@ import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../lib/axios/hospital";
 import BookAppointment from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home_Dashboard/components/BookAppointment";
 import AppointmentsList from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Appointments_Dashboard/AppointmentsList";
-import RecentPatients from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Receptionist/Home_Dashboard/components/RecentPatients";
 import { HosWardContext } from "../../../context/HospitalContext/HosWardContext";
 import { ReceptionistAppContext } from "../../../context/HospitalContext/Receptionist/ReceptionistAppContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -100,7 +99,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
     wards?.filter((w) => w.available_beds < w.total_beds).length || 0;
 
   const fetchPatientByHIN = async (hin) => {
-    const res = await axiosInstanceHos.get(`api/receptionists/patient/${hin}`);
+    const res = await axiosInstanceHos.get(`api/patients/${hin}/details`);
     return res.data;
   };
 
@@ -123,7 +122,6 @@ const Hospital_Receptionist_Home_Dashboard = () => {
       setPatientDetails(result.data);
       setCheckHIN(true);
       setPatientHIN("");
-      queryClient.invalidateQueries({ queryKey: ["receptionist-recent-patients"] });
     } else if (result.isError) {
       toast.error(
         result.error?.response?.data?.message ||
@@ -135,7 +133,7 @@ const Hospital_Receptionist_Home_Dashboard = () => {
 
   const checkInPatientApi = async (payload) => {
     const res = await axiosInstanceHos.post(
-      "api/receptionists/check-in",
+      "api/hospital-ops/check-ins",
       payload,
     );
     return res.data;
@@ -464,17 +462,6 @@ const Hospital_Receptionist_Home_Dashboard = () => {
                       {occupiedWards} / {totalWards} Wards
                     </p>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg my-5 ">
-              <div className=" border rounded-lg p-4 lg:p-6">
-                <h2 className=" mb-4 pb-2 border-b font-medium">
-                  Recent Patients attended to
-                </h2>
-                <div>
-                  <RecentPatients />
                 </div>
               </div>
             </div>

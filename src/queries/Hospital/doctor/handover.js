@@ -1,17 +1,17 @@
 import axiosInstanceHos from "../../../lib/axios/hospital";
 
 // Doctor-to-doctor patient handover (doctor-only).
-// GET /api/doctors/handovers?page=&size= — one combined sent+received paginated list.
+// GET /api/hospital-ops/handovers/doctor?page=&size= — one combined sent+received paginated list.
 // No per-patient server filter; callers filter results by `patient_info.hin`.
 export const fetchDoctorHandovers = async ({ queryKey }) => {
   const [, page = 1, size = 100] = queryKey;
   const res = await axiosInstanceHos.get(
-    `api/doctors/handovers?page=${page}&size=${size}`,
+    `api/hospital-ops/handovers/doctor?page=${page}&size=${size}`,
   );
   return res.data;
 };
 
-// POST /api/doctors/handover — transfers responsibility for a patient to another doctor.
+// POST /api/hospital-ops/handovers/doctor — transfers responsibility for a patient to another doctor.
 // Required: to_doctor_id (recipient doctor SQID), patient_hin, working_diagnosis,
 // current_clinical_status. The other six clinical fields are optional (sent as "").
 export const createDoctorHandover = async ({
@@ -26,7 +26,7 @@ export const createDoctorHandover = async ({
   clinical_concerns = "",
   management_plan = "",
 }) => {
-  const res = await axiosInstanceHos.post("api/doctors/handover", {
+  const res = await axiosInstanceHos.post("api/hospital-ops/handovers/doctor", {
     to_doctor_id,
     patient_hin,
     working_diagnosis,

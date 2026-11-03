@@ -133,7 +133,6 @@ export const invalidateAppointment = (client, { listKey } = {}) => {
 export const invalidateCheckIn = (client, { hin } = {}) => {
   const qc = getClient(client);
 
-  qc.invalidateQueries({ queryKey: ["receptionist-recent-patients"] });
   qc.invalidateQueries({ queryKey: ["doctor-active-check-ins"] });
   qc.invalidateQueries({ queryKey: ["hospital-patients-doctor"] });
   qc.invalidateQueries({ queryKey: ["hospital-patients-nurse"] });

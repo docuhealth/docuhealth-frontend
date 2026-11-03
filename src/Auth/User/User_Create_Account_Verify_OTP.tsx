@@ -11,8 +11,10 @@ import toast from "react-hot-toast";
 
 
 const User_Create_Account_Verify_OTP = () => {
+  const location = useLocation();
   const [otp, setOtp] = useState("");
-  const [email, setEmail] = useState("");
+  // Sign-in sends unverified users here with their email
+  const [email, setEmail] = useState<string>(location.state?.email || "");
   const [role, setRole] = useState("patient");
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);

@@ -9,6 +9,8 @@ import EmptyState from "../../../../../Components/ui/EmptyState";
 interface UserSubAcctMedicalRecordsProps {
   subAcctMedicalRecords: MedicalRecord[];
   subAcctMedicalRecordsLoading: boolean;
+  // The dependant has upgraded to their own account, so the guardian lost access (API 404)
+  noAccess?: boolean;
   setViewDetailMedicalRecord: (value: boolean) => void;
 
   // Cleaned up props
@@ -25,6 +27,7 @@ interface UserSubAcctMedicalRecordsProps {
 const UserSubAcctMedicalRecords = ({
   subAcctMedicalRecords,
   subAcctMedicalRecordsLoading,
+  noAccess = false,
   setViewDetailMedicalRecord,
 
   // Cleaned up props
@@ -68,10 +71,17 @@ const UserSubAcctMedicalRecords = ({
 
             <p>Go Back</p>
           </div>
-          <EmptyState
-            title="No medical records yet!"
-            description="No records yet, no hospital has dropped an after-visit summary."
-          />
+          {noAccess ? (
+            <EmptyState
+              title="You no longer have access"
+              description="This person now has their own DocuHealth account, so their records are no longer shared with you."
+            />
+          ) : (
+            <EmptyState
+              title="No medical records yet!"
+              description="No records yet, no hospital has dropped an after-visit summary."
+            />
+          )}
         </div>
       </>
     );

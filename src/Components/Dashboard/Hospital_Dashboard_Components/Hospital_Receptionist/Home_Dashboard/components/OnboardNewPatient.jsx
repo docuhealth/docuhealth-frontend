@@ -11,7 +11,7 @@ import Input from "../../../../../ui/Input";
 
 const registerPatient = async (payload) => {
   const res = await axiosInstanceHos.post(
-    "api/receptionists/patient/register",
+    "api/patients/register",
     payload,
   );
   return res.data;

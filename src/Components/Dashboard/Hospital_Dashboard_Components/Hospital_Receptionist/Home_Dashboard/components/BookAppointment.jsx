@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
+import { fetchStaffByRole } from "../../../../../../queries/Hospital/fetchStaff";
 import { invalidateAppointment } from "../../../../../../lib/queryInvalidations";
 import CustomTimePicker from "./CustomTimePicker";
 import Modal from "../../../../../ui/Modal";
@@ -185,15 +186,15 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
     }
     setLoading(true);
     try {
-      const res = await axiosInstanceHos.get(
-        `api/receptionists/staff/${selected === "Lab personnel" ? "lab_scientist" : selected.toLowerCase()}`,
+      const staff = await fetchStaffByRole(
+        selected === "Lab personnel" ? "lab_scientist" : selected.toLowerCase(),
       );
-      if (!res.data || res.data.length === 0) {
+      if (staff.length === 0) {
         toast.error(`No ${selected} currently available.`);
         setLoading(false);
         return;
       }
-      setStaffList(res.data);
+      setStaffList(staff);
       setIsStaffSelectedRole(
         selected === "Lab personnel" ? "lab_scientist" : selected.toLowerCase(),
       );
@@ -208,7 +209,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
   const mutation = useMutation({
     mutationFn: (newAppointment) => {
       return axiosInstanceHos.post(
-        "api/receptionists/appointments",
+        "api/hospital-ops/appointments/book",
         newAppointment,
       );
     },
@@ -533,7 +534,7 @@ const BookAppointment = ({ setBookAppointment, patientDetails }) => {
                     <div className="w-full pt-8">
                       <button
                         className="w-full rounded-full border py-2 border-docuhealth-primary text-docuhealth-primary cursor-pointer"
-                        onClick={() => handleAssign(staff.staff_id)}
+                        onClick={() => handleAssign(staff.sqid)}
                       >
                         Assign patient
                       </button>

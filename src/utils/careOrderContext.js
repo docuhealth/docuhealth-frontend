@@ -5,11 +5,11 @@
  * explicit "type" field to switch on:
  *   - Appointment  → legacy shape: `.patient` (see AppointmentsList.jsx)
  *   - CheckIn      → `.patient_info`, no ward/bed/admission info (see
- *                    `api/doctors/check-ins`: `created_at`, `escalated_at`,
+ *                    `api/hospital-ops/check-ins/doctor-queue`: `created_at`, `escalated_at`,
  *                    `claimed_by`, no ward/bed info)
  *   - Admission    → `.patient_info` + `.ward_info` / `.bed_info` /
  *                    `.requested_by_info` (nurse admissions and the doctor's
- *                    `api/hospitals/patients?status=inpatient` list; the old
+ *                    `api/hospital-ops/patients?status=inpatient` list; the old
  *                    `.admission_date` was renamed to `created_at`)
  *
  * Orders, vitals requests, bed requests and refer-out are saved against

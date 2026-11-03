@@ -48,6 +48,7 @@ const UserSubAcctListMobile = ({
   const {
     data: medicalRecordsData,
     isPending: subAcctMedicalRecordsLoading,
+    error: subAcctMedicalRecordsError,
   } = useSubaccountMedicalRecords(selectedSubAcct?.hin, subAcctCurrentPage, pageSize);
 
   const subAcctMedicalRecords = medicalRecordsData?.results || [];
@@ -69,6 +70,7 @@ const UserSubAcctListMobile = ({
             <UserSubAcctMedicalRecords
               subAcctMedicalRecords={subAcctMedicalRecords}
               subAcctMedicalRecordsLoading={subAcctMedicalRecordsLoading}
+              noAccess={(subAcctMedicalRecordsError as any)?.response?.status === 404}
               setViewDetailMedicalRecord={setViewDetailMedicalRecord}
               setSubAcctCurrentPage={setSubAcctCurrentPage}
               subAcctCount={subAcctCount}

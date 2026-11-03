@@ -8,11 +8,10 @@ import PatientVitalsDetails from '../../../Components/Dashboard/Hospital_Dashboa
 import UpdateVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/components/UpdateVitals'
 import PatientsAssignedToMyWard from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/PatientsAssignedToMyWard'
 import ProcessVitals from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/components/ProcessVitals'
-import IncomingBedRequests from '../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Nurses/Home_Dashboard/IncomingBedRequests'
 
 const Hospital_Nurses_Home_Dashboard = () => {
 
-  const { wardInfo, backgroundImage, hospitalName, profile } = useContext(NursesAppContext);
+  const { backgroundImage, hospitalName } = useContext(NursesAppContext);
   const [vitals, setVitals] = useState(false)
   // const [updateVitals, setUpdateVitals] = useState(false)
 
@@ -143,54 +142,11 @@ const Hospital_Nurses_Home_Dashboard = () => {
                   Assigned for vitals
                 </button>
               </div>
-              <div className='bg-white rounded-xl border mt-5 p-5 text-sm text-gray-700'>
-                <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
-                  <div className=' flex items-center gap-2 bg-blue-50 p-3 rounded-md'>
-                    <div className='bg-docuhealth-primary p-2 rounded-full'>
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M22 11V20H20V17H4V20H2V4H4V14H12V7H18C20.2091 7 22 8.79086 22 11ZM20 14V11C20 9.89543 19.1046 9 18 9H14V14H20ZM8 11C8.55228 11 9 10.5523 9 10C9 9.44772 8.55228 9 8 9C7.44772 9 7 9.44772 7 10C7 10.5523 7.44772 11 8 11ZM8 13C6.34315 13 5 11.6569 5 10C5 8.34315 6.34315 7 8 7C9.65685 7 11 8.34315 11 10C11 11.6569 9.65685 13 8 13Z" fill="white" />
-                      </svg>
-
-                    </div>
-                    <div>
-                      <p className='text-xs'>Beds Available / Total Beds</p>
-                      <p className="text-docuhealth-primary font-semibold text-lg">
-                        {(wardInfo?.available_beds ?? "NIL")} / {(wardInfo?.total_beds ?? "NIL")} Beds
-                      </p>
-
-                    </div>
-                  </div>
-                  <div className=' flex items-center gap-2 bg-purple-100 p-3 rounded-md'>
-                    <div className='bg-docuhealth-purple p-2 rounded-full'>
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M22 11V20H20V17H4V20H2V4H4V14H12V7H18C20.2091 7 22 8.79086 22 11ZM20 14V11C20 9.89543 19.1046 9 18 9H14V14H20ZM8 11C8.55228 11 9 10.5523 9 10C9 9.44772 8.55228 9 8 9C7.44772 9 7 9.44772 7 10C7 10.5523 7.44772 11 8 11ZM8 13C6.34315 13 5 11.6569 5 10C5 8.34315 6.34315 7 8 7C9.65685 7 11 8.34315 11 10C11 11.6569 9.65685 13 8 13Z" fill="white" />
-                      </svg>
-
-                    </div>
-                    <div>
-                      <p className='text-xs'>My ward</p>
-                      <p className='text-docuhealth-purple font-semibold text-lg'>  {profile?.ward_info?.name
-                        ? profile.ward_info.name.charAt(0).toUpperCase() + profile.ward_info.name.slice(1)
-                        : "NIL"}{" "}
-                        Ward</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white mt-5 rounded-lg">
-                <div className="border rounded-lg p-4 lg:p-6">
-                  <div className='border-b pb-2 mb-2'>
-                    <h2 className="font-medium">Incoming bed requests</h2>
-                    <p className='text-xs text-gray-500'>Doctors have asked for a bed in your ward. Reception confirms or refuses each one.</p>
-                  </div>
-                  <IncomingBedRequests />
-                </div>
-              </div>
               <div className="bg-white my-5 rounded-lg ">
                 <div className=" border rounded-lg p-4 lg:p-6 ">
                   <div className='flex justify-between items-center border-b pb-2 mb-4'>
                   <h2 className="font-medium">
-                    Patients in my ward
+                    Admitted patients
                   </h2>
                   <Link to ='/hospital-nurses-patients-dashboard'>
                   <p className='text-sm underline text-docuhealth-primary'>view all </p>

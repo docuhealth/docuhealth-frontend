@@ -13,6 +13,6 @@ export const fetchLabAppointments = async ({ queryKey }) => {
   if (dateFrom) params.append("scheduled_time_gte", dateFrom);
   if (dateTo)   params.append("scheduled_time_lte", dateTo);
 
-  const res = await axiosInstanceHos.get(`api/appointments/staff?${params.toString()}`);
+  const res = await axiosInstanceHos.get(`api/hospital-ops/appointments/staff?${params.toString()}`);
   return res.data;
 };

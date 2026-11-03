@@ -425,6 +425,12 @@ const OutPatientsTab = ({ setAdvanceCheckUp, setSelected, setAdvanceCheckUpSourc
                     {outPatient.patient_info.payment_provider.type}
                   </span>
                 )}
+                {/* The encounter has ended but the patient hasn't been checked out yet */}
+                {outPatient?.status === "doctor_seen" && (
+                  <span className="text-[10px] font-bold uppercase bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
+                    Seen · awaiting check-out
+                  </span>
+                )}
               </p>
               <div className="bg-docuhealth-light-green px-2 rounded-full">
                 <p className="text-docuhealth-green ">

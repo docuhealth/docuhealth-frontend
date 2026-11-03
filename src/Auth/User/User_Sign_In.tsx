@@ -99,10 +99,19 @@ const USI = () => {
 
         // Check if HIN exists in the response
         const patientHin = error.response?.data?.hin;
+        // 403 with the right password: deactivated, NIN or email not verified. Only the email
+        // case has no `code`, so it's told apart by its message
+        const detail = String(error.response?.data?.detail || "").toLowerCase();
+        const emailNotVerified =
+          error.response?.status === 403 && !patientHin && detail.includes("email is not verified");
         if (patientHin) {
           setTimeout(() => {
             // Navigate to NIN verification page and pass the HIN
             navigate("/verify-nin", { state: { patient_hin: patientHin } });
+          }, 1000);
+        } else if (emailNotVerified && email) {
+          setTimeout(() => {
+            navigate("/user-create-account-verify-otp", { state: { email } });
           }, 1000);
         }
       } finally {

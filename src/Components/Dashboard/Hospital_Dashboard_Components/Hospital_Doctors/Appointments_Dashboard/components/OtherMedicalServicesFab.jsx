@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { prefetchCommonRadiologyScans } from "../../../../../../queries/Hospital/radiology/scan_requests";
 import { useCheckInOwnership } from "../../../../../../hooks/useCheckInOwnership";
+import { ACTIVE_CHECK_INS_KEY, fetchActiveCheckIns } from "../../../../../../queries/Hospital/doctor/checkIns";
 import { resolveOrderContext, NO_VISIT_MESSAGE } from "../../../../../../utils/careOrderContext";
 import OrderLabModal from "./OrderLabModal";
 import OrderScanModal from "./OrderScanModal";
@@ -69,7 +70,7 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, admiss
     };
   }, [open]);
 
-  const handleItemClick = (item) => {
+  const handleItemClick = async (item) => {
     setOpen(false);
 
     if (item.admissionOnly && !admissionSqid) {
@@ -83,8 +84,14 @@ const OtherMedicalServicesFab = ({ selectedPatientDetails, admissionSqid, admiss
       return;
     }
 
-    if (item.needsConsultation && isConsultationClosed) {
-      toast.error("This visit has no consultation in progress. Call the patient from the queue to start one.");
+    // The cached active list can be stale (encounter ended in another tab or by another doctor), so re-check it
+    const fresh = item.needsConsultation && checkInSqid
+      ? await queryClient.fetchQuery({ queryKey: ACTIVE_CHECK_INS_KEY, queryFn: fetchActiveCheckIns, staleTime: 0 }).catch(() => null)
+      : null;
+    const closedNow = fresh ? !fresh.some((c) => c.sqid === checkInSqid) : isConsultationClosed;
+
+    if (item.needsConsultation && closedNow) {
+      toast.error("This visit has no consultation in progress. Resume the encounter from the Seen list in Doctor Encounter to place orders.");
       return;
     }
 

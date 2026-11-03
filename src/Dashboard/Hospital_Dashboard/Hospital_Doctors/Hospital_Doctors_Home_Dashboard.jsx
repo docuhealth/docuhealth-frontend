@@ -5,7 +5,6 @@ import { Stethoscope, CalendarCheck, TrendingUp, ArrowUpRight, ArrowDownRight } 
 import { DoctorAppContext } from "../../../context/HospitalContext/Doctors/DoctorAppContext";
 import AdmittedPatientsChart from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/AdmittedPatientsChart";
 import DischargedPatientsChart from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/DischargedPatientsChart";
-import AttendanceOverviewChart from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/AttendanceOverviewChart";
 import { useQuery } from "@tanstack/react-query";
 import { getHospitalToken } from "../../../services/authService";
 import { fetchHospitalDoctorDashboardMetrics } from "../../../queries/Hospital/doctor/dashboard_metrics";
@@ -35,11 +34,9 @@ const Hospital_Doctors_Home_Dashboard = () => {
 
   const [admittedFilter, setAdmittedFilter] = useState("Monthly");
   const [dischargedFilter, setDischargedFilter] = useState("Monthly");
-  const [attendanceFilter, setAttendanceFilter] = useState("Monthly");
 
   const admittedRange = useMemo(() => getDatesForFilter(admittedFilter), [admittedFilter]);
   const dischargedRange = useMemo(() => getDatesForFilter(dischargedFilter), [dischargedFilter]);
-  const attendanceRange = useMemo(() => getDatesForFilter(attendanceFilter), [attendanceFilter]);
 
   const { data: admittedMetrics, isPending: admittedLoading } = useQuery({
     queryKey: ["doctors-dashboard-metrics", admittedRange],
@@ -59,15 +56,6 @@ const Hospital_Doctors_Home_Dashboard = () => {
     refetchOnWindowFocus: true,
   });
 
-  const { data: attendanceMetrics, isPending: attendanceLoading } = useQuery({
-    queryKey: ["doctors-dashboard-metrics", attendanceRange],
-    queryFn: fetchHospitalDoctorDashboardMetrics,
-    enabled: isUserLoggedIn,
-    staleTime: 60 * 1000,
-    refetchInterval: 60000,
-    refetchOnWindowFocus: true,
-  });
-
   const summary = dashboardMetrics?.summary || {};
 
   const statCards = [
@@ -80,9 +68,9 @@ const Hospital_Doctors_Home_Dashboard = () => {
       bgClass: "bg-blue-100",
     },
     {
-      title: "Avg. daily attendance",
-      value: summary.avg_daily_attendance?.value ?? 0,
-      trend: summary.avg_daily_attendance?.increase ?? 0,
+      title: "Total admissions",
+      value: summary.total_admissions?.value ?? 0,
+      trend: summary.total_admissions?.increase ?? 0,
       trendText: "increase from last month",
       icon: <Stethoscope size={20} className="text-amber-500" />,
       bgClass: "bg-amber-100",
@@ -127,9 +115,6 @@ const Hospital_Doctors_Home_Dashboard = () => {
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
             <ChartSkeleton title="Admitted patients" withControls />
             <ChartSkeleton title="Discharged patients" withControls />
-          </div>
-          <div className="mt-6 w-full">
-            <ChartSkeleton title="Patient's Attendance overview" withControls />
           </div>
         </div>
       )}
@@ -182,20 +167,6 @@ const Hospital_Doctors_Home_Dashboard = () => {
               data={dischargedMetrics?.charts?.discharged_patients || []}
               filter={dischargedFilter}
               onFilterChange={setDischargedFilter}
-            />
-          )}
-        </div>
-      )}
-
-      {(dashboardMetrics || !dashboardMetricsLoading) && (
-        <div className="mt-6 w-full">
-          {attendanceLoading && !attendanceMetrics ? (
-            <ChartSkeleton title="Patient's Attendance overview" withControls />
-          ) : (
-            <AttendanceOverviewChart
-              data={attendanceMetrics?.charts?.attendance_overview || []}
-              filter={attendanceFilter}
-              onFilterChange={setAttendanceFilter}
             />
           )}
         </div>

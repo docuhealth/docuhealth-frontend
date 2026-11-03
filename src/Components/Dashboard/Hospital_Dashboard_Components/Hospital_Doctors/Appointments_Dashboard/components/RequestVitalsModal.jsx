@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../../lib/axios/hospital";
+import { fetchStaffByRole } from "../../../../../../queries/Hospital/fetchStaff";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
@@ -31,10 +32,9 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
   useEffect(() => {
     const fetchNurses = async () => {
       try {
-        const res = await axiosInstanceHos.get("api/receptionists/staff/nurse");
-        const data = res.data;
+        const data = await fetchStaffByRole("nurse");
 
-        if (!data || data.length === 0) {
+        if (data.length === 0) {
           toast.error("No nurse currently available.");
           onClose();
           return;
@@ -264,7 +264,7 @@ const RequestVitalsModal = ({ selectedPatientDetails, onClose }) => {
                   <div className="w-full pt-8">
                     <button
                       className="w-full rounded-full border py-2 border-docuhealth-primary text-docuhealth-primary cursor-pointer"
-                      onClick={() => handleAssign(staff.staff_id)}
+                      onClick={() => handleAssign(staff.sqid)}
                     >
                       Assign patient
                     </button>

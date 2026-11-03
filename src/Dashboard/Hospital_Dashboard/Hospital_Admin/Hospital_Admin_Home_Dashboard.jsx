@@ -1,13 +1,12 @@
 import { useState, useContext, useMemo } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import template from "../../../assets/img/template.png";
-import { Camera, Trash2, UserCheck, Bed, FileChartColumn, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Camera, Trash2, UserCheck, Bed, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { HosAppContext } from "../../../context/HospitalContext/Admin/HosAppContext";
 import ImageCustomization from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/ImageCustomization";
 import RemoveBrandingModal from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/RemoveBrandingModal";
 import AdmittedPatientsChart from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/AdmittedPatientsChart";
 import DischargedPatientsChart from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/DischargedPatientsChart";
-import AttendanceOverviewChart from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Home_Dashboard/AttendanceOverviewChart";
 import { useQuery } from "@tanstack/react-query";
 import { getHospitalToken } from "../../../services/authService";
 import { fetchHospitalDashboardMetrics } from "../../../queries/Hospital/admin/dashboard_metrics";
@@ -37,11 +36,9 @@ const Hospital_Admin_Home_Dashboard = () => {
 
   const [admittedFilter, setAdmittedFilter] = useState("Monthly");
   const [dischargedFilter, setDischargedFilter] = useState("Monthly");
-  const [attendanceFilter, setAttendanceFilter] = useState("Monthly");
 
   const admittedRange = useMemo(() => getDatesForFilter(admittedFilter), [admittedFilter]);
   const dischargedRange = useMemo(() => getDatesForFilter(dischargedFilter), [dischargedFilter]);
-  const attendanceRange = useMemo(() => getDatesForFilter(attendanceFilter), [attendanceFilter]);
 
   const { data: admittedMetrics, isPending: admittedLoading } = useQuery({
     queryKey: ["hospital-dashboard-metrics", admittedRange],
@@ -61,29 +58,12 @@ const Hospital_Admin_Home_Dashboard = () => {
     refetchOnWindowFocus: true,
   });
 
-  const { data: attendanceMetrics, isPending: attendanceLoading } = useQuery({
-    queryKey: ["hospital-dashboard-metrics", attendanceRange],
-    queryFn: fetchHospitalDashboardMetrics,
-    enabled: isUserLoggedIn,
-    staleTime: 60 * 1000,
-    refetchInterval: 60000,
-    refetchOnWindowFocus: true,
-  });
-
 
   const backgroundImage = profile?.theme?.bg_image || template;
 
   const summary = dashboardMetrics?.summary || {};
 
   const statCards = [
-    {
-      title: "Avg. daily attendance",
-      value: summary.avg_daily_attendance?.value ?? 0,
-      trend: summary.avg_daily_attendance?.increase ?? 0,
-      trendText: "increase from last month",
-      icon: <FileChartColumn size={20} className="text-blue-500" />,
-      bgClass: "bg-blue-100",
-    },
     {
       title: "Bed occupancy",
       value: summary.bed_occupancy?.value ?? "0/0",
@@ -144,8 +124,8 @@ const Hospital_Admin_Home_Dashboard = () => {
       </div>
 
       {dashboardMetricsLoading && !dashboardMetrics && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-          {Array.from({ length: 3 }, (_, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          {Array.from({ length: 2 }, (_, i) => (
             <div key={i} className="bg-white border border-gray-200 rounded-md p-5 flex flex-col justify-between animate-pulse">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-gray-200 rounded-sm" />
@@ -160,7 +140,7 @@ const Hospital_Admin_Home_Dashboard = () => {
 
       {/* Stat Cards */}
       {(dashboardMetrics || !dashboardMetricsLoading) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
           {
             statCards.map((stat, index) => (
               <div
@@ -226,20 +206,6 @@ const Hospital_Admin_Home_Dashboard = () => {
         </div>
       )}
 
-
-      {(dashboardMetrics || !dashboardMetricsLoading) && (
-        <div className="mt-6 w-full">
-          {attendanceLoading && !attendanceMetrics ? (
-            <ChartLoadingPlaceholder title="Patient's Attendance overview" />
-          ) : (
-            <AttendanceOverviewChart
-              data={attendanceMetrics?.charts?.attendance_overview || []}
-              filter={attendanceFilter}
-              onFilterChange={setAttendanceFilter}
-            />
-          )}
-        </div>
-      )}
 
       {isModalOpen && (
         <ImageCustomization onClose={() => setIsModalOpen(false)} />

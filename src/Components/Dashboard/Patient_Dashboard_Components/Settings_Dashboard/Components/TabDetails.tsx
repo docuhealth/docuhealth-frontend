@@ -5,9 +5,15 @@ import { useNavigate } from "react-router-dom";
 import { usePatientProfile } from "../../../../../hooks/patients/usePatientProfile";
 import { useUpdatePatientAccount } from "../../../../../hooks/patients/useUpdatePatientAccount";
 import { useDeactivatePatientAccount } from "../../../../../hooks/patients/useDeactivatePatientAccount";
+import {
+  useChangePassword,
+  useSendEmailChangeOtp,
+  useVerifyEmailChangeOtp,
+} from "../../../../../hooks/patients/useChangePatientCredentials";
 import html2canvas from "html2canvas";
 import IDCardUI from "../../Home_Dashboard/Components/IdCard/IDCardUI";
 import { getPasswordRequirements, isPasswordValid as checkPasswordValid } from "../../../../../utils/passwordStrength";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import PasswordStrengthMeter from "../../../../ui/PasswordStrengthMeter";
 import Spinner from "../../../../ui/Spinner";
 
@@ -15,6 +21,7 @@ const AccountSettingsTab = () => {
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
+    oldPassword: "",
     password: "",
     confirmPassword: "",
     middlename: "",
@@ -29,10 +36,12 @@ const AccountSettingsTab = () => {
   const hasPrefilled = useRef(false);
 
   const [isAcctDeleteConfirmed, setIsAcctDeleteConfirmed] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [isAcctDeleting, setIsAcctDeleting] = useState(false)
+  const [saving, setSaving] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otp, setOtp] = useState("");
   const isPasswordValid = checkPasswordValid(getPasswordRequirements(formData.password));
 
   // 🔹 Pre-fill the form with the current profile once it loads
@@ -50,15 +59,16 @@ const AccountSettingsTab = () => {
   }, [profile]);
 
 
-  const updateAccountMutation = useUpdatePatientAccount({
+  const updateAccountMutation = useUpdatePatientAccount();
+  const changePasswordMutation = useChangePassword();
+  const sendOtpMutation = useSendEmailChangeOtp();
+  const verifyOtpMutation = useVerifyEmailChangeOtp({
     onSuccess: () => {
-      toast.success("Account updated successfully!");
-      resetForm();
+      toast.success("Email updated successfully!");
+      setShowOtpModal(false);
+      setOtp("");
     },
-    onError: (err: any) => {
-      console.error("Error updating account:", err);
-      toast.error("Error updating account.");
-    },
+    onError: (err: any) => toast.error(extractApiErrorMessage(err, "Invalid OTP.")),
   });
 
   const deleteAccountMutation = useDeactivatePatientAccount({
@@ -73,18 +83,20 @@ const AccountSettingsTab = () => {
     },
   });
 
-  const resetForm = () => {
+  const resetForm = (email = profile?.email || "") => {
     setFormData({
       firstname: "",
       lastname: "",
       middlename: "",
-      email: profile?.email || "",
+      email,
+      oldPassword: "",
       password: "",
       confirmPassword: "",
       phone_num: profile?.phone_num || "",
       gender: profile?.gender || "",
       DOB: profile?.dob || "",
     });
+    setShowOldPassword(false);
     setShowPassword(false);
     setShowConfirmPassword(false);
   }
@@ -101,17 +113,18 @@ const AccountSettingsTab = () => {
   };
 
   // 🔹 Handle Save Changes
+  // Profile fields, password and email each have their own endpoint, so save them in turn
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Separate password/email (root fields) from others (profile fields)
-    const { email, password, confirmPassword, ...profileFields } = formData;
+    const { email, oldPassword, password, confirmPassword, DOB, ...rest } = formData;
+    const profileFields: Record<string, string> = { ...rest, dob: DOB };
 
     // Fields are pre-filled with the current profile, so only send ones that actually changed
     const originalValues: Record<string, string> = {
       phone_num: profile?.phone_num || "",
       gender: profile?.gender || "",
-      DOB: profile?.dob || "",
+      dob: profile?.dob || "",
     };
     const filledProfile = Object.fromEntries(
       Object.entries(profileFields).filter(
@@ -119,17 +132,12 @@ const AccountSettingsTab = () => {
       )
     );
 
-    const emailChanged = email.trim() && email !== (profile?.email || "");
+    const newEmail = email.trim();
+    const emailChanged = !!newEmail && newEmail !== (profile?.email || "");
+    const hasProfileChanges = Object.keys(filledProfile).length > 0;
+    const wantsPassword = !!(oldPassword || password || confirmPassword);
 
-    // Include changed email and password if present
-    const payload = {
-      ...(emailChanged && { email }),
-      ...(password.trim() && { password }),
-      ...(Object.keys(filledProfile).length > 0 && { profile: filledProfile }),
-    };
-
-    // Ensure there's something to send
-    if (Object.keys(payload).length === 0) {
+    if (!hasProfileChanges && !wantsPassword && !emailChanged) {
       toast.error("Please fill at least one field before saving changes.");
       return;
     }
@@ -139,18 +147,55 @@ const AccountSettingsTab = () => {
       toast.error("Enter a valid phone number (7 to 15 digits, optional leading +).");
       return;
     }
-    // Validate password if it's included
-    if (payload.password && !isPasswordValid) {
-      toast.error("Password does not meet all requirements.");
-      return;
+    if (wantsPassword) {
+      if (!oldPassword) {
+        toast.error("Enter your current password to set a new one.");
+        return;
+      }
+      if (!isPasswordValid) {
+        toast.error("Password does not meet all requirements.");
+        return;
+      }
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match.");
+        return;
+      }
     }
 
-    if (password && password !== confirmPassword) {
-      toast.error("Passwords do not match.");
-      return;
+    setSaving(true);
+    try {
+      if (hasProfileChanges) {
+        await updateAccountMutation.mutateAsync({ profile: filledProfile });
+        toast.success("Account updated successfully!");
+      }
+      if (wantsPassword) {
+        await changePasswordMutation.mutateAsync({ old_password: oldPassword, new_password: password });
+        toast.success("Password changed successfully!");
+      }
+      if (emailChanged) {
+        await sendOtpMutation.mutateAsync(newEmail);
+        toast.success(`We sent a code to ${newEmail}.`);
+        setOtp("");
+        setShowOtpModal(true);
+      }
+      // Keep the typed email while its code is pending
+      resetForm(emailChanged ? newEmail : undefined);
+    } catch (err: any) {
+      toast.error(extractApiErrorMessage(err, "Error updating account."));
+    } finally {
+      setSaving(false);
     }
+  };
 
-    updateAccountMutation.mutate(payload);
+  const handleVerifyEmail = () => {
+    if (!otp.trim()) return;
+    verifyOtpMutation.mutate(otp.trim());
+  };
+
+  const handleCloseOtpModal = () => {
+    setShowOtpModal(false);
+    setOtp("");
+    setFormData((prev) => ({ ...prev, email: profile?.email || "" }));
   };
 
   // 🔹 Handle Cancel Changes (reset to empty or previous data)
@@ -255,6 +300,9 @@ const AccountSettingsTab = () => {
                   onChange={handleChange}
                   className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none "
                 />
+                <p className="text-[11px] text-gray-500 mt-1">
+                  We will send a code to the new address to confirm it.
+                </p>
               </div>
 
               {/* Other Phone Number Input */}
@@ -311,6 +359,33 @@ const AccountSettingsTab = () => {
                     </svg>
                   </div>
                 </div>
+              </div>
+
+              <div className="relative text-sm">
+                <p className="font-medium mb-1 text-gray-700">Current Password :</p>
+                <div className="relative">
+                  <input
+                    type={showOldPassword ? "text" : "password"}
+                    name="oldPassword"
+                    autoComplete="current-password"
+                    className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm appearance-none pl-8"
+                    value={formData.oldPassword}
+                    onChange={handleChange}
+                  />
+                  <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
+                  <button
+                    type="button"
+                    onClick={() => setShowOldPassword(!showOldPassword)}
+                    className="absolute top-1/2 right-3 transform -translate-y-1/2"
+                  >
+                    {showOldPassword ? (
+                      <FaEyeSlash className="h-3 w-3 text-gray-400" />
+                    ) : (
+                      <FaEye className="h-3 w-3 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                <p className="text-[11px] text-gray-500 mt-1">Only needed to change your password.</p>
               </div>
 
               <div className="relative text-sm">
@@ -396,22 +471,22 @@ const AccountSettingsTab = () => {
               <div className="flex flex-col sm:flex-row gap-2 relative pt-5">
                 <button
                   onClick={handleSubmit}
-                  disabled={updateAccountMutation.isPending}
-                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium text-white rounded-full shadow-xs focus:outline-hidden transition-all cursor-pointer ${!updateAccountMutation.isPending
+                  disabled={saving}
+                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium text-white rounded-full shadow-xs focus:outline-hidden transition-all cursor-pointer ${!saving
                     ? "bg-docuhealth-primary "
                     : "bg-gray-300 cursor-not-allowed"
                     }`}
                 >
-                  {updateAccountMutation.isPending ? (<span className="flex items-center justify-center gap-2">
+                  {saving ? (<span className="flex items-center justify-center gap-2">
                     <Spinner className="h-4 w-4 text-white" />
                     Saving Changes...
                   </span>) : "Save Changes"}
                 </button>
                 <button
                   type="button"
-                  disabled={updateAccountMutation.isPending}
+                  disabled={saving}
                   onClick={handleCancel}
-                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-xs cursor-pointer ${!updateAccountMutation.isPending ? 'text-docuhealth-primary bg-white border border-docuhealth-primary hover:bg-gray-50' : 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-hidden`}
+                  className={`w-full px-3 sm:px-4 py-2 text-sm font-medium  rounded-full shadow-xs cursor-pointer ${!saving ? 'text-docuhealth-primary bg-white border border-docuhealth-primary hover:bg-gray-50' : 'cursor-not-allowed border broder-gray-300 text-gray-300'} focus:outline-hidden`}
                 >
                   Cancel Changes
                 </button>
@@ -452,6 +527,49 @@ const AccountSettingsTab = () => {
           </button>
         </div>
       </div>
+
+      {showOtpModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-sm rounded-xl bg-white p-6 space-y-4">
+            <div>
+              <h3 className="font-medium text-gray-900">Confirm your new email</h3>
+              <p className="text-sm text-gray-500 mt-1">Enter the code sent to {formData.email}.</p>
+            </div>
+            <input
+              name="otp"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="Enter code"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              className="w-full h-[38px] px-3 py-2 border rounded-md outline-hidden focus:border-docuhealth-primary text-sm"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleCloseOtpModal}
+                disabled={verifyOtpMutation.isPending}
+                className="w-full px-4 py-2 text-sm font-medium rounded-full border border-docuhealth-primary text-docuhealth-primary cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleVerifyEmail}
+                disabled={verifyOtpMutation.isPending || !otp.trim()}
+                className={`w-full px-4 py-2 text-sm font-medium rounded-full text-white ${verifyOtpMutation.isPending || !otp.trim() ? "bg-gray-300 cursor-not-allowed" : "bg-docuhealth-primary cursor-pointer"}`}
+              >
+                {verifyOtpMutation.isPending ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Spinner className="h-4 w-4 text-white" />
+                    Verifying...
+                  </span>
+                ) : "Verify"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

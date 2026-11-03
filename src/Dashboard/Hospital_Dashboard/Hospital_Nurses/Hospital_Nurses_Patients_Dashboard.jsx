@@ -101,7 +101,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
 
             // 1. Check active inpatient admissions first (search by name, or size=50)
             let response = await axiosInstanceHos.get(
-              `api/hospitals/patients?status=inpatient${searchName ? `&search=${encodeURIComponent(searchName)}` : "&size=50"}`
+              `api/hospital-ops/patients?status=inpatient${searchName ? `&search=${encodeURIComponent(searchName)}` : "&size=50"}`
             );
             let match = (response.data?.results || []).find(
               (p) => (p?.patient_info?.hin || p?.patient?.hin) === hin
@@ -109,7 +109,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
 
             // If not found with name search, fetch recent inpatients list
             if (!match && searchName) {
-              response = await axiosInstanceHos.get(`api/hospitals/patients?status=inpatient&size=50`);
+              response = await axiosInstanceHos.get(`api/hospital-ops/patients?status=inpatient&size=50`);
               match = (response.data?.results || []).find(
                 (p) => (p?.patient_info?.hin || p?.patient?.hin) === hin
               );
@@ -118,7 +118,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
             // 2. If not found in inpatient, check discharged inpatients
             if (!match) {
               response = await axiosInstanceHos.get(
-                `api/hospitals/patients?status=inpatient_discharge${searchName ? `&search=${encodeURIComponent(searchName)}` : "&size=50"}`
+                `api/hospital-ops/patients?status=inpatient_discharge${searchName ? `&search=${encodeURIComponent(searchName)}` : "&size=50"}`
               );
               match = (response.data?.results || []).find(
                 (p) => (p?.patient_info?.hin || p?.patient?.hin) === hin
@@ -128,7 +128,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
             // 3. If not found, check outpatients
             if (!match) {
               response = await axiosInstanceHos.get(
-                `api/hospitals/patients?status=outpatient${searchName ? `&search=${encodeURIComponent(searchName)}` : "&size=50"}`
+                `api/hospital-ops/patients?status=outpatient${searchName ? `&search=${encodeURIComponent(searchName)}` : "&size=50"}`
               );
               match = (response.data?.results || []).find(
                 (p) => (p?.patient_info?.hin || p?.patient?.hin) === hin
@@ -380,7 +380,7 @@ const Hospital_Nurses_Patients_Dashboard = () => {
                     patient_hin: selected?.patient_info?.hin,
                     ...noteData
                   };
-                  await axiosInstanceHos.post("/api/nurses/in-patient-handover", payload);
+                  await axiosInstanceHos.post("/api/hospital-ops/handovers/nurse", payload);
                   setShowHandoverNoteForm(false);
                   setShowHandoverSuccessModal(true);
                 } catch (error) {

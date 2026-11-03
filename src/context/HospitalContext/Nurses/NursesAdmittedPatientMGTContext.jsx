@@ -19,7 +19,7 @@ const NursesAdmittedPatientMGTProvider = (props) => {
     // 🔹 The Key is the secret: it tracks both status, page, and search
     queryKey: ["hospital-patients-nurse", tab, currentPage, debouncedSearch],
     queryFn: async () => {
-      let url = `api/hospitals/patients?status=${tab}&page=${currentPage}&size=${pageSize}`;
+      let url = `api/hospital-ops/patients?status=${tab}&page=${currentPage}&size=${pageSize}`;
       if (debouncedSearch) {
         url += `&search=${debouncedSearch}`;
       }

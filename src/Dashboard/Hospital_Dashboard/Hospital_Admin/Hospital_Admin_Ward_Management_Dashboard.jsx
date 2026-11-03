@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import DynamicDate from "../../../Components/DynamicDate/DynamicDate";
 import Wards from "../../../Components/Dashboard/Hospital_Dashboard_Components/Hospital_Admin/Ward_Mangement_Dashboard/Wards";
 import { HosAppContext } from "../../../context/HospitalContext/Admin/HosAppContext";
-import axiosInstanceHos from "../../../lib/axios/hospital";
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { invalidateWardManagement } from "../../../lib/queryInvalidations";
+import { createWard } from "../../../queries/Hospital/fetchWards";
+import { extractApiErrorMessage } from "../../../utils/apiError";
 
 const Hospital_Admin_Ward_Management_Dashboard = () => {
   const [showOverlay, setShowOverlay] = useState(false);
@@ -15,11 +16,7 @@ const Hospital_Admin_Ward_Management_Dashboard = () => {
   const queryClient = useQueryClient();
 
   const createWardMutation = useMutation({
-    mutationFn: (createWardData) =>
-      axiosInstanceHos.post("api/hospitals/wards", {
-        name : createWardData.name,
-        total_beds : createWardData.total_beds
-      }),
+    mutationFn: createWard,
     onSuccess: () => {
       toast.success("Ward created successfully!");
       invalidateWardManagement(queryClient);
@@ -28,7 +25,7 @@ const Hospital_Admin_Ward_Management_Dashboard = () => {
     },
     onError : (err) => {
          console.error("Error creating ward:", err);
-      toast.error(err.response?.data?.message || "Failed to create ward");
+      toast.error(extractApiErrorMessage(err, "Failed to create ward"));
     }
   });
 

@@ -500,7 +500,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
       const fetchChart = async () => {
         setLoadingChart(true);
         try {
-          const res = await axiosInstanceHos.get(`/api/inpatients/admissions/${admission.sqid}/charts/${chartType}?page=${page}&size=10`);
+          const res = await axiosInstanceHos.get(`/api/records/admissions/${admission.sqid}/charts/${chartType}?page=${page}&size=10`);
           setChartData(res.data.results || []);
           setChartTotalCount(res.data.count || 0);
         } catch (err) {
@@ -667,7 +667,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
       const fetchChart = async () => {
         setLoadingChart(true);
         try {
-          const res = await axiosInstanceHos.get(`/api/inpatients/admissions/${admission.sqid}/charts/${chartType}?page=${page}&size=10`);
+          const res = await axiosInstanceHos.get(`/api/records/admissions/${admission.sqid}/charts/${chartType}?page=${page}&size=10`);
           setChartData(res.data.results || []);
           setChartTotalCount(res.data.count || 0);
         } catch (err) {
@@ -722,7 +722,7 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
     if (!admission?.sqid) return;
     setIsCalculatingIO(true);
     try {
-      const res = await axiosInstanceHos.get(`/api/inpatients/admissions/${admission.sqid}/fluid-balance`);
+      const res = await axiosInstanceHos.get(`/api/records/admissions/${admission.sqid}/fluid-balance`);
       setFluidBalanceData(res.data);
       setIoCalculationModalOpen(true);
     } catch (err) {
@@ -737,9 +737,12 @@ const NursingTasksQueue = ({ setAdvanceCheckUp, admission, patientFullInfo, task
     switch (status.toLowerCase()) {
       case 'completed': return { text: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' };
       case 'pending': return { text: 'text-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-200' };
-      case 'in-progress': return { text: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' };
+      case 'in-progress':
+      case 'in_progress': return { text: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' };
       case 'escalated': return { text: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' };
       case 'missed': return { text: 'text-gray-600', bg: 'bg-gray-50', border: 'border-gray-200' };
+      // Future rounds are cancelled when the nurse completes the patient's discharge
+      case 'cancelled': return { text: 'text-slate-500', bg: 'bg-slate-50', border: 'border-slate-200' };
       default: return { text: 'text-gray-600', bg: 'bg-gray-50', border: 'border-gray-200' };
     }
   };

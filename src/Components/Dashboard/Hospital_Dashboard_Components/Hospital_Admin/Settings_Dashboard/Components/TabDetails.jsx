@@ -5,6 +5,7 @@ import { FaTimes } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HosAppContext } from "../../../../../../context/HospitalContext/Admin/HosAppContext";
+import { extractApiErrorMessage } from "../../../../../../utils/apiError";
 
 const AccountSettingsTab = () => {
   const { profile, hospital_email } = useContext(HosAppContext);
@@ -122,7 +123,7 @@ const requestOtpMutation = useMutation({
     setShowOtpModal(true);
   },
   onError: (err) => {
-    toast.error(err.response?.data?.message || "Error sending OTP");
+    toast.error(extractApiErrorMessage(err, "Error sending OTP"));
   },
 });
 
@@ -149,7 +150,7 @@ const handleRequestEmailOTP = (e) => {
       setFormData((prev) => ({ ...prev, email: "", otp: "" }));
     },
     onError: (err) => {
-      toast.error(err.response?.data?.message || "Invalid OTP");
+      toast.error(extractApiErrorMessage(err, "Invalid OTP"));
     },
   });
 
@@ -162,7 +163,7 @@ const handleRequestEmailOTP = (e) => {
 
   const updatePasswordMutation = useMutation({
     mutationFn: (passwordData) =>
-      axiosInstanceHos.patch("api/auth/hospital/password", {
+      axiosInstanceHos.patch("api/auth/password", {
         old_password: passwordData.oldPassword,
         new_password: passwordData.newPassword,
       }),
@@ -180,7 +181,7 @@ const handleRequestEmailOTP = (e) => {
       });
     },
     onError: (err) => {
-      toast.error(err.response?.data?.message || "Failed to change password");
+      toast.error(extractApiErrorMessage(err, "Failed to change password"));
     },
   });
 
