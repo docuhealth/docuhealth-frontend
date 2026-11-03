@@ -82,7 +82,9 @@ function SelectContent({
         align={align}
         alignOffset={alignOffset}
         alignItemWithTrigger={alignItemWithTrigger}
-        className="isolate z-50"
+        // Portaled to <body>, so inside a Radix modal (which sets `pointer-events: none` on body)
+        // the options would otherwise ignore the mouse.
+        className="pointer-events-auto isolate z-50"
       >
         <SelectPrimitive.Popup
           data-slot="select-content"

@@ -3,9 +3,8 @@
   "entry": ["src/routes/**/*.tsx"],
   "project": ["src/**/*.{ts,tsx,css}", "e2e/**/*.ts"],
   "ignore": [
-    // shadcn-generated design system (and its hook): components are kept even before use.
+    // shadcn-generated design system: components are kept even before use.
     "src/components/ui/**",
-    "src/hooks/use-mobile.ts",
     // Shared test helper — remove from this list once the first component test uses it.
     "src/test/render.tsx",
   ],

@@ -6,7 +6,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { AuthHeader } from "@/features/auth/components/auth-header";
-import { RequiredMark } from "@/features/auth/components/required-mark";
+import { RequiredMark } from "@/components/required-mark";
 import { StepProgress } from "@/features/auth/components/step-progress";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import { adminDetailsSchema, type AdminDetailsValues } from "@/features/auth/lib/schemas";

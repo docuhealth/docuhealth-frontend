@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { AuthHeader } from "@/features/auth/components/auth-header";
-import { RequiredMark } from "@/features/auth/components/required-mark";
+import { RequiredMark } from "@/components/required-mark";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import {
   organisationTypeLabels,

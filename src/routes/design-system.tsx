@@ -57,6 +57,7 @@ const colorGroups: { title: string; note?: string; swatches: Swatch[] }[] = [
         usage: "Captions, hints",
       },
       { name: "Border color", token: "line", className: "bg-line", usage: "Borders, inputs" },
+      { name: "Divider", token: "divider", className: "bg-divider", usage: "Vertical dividers" },
       { name: "BG color", token: "surface", className: "bg-surface", usage: "Page background" },
       { name: "White", token: "white", className: "bg-white", usage: "Cards, menus" },
     ],
@@ -113,6 +114,9 @@ const typeRoles = [
   { className: "type-h1", name: "Heading/H1", spec: "Space Grotesk · 64px / 110%" },
   { className: "type-h2", name: "Heading/H2", spec: "Space Grotesk · 48px / 110%" },
   { className: "type-h3", name: "Heading/H3", spec: "Space Grotesk Bold · 24px / 135%" },
+  { className: "type-h4", name: "Heading/H4", spec: "Space Grotesk Bold · 20px / 140%" },
+  { className: "type-h5", name: "Heading/H5", spec: "Space Grotesk Bold · 16px / 140%" },
+  { className: "type-stat", name: "Heading/Stat", spec: "Space Grotesk Bold · 24px / 125%" },
   {
     className: "type-heading-sm",
     name: "Heading/Small",
@@ -136,6 +140,11 @@ const typeRoles = [
     spec: "Inter Regular · 14px / 140% · -2.5%",
   },
   {
+    className: "type-body-sm-tight-semibold",
+    name: "Body/Small Tight Semi Bold",
+    spec: "Inter Semi Bold · 14px / 140% · -2.5%",
+  },
+  {
     className: "type-link-sm",
     name: "Link/Small",
     spec: "Inter Medium · 14px / 140% · -2.5%",
@@ -145,7 +154,22 @@ const typeRoles = [
     name: "Body/Small Regular",
     spec: "Inter Regular · 14px / 140%",
   },
+  {
+    className: "type-body-sm-medium",
+    name: "Body/Small Medium",
+    spec: "Inter Medium · 14px / 140%",
+  },
   { className: "type-caption", name: "Body/Caption", spec: "Inter Regular · 12px / 135%" },
+  {
+    className: "type-caption-medium",
+    name: "Body/Caption Medium",
+    spec: "Inter Medium · 12px / 135%",
+  },
+  {
+    className: "type-caption-semibold",
+    name: "Body/Caption Semi Bold",
+    spec: "Inter Semi Bold · 12px / 135% · -0.5%",
+  },
   {
     className: "type-caption-tight",
     name: "Body/Caption Tight",

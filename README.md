@@ -34,7 +34,8 @@ npm run dev
 ```
 
 With `VITE_ENABLE_MOCKS=true` the app runs against the MSW fake API in
-`src/mocks/handlers.ts` (empty for now) instead of the backend.
+`src/mocks/handlers.ts` (one file per feature, e.g. `src/mocks/hospital-admin.ts`) instead of
+the backend.
 
 ## Scripts
 
@@ -60,6 +61,9 @@ src/
   features/<name>/       Domain code: api/ (schemas, requests, query options, mutations),
                          components/, lib/ (none yet)
   components/ui/         shadcn components = the design system (generated; edit freely)
+  components/dashboard/  The hospital dashboards' shared shell and blocks (sidebar, top bar,
+                         stat cards, tables, tabs), driven by props — every role's feature
+                         (hospital-admin, receptionist, …) builds its pages from them
   lib/                   http client, request(), query client
   stores/                Zustand stores (auth session)
   assets/fonts/          Self-hosted variable fonts (Space Grotesk, Inter)
@@ -105,11 +109,14 @@ production, point all four domains at the same deployment.
 - **Forms**: React Hook Form + `zodResolver`; shadcn `Field` / `FieldError` for markup.
 - **Guards**: protect routes in `beforeLoad` (throw `redirect(...)`), not in components.
 - **Styling**: Tailwind classes using tokens from `src/index.css`; no hex values in components.
+  `short:` targets viewports under 480px tall (a phone held sideways), e.g. to tighten a
+  dialog's padding.
 - **Colors** (from the design's color guide, light only):
   - Brand: `bg-primary` (= `brand`), `bg-brand-hover`, `bg-brand-pressed`.
   - Text: headings get `fg-heading` automatically; body text defaults to `fg-body`; captions
     use `fg-caption` (`text-caption` / `text-muted-foreground`).
   - Surfaces: page `bg-background` (#FAFAFA), cards/popovers white, borders `border-border`.
+    Vertical dividers use `bg-divider` (#DFDCD7).
   - Status: `warning` / `success` / `error` / `info`, each `-100` (tint background), `-500`
     (main), `-700` (text on the tint) — e.g. `bg-success-100 text-success-700`.
 - **Fonts**: `font-heading` (Space Grotesk) for headings and buttons; `font-sans` (Inter, the
@@ -117,26 +124,33 @@ production, point all four domains at the same deployment.
 - **Text**: every piece of text uses one type role from the design's typography guide instead
   of mixing size/weight/leading classes. Body text defaults to `type-body`.
 
-  | Class                     | Guide name            | Font · size / line height · tracking     |
-  | ------------------------- | --------------------- | ---------------------------------------- |
-  | `type-h1`                 | Heading/H1            | Space Grotesk · 64px / 110%              |
-  | `type-h2`                 | Heading/H2            | Space Grotesk · 48px / 110%              |
-  | `type-h3`                 | Heading/H3            | Space Grotesk Bold · 24px / 135%         |
-  | `type-heading-sm`         | Heading/Small         | Space Grotesk Medium · 14px / 140%       |
-  | `type-heading-sm-regular` | Heading/Small Regular | Space Grotesk Regular · 14px / 140%      |
-  | `type-quote`              | Header/Quote          | Space Grotesk · 32px / 125%              |
-  | `type-accent-h1`          | Accent/H1             | Inter Semi Bold · 32px / 120% · -2.5%    |
-  | `type-accent-h2`          | Accent/H2             | Inter Semi Bold · 24px / 135% · -2.5%    |
-  | `type-accent-h3`          | Accent/H3             | Inter Semi Bold · 20px / 140% · -2.5%    |
-  | `type-accent-h4`          | Accent/H4             | Inter Regular · 18px / 135%              |
-  | `type-body`               | Body/Medium           | Inter Regular · 16px / 140%              |
-  | `type-body-sm`            | Body/Small            | Inter Medium · 14px / 150%               |
-  | `type-body-sm-tight`      | Body/Small Tight      | Inter Regular · 14px / 140% · -2.5%      |
-  | `type-link-sm`            | Link/Small            | Inter Medium · 14px / 140% · -2.5%       |
-  | `type-body-sm-regular`    | Body/Small Regular    | Inter Regular · 14px / 140%              |
-  | `type-caption`            | Body/Caption          | Inter Regular · 12px / 135%              |
-  | `type-caption-tight`      | Body/Caption Tight    | Inter Regular · 12px / 135% · -2.5%      |
-  | `type-label`              | Label                 | Inter Semi Bold · 12px / 135% · 8%, caps |
+  | Class                         | Guide name                 | Font · size / line height · tracking     |
+  | ----------------------------- | -------------------------- | ---------------------------------------- |
+  | `type-h1`                     | Heading/H1                 | Space Grotesk · 64px / 110%              |
+  | `type-h2`                     | Heading/H2                 | Space Grotesk · 48px / 110%              |
+  | `type-h3`                     | Heading/H3                 | Space Grotesk Bold · 24px / 135%         |
+  | `type-h4`                     | Heading/H4                 | Space Grotesk Bold · 20px / 140%         |
+  | `type-h5`                     | Heading/H5                 | Space Grotesk Bold · 16px / 140%         |
+  | `type-stat`                   | Heading/Stat               | Space Grotesk Bold · 24px / 125%         |
+  | `type-heading-sm`             | Heading/Small              | Space Grotesk Medium · 14px / 140%       |
+  | `type-heading-sm-regular`     | Heading/Small Regular      | Space Grotesk Regular · 14px / 140%      |
+  | `type-quote`                  | Header/Quote               | Space Grotesk · 32px / 125%              |
+  | `type-accent-h1`              | Accent/H1                  | Inter Semi Bold · 32px / 120% · -2.5%    |
+  | `type-accent-h2`              | Accent/H2                  | Inter Semi Bold · 24px / 135% · -2.5%    |
+  | `type-accent-h3`              | Accent/H3                  | Inter Semi Bold · 20px / 140% · -2.5%    |
+  | `type-accent-h4`              | Accent/H4                  | Inter Regular · 18px / 135%              |
+  | `type-body`                   | Body/Medium                | Inter Regular · 16px / 140%              |
+  | `type-body-sm`                | Body/Small                 | Inter Medium · 14px / 150%               |
+  | `type-body-sm-tight`          | Body/Small Tight           | Inter Regular · 14px / 140% · -2.5%      |
+  | `type-body-sm-tight-semibold` | Body/Small Tight Semi Bold | Inter Semi Bold · 14px / 140% · -2.5%    |
+  | `type-link-sm`                | Link/Small                 | Inter Medium · 14px / 140% · -2.5%       |
+  | `type-body-sm-regular`        | Body/Small Regular         | Inter Regular · 14px / 140%              |
+  | `type-body-sm-medium`         | Body/Small Medium          | Inter Medium · 14px / 140%               |
+  | `type-caption`                | Body/Caption               | Inter Regular · 12px / 135%              |
+  | `type-caption-medium`         | Body/Caption Medium        | Inter Medium · 12px / 135%               |
+  | `type-caption-semibold`       | Body/Caption Semi Bold     | Inter Semi Bold · 12px / 135% · -0.5%    |
+  | `type-caption-tight`          | Body/Caption Tight         | Inter Regular · 12px / 135% · -2.5%      |
+  | `type-label`                  | Label                      | Inter Semi Bold · 12px / 135% · 8%, caps |
 
   Roles set only typography, so add a color class alongside (`type-caption text-fg-caption`).
   Always write class names in full — Tailwind only generates classes it finds literally in the

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { AuthFooter, AuthHeader } from "@/features/auth/components/auth-header";
+import { AuthHeader } from "@/features/auth/components/auth-header";
 import { PasswordInput } from "@/features/auth/components/password-input";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import { loginSchema, type LoginValues } from "@/features/auth/lib/schemas";
@@ -13,13 +13,11 @@ import { loginSchema, type LoginValues } from "@/features/auth/lib/schemas";
 const copy = {
   individual: {
     title: "Welcome back",
-    description: "Log in to your DocuHealth account.",
     forgotPasswordTo: "/forgot-password",
-    signUp: { prompt: "Don’t have an account?", linkText: "Create one", to: "/register" },
+    signUp: { prompt: "New to DocuHealth?", linkText: "Create an account", to: "/register" },
   },
   hospital: {
     title: "Log in to your facility",
-    description: "Admins and staff, log in to your hospital’s DocuHealth dashboard.",
     forgotPasswordTo: "/hospital/forgot-password",
     signUp: {
       prompt: "New to DocuHealth?",
@@ -31,7 +29,6 @@ const copy = {
   string,
   {
     title: string;
-    description: string;
     forgotPasswordTo: LinkProps["to"];
     signUp: { prompt: string; linkText: string; to: LinkProps["to"] };
   }
@@ -39,7 +36,7 @@ const copy = {
 
 /** Email and password login; `audience` picks the copy and where the links go. */
 export function LoginForm({ audience }: { audience: keyof typeof copy }) {
-  const { title, description, forgotPasswordTo, signUp } = copy[audience];
+  const { title, forgotPasswordTo, signUp } = copy[audience];
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: devPrefill?.login ?? { email: "", password: "" },
@@ -53,7 +50,17 @@ export function LoginForm({ audience }: { audience: keyof typeof copy }) {
 
   return (
     <div className="flex flex-col gap-8">
-      <AuthHeader title={title} description={description} />
+      <AuthHeader
+        title={title}
+        description={
+          <>
+            {signUp.prompt}{" "}
+            <Link to={signUp.to} className="text-primary hover:underline">
+              {signUp.linkText}
+            </Link>
+          </>
+        }
+      />
 
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <FieldGroup>
@@ -72,12 +79,7 @@ export function LoginForm({ audience }: { audience: keyof typeof copy }) {
           </Field>
 
           <Field data-invalid={!!errors.password}>
-            <div className="flex items-center justify-between">
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Link to={forgotPasswordTo} className="type-caption text-primary hover:underline">
-                Forgot password?
-              </Link>
-            </div>
+            <FieldLabel htmlFor="password">Password</FieldLabel>
             <PasswordInput
               id="password"
               autoComplete="current-password"
@@ -87,6 +89,12 @@ export function LoginForm({ audience }: { audience: keyof typeof copy }) {
               {...form.register("password")}
             />
             <FieldError errors={[errors.password]} />
+            <Link
+              to={forgotPasswordTo}
+              className="w-fit! self-end type-caption text-primary hover:underline"
+            >
+              Forgot password?
+            </Link>
           </Field>
 
           <Button type="submit" loading={isSubmitting} className="h-12 w-full">
@@ -94,8 +102,6 @@ export function LoginForm({ audience }: { audience: keyof typeof copy }) {
           </Button>
         </FieldGroup>
       </form>
-
-      <AuthFooter {...signUp} />
     </div>
   );
 }

@@ -52,7 +52,7 @@ export function SuccessDialog({
         onEscapeKeyDown={preventDismiss}
         onInteractOutside={preventDismiss}
         className={cn(
-          "gap-0 overflow-hidden rounded-xl p-0 text-center",
+          "max-h-[calc(100svh-2rem)] gap-0 overflow-y-auto rounded-xl p-0 text-center",
           header ? "sm:max-w-130" : "sm:max-w-100",
         )}
       >

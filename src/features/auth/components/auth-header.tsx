@@ -12,7 +12,7 @@ export function AuthHeader({ title, description }: { title: string; description:
   );
 }
 
-/** Centered icon, title and message shown in place of a form (e.g. "Check your email"). */
+/** Centered icon, title and message shown in place of a form (e.g. "Link expired"). */
 export function AuthNotice({
   icon,
   tone = "brand",

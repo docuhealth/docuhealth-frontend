@@ -14,12 +14,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AuthHeader } from "@/features/auth/components/auth-header";
-import { RequiredMark } from "@/features/auth/components/required-mark";
+import { RequiredMark } from "@/components/required-mark";
 import { StepProgress } from "@/features/auth/components/step-progress";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import { individualInfoSchema, type IndividualInfoValues } from "@/features/auth/lib/schemas";
 
-const genderOptions = { male: "Male", female: "Female" };
+const genderOptions = { male: "Male", female: "Female", prefer_not_to_say: "Prefer not to say" };
 
 /** Step 1 of the individual sign-up: who the patient is and how to reach them. */
 export function IndividualInfoForm({
