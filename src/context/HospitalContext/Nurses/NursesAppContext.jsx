@@ -20,7 +20,6 @@ const NursesProfileProvider = (props) => {
       });
 
       const profile = data?.nurse;
-      const wardInfo = data?.ward_info;
       const backgroundImage = data?.theme?.bg_image;
       const hospitalName = data?.theme?.name;
       const hospitalLogo = data?.theme?.profile_image;
@@ -31,7 +30,7 @@ const NursesProfileProvider = (props) => {
 
 
   return (
-    <NursesAppContext.Provider value={{ profile, wardInfo, backgroundImage, hospitalName, hospitalLogo, isLoading: !profile && isUserLoggedIn && isPending }}>
+    <NursesAppContext.Provider value={{ profile, backgroundImage, hospitalName, hospitalLogo, isLoading: !profile && isUserLoggedIn && isPending }}>
         {props.children}
     </NursesAppContext.Provider>
   )

@@ -11,27 +11,27 @@ export const NursesPatientsAssignedToWardContext = createContext();
 const NursesPatientsAssignedToWardProvider = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [wardFilter, setWardFilter] = useState("");
   const pageSize = 7; // Example page size
 
   const debouncedSearch = useDebounce(searchQuery, 300);
   const isUserLoggedIn = !!getHospitalToken();
 
   const { data, isPending, isFetching, isError, error } = useQuery({
-    queryKey: ["patients-in-ward", currentPage, debouncedSearch],
+    queryKey: ["patients-in-ward", currentPage, debouncedSearch, wardFilter],
     queryFn: fetchPatientsInMyWard,
     enabled: isUserLoggedIn,
     placeholderData: keepPreviousData,
   });
 
-  // Reset page when search changes
+  // Reset page when search or ward changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, wardFilter]);
 
   useEffect(() => {
     if (isError) {
-      // A nurse with no ward gets a 400 with a bare array: ["Nurse is not assigned to any ward"].
-      toast.error(extractApiErrorMessage(error, "Error fetching patients in my ward !"));
+      toast.error(extractApiErrorMessage(error, "Error fetching admitted patients!"));
       console.error(error);
     }
   }, [isError, error]);
@@ -51,7 +51,9 @@ const NursesPatientsAssignedToWardProvider = (props) => {
         loading: isPending,
         isRefreshing: isFetching,
         searchQuery,
-        setSearchQuery
+        setSearchQuery,
+        wardFilter,
+        setWardFilter,
       }}
     >
       {props.children}

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HosAppContext } from "../../../../../../context/HospitalContext/Admin/HosAppContext";
-import { HosWardContext } from "../../../../../../context/HospitalContext/HosWardContext";
 import Modal from "../../../../../ui/Modal";
 import Button from "../../../../../ui/Button";
 import Input from "../../../../../ui/Input";
@@ -24,7 +23,7 @@ const OnboardNewStaff = ({
   const { data: labAdminData } = useQuery({
     queryKey: ["hospital-staffs-lab-admin-check"],
     queryFn: async () => {
-      const res = await axiosInstanceHos.get("api/hospitals/team-members?role=lab_admin");
+      const res = await axiosInstanceHos.get("api/hospitals/staff?role=lab_admin");
       return res.data;
     },
     staleTime: 1000 * 30,
@@ -40,18 +39,12 @@ const OnboardNewStaff = ({
     role: "",
     personnel: defaultRole || "",
     specialization: "",
-    ward: "",
     email: "",
     password: "",
   });
 
   const hosAppContext = useContext(HosAppContext);
-  const hosWardContext = useContext(HosWardContext);
   const profile = hosAppContext?.profile;
-  const wards = hosWardContext?.wards || [];
-
-  console.log(wards);
-
   const [passwordRequirements, setPasswordRequirements] = useState({});
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({ strength: 0 });
@@ -69,9 +62,6 @@ const OnboardNewStaff = ({
     },
     { value: "radiologist", label: "Radiologist" },
   ];
-
-  // Personnel types that are not assigned to a ward during staff creation.
-  const noWardRoles = ["receptionist", "lab_scientist", "lab_admin", "pharmacist", "radiologist"];
 
   const doctorSpecializations = [
     "Anesthesiologist",
@@ -167,14 +157,6 @@ const OnboardNewStaff = ({
 
   const gender = ["male", "female"];
 
-  const [wardOptions, setWardOptions] = useState([]);
-
-  useEffect(() => {
-    if (Array.isArray(wards)) {
-      setWardOptions(wards);
-    }
-  }, [wards]);
-
   // Auto-generate password on step 2
   useEffect(() => {
     if (step === 2) {
@@ -234,7 +216,7 @@ const OnboardNewStaff = ({
     setForm((prev) => ({
       ...prev,
       [field]: value,
-      ...(field === "personnel" && { specialization: "", ward: "" }),
+      ...(field === "personnel" && { specialization: "" }),
     }));
   };
 
@@ -265,17 +247,10 @@ const OnboardNewStaff = ({
     }
 
     const isReceptionist = form.personnel.toLowerCase() === "receptionist";
-    const isNoWardRole = noWardRoles.includes(form.personnel.toLowerCase());
 
     // Specialization required for anyone with a specialization list (i.e. not receptionist)
     if (!isReceptionist && !form.specialization?.trim()) {
       toast.error("Please select an area of specialization.");
-      return;
-    }
-
-    // Ward required only for roles that are assigned to a ward (e.g. doctor and nurse)
-    if (!isNoWardRole && !String(form.ward || "").trim()) {
-      toast.error("Please assign a ward.");
       return;
     }
 
@@ -284,7 +259,7 @@ const OnboardNewStaff = ({
 
   const createStaffMutation = useMutation({
     mutationFn: (payload) =>
-      axiosInstanceHos.post("api/hospitals/team-member", payload),
+      axiosInstanceHos.post("api/hospitals/staff/create", payload),
     onSuccess: () => {
       toast.success("Team member added successfully");
 
@@ -301,7 +276,6 @@ const OnboardNewStaff = ({
         role: "",
         personnel: "",
         specialization: "",
-        ward: "",
         email: "",
         password: "",
       });
@@ -328,7 +302,6 @@ const OnboardNewStaff = ({
         role: form.personnel,
         gender: form.gender,
         ...(form.specialization && { specialization: form.specialization }),
-        ...(form.ward && { ward: form.ward }),
       },
       login_url: "https://hospital.docuhealthservices.net/login",
       invitation_message: invitationHTML,
@@ -403,21 +376,6 @@ const OnboardNewStaff = ({
                 onChange={(value) => handleChange("specialization", value)}
                 options={specializationOptions.map((s) => ({ value: s, label: s }))}
                 placeholder="Area of specialization"
-                className="col-span-2"
-              />
-
-              {/* Ward dropdown */}
-              <Select
-                disabled={noWardRoles.includes(form.personnel)}
-                value={form.ward}
-                onChange={(value) => handleChange("ward", value)}
-                options={wardOptions.map((w) => ({
-                  value: String(w.sqid || w.id),
-                  label:
-                    (w?.name ? w.name.charAt(0).toUpperCase() + w.name.slice(1) : "") +
-                    " ward",
-                }))}
-                placeholder="Assign to ward"
                 className="col-span-2"
               />
             </div>

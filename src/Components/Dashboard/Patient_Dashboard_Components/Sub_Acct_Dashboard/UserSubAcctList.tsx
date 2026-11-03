@@ -47,7 +47,8 @@ const UserSubAcctList = ({
 
   const {
     data: medicalRecordsData,
-    isPending: subAcctMedicalRecordsLoading
+    isPending: subAcctMedicalRecordsLoading,
+    error: subAcctMedicalRecordsError
   } = useSubaccountMedicalRecords(selectedSubAcct?.hin, subAcctCurrentPage, pageSize);
 
 
@@ -76,6 +77,7 @@ const UserSubAcctList = ({
             <UserSubAcctMedicalRecords
             subAcctMedicalRecords={subAcctMedicalRecords}
             subAcctMedicalRecordsLoading={subAcctMedicalRecordsLoading}
+            noAccess={(subAcctMedicalRecordsError as any)?.response?.status === 404}
             setViewDetailMedicalRecord={handleBackToList} // Passing back logic
             subAcctCount={subAcctCount}
             subAcctCurrentPage={subAcctCurrentPage}

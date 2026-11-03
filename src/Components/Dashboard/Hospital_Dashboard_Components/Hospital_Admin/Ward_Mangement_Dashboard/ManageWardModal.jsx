@@ -6,6 +6,7 @@ import Button from "../../../../ui/Button";
 import Input from "../../../../ui/Input";
 import { fetchWardBeds, updateWard, deleteWard } from "../../../../../queries/Hospital/fetchWards";
 import { invalidateWardManagement } from "../../../../../lib/queryInvalidations";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import { Bed } from "lucide-react";
 
 const ManageWardModal = ({ ward, isOpen, onClose }) => {
@@ -49,7 +50,7 @@ const ManageWardModal = ({ ward, isOpen, onClose }) => {
     },
     onError: (err) => {
       console.error("Error updating ward:", err);
-      toast.error(err.response?.data?.message || "Failed to update ward");
+      toast.error(extractApiErrorMessage(err, "Failed to update ward"));
     },
   });
 
@@ -63,7 +64,7 @@ const ManageWardModal = ({ ward, isOpen, onClose }) => {
     },
     onError: (err) => {
       console.error("Error deleting ward:", err);
-      toast.error(err.response?.data?.message || "Failed to delete ward");
+      toast.error(extractApiErrorMessage(err, "Failed to delete ward"));
     },
   });
 

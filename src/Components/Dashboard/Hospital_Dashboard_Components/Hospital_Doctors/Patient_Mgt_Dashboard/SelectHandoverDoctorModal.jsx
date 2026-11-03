@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { User, X } from "lucide-react";
-import axiosInstanceHos from "../../../../../lib/axios/hospital";
+import { fetchStaffByRole } from "../../../../../queries/Hospital/fetchStaff";
 import { DoctorAppContext } from "../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 import CardGridSkeleton from "../../../../ui/CardGridSkeleton";
 
@@ -16,17 +16,17 @@ const SelectHandoverDoctorModal = ({ onClose, onProceed }) => {
   const { profile } = useContext(DoctorAppContext);
   const [loadingDoctors, setLoadingDoctors] = useState(true);
   const [doctors, setDoctors] = useState([]);
-  // `sqid` is what POST /api/doctors/handover wants as `to_doctor_id` — the
+  // `sqid` is what POST /api/hospital-ops/handovers/doctor wants as `to_doctor_id` — the
   // staff-list responses now carry it (staff_id is not accepted there).
   const [selectedSqid, setSelectedSqid] = useState(null);
 
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const res = await axiosInstanceHos.get("api/receptionists/staff/doctor");
+        const doctors = await fetchStaffByRole("doctor");
         // Drop rows with no sqid and the logged-in doctor — the backend
         // rejects a self-handover with "Cannot handover to yourself."
-        const list = (res.data || []).filter(
+        const list = doctors.filter(
           (d) => d?.sqid && d.sqid !== profile?.sqid,
         );
 

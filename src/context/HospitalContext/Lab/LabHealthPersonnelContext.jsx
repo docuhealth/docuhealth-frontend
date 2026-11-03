@@ -19,7 +19,7 @@ const LabHealthPersonnelProvider = (props) => {
     setLoading(true);
     try {
       const res = await axiosInstanceHos.get(
-        `api/hospitals/team-members?page=${page}&size=${pageSize}`
+        `api/hospitals/staff?page=${page}&size=${pageSize}`
       );
       setHealthPersonnelList(res.data.results || []);
       setCount(res.data.count || 0);

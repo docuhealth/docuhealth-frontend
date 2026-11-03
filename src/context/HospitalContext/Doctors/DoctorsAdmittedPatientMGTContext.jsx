@@ -25,7 +25,7 @@ const DoctorsAdmittedPatientMGTProvider = ({ children }) => {
     queryFn: async () => {
       const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : '';
       const res = await axiosInstanceHos.get(
-        `api/hospitals/patients?status=${tab}&page=${currentPage}&size=${pageSize}${searchParam}`
+        `api/hospital-ops/patients?status=${tab}&page=${currentPage}&size=${pageSize}${searchParam}`
       );
       return res.data;
     },

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import toast from "react-hot-toast";
 import { User, X } from "lucide-react";
-import axiosInstanceHos from "../../../../../lib/axios/hospital";
+import { fetchStaffByRole } from "../../../../../queries/Hospital/fetchStaff";
 import { NursesAppContext } from "../../../../../context/HospitalContext/Nurses/NursesAppContext";
 import Skeleton, { SkeletonText, SkeletonBox } from "../../../../ui/Skeleton";
 
@@ -33,9 +33,8 @@ const SelectHandoverNurseModal = ({ onClose, onProceed }) => {
   useEffect(() => {
     const fetchNurses = async () => {
       try {
-        const res = await axiosInstanceHos.get("api/receptionists/staff/nurse");
-        const data = res.data;
-        
+        const data = await fetchStaffByRole("nurse");
+
         // Exclude the currently logged-in nurse
         const availableNurses = data.filter(n => String(n.staff_id) !== String(profile?.staff_id));
 

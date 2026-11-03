@@ -7,6 +7,7 @@ import {
 } from "../../../Patient_Dashboard_Components/Patient_Appointments_Dashboard/Components/Date_Time_Formatter";
 import toast from "react-hot-toast";
 import axiosInstanceHos from "../../../../../lib/axios/hospital";
+import { fetchStaffByRole } from "../../../../../queries/Hospital/fetchStaff";
 import { CalendarIcon, User, UserIcon, FileText } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SearchBar from "../../../../SearchBar/SearchBar";
@@ -160,12 +161,10 @@ const AppointmentsList = ({ setCaseNoteHistory, setUpdateVitals, setVitalSignsHi
   const fetchHealthPersonnel = async () => {
     setFetchingPersonnel(true);
     try {
-      const res = await axiosInstanceHos.get(`api/receptionists/staff/doctor`);
-      const data = res.data;
+      const data = await fetchStaffByRole("doctor");
 
-      console.log(res.data);
       // Check if empty
-      if (!data || data.length === 0) {
+      if (data.length === 0) {
         toast.error(`No doctors currently available.`);
         setFetchingPersonnel(false);
         return;
@@ -195,7 +194,7 @@ const AppointmentsList = ({ setCaseNoteHistory, setUpdateVitals, setVitalSignsHi
   const assignDoctorMutation = useMutation({
     mutationFn: (payload) =>
       axiosInstanceHos.patch(
-        `api/nurses/appointments/${formData.appointment_sqid}/assign`,
+        `api/hospital-ops/appointments/${formData.appointment_sqid}/assign`,
         payload,
       ),
     onSuccess: () => {
@@ -771,7 +770,7 @@ const AppointmentsList = ({ setCaseNoteHistory, setUpdateVitals, setVitalSignsHi
                         <button
                           className="w-full rounded-full border py-2 border-docuhealth-primary text-docuhealth-primary cursor-pointer"
                           onClick={() => {
-                            handleAssign(staff.staff_id);
+                            handleAssign(staff.sqid);
                             setStaffList([]);
                           }}
                         >

@@ -14,6 +14,8 @@ const Hospital_Verification_Request = () => {
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [inquiry, setInquiry] = useState(null);
+    // Field errors from the API (official_email, documents), shown under each field
+    const [fieldErrors, setFieldErrors] = useState({});
 
     const location = useLocation();
     const navigate = useNavigate()
@@ -29,6 +31,7 @@ const Hospital_Verification_Request = () => {
     }, [location.search]);
 
     const handleFileChange = (e) => {
+        setFieldErrors((p) => ({ ...p, documents: undefined }));
         const files = Array.from(e.target.files);
         const newFiles = files.map((file) => ({
             file,
@@ -59,6 +62,7 @@ const Hospital_Verification_Request = () => {
         }
 
         setLoading(true);
+        setFieldErrors({});
 
         // console.log(inquiry)
         // console.log(documents) 
@@ -92,13 +96,21 @@ const Hospital_Verification_Request = () => {
                 navigate('/')
             },2000)
         } catch (error) {
-            // toast.error("Something went wrong. Please try again.");
-            // console.log
-            toast.error(error.response.data.detail || "Hospital Verification Request failed. Please try again.")
+            const data = error.response?.data || {};
+            const firstOf = (v) => (Array.isArray(v) ? v[0] : v);
+            setFieldErrors({
+                official_email: firstOf(data.official_email),
+                documents: firstOf(data.documents),
+            });
+            // inquiry comes from the link, not a field, so its error is a toast
+            const message =
+                data.detail ||
+                (data.inquiry && `This verification link is invalid: ${firstOf(data.inquiry)}`) ||
+                (data.official_email || data.documents ? "Please fix the highlighted fields." : null);
+            toast.error(message || "Hospital Verification Request failed. Please try again.");
         } finally {
+            // Keep what was entered so the user can fix it and resend
             setLoading(false);
-            setEmail("");
-            setDocuments([]);
         }
     };
 
@@ -132,11 +144,14 @@ const Hospital_Verification_Request = () => {
                                             type="email"
                                             className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                                             value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
+                                            onChange={(e) => { setEmail(e.target.value); setFieldErrors((p) => ({ ...p, official_email: undefined })); }}
                                             required
                                         />
                                         <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                     </div>
+                                    {fieldErrors.official_email && (
+                                        <p className="text-red-500 text-xs mt-1">{fieldErrors.official_email}</p>
+                                    )}
                                 </div>
 
                                 {/* Custom File Upload */}
@@ -159,6 +174,9 @@ const Hospital_Verification_Request = () => {
                                         onChange={handleFileChange}
                                         className="hidden"
                                     />
+                                    {fieldErrors.documents && (
+                                        <p className="text-red-500 text-xs mt-1">{fieldErrors.documents}</p>
+                                    )}
 
                                     {/* Preview Section */}
                                     {documents.length > 0 && (
@@ -242,11 +260,14 @@ const Hospital_Verification_Request = () => {
                                     type="email"
                                     className="w-full px-4 py-3 border rounded-lg pl-10 outline-hidden focus:border-docuhealth-primary"
                                     value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    onChange={(e) => { setEmail(e.target.value); setFieldErrors((p) => ({ ...p, official_email: undefined })); }}
                                     required
                                 />
                                 <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                             </div>
+                            {fieldErrors.official_email && (
+                                <p className="text-red-500 text-xs mt-1">{fieldErrors.official_email}</p>
+                            )}
                         </div>
 
                         {/* Custom File Upload */}
@@ -269,6 +290,9 @@ const Hospital_Verification_Request = () => {
                                 onChange={handleFileChange}
                                 className="hidden"
                             />
+                            {fieldErrors.documents && (
+                                <p className="text-red-500 text-xs mt-1">{fieldErrors.documents}</p>
+                            )}
 
                             {/* Preview Section */}
                             {documents.length > 0 && (

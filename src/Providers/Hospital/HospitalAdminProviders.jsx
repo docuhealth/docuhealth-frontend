@@ -6,7 +6,7 @@ import HosSubscriptionsProvider from "../../context/HospitalContext/Admin/HosSub
 import HosWardProvider from "../../context/HospitalContext/HosWardContext";
 
 const HospitalAdminProviders = ({ children }) => (
-  <HosWardProvider>
+  <HosWardProvider manage>
   <HosProfileProvider>
     <HosAdmittedPatientMGTProvider>
       <HosStaffsProvider>

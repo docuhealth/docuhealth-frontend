@@ -17,7 +17,8 @@ import toast from "react-hot-toast";
 import { renderListOrString, renderLabTests, renderDrugRecords } from "../../../../../../utils/soapNoteHelpers";
 import { resolveOrderContext } from "../../../../../../utils/careOrderContext";
 import { extractApiErrorMessage } from "../../../../../../utils/apiError";
-import { closeCheckIn } from "../../../../../../queries/Hospital/doctor/checkIns";
+import { closeCheckIn, endEncounter } from "../../../../../../queries/Hospital/doctor/checkIns";
+import CloseAppointmentModal from "../../../../../ui/CloseAppointmentModal";
 import { closeAppointment, isAppointmentClosed } from "../../../../../../queries/Hospital/appointments";
 import { invalidateCheckIn, invalidateAppointment } from "../../../../../../lib/queryInvalidations";
 import PatientInfoCard from "../../../../../ui/PatientInfoCard";
@@ -76,7 +77,24 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
       ? { appointment: selectedPatientDetails.sqid }
       : null;
   const appointmentAlreadyClosed = !orderContext.checkIn && isAppointmentClosed(selectedPatientDetails);
-  const { isOtherDoctors } = useCheckInOwnership(orderContext.checkIn);
+  const { isOtherDoctors, isConsultationClosed } = useCheckInOwnership(orderContext.checkIn);
+
+  // Only the doctor running the consultation, on the outpatient page (the lab page reuses this component)
+  const canEndEncounter = isOutpatient && !!orderContext.checkIn && !isConsultationClosed && !isOtherDoctors;
+  const [showEndEncounterModal, setShowEndEncounterModal] = useState(false);
+
+  const endEncounterMutation = useMutation({
+    mutationFn: () => endEncounter(orderContext.checkIn),
+    onSuccess: () => {
+      toast.success("Encounter ended. The patient is now in the Seen list.");
+      invalidateCheckIn(queryClient, { hin });
+      setShowEndEncounterModal(false);
+      setSeePatientDetails?.(false);
+    },
+    onError: (err) => {
+      toast.error(extractApiErrorMessage(err, "Could not end this encounter."));
+    },
+  });
 
   const handleConfirmCheckout = () => {
     if (!checkoutTarget) {
@@ -102,7 +120,7 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
   const { data: patientFullInfo, isLoading: loadingInfo, isError: infoError, error: infoErrorDetail } = useQuery({
     queryKey: ["patient-info", hin],
     queryFn: async () => {
-      const res = await axiosInstanceHos.get(`api/doctors/patient/info/${hin}`);
+      const res = await axiosInstanceHos.get(`api/patients/${hin}/info`);
       return res.data;
     },
     enabled: !!hin,
@@ -327,6 +345,14 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
                     Create a test order
                   </button>
                 )}
+                {canEndEncounter && (
+                  <button
+                    onClick={() => setShowEndEncounterModal(true)}
+                    className="w-full sm:w-auto bg-docuhealth-primary text-white text-sm rounded-full px-6 py-2 hover:bg-docuhealth-primary/90 transition-colors cursor-pointer"
+                  >
+                    End encounter
+                  </button>
+                )}
                 {appointmentAlreadyClosed ? (
                   <span className="w-full sm:w-auto text-center text-sm text-gray-400 border border-gray-200 rounded-full px-6 py-2">
                     Checked out
@@ -436,6 +462,16 @@ const PatientInfo = ({ selectedPatientDetails, setSeePatientDetails, hideCreateO
           onClose={() => setShowOrderModal(false)}
         />
       )}
+      <CloseAppointmentModal
+        isOpen={showEndEncounterModal}
+        onClose={() => setShowEndEncounterModal(false)}
+        onConfirm={() => endEncounterMutation.mutate()}
+        isPending={endEncounterMutation.isPending}
+        title="End this encounter?"
+        confirmLabel="End encounter"
+        pendingLabel="Ending..."
+        message="The patient moves to the Seen list in Encounters. No more orders or encounter notes can be added until you resume the encounter there. The visit stays open until the patient is checked out."
+      />
       {/* ── Checkout Confirmation Modal ── */}
       <Modal
         isOpen={showCheckoutModal}

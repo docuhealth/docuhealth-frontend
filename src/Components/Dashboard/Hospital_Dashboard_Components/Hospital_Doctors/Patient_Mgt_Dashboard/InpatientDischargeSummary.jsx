@@ -14,8 +14,22 @@ import DischargeSuccessModal from "./DischargeSuccessModal";
 import { DEFAULT_FREQUENCY, isFrequencyCode, toFrequencyCode } from "../../../../../utils/careTaskConstants";
 import { invalidatePatientDischarge } from "../../../../../lib/queryInvalidations";
 
-const COMPLETED_LAB_STATUSES = ["completed", "accepted", "result_ready", "approved"];
-const pageSize = 20;
+// Lab order item statuses; "rejected" items fit neither list so they are left out
+const COMPLETED_LAB_STATUSES = ["result_ready", "result_accepted_by_lab_admin", "result_accepted_by_doctor"];
+const PENDING_LAB_STATUSES = ["pending", "in_progress", "sample_collected"];
+const LAB_FETCH_SIZE = 200;
+
+// A nested investigations 400 names an item sqid the doctor never sees, so explain it in words
+const dischargeErrorMessage = (data) => {
+  if (!data || typeof data !== "object") return null;
+  if (data.investigations) return [data.investigations].flat()[0];
+  if (data.completed_investigations)
+    return "One of the selected completed tests could not be used. Remove it and pick again.";
+  if (data.pending_investigations)
+    return "One of the selected pending tests could not be used. Remove it and pick again.";
+  const first = Object.values(data).flat()[0];
+  return typeof first === "string" ? first : null;
+};
 
 const INITIAL_FORM_DATA = {
   chief_complaint: "",
@@ -56,7 +70,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
 
   const { data: patientFullInfo } = useQuery({
     queryKey: ["patient-info", hin],
-    queryFn: async () => (await axiosInstanceHos.get(`api/doctors/patient/info/${hin}`)).data,
+    queryFn: async () => (await axiosInstanceHos.get(`api/patients/${hin}/info`)).data,
     enabled: !!hin,
   });
 
@@ -67,10 +81,21 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
     enabled: !!hin,
   });
 
-  const { data: labRecordsData, isLoading: labRecordsLoading } = useQuery({
-    queryKey: ["patient-lab-records", hin, 1],
-    queryFn: async () =>
-      (await axiosInstanceHos.get(`api/lab/test-orders/patient/${hin}?page=1&size=${pageSize}`)).data,
+  // test-orders/patient/<hin> only returns orders with a result ready, so merge in this
+  // doctor's own orders for the patient to get the tests still waiting on the lab
+  const { data: labOrders, isLoading: labRecordsLoading } = useQuery({
+    queryKey: ["patient-lab-records", hin, "discharge"],
+    queryFn: async () => {
+      const [hospitalOrders, ownOrders] = await Promise.all([
+        axiosInstanceHos.get(`api/lab/test-orders/patient/${hin}?page=1&size=${LAB_FETCH_SIZE}`),
+        axiosInstanceHos.get(
+          `api/lab/doctor-test-orders?page=1&size=${LAB_FETCH_SIZE}&search=${encodeURIComponent(hin)}`
+        ),
+      ]);
+      return [...(hospitalOrders.data?.results || []), ...(ownOrders.data?.results || [])].filter(
+        (order) => order.patient_info?.hin === hin
+      );
+    },
     enabled: !!hin,
   });
 
@@ -132,35 +157,41 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
   };
 
   // ---- Step 2: investigations (from real lab test orders) ----
+  // Items only: the endpoint 400s on an order sqid, so orders without items add nothing
   const flatLabItems = useMemo(() => {
-    const orders = labRecordsData?.results || [];
-    return orders.reduce((acc, order) => {
-      if (Array.isArray(order.items_info)) return acc.concat(order.items_info);
-      if (Array.isArray(order.items)) return acc.concat(order.items);
-      return acc.concat([order]);
-    }, []);
-  }, [labRecordsData]);
+    const items = new Map();
+    for (const order of labOrders || []) {
+      for (const item of order.items_info || order.items || []) {
+        if (item.sqid && !items.has(item.sqid)) items.set(item.sqid, { ...item, ordered_at: order.created_at });
+      }
+    }
+    return [...items.values()].sort((a, b) => new Date(b.ordered_at) - new Date(a.ordered_at));
+  }, [labOrders]);
 
   // `value` must be the lab-test-order item's own sqid — the discharge endpoint
   // takes investigation refs as { sqid, type: "lab_test_order" }.
-  const toInvestigationOption = (item) => ({
-    value: item.sqid,
-    label: item.test_info?.name || "Investigation",
-  });
+  // The order date tells repeat orders of the same test apart.
+  const toInvestigationOption = (item) => {
+    const name = item.test_info?.name || "Investigation";
+    const ordered = item.ordered_at
+      ? new Date(item.ordered_at).toLocaleString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : null;
+    return { value: item.sqid, label: ordered ? `${name} (ordered ${ordered})` : name };
+  };
 
   const completedInvestigationOptions = useMemo(
-    () =>
-      flatLabItems
-        .filter((item) => item.sqid && COMPLETED_LAB_STATUSES.includes(item.status))
-        .map(toInvestigationOption),
+    () => flatLabItems.filter((item) => COMPLETED_LAB_STATUSES.includes(item.status)).map(toInvestigationOption),
     [flatLabItems],
   );
 
   const pendingInvestigationOptions = useMemo(
-    () =>
-      flatLabItems
-        .filter((item) => item.sqid && !COMPLETED_LAB_STATUSES.includes(item.status))
-        .map(toInvestigationOption),
+    () => flatLabItems.filter((item) => PENDING_LAB_STATUSES.includes(item.status)).map(toInvestigationOption),
     [flatLabItems],
   );
 
@@ -311,7 +342,7 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
       care_instructions: formData.care_instructions.trim(),
       // Required free-string field on the endpoint (no enum). The Select carries
       // capitalized labels ("Improved", ...); send them lowercased to match the
-      // GET /api/inpatients/discharged-patients response convention.
+      // GET /api/records/discharged-patients response convention.
       condition_at_discharge: formData.condition_at_discharge.toLowerCase(),
       ...buildFollowUpPayload(),
       ...(formData.completed_investigations.length
@@ -379,10 +410,8 @@ const InpatientDischargeSummary = ({ selectedDischargePatient, setDischargePatie
         return;
       }
 
-      const firstError =
-        data && typeof data === "object" ? Object.values(data).flat()[0] : null;
       const errorMessage =
-        (typeof firstError === "string" && firstError) ||
+        dischargeErrorMessage(data) ||
         data?.detail ||
         data?.message ||
         err?.message ||

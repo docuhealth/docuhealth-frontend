@@ -15,7 +15,7 @@ export const fetchAppointments = async ({ queryKey }) => {
   if (dateTo) params.append("scheduled_time_lte", dateTo);
 
   const res = await axiosInstanceHos.get(
-    `api/appointments/staff?${params.toString()}`,
+    `api/hospital-ops/appointments/staff?${params.toString()}`,
   );
 
   return res.data;

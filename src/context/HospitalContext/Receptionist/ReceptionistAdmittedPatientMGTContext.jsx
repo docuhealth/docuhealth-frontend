@@ -18,7 +18,7 @@ const ReceptionistAdmittedPatientMGTProvider = (props) => {
   const { data, isLoading: loading, isFetching } = useQuery({
     queryKey: ["hospital-patients-receptionist", tab, currentPage, debouncedSearch],
     queryFn: async () => {
-      let url = `api/hospitals/patients?status=${tab}&page=${currentPage}&size=${pageSize}`;
+      let url = `api/hospital-ops/patients?status=${tab}&page=${currentPage}&size=${pageSize}`;
       if (debouncedSearch) url += `&search=${debouncedSearch}`;
       const res = await axiosInstanceHos.get(url);
       return res.data;

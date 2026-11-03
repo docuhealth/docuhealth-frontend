@@ -14,7 +14,7 @@ const fetchAllPages = async (url) => {
     }
 };
 
-export const fetchPatientInfo = async (hin) => (await axiosInstanceHos.get(`api/doctors/patient/info/${hin}`)).data;
+export const fetchPatientInfo = async (hin) => (await axiosInstanceHos.get(`api/patients/${hin}/info`)).data;
 
 // Everything recorded during one stay or visit, oldest first (backend order, do not re-sort)
 export const fetchEncounterRecords = ({ kind, sqid }) =>
@@ -23,8 +23,8 @@ export const fetchEncounterRecords = ({ kind, sqid }) =>
 // A patient's discharged stays and closed visits, for the stay/visit picker
 export const fetchPatientDischargedEncounters = async (hin) => {
     const [stays, visits] = await Promise.all([
-        fetchAllPages("api/hospitals/patients?status=inpatient_discharge"),
-        fetchAllPages("api/hospitals/patients?status=outpatient_discharge"),
+        fetchAllPages("api/hospital-ops/patients?status=inpatient_discharge"),
+        fetchAllPages("api/hospital-ops/patients?status=outpatient_discharge"),
     ]);
     const mine = (rows, kind) => rows
         .filter((r) => r?.patient_info?.hin === hin)

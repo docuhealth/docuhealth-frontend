@@ -6,7 +6,7 @@ import { extractApiErrorMessage } from "../../utils/apiError";
 // Marks the appointment `completed`. Any staff with the same role as the booked staff may close it;
 // other roles and hospital admins get 403, an already-closed appointment gets 400.
 export const closeAppointment = async (sqid) => {
-  const res = await axiosInstanceHos.post(`api/appointments/${sqid}/close`);
+  const res = await axiosInstanceHos.post(`api/hospital-ops/appointments/${sqid}/close`);
   return res.data;
 };
 

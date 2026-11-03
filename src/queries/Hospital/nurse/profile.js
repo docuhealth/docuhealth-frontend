@@ -2,7 +2,7 @@
 import axiosInstanceHos from "../../../lib/axios/hospital";
 
 export const fetchNurseProfile = async () => {
-  const res = await axiosInstanceHos.get("api/nurses/dashboard");
+  const res = await axiosInstanceHos.get("api/hospitals/dashboards/nurse");
   return res.data;
 };
 

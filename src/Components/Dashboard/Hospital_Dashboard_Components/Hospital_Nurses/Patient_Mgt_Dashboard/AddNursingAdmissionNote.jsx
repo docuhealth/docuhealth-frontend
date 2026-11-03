@@ -400,7 +400,7 @@ const AddNursingAdmissionNote = ({ setShowAdmissionNote, selected }) => {
       const admissionSqid = selected?.sqid || selected?.admission_info?.sqid || selected?.id;
       if (!admissionSqid) throw new Error("No admission SQID found");
 
-      await axiosInstanceHos.post(`/api/inpatients/admissions/${admissionSqid}/admission-note`, payload);
+      await axiosInstanceHos.post(`/api/records/admissions/${admissionSqid}/admission-note`, payload);
       
       // Invalidate queries so admitted patient lists and patient views update immediately
       queryClient.invalidateQueries({ queryKey: ["hospital-patients-nurse"] });

@@ -7,7 +7,7 @@ export const fetchHospitalDoctorDashboardMetrics = async ({ queryKey }) => {
   if (start_date) params.start_date = start_date;
   if (end_date) params.end_date = end_date;
 
-  const res = await axiosInstanceHos.get("api/doctors/dashboard", { params });
+  const res = await axiosInstanceHos.get("api/hospitals/dashboards/doctor", { params });
 //   console.log(res.data)
   return res.data;
 };

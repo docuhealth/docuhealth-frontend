@@ -1,11 +1,12 @@
 import React, { createContext, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getHospitalToken } from "../../services/authService";
-import { fetchWards } from "../../queries/Hospital/fetchWards";
+import { fetchWards, fetchManagedWards } from "../../queries/Hospital/fetchWards";
 
 export const HosWardContext = createContext();
 
-const HosWardProvider = ({ children }) => {
+// `manage` is for the hospital admin, who reads wards from wards/manage (staff paths are a 403 for them)
+const HosWardProvider = ({ children, manage = false }) => {
   const isUserLoggedIn = !!getHospitalToken();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
@@ -16,8 +17,8 @@ const {
   isPlaceholderData,
   refetch: refetchWards 
 } = useQuery({
-  queryKey: ["hospital-wards", currentPage], // currentPage is at index 1
-  queryFn: fetchWards, // Pass the function reference only!
+  queryKey: ["hospital-wards", currentPage, manage ? "manage" : "staff"], // currentPage is at index 1
+  queryFn: manage ? fetchManagedWards : fetchWards,
   enabled: isUserLoggedIn,
   placeholderData: (previousData) => previousData,
 });

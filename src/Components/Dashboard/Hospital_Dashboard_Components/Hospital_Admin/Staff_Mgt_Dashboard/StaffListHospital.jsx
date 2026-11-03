@@ -6,6 +6,7 @@ import SearchBar from "../../../../SearchBar/SearchBar";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { invalidateStaffManagement } from "../../../../../lib/queryInvalidations";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
 
 const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
   const {
@@ -46,7 +47,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
   const { data: labAdminData } = useQuery({
     queryKey: ["hospital-staffs-lab-admin-check"],
     queryFn: async () => {
-      const res = await axiosInstanceHos.get("api/hospitals/team-members?role=lab_admin");
+      const res = await axiosInstanceHos.get("api/hospitals/staff?role=lab_admin");
       return res.data;
     },
     staleTime: 1000 * 30,
@@ -179,7 +180,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
 
   const { mutate: removeStaff, isPending: isRemoving } = useMutation({
     mutationFn: (ids) =>
-      axiosInstanceHos.post("/api/hospitals/team-members/remove", {
+      axiosInstanceHos.post("/api/hospitals/staff/remove", {
         staff_ids: ids, // The API expects an object with a staff_ids array
       }),
     onSuccess: () => {
@@ -188,14 +189,14 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       setSelectedStaff([]); // Clear checkboxes after bulk removal
     },
     onError: (err) => {
-      toast.error(err.response?.data?.message || "Failed to remove staff");
+      toast.error(extractApiErrorMessage(err, "Failed to remove staff"));
     },
   });
 
 
   const { mutate: deactivateStaff, isPending: isDeactivating } = useMutation({
     mutationFn: (ids) =>
-      axiosInstanceHos.post("/api/hospitals/team-members/deactivate", {
+      axiosInstanceHos.post("/api/hospitals/staff/deactivate", {
         staff_ids: ids, // The API expects an object with a staff_ids array
       }),
     onSuccess: () => {
@@ -204,7 +205,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       setSelectedStaff([]); // Clear checkboxes after bulk removal
     },
     onError: (err) => {
-      toast.error(err.response?.data?.message || "Failed to deactivate staff");
+      toast.error(extractApiErrorMessage(err, "Failed to deactivate staff"));
     },
   });
 
@@ -222,43 +223,41 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
   };
 
   const handleIndividualRemove = (staff) => {
-    removeStaff([staff.staff_id]);
+    removeStaff([staff.sqid]);
     setActiveMenu(null);
   };
 
+  const { mutate: reactivateStaff } = useMutation({
+    mutationFn: (ids) => axiosInstanceHos.post("/api/hospitals/staff/reactivate", { staff_ids: ids }),
+    onSuccess: (res) => {
+      toast.success(res.data?.message || "Staff member account reactivated successfully");
+      invalidateStaffManagement(queryClient);
+    },
+    onError: (err) => {
+      toast.error(extractApiErrorMessage(err, "Failed to reactivate staff"));
+    },
+  });
+
   const handleDeativate = (staff) => {
-    deactivateStaff([staff.staff_id]);
+    deactivateStaff([staff.sqid]);
+    setActiveMenu(null);
+  };
+
+  const handleReactivate = (staff) => {
+    reactivateStaff([staff.sqid]);
     setActiveMenu(null);
   };
 
   const { mutate: updateRole, isPending: isUpdatingRole } = useMutation({
-    mutationFn: ({ staff_id, role, specialization }) =>
-      // The staff_id goes in the URL path, not the body
-      axiosInstanceHos.patch(
-        `/api/hospitals/team-member/${staff_id}/update`,
-        {
-          role: role, // Body only contains the role
-          ...(specialization && { specialization: specialization })
-        },
-      ),
+    mutationFn: ({ sqid, payload }) =>
+      axiosInstanceHos.patch(`/api/hospitals/staff/${sqid}/update`, payload),
     onSuccess: () => {
       toast.success("Role updated successfully");
       invalidateStaffManagement(queryClient);
       setSelectedStaffForRole(null);
     },
     onError: (err) => {
-      let errorMsg = "Failed to update role";
-      if (err.response?.data) {
-        const data = err.response.data;
-        if (typeof data === 'string') {
-          errorMsg = data;
-        } else if (data.role && Array.isArray(data.role)) {
-          errorMsg = data.role[0];
-        } else {
-          errorMsg = data.error || data.message || data.detail || errorMsg;
-        }
-      }
-      toast.error(errorMsg);
+      toast.error(extractApiErrorMessage(err, "Failed to update role"));
     },
   });
 
@@ -285,11 +284,17 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       );
     }
 
-    updateRole({
-      staff_id: selectedStaffForRole.staff_id,
-      role: newRole,
-      specialization: newSpecialization
-    });
+    // The API rejects a role or specialization that is already assigned, so send only changes
+    const payload = {
+      ...(newRole !== selectedStaffForRole.role && { role: newRole }),
+      ...(newSpecialization &&
+        newSpecialization !== (selectedStaffForRole.specialization || "") && {
+          specialization: newSpecialization,
+        }),
+    };
+    if (Object.keys(payload).length === 0) return toast.error("Nothing has changed.");
+
+    updateRole({ sqid: selectedStaffForRole.sqid, payload });
   };
 
   // --- SELECTION LOGIC ---
@@ -302,7 +307,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
       console.log("Deselected all staff");
       setSelectedStaff([]);
     } else {
-      const allIds = staffs.map((s) => s.staff_id);
+      const allIds = staffs.map((s) => s.sqid);
       // console.log("Selected all staff:", staffs);
       setSelectedStaff(allIds);
     }
@@ -321,8 +326,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
         console.log(`Unchecked staff ID: ${id}`);
         return prev.filter((item) => item !== id);
       } else {
-        // Find the specific staff object using staff_id to log it
-        const staffMember = staffs.find((s) => s.staff_id === id);
+        const staffMember = staffs.find((s) => s.sqid === id);
         console.log("Checked staff:", staffMember);
         return [...prev, id];
       }
@@ -508,8 +512,8 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                     {/* ADDED: Individual Checkbox */}
                     <input
                       type="checkbox"
-                      checked={selectedStaff.includes(staff.staff_id)}
-                      onChange={() => toggleStaff(staff.staff_id)}
+                      checked={selectedStaff.includes(staff.sqid)}
+                      onChange={() => toggleStaff(staff.sqid)}
                       className="w-4 h-4 accent-docuhealth-primary cursor-pointer"
                     />
 
@@ -545,7 +549,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                     <button
                       onClick={() =>
                         setActiveMenu(
-                          activeMenu === staff.staff_id ? null : staff.staff_id,
+                          activeMenu === staff.sqid ? null : staff.sqid,
                         )
                       }
                       className="p-2 hover:bg-gray-200 rounded-full transition-colors"
@@ -560,7 +564,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                       </svg>
                     </button>
 
-                    {activeMenu === staff.staff_id && (
+                    {activeMenu === staff.sqid && (
                       <div className="absolute right-0 top-10 w-40 bg-white border border-gray-200 rounded-md shadow z-50 ">
                         <button
                           onClick={() => handleUpdateRole(staff)}
@@ -568,12 +572,21 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                         >
                           Update Role
                         </button>
-                        <button
-                          onClick={() => handleDeativate(staff)}
-                          className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 font-medium hover:rounded-b-md"
-                        >
-                          Deactivate Account
-                        </button>
+                        {staff.is_active === false ? (
+                          <button
+                            onClick={() => handleReactivate(staff)}
+                            className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700"
+                          >
+                            Activate Account
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleDeativate(staff)}
+                            className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 font-medium hover:rounded-b-md"
+                          >
+                            Deactivate Account
+                          </button>
+                        )}
                         <button
                           onClick={() => handleIndividualRemove(staff)}
                           className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 font-medium hover:rounded-b-md"
@@ -612,8 +625,8 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                     <div className="flex items-center gap-3">
                       <input
                         type="checkbox"
-                        checked={selectedStaff.includes(staff.staff_id)}
-                        onChange={() => toggleStaff(staff.staff_id)}
+                        checked={selectedStaff.includes(staff.sqid)}
+                        onChange={() => toggleStaff(staff.sqid)}
                         className="w-5 h-5 accent-docuhealth-primary cursor-pointer"
                       />
                       {/* Dynamic Avatar with Initials */}
@@ -650,9 +663,9 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                         <button
                           onClick={() =>
                             setActiveMenu(
-                              activeMenu === staff.staff_id
+                              activeMenu === staff.sqid
                                 ? null
-                                : staff.staff_id,
+                                : staff.sqid,
                             )
                           }
                           className="p-1"
@@ -666,7 +679,7 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                             <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
                           </svg>
                         </button>
-                        {activeMenu === staff.staff_id && (
+                        {activeMenu === staff.sqid && (
                           <div className="absolute right-0 top-8 w-52 bg-white border border-gray-200 rounded-lg shadow z-50 py-2">
                             <button
                               onClick={() => handleUpdateRole(staff)}
@@ -675,12 +688,21 @@ const StaffListHospital = ({ selectedStaff, setSelectedStaff, filterType }) => {
                               Update Role
                             </button>
 
-                            <button
-                              onClick={() => handleDeativate(staff)}
-                              className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md"
-                            >
-                              Deactivate Account
-                            </button>
+                            {staff.is_active === false ? (
+                              <button
+                                onClick={() => handleReactivate(staff)}
+                                className="w-full text-left px-4 py-3 text-sm border-b border-gray-50"
+                              >
+                                Activate Account
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleDeativate(staff)}
+                                className="w-full text-left px-4 py-3 text-sm text-red-600 font-bold hover:rounded-b-md"
+                              >
+                                Deactivate Account
+                              </button>
+                            )}
 
                             <button
                               onClick={() => handleIndividualRemove(staff)}

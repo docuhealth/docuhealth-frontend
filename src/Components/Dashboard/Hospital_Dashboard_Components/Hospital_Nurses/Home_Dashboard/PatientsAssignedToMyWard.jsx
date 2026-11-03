@@ -5,6 +5,9 @@ import Pagination2 from '../../../Patient_Dashboard_Components/Pagination/Pagina
 import SearchBar from '../../../../SearchBar/SearchBar'
 import toast from 'react-hot-toast'
 import Skeleton, { SkeletonText } from '../../../../ui/Skeleton'
+import Select from '../../../../ui/Select'
+import { useQuery } from '@tanstack/react-query'
+import { fetchWards } from '../../../../../queries/Hospital/fetchWards'
 
 const WARD_CELL_WIDTHS = ["w-24", "w-14", "w-20", "w-24", "w-12"];
 
@@ -68,16 +71,26 @@ const PatientsAssignedToMyWard = () => {
     setCurrentPage,
     searchQuery,
     setSearchQuery,
+    wardFilter,
+    setWardFilter,
     isRefreshing,
   } = useContext(NursesPatientsAssignedToWardContext);
 
-  console.log(assignedPatientsToWard)
+  // The list covers every ward at the hospital, so the nurse can narrow it to one
+  const { data: wardsData } = useQuery({ queryKey: ["hospital-wards", 1], queryFn: fetchWards });
+  const wardOptions = [
+    { value: "", label: "All wards" },
+    ...(wardsData?.results || []).map((w) => ({
+      value: w.sqid,
+      label: w.name ? w.name.charAt(0).toUpperCase() + w.name.slice(1) : "Unnamed ward",
+    })),
+  ];
 
   if (loading) {
     return <WardPatientsSkeleton />;
   }
 
-  if (assignedPatientsToWard.length === 0 && !searchQuery) {
+  if (assignedPatientsToWard.length === 0 && !searchQuery && !wardFilter) {
     return (
       <div className="flex flex-col justify-center items-center text-center  h-full ">
         <svg
@@ -138,7 +151,7 @@ const PatientsAssignedToMyWard = () => {
         <div className="max-w-md text-center">
           <p className="text-[12px] text-gray-500">
             {" "}
-            You currently don’t have any patients assigned to your ward in this hospital.
+            There are no admitted patients in this hospital right now.
           </p>
         </div>
       </div>
@@ -149,11 +162,22 @@ const PatientsAssignedToMyWard = () => {
 
     <>
       <div className="mb-4 w-full">
-        <SearchBar
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search by patient name, doctor, or email..."
-        />
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex-1">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search by patient name, doctor, or email..."
+            />
+          </div>
+          <Select
+            value={wardFilter}
+            onChange={setWardFilter}
+            options={wardOptions}
+            placeholder="All wards"
+            className="sm:w-56"
+          />
+        </div>
         {isRefreshing && (
           <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 w-full">
             <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-[#3E4095] rounded-full animate-spin"></span>
