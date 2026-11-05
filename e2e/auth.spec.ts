@@ -11,7 +11,7 @@ test("login validates the form and links to the other auth pages", async ({ page
   await page.getByRole("button", { name: "Log in" }).click();
   await expect(page.getByText("Enter a valid email address")).toBeVisible();
 
-  await page.getByRole("link", { name: "Create one" }).click();
+  await page.getByRole("link", { name: "Create an account" }).click();
   await expect(page).toHaveURL(/\/register$/);
   await expect(page.getByRole("heading", { name: "Choose your account type" })).toBeVisible();
 });
@@ -27,16 +27,23 @@ test("sign-up asks for the account type before the form", async ({ page }) => {
   await expect(page.getByLabel("Organization name")).toBeVisible();
 });
 
-test("forgot password shows the check-your-email state", async ({ page }) => {
-  await page.goto("/forgot-password");
+test("password reset: email, code, then a new password", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByRole("link", { name: "Forgot password?" }).click();
+  await expect(page.getByRole("heading", { name: "Reset your password" })).toBeVisible();
   await page.getByLabel("Email address").fill("ada@example.com");
-  await page.getByRole("button", { name: "Send reset link" }).click();
-  await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
-});
+  await page.getByRole("button", { name: "Send code" }).click();
 
-test("reset password without a token shows the expired-link state", async ({ page }) => {
-  await page.goto("/reset-password");
-  await expect(page.getByRole("heading", { name: "Link expired" })).toBeVisible();
+  await expect(page.getByText("we sent to ada@example.com")).toBeVisible();
+  await page.keyboard.type("123456");
+  await page.getByRole("button", { name: "Verify" }).click();
+
+  await expect(page.getByRole("heading", { name: "Create new password" })).toBeVisible();
+  await page.getByLabel("New password", { exact: true }).fill("Password123!");
+  await page.getByLabel("Confirm new password").fill("Password123!");
+  await page.getByRole("button", { name: "Set new password" }).click();
+  await expect(page).toHaveURL(`${main}/login`);
+  await expect(page.getByText("Password updated. Log in with your new password.")).toBeVisible();
 });
 
 test("individual sign-up step 1 validates and offers a switch to provider", async ({ page }) => {
@@ -56,6 +63,7 @@ test("individual sign-up step 2 verifies the email code", async ({ page }) => {
   await page.getByLabel("First name").fill("Ada");
   await page.getByLabel("Last name").fill("Okonkwo");
   await page.getByLabel("Gender").click();
+  await expect(page.getByRole("option", { name: "Prefer not to say" })).toBeVisible();
   await page.getByRole("option", { name: "Female" }).click();
   await page.getByLabel("Email").fill("ada@example.com");
   await page.getByLabel("Phone Number").fill("+2348012345678");

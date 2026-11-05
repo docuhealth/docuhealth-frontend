@@ -15,16 +15,36 @@ import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
-import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AgentIndexRouteImport } from './routes/agent/index'
 import { Route as AgentAuthRouteImport } from './routes/agent/_auth'
 import { Route as HospitalIndexRouteImport } from './routes/hospital/index'
 import { Route as HospitalAuthRouteImport } from './routes/hospital/_auth'
+import { Route as HospitalAdminRouteImport } from './routes/hospital/admin'
+import { Route as HospitalReceptionistRouteImport } from './routes/hospital/receptionist'
 import { Route as AgentAuthRegisterHospitalRouteImport } from './routes/agent/_auth/register-hospital'
 import { Route as HospitalAuthForgotPasswordRouteImport } from './routes/hospital/_auth/forgot-password'
 import { Route as HospitalAuthLoginRouteImport } from './routes/hospital/_auth/login'
 import { Route as HospitalAuthRegisterRouteImport } from './routes/hospital/_auth/register'
 import { Route as HospitalAuthVerifyRouteImport } from './routes/hospital/_auth/verify'
+import { Route as HospitalAdminIndexRouteImport } from './routes/hospital/admin/index'
+import { Route as HospitalAdminAppointmentsRouteImport } from './routes/hospital/admin/appointments'
+import { Route as HospitalAdminHelpRouteImport } from './routes/hospital/admin/help'
+import { Route as HospitalAdminMessagesRouteImport } from './routes/hospital/admin/messages'
+import { Route as HospitalAdminPersonnelRouteImport } from './routes/hospital/admin/personnel'
+import { Route as HospitalAdminSettingsRouteImport } from './routes/hospital/admin/settings'
+import { Route as HospitalReceptionistIndexRouteImport } from './routes/hospital/receptionist/index'
+import { Route as HospitalReceptionistAppointmentsRouteImport } from './routes/hospital/receptionist/appointments'
+import { Route as HospitalReceptionistHelpRouteImport } from './routes/hospital/receptionist/help'
+import { Route as HospitalReceptionistMessagesRouteImport } from './routes/hospital/receptionist/messages'
+import { Route as HospitalReceptionistPersonnelRouteImport } from './routes/hospital/receptionist/personnel'
+import { Route as HospitalReceptionistSettingsRouteImport } from './routes/hospital/receptionist/settings'
+import { Route as HospitalReceptionistStaffRouteImport } from './routes/hospital/receptionist/staff'
+import { Route as HospitalAdminPatientsIndexRouteImport } from './routes/hospital/admin/patients/index'
+import { Route as HospitalAdminPatientsPatientIdRouteImport } from './routes/hospital/admin/patients/$patientId'
+import { Route as HospitalAdminStaffIndexRouteImport } from './routes/hospital/admin/staff/index'
+import { Route as HospitalAdminStaffStaffIdRouteImport } from './routes/hospital/admin/staff/$staffId'
+import { Route as HospitalReceptionistPatientsIndexRouteImport } from './routes/hospital/receptionist/patients/index'
+import { Route as HospitalReceptionistPatientsPatientIdRouteImport } from './routes/hospital/receptionist/patients/$patientId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -55,11 +75,6 @@ const AuthRegisterRoute = AuthRegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AgentIndexRoute = AgentIndexRouteImport.update({
   id: '/agent/',
   path: '/agent/',
@@ -78,6 +93,16 @@ const HospitalIndexRoute = HospitalIndexRouteImport.update({
 const HospitalAuthRoute = HospitalAuthRouteImport.update({
   id: '/hospital/_auth',
   path: '/hospital',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HospitalAdminRoute = HospitalAdminRouteImport.update({
+  id: '/hospital/admin',
+  path: '/hospital/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HospitalReceptionistRoute = HospitalReceptionistRouteImport.update({
+  id: '/hospital/receptionist',
+  path: '/hospital/receptionist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AgentAuthRegisterHospitalRoute =
@@ -107,6 +132,114 @@ const HospitalAuthVerifyRoute = HospitalAuthVerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => HospitalAuthRoute,
 } as any)
+const HospitalAdminIndexRoute = HospitalAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HospitalAdminRoute,
+} as any)
+const HospitalAdminAppointmentsRoute =
+  HospitalAdminAppointmentsRouteImport.update({
+    id: '/appointments',
+    path: '/appointments',
+    getParentRoute: () => HospitalAdminRoute,
+  } as any)
+const HospitalAdminHelpRoute = HospitalAdminHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => HospitalAdminRoute,
+} as any)
+const HospitalAdminMessagesRoute = HospitalAdminMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => HospitalAdminRoute,
+} as any)
+const HospitalAdminPersonnelRoute = HospitalAdminPersonnelRouteImport.update({
+  id: '/personnel',
+  path: '/personnel',
+  getParentRoute: () => HospitalAdminRoute,
+} as any)
+const HospitalAdminSettingsRoute = HospitalAdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => HospitalAdminRoute,
+} as any)
+const HospitalReceptionistIndexRoute =
+  HospitalReceptionistIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => HospitalReceptionistRoute,
+  } as any)
+const HospitalReceptionistAppointmentsRoute =
+  HospitalReceptionistAppointmentsRouteImport.update({
+    id: '/appointments',
+    path: '/appointments',
+    getParentRoute: () => HospitalReceptionistRoute,
+  } as any)
+const HospitalReceptionistHelpRoute =
+  HospitalReceptionistHelpRouteImport.update({
+    id: '/help',
+    path: '/help',
+    getParentRoute: () => HospitalReceptionistRoute,
+  } as any)
+const HospitalReceptionistMessagesRoute =
+  HospitalReceptionistMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => HospitalReceptionistRoute,
+  } as any)
+const HospitalReceptionistPersonnelRoute =
+  HospitalReceptionistPersonnelRouteImport.update({
+    id: '/personnel',
+    path: '/personnel',
+    getParentRoute: () => HospitalReceptionistRoute,
+  } as any)
+const HospitalReceptionistSettingsRoute =
+  HospitalReceptionistSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => HospitalReceptionistRoute,
+  } as any)
+const HospitalReceptionistStaffRoute =
+  HospitalReceptionistStaffRouteImport.update({
+    id: '/staff',
+    path: '/staff',
+    getParentRoute: () => HospitalReceptionistRoute,
+  } as any)
+const HospitalAdminPatientsIndexRoute =
+  HospitalAdminPatientsIndexRouteImport.update({
+    id: '/patients/',
+    path: '/patients/',
+    getParentRoute: () => HospitalAdminRoute,
+  } as any)
+const HospitalAdminPatientsPatientIdRoute =
+  HospitalAdminPatientsPatientIdRouteImport.update({
+    id: '/patients/$patientId',
+    path: '/patients/$patientId',
+    getParentRoute: () => HospitalAdminRoute,
+  } as any)
+const HospitalAdminStaffIndexRoute = HospitalAdminStaffIndexRouteImport.update({
+  id: '/staff/',
+  path: '/staff/',
+  getParentRoute: () => HospitalAdminRoute,
+} as any)
+const HospitalAdminStaffStaffIdRoute =
+  HospitalAdminStaffStaffIdRouteImport.update({
+    id: '/staff/$staffId',
+    path: '/staff/$staffId',
+    getParentRoute: () => HospitalAdminRoute,
+  } as any)
+const HospitalReceptionistPatientsIndexRoute =
+  HospitalReceptionistPatientsIndexRouteImport.update({
+    id: '/patients/',
+    path: '/patients/',
+    getParentRoute: () => HospitalReceptionistRoute,
+  } as any)
+const HospitalReceptionistPatientsPatientIdRoute =
+  HospitalReceptionistPatientsPatientIdRouteImport.update({
+    id: '/patients/$patientId',
+    path: '/patients/$patientId',
+    getParentRoute: () => HospitalReceptionistRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -114,9 +247,10 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
-  '/reset-password': typeof AuthResetPasswordRoute
   '/agent': typeof AgentAuthRouteWithChildren
   '/hospital': typeof HospitalAuthRouteWithChildren
+  '/hospital/admin': typeof HospitalAdminRouteWithChildren
+  '/hospital/receptionist': typeof HospitalReceptionistRouteWithChildren
   '/agent/': typeof AgentIndexRoute
   '/hospital/': typeof HospitalIndexRoute
   '/agent/register-hospital': typeof AgentAuthRegisterHospitalRoute
@@ -124,6 +258,25 @@ export interface FileRoutesByFullPath {
   '/hospital/login': typeof HospitalAuthLoginRoute
   '/hospital/register': typeof HospitalAuthRegisterRoute
   '/hospital/verify': typeof HospitalAuthVerifyRoute
+  '/hospital/admin/appointments': typeof HospitalAdminAppointmentsRoute
+  '/hospital/admin/help': typeof HospitalAdminHelpRoute
+  '/hospital/admin/messages': typeof HospitalAdminMessagesRoute
+  '/hospital/admin/personnel': typeof HospitalAdminPersonnelRoute
+  '/hospital/admin/settings': typeof HospitalAdminSettingsRoute
+  '/hospital/receptionist/appointments': typeof HospitalReceptionistAppointmentsRoute
+  '/hospital/receptionist/help': typeof HospitalReceptionistHelpRoute
+  '/hospital/receptionist/messages': typeof HospitalReceptionistMessagesRoute
+  '/hospital/receptionist/personnel': typeof HospitalReceptionistPersonnelRoute
+  '/hospital/receptionist/settings': typeof HospitalReceptionistSettingsRoute
+  '/hospital/receptionist/staff': typeof HospitalReceptionistStaffRoute
+  '/hospital/admin/': typeof HospitalAdminIndexRoute
+  '/hospital/receptionist/': typeof HospitalReceptionistIndexRoute
+  '/hospital/admin/patients/$patientId': typeof HospitalAdminPatientsPatientIdRoute
+  '/hospital/admin/staff/$staffId': typeof HospitalAdminStaffStaffIdRoute
+  '/hospital/receptionist/patients/$patientId': typeof HospitalReceptionistPatientsPatientIdRoute
+  '/hospital/admin/patients/': typeof HospitalAdminPatientsIndexRoute
+  '/hospital/admin/staff/': typeof HospitalAdminStaffIndexRoute
+  '/hospital/receptionist/patients/': typeof HospitalReceptionistPatientsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -131,7 +284,6 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
-  '/reset-password': typeof AuthResetPasswordRoute
   '/agent': typeof AgentIndexRoute
   '/hospital': typeof HospitalIndexRoute
   '/agent/register-hospital': typeof AgentAuthRegisterHospitalRoute
@@ -139,6 +291,25 @@ export interface FileRoutesByTo {
   '/hospital/login': typeof HospitalAuthLoginRoute
   '/hospital/register': typeof HospitalAuthRegisterRoute
   '/hospital/verify': typeof HospitalAuthVerifyRoute
+  '/hospital/admin/appointments': typeof HospitalAdminAppointmentsRoute
+  '/hospital/admin/help': typeof HospitalAdminHelpRoute
+  '/hospital/admin/messages': typeof HospitalAdminMessagesRoute
+  '/hospital/admin/personnel': typeof HospitalAdminPersonnelRoute
+  '/hospital/admin/settings': typeof HospitalAdminSettingsRoute
+  '/hospital/receptionist/appointments': typeof HospitalReceptionistAppointmentsRoute
+  '/hospital/receptionist/help': typeof HospitalReceptionistHelpRoute
+  '/hospital/receptionist/messages': typeof HospitalReceptionistMessagesRoute
+  '/hospital/receptionist/personnel': typeof HospitalReceptionistPersonnelRoute
+  '/hospital/receptionist/settings': typeof HospitalReceptionistSettingsRoute
+  '/hospital/receptionist/staff': typeof HospitalReceptionistStaffRoute
+  '/hospital/admin': typeof HospitalAdminIndexRoute
+  '/hospital/receptionist': typeof HospitalReceptionistIndexRoute
+  '/hospital/admin/patients/$patientId': typeof HospitalAdminPatientsPatientIdRoute
+  '/hospital/admin/staff/$staffId': typeof HospitalAdminStaffStaffIdRoute
+  '/hospital/receptionist/patients/$patientId': typeof HospitalReceptionistPatientsPatientIdRoute
+  '/hospital/admin/patients': typeof HospitalAdminPatientsIndexRoute
+  '/hospital/admin/staff': typeof HospitalAdminStaffIndexRoute
+  '/hospital/receptionist/patients': typeof HospitalReceptionistPatientsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -148,9 +319,10 @@ export interface FileRoutesById {
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
-  '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/agent/_auth': typeof AgentAuthRouteWithChildren
   '/hospital/_auth': typeof HospitalAuthRouteWithChildren
+  '/hospital/admin': typeof HospitalAdminRouteWithChildren
+  '/hospital/receptionist': typeof HospitalReceptionistRouteWithChildren
   '/agent/': typeof AgentIndexRoute
   '/hospital/': typeof HospitalIndexRoute
   '/agent/_auth/register-hospital': typeof AgentAuthRegisterHospitalRoute
@@ -158,6 +330,25 @@ export interface FileRoutesById {
   '/hospital/_auth/login': typeof HospitalAuthLoginRoute
   '/hospital/_auth/register': typeof HospitalAuthRegisterRoute
   '/hospital/_auth/verify': typeof HospitalAuthVerifyRoute
+  '/hospital/admin/appointments': typeof HospitalAdminAppointmentsRoute
+  '/hospital/admin/help': typeof HospitalAdminHelpRoute
+  '/hospital/admin/messages': typeof HospitalAdminMessagesRoute
+  '/hospital/admin/personnel': typeof HospitalAdminPersonnelRoute
+  '/hospital/admin/settings': typeof HospitalAdminSettingsRoute
+  '/hospital/receptionist/appointments': typeof HospitalReceptionistAppointmentsRoute
+  '/hospital/receptionist/help': typeof HospitalReceptionistHelpRoute
+  '/hospital/receptionist/messages': typeof HospitalReceptionistMessagesRoute
+  '/hospital/receptionist/personnel': typeof HospitalReceptionistPersonnelRoute
+  '/hospital/receptionist/settings': typeof HospitalReceptionistSettingsRoute
+  '/hospital/receptionist/staff': typeof HospitalReceptionistStaffRoute
+  '/hospital/admin/': typeof HospitalAdminIndexRoute
+  '/hospital/receptionist/': typeof HospitalReceptionistIndexRoute
+  '/hospital/admin/patients/$patientId': typeof HospitalAdminPatientsPatientIdRoute
+  '/hospital/admin/staff/$staffId': typeof HospitalAdminStaffStaffIdRoute
+  '/hospital/receptionist/patients/$patientId': typeof HospitalReceptionistPatientsPatientIdRoute
+  '/hospital/admin/patients/': typeof HospitalAdminPatientsIndexRoute
+  '/hospital/admin/staff/': typeof HospitalAdminStaffIndexRoute
+  '/hospital/receptionist/patients/': typeof HospitalReceptionistPatientsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -167,9 +358,10 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/register'
-    | '/reset-password'
     | '/agent'
     | '/hospital'
+    | '/hospital/admin'
+    | '/hospital/receptionist'
     | '/agent/'
     | '/hospital/'
     | '/agent/register-hospital'
@@ -177,6 +369,25 @@ export interface FileRouteTypes {
     | '/hospital/login'
     | '/hospital/register'
     | '/hospital/verify'
+    | '/hospital/admin/appointments'
+    | '/hospital/admin/help'
+    | '/hospital/admin/messages'
+    | '/hospital/admin/personnel'
+    | '/hospital/admin/settings'
+    | '/hospital/receptionist/appointments'
+    | '/hospital/receptionist/help'
+    | '/hospital/receptionist/messages'
+    | '/hospital/receptionist/personnel'
+    | '/hospital/receptionist/settings'
+    | '/hospital/receptionist/staff'
+    | '/hospital/admin/'
+    | '/hospital/receptionist/'
+    | '/hospital/admin/patients/$patientId'
+    | '/hospital/admin/staff/$staffId'
+    | '/hospital/receptionist/patients/$patientId'
+    | '/hospital/admin/patients/'
+    | '/hospital/admin/staff/'
+    | '/hospital/receptionist/patients/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -184,7 +395,6 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/register'
-    | '/reset-password'
     | '/agent'
     | '/hospital'
     | '/agent/register-hospital'
@@ -192,6 +402,25 @@ export interface FileRouteTypes {
     | '/hospital/login'
     | '/hospital/register'
     | '/hospital/verify'
+    | '/hospital/admin/appointments'
+    | '/hospital/admin/help'
+    | '/hospital/admin/messages'
+    | '/hospital/admin/personnel'
+    | '/hospital/admin/settings'
+    | '/hospital/receptionist/appointments'
+    | '/hospital/receptionist/help'
+    | '/hospital/receptionist/messages'
+    | '/hospital/receptionist/personnel'
+    | '/hospital/receptionist/settings'
+    | '/hospital/receptionist/staff'
+    | '/hospital/admin'
+    | '/hospital/receptionist'
+    | '/hospital/admin/patients/$patientId'
+    | '/hospital/admin/staff/$staffId'
+    | '/hospital/receptionist/patients/$patientId'
+    | '/hospital/admin/patients'
+    | '/hospital/admin/staff'
+    | '/hospital/receptionist/patients'
   id:
     | '__root__'
     | '/'
@@ -200,9 +429,10 @@ export interface FileRouteTypes {
     | '/_auth/forgot-password'
     | '/_auth/login'
     | '/_auth/register'
-    | '/_auth/reset-password'
     | '/agent/_auth'
     | '/hospital/_auth'
+    | '/hospital/admin'
+    | '/hospital/receptionist'
     | '/agent/'
     | '/hospital/'
     | '/agent/_auth/register-hospital'
@@ -210,6 +440,25 @@ export interface FileRouteTypes {
     | '/hospital/_auth/login'
     | '/hospital/_auth/register'
     | '/hospital/_auth/verify'
+    | '/hospital/admin/appointments'
+    | '/hospital/admin/help'
+    | '/hospital/admin/messages'
+    | '/hospital/admin/personnel'
+    | '/hospital/admin/settings'
+    | '/hospital/receptionist/appointments'
+    | '/hospital/receptionist/help'
+    | '/hospital/receptionist/messages'
+    | '/hospital/receptionist/personnel'
+    | '/hospital/receptionist/settings'
+    | '/hospital/receptionist/staff'
+    | '/hospital/admin/'
+    | '/hospital/receptionist/'
+    | '/hospital/admin/patients/$patientId'
+    | '/hospital/admin/staff/$staffId'
+    | '/hospital/receptionist/patients/$patientId'
+    | '/hospital/admin/patients/'
+    | '/hospital/admin/staff/'
+    | '/hospital/receptionist/patients/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -218,6 +467,8 @@ export interface RootRouteChildren {
   DesignSystemRoute: typeof DesignSystemRoute
   AgentAuthRoute: typeof AgentAuthRouteWithChildren
   HospitalAuthRoute: typeof HospitalAuthRouteWithChildren
+  HospitalAdminRoute: typeof HospitalAdminRouteWithChildren
+  HospitalReceptionistRoute: typeof HospitalReceptionistRouteWithChildren
   AgentIndexRoute: typeof AgentIndexRoute
   HospitalIndexRoute: typeof HospitalIndexRoute
 }
@@ -266,13 +517,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/reset-password': {
-      id: '/_auth/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof AuthResetPasswordRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/agent/': {
       id: '/agent/'
       path: '/agent'
@@ -299,6 +543,20 @@ declare module '@tanstack/react-router' {
       path: '/hospital'
       fullPath: '/hospital'
       preLoaderRoute: typeof HospitalAuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hospital/admin': {
+      id: '/hospital/admin'
+      path: '/hospital/admin'
+      fullPath: '/hospital/admin'
+      preLoaderRoute: typeof HospitalAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hospital/receptionist': {
+      id: '/hospital/receptionist'
+      path: '/hospital/receptionist'
+      fullPath: '/hospital/receptionist'
+      preLoaderRoute: typeof HospitalReceptionistRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/agent/_auth/register-hospital': {
@@ -336,6 +594,139 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HospitalAuthVerifyRouteImport
       parentRoute: typeof HospitalAuthRoute
     }
+    '/hospital/admin/': {
+      id: '/hospital/admin/'
+      path: '/'
+      fullPath: '/hospital/admin/'
+      preLoaderRoute: typeof HospitalAdminIndexRouteImport
+      parentRoute: typeof HospitalAdminRoute
+    }
+    '/hospital/admin/appointments': {
+      id: '/hospital/admin/appointments'
+      path: '/appointments'
+      fullPath: '/hospital/admin/appointments'
+      preLoaderRoute: typeof HospitalAdminAppointmentsRouteImport
+      parentRoute: typeof HospitalAdminRoute
+    }
+    '/hospital/admin/help': {
+      id: '/hospital/admin/help'
+      path: '/help'
+      fullPath: '/hospital/admin/help'
+      preLoaderRoute: typeof HospitalAdminHelpRouteImport
+      parentRoute: typeof HospitalAdminRoute
+    }
+    '/hospital/admin/messages': {
+      id: '/hospital/admin/messages'
+      path: '/messages'
+      fullPath: '/hospital/admin/messages'
+      preLoaderRoute: typeof HospitalAdminMessagesRouteImport
+      parentRoute: typeof HospitalAdminRoute
+    }
+    '/hospital/admin/personnel': {
+      id: '/hospital/admin/personnel'
+      path: '/personnel'
+      fullPath: '/hospital/admin/personnel'
+      preLoaderRoute: typeof HospitalAdminPersonnelRouteImport
+      parentRoute: typeof HospitalAdminRoute
+    }
+    '/hospital/admin/settings': {
+      id: '/hospital/admin/settings'
+      path: '/settings'
+      fullPath: '/hospital/admin/settings'
+      preLoaderRoute: typeof HospitalAdminSettingsRouteImport
+      parentRoute: typeof HospitalAdminRoute
+    }
+    '/hospital/receptionist/': {
+      id: '/hospital/receptionist/'
+      path: '/'
+      fullPath: '/hospital/receptionist/'
+      preLoaderRoute: typeof HospitalReceptionistIndexRouteImport
+      parentRoute: typeof HospitalReceptionistRoute
+    }
+    '/hospital/receptionist/appointments': {
+      id: '/hospital/receptionist/appointments'
+      path: '/appointments'
+      fullPath: '/hospital/receptionist/appointments'
+      preLoaderRoute: typeof HospitalReceptionistAppointmentsRouteImport
+      parentRoute: typeof HospitalReceptionistRoute
+    }
+    '/hospital/receptionist/help': {
+      id: '/hospital/receptionist/help'
+      path: '/help'
+      fullPath: '/hospital/receptionist/help'
+      preLoaderRoute: typeof HospitalReceptionistHelpRouteImport
+      parentRoute: typeof HospitalReceptionistRoute
+    }
+    '/hospital/receptionist/messages': {
+      id: '/hospital/receptionist/messages'
+      path: '/messages'
+      fullPath: '/hospital/receptionist/messages'
+      preLoaderRoute: typeof HospitalReceptionistMessagesRouteImport
+      parentRoute: typeof HospitalReceptionistRoute
+    }
+    '/hospital/receptionist/personnel': {
+      id: '/hospital/receptionist/personnel'
+      path: '/personnel'
+      fullPath: '/hospital/receptionist/personnel'
+      preLoaderRoute: typeof HospitalReceptionistPersonnelRouteImport
+      parentRoute: typeof HospitalReceptionistRoute
+    }
+    '/hospital/receptionist/settings': {
+      id: '/hospital/receptionist/settings'
+      path: '/settings'
+      fullPath: '/hospital/receptionist/settings'
+      preLoaderRoute: typeof HospitalReceptionistSettingsRouteImport
+      parentRoute: typeof HospitalReceptionistRoute
+    }
+    '/hospital/receptionist/staff': {
+      id: '/hospital/receptionist/staff'
+      path: '/staff'
+      fullPath: '/hospital/receptionist/staff'
+      preLoaderRoute: typeof HospitalReceptionistStaffRouteImport
+      parentRoute: typeof HospitalReceptionistRoute
+    }
+    '/hospital/admin/patients/': {
+      id: '/hospital/admin/patients/'
+      path: '/patients'
+      fullPath: '/hospital/admin/patients/'
+      preLoaderRoute: typeof HospitalAdminPatientsIndexRouteImport
+      parentRoute: typeof HospitalAdminRoute
+    }
+    '/hospital/admin/patients/$patientId': {
+      id: '/hospital/admin/patients/$patientId'
+      path: '/patients/$patientId'
+      fullPath: '/hospital/admin/patients/$patientId'
+      preLoaderRoute: typeof HospitalAdminPatientsPatientIdRouteImport
+      parentRoute: typeof HospitalAdminRoute
+    }
+    '/hospital/admin/staff/': {
+      id: '/hospital/admin/staff/'
+      path: '/staff'
+      fullPath: '/hospital/admin/staff/'
+      preLoaderRoute: typeof HospitalAdminStaffIndexRouteImport
+      parentRoute: typeof HospitalAdminRoute
+    }
+    '/hospital/admin/staff/$staffId': {
+      id: '/hospital/admin/staff/$staffId'
+      path: '/staff/$staffId'
+      fullPath: '/hospital/admin/staff/$staffId'
+      preLoaderRoute: typeof HospitalAdminStaffStaffIdRouteImport
+      parentRoute: typeof HospitalAdminRoute
+    }
+    '/hospital/receptionist/patients/': {
+      id: '/hospital/receptionist/patients/'
+      path: '/patients'
+      fullPath: '/hospital/receptionist/patients/'
+      preLoaderRoute: typeof HospitalReceptionistPatientsIndexRouteImport
+      parentRoute: typeof HospitalReceptionistRoute
+    }
+    '/hospital/receptionist/patients/$patientId': {
+      id: '/hospital/receptionist/patients/$patientId'
+      path: '/patients/$patientId'
+      fullPath: '/hospital/receptionist/patients/$patientId'
+      preLoaderRoute: typeof HospitalReceptionistPatientsPatientIdRouteImport
+      parentRoute: typeof HospitalReceptionistRoute
+    }
   }
 }
 
@@ -343,14 +734,12 @@ interface AuthRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
-  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
-  AuthResetPasswordRoute: AuthResetPasswordRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
@@ -385,12 +774,73 @@ const HospitalAuthRouteWithChildren = HospitalAuthRoute._addFileChildren(
   HospitalAuthRouteChildren,
 )
 
+interface HospitalAdminRouteChildren {
+  HospitalAdminAppointmentsRoute: typeof HospitalAdminAppointmentsRoute
+  HospitalAdminHelpRoute: typeof HospitalAdminHelpRoute
+  HospitalAdminMessagesRoute: typeof HospitalAdminMessagesRoute
+  HospitalAdminPersonnelRoute: typeof HospitalAdminPersonnelRoute
+  HospitalAdminSettingsRoute: typeof HospitalAdminSettingsRoute
+  HospitalAdminIndexRoute: typeof HospitalAdminIndexRoute
+  HospitalAdminPatientsPatientIdRoute: typeof HospitalAdminPatientsPatientIdRoute
+  HospitalAdminStaffStaffIdRoute: typeof HospitalAdminStaffStaffIdRoute
+  HospitalAdminPatientsIndexRoute: typeof HospitalAdminPatientsIndexRoute
+  HospitalAdminStaffIndexRoute: typeof HospitalAdminStaffIndexRoute
+}
+
+const HospitalAdminRouteChildren: HospitalAdminRouteChildren = {
+  HospitalAdminAppointmentsRoute: HospitalAdminAppointmentsRoute,
+  HospitalAdminHelpRoute: HospitalAdminHelpRoute,
+  HospitalAdminMessagesRoute: HospitalAdminMessagesRoute,
+  HospitalAdminPersonnelRoute: HospitalAdminPersonnelRoute,
+  HospitalAdminSettingsRoute: HospitalAdminSettingsRoute,
+  HospitalAdminIndexRoute: HospitalAdminIndexRoute,
+  HospitalAdminPatientsPatientIdRoute: HospitalAdminPatientsPatientIdRoute,
+  HospitalAdminStaffStaffIdRoute: HospitalAdminStaffStaffIdRoute,
+  HospitalAdminPatientsIndexRoute: HospitalAdminPatientsIndexRoute,
+  HospitalAdminStaffIndexRoute: HospitalAdminStaffIndexRoute,
+}
+
+const HospitalAdminRouteWithChildren = HospitalAdminRoute._addFileChildren(
+  HospitalAdminRouteChildren,
+)
+
+interface HospitalReceptionistRouteChildren {
+  HospitalReceptionistAppointmentsRoute: typeof HospitalReceptionistAppointmentsRoute
+  HospitalReceptionistHelpRoute: typeof HospitalReceptionistHelpRoute
+  HospitalReceptionistMessagesRoute: typeof HospitalReceptionistMessagesRoute
+  HospitalReceptionistPersonnelRoute: typeof HospitalReceptionistPersonnelRoute
+  HospitalReceptionistSettingsRoute: typeof HospitalReceptionistSettingsRoute
+  HospitalReceptionistStaffRoute: typeof HospitalReceptionistStaffRoute
+  HospitalReceptionistIndexRoute: typeof HospitalReceptionistIndexRoute
+  HospitalReceptionistPatientsPatientIdRoute: typeof HospitalReceptionistPatientsPatientIdRoute
+  HospitalReceptionistPatientsIndexRoute: typeof HospitalReceptionistPatientsIndexRoute
+}
+
+const HospitalReceptionistRouteChildren: HospitalReceptionistRouteChildren = {
+  HospitalReceptionistAppointmentsRoute: HospitalReceptionistAppointmentsRoute,
+  HospitalReceptionistHelpRoute: HospitalReceptionistHelpRoute,
+  HospitalReceptionistMessagesRoute: HospitalReceptionistMessagesRoute,
+  HospitalReceptionistPersonnelRoute: HospitalReceptionistPersonnelRoute,
+  HospitalReceptionistSettingsRoute: HospitalReceptionistSettingsRoute,
+  HospitalReceptionistStaffRoute: HospitalReceptionistStaffRoute,
+  HospitalReceptionistIndexRoute: HospitalReceptionistIndexRoute,
+  HospitalReceptionistPatientsPatientIdRoute:
+    HospitalReceptionistPatientsPatientIdRoute,
+  HospitalReceptionistPatientsIndexRoute:
+    HospitalReceptionistPatientsIndexRoute,
+}
+
+const HospitalReceptionistRouteWithChildren =
+  HospitalReceptionistRoute._addFileChildren(HospitalReceptionistRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
   DesignSystemRoute: DesignSystemRoute,
   AgentAuthRoute: AgentAuthRouteWithChildren,
   HospitalAuthRoute: HospitalAuthRouteWithChildren,
+  HospitalAdminRoute: HospitalAdminRouteWithChildren,
+  HospitalReceptionistRoute: HospitalReceptionistRouteWithChildren,
   AgentIndexRoute: AgentIndexRoute,
   HospitalIndexRoute: HospitalIndexRoute,
 }

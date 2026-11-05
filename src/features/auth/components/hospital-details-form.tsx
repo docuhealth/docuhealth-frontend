@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AuthHeader } from "@/features/auth/components/auth-header";
-import { RequiredMark } from "@/features/auth/components/required-mark";
+import { RequiredMark } from "@/components/required-mark";
 import { StepProgress } from "@/features/auth/components/step-progress";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import {

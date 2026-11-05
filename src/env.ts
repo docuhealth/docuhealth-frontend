@@ -2,7 +2,8 @@ import { z } from "zod";
 
 // Every VITE_* var is inlined into the client bundle at build time — never put secrets here.
 const envSchema = z.object({
-  VITE_API_URL: z.url(),
+  // Without a trailing slash, so `${VITE_API_URL}/path` never doubles it.
+  VITE_API_URL: z.url().transform((url) => url.replace(/\/+$/, "")),
   VITE_SENTRY_DSN: z
     .string()
     .optional()

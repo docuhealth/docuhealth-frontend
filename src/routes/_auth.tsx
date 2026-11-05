@@ -16,15 +16,16 @@ function AuthLayoutRoute() {
     shouldThrow: false,
     select: (match) => match.search.type === "individual",
   });
+  const loggingIn = useMatch({ from: "/_auth/login", shouldThrow: false });
 
   return (
     <AuthLayout
       headerAction={
-        signingUp && (
+        (signingUp || loggingIn) && (
           <p className="type-body-sm-tight text-fg-body">
             Are you a HealthCare Provider?{" "}
             <Link
-              to="/hospital/register"
+              to={signingUp ? "/hospital/register" : "/hospital/login"}
               className="type-link-sm text-primary underline underline-offset-2"
             >
               Switch

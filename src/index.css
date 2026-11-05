@@ -21,6 +21,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Viewports under 480px tall, e.g. a phone held sideways. */
+@custom-variant short (@media (max-height: 30rem));
+
 @theme inline {
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
@@ -30,6 +33,7 @@
   --color-fg-body: var(--fg-body);
   --color-fg-caption: var(--fg-caption);
   --color-line: var(--line);
+  --color-divider: var(--divider);
   --color-surface: var(--surface);
   --color-warning-100: var(--warning-100);
   --color-warning-500: var(--warning-500);
@@ -101,6 +105,7 @@
   --fg-body: #454f5b;
   --fg-caption: #929aa3;
   --line: #eeeeee; /* "Border color" */
+  --divider: #dfdcd7; /* Vertical dividers, e.g. between the top bar's bell and avatar */
   --surface: #fafafa; /* "BG color" */
   --white: #ffffff;
 
@@ -204,6 +209,30 @@
   font-weight: 700;
 }
 
+/* Heading/H4 */
+@utility type-h4 {
+  font-family: var(--font-heading);
+  font-size: 1.25rem; /* 20px */
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+/* Heading/H5 */
+@utility type-h5 {
+  font-family: var(--font-heading);
+  font-size: 1rem; /* 16px */
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+/* Heading/Stat: a headline number, e.g. on the dashboard's stat cards */
+@utility type-stat {
+  font-family: var(--font-heading);
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.25;
+  font-weight: 700;
+}
+
 /* Heading/Small */
 @utility type-heading-sm {
   font-family: var(--font-heading);
@@ -288,6 +317,15 @@
   letter-spacing: -0.025em;
 }
 
+/* Body/Small Tight Semi Bold */
+@utility type-body-sm-tight-semibold {
+  font-family: var(--font-sans);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
 /* Link/Small: a link inside Body/Small Tight text */
 @utility type-link-sm {
   font-family: var(--font-sans);
@@ -305,12 +343,37 @@
   font-weight: 400;
 }
 
+/* Body/Small Medium */
+@utility type-body-sm-medium {
+  font-family: var(--font-sans);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.4;
+  font-weight: 500;
+}
+
 /* Body/Caption */
 @utility type-caption {
   font-family: var(--font-sans);
   font-size: 0.75rem; /* 12px */
   line-height: 1.35;
   font-weight: 400;
+}
+
+/* Body/Caption Medium */
+@utility type-caption-medium {
+  font-family: var(--font-sans);
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+/* Body/Caption Semi Bold: status pills */
+@utility type-caption-semibold {
+  font-family: var(--font-sans);
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.35;
+  font-weight: 600;
+  letter-spacing: -0.005em;
 }
 
 /* Body/Caption Tight */

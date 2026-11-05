@@ -1,16 +1,29 @@
-import { useNavigate } from "@tanstack/react-router";
+import { type LinkProps, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { RequestResetForm } from "@/features/auth/components/forgot-password-form";
-import { NewPasswordForm } from "@/features/auth/components/reset-password-form";
+import { NewPasswordForm } from "@/features/auth/components/new-password-form";
+import { RequestResetForm } from "@/features/auth/components/request-reset-form";
 import { VerifyCodeForm } from "@/features/auth/components/verify-code-form";
 import type { ResetPasswordValues } from "@/features/auth/lib/schemas";
 
+const copy = {
+  individual: {
+    description: "Enter your registered email and we’ll send you a code to reset your password.",
+    loginTo: "/login",
+  },
+  hospital: {
+    description:
+      "Enter your facility’s registered email and we’ll send you a code to reset your password.",
+    loginTo: "/hospital/login",
+  },
+} satisfies Record<string, { description: string; loginTo: LinkProps["to"] }>;
+
 /**
- * Hospital password reset: email, then the code we send to it, then the new password. Keeps
- * the email so "Change" can go back to it.
+ * Password reset: email, then the code we send to it, then the new password. Keeps the email
+ * so "Change" can go back to it. `audience` picks the copy and which login to return to.
  */
-export function HospitalPasswordReset() {
+export function PasswordReset({ audience }: { audience: keyof typeof copy }) {
+  const { description, loginTo } = copy[audience];
   const navigate = useNavigate();
   const [step, setStep] = useState<"email" | "code" | "password">("email");
   const [email, setEmail] = useState("");
@@ -19,7 +32,7 @@ export function HospitalPasswordReset() {
     // TODO(api): send `email`, the verified code and the new password once the v2 auth API is
     // defined (keep the code from the verify step for this).
     toast.success("Password updated. Log in with your new password.");
-    await navigate({ to: "/hospital/login" });
+    await navigate({ to: loginTo });
   }
 
   if (step === "password") {
@@ -31,7 +44,7 @@ export function HospitalPasswordReset() {
       <VerifyCodeForm
         email={email}
         title="Verify your email"
-        login={{ prompt: "Remember your password?", to: "/hospital/login" }}
+        login={{ prompt: "Remember your password?", to: loginTo }}
         onChangeEmail={() => setStep("email")}
         onVerified={() => setStep("password")}
       />
@@ -40,9 +53,9 @@ export function HospitalPasswordReset() {
 
   return (
     <RequestResetForm
-      description="Enter your facility’s registered email and we’ll send you a code to reset your password."
+      description={description}
       submitLabel="Send code"
-      loginTo="/hospital/login"
+      loginTo={loginTo}
       defaultEmail={email}
       onSubmit={(values) => {
         // TODO(api): call the forgot-password endpoint once the v2 auth API is defined.

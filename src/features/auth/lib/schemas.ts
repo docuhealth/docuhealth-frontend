@@ -35,7 +35,7 @@ export const accountTypeSchema = z.object({
 });
 export type AccountTypeValues = z.infer<typeof accountTypeSchema>;
 
-const genders = ["male", "female"] as const;
+const genders = ["male", "female", "prefer_not_to_say"] as const;
 
 /** Step 1 of the individual sign-up. */
 export const individualInfoSchema = z.object({
