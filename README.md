@@ -3,9 +3,10 @@
 The rebuilt DocuHealth web app (patients, hospitals and their staff roles, partners and
 platform admins), built from the React Setup starter for the new design.
 
-Status: foundations only — tooling, API layer, fonts (Space Grotesk for headings and buttons,
-Inter for everything else), the color palette and type scale, and a placeholder home page at
-`/`. No screens yet; next come the components, then auth and the role dashboards.
+Status: foundations, design system (`/design-system`), and auth/onboarding screens (patient login,
+sign-up, password reset, hospital registration & verification, and field-agent hospital
+registration). Next up: connecting auth to the v2 API, the public landing page, and the role
+dashboards.
 
 ## Stack
 
@@ -34,7 +35,8 @@ npm run dev
 ```
 
 With `VITE_ENABLE_MOCKS=true` the app runs against the MSW fake API in
-`src/mocks/handlers.ts` (empty for now) instead of the backend.
+`src/mocks/handlers.ts` (empty for now) instead of the backend. Set `VITE_PREFILL_FORMS=true` in
+dev to pre-populate auth forms with sample data.
 
 ## Scripts
 
@@ -54,12 +56,15 @@ With `VITE_ENABLE_MOCKS=true` the app runs against the MSW fake API in
 ```
 src/
   routes/                File-based routes — thin; they compose features
-    __root.tsx           Outlet, toaster, devtools, 404
-    index.tsx            "/" — placeholder home page
+    __root.tsx           Outlet, toaster, 404
+    index.tsx            "/" — home page
+    design-system.tsx    "/design-system" — live color, typography & component reference
+    _auth/               Patient auth layout + login, register, forgot/reset-password
     hospital/, agent/    Sections on their own subdomain (see "Sections and subdomains")
   features/<name>/       Domain code: api/ (schemas, requests, query options, mutations),
-                         components/, lib/ (none yet)
-  components/ui/         shadcn components = the design system (generated; edit freely)
+                         components/, lib/ (auth/, landing/)
+  components/            Shared app components (file-dropzone, success-dialog)
+    ui/                  shadcn components = the design system (generated; edit freely)
   lib/                   http client, request(), query client
   stores/                Zustand stores (auth session)
   assets/fonts/          Self-hosted variable fonts (Space Grotesk, Inter)

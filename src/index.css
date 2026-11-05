@@ -25,6 +25,7 @@
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
   --color-brand-pressed: var(--brand-pressed);
+  --color-footer-accent: var(--footer-accent);
   --color-fg-heading: var(--fg-heading);
   --color-fg-body: var(--fg-body);
   --color-fg-caption: var(--fg-caption);
@@ -93,6 +94,7 @@
   --brand: #3e4095;
   --brand-hover: #383a88;
   --brand-pressed: #2c2d6a;
+  --footer-accent: #f2b544;
 
   /* Neutral */
   --fg-heading: #1b2b40; /* "Text color" */
@@ -183,7 +185,7 @@
   font-family: var(--font-heading);
   font-size: 4rem; /* 64px */
   line-height: 1.1;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 /* Heading/H2 */
@@ -191,7 +193,7 @@
   font-family: var(--font-heading);
   font-size: 3rem; /* 48px */
   line-height: 1.1;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 /* Heading/H3 */

@@ -9,5 +9,8 @@
   "files.watcherExclude": { "src/routeTree.gen.ts": true },
   "search.exclude": { "src/routeTree.gen.ts": true },
   "tailwindCSS.experimental.configFile": "src/index.css",
-  "tailwindCSS.classFunctions": ["cn", "cva"]
+  "tailwindCSS.classFunctions": ["cn", "cva"],
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
 }
