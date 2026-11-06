@@ -98,6 +98,95 @@ full URL on the right subdomain. `VITE_ROOT_DOMAIN` names the production domain;
 (e.g. preview deploys) nothing is rewritten and the prefixed paths are used directly. In
 production, point all four domains at the same deployment.
 
+## Links and user flows
+
+Paths below are what appears in the browser, on the base URL from the table above. For example,
+`/register` under Hospitals is `hospital.docuhealthservices.net/register` in production and
+`hospital.localhost:5173/register` in dev.
+
+Logging in isn't connected to the API yet, so nothing redirects to a dashboard after login and
+the dashboards have no auth guard. Open a dashboard by going to its URL directly.
+
+### Patients and public site
+
+| Path                        | Page                                           |
+| --------------------------- | ---------------------------------------------- |
+| `/`                         | Landing page                                   |
+| `/login`                    | Patient login                                  |
+| `/register`                 | Choose an account type                         |
+| `/register?type=individual` | Patient sign-up                                |
+| `/forgot-password`          | Patient password reset                         |
+| `/design-system`            | Live color, typography and component reference |
+
+```
+Sign up:   / → /register → choose an account type
+             ├─ Individual: /register?type=individual
+             │    your info → verify email code → account details → HIN shown → /login
+             └─ Health Provider: hospital /register (see Hospitals)
+
+Log in:    /login → stays on the page with a "not connected" message (later: patient dashboard)
+
+Reset:     /forgot-password → email → code → new password → /login
+```
+
+The landing page's "Partner with Us" and contact section links go to the hospital `/register`. A
+"Switch" link in the auth header moves between the patient and hospital versions of login and
+sign-up. Anyone with a session who opens a patient auth page is redirected to `/`.
+
+### Hospitals and their staff
+
+| Path                             | Page                                                        |
+| -------------------------------- | ----------------------------------------------------------- |
+| `/`                              | Redirects to `/login` (later: the staff member's dashboard) |
+| `/login`                         | Hospital login                                              |
+| `/register`                      | Facility registration request                               |
+| `/verify?token=…`                | Facility documents and admin details, from the email link   |
+| `/forgot-password`               | Hospital password reset                                     |
+| `/admin`                         | Hospital admin dashboard                                    |
+| `/admin/staff`                   | Staff list (`/admin/staff/:staffId` for one)                |
+| `/admin/patients`                | Patient list (`/admin/patients/:patientId` for one)         |
+| `/admin/appointments`            | Appointments                                                |
+| `/admin/messages`                | Messages                                                    |
+| `/admin/personnel`               | Health personnel                                            |
+| `/admin/settings`, `/admin/help` | Settings and help                                           |
+| `/receptionist`                  | Receptionist dashboard                                      |
+| `/receptionist/…`                | Same sections as admin, except a single `/staff` page       |
+
+```
+Register:  /register → submit facility details → approval → verification email
+             → /verify?token=… → documents → admin details → done → main site /
+           (no token shows a "Link expired" notice)
+
+Log in:    /login → stays on the page with a "not connected" message (later: staff dashboard)
+
+Reset:     /forgot-password → email → code → new password → /login
+
+Log out:   any dashboard → clears the session → /login
+```
+
+`hospital.<domain>/admin` is the **hospital's** admin dashboard. It isn't the DocuHealth admin
+section, which is `admin.<domain>`.
+
+### Field agents
+
+| Path                 | Page                                                 |
+| -------------------- | ---------------------------------------------------- |
+| `/`                  | Redirects to `/register-hospital` (later: dashboard) |
+| `/register-hospital` | Register a hospital on its behalf                    |
+
+```
+Register a hospital:  /register-hospital
+  hospital details → location → admin details → done (we email the admin) → main site /
+```
+
+There's no agent login or dashboard yet, so this page is open to anyone, and no page links to the
+agent section.
+
+### DocuHealth admins
+
+Not built. The subdomain is reserved in `src/lib/sections.ts`, but `src/routes/admin/` doesn't
+exist yet, so `admin.<domain>` shows the 404 page.
+
 ## Conventions
 
 - **Imports** use the `@/` alias; no `../`. Enforced by lint:
