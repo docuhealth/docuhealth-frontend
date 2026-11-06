@@ -46,9 +46,9 @@ function AccordionTrigger({
           className="relative flex size-5 shrink-0 items-center justify-center transition-transform duration-300 ease-in-out group-aria-expanded/accordion-trigger:rotate-180"
         >
           {/* Horizontal minus line */}
-          <span className="absolute h-0.5 w-3.5 rounded-full bg-primary" />
+          <span className="absolute h-[1.5px] w-4.5 rounded-full bg-primary" />
           {/* Vertical line that collapses/rotates into horizontal line when opened */}
-          <span className="absolute h-3.5 w-0.5 rounded-full bg-primary transition-all duration-300 ease-in-out group-aria-expanded/accordion-trigger:scale-y-0 group-aria-expanded/accordion-trigger:rotate-90 group-aria-expanded/accordion-trigger:opacity-0" />
+          <span className="absolute h-4.5 w-[1.5px] rounded-full bg-primary transition-all duration-300 ease-in-out group-aria-expanded/accordion-trigger:scale-y-0 group-aria-expanded/accordion-trigger:rotate-90 group-aria-expanded/accordion-trigger:opacity-0" />
         </span>
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>

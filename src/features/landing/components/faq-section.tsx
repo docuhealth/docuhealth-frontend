@@ -4,6 +4,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { LandingContainer } from "@/features/landing/components/landing-container";
+import { SectionHeading } from "@/features/landing/components/section-heading";
 
 const faqs = [
   {
@@ -35,29 +37,30 @@ const faqs = [
 
 export function FaqSection() {
   return (
-    <section id="faq" className="mx-auto w-full max-w-11/12 px-4 py-16 sm:py-20 lg:py-28 xl:px-6">
-      <div className="mx-auto flex max-w-xl flex-col items-center text-center">
-        <h2 className="type-accent-h1 md:type-h2">
-          <span className="font-normal">Frequently asked</span>{" "}
-          <span className="font-bold">questions</span>
-        </h2>
-        <p className="mt-3 max-w-md type-body-sm-regular text-fg-body sm:type-body">
-          See the answers to some of the frequent questions we&apos;re being asked about DocuHealth.
-        </p>
-      </div>
+    <LandingContainer id="faq" className="pt-20 lg:pt-40">
+      <SectionHeading
+        title={
+          <>
+            Frequently asked <strong>questions</strong>
+          </>
+        }
+        description="See the answers to some of the frequent questions we're being asked about DocuHealth."
+      />
 
-      <div className="mx-auto mt-12 max-w-3xl lg:mt-16">
+      <div className="mx-auto mt-10 max-w-175">
         <Accordion type="single" collapsible defaultValue="item-0">
           {faqs.map((faq, index) => (
-            <AccordionItem key={faq.question} value={`item-${index}`}>
-              <AccordionTrigger className="type-body sm:type-accent-h3">
-                {faq.question}
-              </AccordionTrigger>
-              <AccordionContent className="max-w-2xl">{faq.answer}</AccordionContent>
+            <AccordionItem
+              key={faq.question}
+              value={`item-${index}`}
+              className="py-0 first:border-t-0 last:border-b-0"
+            >
+              <AccordionTrigger className="py-4.75 type-title-sm">{faq.question}</AccordionTrigger>
+              <AccordionContent className="pt-0 type-body">{faq.answer}</AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
       </div>
-    </section>
+    </LandingContainer>
   );
 }

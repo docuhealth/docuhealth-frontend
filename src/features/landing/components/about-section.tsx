@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import avatar1Url from "@/assets/avatars/avatar-1.jpg";
-import avatar2Url from "@/assets/avatars/avatar-2.jpg";
-import avatar3Url from "@/assets/avatars/avatar-3.jpg";
+import avatar1Url from "@/assets/avatars/about-doctor-1.jpg";
+import avatar2Url from "@/assets/avatars/about-doctor-2.jpg";
+import avatar3Url from "@/assets/avatars/about-doctor-3.jpg";
 import { Avatar, AvatarGroup, AvatarImage } from "@/components/ui/avatar";
 
 const avatars = [
@@ -16,7 +16,7 @@ const trailingWords =
   );
 
 export function AboutSection() {
-  const paragraphRef = useRef<HTMLParagraphElement>(null);
+  const paragraphRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const paragraph = paragraphRef.current;
@@ -65,60 +65,48 @@ export function AboutSection() {
 
   return (
     <section id="about" className="bg-fg-heading text-white">
-      {/* Top architectural grid band */}
-      <div className="mx-auto w-full max-w-11/12 px-4 xl:px-6">
-        <div className="h-12 border-x border-white/10 md:h-20" />
-      </div>
+      <div className="relative mx-auto max-w-360 px-4 pt-32 pb-20 lg:pt-40 lg:pb-40">
+        {/* Architectural grid: side rails, a top rule, and a marker where they cross */}
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <span className="absolute inset-y-0 left-4 w-px bg-white/10 lg:left-21" />
+          <span className="absolute inset-y-0 right-4 w-px bg-white/10 lg:right-21" />
+          <span className="absolute inset-x-0 top-23.5 h-px bg-white/10" />
+          <span className="absolute top-23.5 left-4 size-1.5 -translate-1/2 bg-white/10 lg:left-21" />
+          <span className="absolute top-23.5 right-4 size-1.5 translate-x-1/2 -translate-y-1/2 bg-white/10 lg:right-21" />
+        </div>
 
-      {/* Main framed section */}
-      <div className="border-t border-white/10">
-        <div className="mx-auto w-full max-w-11/12 px-4 xl:px-6">
-          <div className="relative flex flex-col items-center border-x border-white/10 px-4 py-20 text-center sm:px-8 md:py-28 lg:py-36">
-            {/* Corner intersection markers */}
+        <div className="relative flex flex-col items-center text-center">
+          <span className="rounded-full bg-white/10 px-4 py-1.75 type-body-sm-medium tracking-widest text-white uppercase">
+            About Us
+          </span>
+
+          <div ref={paragraphRef} className="mt-12 max-w-220 type-statement">
             <span
-              aria-hidden
-              className="pointer-events-none absolute -top-1 -left-1 size-2 bg-white/25"
-            />
-            <span
-              aria-hidden
-              className="pointer-events-none absolute -top-1 -right-1 size-2 bg-white/25"
-            />
-
-            <span className="rounded-full bg-white/10 px-4 py-1.5 type-label text-white/90">
-              About Us
-            </span>
-
-            <p
-              ref={paragraphRef}
-              className="mt-8 max-w-4xl type-accent-h2 sm:type-accent-h1 md:type-h2"
+              data-reveal-item
+              className="text-white/35 transition-colors duration-200 data-[active=true]:text-white"
             >
-              <span
-                data-reveal-item
-                className="text-fg-caption transition-colors duration-200 data-[active=true]:text-white"
-              >
-                DocuHealth{" "}
-              </span>
-              <AvatarGroup
-                data-reveal-item
-                className="mx-1.5 inline-flex -space-x-3 align-middle opacity-40 transition-opacity duration-200 data-[active=true]:opacity-100 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-white"
-              >
-                {avatars.map((avatar) => (
-                  <Avatar key={avatar.alt} className="size-8 sm:size-10 md:size-12">
-                    <AvatarImage src={avatar.src} alt={avatar.alt} />
-                  </Avatar>
-                ))}
-              </AvatarGroup>{" "}
-              {trailingWords.map((word, index) => (
-                <span
-                  key={`${index}-${word}`}
-                  data-reveal-item
-                  className="text-fg-caption transition-colors duration-200 data-[active=true]:text-white"
-                >
-                  {word}
-                  {index < trailingWords.length - 1 ? " " : ""}
-                </span>
+              DocuHealth{" "}
+            </span>
+            <AvatarGroup
+              data-reveal-item
+              className="inline-flex -space-x-1.5 align-middle opacity-40 transition-opacity duration-200 data-[active=true]:opacity-100 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-white"
+            >
+              {avatars.map((avatar) => (
+                <Avatar key={avatar.alt} className="size-9 md:size-14">
+                  <AvatarImage src={avatar.src} alt={avatar.alt} />
+                </Avatar>
               ))}
-            </p>
+            </AvatarGroup>{" "}
+            {trailingWords.map((word, index) => (
+              <span
+                key={`${index}-${word}`}
+                data-reveal-item
+                className="text-white/35 transition-colors duration-200 data-[active=true]:text-white"
+              >
+                {word}
+                {index < trailingWords.length - 1 ? " " : ""}
+              </span>
+            ))}
           </div>
         </div>
       </div>

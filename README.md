@@ -127,33 +127,43 @@ production, point all four domains at the same deployment.
 - **Text**: every piece of text uses one type role from the design's typography guide instead
   of mixing size/weight/leading classes. Body text defaults to `type-body`.
 
-  | Class                         | Guide name                 | Font · size / line height · tracking     |
-  | ----------------------------- | -------------------------- | ---------------------------------------- |
-  | `type-h1`                     | Heading/H1                 | Space Grotesk · 64px / 110%              |
-  | `type-h2`                     | Heading/H2                 | Space Grotesk · 48px / 110%              |
-  | `type-h3`                     | Heading/H3                 | Space Grotesk Bold · 24px / 135%         |
-  | `type-h4`                     | Heading/H4                 | Space Grotesk Bold · 20px / 140%         |
-  | `type-h5`                     | Heading/H5                 | Space Grotesk Bold · 16px / 140%         |
-  | `type-stat`                   | Heading/Stat               | Space Grotesk Bold · 24px / 125%         |
-  | `type-heading-sm`             | Heading/Small              | Space Grotesk Medium · 14px / 140%       |
-  | `type-heading-sm-regular`     | Heading/Small Regular      | Space Grotesk Regular · 14px / 140%      |
-  | `type-quote`                  | Header/Quote               | Space Grotesk · 32px / 125%              |
-  | `type-accent-h1`              | Accent/H1                  | Inter Semi Bold · 32px / 120% · -2.5%    |
-  | `type-accent-h2`              | Accent/H2                  | Inter Semi Bold · 24px / 135% · -2.5%    |
-  | `type-accent-h3`              | Accent/H3                  | Inter Semi Bold · 20px / 140% · -2.5%    |
-  | `type-accent-h4`              | Accent/H4                  | Inter Regular · 18px / 135%              |
-  | `type-body`                   | Body/Medium                | Inter Regular · 16px / 140%              |
-  | `type-body-sm`                | Body/Small                 | Inter Medium · 14px / 150%               |
-  | `type-body-sm-tight`          | Body/Small Tight           | Inter Regular · 14px / 140% · -2.5%      |
-  | `type-body-sm-tight-semibold` | Body/Small Tight Semi Bold | Inter Semi Bold · 14px / 140% · -2.5%    |
-  | `type-link-sm`                | Link/Small                 | Inter Medium · 14px / 140% · -2.5%       |
-  | `type-body-sm-regular`        | Body/Small Regular         | Inter Regular · 14px / 140%              |
-  | `type-body-sm-medium`         | Body/Small Medium          | Inter Medium · 14px / 140%               |
-  | `type-caption`                | Body/Caption               | Inter Regular · 12px / 135%              |
-  | `type-caption-medium`         | Body/Caption Medium        | Inter Medium · 12px / 135%               |
-  | `type-caption-semibold`       | Body/Caption Semi Bold     | Inter Semi Bold · 12px / 135% · -0.5%    |
-  | `type-caption-tight`          | Body/Caption Tight         | Inter Regular · 12px / 135% · -2.5%      |
-  | `type-label`                  | Label                      | Inter Semi Bold · 12px / 135% · 8%, caps |
+  | Class                         | Guide name                 | Font · size / line height · tracking                |
+  | ----------------------------- | -------------------------- | --------------------------------------------------- |
+  | `type-h1`                     | Heading/H1                 | Space Grotesk · 64px / 110%                         |
+  | `type-h2`                     | Heading/H2                 | Space Grotesk · 48px / 110%                         |
+  | `type-h3`                     | Heading/H3                 | Space Grotesk Bold · 24px / 135%                    |
+  | `type-h4`                     | Heading/H4                 | Space Grotesk Bold · 20px / 140%                    |
+  | `type-h5`                     | Heading/H5                 | Space Grotesk Bold · 16px / 140%                    |
+  | `type-stat`                   | Heading/Stat               | Space Grotesk Bold · 24px / 125%                    |
+  | `type-heading-sm`             | Heading/Small              | Space Grotesk Medium · 14px / 140%                  |
+  | `type-heading-sm-regular`     | Heading/Small Regular      | Space Grotesk Regular · 14px / 140%                 |
+  | `type-quote`                  | Header/Quote               | Space Grotesk · 32px / 125%                         |
+  | `type-section`                | Landing/Section            | Space Grotesk · 40px / 110% · -2.5% (30px mobile)   |
+  | `type-statement`              | Landing/Statement          | Inter Regular · 56px / 117% · -2.5% (28px mobile)   |
+  | `type-stat-lg`                | Landing/Stat               | Space Grotesk Semi Bold · 96px / 100% (64px mobile) |
+  | `type-title-xl`               | Landing/Title XL           | Space Grotesk · 28px / 130%                         |
+  | `type-title-lg`               | Landing/Contact            | Space Grotesk Semi Bold · 22px / 135%               |
+  | `type-title`                  | Landing/Title              | Space Grotesk Medium · 20px / 130%                  |
+  | `type-title-sm`               | Landing/Title Small        | Space Grotesk Medium · 18px / 140%                  |
+  | `type-lead`                   | Landing/Lead               | Inter Regular · 18px / 135% · -2.5%                 |
+  | `type-body-tight`             | Landing/Body               | Inter Regular · 16px / 140% · -2%                   |
+  | `type-body-lg`                | Landing/Body Large         | Inter Regular · 20px / 140%                         |
+  | `type-accent-h1`              | Accent/H1                  | Inter Semi Bold · 32px / 120% · -2.5%               |
+  | `type-accent-h2`              | Accent/H2                  | Inter Semi Bold · 24px / 135% · -2.5%               |
+  | `type-accent-h3`              | Accent/H3                  | Inter Semi Bold · 20px / 140% · -2.5%               |
+  | `type-accent-h4`              | Accent/H4                  | Inter Regular · 18px / 135%                         |
+  | `type-body`                   | Body/Medium                | Inter Regular · 16px / 140%                         |
+  | `type-body-sm`                | Body/Small                 | Inter Medium · 14px / 150%                          |
+  | `type-body-sm-tight`          | Body/Small Tight           | Inter Regular · 14px / 140% · -2.5%                 |
+  | `type-body-sm-tight-semibold` | Body/Small Tight Semi Bold | Inter Semi Bold · 14px / 140% · -2.5%               |
+  | `type-link-sm`                | Link/Small                 | Inter Medium · 14px / 140% · -2.5%                  |
+  | `type-body-sm-regular`        | Body/Small Regular         | Inter Regular · 14px / 140%                         |
+  | `type-body-sm-medium`         | Body/Small Medium          | Inter Medium · 14px / 140%                          |
+  | `type-caption`                | Body/Caption               | Inter Regular · 12px / 135%                         |
+  | `type-caption-medium`         | Body/Caption Medium        | Inter Medium · 12px / 135%                          |
+  | `type-caption-semibold`       | Body/Caption Semi Bold     | Inter Semi Bold · 12px / 135% · -0.5%               |
+  | `type-caption-tight`          | Body/Caption Tight         | Inter Regular · 12px / 135% · -2.5%                 |
+  | `type-label`                  | Label                      | Inter Semi Bold · 12px / 135% · 8%, caps            |
 
   Roles set only typography, so add a color class alongside (`type-caption text-fg-caption`).
   Always write class names in full — Tailwind only generates classes it finds literally in the
