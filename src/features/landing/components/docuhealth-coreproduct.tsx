@@ -4,10 +4,7 @@ import providerImageUrl from "@/assets/images/core-product-provider.png";
 
 export function DocuhealthCoreProduct() {
   return (
-    <section
-      id="products"
-      className="mx-auto w-full max-w-11/12 px-4 py-16 sm:py-20 lg:py-28 xl:px-6"
-    >
+    <section id="products" className="w-full py-16 sm:py-20 lg:py-28">
       <div className="mx-auto flex max-w-xl flex-col items-center text-center">
         <h2 className="type-accent-h1 md:type-h2">
           <span className="font-normal">DocuHealth</span>{" "}

@@ -64,15 +64,15 @@ export function AboutSection() {
   }, []);
 
   return (
-    <section id="about" className="bg-fg-heading text-white">
+    <section id="about" className="w-full bg-fg-heading text-white">
       {/* Top architectural grid band */}
-      <div className="mx-auto w-full max-w-11/12 px-4 xl:px-6">
+      <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8">
         <div className="h-12 border-x border-white/10 md:h-20" />
       </div>
 
       {/* Main framed section */}
       <div className="border-t border-white/10">
-        <div className="mx-auto w-full max-w-11/12 px-4 xl:px-6">
+        <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="relative flex flex-col items-center border-x border-white/10 px-4 py-20 text-center sm:px-8 md:py-28 lg:py-36">
             {/* Corner intersection markers */}
             <span

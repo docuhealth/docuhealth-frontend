@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export function HeroPage() {
   return (
-    <section className="flex flex-col items-center py-20 pt-12 text-center md:pt-16">
+    <section className="flex flex-col items-center px-4 pt-10 pb-16 text-center sm:px-6 sm:pt-14 sm:pb-20 md:pt-16">
       <h1 className="max-w-4xl type-h2 md:type-h1">
         Nigeria’s First <span className="text-primary">Centralized</span>
         <br className="hidden sm:inline" /> Healthcare Platform

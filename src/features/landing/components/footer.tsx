@@ -68,8 +68,8 @@ export function Footer() {
   }
 
   return (
-    <footer className="bg-fg-heading text-white">
-      <div className="mx-auto w-full max-w-11/12 px-4 py-16 sm:py-20 lg:py-24 xl:px-6">
+    <footer className="w-full bg-fg-heading text-white">
+      <div className="mx-auto w-full max-w-[1440px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[400px_1fr] xl:grid-cols-[440px_1fr] xl:gap-16">
           {/* Left Column: White Newsletter Card */}
           <div className="rounded-2xl border border-line/20 bg-white p-6 text-fg-heading shadow-xl sm:p-8">

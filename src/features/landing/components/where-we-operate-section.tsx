@@ -20,7 +20,7 @@ const legendItems = [
 
 export function WhereWeOperateSection() {
   return (
-    <section className="mx-auto w-full max-w-11/12 px-4 py-16 sm:py-20 lg:py-28 xl:px-6">
+    <section className="w-full py-16 sm:py-20 lg:py-28">
       <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
         {/* Left column: Heading, office cards, and map legend */}
         <div>
