@@ -179,10 +179,17 @@ export function Navbar() {
                 Our Company
                 <CaretDownIcon className="size-3.5" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="min-w-60">
+              <DropdownMenuContent
+                align="start"
+                sideOffset={12}
+                className="min-w-52 p-1.5 shadow-lg"
+              >
                 {companyLinks.map((item) => (
                   <DropdownMenuItem key={item.label} asChild>
-                    <a href={item.href} className="cursor-pointer py-2 type-body-sm-regular">
+                    <a
+                      href={item.href}
+                      className="cursor-pointer px-3 py-2.5 type-body-sm-regular transition-colors focus:bg-primary/5 focus:text-primary"
+                    >
                       {item.label}
                     </a>
                   </DropdownMenuItem>
