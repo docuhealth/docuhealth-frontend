@@ -1,11 +1,11 @@
-import { CaretRightIcon, IdentificationCardIcon, InfoIcon, LockIcon } from "@phosphor-icons/react";
+import { CaretRightIcon, IdentificationCardIcon, LockIcon } from "@phosphor-icons/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { AuthHeader } from "@/features/auth/components/auth-header";
+import { NinHint } from "@/components/nin-hint";
 import { RequiredMark } from "@/components/required-mark";
 import { StepProgress } from "@/features/auth/components/step-progress";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
@@ -47,18 +47,7 @@ export function AccountDetailsForm({
               <FieldLabel htmlFor="nin" className="gap-1">
                 NIN <RequiredMark />
               </FieldLabel>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label="What is a NIN?"
-                    className="text-fg-caption transition-colors hover:text-fg-body"
-                  >
-                    <InfoIcon className="size-4.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>Your 11-digit National Identification Number</TooltipContent>
-              </Tooltip>
+              <NinHint />
             </div>
             <InputGroup className="bg-card">
               <InputGroupInput

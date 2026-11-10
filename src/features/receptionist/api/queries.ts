@@ -2,6 +2,8 @@ import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { request } from "@/lib/api";
 import type { Period } from "@/lib/period";
 import {
+  appointmentCalendarSchema,
+  appointmentDetailSchema,
   type AppointmentDay,
   appointmentListSchema,
   checkOutSummarySchema,
@@ -21,6 +23,8 @@ export const receptionistKeys = {
   overview: (period: Period) => [...receptionistKeys.all, "overview", period] as const,
   appointments: (day: AppointmentDay, search: string) =>
     [...receptionistKeys.all, "appointments", day, search] as const,
+  appointment: (id: string) => [...receptionistKeys.all, "appointment", id] as const,
+  calendar: (from: string, to: string) => [...receptionistKeys.all, "calendar", from, to] as const,
   /** Every queue list, whatever its search. */
   queues: () => [...receptionistKeys.all, "queue"] as const,
   queue: (search: string) => [...receptionistKeys.queues(), search] as const,
@@ -56,6 +60,25 @@ export const appointmentListQuery = (day: AppointmentDay, search: string) =>
         params: { day, search },
       }),
     placeholderData: keepPreviousData,
+  });
+
+/** Appointments from `from` up to `to` (ISO date-times) and their numbers, for the calendar. */
+export const appointmentCalendarQuery = (from: string, to: string) =>
+  queryOptions({
+    queryKey: receptionistKeys.calendar(from, to),
+    queryFn: () =>
+      request(appointmentCalendarSchema, {
+        url: "/hospital/reception/appointments/calendar",
+        params: { from, to },
+      }),
+    placeholderData: keepPreviousData,
+  });
+
+export const appointmentDetailQuery = (id: string) =>
+  queryOptions({
+    queryKey: receptionistKeys.appointment(id),
+    queryFn: () =>
+      request(appointmentDetailSchema, { url: `/hospital/reception/appointments/${id}` }),
   });
 
 export const receptionQueueQuery = (search: string) =>

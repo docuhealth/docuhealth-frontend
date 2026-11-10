@@ -2,7 +2,6 @@ import { ArrowRightIcon, CaretRightIcon } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { toast } from "sonner";
 import { CountTab, CountTabsList } from "@/components/dashboard/count-tabs";
 import { DashboardCard } from "@/components/dashboard/dashboard-card";
 import { SearchField } from "@/components/dashboard/search-field";
@@ -13,20 +12,13 @@ import {
   type AppointmentDay,
   appointmentDayLabels,
   type AppointmentList,
-  appointmentStatusLabels,
 } from "@/features/receptionist/api/schemas";
+import { AppointmentDetailsDialog } from "@/features/receptionist/components/appointment-details-dialog";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { StatusTag } from "@/features/receptionist/components/status-tag";
 import { formatClockTime, formatShortDay } from "@/lib/format";
-import { cn } from "@/lib/utils";
 
 type Appointment = AppointmentList["items"][number];
-
-const statusTones = {
-  upcoming: "bg-line text-fg-caption",
-  arrived: "bg-success-100 text-success-700",
-  checked_in: "bg-success-100 text-success-500",
-  in_progress: "bg-info-100 text-info-500",
-} as const satisfies Record<Appointment["status"], string>;
 
 /** How many appointments the card shows; the rest are a click away. */
 const PREVIEW_ROWS = 5;
@@ -45,6 +37,7 @@ export function AppointmentsCard() {
   const [search, setSearch] = useState("");
   const term = useDebouncedValue(search.trim());
   const { data, isError } = useQuery(appointmentListQuery(day, term));
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const empty = isError
     ? "We couldn’t load the appointments. Try again in a moment."
@@ -83,6 +76,7 @@ export function AppointmentsCard() {
               key={appointment.id}
               appointment={appointment}
               showDay={day === "upcoming"}
+              onOpen={setOpenId}
             />
           ))}
         </ul>
@@ -95,6 +89,7 @@ export function AppointmentsCard() {
         View all appointments
         <ArrowRightIcon className="size-4" />
       </Link>
+      <AppointmentDetailsDialog appointmentId={openId} onClose={() => setOpenId(null)} />
     </DashboardCard>
   );
 }
@@ -103,7 +98,15 @@ export function AppointmentsCard() {
  * Time, patient, reason and status; on narrow cards the reason (and, narrower still, the status)
  * move under the patient, where there's no room for their own columns.
  */
-function AppointmentRow({ appointment, showDay }: { appointment: Appointment; showDay: boolean }) {
+function AppointmentRow({
+  appointment,
+  showDay,
+  onOpen,
+}: {
+  appointment: Appointment;
+  showDay: boolean;
+  onOpen: (id: string) => void;
+}) {
   const at = new Date(appointment.at);
   const { patient } = appointment;
 
@@ -130,26 +133,11 @@ function AppointmentRow({ appointment, showDay }: { appointment: Appointment; sh
         variant="ghost"
         size="icon-sm"
         aria-label={`Open ${patient.name}’s appointment`}
-        // TODO(design): open the appointment once it's designed.
-        onClick={() => toast.info("Appointment details aren’t built yet.")}
+        onClick={() => onOpen(appointment.id)}
         className="-mr-1.5 shrink-0 text-fg-caption"
       >
         <CaretRightIcon className="size-4" />
       </Button>
     </li>
-  );
-}
-
-function StatusTag({ status, className }: { status: Appointment["status"]; className?: string }) {
-  return (
-    <span
-      className={cn(
-        "rounded-full px-2.5 py-1 type-caption-medium whitespace-nowrap",
-        statusTones[status],
-        className,
-      )}
-    >
-      {appointmentStatusLabels[status]}
-    </span>
   );
 }

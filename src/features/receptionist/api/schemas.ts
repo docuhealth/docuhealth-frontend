@@ -50,8 +50,9 @@ export const appointmentStatusLabels = {
   arrived: "Arrived",
   checked_in: "Checked In",
   in_progress: "In-Progress",
+  cancelled: "Cancelled",
 } as const;
-type AppointmentStatus = keyof typeof appointmentStatusLabels;
+export type AppointmentStatus = keyof typeof appointmentStatusLabels;
 
 /** One day's (or the later) appointments; `counts` covers every tab whatever the search. */
 export const appointmentListSchema = z.object({
@@ -72,6 +73,56 @@ export const appointmentListSchema = z.object({
 export type AppointmentList = z.infer<typeof appointmentListSchema>;
 
 export const appointmentSchema = appointmentListSchema.shape.items.element;
+export type Appointment = z.infer<typeof appointmentSchema>;
+
+/** Why an appointment is being cancelled, in the order the cancel dialog offers them. */
+export const cancellationReasonLabels = {
+  schedule_conflict: "Schedule conflict",
+  feeling_better: "Feeling better",
+  transport_issues: "Transport issues",
+  cost_concerns: "Cost concerns",
+  will_rebook_later: "Will rebook later",
+  other: "Other",
+} as const;
+export type CancellationReason = keyof typeof cancellationReasonLabels;
+
+/** One appointment opened from the calendar, with what the front desk needs to manage it. */
+export const appointmentDetailSchema = appointmentSchema.extend({
+  patient: z.object({
+    id: z.string(),
+    name: z.string(),
+    /** Digits only. */
+    hin: z.string(),
+    phone: z.string().nullable(),
+    email: z.email().nullable(),
+  }),
+  /** Who booked it in, e.g. "Front desk" or "Dr. Adebayo". */
+  bookedWith: z.string(),
+  note: z.string().nullable(),
+});
+export type AppointmentDetail = z.infer<typeof appointmentDetailSchema>;
+
+/**
+ * The Appointments page: every appointment from `from` up to `to` (cancelled ones too, earliest
+ * first), and that span's numbers.
+ */
+export const appointmentCalendarSchema = z.object({
+  summary: z.object({
+    /** Every appointment in the span, cancelled ones included. */
+    booked: count,
+    /** Percentage against the span of the same length before. */
+    bookedChange: z.number(),
+    checkedIn: count,
+    cancelled: count,
+    /** How many more (or, negative, fewer) were cancelled than in the span before. */
+    cancelledChange: z.number().int(),
+    openSlots: count,
+    /** Every slot the front desk can book in the span. */
+    totalSlots: count,
+  }),
+  items: z.array(appointmentSchema),
+});
+export type AppointmentCalendar = z.infer<typeof appointmentCalendarSchema>;
 
 /** Patients checked in and waiting, longest wait first. */
 export const receptionQueueSchema = z.object({
@@ -109,6 +160,8 @@ export const patientLookupSchema = z.object({
       dateOfBirth: z.iso.date(),
       sex: z.enum(Object.keys(sexLabels) as [Sex, ...Sex[]]),
       avatarUrl: z.url().nullable(),
+      phone: z.string().nullable(),
+      email: z.email().nullable(),
     }),
   ),
 });
@@ -216,6 +269,41 @@ export const checkOutSummarySchema = z.object({
   appointmentRequests: z.array(appointmentRequestSchema),
 });
 export type CheckOutSummary = z.infer<typeof checkOutSummarySchema>;
+
+/** How a guardian is related to the child they're linked to. */
+export const relationshipLabels = {
+  mother: "Mother",
+  father: "Father",
+  grandparent: "Grandparent",
+  sibling: "Sibling",
+  aunt_uncle: "Aunt / Uncle",
+  legal_guardian: "Legal guardian",
+  other: "Other",
+} as const;
+export type Relationship = keyof typeof relationshipLabels;
+
+/** Whether the front desk has confirmed the guardian really is responsible for the child. */
+export const guardianVerificationLabels = {
+  pending: "Pending",
+  verified: "Verified",
+  not_verified: "Not verified",
+} as const;
+export type GuardianVerification = keyof typeof guardianVerificationLabels;
+
+/** Where the verification code for a new guardian's phone went. */
+export const phoneVerificationSentSchema = z.object({ phone: z.string() });
+
+/** A child linked to a guardian: the child (new or existing) and who they're linked to. */
+export const dependentLinkedSchema = z.object({
+  child: z.object({
+    id: z.string(),
+    name: z.string(),
+    /** Digits only. */
+    hin: z.string(),
+  }),
+  guardian: z.object({ id: z.string(), name: z.string() }),
+});
+export type DependentLinked = z.infer<typeof dependentLinkedSchema>;
 
 /** Where the verification code for a new patient's email went. */
 export const verificationSentSchema = z.object({ email: z.email() });

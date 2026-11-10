@@ -21,8 +21,8 @@ const dayFocusOrder = [
 
 /**
  * A date typed as DD/MM/YYYY, or picked from the calendar behind its icon. `value` is
- * "YYYY-MM-DD", and "" while what's typed isn't a whole date. Days before `min` can't be
- * picked (they can still be typed, so say why in the form's validation).
+ * "YYYY-MM-DD", and "" while what's typed isn't a whole date. Days before `min` or after `max`
+ * can't be picked (they can still be typed, so say why in the form's validation).
  */
 export function DateInput({
   id,
@@ -31,6 +31,7 @@ export function DateInput({
   onChange,
   onBlur,
   min,
+  max,
   invalid,
   className,
   ref,
@@ -41,6 +42,7 @@ export function DateInput({
   onChange: (value: string) => void;
   onBlur?: () => void;
   min?: Date;
+  max?: Date;
   invalid?: boolean;
   className?: string;
   ref?: Ref<HTMLInputElement>;
@@ -92,8 +94,12 @@ export function DateInput({
           mode="single"
           selected={selected}
           // A typed day that can't be picked opens on the first month that can.
-          defaultMonth={selected && !(min && selected < min) ? selected : min}
-          disabled={min ? { before: min } : undefined}
+          defaultMonth={
+            selected && !(min && selected < min) && !(max && selected > max)
+              ? selected
+              : (min ?? max)
+          }
+          disabled={[...(min ? [{ before: min }] : []), ...(max ? [{ after: max }] : [])]}
           weekStartsOn={1}
           onSelect={(date) => {
             if (!date) return;

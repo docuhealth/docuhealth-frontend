@@ -1,41 +1,41 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import {
-  FormDialog,
-  FormDialogBody,
-  FormDialogFooter,
-  FormDialogHeader,
-} from "@/components/dashboard/form-dialog";
-import { DateInput } from "@/components/date-input";
-import { RequiredMark } from "@/components/required-mark";
+import { FormDialog, FormDialogHeader } from "@/components/dashboard/form-dialog";
 import { SuccessDialog } from "@/components/success-dialog";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { TimeInput } from "@/components/time-input";
-import { Textarea } from "@/components/ui/textarea";
 import { useBookAppointment } from "@/features/receptionist/api/mutations";
-import { PatientSummary } from "@/features/receptionist/components/patient-summary";
+import { AppointmentForm } from "@/features/receptionist/components/appointment-form";
+import { FindPatientStep } from "@/features/receptionist/components/find-patient-step";
+import { RegisterPatientForm } from "@/features/receptionist/components/register-patient-form";
 import { devPrefill } from "@/features/receptionist/lib/dev-prefill";
-import {
-  type BookAppointmentValues,
-  bookAppointmentSchema,
-} from "@/features/receptionist/lib/schemas";
 import { getErrorMessage } from "@/lib/api";
+import { formatHin } from "@/lib/format";
 
-type Patient = { id: string; name: string; hin: string; phone: string | null };
+type Patient = {
+  id: string;
+  name: string;
+  hin: string;
+  phone: string | null;
+  email?: string | null;
+};
+
+/** A date ("YYYY-MM-DD") and time ("HH:MM") to start the form on, e.g. a calendar slot. */
+type Slot = { date: string; time: string };
 
 /**
  * "Appointment Details" modal: the front desk picks a date and time (and an optional note) to
- * book `patient` in. Once it's booked, "Appointment booked!" takes its place.
+ * book `patient` in. Without a `patient`, it starts with "Find patient", looking them up by
+ * HIN (step 1 of 2), or registering a walk-in no one has on file.
+ * Once it's booked, "Appointment booked!" takes its place.
  */
 export function BookAppointmentDialog({
   patient,
+  slot,
   open,
   onOpenChange,
 }: {
-  patient: Patient;
+  patient?: Patient;
+  slot?: Slot;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -44,14 +44,11 @@ export function BookAppointmentDialog({
   return (
     <>
       <FormDialog open={open} onOpenChange={onOpenChange}>
-        <FormDialogHeader
-          title="Appointment Details"
-          description="Add the details for this appointment."
-        />
-        {/* Remounts on each open, so the form starts fresh. */}
+        {/* Remounts on each open, so it starts fresh. */}
         {open && (
-          <BookAppointmentForm
+          <BookAppointmentSteps
             patient={patient}
+            slot={slot}
             onBooked={() => {
               onOpenChange(false);
               setBooked(true);
@@ -70,102 +67,112 @@ export function BookAppointmentDialog({
   );
 }
 
-function BookAppointmentForm({ patient, onBooked }: { patient: Patient; onBooked: () => void }) {
-  const book = useBookAppointment();
-  // Midnight today: earlier days can't be picked.
-  const [today] = useState(() => new Date(new Date().setHours(0, 0, 0, 0)));
-  const form = useForm<BookAppointmentValues>({
-    resolver: zodResolver(bookAppointmentSchema),
-    defaultValues: devPrefill?.bookAppointment ?? { date: "", time: "", note: "" },
-  });
-  const { errors } = form.formState;
+function BookAppointmentSteps({
+  patient,
+  slot,
+  onBooked,
+}: {
+  patient?: Patient;
+  slot?: Slot;
+  onBooked: () => void;
+}) {
+  const [found, setFound] = useState<Patient | null>(null);
+  // Only a patient found or registered here (not one handed in) can be swapped for someone else.
+  const [step, setStep] = useState<"find" | "register" | "details">("find");
+  const chosen = patient ?? (step === "details" ? found : null);
 
-  function onSubmit({ date, time, note }: BookAppointmentValues) {
-    book.mutate(
-      { patientId: patient.id, at: new Date(`${date}T${time}`).toISOString(), note },
-      {
-        onSuccess: onBooked,
-        onError: (error) => toast.error(getErrorMessage(error)),
-      },
+  if (step === "register" && !patient) {
+    // A walk-in: register them (three steps of their own), then book them straight away.
+    return (
+      <RegisterPatientForm
+        submitLabel="Register and Continue"
+        onExit={() => setStep("find")}
+        onRegistered={({ id, name, hin, phone, email }) => {
+          setFound({ id, name, hin, phone, email });
+          setStep("details");
+          toast.success(`${name} is registered. Their HIN is ${formatHin(hin)}.`);
+        }}
+      />
+    );
+  }
+
+  if (!chosen) {
+    return (
+      <>
+        <FormDialogHeader
+          title="Find patient"
+          description="Search patient by HIN"
+          progress={{ step: 1, total: 2 }}
+        />
+        <FindPatientStep
+          initialHin={found ? formatHin(found.hin) : undefined}
+          onContinue={({ id, name, hin, phone, email }) => {
+            setFound({ id, name, hin, phone, email });
+            setStep("details");
+          }}
+          onRegisterPatient={() => setStep("register")}
+        />
+      </>
     );
   }
 
   return (
-    <form
-      onSubmit={form.handleSubmit(onSubmit)}
-      noValidate
-      className="flex min-h-0 flex-1 flex-col"
-    >
-      <FormDialogBody>
-        <PatientSummary patient={{ name: patient.name, hin: patient.hin, phone: patient.phone }} />
+    <>
+      <FormDialogHeader
+        title="Appointment Details"
+        description="Add the details for this appointment."
+        progress={patient ? undefined : { step: 2, total: 2 }}
+      />
+      <BookAppointmentForm
+        patient={chosen}
+        slot={slot}
+        onChangePatient={patient ? undefined : () => setStep("find")}
+        onBooked={onBooked}
+      />
+    </>
+  );
+}
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <Controller
-            name="date"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="appointmentDate" className="gap-1">
-                  Date <RequiredMark />
-                </FieldLabel>
-                <DateInput
-                  ref={field.ref}
-                  id="appointmentDate"
-                  name={field.name}
-                  value={field.value}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  min={today}
-                  invalid={fieldState.invalid}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
-          />
+function BookAppointmentForm({
+  patient,
+  slot,
+  onChangePatient,
+  onBooked,
+}: {
+  patient: Patient;
+  slot?: Slot;
+  onChangePatient?: () => void;
+  onBooked: () => void;
+}) {
+  const book = useBookAppointment();
 
-          <Controller
-            name="time"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="appointmentTime" className="gap-1">
-                  Time <RequiredMark />
-                </FieldLabel>
-                <TimeInput
-                  ref={field.ref}
-                  id="appointmentTime"
-                  name={field.name}
-                  value={field.value}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  invalid={fieldState.invalid}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
-          />
-        </div>
-
-        <Field data-invalid={!!errors.note}>
-          <FieldLabel htmlFor="appointmentNote">
-            Add note <span className="font-normal text-fg-caption">(optional)</span>
-          </FieldLabel>
-          <Textarea
-            id="appointmentNote"
-            placeholder="Type here"
-            aria-invalid={!!errors.note}
-            className="min-h-28 bg-card"
-            {...form.register("note")}
-          />
-          <FieldError errors={[errors.note]} />
-        </Field>
-      </FormDialogBody>
-
-      <FormDialogFooter>
-        <Button type="submit" loading={book.isPending} className="h-11 px-5 type-heading-sm">
-          Book Appointment
-        </Button>
-      </FormDialogFooter>
-    </form>
+  return (
+    <AppointmentForm
+      patient={patient}
+      defaultValues={{
+        ...(devPrefill?.bookAppointment ?? { date: "", time: "", note: "" }),
+        ...slot,
+      }}
+      submitLabel="Book Appointment"
+      pending={book.isPending}
+      patientAction={
+        onChangePatient && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onChangePatient}
+            className="h-9 shrink-0 bg-card px-4 type-body-sm-medium text-fg-heading"
+          >
+            Change
+          </Button>
+        )
+      }
+      onSubmit={({ at, note }) =>
+        book.mutate(
+          { patientId: patient.id, at, note },
+          { onSuccess: onBooked, onError: (error) => toast.error(getErrorMessage(error)) },
+        )
+      }
+    />
   );
 }

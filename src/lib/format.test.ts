@@ -3,6 +3,8 @@ import {
   ageOn,
   formatClockTime,
   formatShortDay,
+  formatShortDayTime,
+  formatLongDateTime,
   firstName,
   formatAppointment,
   formatDate,
@@ -188,5 +190,19 @@ describe("formatDateWithComma", () => {
 describe("formatDayMonthTime", () => {
   it("gives the day, month and time", () => {
     expect(formatDayMonthTime(new Date(2026, 9, 8, 9, 42))).toBe("08 Oct, 9:42 AM");
+  });
+});
+
+describe("formatShortDayTime", () => {
+  it("gives the short day and the time", () => {
+    expect(formatShortDayTime(new Date(2026, 9, 13, 14, 0))).toBe("Tue 13 Oct, 2:00 PM");
+  });
+});
+
+describe("formatLongDateTime", () => {
+  it("gives the long date and the clock time", () => {
+    expect(formatLongDateTime(new Date(2026, 9, 9, 11, 0))).toBe(
+      "Friday, 9 October 2026 · 11:00 AM",
+    );
   });
 });

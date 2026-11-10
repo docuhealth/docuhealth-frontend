@@ -1,6 +1,4 @@
 import {
-  ArrowCircleDownIcon,
-  ArrowCircleUpIcon,
   CalendarCheckIcon,
   CalendarDotsIcon,
   ClockIcon,
@@ -12,6 +10,7 @@ import { useState } from "react";
 import { PeriodSelect } from "@/components/dashboard/period-select";
 import { StatBanner } from "@/components/dashboard/stat-banner";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { Trend } from "@/components/dashboard/trend";
 import { Button } from "@/components/ui/button";
 import {
   receptionistProfileQuery,
@@ -23,7 +22,6 @@ import { ReceptionQueueCard } from "@/features/receptionist/components/reception
 import { RegisterPatientDialog } from "@/features/receptionist/components/register-patient-dialog";
 import { greetingFor } from "@/lib/format";
 import type { Period } from "@/lib/period";
-import { cn } from "@/lib/utils";
 
 /** What the total check-ins are compared with, for each period. */
 const previousPeriod = { today: "yesterday", week: "last 7 days", month: "last 30 days" };
@@ -118,37 +116,5 @@ export function ReceptionistDashboard({
       />
       <RegisterPatientDialog open={registering} onOpenChange={setRegistering} />
     </div>
-  );
-}
-
-/**
- * "12% vs. last 7 days", with the percentage and its arrow (up or down) in green when the
- * change is good news and red when it isn't.
- */
-function Trend({
-  change,
-  since,
-  goodWhen = "up",
-}: {
-  change: number;
-  since: string;
-  goodWhen?: "up" | "down";
-}) {
-  const up = change >= 0;
-  const Arrow = up ? ArrowCircleUpIcon : ArrowCircleDownIcon;
-  return (
-    <span className="inline-flex flex-wrap items-center gap-1">
-      <span
-        className={cn(
-          "inline-flex items-center gap-1",
-          up === (goodWhen === "up") ? "text-success-500" : "text-error-500",
-        )}
-      >
-        <Arrow weight="fill" className="size-4" />
-        <span className="sr-only">{up ? "Up" : "Down"}</span>
-        {Math.abs(change)}%
-      </span>
-      vs. {since}
-    </span>
   );
 }

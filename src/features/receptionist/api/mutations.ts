@@ -2,7 +2,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { request } from "@/lib/api";
 import { receptionistKeys } from "@/features/receptionist/api/queries";
 import {
+  appointmentDetailSchema,
   appointmentRequestSchema,
+  type CancellationReason,
+  dependentLinkedSchema,
+  type GuardianVerification,
+  phoneVerificationSentSchema,
+  type Relationship,
   appointmentSchema,
   emailVerifiedSchema,
   queueEntrySchema,
@@ -104,6 +110,127 @@ export function useBookAppointment() {
         method: "POST",
         url: "/hospital/reception/appointments",
         data: appointment,
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: receptionistKeys.all }),
+  });
+}
+
+/**
+ * Move an appointment to `at` (ISO), with its note; the patient is told. Refreshes every
+ * receptionist query, since it moves between days on the calendar and lists.
+ */
+export function useRescheduleAppointment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, ...change }: { id: string; at: string; note: string }) =>
+      request(appointmentDetailSchema, {
+        method: "POST",
+        url: `/hospital/reception/appointments/${id}/reschedule`,
+        data: change,
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: receptionistKeys.all }),
+  });
+}
+
+/**
+ * Cancel an appointment, saying why (`details` spells out an "other" reason); the patient is
+ * told. Refreshes every receptionist query: the counts and lists change.
+ */
+export function useCancelAppointment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      ...cancellation
+    }: {
+      id: string;
+      reason: CancellationReason;
+      details: string;
+    }) =>
+      request(appointmentDetailSchema, {
+        method: "POST",
+        url: `/hospital/reception/appointments/${id}/cancel`,
+        data: cancellation,
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: receptionistKeys.all }),
+  });
+}
+
+/** Text a verification code to a new guardian's phone (again, for "Resend Code"). */
+export function useSendPhoneCode() {
+  return useMutation({
+    mutationFn: (phone: string) =>
+      request(phoneVerificationSentSchema, {
+        method: "POST",
+        url: "/hospital/reception/phone-verifications",
+        data: { phone },
+      }),
+  });
+}
+
+/** Check the code texted to a guardian; the token it returns goes with their registration. */
+export function useVerifyPhone() {
+  return useMutation({
+    mutationFn: (verification: { phone: string; code: string }) =>
+      request(emailVerifiedSchema, {
+        method: "POST",
+        url: "/hospital/reception/phone-verifications/check",
+        data: verification,
+      }),
+  });
+}
+
+/**
+ * Create an account for a guardian bringing a child in. Their email is optional, since the phone
+ * is what's verified. Refreshes every receptionist query, since lookups can now find them.
+ */
+export function useRegisterGuardian() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (guardian: {
+      firstName: string;
+      lastName: string;
+      otherName: string;
+      sex: Sex;
+      email: string | null;
+      phone: string;
+      nin: string;
+      password: string;
+      verificationToken: string;
+    }) =>
+      request(registeredPatientSchema, {
+        method: "POST",
+        url: "/hospital/reception/guardians",
+        data: guardian,
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: receptionistKeys.all }),
+  });
+}
+
+/**
+ * Link a child to a guardian: a child already on record (`child.id`) or a new one, created here.
+ * Refreshes every receptionist query, since both profiles change.
+ */
+export function useLinkDependent() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (link: {
+      guardianId: string;
+      child:
+        { id: string } | { firstName: string; lastName: string; dateOfBirth: string; sex: Sex };
+      relationship: Relationship;
+      verification: GuardianVerification;
+      primaryContact: boolean;
+      canConsentToTreatment: boolean;
+    }) =>
+      request(dependentLinkedSchema, {
+        method: "POST",
+        url: "/hospital/reception/dependents",
+        data: link,
       }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: receptionistKeys.all }),
   });

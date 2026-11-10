@@ -171,3 +171,13 @@ export function formatDateWithComma(date: Date) {
 export function formatDayMonthTime(date: Date) {
   return `${twoDigitDay.format(date)}, ${appointmentTime.format(date)}`;
 }
+
+/** e.g. "Tue 13 Oct, 2:00 PM". */
+export function formatShortDayTime(date: Date) {
+  return `${dayMonth.format(date)}, ${appointmentTime.format(date)}`;
+}
+
+/** e.g. "Friday, 9 October 2026 · 11:00 AM". */
+export function formatLongDateTime(date: Date) {
+  return `${formatLongDate(date)} · ${clockTime.format(date)}`;
+}

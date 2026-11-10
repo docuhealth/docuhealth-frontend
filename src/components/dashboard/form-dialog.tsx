@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { FieldGroup } from "@/components/ui/field";
+import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 /**
@@ -37,21 +38,26 @@ export function FormDialog({
   );
 }
 
-/** `progress` swaps the header's bottom border for a step bar (e.g. step 1 of 2). */
+/**
+ * `progress` swaps the header's bottom border for a step bar (e.g. step 1 of 2). `children`
+ * sit along the bottom border, e.g. a row of tabs.
+ */
 export function FormDialogHeader({
   title,
   description,
   progress,
+  children,
 }: {
   title: string;
   description: string;
   progress?: { step: number; total: number };
+  children?: ReactNode;
 }) {
   return (
     <header
       className={cn(
         "flex flex-col gap-4 px-6 pt-5 short:pt-3",
-        progress ? "pb-1" : "border-b pb-5 short:pb-3",
+        progress ? "pb-1" : children ? "border-b" : "border-b pb-5 short:pb-3",
       )}
     >
       <div className="flex items-start justify-between gap-4">
@@ -90,6 +96,7 @@ export function FormDialogHeader({
           ))}
         </div>
       )}
+      {children}
     </header>
   );
 }
@@ -105,23 +112,41 @@ export function FormDialogBody({ className, ...props }: ComponentProps<typeof Fi
 
 /**
  * Cancel on the left (closes the dialog; `closeLabel` renames it), the action on the right.
- * With `onBack`, the left button is "Go back" to the step before instead.
+ * With `onBack`, the left button goes back to the step before instead ("Go back", or
+ * `backLabel`).
  */
 export function FormDialogFooter({
   closeLabel = "Cancel",
   onBack,
+  backLabel = "Go back",
+  progress,
   children,
 }: {
   closeLabel?: string;
   onBack?: () => void;
-  children: ReactNode;
+  backLabel?: string;
+  /** How far through a long flow this is, from 0 to 1, as a bar along the footer's top edge. */
+  progress?: number;
+  children?: ReactNode;
 }) {
   const leftButtonClass = "h-11 px-5 type-body-sm-medium";
   return (
-    <footer className="flex items-center justify-between gap-3 border-t px-6 py-6 short:py-3">
+    <footer
+      className={cn(
+        "relative flex items-center justify-between gap-3 px-6 py-6 short:py-3",
+        progress === undefined && "border-t",
+      )}
+    >
+      {progress !== undefined && (
+        <Progress
+          aria-label="Progress"
+          value={progress * 100}
+          className="absolute inset-x-0 top-0 rounded-none bg-line"
+        />
+      )}
       {onBack ? (
         <Button type="button" variant="outline" onClick={onBack} className={leftButtonClass}>
-          Go back
+          {backLabel}
         </Button>
       ) : (
         <DialogClose asChild>
