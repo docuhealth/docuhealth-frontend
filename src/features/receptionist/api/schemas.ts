@@ -102,6 +102,27 @@ export const appointmentDetailSchema = appointmentSchema.extend({
 });
 export type AppointmentDetail = z.infer<typeof appointmentDetailSchema>;
 
+/** In the order the gender select lists them. */
+export const sexLabels = {
+  male: "Male",
+  female: "Female",
+  prefer_not_to_say: "Prefer not to say",
+} as const;
+export type Sex = keyof typeof sexLabels;
+
+const sex = z.enum(Object.keys(sexLabels) as [Sex, ...Sex[]]);
+
+/** An appointment on the Appointments page, with enough of the patient to tell them apart. */
+export const calendarAppointmentSchema = appointmentSchema.extend({
+  patient: appointmentSchema.shape.patient.extend({
+    /** Digits only. */
+    hin: z.string(),
+    dateOfBirth: z.iso.date(),
+    sex,
+  }),
+});
+export type CalendarAppointment = z.infer<typeof calendarAppointmentSchema>;
+
 /**
  * The Appointments page: every appointment from `from` up to `to` (cancelled ones too, earliest
  * first), and that span's numbers.
@@ -120,7 +141,7 @@ export const appointmentCalendarSchema = z.object({
     /** Every slot the front desk can book in the span. */
     totalSlots: count,
   }),
-  items: z.array(appointmentSchema),
+  items: z.array(calendarAppointmentSchema),
 });
 export type AppointmentCalendar = z.infer<typeof appointmentCalendarSchema>;
 
@@ -141,14 +162,6 @@ export type QueueEntry = ReceptionQueue["items"][number];
 
 export const queueEntrySchema = receptionQueueSchema.shape.items.element;
 
-/** In the order the gender select lists them. */
-export const sexLabels = {
-  male: "Male",
-  female: "Female",
-  prefer_not_to_say: "Prefer not to say",
-} as const;
-export type Sex = keyof typeof sexLabels;
-
 /** Registered patients whose HIN matches the one looked up (one, or none). */
 export const patientLookupSchema = z.object({
   items: z.array(
@@ -158,7 +171,7 @@ export const patientLookupSchema = z.object({
       /** Digits only, e.g. "12334567890". */
       hin: z.string(),
       dateOfBirth: z.iso.date(),
-      sex: z.enum(Object.keys(sexLabels) as [Sex, ...Sex[]]),
+      sex,
       avatarUrl: z.url().nullable(),
       phone: z.string().nullable(),
       email: z.email().nullable(),
@@ -182,7 +195,6 @@ export type VisitKind = keyof typeof visitKindLabels;
 export const visitStatusLabels = { checked_in: "Checked in", checked_out: "Checked out" } as const;
 type VisitStatus = keyof typeof visitStatusLabels;
 
-const sex = z.enum(Object.keys(sexLabels) as [Sex, ...Sex[]]);
 const visitStatus = z.enum(Object.keys(visitStatusLabels) as [VisitStatus, ...VisitStatus[]]);
 
 /** Someone linked to a patient's account: a dependent they manage, or a proxy managing theirs. */

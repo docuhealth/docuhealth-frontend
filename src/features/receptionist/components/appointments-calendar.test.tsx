@@ -1,6 +1,7 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AppointmentsCalendar } from "@/features/receptionist/components/appointments-calendar";
+import { formatLongDate } from "@/lib/format";
 import { renderWithProviders } from "@/test/render";
 
 describe("AppointmentsCalendar", () => {
@@ -176,5 +177,26 @@ describe("AppointmentsCalendar", () => {
     const details = await screen.findByRole("dialog", { name: "Appointment Details" });
     expect(within(details).getByText("Ada Obi")).toBeInTheDocument();
     expect(within(details).getByRole("button", { name: "Change" })).toBeInTheDocument();
+  });
+
+  it("lists each patient's age, sex and HIN, and copies the HIN without opening the appointment", async () => {
+    const { user } = renderWithProviders(
+      <AppointmentsCalendar view="list" date={new Date()} onNavigate={() => {}} />,
+    );
+
+    const today = await screen.findByRole("region", { name: formatLongDate(new Date()) });
+    const row = within(today)
+      .getByRole("button", { name: /Olumide Ajayi, .*Cancelled/ })
+      .closest("li");
+    if (!row) throw new Error("No row for Olumide Ajayi");
+    expect(within(row).getByText(/^\d+ yrs · Male$/)).toBeInTheDocument();
+    expect(within(row).getByText(/^HIN \d{3}-\d{3}-\d{3}-\d{2}$/)).toBeInTheDocument();
+
+    await user.click(within(row).getByRole("button", { name: "Copy HIN" }));
+    expect(await within(row).findByRole("button", { name: "HIN copied" })).toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "Appointment Details" })).not.toBeInTheDocument();
+
+    await user.click(within(row).getByRole("button", { name: /Olumide Ajayi/ }));
+    expect(await screen.findByRole("dialog", { name: "Appointment Details" })).toBeInTheDocument();
   });
 });

@@ -3,6 +3,7 @@ import { env } from "@/env";
 import type {
   DependentLinked,
   AppointmentCalendar,
+  CalendarAppointment,
   AppointmentDetail,
   AppointmentList,
   AppointmentRequest,
@@ -153,23 +154,54 @@ appointments.sort((a, b) => a.at.localeCompare(b.at));
 /** What the calendar's chips leave out: set when booked, or made up from the patient. */
 const appointmentExtras = new Map<string, { note: string | null; bookedWith: string }>();
 
+const femaleFirstNames = new Set(
+  "Blessing Fatima Ngozi Sola Zainab Bisi Ruth Amina Halima Folasade Precious Joyce Grace Chiamaka Funmilayo Adaeze".split(
+    " ",
+  ),
+);
+
+/**
+ * A patient's HIN, birthday and sex: the registered patient's own, or, for patients the mock
+ * didn't register, made up from their name so they stay the same.
+ */
+function patientFacts({ id, name }: { id: string; name: string }): {
+  hin: string;
+  dateOfBirth: string;
+  sex: Sex;
+  registeredPatient: MockPatient | undefined;
+} {
+  const registeredPatient = registered.find((patient) => patient.id === id);
+  if (registeredPatient) {
+    const { hin, dateOfBirth, sex } = registeredPatient;
+    return { hin, dateOfBirth, sex, registeredPatient };
+  }
+  const hash = Array.from({ length: name.length }, (_, index) => name.charCodeAt(index)).reduce(
+    (sum, code) => (sum * 31 + code) % 1e11,
+    7,
+  );
+  return {
+    hin: String(hash).padStart(11, "1"),
+    dateOfBirth: bornYearsAgo(18 + (hash % 60)),
+    sex: femaleFirstNames.has(name.split(" ")[0] ?? "") ? "female" : "male",
+    registeredPatient,
+  };
+}
+
+function calendarAppointment(appointment: Appointment): CalendarAppointment {
+  const { hin, dateOfBirth, sex } = patientFacts(appointment.patient);
+  return { ...appointment, patient: { ...appointment.patient, hin, dateOfBirth, sex } };
+}
+
 function appointmentDetail(appointment: Appointment): AppointmentDetail {
   const { id, name, phone } = appointment.patient;
   const extras = appointmentExtras.get(appointment.id);
-  const registeredPatient = registered.find((patient) => patient.id === id);
-  // A stable 11-digit HIN made from the patient's name, for patients the mock didn't register.
-  const madeUpHin = String(
-    Array.from({ length: name.length }, (_, index) => name.charCodeAt(index)).reduce(
-      (sum, code) => (sum * 31 + code) % 1e11,
-      7,
-    ),
-  ).padStart(11, "1");
+  const { hin, registeredPatient } = patientFacts(appointment.patient);
   return {
     ...appointment,
     patient: {
       id,
       name,
-      hin: registeredPatient?.hin ?? madeUpHin,
+      hin,
       phone,
       email: registeredPatient?.email ?? `${name.toLowerCase().replace(/\s+/g, ".")}@gmail.com`,
     },
@@ -416,7 +448,7 @@ export const receptionistHandlers = [
         openSlots: Math.max(0, totalSlots - (items.length - cancelled(items))),
         totalSlots,
       },
-      items,
+      items: items.map(calendarAppointment),
     } satisfies AppointmentCalendar);
   }),
   http.get(api("/hospital/reception/appointments/:id"), ({ params }) => {
