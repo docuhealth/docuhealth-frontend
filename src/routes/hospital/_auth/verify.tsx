@@ -6,19 +6,22 @@ import { AuthNotice } from "@/features/auth/components/auth-header";
 import { FacilityVerification } from "@/features/auth/components/facility-verification";
 
 export const Route = createFileRoute("/hospital/_auth/verify")({
-  // `token` comes from the "Verify Hospital Details" link in the verification email.
-  validateSearch: z.object({ token: z.string().optional() }),
+  // `token` and `application` come from the verification link in the official facility email.
+  validateSearch: z.object({
+    token: z.string().optional(),
+    application: z.string().optional(),
+  }),
   component: VerifyHospitalPage,
 });
 
 function VerifyHospitalPage() {
-  const { token } = Route.useSearch();
+  const { token, application } = Route.useSearch();
 
   return (
     <>
-      <title>Upload documents · DocuHealth</title>
+      <title>Verify facility · DocuHealth</title>
       {token ? (
-        <FacilityVerification token={token} />
+        <FacilityVerification token={token} application={application ?? "fapp_default"} />
       ) : (
         <div className="flex flex-col gap-6">
           <AuthNotice icon={<WarningCircleIcon />} tone="error" title="Link expired">

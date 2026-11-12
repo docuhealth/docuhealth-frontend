@@ -1,26 +1,25 @@
 import { CaretRightIcon } from "@phosphor-icons/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
+import { RequiredMark } from "@/components/required-mark";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
-  SelectCheckboxItem,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { AuthHeader } from "@/features/auth/components/auth-header";
-import { RequiredMark } from "@/components/required-mark";
 import { StepProgress } from "@/features/auth/components/step-progress";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import {
   hospitalDetailsSchema,
+  type HospitalDetailsValues,
   organisationTypeLabels,
   ownershipLabels,
-  type HospitalDetailsValues,
 } from "@/features/auth/lib/schemas";
 
 /** Field agent registering a hospital, step 1: what the facility is. */
@@ -38,7 +37,7 @@ export function HospitalDetailsForm({
   const form = useForm<HospitalDetailsValues>({
     resolver: zodResolver(hospitalDetailsSchema),
     defaultValues: defaultValues ??
-      devPrefill?.hospitalDetails ?? { hospitalName: "", facilityTypes: [], rcNumber: "" },
+      devPrefill?.hospitalDetails ?? { hospitalName: "", rcNumber: "" },
   });
   const { errors, isSubmitting } = form.formState;
 
@@ -70,34 +69,33 @@ export function HospitalDetailsForm({
           </Field>
 
           <Controller
-            name="facilityTypes"
+            name="facilityType"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="facilityTypes" className="gap-1">
+                <FieldLabel htmlFor="facilityType" className="gap-1">
                   Facility type <RequiredMark />
                 </FieldLabel>
                 <Select
-                  multiple
                   name={field.name}
                   items={organisationTypeLabels}
-                  value={field.value}
+                  value={field.value ?? null}
                   onValueChange={field.onChange}
                   required
                 >
                   <SelectTrigger
-                    id="facilityTypes"
+                    id="facilityType"
                     aria-invalid={fieldState.invalid}
                     onBlur={field.onBlur}
                     className="w-full bg-card"
                   >
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
-                  <SelectContent header="Select one or more">
+                  <SelectContent>
                     {Object.entries(organisationTypeLabels).map(([value, label]) => (
-                      <SelectCheckboxItem key={value} value={value}>
+                      <SelectItem key={value} value={value}>
                         {label}
-                      </SelectCheckboxItem>
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

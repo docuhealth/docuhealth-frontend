@@ -5,13 +5,43 @@ const phone = z
   .string()
   .trim()
   .regex(/^\+?\d[\d\s-]{6,}$/, "Enter a valid phone number");
+const hin = z
+  .string()
+  .trim()
+  .regex(/^\d{9,16}$/, "Enter a valid Health Identification Number (HIN)");
 const newPassword = z.string().min(8, "Use at least 8 characters");
 
-export const loginSchema = z.object({
-  email,
+const staffIdentifier = z
+  .string()
+  .trim()
+  .min(1, "Enter your email address or phone number")
+  .refine(
+    (val) => email.safeParse(val).success || phone.safeParse(val).success,
+    "Enter a valid email address or phone number",
+  );
+
+const patientIdentifier = z
+  .string()
+  .trim()
+  .min(1, "Enter your email, phone number, or HIN")
+  .refine(
+    (val) =>
+      email.safeParse(val).success || phone.safeParse(val).success || hin.safeParse(val).success,
+    "Enter a valid email address, phone number, or HIN",
+  );
+
+export const patientLoginSchema = z.object({
+  identifier: patientIdentifier,
   password: z.string().min(1, "Enter your password"),
 });
-export type LoginValues = z.infer<typeof loginSchema>;
+
+export const staffLoginSchema = z.object({
+  identifier: staffIdentifier,
+  password: z.string().min(1, "Enter your password"),
+});
+
+export const loginSchema = staffLoginSchema;
+export type LoginValues = z.infer<typeof patientLoginSchema>;
 
 export const forgotPasswordSchema = z.object({ email });
 export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
@@ -35,7 +65,12 @@ export const accountTypeSchema = z.object({
 });
 export type AccountTypeValues = z.infer<typeof accountTypeSchema>;
 
-const genders = ["male", "female", "prefer_not_to_say"] as const;
+export const genderLabels = {
+  male: "Male",
+  female: "Female",
+} as const;
+export type Gender = keyof typeof genderLabels;
+const genders = ["male", "female"] as const;
 
 /** Step 1 of the individual sign-up. */
 export const individualInfoSchema = z.object({
@@ -43,6 +78,14 @@ export const individualInfoSchema = z.object({
   lastName: z.string().trim().min(1, "Enter your last name"),
   otherName: z.string().trim(),
   gender: z.enum(genders, "Select a gender"),
+  dob: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Enter your date of birth")
+    .refine((value) => {
+      const parsed = new Date(`${value}T00:00:00`);
+      return !Number.isNaN(parsed.getTime()) && parsed <= new Date();
+    }, "Date of birth cannot be in the future"),
   email,
   phone,
   acceptTerms: z.literal(true, "Accept the Terms and Privacy Policy to continue"),
@@ -56,13 +99,42 @@ export const verifyCodeSchema = z.object({
 });
 export type VerifyCodeValues = z.infer<typeof verifyCodeSchema>;
 
+export const ninFieldSchema = z
+  .string()
+  .transform((value) => value.replace(/\D/g, ""))
+  .pipe(z.string().length(11, "Enter your 11-digit NIN"));
+
+/** Gate screen for migrated patients who have not yet verified their NIN. */
+export const verifyNinSchema = z.object({
+  nin: ninFieldSchema,
+});
+export type VerifyNinInput = z.input<typeof verifyNinSchema>;
+export type VerifyNinValues = z.output<typeof verifyNinSchema>;
+
+export const firstLoginRoleLabels = {
+  doctor: "Doctor",
+  nurse: "Nurse",
+  receptionist: "Receptionist",
+} as const;
+export type FirstLoginRole = keyof typeof firstLoginRoleLabels;
+
+/** Gate screen for migrated hospital accounts completing their personal admin profile on first login. */
+export const firstLoginSchema = z.object({
+  firstName: z.string().trim().min(1, "Enter your first name"),
+  lastName: z.string().trim().min(1, "Enter your last name"),
+  phone,
+  gender: z.enum(genders, "Select a gender"),
+  role: z.enum(
+    Object.keys(firstLoginRoleLabels) as [FirstLoginRole, ...FirstLoginRole[]],
+    "Select your role",
+  ),
+});
+export type FirstLoginValues = z.infer<typeof firstLoginSchema>;
+
 /** Last step of the individual sign-up: NIN and the account password. */
 export const accountDetailsSchema = z
   .object({
-    nin: z
-      .string()
-      .transform((value) => value.replace(/\D/g, ""))
-      .pipe(z.string().length(11, "Enter your 11-digit NIN")),
+    nin: ninFieldSchema,
     password: newPassword,
     confirmPassword: z.string(),
   })
@@ -74,18 +146,21 @@ export type AccountDetailsInput = z.input<typeof accountDetailsSchema>;
 export type AccountDetailsValues = z.output<typeof accountDetailsSchema>;
 
 export const organisationTypeLabels = {
-  hospital: "Hospital/Clinic",
+  hospital: "Hospital / Clinic",
   laboratory: "Laboratory only",
   radiology: "Radiology only",
-  pharmacy: "Pharmacy/Chemist",
+  pharmacy: "Pharmacy / Chemist",
+  observation: "Observation / Health Post",
 } as const;
-type OrganisationType = keyof typeof organisationTypeLabels;
+export type OrganisationType = keyof typeof organisationTypeLabels;
+const organisationTypes = Object.keys(organisationTypeLabels) as [
+  OrganisationType,
+  ...OrganisationType[],
+];
 
 /** First step of the provider sign-up: the facility and how to reach it. */
 export const providerInfoSchema = z.object({
-  organisationTypes: z
-    .array(z.enum(Object.keys(organisationTypeLabels) as [OrganisationType, ...OrganisationType[]]))
-    .min(1, "Select at least one organisation type"),
+  facilityType: z.enum(organisationTypes, "Select an organisation type"),
   organisationName: z.string().trim().min(1, "Enter your organisation's name"),
   email,
   phone,
@@ -97,8 +172,12 @@ const DOCUMENT_TYPES = ["application/pdf", "image/jpeg", "image/png"];
 const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024;
 export const MAX_DOCUMENTS = 4;
 
-/** Licensing documents a facility uploads from the verification email's link. */
+/** Address + licensing documents a facility submits to complete verification. */
 export const facilityDocumentsSchema = z.object({
+  country: z.string().trim().min(1, "Select a country"),
+  state: z.string().trim().min(1, "Select a state"),
+  city: z.string().trim().min(1, "Select a city / LGA"),
+  street: z.string().trim().min(1, "Enter the street address"),
   files: z
     .array(
       z
@@ -111,12 +190,34 @@ export const facilityDocumentsSchema = z.object({
 });
 export type FacilityDocumentsValues = z.infer<typeof facilityDocumentsSchema>;
 
-/** Second step of facility verification: who gets the setup invite. */
+export const adminRoleLabels = {
+  doctor: "Doctor",
+  nurse: "Nurse",
+  receptionist: "Receptionist",
+  lab_scientist: "Lab Scientist",
+  radiologist: "Radiologist",
+  pharmacist: "Pharmacist",
+} as const;
+export type AdminRole = keyof typeof adminRoleLabels;
+const adminRoles = Object.keys(adminRoleLabels) as [AdminRole, ...AdminRole[]];
+
+export const allowedRolesByFacilityType: Record<OrganisationType, AdminRole[]> = {
+  hospital: ["doctor", "nurse", "receptionist"],
+  observation: ["doctor", "nurse", "receptionist"],
+  laboratory: ["lab_scientist"],
+  radiology: ["radiologist"],
+  pharmacy: ["pharmacist"],
+};
+
+/** Admin details step of facility verification or agent hospital registration. */
 export const adminDetailsSchema = z.object({
   firstName: z.string().trim().min(1, "Enter the admin's first name"),
   lastName: z.string().trim().min(1, "Enter the admin's last name"),
   email,
   phone,
+  gender: z.enum(genders, "Select a gender"),
+  role: z.enum(adminRoles, "Select a role"),
+  specialization: z.string().trim().optional(),
 });
 export type AdminDetailsValues = z.infer<typeof adminDetailsSchema>;
 
@@ -126,9 +227,7 @@ type Ownership = keyof typeof ownershipLabels;
 /** Field agent registering a hospital, step 1: what the facility is. */
 export const hospitalDetailsSchema = z.object({
   hospitalName: z.string().trim().min(1, "Enter the hospital's name"),
-  facilityTypes: z
-    .array(z.enum(Object.keys(organisationTypeLabels) as [OrganisationType, ...OrganisationType[]]))
-    .min(1, "Select at least one facility type"),
+  facilityType: z.enum(organisationTypes, "Select a facility type"),
   ownership: z.enum(
     Object.keys(ownershipLabels) as [Ownership, ...Ownership[]],
     "Select ownership",
@@ -142,8 +241,9 @@ export type HospitalDetailsValues = z.infer<typeof hospitalDetailsSchema>;
 
 /** Field agent registering a hospital, step 2: where it is and how to reach it. */
 export const hospitalLocationSchema = z.object({
-  state: z.string().trim().min(1, "Enter the state"),
-  lga: z.string().trim().min(1, "Enter the LGA"),
+  country: z.string().trim().min(1, "Select a country"),
+  state: z.string().trim().min(1, "Select a state"),
+  lga: z.string().trim().min(1, "Select an LGA"),
   streetAddress: z.string().trim().min(1, "Enter the street address"),
   phone,
   email,
