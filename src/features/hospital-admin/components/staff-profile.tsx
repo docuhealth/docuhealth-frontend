@@ -27,7 +27,7 @@ import {
   StaffChangeDialogs,
   type StaffChangeStep,
 } from "@/features/hospital-admin/components/staff-change-dialogs";
-import { StatCard } from "@/components/dashboard/stat-card";
+import { StatCard, StatGrid } from "@/components/dashboard/stat-card";
 import { StatusPill } from "@/components/dashboard/status-pill";
 import { ageOn, firstName, formatAppointment, formatDate } from "@/lib/format";
 
@@ -111,7 +111,7 @@ export function StaffProfile({
         </div>
       </div>
 
-      <dl className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+      <StatGrid>
         <StatCard
           icon={<UsersIcon />}
           label="Total patients seen"
@@ -140,7 +140,7 @@ export function StaffProfile({
           value={stats.followUpsRequested}
           note={`${stats.followUpsPending} still pending`}
         />
-      </dl>
+      </StatGrid>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <ProfileCard

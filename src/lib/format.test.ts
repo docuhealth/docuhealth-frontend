@@ -5,6 +5,9 @@ import {
   formatShortDay,
   formatShortDayTime,
   formatLongDateTime,
+  formatDateDotTime,
+  formatDateCommaTime,
+  formatFileSize,
   firstName,
   formatAppointment,
   formatDate,
@@ -15,6 +18,7 @@ import {
   formatDuration,
   formatHin,
   formatLongDate,
+  formatShortTimeAgo,
   formatTimeAgo,
   greetingFor,
   initials,
@@ -48,6 +52,27 @@ describe("initials", () => {
     ["  ", ""],
   ])("%s → %s", (name, expected) => {
     expect(initials(name)).toBe(expected);
+  });
+});
+
+describe("formatShortTimeAgo", () => {
+  const now = new Date(2026, 9, 14, 12);
+  const ago = (ms: number) => new Date(now.getTime() - ms);
+  const minute = 60_000;
+  const day = 24 * 60 * minute;
+
+  it.each([
+    [0, "just now"],
+    [5 * minute, "5m ago"],
+    [3 * 60 * minute, "3h ago"],
+    [1 * day, "1d ago"],
+    [6 * day, "6d ago"],
+    [7 * day, "1w ago"],
+    [15 * day, "2w ago"],
+    [60 * day, "2mo ago"],
+    [400 * day, "1y ago"],
+  ])("%i ms ago reads %s", (ms, expected) => {
+    expect(formatShortTimeAgo(ago(ms), now)).toBe(expected);
   });
 });
 
@@ -204,5 +229,26 @@ describe("formatLongDateTime", () => {
     expect(formatLongDateTime(new Date(2026, 9, 9, 11, 0))).toBe(
       "Friday, 9 October 2026 · 11:00 AM",
     );
+  });
+});
+
+describe("formatDateDotTime", () => {
+  it("gives the date and the time, split by a dot", () => {
+    expect(formatDateDotTime(new Date(2025, 11, 23, 15, 45))).toBe("23 Dec 2025 · 3:45 PM");
+  });
+});
+
+describe("formatDateCommaTime", () => {
+  it("gives the date and the time, split by a comma", () => {
+    expect(formatDateCommaTime(new Date(2025, 6, 15, 12, 45))).toBe("15 Jul 2025, 12:45 PM");
+  });
+});
+
+describe("formatFileSize", () => {
+  it("gives megabytes from 100 KB up, and kilobytes below", () => {
+    expect(formatFileSize(400_000)).toBe("0.4 MB");
+    expect(formatFileSize(2_500_000)).toBe("2.5 MB");
+    expect(formatFileSize(24_300_000)).toBe("24 MB");
+    expect(formatFileSize(45_000)).toBe("45 KB");
   });
 });

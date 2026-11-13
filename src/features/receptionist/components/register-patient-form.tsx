@@ -73,7 +73,7 @@ const steps = {
 } as const satisfies Record<Variant, Record<Step, { title: string; description: string }>>;
 
 // Every step's body is as tall as the first, so the dialog doesn't jump between them.
-const bodyClass = "min-h-[28rem]";
+const bodyMinHeight = "28rem";
 
 /** Who was just registered, for whatever comes next (e.g. booking them in). */
 export type NewPatient = { id: string; hin: string; name: string; phone: string; email: string };
@@ -214,7 +214,7 @@ export function RegisterPatientForm({
       />
 
       {step === 1 && (
-        <FormDialogBody className={bodyClass}>
+        <FormDialogBody minHeight={bodyMinHeight}>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <Field data-invalid={!!errors.firstName}>
               <FieldLabel htmlFor="patientFirstName" className="gap-1">
@@ -341,7 +341,7 @@ export function RegisterPatientForm({
       )}
 
       {step === 2 && (
-        <FormDialogBody className={bodyClass}>
+        <FormDialogBody minHeight={bodyMinHeight}>
           <Controller
             name="code"
             control={form.control}
@@ -392,7 +392,7 @@ export function RegisterPatientForm({
       )}
 
       {step === 3 && (
-        <FormDialogBody className={bodyClass}>
+        <FormDialogBody minHeight={bodyMinHeight}>
           <Field data-invalid={!!errors.nin}>
             <div className="flex items-center justify-between">
               <FieldLabel htmlFor="patientNin" className="gap-1">

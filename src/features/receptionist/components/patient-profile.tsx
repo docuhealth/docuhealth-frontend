@@ -19,7 +19,7 @@ import { DashboardTable, PersonCell } from "@/components/dashboard/dashboard-tab
 import { FilterSelect } from "@/components/dashboard/filter-select";
 import { PersonAvatar } from "@/components/dashboard/person-avatar";
 import { InfoRow, ProfileCard } from "@/components/dashboard/profile-card";
-import { StatCard } from "@/components/dashboard/stat-card";
+import { StatCard, StatGrid } from "@/components/dashboard/stat-card";
 import { StatusPill } from "@/components/dashboard/status-pill";
 import { TablePagination } from "@/components/dashboard/table-pagination";
 import { Button } from "@/components/ui/button";
@@ -125,7 +125,7 @@ export function PatientProfile({ patientId }: { patientId: string }) {
         <BookAppointmentDialog patient={patient} open={booking} onOpenChange={setBooking} />
       </div>
 
-      <dl className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+      <StatGrid>
         <StatCard
           icon={<UserIcon />}
           label="Total visits"
@@ -164,7 +164,7 @@ export function PatientProfile({ patientId }: { patientId: string }) {
               : "No records to display"
           }
         />
-      </dl>
+      </StatGrid>
 
       <div className="grid items-start gap-6 lg:grid-cols-2">
         <div className="flex min-w-0 flex-col gap-6">

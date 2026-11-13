@@ -30,7 +30,7 @@ import { FilterSelect } from "@/components/dashboard/filter-select";
 import { PatientList } from "@/features/hospital-admin/components/patient-list";
 import { PeriodSelect } from "@/components/dashboard/period-select";
 import { SearchField } from "@/components/dashboard/search-field";
-import { StatCard } from "@/components/dashboard/stat-card";
+import { StatCard, StatGrid } from "@/components/dashboard/stat-card";
 import { formatLongDate } from "@/lib/format";
 import {
   defaultPatientFilters,
@@ -105,7 +105,7 @@ export function PatientManagement({
         </div>
       </div>
 
-      <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <StatGrid className="grid-cols-1 sm:grid-cols-2">
         <StatCard
           icon={<UserIcon />}
           label="Total check-in"
@@ -130,7 +130,7 @@ export function PatientManagement({
           value={stats.returningPatients.toLocaleString("en-GB")}
           note="Visited before today"
         />
-      </dl>
+      </StatGrid>
 
       <section aria-label="Patients" className="@container rounded-xl border bg-card">
         <Tabs

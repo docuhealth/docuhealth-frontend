@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { DialogDescription } from "@/components/ui/dialog";
 import { useSetStaffStatus } from "@/features/hospital-admin/api/mutations";
 import { type StaffMember, staffRoles } from "@/features/hospital-admin/api/schemas";
-import { ConfirmDialog } from "@/features/hospital-admin/components/confirm-dialog";
+import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { PersonAvatar } from "@/components/dashboard/person-avatar";
 import { getErrorMessage } from "@/lib/api";
 

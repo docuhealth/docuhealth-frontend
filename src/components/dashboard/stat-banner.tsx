@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import defaultBannerUrl from "@/assets/images/dashboard-banner.jpg";
+import { StatGrid } from "@/components/dashboard/stat-card";
 
 /**
  * The hospital's banner photo (`imageUrl`, or the default one) with `StatCard`s over its lower
@@ -21,9 +22,7 @@ export function StatBanner({
         alt=""
         className="absolute inset-0 size-full object-cover"
       />
-      <dl className="relative grid grid-cols-2 gap-3 p-3 pt-28 sm:pt-36 xl:grid-cols-4">
-        {children}
-      </dl>
+      <StatGrid className="relative gap-3 p-3 pt-28 sm:pt-36">{children}</StatGrid>
       {/* After the cards, so it stacks above their full-banner grid and stays clickable. */}
       {action}
     </section>

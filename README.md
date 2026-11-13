@@ -61,12 +61,13 @@ src/
     _auth/               Patient auth layout + login, register, forgot-password
     hospital/, agent/    Sections on their own subdomain (see "Sections and subdomains")
   features/<name>/       Domain code: api/ (schemas, requests, query options, mutations),
-                         components/, lib/ (auth/, hospital-admin/, landing/, receptionist/)
+                         components/, lib/ (auth/, hospital-admin/, landing/, receptionist/,
+                         radiologist/)
   components/            Shared app components (file-dropzone, success-dialog, required-mark)
     ui/                  shadcn components = the design system (generated; edit freely)
     dashboard/           The hospital dashboards' shared shell and blocks (sidebar, top bar,
                          stat cards, tables, tabs), driven by props — every role's feature
-                         (hospital-admin, receptionist, …) builds its pages from them
+                         (hospital-admin, receptionist, radiologist, …) builds its pages from them
   lib/                   http client, request(), query client
   stores/                Zustand stores (auth session)
   assets/fonts/          Self-hosted variable fonts (Space Grotesk, Inter)
@@ -151,6 +152,9 @@ sign-up. Anyone with a session who opens a patient auth page is redirected to `/
 | `/admin/settings`, `/admin/help` | Settings and help                                           |
 | `/receptionist`                  | Receptionist dashboard                                      |
 | `/receptionist/…`                | Same sections as admin, except a single `/staff` page       |
+| `/radiologist`                   | Radiologist dashboard                                       |
+| `/radiologist/scan-orders`       | Scan orders (`/radiologist/scan-orders/:orderId` for one)   |
+| `/radiologist/…`                 | Appointments, messages, personnel, settings, help           |
 
 ```
 Register:  /register → submit facility details → approval → verification email

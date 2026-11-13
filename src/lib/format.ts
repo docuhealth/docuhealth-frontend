@@ -34,6 +34,20 @@ export function formatTimeAgo(date: Date, now = new Date()) {
   return relative.format(-Math.floor(days / 365), "year");
 }
 
+/** `formatTimeAgo` squeezed into a pill: "5m ago", "3h ago", "2d ago", "1w ago", "4mo ago". */
+export function formatShortTimeAgo(date: Date, now = new Date()) {
+  const minutes = Math.max(0, Math.floor((now.getTime() - date.getTime()) / 60_000));
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  if (days < 30) return `${Math.floor(days / 7)}w ago`;
+  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+  return `${Math.floor(days / 365)}y ago`;
+}
+
 /** First letters of the first and last word: "Tunde Adeyemi" → "TA". */
 export function initials(name: string) {
   const words = name.trim().split(/\s+/);
@@ -180,4 +194,31 @@ export function formatShortDayTime(date: Date) {
 /** e.g. "Friday, 9 October 2026 · 11:00 AM". */
 export function formatLongDateTime(date: Date) {
   return `${formatLongDate(date)} · ${clockTime.format(date)}`;
+}
+
+/** e.g. "23 Dec 2025 · 3:45 PM". */
+export function formatDateDotTime(date: Date) {
+  return `${appointmentDay.format(date)} · ${appointmentTime.format(date)}`;
+}
+
+/** e.g. "3:45 PM". */
+export function formatTime(date: Date) {
+  return appointmentTime.format(date);
+}
+
+/** e.g. "15 Jul 2025, 12:45 PM". */
+export function formatDateCommaTime(date: Date) {
+  return `${appointmentDay.format(date)}, ${appointmentTime.format(date)}`;
+}
+
+/** e.g. "15 Jul 2025". */
+export function formatDay(date: Date) {
+  return appointmentDay.format(date);
+}
+
+/** A file's size in MB from 100 KB up, as the file lists show it: "0.4 MB", "2.5 MB", "24 MB". */
+export function formatFileSize(bytes: number) {
+  if (bytes < 100_000) return `${Math.max(1, Math.round(bytes / 1000))} KB`;
+  const mb = bytes / 1_000_000;
+  return `${mb < 10 ? Number(mb.toFixed(1)) : Math.round(mb)} MB`;
 }

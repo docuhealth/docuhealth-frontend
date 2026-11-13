@@ -25,7 +25,7 @@ export function FindPatientStep({
 
   return (
     <>
-      <FormDialogBody className="min-h-80 gap-5">
+      <FormDialogBody minHeight="20rem" className="gap-5">
         <PatientSearchField
           search={search}
           inputId="appointmentHin"

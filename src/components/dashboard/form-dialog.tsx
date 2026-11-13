@@ -101,10 +101,22 @@ export function FormDialogHeader({
   );
 }
 
-export function FormDialogBody({ className, ...props }: ComponentProps<typeof FieldGroup>) {
+/**
+ * `minHeight` keeps a flow's steps the same height (e.g. "28rem"), but never more than the
+ * screen leaves room for beside the header and footer, so on small phones the body scrolls
+ * rather than pushing the footer out of the dialog. Don't use a `min-h-*` class for this.
+ */
+export function FormDialogBody({
+  className,
+  minHeight,
+  style,
+  ...props
+}: ComponentProps<typeof FieldGroup> & { minHeight?: string }) {
   return (
     <FieldGroup
       className={cn("min-h-0 flex-1 overflow-y-auto px-6 py-6 short:py-4", className)}
+      // 20rem: the dialog's margin, plus a header with a step bar and a footer of stacked buttons.
+      style={minHeight ? { minHeight: `min(${minHeight}, 100svh - 20rem)`, ...style } : style}
       {...props}
     />
   );
@@ -133,7 +145,7 @@ export function FormDialogFooter({
   return (
     <footer
       className={cn(
-        "relative flex items-center justify-between gap-3 px-6 py-6 short:py-3",
+        "@container relative px-6 py-6 short:py-3",
         progress === undefined && "border-t",
       )}
     >
@@ -144,18 +156,24 @@ export function FormDialogFooter({
           className="absolute inset-x-0 top-0 rounded-none bg-line"
         />
       )}
-      {onBack ? (
-        <Button type="button" variant="outline" onClick={onBack} className={leftButtonClass}>
-          {backLabel}
-        </Button>
-      ) : (
-        <DialogClose asChild>
-          <Button type="button" variant="outline" className={leftButtonClass}>
-            {closeLabel}
+      {/*
+        Like ConfirmDialog: on narrow dialogs the buttons share the row, and only when both labels
+        can't fit on one line does the action wrap above (wrap-reverse), each then full width.
+      */}
+      <div className="flex flex-wrap-reverse items-center justify-between gap-3 *:grow *:whitespace-nowrap @sm:*:grow-0">
+        {onBack ? (
+          <Button type="button" variant="outline" onClick={onBack} className={leftButtonClass}>
+            {backLabel}
           </Button>
-        </DialogClose>
-      )}
-      {children}
+        ) : (
+          <DialogClose asChild>
+            <Button type="button" variant="outline" className={leftButtonClass}>
+              {closeLabel}
+            </Button>
+          </DialogClose>
+        )}
+        {children}
+      </div>
     </footer>
   );
 }

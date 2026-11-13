@@ -9,7 +9,7 @@ import {
 } from "@phosphor-icons/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { StatCard } from "@/components/dashboard/stat-card";
+import { StatCard, StatGrid } from "@/components/dashboard/stat-card";
 import { Trend } from "@/components/dashboard/trend";
 import { Button } from "@/components/ui/button";
 import { appointmentCalendarQuery } from "@/features/receptionist/api/queries";
@@ -200,7 +200,7 @@ function Summary({
   const { cancelledChange } = summary;
 
   return (
-    <dl aria-label="Summary" className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+    <StatGrid aria-label="Summary" className="gap-3">
       <StatCard
         icon={<CalendarBlankIcon />}
         label={`Booked this ${noun}`}
@@ -237,6 +237,6 @@ function Summary({
         value={summary.openSlots.toLocaleString("en-GB")}
         note={`Of ${summary.totalSlots.toLocaleString("en-GB")} ${slots} slots`}
       />
-    </dl>
+    </StatGrid>
   );
 }

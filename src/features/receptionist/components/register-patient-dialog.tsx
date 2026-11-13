@@ -170,7 +170,7 @@ function RegisterSteps({
   return (
     <>
       <FormDialogHeader title="Register patient" description="Who are you registering?" />
-      <FormDialogBody className="min-h-80 gap-4">
+      <FormDialogBody minHeight="20rem" className="gap-4">
         <fieldset className="flex flex-col gap-4">
           <legend className="sr-only">Who are you registering?</legend>
           {(Object.keys(kinds) as Kind[]).map((value) => (

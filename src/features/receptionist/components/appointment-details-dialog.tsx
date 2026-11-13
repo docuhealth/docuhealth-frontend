@@ -115,7 +115,7 @@ function AppointmentDetails({
           title="Appointment Details"
           description={isError ? "Something went wrong." : "Loading…"}
         />
-        <FormDialogBody className="min-h-64 items-center justify-center">
+        <FormDialogBody minHeight="16rem" className="items-center justify-center">
           {isError ? (
             <p className="text-center type-body-sm-regular text-error-500">
               We couldn’t load this appointment. Try again in a moment.
@@ -172,7 +172,7 @@ function Summary({
   return (
     <>
       <FormDialogHeader title="Appointment Details" description={formatLongDateTime(at)} />
-      <FormDialogBody className="min-h-80">
+      <FormDialogBody minHeight="20rem">
         <PatientSummary patient={appointment.patient} />
         <dl className="flex flex-col gap-4 type-body [&_dd]:text-right [&_dd]:text-fg-heading [&_div]:flex [&_div]:items-center [&_div]:justify-between [&_div]:gap-4 [&_dt]:text-fg-caption">
           <div>
@@ -203,21 +203,24 @@ function Summary({
       </FormDialogBody>
 
       {manageable && (
-        <footer className="flex flex-wrap items-center justify-between gap-3 border-t px-6 py-6 short:py-3">
-          <Button
-            variant="outline"
-            className="h-11 border-error-500 px-5 type-body-sm-medium text-error-500 hover:bg-error-100 hover:text-error-700"
-            onClick={onCancel}
-          >
-            Cancel appointment
-          </Button>
-          <Button
-            className="h-11 gap-2 px-5 type-heading-sm has-data-[icon=inline-end]:pr-4"
-            onClick={onReschedule}
-          >
-            Reschedule
-            <CaretRightIcon data-icon="inline-end" />
-          </Button>
+        // Wraps like FormDialogFooter: side by side while both fit, then stacked, full width.
+        <footer className="@container border-t px-6 py-6 short:py-3">
+          <div className="flex flex-wrap-reverse items-center justify-between gap-3 *:grow *:whitespace-nowrap @sm:*:grow-0">
+            <Button
+              variant="outline"
+              className="h-11 border-error-500 px-5 type-body-sm-medium text-error-500 hover:bg-error-100 hover:text-error-700"
+              onClick={onCancel}
+            >
+              Cancel appointment
+            </Button>
+            <Button
+              className="h-11 gap-2 px-5 type-heading-sm has-data-[icon=inline-end]:pr-4"
+              onClick={onReschedule}
+            >
+              Reschedule
+              <CaretRightIcon data-icon="inline-end" />
+            </Button>
+          </div>
         </footer>
       )}
     </>
@@ -300,7 +303,7 @@ function CancelForm({
         noValidate
         className="flex min-h-0 flex-1 flex-col"
       >
-        <FormDialogBody className="min-h-80">
+        <FormDialogBody minHeight="20rem">
           <Controller
             name="reason"
             control={form.control}

@@ -34,7 +34,7 @@ export function PatientLookup({
   });
 
   return (
-    <FormDialogBody className="min-h-[28rem] gap-5">
+    <FormDialogBody minHeight="28rem" className="gap-5">
       <Field>
         <FieldLabel htmlFor={inputId} className="gap-1">
           Enter HIN <RequiredMark />

@@ -16,11 +16,15 @@ const tones = {
   },
 };
 
+// Grows into the row's spare room, but never narrower than its label, so a pair that can't fit
+// wraps instead of squeezing; just its own width once the dialog is wide enough.
+const buttonClass = "h-11 grow px-5 whitespace-nowrap @sm:grow-0 @sm:px-8";
+
 /**
- * "Are you sure?" before a change to someone's access: `icon` and `title` in a header tinted
- * by `tone`, the details in `children` (put the explanation in a DialogDescription), then
- * Cancel and a tinted `confirmLabel` button. `size="lg"` widens it for a list, e.g. of people
- * being removed.
+ * "Are you sure?" before a change that matters, e.g. to someone's access or sharing a result:
+ * `icon` and `title` in a header tinted by `tone`, the details in `children` (put the
+ * explanation in a DialogDescription), then Cancel and a tinted `confirmLabel` button.
+ * `size="lg"` widens it for a list, e.g. of people being removed.
  */
 export function ConfirmDialog({
   tone,
@@ -68,17 +72,24 @@ export function ConfirmDialog({
           {children}
         </div>
 
-        <footer className="flex justify-end gap-3 px-6 pb-6 short:pb-3">
-          <Button variant="outline" className="h-11 px-8" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            className={cn("h-11 px-8", tones[tone].confirm)}
-            loading={pending}
-            onClick={onConfirm}
-          >
-            {confirmLabel}
-          </Button>
+        {/*
+          Wide dialogs: the buttons at their own width, on the right. Narrow ones: side by side,
+          sharing the row, and only when both labels can't fit on one line does the action wrap
+          above Cancel (wrap-reverse), each then full width.
+        */}
+        <footer className="@container px-6 pb-6 short:pb-3">
+          <div className="flex flex-wrap-reverse gap-3 @sm:justify-end">
+            <Button variant="outline" className={buttonClass} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              className={cn(buttonClass, tones[tone].confirm)}
+              loading={pending}
+              onClick={onConfirm}
+            >
+              {confirmLabel}
+            </Button>
+          </div>
         </footer>
       </DialogContent>
     </Dialog>

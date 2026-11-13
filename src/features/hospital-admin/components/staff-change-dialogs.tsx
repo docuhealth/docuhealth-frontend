@@ -13,7 +13,7 @@ import {
   type StaffMemberChange,
   staffRoles,
 } from "@/features/hospital-admin/api/schemas";
-import { ConfirmDialog } from "@/features/hospital-admin/components/confirm-dialog";
+import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { getErrorMessage } from "@/lib/api";
 
 /**

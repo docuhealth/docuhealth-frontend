@@ -29,7 +29,7 @@ import { CountTab, CountTabsList } from "@/components/dashboard/count-tabs";
 import { FilterSelect } from "@/components/dashboard/filter-select";
 import { PersonAvatar } from "@/components/dashboard/person-avatar";
 import { InfoRow, ProfileCard } from "@/components/dashboard/profile-card";
-import { StatCard } from "@/components/dashboard/stat-card";
+import { StatCard, StatGrid } from "@/components/dashboard/stat-card";
 import { ageOn, formatDate, formatDayAndTime } from "@/lib/format";
 
 const coverageTones = {
@@ -99,7 +99,7 @@ export function PatientProfile({ patientId }: { patientId: string }) {
         </Button>
       </div>
 
-      <dl className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+      <StatGrid>
         <StatCard
           icon={<UserIcon />}
           label="Total visits"
@@ -131,7 +131,7 @@ export function PatientProfile({ patientId }: { patientId: string }) {
           now={now}
           none="No records to display"
         />
-      </dl>
+      </StatGrid>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <ProfileCard
