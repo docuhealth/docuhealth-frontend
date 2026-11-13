@@ -31,8 +31,8 @@ const doctorName = (info) =>
 /**
  * Per-patient doctor-to-doctor handover notes.
  *
- * Read side: `GET /api/doctors/handovers` (one combined sent + received list,
- * filtered here by the patient's HIN). Create side: `POST /api/doctors/handover`
+ * Read side: `GET /api/hospital-ops/handovers/doctor` (one combined sent + received list,
+ * filtered here by the patient's HIN). Create side: `POST /api/hospital-ops/handovers/doctor`
  * with the 8 structured fields from AddHandoverNoteForm plus the recipient
  * doctor's SQID and the patient HIN.
  */

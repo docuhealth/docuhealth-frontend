@@ -2,6 +2,8 @@ import React, { createContext, useState, useEffect, useMemo, useRef } from "reac
 import axiosInstanceHos from "../../../lib/axios/hospital";
 import toast from "react-hot-toast";
 import { extractApiErrorMessage } from "../../../utils/apiError";
+import { closeCheckIn, endEncounter as endEncounterRequest } from "../../../queries/Hospital/doctor/checkIns";
+import { invalidateCheckIn } from "../../../lib/queryInvalidations";
 import { matchesPatientSearch, SEARCH_PAGE_SIZE } from "../../../utils/matchesPatientSearch";
 
 export const DoctorEncounterContext = createContext();
@@ -9,6 +11,8 @@ export const DoctorEncounterContext = createContext();
 const TAB_STATUS_MAP = {
   "Pending": "doctor_idle",
   "Active": "doctor_active",
+  // Encounter ended but the visit is still open; no other list shows these, so check-out happens from here
+  "Seen": "doctor_seen",
 };
 
 export const DoctorEncounterProvider = ({ children }) => {
@@ -48,8 +52,8 @@ export const DoctorEncounterProvider = ({ children }) => {
     try {
       const status = TAB_STATUS_MAP[activeTab];
       let url = isSearching
-        ? `api/doctors/check-ins?status=${status}&page=1&size=${SEARCH_PAGE_SIZE}`
-        : `api/doctors/check-ins?status=${status}&page=${currentPage}`;
+        ? `api/hospital-ops/check-ins/doctor-queue?status=${status}&page=1&size=${SEARCH_PAGE_SIZE}`
+        : `api/hospital-ops/check-ins/doctor-queue?status=${status}&page=${currentPage}`;
 
       const response = await axiosInstanceHos.get(url);
       if (requestId !== latestRequest.current) return;
@@ -100,13 +104,41 @@ export const DoctorEncounterProvider = ({ children }) => {
 
   const claimPatient = async (sqid) => {
     try {
-      await axiosInstanceHos.post(`api/doctors/check-ins/${sqid}/claim`, {});
+      await axiosInstanceHos.post(`api/hospital-ops/check-ins/${sqid}/claim`, {});
       toast.success("Patient successfully claimed!");
       fetchEncounters(); // Refresh list to remove from pending
       return true;
     } catch (error) {
       console.error("Error claiming patient:", error);
       toast.error(extractApiErrorMessage(error, "Failed to claim patient."));
+      return false;
+    }
+  };
+
+  const checkOutPatient = async (encounter) => {
+    try {
+      await closeCheckIn(encounter.sqid);
+      toast.success("Patient checked out.");
+      invalidateCheckIn(undefined, { hin: encounter.patient_info?.hin });
+      fetchEncounters();
+      return true;
+    } catch (error) {
+      console.error("Error checking patient out:", error);
+      toast.error(extractApiErrorMessage(error, "Could not check this patient out."));
+      return false;
+    }
+  };
+
+  const endEncounter = async (encounter) => {
+    try {
+      await endEncounterRequest(encounter.sqid);
+      toast.success("Encounter ended. The patient is now in the Seen list.");
+      invalidateCheckIn(undefined, { hin: encounter.patient_info?.hin });
+      fetchEncounters();
+      return true;
+    } catch (error) {
+      console.error("Error ending encounter:", error);
+      toast.error(extractApiErrorMessage(error, "Could not end this encounter."));
       return false;
     }
   };
@@ -130,6 +162,8 @@ export const DoctorEncounterProvider = ({ children }) => {
         setSearchQuery,
         fetchEncounters,
         claimPatient,
+        checkOutPatient,
+        endEncounter,
         selectedPatientForWall,
         setSelectedPatientForWall,
         selectedPatientForActivities,

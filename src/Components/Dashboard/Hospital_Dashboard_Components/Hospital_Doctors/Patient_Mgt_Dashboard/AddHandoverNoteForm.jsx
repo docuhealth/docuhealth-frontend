@@ -19,7 +19,7 @@ export const HANDOVER_FIELDS = [
 const EMPTY_FORM = HANDOVER_FIELDS.reduce((acc, f) => ({ ...acc, [f.key]: "" }), {});
 
 // Doctor-to-doctor handover note form. The receiving doctor is picked in the previous
-// step; the parent (PatientHandoverTab) POSTs these fields to /api/doctors/handover.
+// step; the parent (PatientHandoverTab) POSTs these fields to /api/hospital-ops/handovers/doctor.
 // Only working_diagnosis and current_clinical_status are required; the rest go up as "".
 const AddHandoverNoteForm = ({ onBack, onUpload, handoverDoctorName, isSubmitting = false }) => {
   const [form, setForm] = useState(EMPTY_FORM);

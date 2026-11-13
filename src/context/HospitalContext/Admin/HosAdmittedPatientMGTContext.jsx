@@ -22,7 +22,7 @@ const HosAdmittedPatientMGTProvider = ({ children }) => {
   const { data, isLoading: loading, isFetching } = useQuery({
     queryKey: ["hospital-patients-admin", tab, currentPage, debouncedSearch],
     queryFn: async () => {
-      let url = `api/hospitals/patients?status=${tab}&page=${currentPage}&size=${pageSize}`;
+      let url = `api/hospital-ops/patients?status=${tab}&page=${currentPage}&size=${pageSize}`;
       if (debouncedSearch) {
         url += `&search=${encodeURIComponent(debouncedSearch)}`;
       }

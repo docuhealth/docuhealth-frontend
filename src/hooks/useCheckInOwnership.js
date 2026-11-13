@@ -16,8 +16,8 @@ export const useCheckInOwnership = (checkInSqid) => {
 
   const loaded = !!checkInSqid && Array.isArray(activeCheckIns);
   const checkIn = loaded ? activeCheckIns.find((c) => c.sqid === checkInSqid) : null;
-  const ownerId = checkIn?.claimed_by?.staff_id;
-  const isOtherDoctors = !!(ownerId && profile?.staff_id && ownerId !== profile.staff_id);
+  const ownerId = checkIn?.claimed_by?.sqid;
+  const isOtherDoctors = !!(ownerId && profile?.sqid && ownerId !== profile.sqid);
   const owner = checkIn?.claimed_by;
 
   return {

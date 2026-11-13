@@ -22,7 +22,7 @@ const NursesHealthPersonnelProvider = (props) => {
 
         try {
             const res = await axiosInstanceHos.get(
-                `api/hospitals/team-members?page=${page}&size=${pageSize}`
+                `api/hospitals/staff?page=${page}&size=${pageSize}`
             );
 
             console.log(res.data)

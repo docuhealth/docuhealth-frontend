@@ -12,7 +12,7 @@ export async function fetchPatientProfile(): Promise<PatientInfo> {
 }
 
 export async function fetchPatientVitalSigns(page: number = 1): Promise<PaginatedResponse<VitalSignsInfo>> {
-  const res = await axiosInstance.get(`api/patients/vital-signs?page=${page}`);
+  const res = await axiosInstance.get(`api/records/vital-signs/mine?page=${page}`);
   return res.data;
 }
 
@@ -40,7 +40,7 @@ export async function fetchPatientAppointments(
   dateFrom?: string,
   dateTo?: string
 ): Promise<PaginatedResponse<AppointmentDetail>> {
-  let url = `api/patients/appointments?page=${page}&size=${pageSize}`;
+  let url = `api/hospital-ops/appointments/mine?page=${page}&size=${pageSize}`;
   if (search) url += `&search=${search}`;
   if (dateFrom) url += `&scheduled_time_gte=${dateFrom}`;
   if (dateTo) url += `&scheduled_time_lte=${dateTo}`;
@@ -49,7 +49,7 @@ export async function fetchPatientAppointments(
 }
 
 export async function fetchPatientDrugRecords(page: number, pageSize: number, search?: string): Promise<PaginatedResponse<DrugRecordDetail>> {
-  let url = `api/patients/drug-records?page=${page}&size=${pageSize}`;
+  let url = `api/pharmacy/patients/drug-records?page=${page}&size=${pageSize}`;
   if (search) url += `&search=${search}`;
   const res = await axiosInstance.get(url);
   return res.data;
@@ -72,6 +72,22 @@ export async function updatePatientAccount(payload: any): Promise<any> {
   return res.data;
 }
 
+// patients/update only takes `profile`; email and password go through the auth endpoints
+export async function changePassword(payload: { old_password: string; new_password: string }): Promise<any> {
+  const res = await axiosInstance.patch("api/auth/password", payload);
+  return res.data;
+}
+
+export async function sendEmailChangeOtp(new_email: string): Promise<any> {
+  const res = await axiosInstance.post("api/auth/email/send-otp", { new_email });
+  return res.data;
+}
+
+export async function verifyEmailChangeOtp(otp: string): Promise<any> {
+  const res = await axiosInstance.patch("api/auth/email/verify-otp", { otp });
+  return res.data;
+}
+
 export async function deactivatePatientAccount(): Promise<any> {
   const res = await axiosInstance.delete("api/patients/delete");
   return res.data;
@@ -83,7 +99,7 @@ export async function fetchSubaccountMedicalRecords(
   pageSize: number
 ): Promise<PaginatedResponse<any>> {
   const res = await axiosInstance.get(
-    `api/patients/subaccounts/soap-notes/${hin}?page=${page}&size=${pageSize}`
+    `api/records/soap-notes/subaccounts/${hin}?page=${page}&size=${pageSize}`
   );
   return res.data;
 }

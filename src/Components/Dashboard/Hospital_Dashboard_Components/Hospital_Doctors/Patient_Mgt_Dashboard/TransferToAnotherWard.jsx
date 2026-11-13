@@ -17,7 +17,7 @@ const TransferToAnotherWard = ({ setRequestAdmission, selectedPatientDetails, on
   const [availableBeds, setAvailableBeds] = useState([]);
   const [form, setForm] = useState({ new_ward: "", new_bed: "" });
 
-  // The doctor inpatient list row (api/hospitals/patients?status=inpatient)
+  // The doctor inpatient list row (api/hospital-ops/patients?status=inpatient)
   // carries the admission SQID as `sqid` — there's no numeric id on it — and
   // the patient HIN under `patient_info`.
   const admissionSqid = selectedPatientDetails?.sqid || "";

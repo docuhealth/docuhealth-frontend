@@ -6,7 +6,7 @@ import VitalSignsCard from "../../../../ui/VitalSignsCard";
 import Skeleton from "../../../../ui/Skeleton";
 
 // Read-only doctor + nurse in-patient discharge summary, off
-// GET /api/inpatients/discharged-patients (matched by admission sqid in the query
+// GET /api/records/discharged-patients (matched by admission sqid in the query
 // layer). The nurse block shows an "awaiting nurse" state until the nurse
 // executes the discharge task and `nurse_discharge_form` is populated.
 
@@ -91,7 +91,7 @@ const closerLabel = (s) =>
   s ? `${s.role === "doctor" ? "Dr. " : ""}${s.firstname ?? ""} ${s.lastname ?? ""}`.trim() : null;
 
 // Out-patient discharge summary, rendered from the closed check-in row
-// (GET /api/hospitals/patients?status=outpatient_discharge). The row has no
+// (GET /api/hospital-ops/patients?status=outpatient_discharge). The row has no
 // discharge form; `closed_by_info` is null when the end-of-day job closed the visit.
 const OutpatientDischargeSummary = ({ row, fallbackPatient }) => {
   const patient =
@@ -139,7 +139,7 @@ const OutpatientDischargeSummary = ({ row, fallbackPatient }) => {
 const DoctorDischargeSummaryView = ({ admissionSqid, dischargeRow, fallbackPatient }) => {
   // The discharged-patients list row now carries the discharge form(s) inline, so
   // when we're handed that row we render from it directly — no lookup. The
-  // paginated /api/inpatients/discharged-patients hunt stays as a fallback for
+  // paginated /api/records/discharged-patients hunt stays as a fallback for
   // legacy rows opened without the inline forms.
   // Out-patient rows are closed check-ins: `sqid, patient_info, closed_by_info, closed_at`.
   const isOutpatientRow = !!dischargeRow && "closed_at" in dischargeRow;

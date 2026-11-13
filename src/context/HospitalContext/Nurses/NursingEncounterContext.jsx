@@ -55,13 +55,13 @@ export const NursingEncounterProvider = ({ children }) => {
 
       let data = null;
       if (NEWEST_FIRST_STATUSES.has(status) && !isSearching && !backendNewestFirst.current) {
-        data = await fetchNewestFirstPage("api/nurses/check-ins", status, currentPage, knownTotals.current[status]);
+        data = await fetchNewestFirstPage("api/hospital-ops/check-ins/nurse-queue", status, currentPage, knownTotals.current[status]);
         if (data === null) backendNewestFirst.current = true;
       }
       if (data === null) {
         const url = isSearching
-          ? `api/nurses/check-ins?status=${status}&page=1&size=${SEARCH_PAGE_SIZE}`
-          : `api/nurses/check-ins?status=${status}&page=${currentPage}`;
+          ? `api/hospital-ops/check-ins/nurse-queue?status=${status}&page=1&size=${SEARCH_PAGE_SIZE}`
+          : `api/hospital-ops/check-ins/nurse-queue?status=${status}&page=${currentPage}`;
         data = (await axiosInstanceHos.get(url)).data;
       }
       if (requestId !== latestRequest.current) return;
@@ -110,7 +110,7 @@ export const NursingEncounterProvider = ({ children }) => {
 
   const claimEncounter = async (sqid) => {
     try {
-      const response = await axiosInstanceHos.post(`/api/nurses/check-ins/${sqid}/reserve`, {});
+      const response = await axiosInstanceHos.post(`/api/hospital-ops/check-ins/${sqid}/reserve`, {});
       toast.success("Check-in claimed successfully!");
 
       // 1. Update state immediately with response data
@@ -136,7 +136,7 @@ export const NursingEncounterProvider = ({ children }) => {
   const submitAssessment = async (sqid, payload, escalate = false) => {
     try {
       const finalPayload = { ...payload, escalate };
-      await axiosInstanceHos.post(`/api/nurses/check-ins/${sqid}/nursing-assessment`, finalPayload);
+      await axiosInstanceHos.post(`/api/hospital-ops/check-ins/${sqid}/nursing-assessment`, finalPayload);
 
       toast.success(escalate ? "Patient sent to doctor's queue!" : "Encounter recorded successfully!");
       fetchEncounters(); // Invalidate / refetch

@@ -6,6 +6,7 @@ import { HosAppContext } from "../../../../../context/HospitalContext/Admin/HosA
 import { HosWardContext } from "../../../../../context/HospitalContext/HosWardContext";
 import { deleteWard } from "../../../../../queries/Hospital/fetchWards";
 import { invalidateWardManagement } from "../../../../../lib/queryInvalidations";
+import { extractApiErrorMessage } from "../../../../../utils/apiError";
 import Pagination2 from "../../../Patient_Dashboard_Components/Pagination/Pagination2";
 import ManageWardModal from "./ManageWardModal";
 
@@ -27,7 +28,7 @@ const Wards = () => {
     },
     onError: (err) => {
       console.error("Error deleting ward:", err);
-      toast.error(err.response?.data?.message || "Failed to delete ward");
+      toast.error(extractApiErrorMessage(err, "Failed to delete ward"));
     },
   });
 

@@ -13,6 +13,8 @@ import Button from "../../../../ui/Button";
 import GeneralPatientInfoForm from "../../../../ui/GeneralPatientInfoForm";
 import VitalSignsCard from "../../../../ui/VitalSignsCard";
 import RecentCareActivitiesModal from "./RecentCareActivitiesModal";
+import CloseAppointmentModal from "../../../../ui/CloseAppointmentModal";
+import { DoctorAppContext } from "../../../../../context/HospitalContext/Doctors/DoctorAppContext";
 
 const getBadgeStyle = (status) => {
   switch (status) {
@@ -39,16 +41,20 @@ const getTriageColor = (priority) => {
 
 const getCallUpStatus = (status) => {
   if (status === "doctor_active") return { text: "Active", style: "bg-green-100 text-green-600" };
+  if (status === "doctor_seen") return { text: "Seen", style: "bg-blue-100 text-blue-600" };
   if (status === "closed") return { text: "Closed", style: "bg-gray-100 text-gray-500" };
   return { text: "Awaiting", style: "bg-amber-50 text-amber-500" };
 };
+
+// Active and Seen rows have had a doctor, so they show the doctor columns and care activities
+const isDoctorTab = (tab) => tab === "Active" || tab === "Seen";
 
 // Column header shared by the table and its skeleton so titles and widths stay in step.
 const EncounterHeader = ({ activeTab }) => (
   <TableHeader className="!bg-transparent !border-none">
     <tr>
       <TableHead className="w-[20%] rounded-l-full border-y border-l border-gray-200 normal-case text-gray-700 pl-10">Patient</TableHead>
-      {activeTab === "Active" ? (
+      {isDoctorTab(activeTab) ? (
         <>
           <TableHead className="w-[15%] border-y border-gray-200 normal-case text-gray-700">Last Encounter Time</TableHead>
           <TableHead className="w-[20%] border-y border-gray-200 normal-case text-gray-700">Last Doctor Encountered</TableHead>
@@ -82,7 +88,7 @@ const EncounterSkeleton = ({ activeTab }) => (
                   <Skeleton className="h-3.5 w-28" />
                 </div>
               </TableCell>
-              {Array.from({ length: activeTab === "Active" ? 2 : 3 }, (_, j) => (
+              {Array.from({ length: isDoctorTab(activeTab) ? 2 : 3 }, (_, j) => (
                 <TableCell key={j} className="border-b border-gray-200">
                   <Skeleton className="h-3.5 w-24" />
                 </TableCell>
@@ -129,6 +135,8 @@ const DoctorEncounterTable = () => {
     loading, 
     activeTab, 
     claimPatient,
+    checkOutPatient,
+    endEncounter,
     selectedPatientForWall,
     setSelectedPatientForWall,
     selectedPatientForActivities,
@@ -139,6 +147,80 @@ const DoctorEncounterTable = () => {
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
+  const [checkoutEncounter, setCheckoutEncounter] = useState(null);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  const openEncounter = (encounter) =>
+    isDoctorTab(activeTab) ? setSelectedPatientForActivities(encounter) : setSelectedPatientForWall(encounter);
+  const openLabel =
+    activeTab === "Pending" ? "Open Patient's wall" : isDoctorTab(activeTab) ? "View recent Care Activities" : "View Details";
+
+  const handleConfirmCheckout = async () => {
+    setIsCheckingOut(true);
+    const success = await checkOutPatient(checkoutEncounter);
+    setIsCheckingOut(false);
+    if (success) setCheckoutEncounter(null);
+  };
+
+  const { profile } = useContext(DoctorAppContext) || {};
+  const [endingEncounter, setEndingEncounter] = useState(null);
+  const [isEnding, setIsEnding] = useState(false);
+  const [resumingSqid, setResumingSqid] = useState(null);
+
+  // Only the doctor who claimed the patient can end the encounter (anyone else gets a 400)
+  const isMyEncounter = (encounter) => {
+    const ownerId = encounter.claimed_by?.sqid;
+    return !!ownerId && !!profile?.sqid && ownerId === profile.sqid;
+  };
+
+  const handleConfirmEnd = async () => {
+    setIsEnding(true);
+    const success = await endEncounter(endingEncounter);
+    setIsEnding(false);
+    if (success) setEndingEncounter(null);
+  };
+
+  // Resuming is a fresh claim (doctor_seen -> doctor_active), then straight to the patient page like a call-up
+  const handleResume = async (encounter) => {
+    setResumingSqid(encounter.sqid);
+    const success = await claimPatient(encounter.sqid);
+    setResumingSqid(null);
+    if (success) {
+      navigate("/hospital-doctors-patients-dashboard", {
+        state: { openOutpatient: { ...encounter, status: "doctor_active" } },
+      });
+    }
+  };
+
+  const rowActions = (encounter, mobile) => {
+    const primary = `bg-docuhealth-primary text-white hover:bg-docuhealth-primary/90 rounded-full font-medium text-xs transition-colors disabled:opacity-60 ${mobile ? "w-full py-2.5" : "px-5 py-3 whitespace-nowrap"}`;
+    const outline = `border border-docuhealth-primary text-docuhealth-primary hover:bg-blue-50 rounded-full font-medium text-xs transition-colors disabled:opacity-60 ${mobile ? "w-full py-2.5" : "px-5 py-3 whitespace-nowrap"}`;
+    const isResuming = resumingSqid === encounter.sqid;
+    return (
+      <>
+        {activeTab === "Active" && isMyEncounter(encounter) && (
+          <button onClick={() => setEndingEncounter(encounter)} className={primary}>
+            End encounter
+          </button>
+        )}
+        {activeTab === "Seen" && (
+          <>
+            <button
+              onClick={() => handleResume(encounter)}
+              disabled={!!resumingSqid}
+              className={`${outline} flex items-center justify-center gap-2`}
+            >
+              {isResuming && <Spinner className="w-3 h-3" />}
+              Resume encounter
+            </button>
+            <button onClick={() => setCheckoutEncounter(encounter)} disabled={isResuming} className={primary}>
+              Check out
+            </button>
+          </>
+        )}
+      </>
+    );
+  };
 
   // When patient wall is open
   if (selectedPatientForWall) {
@@ -353,7 +435,7 @@ const DoctorEncounterTable = () => {
                       <span className="font-medium text-gray-900">{patientName}</span>
                     </div>
                   </TableCell>
-                  {activeTab === "Active" ? (
+                  {isDoctorTab(activeTab) ? (
                     <>
                       <TableCell className="text-gray-600 border-b border-gray-200">
                         {moment(encounter.last_doctor_interaction?.created_at || encounter.claimed_at || encounter.created_at).format("MMM DD, YYYY / hh:mm A")}
@@ -387,13 +469,15 @@ const DoctorEncounterTable = () => {
                     </span>
                   </TableCell>
                   <TableCell className="border-b border-gray-200">
-                    <button 
-                      onClick={() => activeTab === "Active" ? setSelectedPatientForActivities(encounter) : setSelectedPatientForWall(encounter)}
-                      className="bg-blue-50 text-docuhealth-primary hover:bg-blue-100 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors"
-                    >
-                      {activeTab === "Pending" ? "Open Patient's wall" : 
-                       activeTab === "Active" ? "View recent Care Activities" : "View Details"}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() => openEncounter(encounter)}
+                        className="bg-blue-50 text-docuhealth-primary hover:bg-blue-100 px-7 py-3 rounded-full font-medium text-xs whitespace-nowrap transition-colors"
+                      >
+                        {openLabel}
+                      </button>
+                      {rowActions(encounter, false)}
+                    </div>
                   </TableCell>
                 </TableRow>
               );
@@ -446,7 +530,7 @@ const DoctorEncounterTable = () => {
                   </span>
                 </div>
 
-                {activeTab === "Active" ? (
+                {isDoctorTab(activeTab) ? (
                   <>
                     <div className="flex flex-col bg-gray-50 rounded-lg p-2 border border-gray-100">
                       <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Last Encounter</span>
@@ -482,13 +566,13 @@ const DoctorEncounterTable = () => {
               </div>
 
               <div className="flex flex-col gap-2.5 mt-2">
-                <button 
-                  onClick={() => activeTab === "Active" ? setSelectedPatientForActivities(encounter) : setSelectedPatientForWall(encounter)}
+                <button
+                  onClick={() => openEncounter(encounter)}
                   className="w-full bg-blue-50 text-docuhealth-primary hover:bg-blue-100 py-2.5 rounded-full font-medium text-xs transition-colors"
                 >
-                  {activeTab === "Pending" ? "Open Patient's wall" : 
-                   activeTab === "Active" ? "View recent Care Activities" : "View Details"}
+                  {openLabel}
                 </button>
+                {rowActions(encounter, true)}
               </div>
 
             </div>
@@ -500,7 +584,28 @@ const DoctorEncounterTable = () => {
       <RecentCareActivitiesModal 
         isOpen={!!selectedPatientForActivities} 
         onClose={() => setSelectedPatientForActivities(null)} 
-        encounter={selectedPatientForActivities} 
+        encounter={selectedPatientForActivities}
+      />
+
+      <CloseAppointmentModal
+        isOpen={!!checkoutEncounter}
+        onClose={() => setCheckoutEncounter(null)}
+        onConfirm={handleConfirmCheckout}
+        isPending={isCheckingOut}
+        title="Check out this patient?"
+        confirmLabel="Check out"
+        message={`This closes ${checkoutEncounter?.patient_info?.firstname ? `${checkoutEncounter.patient_info.firstname}'s` : "the patient's"} visit. It cannot be undone.`}
+      />
+
+      <CloseAppointmentModal
+        isOpen={!!endingEncounter}
+        onClose={() => setEndingEncounter(null)}
+        onConfirm={handleConfirmEnd}
+        isPending={isEnding}
+        title="End this encounter?"
+        confirmLabel="End encounter"
+        pendingLabel="Ending..."
+        message={`${endingEncounter?.patient_info?.firstname || "The patient"} moves to the Seen list. No more orders or encounter notes can be added until you resume the encounter. The visit stays open until the patient is checked out.`}
       />
     </>
   );

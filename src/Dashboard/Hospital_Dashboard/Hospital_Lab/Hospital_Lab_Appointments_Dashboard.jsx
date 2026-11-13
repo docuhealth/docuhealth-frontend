@@ -18,7 +18,7 @@ const getPatientName = (appt) =>
 
 const getTestName = (appt) => appt.test_name || appt.test || "Test request";
 
-// `api/appointments/staff` nests the HIN under `patient.hin`; keep the older
+// `api/hospital-ops/appointments/staff` nests the HIN under `patient.hin`; keep the older
 // flat shapes as fallbacks.
 const getPatientHin = (appt) =>
   appt.patient?.hin || appt.patient_hin || appt.patient_info?.hin || appt.hin || null;

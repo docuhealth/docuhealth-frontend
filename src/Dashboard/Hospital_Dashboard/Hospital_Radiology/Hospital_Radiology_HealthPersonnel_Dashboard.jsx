@@ -3,7 +3,7 @@ import HealthPersonnelList from "../../../Components/Dashboard/Hospital_Dashboar
 
 // Same shared HealthPersonnelList used by Doctors/Nurses/Lab/Pharmacist —
 // it's backed by a real, role-agnostic, already-live endpoint
-// (api/hospitals/team-members), so this needs no dummy data.
+// (api/hospitals/staff), so this needs no dummy data.
 const Hospital_Radiology_HealthPersonnel_Dashboard = () => {
   return (
     <>

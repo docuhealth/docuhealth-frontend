@@ -5,7 +5,7 @@ import DoctorEncounterTable from "../../../Components/Dashboard/Hospital_Dashboa
 import Pagination2 from "../../../Components/Dashboard/Patient_Dashboard_Components/Pagination/Pagination2";
 import SearchBar from "../../../Components/SearchBar/SearchBar";
 
-const tabs = ["Pending", "Active"];
+const tabs = ["Pending", "Active", "Seen"];
 
 const Hospital_Doctors_Encounter_Dashboard = () => {
   const { activeTab, setActiveTab, currentPage, totalPages, setCurrentPage, count, selectedPatientForWall, searchQuery, setSearchQuery } = useContext(DoctorEncounterContext);

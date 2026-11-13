@@ -22,7 +22,7 @@ const AdvanceCheckUp = ({ selected, setAdvanceCheckUp, setSharedSoapNoteDetail, 
   const { data: patientFullInfo, isLoading, isError } = useQuery({
     queryKey: ["patient-info", hin],
     queryFn: async () => {
-      const res = await axiosInstanceHos.get(`api/doctors/patient/info/${hin}`);
+      const res = await axiosInstanceHos.get(`api/patients/${hin}/info`);
       return res.data;
     },
     enabled: !!hin,

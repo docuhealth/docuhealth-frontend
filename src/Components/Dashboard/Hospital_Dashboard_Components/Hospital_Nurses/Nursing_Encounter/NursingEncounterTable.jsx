@@ -53,6 +53,7 @@ const getTriageBadgeStyle = (priority) => {
 
 const getCallUpStatus = (status) => {
   if (status === "doctor_active") return { text: "Doctor Active", style: "bg-green-100 text-green-500" };
+  if (status === "doctor_seen") return { text: "Doctor Seen", style: "bg-blue-100 text-blue-600" };
   if (status === "closed") return { text: "Closed", style: "bg-gray-100 text-gray-500" };
   return { text: "Awaiting", style: "bg-amber-50 text-amber-500" };
 };
