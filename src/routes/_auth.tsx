@@ -1,11 +1,16 @@
 import { createFileRoute, Link, Outlet, redirect, useMatch } from "@tanstack/react-router";
 import { AuthLayout } from "@/features/auth/components/auth-layout";
-import { useAuthStore } from "@/stores/auth-store";
+import { getPostLoginDestination, useAuthStore } from "@/stores/auth-store";
 
 export const Route = createFileRoute("/_auth")({
-  // Signed-in users have no business on the auth pages.
-  beforeLoad: () => {
-    if (useAuthStore.getState().session) throw redirect({ to: "/" });
+  // Signed-in users have no business on the auth pages, unless they are completing a gate step.
+  beforeLoad: ({ location }) => {
+    const { session } = useAuthStore.getState();
+    if (!session) return;
+    if (session.nextStep === "nin_not_verified" && location.pathname === "/verify-nin") {
+      return;
+    }
+    throw redirect({ to: getPostLoginDestination(session) });
   },
   component: AuthLayoutRoute,
 });

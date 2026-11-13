@@ -1,6 +1,8 @@
 import { CaretRightIcon, EnvelopeSimpleIcon, PhoneIcon } from "@phosphor-icons/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
+import { DateInput } from "@/components/date-input";
+import { RequiredMark } from "@/components/required-mark";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -14,12 +16,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AuthHeader } from "@/features/auth/components/auth-header";
-import { RequiredMark } from "@/components/required-mark";
 import { StepProgress } from "@/features/auth/components/step-progress";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
-import { individualInfoSchema, type IndividualInfoValues } from "@/features/auth/lib/schemas";
+import {
+  genderLabels,
+  individualInfoSchema,
+  type IndividualInfoValues,
+} from "@/features/auth/lib/schemas";
 
-const genderOptions = { male: "Male", female: "Female", prefer_not_to_say: "Prefer not to say" };
+const TODAY = new Date();
 
 /** Step 1 of the individual sign-up: who the patient is and how to reach them. */
 export function IndividualInfoForm({
@@ -32,7 +37,7 @@ export function IndividualInfoForm({
   totalSteps: number;
   /** Answers from an earlier visit to this step, e.g. after "Change" on the next one. */
   defaultValues?: IndividualInfoValues;
-  onContinue: (values: IndividualInfoValues) => void;
+  onContinue: (values: IndividualInfoValues) => void | Promise<void>;
 }) {
   const form = useForm<IndividualInfoValues>({
     resolver: zodResolver(individualInfoSchema),
@@ -41,15 +46,15 @@ export function IndividualInfoForm({
         firstName: "",
         lastName: "",
         otherName: "",
+        dob: "",
         email: "",
         phone: "",
       },
   });
   const { errors, isSubmitting } = form.formState;
 
-  function onSubmit(values: IndividualInfoValues) {
-    // TODO(api): create the account and send the verification code once the v2 auth API is defined.
-    onContinue(values);
+  async function onSubmit(values: IndividualInfoValues) {
+    await onContinue(values);
   }
 
   return (
@@ -101,7 +106,7 @@ export function IndividualInfoForm({
               <Input
                 id="otherName"
                 autoComplete="additional-name"
-                placeholder="E.g. John"
+                placeholder="E.g. Chiamaka"
                 className="bg-card"
                 {...form.register("otherName")}
               />
@@ -117,7 +122,7 @@ export function IndividualInfoForm({
                   </FieldLabel>
                   <Select
                     name={field.name}
-                    items={genderOptions}
+                    items={genderLabels}
                     value={field.value ?? null}
                     onValueChange={field.onChange}
                     required
@@ -131,7 +136,7 @@ export function IndividualInfoForm({
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(genderOptions).map(([value, label]) => (
+                      {Object.entries(genderLabels).map(([value, label]) => (
                         <SelectItem key={value} value={value}>
                           {label}
                         </SelectItem>
@@ -143,6 +148,29 @@ export function IndividualInfoForm({
               )}
             />
           </div>
+
+          <Controller
+            name="dob"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="dob" className="gap-1">
+                  Date of birth <RequiredMark />
+                </FieldLabel>
+                <DateInput
+                  ref={field.ref}
+                  id="dob"
+                  name={field.name}
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  max={TODAY}
+                  invalid={fieldState.invalid}
+                />
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
 
           <Field data-invalid={!!errors.email}>
             <FieldLabel htmlFor="email" className="gap-1">

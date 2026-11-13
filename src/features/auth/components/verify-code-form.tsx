@@ -2,7 +2,7 @@ import { CaretRightIcon } from "@phosphor-icons/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, type LinkProps } from "@tanstack/react-router";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -12,10 +12,11 @@ import { AuthHeader } from "@/features/auth/components/auth-header";
 import { StepProgress } from "@/features/auth/components/step-progress";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import { OTP_LENGTH, verifyCodeSchema, type VerifyCodeValues } from "@/features/auth/lib/schemas";
+import { getErrorMessage } from "@/lib/api";
 
 /**
  * Confirms the email address with the code we sent to it — a sign-up step, or the middle of a
- * password reset. The step bar shows only when `step` and `totalSteps` are given.
+ * password reset, or admin email verification. The step bar shows only when `step` and `totalSteps` are given.
  */
 export function VerifyCodeForm({
   email,
@@ -25,34 +26,47 @@ export function VerifyCodeForm({
   login = { prompt: "Already have an account?", to: "/login" },
   onChangeEmail,
   onVerified,
+  onResend,
 }: {
   email: string;
   step?: number;
   totalSteps?: number;
   title?: string;
-  /** Prompt and target of the "Log in" link under the button. */
-  login?: { prompt: string; to: LinkProps["to"] };
+  /** Prompt and target of the "Log in" link under the button. Pass `null` to hide. */
+  login?: { prompt: string; to: LinkProps["to"] } | null;
   /** Go back to the step where the email was entered. */
-  onChangeEmail: () => void;
-  onVerified: () => void;
+  onChangeEmail?: () => void;
+  onVerified: (code: string) => void | Promise<void>;
+  onResend?: () => void | Promise<void>;
 }) {
   const form = useForm<VerifyCodeValues>({
     resolver: zodResolver(verifyCodeSchema),
     defaultValues: devPrefill?.verifyCode ?? { code: "" },
   });
   const { isSubmitting } = form.formState;
+  const [isResending, setIsResending] = useState(false);
 
   // The code is the only thing to do on this step, so start typing straight away.
   useEffect(() => form.setFocus("code"), [form]);
 
-  function onSubmit(_values: VerifyCodeValues) {
-    // TODO(api): check the code once the v2 auth API is defined.
-    onVerified();
+  async function onSubmit(values: VerifyCodeValues) {
+    await onVerified(values.code);
   }
 
-  function resendCode() {
-    // TODO(api): ask the backend for a new code once the v2 auth API is defined.
-    toast.success(`We sent a new code to ${email}.`);
+  async function resendCode() {
+    if (!onResend) {
+      toast.success(`We sent a new code to ${email}.`);
+      return;
+    }
+    try {
+      setIsResending(true);
+      await onResend();
+      toast.success(`We sent a new code to ${email}.`);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setIsResending(false);
+    }
   }
 
   return (
@@ -66,14 +80,19 @@ export function VerifyCodeForm({
           title={title}
           description={
             <>
-              Enter the {OTP_LENGTH}-digit code we sent to {email}.{" "}
-              <button
-                type="button"
-                onClick={onChangeEmail}
-                className="text-primary underline underline-offset-2"
-              >
-                Change
-              </button>
+              Enter the {OTP_LENGTH}-digit code we sent to {email}.
+              {onChangeEmail && (
+                <>
+                  {" "}
+                  <button
+                    type="button"
+                    onClick={onChangeEmail}
+                    className="text-primary underline underline-offset-2"
+                  >
+                    Change
+                  </button>
+                </>
+              )}
             </>
           }
         />
@@ -118,10 +137,11 @@ export function VerifyCodeForm({
             Didn’t receive the email?{" "}
             <button
               type="button"
-              onClick={resendCode}
-              className="text-primary underline underline-offset-2"
+              disabled={isResending}
+              onClick={() => void resendCode()}
+              className="text-primary underline underline-offset-2 disabled:opacity-50"
             >
-              Resend Code
+              {isResending ? "Sending..." : "Resend Code"}
             </button>
           </p>
         </div>
@@ -131,12 +151,14 @@ export function VerifyCodeForm({
             Verify
             <CaretRightIcon data-icon="inline-end" />
           </Button>
-          <p className="text-center type-body-sm-regular text-muted-foreground">
-            {login.prompt}{" "}
-            <Link to={login.to} className="text-primary underline underline-offset-2">
-              Log in
-            </Link>
-          </p>
+          {login && (
+            <p className="text-center type-body-sm-regular text-muted-foreground">
+              {login.prompt}{" "}
+              <Link to={login.to} className="text-primary underline underline-offset-2">
+                Log in
+              </Link>
+            </p>
+          )}
         </div>
       </form>
     </div>

@@ -1,6 +1,8 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { SuccessDialog } from "@/components/success-dialog";
+import { useRegisterFacilityByAgent } from "@/features/auth/api/mutations";
 import { AdminDetailsForm } from "@/features/auth/components/admin-details-form";
 import { HospitalDetailsForm } from "@/features/auth/components/hospital-details-form";
 import { HospitalLocationForm } from "@/features/auth/components/hospital-location-form";
@@ -9,6 +11,7 @@ import type {
   HospitalDetailsValues,
   HospitalLocationValues,
 } from "@/features/auth/lib/schemas";
+import { getErrorMessage } from "@/lib/api";
 
 const TOTAL_STEPS = 3;
 
@@ -19,20 +22,54 @@ export function AgentHospitalRegistration() {
   const [details, setDetails] = useState<HospitalDetailsValues>();
   const [location, setLocation] = useState<HospitalLocationValues>();
   const [admin, setAdmin] = useState<AdminDetailsValues>();
+  const registerFacilityMutation = useRegisterFacilityByAgent();
 
   async function register(adminDetails: AdminDetailsValues) {
-    // TODO(api): send `details` + `location` + `adminDetails` once the v2 API is defined.
-    await Promise.resolve();
-    setAdmin(adminDetails);
+    if (!details || !location) return;
+    try {
+      await registerFacilityMutation.mutateAsync({
+        facility_type: details.facilityType,
+        name: details.hospitalName.trim(),
+        official_email: location.email.trim(),
+        phone: location.phone.trim(),
+        country: location.country.trim(),
+        state: location.state.trim(),
+        city: location.lga.trim(),
+        street: location.streetAddress.trim(),
+        login_url: `${window.location.origin}/hospital/login`,
+        admins: [
+          {
+            part: details.facilityType,
+            email: adminDetails.email.trim(),
+            profile: {
+              firstname: adminDetails.firstName.trim(),
+              lastname: adminDetails.lastName.trim(),
+              phone_num: adminDetails.phone.trim(),
+              role: adminDetails.role,
+              gender: adminDetails.gender,
+              specialization: adminDetails.specialization?.trim() || undefined,
+            },
+          },
+        ],
+      });
+      setAdmin(adminDetails);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
   }
 
-  // TODO: return to the agent's dashboard once it exists.
   const leave = () => void navigate({ to: "/" });
 
   if (step === 3 && details && location) {
     return (
       <>
-        <AdminDetailsForm step={3} totalSteps={TOTAL_STEPS} onRegister={register} />
+        <AdminDetailsForm
+          step={3}
+          totalSteps={TOTAL_STEPS}
+          facilityType={details.facilityType}
+          submitLabel="Register hospital"
+          onRegister={register}
+        />
         <SuccessDialog
           open={admin !== undefined}
           onOpenChange={(open) => !open && leave()}

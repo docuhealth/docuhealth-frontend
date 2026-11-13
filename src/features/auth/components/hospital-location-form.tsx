@@ -1,15 +1,26 @@
 import { CaretRightIcon, EnvelopeSimpleIcon, PhoneIcon } from "@phosphor-icons/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import { RequiredMark } from "@/components/required-mark";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { AuthHeader } from "@/features/auth/components/auth-header";
-import { RequiredMark } from "@/components/required-mark";
 import { StepProgress } from "@/features/auth/components/step-progress";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import { hospitalLocationSchema, type HospitalLocationValues } from "@/features/auth/lib/schemas";
+import { DEFAULT_COUNTRY, getLgasForState, NIGERIA_STATES } from "@/lib/locations";
+
+const countryItems = { [DEFAULT_COUNTRY]: DEFAULT_COUNTRY };
+const stateItems = Object.fromEntries(NIGERIA_STATES.map((s) => [s, s]));
 
 /** Field agent registering a hospital, step 2: where it is and how to reach it. */
 export function HospitalLocationForm({
@@ -27,6 +38,7 @@ export function HospitalLocationForm({
     resolver: zodResolver(hospitalLocationSchema),
     defaultValues: defaultValues ??
       devPrefill?.hospitalLocation ?? {
+        country: DEFAULT_COUNTRY,
         state: "",
         lga: "",
         streetAddress: "",
@@ -35,6 +47,10 @@ export function HospitalLocationForm({
       },
   });
   const { errors, isSubmitting } = form.formState;
+
+  const selectedState = useWatch({ control: form.control, name: "state" });
+  const lgaList = getLgasForState(selectedState);
+  const lgaItems = Object.fromEntries(lgaList.map((lga) => [lga, lga]));
 
   return (
     <div className="flex flex-col gap-10">
@@ -47,37 +63,117 @@ export function HospitalLocationForm({
 
       <form onSubmit={form.handleSubmit(onContinue)} noValidate>
         <FieldGroup>
-          <Field data-invalid={!!errors.state}>
-            <FieldLabel htmlFor="state" className="gap-1">
-              State <RequiredMark />
-            </FieldLabel>
-            <Input
-              id="state"
-              autoComplete="address-level1"
-              placeholder="E.g. Lagos"
-              aria-required
-              aria-invalid={!!errors.state}
-              className="bg-card"
-              {...form.register("state")}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <Controller
+              name="country"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="country" className="gap-1">
+                    Country <RequiredMark />
+                  </FieldLabel>
+                  <Select
+                    name={field.name}
+                    items={countryItems}
+                    value={field.value ?? DEFAULT_COUNTRY}
+                    onValueChange={field.onChange}
+                    required
+                  >
+                    <SelectTrigger
+                      id="country"
+                      aria-invalid={fieldState.invalid}
+                      onBlur={field.onBlur}
+                      className="w-full bg-card"
+                    >
+                      <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={DEFAULT_COUNTRY}>{DEFAULT_COUNTRY}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
             />
-            <FieldError errors={[errors.state]} />
-          </Field>
 
-          <Field data-invalid={!!errors.lga}>
-            <FieldLabel htmlFor="lga" className="gap-1">
-              LGA <RequiredMark />
-            </FieldLabel>
-            <Input
-              id="lga"
-              autoComplete="address-level2"
-              placeholder="Enter LGA"
-              aria-required
-              aria-invalid={!!errors.lga}
-              className="bg-card"
-              {...form.register("lga")}
+            <Controller
+              name="state"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="state" className="gap-1">
+                    State <RequiredMark />
+                  </FieldLabel>
+                  <Select
+                    name={field.name}
+                    items={stateItems}
+                    value={field.value || null}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      form.setValue("lga", "");
+                    }}
+                    required
+                  >
+                    <SelectTrigger
+                      id="state"
+                      aria-invalid={fieldState.invalid}
+                      onBlur={field.onBlur}
+                      className="w-full bg-card"
+                    >
+                      <SelectValue placeholder="Select state" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {NIGERIA_STATES.map((stateName) => (
+                        <SelectItem key={stateName} value={stateName}>
+                          {stateName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
             />
-            <FieldError errors={[errors.lga]} />
-          </Field>
+          </div>
+
+          <Controller
+            name="lga"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="lga" className="gap-1">
+                  LGA <RequiredMark />
+                </FieldLabel>
+                <Select
+                  name={field.name}
+                  items={lgaItems}
+                  value={field.value || null}
+                  onValueChange={field.onChange}
+                  disabled={!selectedState}
+                  required
+                >
+                  <SelectTrigger
+                    id="lga"
+                    aria-invalid={fieldState.invalid}
+                    onBlur={field.onBlur}
+                    className="w-full bg-card"
+                  >
+                    <SelectValue
+                      placeholder={selectedState ? "Select LGA" : "Select a state first"}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {lgaList.map((lgaName) => (
+                      <SelectItem key={lgaName} value={lgaName}>
+                        {lgaName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
 
           <Field data-invalid={!!errors.streetAddress}>
             <FieldLabel htmlFor="streetAddress" className="gap-1">

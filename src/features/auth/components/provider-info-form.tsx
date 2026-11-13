@@ -3,6 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { RequiredMark } from "@/components/required-mark";
 import { SuccessDialog } from "@/components/success-dialog";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -10,27 +12,27 @@ import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import {
   Select,
-  SelectCheckboxItem,
   SelectContent,
+  SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useCreateFacilityApplication } from "@/features/auth/api/mutations";
 import { AuthHeader } from "@/features/auth/components/auth-header";
-import { RequiredMark } from "@/components/required-mark";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import {
   organisationTypeLabels,
   providerInfoSchema,
   type ProviderInfoValues,
 } from "@/features/auth/lib/schemas";
+import { getErrorMessage } from "@/lib/api";
 
 /** Provider sign-up: the facility's details, submitted for approval in one step. */
 export function ProviderInfoForm() {
   const form = useForm<ProviderInfoValues>({
     resolver: zodResolver(providerInfoSchema),
     defaultValues: devPrefill?.providerInfo ?? {
-      organisationTypes: [],
       organisationName: "",
       email: "",
       phone: "",
@@ -40,14 +42,25 @@ export function ProviderInfoForm() {
   const { errors, isSubmitting } = form.formState;
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
+  const createApplicationMutation = useCreateFacilityApplication();
 
-  async function onSubmit(_values: ProviderInfoValues) {
-    // TODO(api): submit the facility once the v2 auth API is defined.
-    await Promise.resolve();
-    setSubmitted(true);
+  async function onSubmit(values: ProviderInfoValues) {
+    try {
+      await createApplicationMutation.mutateAsync({
+        facility_type: values.facilityType,
+        name: values.organisationName.trim(),
+        official_email: values.email.trim(),
+        phone: values.phone.trim(),
+        message: values.message.trim() || undefined,
+        redirect_url: `${window.location.origin}/hospital/verify`,
+      });
+      setSubmitted(true);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
   }
 
-  // There's nothing to do here until the facility is approved, so leaving the dialog leaves the page.
+  // There's nothing to do here until the facility verifies its email, so leaving the dialog leaves the page.
   const leave = () => void navigate({ to: "/" });
 
   return (
@@ -60,34 +73,33 @@ export function ProviderInfoForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <FieldGroup>
           <Controller
-            name="organisationTypes"
+            name="facilityType"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="organisationTypes" className="gap-1">
+                <FieldLabel htmlFor="facilityType" className="gap-1">
                   Organisation Type <RequiredMark />
                 </FieldLabel>
                 <Select
-                  multiple
                   name={field.name}
                   items={organisationTypeLabels}
-                  value={field.value}
+                  value={field.value ?? null}
                   onValueChange={field.onChange}
                   required
                 >
                   <SelectTrigger
-                    id="organisationTypes"
+                    id="facilityType"
                     aria-invalid={fieldState.invalid}
                     onBlur={field.onBlur}
                     className="w-full bg-card"
                   >
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
-                  <SelectContent header="Select one or more">
+                  <SelectContent>
                     {Object.entries(organisationTypeLabels).map(([value, label]) => (
-                      <SelectCheckboxItem key={value} value={value}>
+                      <SelectItem key={value} value={value}>
                         {label}
-                      </SelectCheckboxItem>
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -164,7 +176,11 @@ export function ProviderInfoForm() {
             />
           </Field>
 
-          <Button type="submit" loading={isSubmitting} className="mt-3 h-12 w-full">
+          <Button
+            type="submit"
+            loading={isSubmitting || createApplicationMutation.isPending}
+            className="mt-3 h-12 w-full"
+          >
             Continue
             <CaretRightIcon data-icon="inline-end" />
           </Button>
@@ -175,7 +191,7 @@ export function ProviderInfoForm() {
         open={submitted}
         onOpenChange={(open) => !open && leave()}
         title="Application submitted!"
-        description="Your registration is under review. We’ll notify you by email once your healthcare facility has been approved."
+        description="We’ve sent a verification link to your official email address. Open that link to assign your administrator and upload your facility documents."
         primaryAction={{ label: "Done", onClick: leave }}
       />
     </div>

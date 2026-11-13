@@ -30,8 +30,8 @@ describe("request", () => {
       user: { id: "u", name: "U", email: "u@example.com", role: "member" },
     });
     server.use(
-      http.post(`${env.VITE_API_URL}/auth/refresh`, () =>
-        HttpResponse.json({ accessToken: "mock-access", refreshToken: "mock-refresh" }),
+      http.post(`${env.VITE_API_URL}/api/auth/refresh`, () =>
+        HttpResponse.json({ data: { access_token: "mock-access" } }),
       ),
       http.get(url, ({ request }) =>
         request.headers.get("Authorization") === "Bearer mock-access"
