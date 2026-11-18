@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sectionRewrite } from "@/lib/sections";
+import { absoluteUrl, sectionRewrite } from "@/lib/sections";
 
 const input = (href: string) => String(sectionRewrite.input?.({ url: new URL(href) }) ?? href);
 const output = (href: string) => String(sectionRewrite.output?.({ url: new URL(href) }) ?? href);
@@ -39,6 +39,44 @@ describe("section rewrite", () => {
     );
     expect(output("https://docuhealth-v2-git-x.vercel.app/hospital/register")).toBe(
       "https://docuhealth-v2-git-x.vercel.app/hospital/register",
+    );
+  });
+});
+
+describe("environment subdomains", () => {
+  it("reads the section in front of an environment (hospital.v2.<root>)", () => {
+    expect(input("http://hospital.v2.localhost:5173/register")).toBe(
+      "http://hospital.v2.localhost:5173/hospital/register",
+    );
+    expect(input("http://v2.localhost:5173/login")).toBe("http://v2.localhost:5173/login");
+  });
+
+  it("keeps links inside the same environment", () => {
+    expect(output("http://v2.localhost:5173/hospital/verify")).toBe(
+      "http://hospital.v2.localhost:5173/verify",
+    );
+    expect(output("http://hospital.v2.localhost:5173/login")).toBe(
+      "http://v2.localhost:5173/login",
+    );
+  });
+});
+
+describe("absoluteUrl", () => {
+  it("builds the real link for an internal path, from any section", () => {
+    expect(absoluteUrl("/hospital/verify", "http://hospital.localhost:5173")).toBe(
+      "http://hospital.localhost:5173/verify",
+    );
+    expect(absoluteUrl("/hospital/login", "http://agent.v2.localhost:5173")).toBe(
+      "http://hospital.v2.localhost:5173/login",
+    );
+    expect(absoluteUrl("/login", "http://hospital.localhost:5173")).toBe(
+      "http://localhost:5173/login",
+    );
+  });
+
+  it("keeps the prefixed path on hosts outside the root domain", () => {
+    expect(absoluteUrl("/hospital/verify", "https://docuhealth-v2-git-x.vercel.app")).toBe(
+      "https://docuhealth-v2-git-x.vercel.app/hospital/verify",
     );
   });
 });

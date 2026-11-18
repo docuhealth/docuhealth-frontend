@@ -27,6 +27,7 @@ import {
   type ProviderInfoValues,
 } from "@/features/auth/lib/schemas";
 import { getErrorMessage } from "@/lib/api";
+import { absoluteUrl } from "@/lib/sections";
 
 /** Provider sign-up: the facility's details, submitted for approval in one step. */
 export function ProviderInfoForm() {
@@ -52,7 +53,7 @@ export function ProviderInfoForm() {
         official_email: values.email.trim(),
         phone: values.phone.trim(),
         message: values.message.trim() || undefined,
-        redirect_url: `${window.location.origin}/hospital/verify`,
+        redirect_url: absoluteUrl("/hospital/verify"),
       });
       setSubmitted(true);
     } catch (error) {

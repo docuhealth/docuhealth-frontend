@@ -1,21 +1,13 @@
 import { SignOutIcon, UserCircleIcon } from "@phosphor-icons/react";
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import logoUrl from "@/assets/logos/logo.svg";
 import { Button } from "@/components/ui/button";
-import { env } from "@/env";
 import { useLogOut } from "@/hooks/use-log-out";
+import { requireDashboard } from "@/lib/auth-guards";
 import { useAuthStore } from "@/stores/auth-store";
 
 export const Route = createFileRoute("/patient")({
-  beforeLoad: () => {
-    const { session } = useAuthStore.getState();
-    if (session?.nextStep === "nin_not_verified") {
-      throw redirect({ to: "/verify-nin" });
-    }
-    if (!session && !env.VITE_ENABLE_MOCKS) {
-      throw redirect({ to: "/login" });
-    }
-  },
+  beforeLoad: () => requireDashboard("/patient"),
   component: PatientDashboardPage,
 });
 

@@ -107,18 +107,22 @@ export function isStaffActingAs(entry: ActingAsEntry): entry is StaffActingAs {
   );
 }
 
+/** The dashboards a signed-in user can land on. */
+export type Dashboard =
+  "/patient" | "/hospital/admin" | "/hospital/receptionist" | "/hospital/radiologist";
+
+/** Staff roles with a dashboard of their own; admins of any role get the admin dashboard. */
+const roleDashboards: Partial<Record<string, Dashboard>> = {
+  receptionist: "/hospital/receptionist",
+  radiologist: "/hospital/radiologist",
+};
+
 /**
  * Picks where a user should go right after logging in or finishing a `next_step` gate.
  */
 export function getPostLoginDestination(
   session: Session | null,
-):
-  | "/verify-nin"
-  | "/hospital/first-login"
-  | "/hospital/admin"
-  | "/hospital/receptionist"
-  | "/patient"
-  | "/login" {
+): Dashboard | "/verify-nin" | "/hospital/first-login" | "/login" {
   if (!session) return "/login";
 
   if (session.nextStep === "nin_not_verified") {
@@ -131,10 +135,9 @@ export function getPostLoginDestination(
   const staffEntry = session.actingAs?.find(isStaffActingAs);
   if (session.accountType === "staff" || staffEntry) {
     const role = staffEntry?.staff_role ?? staffEntry?.role ?? session.user.role;
-    if (staffEntry && !staffEntry.is_admin && role === "receptionist") {
-      return "/hospital/receptionist";
-    }
-    return "/hospital/admin";
+    const roleDashboard = staffEntry && !staffEntry.is_admin ? roleDashboards[role] : undefined;
+    // TODO(api): doctors, nurses and the other roles have no dashboard yet, so they get the admin one.
+    return roleDashboard ?? "/hospital/admin";
   }
 
   return "/patient";

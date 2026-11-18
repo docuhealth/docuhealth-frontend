@@ -20,8 +20,8 @@ function VerifyHospitalPage() {
   return (
     <>
       <title>Verify facility · DocuHealth</title>
-      {token ? (
-        <FacilityVerification token={token} application={application ?? "fapp_default"} />
+      {token && application ? (
+        <FacilityVerification token={token} application={application} />
       ) : (
         <div className="flex flex-col gap-6">
           <AuthNotice icon={<WarningCircleIcon />} tone="error" title="Link expired">

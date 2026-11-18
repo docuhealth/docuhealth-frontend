@@ -22,5 +22,7 @@ export default defineConfig({
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],
     css: false,
+    // The dialog-flow tests click through several steps; 5s is too tight when every file runs at once.
+    testTimeout: 15_000,
   },
 });

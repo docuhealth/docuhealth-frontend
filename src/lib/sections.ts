@@ -8,8 +8,10 @@ import { env } from "@/env";
  *   hospital.docuhealthservices.net/register  ⇄  /hospital/register (internal)
  *
  * Everything else (public site, patients) is the main section on the root domain, with no prefix.
- * On hosts outside the root domain (e.g. preview deploys) nothing is rewritten and the prefixed
- * paths are used as-is.
+ * An environment can sit between the two, and each of its sections is a subdomain of it:
+ * `v2.docuhealthservices.net` is that environment's main site and `hospital.v2.docuhealthservices.net`
+ * its hospital site. On hosts outside the root domain (e.g. preview deploys) nothing is rewritten
+ * and the prefixed paths are used as-is.
  */
 const sections = ["hospital", "admin", "agent"] as const;
 type Section = (typeof sections)[number];
@@ -20,8 +22,9 @@ const rootDomains = ["localhost", env.VITE_ROOT_DOMAIN].filter((d): d is string 
 function sectionOfHost(hostname: string): Section | null | undefined {
   const root = rootDomains.find((d) => hostname === d || hostname.endsWith(`.${d}`));
   if (!root) return undefined;
-  const sub = hostname.slice(0, -root.length).replace(/\.$/, "");
-  return sections.find((section) => section === sub) ?? null;
+  // "hospital" in hospital.docuhealthservices.net and in hospital.v2.docuhealthservices.net.
+  const first = hostname.slice(0, -root.length).split(".")[0];
+  return sections.find((section) => section === first) ?? null;
 }
 
 function sectionOfPath(pathname: string): Section | null {
@@ -52,3 +55,14 @@ export const sectionRewrite: LocationRewrite = {
     return url;
   },
 };
+
+/**
+ * The full URL of an internal path (`/hospital/verify`) on the deployment the app is running on,
+ * for links that leave the app, e.g. the ones the backend puts in emails. On our domains it's the
+ * right section's subdomain (`https://hospital.v2.docuhealthservices.net/verify` from v2); anywhere
+ * else it's the prefixed path on the current origin.
+ */
+export function absoluteUrl(path: string, origin = window.location.origin): string {
+  const url = new URL(path, origin);
+  return String(sectionRewrite.output?.({ url }) ?? url);
+}

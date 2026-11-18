@@ -3,27 +3,60 @@ import { env } from "@/env";
 
 const api = (path: string) => `${env.VITE_API_URL}${path}`;
 
+/**
+ * Login scenarios, picked by the email's first part (`wrong@…`, `nin@…`). Any other email logs in
+ * as a patient on the patient site, or a doctor with admin access on the hospital site.
+ */
+const staffScenarios: Record<string, { role: string; isAdmin: boolean; firstLogin?: boolean }> = {
+  reception: { role: "receptionist", isAdmin: false },
+  radiology: { role: "radiologist", isAdmin: false },
+  firstlogin: { role: "doctor", isAdmin: true, firstLogin: true },
+};
+
+/** Codes (OTP) the mock always rejects, to try the error path. */
+const WRONG_CODE = "000000";
+
+const invalidCode = () =>
+  HttpResponse.json({ detail: "Invalid OTP", status: "error" }, { status: 400 });
+
 export const authHandlers = [
   http.post(api("/api/auth/login"), async ({ request }) => {
     const body = (await request.json()) as {
       identifier?: string;
       account_type?: "patient" | "staff" | null;
     };
+    const scenario = (body.identifier ?? "").split("@")[0]?.toLowerCase() ?? "";
+    if (scenario === "wrong") {
+      return HttpResponse.json(
+        { detail: "Invalid login credentials.", status: "error" },
+        { status: 401 },
+      );
+    }
+
     const isStaff = body.account_type === "staff";
+    const staff = staffScenarios[scenario] ?? { role: "doctor", isAdmin: true };
+    const nextStep = isStaff
+      ? staff.firstLogin
+        ? "admin_details_required"
+        : null
+      : scenario === "nin"
+        ? "nin_not_verified"
+        : null;
+
     return HttpResponse.json({
       status: "success",
       message: "Logged in successfully",
       data: {
         access_token: "mock-access-token",
-        next_step: null,
+        next_step: nextStep,
         acting_as: isStaff
           ? [
               {
                 type: "facility_staff",
                 facility_sqid: "hosp_mock_1",
                 facility_type: "hospital",
-                role: "doctor",
-                is_admin: true,
+                role: staff.role,
+                is_admin: staff.isAdmin,
               },
             ]
           : [{ type: "self" }],
@@ -33,7 +66,7 @@ export const authHandlers = [
           lastname: isStaff ? "Adeyemi" : "Okafor",
           email: body.identifier ?? "user@docuhealth.example.com",
           hin: isStaff ? null : "1234567890123",
-          role: isStaff ? "doctor" : "patient",
+          role: isStaff ? staff.role : "patient",
         },
       },
     });
@@ -62,12 +95,14 @@ export const authHandlers = [
     HttpResponse.json({ status: "success", message: "Verification code sent" }),
   ),
 
-  http.post(api("/api/auth/signup/verify-code"), () =>
-    HttpResponse.json({
+  http.post(api("/api/auth/signup/verify-code"), async ({ request }) => {
+    const { code } = (await request.json()) as { code?: string };
+    if (code === WRONG_CODE) return invalidCode();
+    return HttpResponse.json({
       status: "success",
       data: { signup_token: "mock-signup-token" },
-    }),
-  ),
+    });
+  }),
 
   http.post(api("/api/auth/signup/complete"), () =>
     HttpResponse.json({
@@ -86,12 +121,14 @@ export const authHandlers = [
     HttpResponse.json({ status: "success", message: "OTP sent" }),
   ),
 
-  http.post(api("/api/auth/forgot-password/verify-otp"), () =>
-    HttpResponse.json({
+  http.post(api("/api/auth/forgot-password/verify-otp"), async ({ request }) => {
+    const { otp } = (await request.json()) as { otp?: string };
+    if (otp === WRONG_CODE) return invalidCode();
+    return HttpResponse.json({
       status: "success",
       data: { access_token: "mock-reset-token" },
-    }),
-  ),
+    });
+  }),
 
   http.patch(api("/api/auth/reset-password"), () =>
     HttpResponse.json({ status: "success", message: "Password updated" }),
@@ -157,7 +194,9 @@ export const authHandlers = [
     const body = (await request.json()) as {
       application?: string;
       facility_type?: string;
+      code?: string;
     };
+    if (body.code === WRONG_CODE) return invalidCode();
     return HttpResponse.json({
       status: "success",
       data: {

@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { requireDashboard } from "@/lib/auth-guards";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { radiologistProfileQuery } from "@/features/radiologist/api/queries";
 import { RadiologistSidebar } from "@/features/radiologist/components/radiologist-sidebar";
@@ -7,8 +8,7 @@ import { RadiologistTopBar } from "@/features/radiologist/components/radiologist
 
 /** The radiologist dashboard: sidebar, top bar and the current page. */
 export const Route = createFileRoute("/hospital/radiologist")({
-  // TODO(api): only let signed-in radiologists in (redirect to /hospital/login) once the
-  // hospital login is connected to the API.
+  beforeLoad: () => requireDashboard("/hospital/radiologist"),
   loader: ({ context }) => context.queryClient.ensureQueryData(radiologistProfileQuery()),
   component: RadiologistLayout,
 });

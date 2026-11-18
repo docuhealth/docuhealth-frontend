@@ -1,8 +1,8 @@
-import { fireEvent, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AppointmentsCalendar } from "@/features/receptionist/components/appointments-calendar";
 import { formatLongDate } from "@/lib/format";
-import { renderWithProviders } from "@/test/render";
+import { pickOption, renderWithProviders } from "@/test/render";
 
 describe("AppointmentsCalendar", () => {
   it("shows today's numbers and appointments, and switches views", async () => {
@@ -154,8 +154,7 @@ describe("AppointmentsCalendar", () => {
     await fill(/First name/, "Ada");
     await fill(/Last name/, "Obi");
     await user.click(screen.getByRole("combobox", { name: /Gender/ }));
-    // The list ignores the pointer while it animates open, so click the option directly.
-    fireEvent.click(await screen.findByRole("option", { name: "Female" }));
+    await pickOption("Female");
     await fill(/Email/, "ada.obi@email.com");
     await fill(/Phone Number/, "+2348031112233");
     await user.click(screen.getByRole("button", { name: "Continue" }));

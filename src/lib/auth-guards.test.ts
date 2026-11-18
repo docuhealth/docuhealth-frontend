@@ -1,0 +1,109 @@
+import { isRedirect } from "@tanstack/react-router";
+import { describe, expect, it } from "vitest";
+import { redirectIfSignedIn, requireDashboard, requireGate } from "@/lib/auth-guards";
+import {
+  type ActingAsEntry,
+  getPostLoginDestination,
+  type Session,
+  useAuthStore,
+} from "@/stores/auth-store";
+
+function session(overrides: Partial<Session> = {}): Session {
+  return {
+    accessToken: "t",
+    accountType: "patient",
+    user: { id: "u", name: "U", email: "u@example.com", role: "patient" },
+    ...overrides,
+  };
+}
+
+const staff = (role: string, isAdmin = false, extra: Partial<Session> = {}) =>
+  session({
+    accountType: "staff",
+    actingAs: [{ type: "facility_staff", role, is_admin: isAdmin } satisfies ActingAsEntry],
+    ...extra,
+  });
+
+/** Where `guard` sends the user, or `undefined` when it lets them through. */
+function redirectedTo(guard: () => void, signedIn: Session | null) {
+  if (signedIn) useAuthStore.getState().setSession(signedIn);
+  else useAuthStore.getState().clearSession();
+  try {
+    guard();
+    return undefined;
+  } catch (error) {
+    if (isRedirect(error)) return error.options.to;
+    throw error;
+  }
+}
+
+describe("getPostLoginDestination", () => {
+  it("sends each role to its dashboard", () => {
+    expect(getPostLoginDestination(session())).toBe("/patient");
+    expect(getPostLoginDestination(staff("receptionist"))).toBe("/hospital/receptionist");
+    expect(getPostLoginDestination(staff("radiologist"))).toBe("/hospital/radiologist");
+    expect(getPostLoginDestination(staff("doctor", true))).toBe("/hospital/admin");
+    // An admin gets the admin dashboard whatever their role.
+    expect(getPostLoginDestination(staff("receptionist", true))).toBe("/hospital/admin");
+  });
+
+  it("sends a pending gate step before any dashboard", () => {
+    expect(getPostLoginDestination(session({ nextStep: "nin_not_verified" }))).toBe("/verify-nin");
+    expect(
+      getPostLoginDestination(staff("doctor", true, { nextStep: "admin_details_required" })),
+    ).toBe("/hospital/first-login");
+  });
+});
+
+describe("requireDashboard", () => {
+  it("sends someone without a session to the right login", () => {
+    expect(redirectedTo(() => requireDashboard("/patient"), null)).toBe("/login");
+    expect(redirectedTo(() => requireDashboard("/hospital/radiologist"), null)).toBe(
+      "/hospital/login",
+    );
+  });
+
+  it("lets the right role in and moves everyone else to their own dashboard", () => {
+    expect(
+      redirectedTo(() => requireDashboard("/hospital/receptionist"), staff("receptionist")),
+    ).toBeUndefined();
+    expect(redirectedTo(() => requireDashboard("/hospital/admin"), staff("receptionist"))).toBe(
+      "/hospital/receptionist",
+    );
+    expect(redirectedTo(() => requireDashboard("/patient"), staff("radiologist"))).toBe(
+      "/hospital/radiologist",
+    );
+  });
+
+  it("holds a dashboard back until its gate step is done", () => {
+    expect(
+      redirectedTo(
+        () => requireDashboard("/hospital/admin"),
+        staff("doctor", true, { nextStep: "admin_details_required" }),
+      ),
+    ).toBe("/hospital/first-login");
+  });
+});
+
+describe("requireGate", () => {
+  it("only opens for a session with that step to do", () => {
+    expect(redirectedTo(() => requireGate("nin_not_verified"), null)).toBe("/login");
+    expect(redirectedTo(() => requireGate("admin_details_required"), null)).toBe("/hospital/login");
+    expect(
+      redirectedTo(
+        () => requireGate("nin_not_verified"),
+        session({ nextStep: "nin_not_verified" }),
+      ),
+    ).toBeUndefined();
+    expect(redirectedTo(() => requireGate("admin_details_required"), staff("doctor", true))).toBe(
+      "/hospital/admin",
+    );
+  });
+});
+
+describe("redirectIfSignedIn", () => {
+  it("lets visitors stay and sends signed-in users to their dashboard", () => {
+    expect(redirectedTo(redirectIfSignedIn, null)).toBeUndefined();
+    expect(redirectedTo(redirectIfSignedIn, staff("receptionist"))).toBe("/hospital/receptionist");
+  });
+});

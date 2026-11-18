@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordGroupInput } from "@/components/password-group-input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import {
   Select,
@@ -279,9 +280,8 @@ function AddStaffForm({ onAdded }: { onAdded: () => void }) {
               <InputGroupAddon>
                 <LockSimpleIcon className="size-5" />
               </InputGroupAddon>
-              <InputGroupInput
+              <PasswordGroupInput
                 id="staffPassword"
-                type="password"
                 autoComplete="new-password"
                 placeholder="Enter password"
                 aria-required

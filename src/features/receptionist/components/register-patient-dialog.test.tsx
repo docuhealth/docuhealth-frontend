@@ -1,9 +1,9 @@
-import { fireEvent, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { RegisterPatientDialog } from "@/features/receptionist/components/register-patient-dialog";
-import { renderWithProviders } from "@/test/render";
+import { pickOption, renderWithProviders } from "@/test/render";
 
 const navigate = vi.fn();
 vi.mock("@tanstack/react-router", async (importOriginal) => ({
@@ -18,10 +18,10 @@ async function fill(user: UserEvent, label: RegExp, value: string) {
   await user.type(field, value);
 }
 
-/** Picks from one of the dialog's selects. The list ignores the pointer while it opens. */
+/** Picks from one of the dialog's selects. */
 async function choose(user: UserEvent, label: RegExp, option: string) {
   await user.click(screen.getByRole("combobox", { name: label }));
-  fireEvent.click(await screen.findByRole("option", { name: option }));
+  await pickOption(option);
 }
 
 async function findGuardian(user: UserEvent, hin: string) {

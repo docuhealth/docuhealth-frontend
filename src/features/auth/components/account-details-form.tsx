@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { PasswordGroupInput } from "@/components/password-group-input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { AuthHeader } from "@/features/auth/components/auth-header";
 import { NinHint } from "@/components/nin-hint";
@@ -71,9 +72,8 @@ export function AccountDetailsForm({
               Password <RequiredMark />
             </FieldLabel>
             <InputGroup className="bg-card">
-              <InputGroupInput
+              <PasswordGroupInput
                 id="password"
-                type="password"
                 autoComplete="new-password"
                 placeholder="Enter password"
                 aria-required
@@ -92,9 +92,8 @@ export function AccountDetailsForm({
               Confirm Password <RequiredMark />
             </FieldLabel>
             <InputGroup className="bg-card">
-              <InputGroupInput
+              <PasswordGroupInput
                 id="confirmPassword"
-                type="password"
                 autoComplete="new-password"
                 placeholder="Enter password"
                 aria-required

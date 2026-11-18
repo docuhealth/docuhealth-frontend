@@ -3,10 +3,10 @@
 The rebuilt DocuHealth web app (patients, hospitals and their staff roles, partners and
 platform admins), built from the React Setup starter for the new design.
 
-Status: foundations, design system (`/design-system`), and auth/onboarding screens (patient login,
-sign-up, password reset, hospital registration & verification, and field-agent hospital
-registration). Next up: connecting auth to the v2 API, the public landing page, and the role
-dashboards.
+Status: foundations, design system (`/design-system`), the landing page, auth/onboarding connected
+to the v2 API (patient login, sign-up, password reset, the NIN and admin-details gates, hospital
+registration & verification, and field-agent hospital registration), and the hospital admin,
+receptionist and radiologist dashboards (on the mock API until their endpoints exist).
 
 ## Stack
 
@@ -36,6 +36,20 @@ npm run dev
 
 With `VITE_ENABLE_MOCKS=true` the app runs against the MSW fake API in
 `src/mocks/handlers.ts` (one file per feature, e.g. `src/mocks/hospital-admin.ts`) instead of the backend. Set `VITE_PREFILL_FORMS=true` in dev to pre-populate auth forms with sample data.
+
+The mock login picks a scenario from the email's first part (any password works):
+
+| Email          | Patient login             | Hospital login            |
+| -------------- | ------------------------- | ------------------------- |
+| `wrong@…`      | 401 "Invalid credentials" | 401 "Invalid credentials" |
+| `nin@…`        | `/verify-nin` gate        | —                         |
+| `firstlogin@…` | —                         | `/first-login` gate       |
+| `reception@…`  | —                         | Receptionist dashboard    |
+| `radiology@…`  | —                         | Radiologist dashboard     |
+| anything else  | Patient portal            | Admin dashboard (doctor)  |
+
+Any verification code works except `000000`, which returns "Invalid OTP". On the dev server with
+mocks on, the dashboards also open without logging in; production builds always require a session.
 
 ## Scripts
 
@@ -99,14 +113,22 @@ full URL on the right subdomain. `VITE_ROOT_DOMAIN` names the production domain;
 (e.g. preview deploys) nothing is rewritten and the prefixed paths are used directly. In
 production, point all four domains at the same deployment.
 
+An environment can sit between the section and the root domain: with
+`VITE_ROOT_DOMAIN=docuhealthservices.net`, `v2.docuhealthservices.net` is the v2 environment's main
+site and `hospital.v2.docuhealthservices.net` its hospital site. Links that leave the app (the
+`login_url` / `redirect_url` the backend puts in emails) are built with `absoluteUrl()` from
+`src/lib/sections.ts`, so they always point at the environment the request came from.
+
 ## Links and user flows
 
 Paths below are what appears in the browser, on the base URL from the table above. For example,
 `/register` under Hospitals is `hospital.docuhealthservices.net/register` in production and
 `hospital.localhost:5173/register` in dev.
 
-Logging in isn't connected to the API yet, so nothing redirects to a dashboard after login and
-the dashboards have no auth guard. Open a dashboard by going to its URL directly.
+Guards live in `src/lib/auth-guards.ts`. A dashboard needs a session for its role (anyone else is
+sent to their own dashboard), a pending gate step (`/verify-nin`, `/first-login`) comes before any
+dashboard, and login/sign-up pages send anyone already signed in to their dashboard. Doctors,
+nurses and the other roles have no dashboard yet, so they land on the admin one.
 
 ### Patients and public site
 
@@ -125,43 +147,47 @@ Sign up:   / → /register → choose an account type
              │    your info → verify email code → account details → HIN shown → /login
              └─ Health Provider: hospital /register (see Hospitals)
 
-Log in:    /login → stays on the page with a "not connected" message (later: patient dashboard)
+Log in:    /login → /patient  (or /verify-nin first if the NIN isn't verified → /patient)
 
 Reset:     /forgot-password → email → code → new password → /login
+
+Log out:   /patient → clears the session → /login
 ```
 
 The landing page's "Partner with Us" and contact section links go to the hospital `/register`. A
 "Switch" link in the auth header moves between the patient and hospital versions of login and
-sign-up. Anyone with a session who opens a patient auth page is redirected to `/`.
+sign-up. Anyone with a session who opens a patient auth page is sent to their dashboard.
 
 ### Hospitals and their staff
 
-| Path                             | Page                                                        |
-| -------------------------------- | ----------------------------------------------------------- |
-| `/`                              | Redirects to `/login` (later: the staff member's dashboard) |
-| `/login`                         | Hospital login                                              |
-| `/register`                      | Facility registration request                               |
-| `/verify?token=…`                | Facility documents and admin details, from the email link   |
-| `/forgot-password`               | Hospital password reset                                     |
-| `/admin`                         | Hospital admin dashboard                                    |
-| `/admin/staff`                   | Staff list (`/admin/staff/:staffId` for one)                |
-| `/admin/patients`                | Patient list (`/admin/patients/:patientId` for one)         |
-| `/admin/appointments`            | Appointments                                                |
-| `/admin/messages`                | Messages                                                    |
-| `/admin/personnel`               | Health personnel                                            |
-| `/admin/settings`, `/admin/help` | Settings and help                                           |
-| `/receptionist`                  | Receptionist dashboard                                      |
-| `/receptionist/…`                | Same sections as admin, except a single `/staff` page       |
-| `/radiologist`                   | Radiologist dashboard                                       |
-| `/radiologist/scan-orders`       | Scan orders (`/radiologist/scan-orders/:orderId` for one)   |
-| `/radiologist/…`                 | Appointments, messages, personnel, settings, help           |
+| Path                             | Page                                                      |
+| -------------------------------- | --------------------------------------------------------- |
+| `/`                              | The staff member's dashboard, or `/login`                 |
+| `/first-login`                   | Admin details gate for migrated accounts                  |
+| `/login`                         | Hospital login                                            |
+| `/register`                      | Facility registration request                             |
+| `/verify?token=…`                | Facility documents and admin details, from the email link |
+| `/forgot-password`               | Hospital password reset                                   |
+| `/admin`                         | Hospital admin dashboard                                  |
+| `/admin/staff`                   | Staff list (`/admin/staff/:staffId` for one)              |
+| `/admin/patients`                | Patient list (`/admin/patients/:patientId` for one)       |
+| `/admin/appointments`            | Appointments                                              |
+| `/admin/messages`                | Messages                                                  |
+| `/admin/personnel`               | Health personnel                                          |
+| `/admin/settings`, `/admin/help` | Settings and help                                         |
+| `/receptionist`                  | Receptionist dashboard                                    |
+| `/receptionist/…`                | Same sections as admin, except a single `/staff` page     |
+| `/radiologist`                   | Radiologist dashboard                                     |
+| `/radiologist/scan-orders`       | Scan orders (`/radiologist/scan-orders/:orderId` for one) |
+| `/radiologist/…`                 | Appointments, messages, personnel, settings, help         |
 
 ```
 Register:  /register → submit facility details → approval → verification email
              → /verify?token=… → documents → admin details → done → main site /
-           (no token shows a "Link expired" notice)
+           (a link without its token or application shows a "Link expired" notice)
 
-Log in:    /login → stays on the page with a "not connected" message (later: staff dashboard)
+Log in:    /login → the role's dashboard: /admin (admins, and roles without a dashboard),
+           /receptionist, /radiologist  (or /first-login first if admin details are missing)
 
 Reset:     /forgot-password → email → code → new password → /login
 

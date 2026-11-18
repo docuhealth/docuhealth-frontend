@@ -38,9 +38,49 @@ export async function request<TSchema extends z.ZodType>(
  * @public
  */
 export function getErrorMessage(error: unknown): string {
-  if (isAxiosError<{ message?: string }>(error)) {
-    return error.response?.data?.message ?? error.message;
+  if (isAxiosError(error)) {
+    if (!error.response) {
+      return "Couldn't reach DocuHealth. Check your connection and try again.";
+    }
+    return messageFromBody(error.response.data) ?? error.message;
   }
   if (error instanceof Error) return error.message;
   return "Something went wrong";
+}
+
+/** Fields that only describe the response, never what went wrong. */
+const envelopeKeys = new Set(["status", "code", "success", "status_code"]);
+
+/**
+ * The first readable message in an error body. Covers `{ message }`, `{ detail }` (Django REST
+ * Framework), `{ error: "…" | { message } }`, and DRF field errors (`{ nin: ["…"] }`), which are
+ * shown as "nin: …" unless they're `non_field_errors`.
+ */
+function messageFromBody(body: unknown, field?: string): string | undefined {
+  if (typeof body === "string") {
+    const text = body.trim();
+    // An HTML error page (e.g. a Django 500) is no use in a toast.
+    if (!text || text.startsWith("<")) return undefined;
+    return field && field !== "non_field_errors" ? `${field.replaceAll("_", " ")}: ${text}` : text;
+  }
+  if (Array.isArray(body)) {
+    for (const item of body) {
+      const message = messageFromBody(item, field);
+      if (message) return message;
+    }
+    return undefined;
+  }
+  if (typeof body !== "object" || body === null) return undefined;
+
+  const record = body as Record<string, unknown>;
+  for (const key of ["message", "detail", "error", "errors"]) {
+    const message = messageFromBody(record[key]);
+    if (message) return message;
+  }
+  for (const [key, value] of Object.entries(record)) {
+    if (envelopeKeys.has(key) || key === "data") continue;
+    const message = messageFromBody(value, key);
+    if (message) return message;
+  }
+  return messageFromBody(record.data);
 }

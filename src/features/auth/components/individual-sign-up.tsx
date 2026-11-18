@@ -13,6 +13,7 @@ import { IndividualInfoForm } from "@/features/auth/components/individual-info-f
 import { VerifyCodeForm } from "@/features/auth/components/verify-code-form";
 import type { AccountDetailsValues, IndividualInfoValues } from "@/features/auth/lib/schemas";
 import { getErrorMessage } from "@/lib/api";
+import { absoluteUrl } from "@/lib/sections";
 import { getPostLoginDestination, useAuthStore } from "@/stores/auth-store";
 
 const TOTAL_STEPS = 3;
@@ -39,7 +40,7 @@ export function IndividualSignUp() {
       email: values.email.trim(),
       phone: values.phone.trim(),
       verify_by: "email",
-      login_url: `${window.location.origin}/login`,
+      login_url: absoluteUrl("/login"),
     });
   }
 

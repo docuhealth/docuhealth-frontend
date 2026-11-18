@@ -5,7 +5,7 @@ import {
   createRouter,
   RouterProvider,
 } from "@tanstack/react-router";
-import { render, type RenderOptions } from "@testing-library/react";
+import { fireEvent, render, type RenderOptions, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { type ReactElement, Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
@@ -57,4 +57,17 @@ export function renderWithRouter(ui: ReactElement) {
       </QueryClientProvider>,
     ),
   };
+}
+
+/**
+ * Picks `name` from an open Base UI select list. The list ignores real pointer clicks while it
+ * animates open, and a plain synthetic click only counts on the highlighted item, so send the
+ * click assistive technology would (`pointerType: ""`), which selects any item.
+ */
+export async function pickOption(name: string) {
+  const option = await screen.findByRole("option", { name });
+  fireEvent(
+    option,
+    new PointerEvent("click", { bubbles: true, cancelable: true, pointerType: "" }),
+  );
 }

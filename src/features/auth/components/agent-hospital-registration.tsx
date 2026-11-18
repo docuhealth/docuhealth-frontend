@@ -12,6 +12,7 @@ import type {
   HospitalLocationValues,
 } from "@/features/auth/lib/schemas";
 import { getErrorMessage } from "@/lib/api";
+import { absoluteUrl } from "@/lib/sections";
 
 const TOTAL_STEPS = 3;
 
@@ -36,7 +37,7 @@ export function AgentHospitalRegistration() {
         state: location.state.trim(),
         city: location.lga.trim(),
         street: location.streetAddress.trim(),
-        login_url: `${window.location.origin}/hospital/login`,
+        login_url: absoluteUrl("/hospital/login"),
         admins: [
           {
             part: details.facilityType,

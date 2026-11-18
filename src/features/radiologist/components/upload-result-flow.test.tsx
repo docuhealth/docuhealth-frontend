@@ -1,7 +1,7 @@
-import { fireEvent, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { ScanOrderDetails } from "@/features/radiologist/components/scan-order-details";
-import { renderWithRouter } from "@/test/render";
+import { pickOption, renderWithRouter } from "@/test/render";
 
 const yesterday = new Date();
 yesterday.setDate(yesterday.getDate() - 1);
@@ -23,8 +23,7 @@ describe("UploadResultFlow", () => {
 
     await user.type(name, "Dr. Ada Bello");
     await user.click(within(dialog).getByRole("combobox", { name: /Specialty/ }));
-    // The list ignores the pointer while it opens.
-    fireEvent.click(await screen.findByRole("option", { name: "Sonographer" }));
+    await pickOption("Sonographer");
     const date = within(dialog).getByLabelText(/Date of reporting/);
     await user.clear(date);
     await user.type(date, yesterdayText);

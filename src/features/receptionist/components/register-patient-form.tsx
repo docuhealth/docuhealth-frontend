@@ -20,6 +20,7 @@ import { RequiredMark } from "@/components/required-mark";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordGroupInput } from "@/components/password-group-input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import {
@@ -425,9 +426,8 @@ export function RegisterPatientForm({
               <InputGroupAddon>
                 <LockIcon className="size-5" />
               </InputGroupAddon>
-              <InputGroupInput
+              <PasswordGroupInput
                 id="patientPassword"
-                type="password"
                 autoComplete="new-password"
                 placeholder="Enter password"
                 aria-required
@@ -446,9 +446,8 @@ export function RegisterPatientForm({
               <InputGroupAddon>
                 <LockIcon className="size-5" />
               </InputGroupAddon>
-              <InputGroupInput
+              <PasswordGroupInput
                 id="patientConfirmPassword"
-                type="password"
                 autoComplete="new-password"
                 placeholder="Enter password"
                 aria-required

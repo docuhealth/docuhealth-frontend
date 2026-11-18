@@ -2,7 +2,7 @@ import { HttpResponse, http } from "msw";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import { env } from "@/env";
-import { ApiSchemaError, request } from "@/lib/api";
+import { ApiSchemaError, getErrorMessage, request } from "@/lib/api";
 import { server } from "@/mocks/node";
 import { useAuthStore } from "@/stores/auth-store";
 
@@ -43,5 +43,44 @@ describe("request", () => {
       id: "1",
     });
     expect(useAuthStore.getState().session?.accessToken).toBe("mock-access");
+  });
+});
+
+describe("getErrorMessage", () => {
+  async function messageFor(status: number, body: unknown) {
+    server.use(http.get(url, () => HttpResponse.json(body as object, { status })));
+    return getErrorMessage(await request(z.unknown(), { url: "/thing" }).catch((e) => e));
+  }
+
+  it("reads DRF's detail", async () => {
+    expect(await messageFor(400, { detail: "Invalid OTP", status: "error" })).toBe("Invalid OTP");
+  });
+
+  it("prefers message, then detail, then error", async () => {
+    expect(await messageFor(400, { message: "Nope", detail: "Invalid OTP" })).toBe("Nope");
+    expect(await messageFor(400, { error: { message: "Expired code" } })).toBe("Expired code");
+  });
+
+  it("names the field for DRF field errors, but not for non_field_errors", async () => {
+    expect(await messageFor(400, { official_email: ["Already registered."] })).toBe(
+      "official email: Already registered.",
+    );
+    expect(await messageFor(400, { non_field_errors: ["Passwords don't match."] })).toBe(
+      "Passwords don't match.",
+    );
+  });
+
+  it("falls back to the status text when the body says nothing useful", async () => {
+    server.use(http.get(url, () => new HttpResponse("<html>Server Error</html>", { status: 500 })));
+    const error = await request(z.unknown(), { url: "/thing" }).catch((e) => e);
+    expect(getErrorMessage(error)).toBe("Request failed with status code 500");
+  });
+
+  it("explains a request that never got an answer (offline, CORS)", async () => {
+    server.use(http.get(url, () => HttpResponse.error()));
+    const error = await request(z.unknown(), { url: "/thing" }).catch((e) => e);
+    expect(getErrorMessage(error)).toBe(
+      "Couldn't reach DocuHealth. Check your connection and try again.",
+    );
   });
 });
