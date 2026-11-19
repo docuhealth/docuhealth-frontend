@@ -69,6 +69,33 @@ export const scanScheduleSchema = z.object({
 });
 export type ScanSchedule = z.infer<typeof scanScheduleSchema>;
 
+/** A scan appointment just booked, as the schedule lists it. */
+export const scanAppointmentSchema = scanScheduleSchema.shape.items.element;
+
+/** The kinds of scan an appointment can be booked for, in the order the select lists them. */
+export const scanModalityLabels = {
+  x_ray: "X-ray",
+  ct: "CT scan",
+  mri: "MRI",
+  ultrasound: "Ultrasound",
+  mammogram: "Mammogram",
+  fluoroscopy: "Fluoroscopy",
+  dexa: "Bone density (DEXA)",
+} as const;
+export type ScanModality = keyof typeof scanModalityLabels;
+
+/** Registered patients whose HIN matches the one looked up (one, or none). */
+export const patientLookupSchema = z.object({
+  items: z.array(
+    patientSchema.extend({
+      dateOfBirth: z.iso.date(),
+      phone: z.string().nullable(),
+      email: z.email().nullable(),
+    }),
+  ),
+});
+export type FoundPatient = z.infer<typeof patientLookupSchema>["items"][number];
+
 export const uploadStatusLabels = {
   successful: "Successful",
   processing: "Processing",

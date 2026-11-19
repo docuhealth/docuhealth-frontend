@@ -109,12 +109,17 @@ export function isStaffActingAs(entry: ActingAsEntry): entry is StaffActingAs {
 
 /** The dashboards a signed-in user can land on. */
 export type Dashboard =
-  "/patient" | "/hospital/admin" | "/hospital/receptionist" | "/hospital/radiologist";
+  | "/patient"
+  | "/hospital/admin"
+  | "/hospital/receptionist"
+  | "/hospital/radiologist"
+  | "/hospital/lab-scientist";
 
 /** Staff roles with a dashboard of their own; admins of any role get the admin dashboard. */
 const roleDashboards: Partial<Record<string, Dashboard>> = {
   receptionist: "/hospital/receptionist",
   radiologist: "/hospital/radiologist",
+  lab_scientist: "/hospital/lab-scientist",
 };
 
 /**

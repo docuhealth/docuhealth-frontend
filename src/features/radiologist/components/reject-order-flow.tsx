@@ -10,7 +10,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { useRejectScanOrder } from "@/features/radiologist/api/mutations";
 import type { ScanOrder } from "@/features/radiologist/api/schemas";
-import { CancelCircleIcon } from "@/features/radiologist/components/icons";
+import { CancelCircleIcon } from "@/components/hugeicons";
 import { devPrefill } from "@/features/radiologist/lib/dev-prefill";
 import { type RejectOrderValues, rejectOrderSchema } from "@/features/radiologist/lib/schemas";
 import { getErrorMessage } from "@/lib/api";

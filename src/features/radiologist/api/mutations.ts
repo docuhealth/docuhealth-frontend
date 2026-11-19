@@ -1,7 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { radiologistKeys } from "@/features/radiologist/api/queries";
-import { type ScanOrder, scanOrderSchema } from "@/features/radiologist/api/schemas";
+import {
+  type ScanOrder,
+  scanAppointmentSchema,
+  scanOrderSchema,
+} from "@/features/radiologist/api/schemas";
 import type {
+  BookScanValues,
   ImagingTimeValues,
   RejectOrderValues,
   UploadResultValues,
@@ -15,6 +20,37 @@ function useOrderUpdated(orderId: string) {
     queryClient.setQueryData(radiologistKeys.scanOrder(orderId), order);
     return queryClient.invalidateQueries({ queryKey: radiologistKeys.all });
   };
+}
+
+/**
+ * Book a patient in for a scan. Refreshes every radiologist query, since it adds to the schedule
+ * and the overview's numbers.
+ */
+export function useBookScanAppointment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      patientId,
+      values: { date, time, note },
+    }: {
+      patientId: string;
+      values: BookScanValues;
+    }) =>
+      request(scanAppointmentSchema, {
+        method: "POST",
+        url: "/hospital/radiology/appointments",
+        data: {
+          patientId,
+          // Hidden in the dialog for now:
+          // modality,
+          // bodyPart,
+          at: new Date(`${date}T${time}`).toISOString(),
+          note,
+        },
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: radiologistKeys.all }),
+  });
 }
 
 /** Accept a pending order: it moves to in progress, its imaging time still to be logged. */

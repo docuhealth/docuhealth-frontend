@@ -19,7 +19,7 @@ import {
   requestStatusLabels,
 } from "@/features/receptionist/api/schemas";
 import { BookAppointmentDialog } from "@/features/receptionist/components/book-appointment-dialog";
-import { PatientSummary } from "@/features/receptionist/components/patient-summary";
+import { PatientSummary } from "@/components/dashboard/patient-summary";
 import { formatDayAndTime, formatShortDay } from "@/lib/format";
 import { cn } from "@/lib/utils";
 

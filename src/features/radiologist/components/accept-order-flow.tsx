@@ -5,7 +5,7 @@ import { SuccessDialog } from "@/components/success-dialog";
 import { DialogDescription } from "@/components/ui/dialog";
 import { useAcceptScanOrder } from "@/features/radiologist/api/mutations";
 import type { ScanOrder } from "@/features/radiologist/api/schemas";
-import { InformationCircleIcon } from "@/features/radiologist/components/icons";
+import { InformationCircleIcon } from "@/components/hugeicons";
 import { ImagingTimeDialog } from "@/features/radiologist/components/imaging-time-dialog";
 import { getErrorMessage } from "@/lib/api";
 import { formatDateCommaTime } from "@/lib/format";

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { TimeInput } from "@/components/time-input";
 import { Textarea } from "@/components/ui/textarea";
-import { PatientSummary } from "@/features/receptionist/components/patient-summary";
+import { PatientSummary } from "@/components/dashboard/patient-summary";
 import {
   type BookAppointmentValues,
   bookAppointmentSchema,

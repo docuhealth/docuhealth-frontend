@@ -85,7 +85,7 @@ const appointments: Appointment[] = (
 ).map(([days, time, name, phone, reason, status], index) => ({
   id: `appointment-${index + 1}`,
   at: at(days, time),
-  patient: { id: `patient-${index + 1}`, name, phone },
+  patient: { id: `patient-${index + 1}`, name, phone, avatarUrl: null },
   reason,
   status,
 }));
@@ -143,6 +143,7 @@ for (let days = -60; days <= 75; days++) {
         id: `calendar-patient-${calendarNames.indexOf(name) + 1}`,
         name,
         phone: `+23480${String(30_000_000 + calendarNames.indexOf(name) * 1_234_567).slice(0, 8)}`,
+        avatarUrl: null,
       },
       reason: calendarReasons[Math.floor(noise(seed + 0.25) * calendarReasons.length)] ?? "",
       status: cancelled ? "cancelled" : days < 0 ? "checked_in" : "upcoming",
@@ -219,19 +220,20 @@ function between(from: Date, to: Date) {
 
 const queue: ReceptionQueue["items"] = (
   [
-    ["Chinonso Okafor", "DH-28491", "Check-up", 12],
-    ["Amina Yusuf", "DH-28492", "Lab Results", 18],
-    ["Tunde Adeyemi", "DH-28493", "Fever", 24],
-    ["Chioma Nwosu", "DH-39172", "Routine Check-up", 32],
-    ["Emeka Uche", "DH-28495", "Medication Review", 38],
-    ["Hauwa Garba", "DH-28496", "Antenatal Check", 41],
-    ["Yemi Ojo", "DH-28497", "Wound Dressing", 45],
-    ["Chidinma Okeke", "DH-28498", "Follow-up", 52],
+    ["Chinonso Okafor", "DH-28491", "Check-up", "completed", 12],
+    ["Amina Yusuf", "DH-28492", "Lab Results", "in_progress", 18],
+    ["Tunde Adeyemi", "DH-28493", "Fever", "in_progress", 24],
+    ["Chioma Nwosu", "DH-39172", "Routine Check-up", "pending", 32],
+    ["Emeka Uche", "DH-28495", "Medication Review", "pending", 38],
+    ["Hauwa Garba", "DH-28496", "Antenatal Check", "pending", 41],
+    ["Yemi Ojo", "DH-28497", "Wound Dressing", "pending", 45],
+    ["Chidinma Okeke", "DH-28498", "Follow-up", "pending", 52],
   ] as const
-).map(([name, hin, reason, waitMinutes], index) => ({
+).map(([name, hin, reason, status, waitMinutes], index) => ({
   id: `queue-${index + 1}`,
-  patient: { id: `patient-${index + 1}`, name, hin },
+  patient: { id: `patient-${index + 1}`, name, hin, avatarUrl: null },
   reason,
+  status,
   waitMinutes,
 }));
 
@@ -573,7 +575,12 @@ export const receptionistHandlers = [
     const appointment: Appointment = {
       id: `appointment-${appointments.length + 1}`,
       at,
-      patient: { id: patientId, name, phone: profile?.phone ?? "+2348095512093" },
+      patient: {
+        id: patientId,
+        name,
+        phone: profile?.phone ?? "+2348095512093",
+        avatarUrl: profile?.avatarUrl ?? null,
+      },
       reason: "Consultation",
       status: "upcoming",
     };

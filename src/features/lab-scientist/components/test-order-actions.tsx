@@ -1,0 +1,32 @@
+import { useState } from "react";
+import { toast } from "sonner";
+import { AddIcon, CalendarAddIcon } from "@/components/hugeicons";
+import { Button } from "@/components/ui/button";
+import { BookAppointmentDialog } from "@/features/lab-scientist/components/book-appointment-dialog";
+
+/** "Book Appointment" and "New Test", at the top right of the Overview and Test orders pages. */
+export function TestOrderActions() {
+  const [booking, setBooking] = useState(false);
+
+  return (
+    <>
+      <Button
+        variant="outline"
+        className="h-12 gap-2 bg-card px-4 type-body-sm-medium text-fg-heading has-data-[icon=inline-start]:pl-4"
+        onClick={() => setBooking(true)}
+      >
+        <CalendarAddIcon data-icon="inline-start" className="size-5" />
+        Book Appointment
+      </Button>
+      <Button
+        className="h-12 gap-2 px-4 type-heading-sm has-data-[icon=inline-start]:pl-4"
+        // TODO(design): open the new test form once it's designed.
+        onClick={() => toast.info("Adding tests isn’t built yet.")}
+      >
+        <AddIcon data-icon="inline-start" className="size-5" />
+        New Test
+      </Button>
+      <BookAppointmentDialog open={booking} onOpenChange={setBooking} />
+    </>
+  );
+}

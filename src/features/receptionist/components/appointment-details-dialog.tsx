@@ -28,7 +28,7 @@ import {
 } from "@/features/receptionist/api/schemas";
 import { AppointmentForm } from "@/features/receptionist/components/appointment-form";
 import { StatusTag } from "@/features/receptionist/components/status-tag";
-import { PatientSummary } from "@/features/receptionist/components/patient-summary";
+import { PatientSummary } from "@/components/dashboard/patient-summary";
 import { devPrefill } from "@/features/receptionist/lib/dev-prefill";
 import {
   type CancelAppointmentInput,

@@ -67,6 +67,9 @@ export function formatDate(date: Date) {
   return fullDate.format(date);
 }
 
+/** From this age a patient is an adult and registers on their own. */
+export const ADULT_AGE = 18;
+
 /** Whole years from `birth` to `on`. */
 export function ageOn(birth: Date, on = new Date()) {
   const birthdayPassed =

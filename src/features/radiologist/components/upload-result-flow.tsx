@@ -29,7 +29,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useUploadScanResult } from "@/features/radiologist/api/mutations";
 import { reporterSpecialtyLabels } from "@/features/radiologist/api/schemas";
-import { InformationCircleIcon } from "@/features/radiologist/components/icons";
+import { InformationCircleIcon } from "@/components/hugeicons";
 import { devPrefill } from "@/features/radiologist/lib/dev-prefill";
 import {
   type UploadResultInput,

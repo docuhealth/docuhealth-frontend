@@ -3,23 +3,34 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { DashboardCard } from "@/components/dashboard/dashboard-card";
-import { DashboardTable } from "@/components/dashboard/dashboard-table";
+import { DashboardTable, PersonCell } from "@/components/dashboard/dashboard-table";
 import { SearchField } from "@/components/dashboard/search-field";
+import { StatusPill } from "@/components/dashboard/status-pill";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { receptionQueueQuery } from "@/features/receptionist/api/queries";
-import type { QueueEntry } from "@/features/receptionist/api/schemas";
+import {
+  type QueueEntry,
+  type QueueStatus,
+  queueStatusLabels,
+} from "@/features/receptionist/api/schemas";
 import { CheckOutDialog } from "@/features/receptionist/components/check-out-dialog";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 
 /** How many waiting patients the card shows; the rest are a click away. */
 const PREVIEW_ROWS = 5;
 
-// On narrow cards the # column goes, and the reason moves under the patient's name.
+const statusTones = {
+  pending: "warning",
+  in_progress: "info",
+  completed: "success",
+} as const satisfies Record<QueueStatus, string>;
+
+// On narrow cards the # column goes, and the status moves under the patient's name.
 const columns = {
   number: "hidden w-10 @sm:table-cell",
   name: "pl-4 @sm:pl-2",
-  reason: "hidden w-[28%] @md:table-cell",
+  status: "hidden w-28 @md:table-cell",
   wait: "w-20",
   action: "w-28",
 };
@@ -45,14 +56,13 @@ export function ReceptionQueueCard() {
       }
     >
       <DashboardTable
-        plainHeader
         className="type-body-sm-regular"
         columns={[
-          { label: "#", className: `${columns.number} type-body-sm-regular` },
-          { label: "Patient Name", className: `${columns.name} type-body-sm-regular` },
-          { label: "Reason", className: `${columns.reason} type-body-sm-regular` },
-          { label: "Wait time", className: `${columns.wait} type-body-sm-regular` },
-          { label: "Action", className: `${columns.action} type-body-sm-regular` },
+          { label: "#", className: columns.number },
+          { label: "Patient Name", className: columns.name },
+          { label: "Status", className: columns.status },
+          { label: "Wait time", className: columns.wait },
+          { label: "Action", className: columns.action },
         ]}
         empty={
           isError
@@ -65,14 +75,19 @@ export function ReceptionQueueCard() {
           <TableRow key={entry.id}>
             <TableCell className={columns.number}>{index + 1}</TableCell>
             <TableCell className={columns.name}>
-              <div className="flex min-w-0 flex-col">
-                <span className="truncate text-fg-heading">{entry.patient.name}</span>
-                <span className="truncate text-fg-caption">HIN: {entry.patient.hin}</span>
-                <span className="truncate text-fg-caption @md:hidden">{entry.reason}</span>
+              <div className="flex min-w-0 flex-col items-start gap-1">
+                <PersonCell
+                  name={entry.patient.name}
+                  avatarUrl={entry.patient.avatarUrl}
+                  detail={`HIN: ${entry.patient.hin}`}
+                />
+                <span className="@md:hidden">
+                  <QueueStatusPill status={entry.status} />
+                </span>
               </div>
             </TableCell>
-            <TableCell className={`${columns.reason} whitespace-normal text-fg-heading`}>
-              {entry.reason}
+            <TableCell className={columns.status}>
+              <QueueStatusPill status={entry.status} />
             </TableCell>
             <TableCell className={`${columns.wait} text-fg-heading`}>
               {entry.waitMinutes} mins
@@ -95,6 +110,10 @@ export function ReceptionQueueCard() {
       <CheckOutDialog entry={checkingOut} onOpenChange={(open) => !open && setCheckingOut(null)} />
     </DashboardCard>
   );
+}
+
+function QueueStatusPill({ status }: { status: QueueStatus }) {
+  return <StatusPill tone={statusTones[status]}>{queueStatusLabels[status]}</StatusPill>;
 }
 
 function CheckOutButton({ entry, onClick }: { entry: QueueEntry; onClick: () => void }) {

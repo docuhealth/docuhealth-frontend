@@ -2,14 +2,8 @@ import { FilePdfIcon, ImageIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import type { ScanResult } from "@/features/radiologist/api/schemas";
-import {
-  CalendarIcon,
-  ScanIcon,
-  UploadIcon,
-  UserIcon,
-  ViewIcon,
-} from "@/features/radiologist/components/icons";
-import { DetailRow, OrderCard } from "@/features/radiologist/components/scan-order-parts";
+import { CalendarIcon, ScanIcon, UploadIcon, UserIcon, ViewIcon } from "@/components/hugeicons";
+import { DetailRow, OrderCard } from "@/components/dashboard/order-card";
 import { formatDateCommaTime, formatDay, formatFileSize } from "@/lib/format";
 
 /** A completed order's report, its files, and the radiologist's conclusions. */

@@ -1,10 +1,11 @@
 import { CaretRightIcon } from "@phosphor-icons/react";
 import { FormDialogBody, FormDialogFooter } from "@/components/dashboard/form-dialog";
 import { Button } from "@/components/ui/button";
+import { patientLookupQuery } from "@/features/receptionist/api/queries";
 import type { FoundPatient } from "@/features/receptionist/api/schemas";
-import { NoMatchCard, PatientSearchField } from "@/features/receptionist/components/patient-search";
+import { NoMatchCard, PatientSearchField } from "@/components/dashboard/patient-search";
 import { devPrefill } from "@/features/receptionist/lib/dev-prefill";
-import { usePatientSearch } from "@/features/receptionist/lib/use-patient-search";
+import { usePatientSearch } from "@/hooks/use-patient-search";
 
 /**
  * "Find patient", the first step of booking: a HIN field, the patients it matches (the only
@@ -20,7 +21,7 @@ export function FindPatientStep({
   onContinue: (patient: FoundPatient) => void;
   onRegisterPatient: () => void;
 }) {
-  const search = usePatientSearch(initialHin ?? devPrefill?.checkIn.hin);
+  const search = usePatientSearch(patientLookupQuery, initialHin ?? devPrefill?.checkIn.hin);
   const { picked, status } = search;
 
   return (

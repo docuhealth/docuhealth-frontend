@@ -76,7 +76,7 @@ src/
     hospital/, agent/    Sections on their own subdomain (see "Sections and subdomains")
   features/<name>/       Domain code: api/ (schemas, requests, query options, mutations),
                          components/, lib/ (auth/, hospital-admin/, landing/, receptionist/,
-                         radiologist/)
+                         radiologist/, lab-scientist/)
   components/            Shared app components (file-dropzone, success-dialog, required-mark)
     ui/                  shadcn components = the design system (generated; edit freely)
     dashboard/           The hospital dashboards' shared shell and blocks (sidebar, top bar,
@@ -180,6 +180,9 @@ sign-up. Anyone with a session who opens a patient auth page is sent to their da
 | `/radiologist`                   | Radiologist dashboard                                     |
 | `/radiologist/scan-orders`       | Scan orders (`/radiologist/scan-orders/:orderId` for one) |
 | `/radiologist/…`                 | Appointments, messages, personnel, settings, help         |
+| `/lab-scientist`                 | Lab scientist dashboard                                   |
+| `/lab-scientist/test-orders`     | Test orders (`/lab-scientist/test-orders/:orderId`)       |
+| `/lab-scientist/…`               | Appointments, messages, personnel, settings, help         |
 
 ```
 Register:  /register → submit facility details → approval → verification email
@@ -187,7 +190,8 @@ Register:  /register → submit facility details → approval → verification e
            (a link without its token or application shows a "Link expired" notice)
 
 Log in:    /login → the role's dashboard: /admin (admins, and roles without a dashboard),
-           /receptionist, /radiologist  (or /first-login first if admin details are missing)
+           /receptionist, /radiologist, /lab-scientist  (or /first-login first if admin
+           details are missing)
 
 Reset:     /forgot-password → email → code → new password → /login
 

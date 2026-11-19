@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { ScanOrder } from "@/features/radiologist/api/schemas";
-import { AlertMarkIcon, CancelIcon, TickIcon } from "@/features/radiologist/components/icons";
+import { AlertMarkIcon, CancelIcon, TickIcon } from "@/components/hugeicons";
 import { ScanStageTag } from "@/features/radiologist/components/status-tag";
 import { formatDateCommaTime } from "@/lib/format";
 import { cn } from "@/lib/utils";

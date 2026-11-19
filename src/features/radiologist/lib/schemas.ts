@@ -2,6 +2,9 @@ import { z } from "zod";
 import {
   type ReporterSpecialty,
   reporterSpecialtyLabels,
+  // For the Book Appointment dialog's scan type, hidden for now:
+  // type ScanModality,
+  // scanModalityLabels,
 } from "@/features/radiologist/api/schemas";
 import { toIsoDate } from "@/lib/date-input";
 
@@ -84,6 +87,38 @@ export function imagingTimeSchema(requestedAt: Date) {
     });
 }
 export type ImagingTimeValues = z.infer<ReturnType<typeof imagingTimeSchema>>;
+
+/**
+ * The Book Appointment dialog's details step: a date and time from now on. `date` is
+ * "YYYY-MM-DD" and `time` "HH:MM", or "" until whole. (Scan type and body part are hidden for
+ * now; uncomment them here and in the dialog to bring them back.)
+ */
+export const bookScanSchema = z
+  .object({
+    // Empty until one is picked, so the select can start blank.
+    // modality: z
+    //   .string()
+    //   .pipe(
+    //     z.enum(
+    //       Object.keys(scanModalityLabels) as [ScanModality, ...ScanModality[]],
+    //       "Select a scan type",
+    //     ),
+    //   ),
+    // bodyPart: required("Enter the body part to scan").max(100, "Keep this to 100 characters"),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a date as DD/MM/YYYY"),
+    time: z.string().regex(/^\d{2}:\d{2}$/, "Enter a time as HH:MM"),
+    note: z.string().trim().max(500, "Keep the note to 500 characters"),
+  })
+  .superRefine(({ date, time }, context) => {
+    const now = new Date();
+    if (date < toIsoDate(now)) {
+      context.addIssue({ code: "custom", path: ["date"], message: "Pick a date from today on" });
+    } else if (time && new Date(`${date}T${time}`) <= now) {
+      context.addIssue({ code: "custom", path: ["time"], message: "That time has passed" });
+    }
+  });
+export type BookScanInput = z.input<typeof bookScanSchema>;
+export type BookScanValues = z.output<typeof bookScanSchema>;
 
 /** The Reject Scan Order dialog: why, for the requesting doctor. */
 export const rejectOrderSchema = z.object({

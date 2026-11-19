@@ -42,6 +42,7 @@ describe("getPostLoginDestination", () => {
     expect(getPostLoginDestination(session())).toBe("/patient");
     expect(getPostLoginDestination(staff("receptionist"))).toBe("/hospital/receptionist");
     expect(getPostLoginDestination(staff("radiologist"))).toBe("/hospital/radiologist");
+    expect(getPostLoginDestination(staff("lab_scientist"))).toBe("/hospital/lab-scientist");
     expect(getPostLoginDestination(staff("doctor", true))).toBe("/hospital/admin");
     // An admin gets the admin dashboard whatever their role.
     expect(getPostLoginDestination(staff("receptionist", true))).toBe("/hospital/admin");

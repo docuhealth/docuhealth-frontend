@@ -1,5 +1,6 @@
 import { env } from "@/env";
 import type {
+  BookScanInput,
   ImagingTimeValues,
   RejectOrderValues,
   UploadResultInput,
@@ -28,6 +29,15 @@ tomorrow.setDate(tomorrow.getDate() + 1);
 export const devPrefill = enabled
   ? {
       imagingTime: { date: toIsoDate(tomorrow), time: "10:30" } satisfies ImagingTimeValues,
+      /** Finds Chidi Okafor in the mock API. */
+      bookScanHin: "541-452-042-11",
+      bookScan: {
+        // modality: "x_ray",
+        // bodyPart: "Chest",
+        date: toIsoDate(tomorrow),
+        time: "11:30",
+        note: "",
+      } satisfies BookScanInput,
       rejectOrder: {
         reason:
           "The requested scan doesn’t match the clinical question. Please confirm the imaging type with the requesting doctor and send a new request.",

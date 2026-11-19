@@ -10,6 +10,7 @@ const api = (path: string) => `${env.VITE_API_URL}${path}`;
 const staffScenarios: Record<string, { role: string; isAdmin: boolean; firstLogin?: boolean }> = {
   reception: { role: "receptionist", isAdmin: false },
   radiology: { role: "radiologist", isAdmin: false },
+  lab: { role: "lab_scientist", isAdmin: false },
   firstlogin: { role: "doctor", isAdmin: true, firstLogin: true },
 };
 

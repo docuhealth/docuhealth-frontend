@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { toIsoDate } from "@/lib/date-input";
+import { ADULT_AGE } from "@/lib/format";
 import {
   type CancellationReason,
   cancellationReasonLabels,
@@ -110,9 +111,6 @@ export const cancelAppointmentSchema = z
   });
 export type CancelAppointmentInput = z.input<typeof cancelAppointmentSchema>;
 export type CancelAppointmentValues = z.output<typeof cancelAppointmentSchema>;
-
-/** From this age a patient is an adult and registers on their own. */
-export const ADULT_AGE = 18;
 
 /** A new child for "Who is the child?": who they are and when they were born. */
 export const childDetailsSchema = z

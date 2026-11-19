@@ -7,12 +7,7 @@ import {
   radiologistProfileQuery,
   radiologyOverviewQuery,
 } from "@/features/radiologist/api/queries";
-import {
-  CheckmarkCircleIcon,
-  ClockFadingIcon,
-  ClockIcon,
-  XRayIcon,
-} from "@/features/radiologist/components/icons";
+import { CheckmarkCircleIcon, ClockFadingIcon, ClockIcon, XRayIcon } from "@/components/hugeicons";
 import { RecentUploadsCard } from "@/features/radiologist/components/recent-uploads-card";
 import { ScanOrderActions } from "@/features/radiologist/components/scan-order-actions";
 import { ScanRecords } from "@/features/radiologist/components/scan-records";

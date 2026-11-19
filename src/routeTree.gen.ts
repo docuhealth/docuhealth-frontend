@@ -22,6 +22,7 @@ import { Route as AgentAuthRouteImport } from './routes/agent/_auth'
 import { Route as HospitalIndexRouteImport } from './routes/hospital/index'
 import { Route as HospitalAuthRouteImport } from './routes/hospital/_auth'
 import { Route as HospitalAdminRouteImport } from './routes/hospital/admin'
+import { Route as HospitalLabScientistRouteImport } from './routes/hospital/lab-scientist'
 import { Route as HospitalRadiologistRouteImport } from './routes/hospital/radiologist'
 import { Route as HospitalReceptionistRouteImport } from './routes/hospital/receptionist'
 import { Route as AgentAuthRegisterHospitalRouteImport } from './routes/agent/_auth/register-hospital'
@@ -36,6 +37,12 @@ import { Route as HospitalAdminHelpRouteImport } from './routes/hospital/admin/h
 import { Route as HospitalAdminMessagesRouteImport } from './routes/hospital/admin/messages'
 import { Route as HospitalAdminPersonnelRouteImport } from './routes/hospital/admin/personnel'
 import { Route as HospitalAdminSettingsRouteImport } from './routes/hospital/admin/settings'
+import { Route as HospitalLabScientistIndexRouteImport } from './routes/hospital/lab-scientist/index'
+import { Route as HospitalLabScientistAppointmentsRouteImport } from './routes/hospital/lab-scientist/appointments'
+import { Route as HospitalLabScientistHelpRouteImport } from './routes/hospital/lab-scientist/help'
+import { Route as HospitalLabScientistMessagesRouteImport } from './routes/hospital/lab-scientist/messages'
+import { Route as HospitalLabScientistPersonnelRouteImport } from './routes/hospital/lab-scientist/personnel'
+import { Route as HospitalLabScientistSettingsRouteImport } from './routes/hospital/lab-scientist/settings'
 import { Route as HospitalRadiologistIndexRouteImport } from './routes/hospital/radiologist/index'
 import { Route as HospitalRadiologistAppointmentsRouteImport } from './routes/hospital/radiologist/appointments'
 import { Route as HospitalRadiologistHelpRouteImport } from './routes/hospital/radiologist/help'
@@ -53,6 +60,8 @@ import { Route as HospitalAdminPatientsIndexRouteImport } from './routes/hospita
 import { Route as HospitalAdminPatientsPatientIdRouteImport } from './routes/hospital/admin/patients/$patientId'
 import { Route as HospitalAdminStaffIndexRouteImport } from './routes/hospital/admin/staff/index'
 import { Route as HospitalAdminStaffStaffIdRouteImport } from './routes/hospital/admin/staff/$staffId'
+import { Route as HospitalLabScientistTestOrdersIndexRouteImport } from './routes/hospital/lab-scientist/test-orders/index'
+import { Route as HospitalLabScientistTestOrdersOrderIdRouteImport } from './routes/hospital/lab-scientist/test-orders/$orderId'
 import { Route as HospitalRadiologistScanOrdersIndexRouteImport } from './routes/hospital/radiologist/scan-orders/index'
 import { Route as HospitalRadiologistScanOrdersOrderIdRouteImport } from './routes/hospital/radiologist/scan-orders/$orderId'
 import { Route as HospitalReceptionistPatientsIndexRouteImport } from './routes/hospital/receptionist/patients/index'
@@ -120,6 +129,11 @@ const HospitalAuthRoute = HospitalAuthRouteImport.update({
 const HospitalAdminRoute = HospitalAdminRouteImport.update({
   id: '/hospital/admin',
   path: '/hospital/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HospitalLabScientistRoute = HospitalLabScientistRouteImport.update({
+  id: '/hospital/lab-scientist',
+  path: '/hospital/lab-scientist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HospitalRadiologistRoute = HospitalRadiologistRouteImport.update({
@@ -195,6 +209,42 @@ const HospitalAdminSettingsRoute = HospitalAdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => HospitalAdminRoute,
 } as any)
+const HospitalLabScientistIndexRoute =
+  HospitalLabScientistIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => HospitalLabScientistRoute,
+  } as any)
+const HospitalLabScientistAppointmentsRoute =
+  HospitalLabScientistAppointmentsRouteImport.update({
+    id: '/appointments',
+    path: '/appointments',
+    getParentRoute: () => HospitalLabScientistRoute,
+  } as any)
+const HospitalLabScientistHelpRoute =
+  HospitalLabScientistHelpRouteImport.update({
+    id: '/help',
+    path: '/help',
+    getParentRoute: () => HospitalLabScientistRoute,
+  } as any)
+const HospitalLabScientistMessagesRoute =
+  HospitalLabScientistMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => HospitalLabScientistRoute,
+  } as any)
+const HospitalLabScientistPersonnelRoute =
+  HospitalLabScientistPersonnelRouteImport.update({
+    id: '/personnel',
+    path: '/personnel',
+    getParentRoute: () => HospitalLabScientistRoute,
+  } as any)
+const HospitalLabScientistSettingsRoute =
+  HospitalLabScientistSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => HospitalLabScientistRoute,
+  } as any)
 const HospitalRadiologistIndexRoute =
   HospitalRadiologistIndexRouteImport.update({
     id: '/',
@@ -295,6 +345,18 @@ const HospitalAdminStaffStaffIdRoute =
     path: '/staff/$staffId',
     getParentRoute: () => HospitalAdminRoute,
   } as any)
+const HospitalLabScientistTestOrdersIndexRoute =
+  HospitalLabScientistTestOrdersIndexRouteImport.update({
+    id: '/test-orders/',
+    path: '/test-orders/',
+    getParentRoute: () => HospitalLabScientistRoute,
+  } as any)
+const HospitalLabScientistTestOrdersOrderIdRoute =
+  HospitalLabScientistTestOrdersOrderIdRouteImport.update({
+    id: '/test-orders/$orderId',
+    path: '/test-orders/$orderId',
+    getParentRoute: () => HospitalLabScientistRoute,
+  } as any)
 const HospitalRadiologistScanOrdersIndexRoute =
   HospitalRadiologistScanOrdersIndexRouteImport.update({
     id: '/scan-orders/',
@@ -331,6 +393,7 @@ export interface FileRoutesByFullPath {
   '/agent': typeof AgentAuthRouteWithChildren
   '/hospital': typeof HospitalAuthRouteWithChildren
   '/hospital/admin': typeof HospitalAdminRouteWithChildren
+  '/hospital/lab-scientist': typeof HospitalLabScientistRouteWithChildren
   '/hospital/radiologist': typeof HospitalRadiologistRouteWithChildren
   '/hospital/receptionist': typeof HospitalReceptionistRouteWithChildren
   '/agent/': typeof AgentIndexRoute
@@ -346,6 +409,11 @@ export interface FileRoutesByFullPath {
   '/hospital/admin/messages': typeof HospitalAdminMessagesRoute
   '/hospital/admin/personnel': typeof HospitalAdminPersonnelRoute
   '/hospital/admin/settings': typeof HospitalAdminSettingsRoute
+  '/hospital/lab-scientist/appointments': typeof HospitalLabScientistAppointmentsRoute
+  '/hospital/lab-scientist/help': typeof HospitalLabScientistHelpRoute
+  '/hospital/lab-scientist/messages': typeof HospitalLabScientistMessagesRoute
+  '/hospital/lab-scientist/personnel': typeof HospitalLabScientistPersonnelRoute
+  '/hospital/lab-scientist/settings': typeof HospitalLabScientistSettingsRoute
   '/hospital/radiologist/appointments': typeof HospitalRadiologistAppointmentsRoute
   '/hospital/radiologist/help': typeof HospitalRadiologistHelpRoute
   '/hospital/radiologist/messages': typeof HospitalRadiologistMessagesRoute
@@ -358,14 +426,17 @@ export interface FileRoutesByFullPath {
   '/hospital/receptionist/settings': typeof HospitalReceptionistSettingsRoute
   '/hospital/receptionist/staff': typeof HospitalReceptionistStaffRoute
   '/hospital/admin/': typeof HospitalAdminIndexRoute
+  '/hospital/lab-scientist/': typeof HospitalLabScientistIndexRoute
   '/hospital/radiologist/': typeof HospitalRadiologistIndexRoute
   '/hospital/receptionist/': typeof HospitalReceptionistIndexRoute
   '/hospital/admin/patients/$patientId': typeof HospitalAdminPatientsPatientIdRoute
   '/hospital/admin/staff/$staffId': typeof HospitalAdminStaffStaffIdRoute
+  '/hospital/lab-scientist/test-orders/$orderId': typeof HospitalLabScientistTestOrdersOrderIdRoute
   '/hospital/radiologist/scan-orders/$orderId': typeof HospitalRadiologistScanOrdersOrderIdRoute
   '/hospital/receptionist/patients/$patientId': typeof HospitalReceptionistPatientsPatientIdRoute
   '/hospital/admin/patients/': typeof HospitalAdminPatientsIndexRoute
   '/hospital/admin/staff/': typeof HospitalAdminStaffIndexRoute
+  '/hospital/lab-scientist/test-orders/': typeof HospitalLabScientistTestOrdersIndexRoute
   '/hospital/radiologist/scan-orders/': typeof HospitalRadiologistScanOrdersIndexRoute
   '/hospital/receptionist/patients/': typeof HospitalReceptionistPatientsIndexRoute
 }
@@ -390,6 +461,11 @@ export interface FileRoutesByTo {
   '/hospital/admin/messages': typeof HospitalAdminMessagesRoute
   '/hospital/admin/personnel': typeof HospitalAdminPersonnelRoute
   '/hospital/admin/settings': typeof HospitalAdminSettingsRoute
+  '/hospital/lab-scientist/appointments': typeof HospitalLabScientistAppointmentsRoute
+  '/hospital/lab-scientist/help': typeof HospitalLabScientistHelpRoute
+  '/hospital/lab-scientist/messages': typeof HospitalLabScientistMessagesRoute
+  '/hospital/lab-scientist/personnel': typeof HospitalLabScientistPersonnelRoute
+  '/hospital/lab-scientist/settings': typeof HospitalLabScientistSettingsRoute
   '/hospital/radiologist/appointments': typeof HospitalRadiologistAppointmentsRoute
   '/hospital/radiologist/help': typeof HospitalRadiologistHelpRoute
   '/hospital/radiologist/messages': typeof HospitalRadiologistMessagesRoute
@@ -402,14 +478,17 @@ export interface FileRoutesByTo {
   '/hospital/receptionist/settings': typeof HospitalReceptionistSettingsRoute
   '/hospital/receptionist/staff': typeof HospitalReceptionistStaffRoute
   '/hospital/admin': typeof HospitalAdminIndexRoute
+  '/hospital/lab-scientist': typeof HospitalLabScientistIndexRoute
   '/hospital/radiologist': typeof HospitalRadiologistIndexRoute
   '/hospital/receptionist': typeof HospitalReceptionistIndexRoute
   '/hospital/admin/patients/$patientId': typeof HospitalAdminPatientsPatientIdRoute
   '/hospital/admin/staff/$staffId': typeof HospitalAdminStaffStaffIdRoute
+  '/hospital/lab-scientist/test-orders/$orderId': typeof HospitalLabScientistTestOrdersOrderIdRoute
   '/hospital/radiologist/scan-orders/$orderId': typeof HospitalRadiologistScanOrdersOrderIdRoute
   '/hospital/receptionist/patients/$patientId': typeof HospitalReceptionistPatientsPatientIdRoute
   '/hospital/admin/patients': typeof HospitalAdminPatientsIndexRoute
   '/hospital/admin/staff': typeof HospitalAdminStaffIndexRoute
+  '/hospital/lab-scientist/test-orders': typeof HospitalLabScientistTestOrdersIndexRoute
   '/hospital/radiologist/scan-orders': typeof HospitalRadiologistScanOrdersIndexRoute
   '/hospital/receptionist/patients': typeof HospitalReceptionistPatientsIndexRoute
 }
@@ -426,6 +505,7 @@ export interface FileRoutesById {
   '/agent/_auth': typeof AgentAuthRouteWithChildren
   '/hospital/_auth': typeof HospitalAuthRouteWithChildren
   '/hospital/admin': typeof HospitalAdminRouteWithChildren
+  '/hospital/lab-scientist': typeof HospitalLabScientistRouteWithChildren
   '/hospital/radiologist': typeof HospitalRadiologistRouteWithChildren
   '/hospital/receptionist': typeof HospitalReceptionistRouteWithChildren
   '/agent/': typeof AgentIndexRoute
@@ -441,6 +521,11 @@ export interface FileRoutesById {
   '/hospital/admin/messages': typeof HospitalAdminMessagesRoute
   '/hospital/admin/personnel': typeof HospitalAdminPersonnelRoute
   '/hospital/admin/settings': typeof HospitalAdminSettingsRoute
+  '/hospital/lab-scientist/appointments': typeof HospitalLabScientistAppointmentsRoute
+  '/hospital/lab-scientist/help': typeof HospitalLabScientistHelpRoute
+  '/hospital/lab-scientist/messages': typeof HospitalLabScientistMessagesRoute
+  '/hospital/lab-scientist/personnel': typeof HospitalLabScientistPersonnelRoute
+  '/hospital/lab-scientist/settings': typeof HospitalLabScientistSettingsRoute
   '/hospital/radiologist/appointments': typeof HospitalRadiologistAppointmentsRoute
   '/hospital/radiologist/help': typeof HospitalRadiologistHelpRoute
   '/hospital/radiologist/messages': typeof HospitalRadiologistMessagesRoute
@@ -453,14 +538,17 @@ export interface FileRoutesById {
   '/hospital/receptionist/settings': typeof HospitalReceptionistSettingsRoute
   '/hospital/receptionist/staff': typeof HospitalReceptionistStaffRoute
   '/hospital/admin/': typeof HospitalAdminIndexRoute
+  '/hospital/lab-scientist/': typeof HospitalLabScientistIndexRoute
   '/hospital/radiologist/': typeof HospitalRadiologistIndexRoute
   '/hospital/receptionist/': typeof HospitalReceptionistIndexRoute
   '/hospital/admin/patients/$patientId': typeof HospitalAdminPatientsPatientIdRoute
   '/hospital/admin/staff/$staffId': typeof HospitalAdminStaffStaffIdRoute
+  '/hospital/lab-scientist/test-orders/$orderId': typeof HospitalLabScientistTestOrdersOrderIdRoute
   '/hospital/radiologist/scan-orders/$orderId': typeof HospitalRadiologistScanOrdersOrderIdRoute
   '/hospital/receptionist/patients/$patientId': typeof HospitalReceptionistPatientsPatientIdRoute
   '/hospital/admin/patients/': typeof HospitalAdminPatientsIndexRoute
   '/hospital/admin/staff/': typeof HospitalAdminStaffIndexRoute
+  '/hospital/lab-scientist/test-orders/': typeof HospitalLabScientistTestOrdersIndexRoute
   '/hospital/radiologist/scan-orders/': typeof HospitalRadiologistScanOrdersIndexRoute
   '/hospital/receptionist/patients/': typeof HospitalReceptionistPatientsIndexRoute
 }
@@ -477,6 +565,7 @@ export interface FileRouteTypes {
     | '/agent'
     | '/hospital'
     | '/hospital/admin'
+    | '/hospital/lab-scientist'
     | '/hospital/radiologist'
     | '/hospital/receptionist'
     | '/agent/'
@@ -492,6 +581,11 @@ export interface FileRouteTypes {
     | '/hospital/admin/messages'
     | '/hospital/admin/personnel'
     | '/hospital/admin/settings'
+    | '/hospital/lab-scientist/appointments'
+    | '/hospital/lab-scientist/help'
+    | '/hospital/lab-scientist/messages'
+    | '/hospital/lab-scientist/personnel'
+    | '/hospital/lab-scientist/settings'
     | '/hospital/radiologist/appointments'
     | '/hospital/radiologist/help'
     | '/hospital/radiologist/messages'
@@ -504,14 +598,17 @@ export interface FileRouteTypes {
     | '/hospital/receptionist/settings'
     | '/hospital/receptionist/staff'
     | '/hospital/admin/'
+    | '/hospital/lab-scientist/'
     | '/hospital/radiologist/'
     | '/hospital/receptionist/'
     | '/hospital/admin/patients/$patientId'
     | '/hospital/admin/staff/$staffId'
+    | '/hospital/lab-scientist/test-orders/$orderId'
     | '/hospital/radiologist/scan-orders/$orderId'
     | '/hospital/receptionist/patients/$patientId'
     | '/hospital/admin/patients/'
     | '/hospital/admin/staff/'
+    | '/hospital/lab-scientist/test-orders/'
     | '/hospital/radiologist/scan-orders/'
     | '/hospital/receptionist/patients/'
   fileRoutesByTo: FileRoutesByTo
@@ -536,6 +633,11 @@ export interface FileRouteTypes {
     | '/hospital/admin/messages'
     | '/hospital/admin/personnel'
     | '/hospital/admin/settings'
+    | '/hospital/lab-scientist/appointments'
+    | '/hospital/lab-scientist/help'
+    | '/hospital/lab-scientist/messages'
+    | '/hospital/lab-scientist/personnel'
+    | '/hospital/lab-scientist/settings'
     | '/hospital/radiologist/appointments'
     | '/hospital/radiologist/help'
     | '/hospital/radiologist/messages'
@@ -548,14 +650,17 @@ export interface FileRouteTypes {
     | '/hospital/receptionist/settings'
     | '/hospital/receptionist/staff'
     | '/hospital/admin'
+    | '/hospital/lab-scientist'
     | '/hospital/radiologist'
     | '/hospital/receptionist'
     | '/hospital/admin/patients/$patientId'
     | '/hospital/admin/staff/$staffId'
+    | '/hospital/lab-scientist/test-orders/$orderId'
     | '/hospital/radiologist/scan-orders/$orderId'
     | '/hospital/receptionist/patients/$patientId'
     | '/hospital/admin/patients'
     | '/hospital/admin/staff'
+    | '/hospital/lab-scientist/test-orders'
     | '/hospital/radiologist/scan-orders'
     | '/hospital/receptionist/patients'
   id:
@@ -571,6 +676,7 @@ export interface FileRouteTypes {
     | '/agent/_auth'
     | '/hospital/_auth'
     | '/hospital/admin'
+    | '/hospital/lab-scientist'
     | '/hospital/radiologist'
     | '/hospital/receptionist'
     | '/agent/'
@@ -586,6 +692,11 @@ export interface FileRouteTypes {
     | '/hospital/admin/messages'
     | '/hospital/admin/personnel'
     | '/hospital/admin/settings'
+    | '/hospital/lab-scientist/appointments'
+    | '/hospital/lab-scientist/help'
+    | '/hospital/lab-scientist/messages'
+    | '/hospital/lab-scientist/personnel'
+    | '/hospital/lab-scientist/settings'
     | '/hospital/radiologist/appointments'
     | '/hospital/radiologist/help'
     | '/hospital/radiologist/messages'
@@ -598,14 +709,17 @@ export interface FileRouteTypes {
     | '/hospital/receptionist/settings'
     | '/hospital/receptionist/staff'
     | '/hospital/admin/'
+    | '/hospital/lab-scientist/'
     | '/hospital/radiologist/'
     | '/hospital/receptionist/'
     | '/hospital/admin/patients/$patientId'
     | '/hospital/admin/staff/$staffId'
+    | '/hospital/lab-scientist/test-orders/$orderId'
     | '/hospital/radiologist/scan-orders/$orderId'
     | '/hospital/receptionist/patients/$patientId'
     | '/hospital/admin/patients/'
     | '/hospital/admin/staff/'
+    | '/hospital/lab-scientist/test-orders/'
     | '/hospital/radiologist/scan-orders/'
     | '/hospital/receptionist/patients/'
   fileRoutesById: FileRoutesById
@@ -618,6 +732,7 @@ export interface RootRouteChildren {
   AgentAuthRoute: typeof AgentAuthRouteWithChildren
   HospitalAuthRoute: typeof HospitalAuthRouteWithChildren
   HospitalAdminRoute: typeof HospitalAdminRouteWithChildren
+  HospitalLabScientistRoute: typeof HospitalLabScientistRouteWithChildren
   HospitalRadiologistRoute: typeof HospitalRadiologistRouteWithChildren
   HospitalReceptionistRoute: typeof HospitalReceptionistRouteWithChildren
   AgentIndexRoute: typeof AgentIndexRoute
@@ -717,6 +832,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HospitalAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hospital/lab-scientist': {
+      id: '/hospital/lab-scientist'
+      path: '/hospital/lab-scientist'
+      fullPath: '/hospital/lab-scientist'
+      preLoaderRoute: typeof HospitalLabScientistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hospital/radiologist': {
       id: '/hospital/radiologist'
       path: '/hospital/radiologist'
@@ -814,6 +936,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/hospital/admin/settings'
       preLoaderRoute: typeof HospitalAdminSettingsRouteImport
       parentRoute: typeof HospitalAdminRoute
+    }
+    '/hospital/lab-scientist/': {
+      id: '/hospital/lab-scientist/'
+      path: '/'
+      fullPath: '/hospital/lab-scientist/'
+      preLoaderRoute: typeof HospitalLabScientistIndexRouteImport
+      parentRoute: typeof HospitalLabScientistRoute
+    }
+    '/hospital/lab-scientist/appointments': {
+      id: '/hospital/lab-scientist/appointments'
+      path: '/appointments'
+      fullPath: '/hospital/lab-scientist/appointments'
+      preLoaderRoute: typeof HospitalLabScientistAppointmentsRouteImport
+      parentRoute: typeof HospitalLabScientistRoute
+    }
+    '/hospital/lab-scientist/help': {
+      id: '/hospital/lab-scientist/help'
+      path: '/help'
+      fullPath: '/hospital/lab-scientist/help'
+      preLoaderRoute: typeof HospitalLabScientistHelpRouteImport
+      parentRoute: typeof HospitalLabScientistRoute
+    }
+    '/hospital/lab-scientist/messages': {
+      id: '/hospital/lab-scientist/messages'
+      path: '/messages'
+      fullPath: '/hospital/lab-scientist/messages'
+      preLoaderRoute: typeof HospitalLabScientistMessagesRouteImport
+      parentRoute: typeof HospitalLabScientistRoute
+    }
+    '/hospital/lab-scientist/personnel': {
+      id: '/hospital/lab-scientist/personnel'
+      path: '/personnel'
+      fullPath: '/hospital/lab-scientist/personnel'
+      preLoaderRoute: typeof HospitalLabScientistPersonnelRouteImport
+      parentRoute: typeof HospitalLabScientistRoute
+    }
+    '/hospital/lab-scientist/settings': {
+      id: '/hospital/lab-scientist/settings'
+      path: '/settings'
+      fullPath: '/hospital/lab-scientist/settings'
+      preLoaderRoute: typeof HospitalLabScientistSettingsRouteImport
+      parentRoute: typeof HospitalLabScientistRoute
     }
     '/hospital/radiologist/': {
       id: '/hospital/radiologist/'
@@ -934,6 +1098,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HospitalAdminStaffStaffIdRouteImport
       parentRoute: typeof HospitalAdminRoute
     }
+    '/hospital/lab-scientist/test-orders/': {
+      id: '/hospital/lab-scientist/test-orders/'
+      path: '/test-orders'
+      fullPath: '/hospital/lab-scientist/test-orders/'
+      preLoaderRoute: typeof HospitalLabScientistTestOrdersIndexRouteImport
+      parentRoute: typeof HospitalLabScientistRoute
+    }
+    '/hospital/lab-scientist/test-orders/$orderId': {
+      id: '/hospital/lab-scientist/test-orders/$orderId'
+      path: '/test-orders/$orderId'
+      fullPath: '/hospital/lab-scientist/test-orders/$orderId'
+      preLoaderRoute: typeof HospitalLabScientistTestOrdersOrderIdRouteImport
+      parentRoute: typeof HospitalLabScientistRoute
+    }
     '/hospital/radiologist/scan-orders/': {
       id: '/hospital/radiologist/scan-orders/'
       path: '/scan-orders'
@@ -1043,6 +1221,33 @@ const HospitalAdminRouteWithChildren = HospitalAdminRoute._addFileChildren(
   HospitalAdminRouteChildren,
 )
 
+interface HospitalLabScientistRouteChildren {
+  HospitalLabScientistAppointmentsRoute: typeof HospitalLabScientistAppointmentsRoute
+  HospitalLabScientistHelpRoute: typeof HospitalLabScientistHelpRoute
+  HospitalLabScientistMessagesRoute: typeof HospitalLabScientistMessagesRoute
+  HospitalLabScientistPersonnelRoute: typeof HospitalLabScientistPersonnelRoute
+  HospitalLabScientistSettingsRoute: typeof HospitalLabScientistSettingsRoute
+  HospitalLabScientistIndexRoute: typeof HospitalLabScientistIndexRoute
+  HospitalLabScientistTestOrdersOrderIdRoute: typeof HospitalLabScientistTestOrdersOrderIdRoute
+  HospitalLabScientistTestOrdersIndexRoute: typeof HospitalLabScientistTestOrdersIndexRoute
+}
+
+const HospitalLabScientistRouteChildren: HospitalLabScientistRouteChildren = {
+  HospitalLabScientistAppointmentsRoute: HospitalLabScientistAppointmentsRoute,
+  HospitalLabScientistHelpRoute: HospitalLabScientistHelpRoute,
+  HospitalLabScientistMessagesRoute: HospitalLabScientistMessagesRoute,
+  HospitalLabScientistPersonnelRoute: HospitalLabScientistPersonnelRoute,
+  HospitalLabScientistSettingsRoute: HospitalLabScientistSettingsRoute,
+  HospitalLabScientistIndexRoute: HospitalLabScientistIndexRoute,
+  HospitalLabScientistTestOrdersOrderIdRoute:
+    HospitalLabScientistTestOrdersOrderIdRoute,
+  HospitalLabScientistTestOrdersIndexRoute:
+    HospitalLabScientistTestOrdersIndexRoute,
+}
+
+const HospitalLabScientistRouteWithChildren =
+  HospitalLabScientistRoute._addFileChildren(HospitalLabScientistRouteChildren)
+
 interface HospitalRadiologistRouteChildren {
   HospitalRadiologistAppointmentsRoute: typeof HospitalRadiologistAppointmentsRoute
   HospitalRadiologistHelpRoute: typeof HospitalRadiologistHelpRoute
@@ -1107,6 +1312,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgentAuthRoute: AgentAuthRouteWithChildren,
   HospitalAuthRoute: HospitalAuthRouteWithChildren,
   HospitalAdminRoute: HospitalAdminRouteWithChildren,
+  HospitalLabScientistRoute: HospitalLabScientistRouteWithChildren,
   HospitalRadiologistRoute: HospitalRadiologistRouteWithChildren,
   HospitalReceptionistRoute: HospitalReceptionistRouteWithChildren,
   AgentIndexRoute: AgentIndexRoute,

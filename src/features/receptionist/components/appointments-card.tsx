@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { CountTab, CountTabsList } from "@/components/dashboard/count-tabs";
 import { DashboardCard } from "@/components/dashboard/dashboard-card";
+import { PersonAvatar } from "@/components/dashboard/person-avatar";
 import { SearchField } from "@/components/dashboard/search-field";
 import { Button } from "@/components/ui/button";
 import { Tabs } from "@/components/ui/tabs";
@@ -70,16 +71,30 @@ export function AppointmentsCard() {
       {empty ? (
         <p className="py-10 text-center type-body-sm-regular text-fg-caption">{empty}</p>
       ) : (
-        <ul aria-label={`${appointmentDayLabels[day]}’s appointments`} className="mt-2">
-          {data?.items.slice(0, PREVIEW_ROWS).map((appointment) => (
-            <AppointmentRow
-              key={appointment.id}
-              appointment={appointment}
-              showDay={day === "upcoming"}
-              onOpen={setOpenId}
-            />
-          ))}
-        </ul>
+        <>
+          {/* Column labels; widths match AppointmentRow's. Screen readers get each row whole. */}
+          <div
+            aria-hidden
+            className="mt-4 flex h-9 items-center gap-3 rounded-t-lg bg-line pl-4 type-caption text-fg-body"
+          >
+            <span className="w-20 shrink-0 @md:w-24">Time</span>
+            <span className="min-w-0 flex-1">Patient Name</span>
+            <span className="hidden w-[22%] @md:block">Reason</span>
+            <span className="hidden w-24 shrink-0 @sm:block">Status</span>
+            {/* Room for the row's open button. */}
+            <span className="w-5.5 shrink-0" />
+          </div>
+          <ul aria-label={`${appointmentDayLabels[day]}’s appointments`}>
+            {data?.items.slice(0, PREVIEW_ROWS).map((appointment) => (
+              <AppointmentRow
+                key={appointment.id}
+                appointment={appointment}
+                showDay={day === "upcoming"}
+                onOpen={setOpenId}
+              />
+            ))}
+          </ul>
+        </>
       )}
 
       <Link
@@ -111,16 +126,19 @@ function AppointmentRow({
   const { patient } = appointment;
 
   return (
-    <li className="flex items-center gap-3 border-b py-3.5 type-body-sm-regular">
+    <li className="flex items-center gap-3 border-b py-3.5 pl-4 type-body-sm-regular">
       <div className="flex w-20 shrink-0 flex-col @md:w-24">
         {showDay && <span className="type-caption text-fg-caption">{formatShortDay(at)}</span>}
         <span className="text-fg-heading">{formatClockTime(at)}</span>
       </div>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-fg-heading">{patient.name}</span>
-        <span className="truncate text-fg-caption">{patient.phone}</span>
-        <span className="truncate text-fg-caption @md:hidden">{appointment.reason}</span>
-        <StatusTag status={appointment.status} className="mt-1 self-start @sm:hidden" />
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <PersonAvatar name={patient.name} src={patient.avatarUrl} />
+        <div className="flex min-w-0 flex-col">
+          <span className="truncate text-fg-heading">{patient.name}</span>
+          <span className="truncate text-fg-caption">{patient.phone}</span>
+          <span className="truncate text-fg-caption @md:hidden">{appointment.reason}</span>
+          <StatusTag status={appointment.status} className="mt-1 self-start @sm:hidden" />
+        </div>
       </div>
       <span className="hidden w-[22%] truncate text-fg-caption @md:block">
         {appointment.reason}

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLinkDependent } from "@/features/receptionist/api/mutations";
+import { patientLookupQuery } from "@/features/receptionist/api/queries";
 import {
   type DependentLinked,
   type GuardianVerification,
@@ -30,12 +31,11 @@ import {
   relationshipLabels,
   sexLabels,
 } from "@/features/receptionist/api/schemas";
-import { NoMatchCard, PatientSearchField } from "@/features/receptionist/components/patient-search";
-import { PatientSummary } from "@/features/receptionist/components/patient-summary";
+import { NoMatchCard, PatientSearchField } from "@/components/dashboard/patient-search";
+import { PatientSummary } from "@/components/dashboard/patient-summary";
 import { RegisterPatientForm } from "@/features/receptionist/components/register-patient-form";
 import { devPrefill } from "@/features/receptionist/lib/dev-prefill";
 import {
-  ADULT_AGE,
   type ChildDetailsInput,
   type ChildDetailsValues,
   childDetailsSchema,
@@ -43,9 +43,9 @@ import {
   type LinkGuardianValues,
   linkGuardianSchema,
 } from "@/features/receptionist/lib/schemas";
-import { usePatientSearch } from "@/features/receptionist/lib/use-patient-search";
+import { usePatientSearch } from "@/hooks/use-patient-search";
 import { getErrorMessage } from "@/lib/api";
-import { ageOn } from "@/lib/format";
+import { ADULT_AGE, ageOn } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type Guardian = { id: string; name: string; hin: string; phone: string | null };
@@ -169,7 +169,7 @@ function GuardianStep({
   onCreate: () => void;
   onContinue: (guardian: Guardian) => void;
 }) {
-  const search = usePatientSearch(initialHin ?? devPrefill?.guardianHin);
+  const search = usePatientSearch(patientLookupQuery, initialHin ?? devPrefill?.guardianHin);
   const { picked, status } = search;
   // Only an adult can take responsibility for a child.
   const tooYoung = picked ? ageOn(new Date(picked.dateOfBirth)) < ADULT_AGE : false;
@@ -253,7 +253,7 @@ function ChildStep({
   onContinue: (child: Child) => void;
 }) {
   const [tab, setTab] = useState<"search" | "register">(draft ? "register" : "search");
-  const search = usePatientSearch(devPrefill?.childHin);
+  const search = usePatientSearch(patientLookupQuery, devPrefill?.childHin);
   const { picked } = search;
   const [today] = useState(() => new Date());
   const form = useForm<ChildDetailsInput, unknown, ChildDetailsValues>({

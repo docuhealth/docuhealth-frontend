@@ -61,7 +61,12 @@ export const appointmentListSchema = z.object({
     z.object({
       id: z.string(),
       at: z.iso.datetime(),
-      patient: z.object({ id: z.string(), name: z.string(), phone: z.string() }),
+      patient: z.object({
+        id: z.string(),
+        name: z.string(),
+        phone: z.string(),
+        avatarUrl: z.url().nullable(),
+      }),
       /** e.g. "Follow-up". */
       reason: z.string(),
       status: z.enum(
@@ -145,14 +150,28 @@ export const appointmentCalendarSchema = z.object({
 });
 export type AppointmentCalendar = z.infer<typeof appointmentCalendarSchema>;
 
+/** Where a checked-in patient is in their visit; the same states the admin's queue shows. */
+export const queueStatusLabels = {
+  pending: "Pending",
+  in_progress: "In-progress",
+  completed: "Completed",
+} as const;
+export type QueueStatus = keyof typeof queueStatusLabels;
+
 /** Patients checked in and waiting, longest wait first. */
 export const receptionQueueSchema = z.object({
   items: z.array(
     z.object({
       id: z.string(),
-      patient: z.object({ id: z.string(), name: z.string(), hin: z.string() }),
+      patient: z.object({
+        id: z.string(),
+        name: z.string(),
+        hin: z.string(),
+        avatarUrl: z.url().nullable(),
+      }),
       /** Why they came in, e.g. "Lab Results". */
       reason: z.string(),
+      status: z.enum(Object.keys(queueStatusLabels) as [QueueStatus, ...QueueStatus[]]),
       waitMinutes: count,
     }),
   ),

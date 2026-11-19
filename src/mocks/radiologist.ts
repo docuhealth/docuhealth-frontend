@@ -3,8 +3,11 @@ import { env } from "@/env";
 import {
   type ReporterSpecialty,
   reporterSpecialtyLabels,
+  type ScanModality,
+  scanModalityLabels,
 } from "@/features/radiologist/api/schemas";
 import type {
+  FoundPatient,
   RadiologistProfile,
   RadiologyOverview,
   RecentUploads,
@@ -287,7 +290,56 @@ function changeable(id: unknown, stage: ScanStage, message: string) {
   return { record, index };
 }
 
+/**
+ * Everyone the radiology mock knows, for looking a HIN up when booking: the patients on the
+ * schedule (Chidi Okafor is 541-452-042-11) and on the scan orders.
+ */
+function knownPatients(): FoundPatient[] {
+  const seen = new Map<string, FoundPatient>();
+  for (const { patient } of schedule) {
+    seen.set(patient.hin, {
+      ...patient,
+      dateOfBirth: "1990-01-15",
+      phone: null,
+      email: `${patient.name.toLowerCase().replace(/\s+/g, ".")}@email.com`,
+    });
+  }
+  for (const { patient } of records) {
+    const { sex: _sex, ...rest } = patient;
+    seen.set(patient.hin, { ...rest, phone: null, email: null });
+  }
+  return [...seen.values()];
+}
+
 export const radiologistHandlers = [
+  http.get(api("/hospital/radiology/patients"), ({ request }) => {
+    const hin = new URL(request.url).searchParams.get("hin")?.replace(/\D/g, "");
+    return HttpResponse.json({
+      items: knownPatients().filter((patient) => patient.hin === hin),
+    });
+  }),
+  http.post(api("/hospital/radiology/appointments"), async ({ request }) => {
+    // The dialog leaves the scan type and body part out for now.
+    const { patientId, modality, bodyPart, at } = (await request.json()) as {
+      patientId: string;
+      modality?: ScanModality;
+      bodyPart?: string;
+      at: string;
+    };
+    const found = knownPatients().find(({ id }) => id === patientId);
+    if (!found) return HttpResponse.json({ message: "Patient not found" }, { status: 404 });
+    const appointment: ScanSchedule["items"][number] = {
+      id: `schedule-${schedule.length + 1}`,
+      at,
+      patient: { id: found.id, name: found.name, avatarUrl: found.avatarUrl, hin: found.hin },
+      scanType: modality
+        ? [bodyPart, scanModalityLabels[modality]].filter(Boolean).join(" ")
+        : "Scan appointment",
+    };
+    schedule.push(appointment);
+    schedule.sort((a, b) => a.at.localeCompare(b.at));
+    return HttpResponse.json(appointment, { status: 201 });
+  }),
   http.post(api("/hospital/radiology/scan-orders/:id/accept"), ({ params }) => {
     const found = changeable(params.id, "pending", "Only a pending order can be accepted.");
     if (found.error) return found.error;

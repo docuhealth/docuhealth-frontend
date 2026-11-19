@@ -6,11 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import type { FoundPatient } from "@/features/receptionist/api/schemas";
-import { ADULT_AGE } from "@/features/receptionist/lib/schemas";
-import type { PatientSearch } from "@/features/receptionist/lib/use-patient-search";
-import { ageOn, formatHin } from "@/lib/format";
+import type { PatientSearch } from "@/hooks/use-patient-search";
+import { ADULT_AGE, ageOn, formatHin } from "@/lib/format";
 import { cn } from "@/lib/utils";
+
+/** What a match card shows of a patient a HIN lookup found. */
+type FoundPatient = {
+  id: string;
+  name: string;
+  hin: string;
+  dateOfBirth: string;
+  avatarUrl: string | null;
+  email: string | null;
+};
 
 /**
  * The HIN field, then what it found: a card per match to pick from, or `noMatch` when nobody
@@ -22,7 +30,7 @@ export function PatientSearchField({
   hint,
   noMatch,
 }: {
-  search: PatientSearch;
+  search: PatientSearch<FoundPatient>;
   inputId: string;
   hint?: string;
   noMatch: ReactNode;
@@ -120,7 +128,7 @@ function MatchCard({
   );
 }
 
-/** Nobody has the HIN: a grey card saying so, with a button to add them instead. */
+/** Nobody has the HIN: a grey card saying so, with a button to add them instead (if given). */
 export function NoMatchCard({
   title,
   children,
@@ -129,8 +137,8 @@ export function NoMatchCard({
 }: {
   title: string;
   children: ReactNode;
-  actionLabel: string;
-  onAction: () => void;
+  actionLabel?: string;
+  onAction?: () => void;
 }) {
   return (
     <div className="flex flex-col items-center gap-2 rounded-xl border bg-surface px-6 py-7 text-center">
@@ -139,9 +147,11 @@ export function NoMatchCard({
       </div>
       <p className="type-h5">{title}</p>
       <p className="max-w-sm type-body-sm-regular text-fg-caption">{children}</p>
-      <Button type="button" className="mt-3 h-11 px-5 type-heading-sm" onClick={onAction}>
-        {actionLabel}
-      </Button>
+      {actionLabel && onAction && (
+        <Button type="button" className="mt-3 h-11 px-5 type-heading-sm" onClick={onAction}>
+          {actionLabel}
+        </Button>
+      )}
     </div>
   );
 }

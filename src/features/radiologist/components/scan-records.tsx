@@ -28,7 +28,7 @@ import {
   UnfoldMoreIcon,
   UserIcon,
   XRayIcon,
-} from "@/features/radiologist/components/icons";
+} from "@/components/hugeicons";
 import { ScanStatusTag } from "@/features/radiologist/components/status-tag";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { ageOn, formatDateDotTime, formatDayAndTime, maskHin } from "@/lib/format";

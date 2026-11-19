@@ -2,6 +2,7 @@ import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { request } from "@/lib/api";
 import type { Period } from "@/lib/period";
 import {
+  patientLookupSchema,
   radiologistProfileSchema,
   radiologyOverviewSchema,
   recentUploadsSchema,
@@ -23,6 +24,7 @@ export const radiologistKeys = {
   scanRecords: (params: ScanRecordParams) =>
     [...radiologistKeys.all, "scan-records", params] as const,
   scanOrder: (id: string) => [...radiologistKeys.all, "scan-order", id] as const,
+  patientLookup: (hin: string) => [...radiologistKeys.all, "patient-lookup", hin] as const,
 };
 
 export const radiologistProfileQuery = () =>
@@ -73,6 +75,14 @@ export const scanRecordListQuery = (params: ScanRecordParams) =>
         params,
       }),
     placeholderData: keepPreviousData,
+  });
+
+/** Patients with this HIN (digits only), to book a scan appointment for. */
+export const patientLookupQuery = (hin: string) =>
+  queryOptions({
+    queryKey: radiologistKeys.patientLookup(hin),
+    queryFn: () =>
+      request(patientLookupSchema, { url: "/hospital/radiology/patients", params: { hin } }),
   });
 
 export const scanOrderQuery = (id: string) =>

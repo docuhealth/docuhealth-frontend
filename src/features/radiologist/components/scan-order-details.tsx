@@ -22,8 +22,8 @@ import {
   UploadIcon,
   UserIcon,
   ViewIcon,
-} from "@/features/radiologist/components/icons";
-import { DetailRow, OrderCard } from "@/features/radiologist/components/scan-order-parts";
+} from "@/components/hugeicons";
+import { DetailRow, OrderCard } from "@/components/dashboard/order-card";
 import {
   RejectionReason,
   ScanOrderProgress,

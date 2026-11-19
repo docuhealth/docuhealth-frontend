@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-/** A white panel on the scan order page: a title (and `description`) ruled off from the body. */
+/** A white panel on an order page (scan or test): a title (and `description`) ruled off from the body. */
 export function OrderCard({
   title,
   description,
