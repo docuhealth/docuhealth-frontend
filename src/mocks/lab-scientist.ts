@@ -1,154 +1,61 @@
 import { HttpResponse, http } from "msw";
 import { env } from "@/env";
-import type {
-  FoundPatient,
-  LabOverview,
-  LabTest,
-  PendingApprovals,
-  TestAppointments,
-  TestOrder,
-  TestRecord,
-  TestRecordList,
-  TestStage,
-} from "@/features/lab-scientist/api/schemas";
+
+// The lab's endpoints, faked with the real API's paths and shapes (`LabTestOrder` with its
+// `items_info`, one per test, each with the test's parameters; docs/api/openapi.json), so the
+// app's parsers run against the real format.
 
 const api = (path: string) => `${env.VITE_API_URL}${path}`;
 
-/** This week's numbers; the other periods scale them (pending tests don't). */
-const overview: LabOverview = {
-  totalTests: 62,
-  pendingTests: 12,
-  approvedResults: 4,
-  returningPatients: 10,
+const HOUR = 60 * 60_000;
+const MINUTE = 60_000;
+
+const hospital = {
+  name: "Lagos University Teaching Hospital",
+  email: "lab@luth.example.com",
+  sqid: "pm9XGQd",
 };
 
-const periodScale = { today: 0.25, week: 1, month: 4 } as const;
-/** How far ahead each period reaches. */
-const periodDays = { today: 1, week: 7, month: 31 } as const;
+type Patient = { hin: string; firstname: string; lastname: string; gender: string; dob: string };
 
-function periodOf(request: Request) {
-  const period = new URL(request.url).searchParams.get("period");
-  return period === "today" || period === "month" ? period : "week";
-}
+const patient = (index: number, name: string, dob: string, gender: string): Patient => {
+  const [firstname = "", lastname = ""] = name.split(" ");
+  return { hin: String(54_137_284_910 + index * 7_919_301), firstname, lastname, gender, dob };
+};
 
-const MINUTE = 60_000;
-const HOUR = 60 * MINUTE;
-const DAY = 24 * HOUR;
+type Parameter = [
+  name: string,
+  loinc: string,
+  unit: string,
+  low: number | null,
+  high: number | null,
+  text?: string,
+];
 
-/** `days` from today (negative for the past) at `time` ("09:30"). */
-function at(days: number, time: string) {
-  const [hours = 0, minutes = 0] = time.split(":").map(Number);
-  const date = new Date();
-  date.setDate(date.getDate() + days);
-  date.setHours(hours, minutes, 0, 0);
-  return date.toISOString();
-}
-
-const patient = (index: number, name: string) => ({
-  id: `lab-patient-${index}`,
-  name,
-  avatarUrl: null,
-  hin: String(54_137_284_910 + index * 7_919_301),
-});
-
-const appointments: TestAppointments["items"] = (
-  [
-    [0, "09:30", "Chidi Okafor", "Full Blood Count"],
-    [0, "10:00", "Tunde Adeyemi", "Blood Glucose"],
-    [1, "13:00", "Amina Yusuf", "Lipid Profile"],
-    [2, "11:00", "Chioma Nwosu", "Liver Function Test"],
-    [3, "10:30", "Emeka Uche", "Urinalysis"],
-    [4, "09:00", "David Bello", "Malaria Parasite Test"],
-    [12, "09:30", "Joyce Sarah", "Fasting Blood Sugar"],
-  ] as const
-).map(([days, time, name, testType], index) => ({
-  id: `lab-appointment-${index + 1}`,
-  at: at(days, time),
-  patient: patient(index + 1, name),
-  testType,
-}));
-
-const approvals: PendingApprovals["items"] = (
-  [
-    [0, "10:42", "Amaka Eze", "Full Blood Count"],
-    [-1, "15:15", "Chidi Okafor", "Lipid Profile"],
-    [-2, "11:20", "Emeka Uche", "Blood Glucose Test"],
-    [-2, "09:05", "Grace Nwosu", "Urinalysis"],
-    [-3, "15:15", "Chidi Okafor", "Blood Glucose Test"],
-    [-4, "12:30", "David Bello", "Malaria Parasite Test"],
-  ] as const
-).map(([days, time, name, testType], index) => ({
-  id: `approval-${index + 1}`,
-  testType,
-  patient: { id: `lab-approval-patient-${index + 1}`, name },
-  enteredAt: at(days, time),
-}));
-
-/** The tests each kind of order asks for. */
-const catalogue: Record<string, LabTest[]> = {
+/** The tests orders ask for, and each test's parameters. */
+const catalogue: Record<string, Parameter[]> = {
+  // A range given as text, so its results get no flag.
+  "HIV screening": [["HIV 1/2 antibody", "7917-8", "", null, null, "Non-reactive"]],
   "Malaria/typhoid test": [
-    {
-      name: "Malaria parasite density",
-      loinc: "51587-4",
-      unit: "/µL",
-      referenceLow: 0,
-      referenceHigh: 0,
-    },
-    {
-      name: "Widal O antigen titre",
-      loinc: "5763-8",
-      unit: "1:",
-      referenceLow: 0,
-      referenceHigh: 80,
-    },
+    ["Malaria parasite density", "51587-4", "/µL", 0, 0],
+    ["Widal O antigen titre", "5763-8", "1:", 0, 80],
   ],
   "Full blood count": [
-    { name: "Haemoglobin", loinc: "718-7", unit: "g/dL", referenceLow: 13, referenceHigh: 17 },
-    { name: "Packed cell volume", loinc: "4544-3", unit: "%", referenceLow: 40, referenceHigh: 54 },
+    ["Haemoglobin", "718-7", "g/dL", 13, 17],
+    ["Packed cell volume", "4544-3", "%", 40, 54],
   ],
-  Urinalysis: [
-    {
-      name: "Urine specific gravity",
-      loinc: "5811-5",
-      unit: "",
-      referenceLow: 1.005,
-      referenceHigh: 1.03,
-    },
-  ],
+  Urinalysis: [["Urine specific gravity", "5811-5", "", 1.005, 1.03]],
   "Lipid profile": [
-    {
-      name: "Total cholesterol",
-      loinc: "2093-3",
-      unit: "mg/dL",
-      referenceLow: 125,
-      referenceHigh: 200,
-    },
-    {
-      name: "HDL cholesterol",
-      loinc: "2085-9",
-      unit: "mg/dL",
-      referenceLow: 40,
-      referenceHigh: 60,
-    },
+    ["Total cholesterol", "2093-3", "mg/dL", 125, 200],
+    ["HDL cholesterol", "2085-9", "mg/dL", 40, 60],
   ],
   "Liver function test": [
-    { name: "ALT", loinc: "1742-6", unit: "U/L", referenceLow: 7, referenceHigh: 56 },
-    { name: "AST", loinc: "1920-8", unit: "U/L", referenceLow: 10, referenceHigh: 40 },
+    ["ALT", "1742-6", "U/L", 7, 56],
+    ["AST", "1920-8", "U/L", 10, 40],
   ],
-  "Fasting blood sugar": [
-    {
-      name: "Fasting glucose",
-      loinc: "1558-6",
-      unit: "mg/dL",
-      referenceLow: 70,
-      referenceHigh: 100,
-    },
-  ],
-  Haemoglobin: [
-    { name: "Haemoglobin", loinc: "718-7", unit: "g/dL", referenceLow: 13, referenceHigh: 17 },
-  ],
+  "Fasting blood sugar": [["Fasting glucose", "1558-6", "mg/dL", 70, 100]],
 };
-const testTypes = Object.keys(catalogue);
+const testNames = Object.keys(catalogue);
 
 const recordPatients = [
   ["Yemi Ojo", "1974-03-02", "male"],
@@ -162,15 +69,22 @@ const recordPatients = [
   ["Ngozi Eze", "1989-12-01", "female"],
   ["Ibrahim Musa", "1965-08-22", "male"],
   ["Fatima Bello", "1992-10-15", "female"],
-  ["Segun Oladipo", "1983-11-27", "prefer_not_to_say"],
+  ["Segun Oladipo", "1983-11-27", "unknown"],
 ] as const;
-const doctors = ["Dr. Raphael Jonnas", "Dr. Sarah Adeyemi", "Dr. Ibrahim Sani", "Dr. Tola Bello"];
+const doctors = [
+  ["Raphael", "Jonnas"],
+  ["Sarah", "Adeyemi"],
+  ["Ibrahim", "Sani"],
+  ["Tola", "Bello"],
+] as const;
+
+type Stage = "pending" | "in_progress" | "completed" | "rejected";
 
 /**
- * Hours ago each tab's orders were requested; how many there are sets the tab's count. All fall
- * within the last week, so "This Week" shows every one and "Today" only the newest.
+ * Hours ago each tab's orders were requested; how many there are sets the tab's count (each order
+ * has one test, so it sits in one tab).
  */
-const stageAges: Record<TestStage, number[]> = {
+const stageAges: Record<Stage, number[]> = {
   pending: [
     2, 20, 30, 54, 75, 98, 120, 126, 130, 134, 138, 142, 146, 150, 154, 158, 160, 162, 164, 166,
   ],
@@ -179,251 +93,305 @@ const stageAges: Record<TestStage, number[]> = {
   rejected: [6, 40, 100],
 };
 
+type Result = {
+  sqid: string;
+  created_at: string;
+  values: Record<string, string>;
+  interpretation: string;
+  clinical_correlation: string;
+  status: "pending" | "accepted" | "rejected";
+};
+
+type Item = {
+  sqid: string;
+  test: string;
+  status:
+    | "pending"
+    | "sample_collected"
+    | "in_progress"
+    | "result_ready"
+    | "result_accepted_by_lab_admin"
+    | "result_accepted_by_doctor"
+    | "rejected";
+  specimen_collected_at: string | null;
+  rejection_reason: string | null;
+  result: Result | null;
+};
+
+type Order = {
+  sqid: string;
+  patient: Patient;
+  doctor: readonly [string, string];
+  created_at: string;
+  note: string;
+  items: Item[];
+};
+
+const after = (from: string, minutes: number) =>
+  new Date(new Date(from).getTime() + minutes * MINUTE).toISOString();
+
+/** A healthy value for each parameter, as text, like the API stores them. */
+function healthyValues(test: string) {
+  return Object.fromEntries(
+    (catalogue[test] ?? []).map(([, loinc, , low, high, text]) => [
+      loinc,
+      low !== null && high !== null ? String(Number(((low + high) / 2).toFixed(3))) : (text ?? ""),
+    ]),
+  );
+}
+
 let next = 0;
-const records: TestRecord[] = (Object.entries(stageAges) as [TestStage, number[]][]).flatMap(
+const orders: Order[] = (Object.entries(stageAges) as [Stage, number[]][]).flatMap(
   ([stage, ages]) =>
     ages.map((hoursAgo, index) => {
       const n = next++;
-      const [name, dateOfBirth, sex] = recordPatients[n % recordPatients.length]!;
+      const [name, dob, gender] = recordPatients[n % recordPatients.length]!;
+      const created_at = new Date(Date.now() - hoursAgo * HOUR).toISOString();
+      const test = testNames[n % testNames.length]!;
+      const id = `test-order-${n + 1}`;
+      // Every other test in progress has its sample in; a few results wait for the lab admin.
+      const status: Item["status"] =
+        stage === "in_progress"
+          ? index % 2 === 0
+            ? "sample_collected"
+            : "in_progress"
+          : stage === "completed"
+            ? index % 5 === 1
+              ? "result_ready"
+              : "result_accepted_by_doctor"
+            : stage;
+      const collected = status !== "pending" && status !== "in_progress" && status !== "rejected";
       return {
-        id: `test-order-${n + 1}`,
-        patient: { ...patient(100 + n, name), dateOfBirth, sex },
-        testType: testTypes[n % testTypes.length]!,
-        requestedBy: doctors[n % doctors.length]!,
-        requestedAt: new Date(Date.now() - hoursAgo * HOUR).toISOString(),
-        stage,
-        // The two most recent pending (and the newest rejected) orders haven't been opened yet.
-        seen: !((stage === "pending" && index < 2) || (stage === "rejected" && index === 0)),
-        // The newest in-progress test was booked; the doctors asked for the rest.
-        progress: stage === "in_progress" ? (index === 0 ? "appointment" : "doctor_request") : null,
+        sqid: id,
+        // Chidi Okafor (541-452-042-11) has a pending order, so the lab can find him to book.
+        patient:
+          n === 19
+            ? patient(1, "Chidi Okafor", "1988-04-12", "male")
+            : patient(100 + n, name, dob, gender),
+        doctor: doctors[n % doctors.length]!,
+        created_at,
+        note:
+          index % 2 === 0
+            ? "Patient reports fatigue and intermittent fever for a week. Please flag anything outside the range."
+            : "",
+        items: [
+          {
+            sqid: `${id}-item-1`,
+            test,
+            status,
+            specimen_collected_at: collected ? after(created_at, 60) : null,
+            rejection_reason:
+              stage === "rejected"
+                ? "The sample was haemolysed and can’t be tested. Please collect a fresh sample and send a new request."
+                : null,
+            result:
+              stage === "completed"
+                ? {
+                    sqid: `${id}-result`,
+                    created_at: after(created_at, 240),
+                    values: healthyValues(test),
+                    interpretation:
+                      "All values fall within their reference ranges.\nNo evidence of anaemia, infection or organ dysfunction.",
+                    clinical_correlation:
+                      "Normal results suggest the patient’s symptoms may have another cause.\nRepeat testing if symptoms persist.",
+                    status: status === "result_ready" ? "pending" : "accepted",
+                  }
+                : null,
+          },
+        ],
       };
     }),
 );
 
-/** What's been done to orders on the dev server, by order id; it replaces the generated data. */
-const acceptedAt = new Map<string, string>();
-const sampleCollectedAt = new Map<string, string>();
-const rejections = new Map<string, NonNullable<TestOrder["rejection"]>>();
-const results = new Map<string, NonNullable<TestOrder["result"]>>();
-
-/** A record from the list, filled out with what its own page shows. */
-function orderFor(record: TestRecord, index: number): TestOrder {
-  const tests = catalogue[record.testType] ?? catalogue.Haemoglobin!;
-  const requested = new Date(record.requestedAt).getTime();
-  const after = (minutes: number) => new Date(requested + minutes * MINUTE).toISOString();
-  const accepted = record.stage === "in_progress" || record.stage === "completed";
-  // Half the seeded in-progress orders have their sample in already; one accepted here doesn't.
-  const collected =
-    record.stage === "completed" ||
-    (record.stage === "in_progress" && !acceptedAt.has(record.id) && index % 2 === 0);
-
+function parameterOf([name, loinc, unit, low, high, text]: Parameter, index: number) {
   return {
-    id: record.id,
-    stage: record.stage,
-    patient: { ...record.patient, hmo: index % 3 !== 2 },
-    tests,
-    pregnancyStatus: record.patient.sex === "female" && index % 4 === 0 ? "1st trimester" : null,
-    requestedBy: record.requestedBy,
-    requestedAt: record.requestedAt,
-    provider: {
-      name: "Downtown Medical Clinic",
-      email: "lab-requests@downtownmedical.example.com",
-    },
-    note:
-      index % 2 === 0
-        ? "Patient reports fatigue and intermittent fever for a week. Please flag anything outside the range."
-        : null,
-    acceptedAt: acceptedAt.get(record.id) ?? (accepted ? after(30) : null),
-    sampleCollectedAt: sampleCollectedAt.get(record.id) ?? (collected ? after(60) : null),
-    rejection:
-      rejections.get(record.id) ??
-      (record.stage === "rejected"
-        ? {
-            at: after(45),
-            reason:
-              "The sample was haemolysed and can’t be tested. Please collect a fresh sample and send a new request.",
-          }
-        : null),
-    result:
-      results.get(record.id) ??
-      (record.stage === "completed"
-        ? {
-            uploadedAt: after(240),
-            values: tests.map((test) => ({
-              loinc: test.loinc,
-              value: Number(((test.referenceLow + test.referenceHigh) / 2).toFixed(2)),
-            })),
-            interpretation:
-              "All values fall within their reference ranges.\nNo evidence of anaemia, infection or organ dysfunction.",
-            clinicalCorrelation:
-              "Normal results suggest the patient’s symptoms may have another cause; consider further evaluation.\nRepeat testing if symptoms persist.",
-          }
-        : null),
+    sqid: `param-${loinc}`,
+    name,
+    unit,
+    loinc_code: loinc,
+    ref_low: low,
+    ref_high: high,
+    ref_text: text ?? "",
+    order: index + 1,
   };
 }
 
-function matches(search: string | null, ...values: string[]) {
-  const term = search?.trim().toLowerCase();
-  return !term || values.some((value) => value.toLowerCase().includes(term));
+/** `LabTestOrder`, as the API returns it. */
+function read(order: Order) {
+  const patientInfo = order.patient;
+  return {
+    sqid: order.sqid,
+    ordered_by_info: {
+      sqid: `doctor-${order.doctor[1]}`,
+      firstname: order.doctor[0],
+      lastname: order.doctor[1],
+      role: "doctor",
+      specialization: null,
+    },
+    hospital_info: hospital,
+    patient_info: patientInfo,
+    aggregate_status: order.items[0]?.status ?? "pending",
+    created_at: order.created_at,
+    note: order.note,
+    items_info: order.items.map((item) => {
+      const parameters = (catalogue[item.test] ?? []).map(parameterOf);
+      return {
+        sqid: item.sqid,
+        test: 1,
+        test_info: {
+          sqid: `test-${item.test}`,
+          name: item.test,
+          description: "",
+          turnaround_hours: 4,
+          fasting_required: false,
+          special_instructions: "",
+          category: { sqid: "category-1", name: "Haematology" },
+          parameters,
+          specimens: [],
+          additional_details: null,
+        },
+        patient_info: patientInfo,
+        status: item.status,
+        specimen_collected_at: item.specimen_collected_at,
+        rejection_reason: item.rejection_reason,
+        result_info: item.result
+          ? {
+              sqid: item.result.sqid,
+              created_at: item.result.created_at,
+              item: item.sqid,
+              parameters_info: parameters.map((parameter) => ({
+                parameter_info: parameter,
+                value: item.result!.values[parameter.loinc_code] ?? "",
+              })),
+              comments: "",
+              interpretation: item.result.interpretation,
+              clinical_correlation: item.result.clinical_correlation,
+              submitted_by_info: null,
+              status: item.result.status,
+            }
+          : null,
+      };
+    }),
+  };
 }
 
-/** The order's record and index, or a response saying why it can't be changed. */
-function changeable(id: unknown, stage: TestStage, message: string) {
-  const index = records.findIndex((record) => record.id === id);
-  const record = records[index];
-  if (!record) {
-    return { error: HttpResponse.json({ message: "Test order not found." }, { status: 404 }) };
+/** The order and item a request names, or a response saying why it can't be changed. */
+function findItem(orderId: unknown, itemId: unknown, allowed: Item["status"][], message: string) {
+  const order = orders.find(({ sqid }) => sqid === orderId);
+  const item = order?.items.find(({ sqid }) => sqid === itemId);
+  if (!order || !item)
+    return { error: HttpResponse.json({ detail: "Not found." }, { status: 404 }) };
+  if (!allowed.includes(item.status)) {
+    return { error: HttpResponse.json({ detail: message }, { status: 400 }) };
   }
-  if (record.stage !== stage) {
-    return { error: HttpResponse.json({ message }, { status: 409 }) };
-  }
-  return { record, index };
-}
-
-/**
- * Everyone the lab mock knows, for looking a HIN up when booking: the patients with upcoming
- * tests (Chidi Okafor is 541-452-042-11) and those on the test orders.
- */
-function knownPatients(): FoundPatient[] {
-  const seen = new Map<string, FoundPatient>();
-  for (const { patient: person } of appointments) {
-    seen.set(person.hin, {
-      ...person,
-      dateOfBirth: "1990-01-15",
-      phone: null,
-      email: `${person.name.toLowerCase().replace(/\s+/g, ".")}@email.com`,
-    });
-  }
-  for (const { patient: person } of records) {
-    const { sex: _sex, ...rest } = person;
-    seen.set(person.hin, { ...rest, phone: null, email: null });
-  }
-  return [...seen.values()];
+  return { order, item };
 }
 
 export const labScientistHandlers = [
-  http.get(api("/hospital/lab/overview"), ({ request }) => {
-    const scale = periodScale[periodOf(request)];
+  http.get(api("/api/lab/dashboard"), () => {
+    const items = orders.flatMap((order) => order.items);
+    const at = (...statuses: Item["status"][]) =>
+      items.filter((item) => statuses.includes(item.status)).length;
     return HttpResponse.json({
-      totalTests: Math.round(overview.totalTests * scale),
-      pendingTests: overview.pendingTests,
-      approvedResults: Math.round(overview.approvedResults * scale),
-      returningPatients: Math.round(overview.returningPatients * scale),
-    } satisfies LabOverview);
-  }),
-  http.get(api("/hospital/lab/appointments"), ({ request }) => {
-    const until = Date.now() + periodDays[periodOf(request)] * DAY;
-    return HttpResponse.json({
-      items: appointments.filter((item) => new Date(item.at).getTime() < until),
-    } satisfies TestAppointments);
-  }),
-  http.post(api("/hospital/lab/appointments"), async ({ request }) => {
-    const { patientId, at: when } = (await request.json()) as { patientId: string; at: string };
-    const found = knownPatients().find(({ id }) => id === patientId);
-    if (!found) return HttpResponse.json({ message: "Patient not found" }, { status: 404 });
-    const appointment: TestAppointments["items"][number] = {
-      id: `lab-appointment-${appointments.length + 1}`,
-      at: when,
-      patient: { id: found.id, name: found.name, avatarUrl: found.avatarUrl, hin: found.hin },
-      testType: "Lab test",
-    };
-    appointments.push(appointment);
-    appointments.sort((a, b) => a.at.localeCompare(b.at));
-    return HttpResponse.json(appointment, { status: 201 });
-  }),
-  http.get(api("/hospital/lab/approvals"), () =>
-    HttpResponse.json({ items: approvals } satisfies PendingApprovals),
-  ),
-  http.get(api("/hospital/lab/patients"), ({ request }) => {
-    const hin = new URL(request.url).searchParams.get("hin")?.replace(/\D/g, "");
-    return HttpResponse.json({
-      items: knownPatients().filter((person) => person.hin === hin),
-    });
-  }),
-  http.post(api("/hospital/lab/test-orders/:id/accept"), ({ params }) => {
-    const found = changeable(params.id, "pending", "Only a pending order can be accepted.");
-    if (found.error) return found.error;
-    acceptedAt.set(found.record.id, new Date().toISOString());
-    records[found.index] = {
-      ...found.record,
-      stage: "in_progress",
-      seen: true,
-      progress: "doctor_request",
-    };
-    return HttpResponse.json(orderFor(records[found.index]!, found.index));
-  }),
-  http.post(api("/hospital/lab/test-orders/:id/reject"), async ({ params, request }) => {
-    const found = changeable(params.id, "pending", "Only a pending order can be rejected.");
-    if (found.error) return found.error;
-    const { reason } = (await request.json()) as { reason: string };
-    rejections.set(found.record.id, { at: new Date().toISOString(), reason });
-    records[found.index] = { ...found.record, stage: "rejected", seen: true };
-    return HttpResponse.json(orderFor(records[found.index]!, found.index));
-  }),
-  http.put(api("/hospital/lab/test-orders/:id/sample-collection"), async ({ params, request }) => {
-    const found = changeable(params.id, "in_progress", "Only an order in progress can be logged.");
-    if (found.error) return found.error;
-    const { collectedAt } = (await request.json()) as { collectedAt: string };
-    sampleCollectedAt.set(found.record.id, collectedAt);
-    return HttpResponse.json(orderFor(found.record, found.index));
-  }),
-  http.post(api("/hospital/lab/test-orders/:id/result"), async ({ params, request }) => {
-    const found = changeable(params.id, "in_progress", "Only an order in progress takes results.");
-    if (found.error) return found.error;
-    const body = (await request.json()) as Omit<NonNullable<TestOrder["result"]>, "uploadedAt"> & {
-      collectedAt: string;
-    };
-    sampleCollectedAt.set(found.record.id, body.collectedAt);
-    results.set(found.record.id, {
-      uploadedAt: new Date().toISOString(),
-      values: body.values,
-      interpretation: body.interpretation,
-      clinicalCorrelation: body.clinicalCorrelation,
-    });
-    records[found.index] = { ...found.record, stage: "completed", progress: null };
-    return HttpResponse.json(orderFor(records[found.index]!, found.index));
-  }),
-  http.get(api("/hospital/lab/test-orders/:id"), ({ params }) => {
-    const index = records.findIndex((record) => record.id === params.id);
-    if (index === -1) {
-      return HttpResponse.json({ message: "Test order not found." }, { status: 404 });
-    }
-    return HttpResponse.json(orderFor(records[index]!, index));
-  }),
-  http.get(api("/hospital/lab/test-orders"), ({ request }) => {
-    const params = new URL(request.url).searchParams;
-    const stage = (params.get("stage") ?? "pending") as TestStage;
-    const page = Number(params.get("page") ?? 1);
-    const pageSize = Number(params.get("pageSize") ?? 7);
-    const direction = params.get("sort") === "oldest" ? -1 : 1;
-    const period = params.get("period");
-    const since =
-      period === "today" || period === "week" || period === "month"
-        ? Date.now() - periodDays[period] * DAY
-        : 0;
-    const inPeriod = records.filter((record) => new Date(record.requestedAt).getTime() > since);
-
-    const matching = inPeriod
-      .filter(
-        (record) =>
-          record.stage === stage &&
-          matches(params.get("search"), record.patient.name, record.patient.hin, record.testType),
-      )
-      .sort(
-        (a, b) =>
-          (new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()) * direction,
-      );
-    const count = (of: TestStage) => inPeriod.filter((record) => record.stage === of).length;
-
-    return HttpResponse.json({
-      counts: {
-        pending: count("pending"),
-        in_progress: count("in_progress"),
-        completed: count("completed"),
-        rejected: count("rejected"),
+      summary: {
+        total_items: items.length,
+        pending: at("pending"),
+        in_progress: at("sample_collected", "in_progress"),
+        result_ready: at("result_ready"),
+        result_ready_change: 0,
       },
-      total: matching.length,
-      items: matching.slice((page - 1) * pageSize, page * pageSize),
-    } satisfies TestRecordList);
+      lab_scientist: null,
+      theme: null,
+    });
   }),
+  http.get(api("/api/lab/test-orders"), ({ request }) => {
+    const params = new URL(request.url).searchParams;
+    const status = params.get("status");
+    const page = Number(params.get("page") ?? 1);
+    const size = Number(params.get("size") ?? 10);
+    // As the API does: an order is listed if any of its tests is at the status.
+    const matching = orders
+      .filter((order) => !status || order.items.some((item) => item.status === status))
+      .sort((a, b) => b.created_at.localeCompare(a.created_at));
+    return HttpResponse.json({
+      count: matching.length,
+      next: null,
+      previous: null,
+      results: matching.slice((page - 1) * size, page * size).map(read),
+    });
+  }),
+  http.get(api("/api/lab/test-orders/:sqid"), ({ params }) => {
+    const order = orders.find(({ sqid }) => sqid === params.sqid);
+    if (!order) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    return HttpResponse.json(read(order));
+  }),
+  http.patch(api("/api/lab/test-orders/:sqid/items/:item/accept"), ({ params }) => {
+    const found = findItem(
+      params.sqid,
+      params.item,
+      ["pending"],
+      "Only a pending test can be accepted.",
+    );
+    if (found.error) return found.error;
+    found.item.status = "in_progress";
+    return HttpResponse.json(
+      read(found.order).items_info.find(({ sqid }) => sqid === found.item.sqid),
+    );
+  }),
+  http.patch(api("/api/lab/test-orders/:sqid/items/:item/reject"), async ({ params, request }) => {
+    const found = findItem(
+      params.sqid,
+      params.item,
+      ["pending"],
+      "Only a pending test can be rejected.",
+    );
+    if (found.error) return found.error;
+    const { rejection_reason } = (await request.json()) as { rejection_reason: string };
+    Object.assign(found.item, { status: "rejected", rejection_reason });
+    return HttpResponse.json(read(found.order));
+  }),
+  http.patch(
+    api("/api/lab/test-orders/:sqid/items/:item/specimen-collection-time"),
+    async ({ params, request }) => {
+      const found = findItem(
+        params.sqid,
+        params.item,
+        ["in_progress", "sample_collected"],
+        "Only an accepted test's sample can be logged.",
+      );
+      if (found.error) return found.error;
+      const { specimen_collected_at } = (await request.json()) as { specimen_collected_at: string };
+      Object.assign(found.item, { status: "sample_collected", specimen_collected_at });
+      return HttpResponse.json({ sqid: found.item.sqid, specimen_collected_at });
+    },
+  ),
+  http.post(
+    api("/api/lab/test-orders/:sqid/items/:item/result/submit"),
+    async ({ params, request }) => {
+      const found = findItem(
+        params.sqid,
+        params.item,
+        ["in_progress", "sample_collected"],
+        "Only an accepted test takes a result.",
+      );
+      if (found.error) return found.error;
+      const body = (await request.json()) as {
+        parameters: { parameter: string; value: string }[];
+        interpretation: string;
+        clinical_correlation: string;
+      };
+      found.item.result = {
+        sqid: `${found.item.sqid}-result`,
+        created_at: new Date().toISOString(),
+        values: Object.fromEntries(
+          body.parameters.map(({ parameter, value }) => [parameter.replace(/^param-/, ""), value]),
+        ),
+        interpretation: body.interpretation,
+        clinical_correlation: body.clinical_correlation,
+        status: "pending",
+      };
+      found.item.status = "result_ready";
+      return HttpResponse.json(read(found.order).items_info[0]?.result_info, { status: 201 });
+    },
+  ),
 ];

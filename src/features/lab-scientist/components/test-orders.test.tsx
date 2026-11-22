@@ -15,8 +15,8 @@ describe("TestOrders", () => {
     await user.click(screen.getByRole("tab", { name: /In-Progress Test/ }));
     await screen.findByText("Showing 1 to 4 of 4 entries");
     const table = screen.getByRole("table");
-    expect(within(table).getByText("Appt")).toBeInTheDocument();
-    expect(within(table).getAllByText("Doctor req")).toHaveLength(3);
+    // TODO(api): no source says whether a test was booked or asked for ("Appt"/"Doctor req").
+    expect(within(table).getAllByText("In progress")).toHaveLength(4);
 
     await user.click(screen.getByRole("button", { name: "Grid view" }));
     const cards = await screen.findByRole("list", { name: "Test records" });

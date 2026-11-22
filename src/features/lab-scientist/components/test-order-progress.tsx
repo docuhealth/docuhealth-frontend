@@ -46,7 +46,7 @@ function stepsFor(order: TestOrder): Step[] {
         received,
         {
           title: "Request rejected",
-          detail: order.rejection
+          detail: order.rejection?.at
             ? `${formatDateCommaTime(new Date(order.rejection.at))} · by the lab`
             : "By the lab",
           state: "rejected",

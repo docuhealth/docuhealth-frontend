@@ -21,7 +21,7 @@ export function AcceptOrderFlow({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const accept = useAcceptTestOrder(order.id);
+  const accept = useAcceptTestOrder(order);
   const [approved, setApproved] = useState(false);
 
   return (

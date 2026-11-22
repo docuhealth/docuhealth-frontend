@@ -1,7 +1,7 @@
 import { DashboardTable } from "@/components/dashboard/dashboard-table";
 import { OrderCard } from "@/components/dashboard/order-card";
 import { TableCell, TableRow } from "@/components/ui/table";
-import type { TestOrder } from "@/features/lab-scientist/api/schemas";
+import type { LabTest, TestOrder } from "@/features/lab-scientist/api/schemas";
 import { FlagTag } from "@/features/lab-scientist/components/status-tag";
 import { TestName } from "@/features/lab-scientist/components/test-name";
 import { flagFor, referenceRange } from "@/features/lab-scientist/lib/stage";
@@ -62,7 +62,7 @@ export function TestOrderResult({ order, result }: { order: TestOrder; result: R
                 </TableCell>
                 <TableCell className={columns.range}>{referenceRange(test)}</TableCell>
                 <TableCell className={columns.flag}>
-                  {value !== undefined && <FlagTag flag={flagFor(test, value)} />}
+                  <ResultFlagTag test={test} value={value} />
                 </TableCell>
               </TableRow>
             );
@@ -93,4 +93,10 @@ function NumberedCard({ title, text }: { title: string; text: string }) {
       </ol>
     </OrderCard>
   );
+}
+
+/** A numeric result's flag against its range; nothing for text results or text ranges. */
+function ResultFlagTag({ test, value }: { test: LabTest; value: number | string | undefined }) {
+  const flag = typeof value === "number" ? flagFor(test, value) : null;
+  return flag ? <FlagTag flag={flag} /> : null;
 }

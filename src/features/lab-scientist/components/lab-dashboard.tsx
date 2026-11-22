@@ -54,7 +54,8 @@ export function LabDashboard({
           icon={<TestTubeIcon />}
           label="Total Lab Tests"
           value={overview.totalTests.toLocaleString("en-GB")}
-          note={`All lab tests ${span}`}
+          // TODO(api): the dashboard ignores dates, so this counts every test so far.
+          note="All tests so far"
         />
         <StatCard
           icon={<ClockFadingIcon />}
@@ -65,14 +66,14 @@ export function LabDashboard({
         <StatCard
           icon={<CheckmarkCircleIcon />}
           label="Approved Results"
-          value={overview.approvedResults.toLocaleString("en-GB")}
-          note={capitalize(span)}
+          value={<Unavailable value={overview.approvedResults} />}
+          note={overview.approvedResults === null ? "Not available yet" : capitalize(span)}
         />
         <StatCard
           icon={<ArrowCounterClockwiseIcon />}
           label="Returning Patients"
-          value={overview.returningPatients.toLocaleString("en-GB")}
-          note="Visited before today"
+          value={<Unavailable value={overview.returningPatients} />}
+          note={overview.returningPatients === null ? "Not available yet" : "Visited before today"}
         />
       </StatBanner>
 
@@ -86,4 +87,13 @@ export function LabDashboard({
 
 function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** A count, or a muted dash while the API has no figure for it (TODO(api)). */
+function Unavailable({ value }: { value: number | null }) {
+  return value === null ? (
+    <span className="text-fg-caption">—</span>
+  ) : (
+    <>{value.toLocaleString("en-GB")}</>
+  );
 }

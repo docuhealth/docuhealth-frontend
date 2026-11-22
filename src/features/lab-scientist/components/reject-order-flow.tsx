@@ -61,7 +61,7 @@ function RejectOrderForm({
   onClose: () => void;
   onRejected: () => void;
 }) {
-  const reject = useRejectTestOrder(order.id);
+  const reject = useRejectTestOrder(order);
   const form = useForm<RejectOrderValues>({
     resolver: zodResolver(rejectOrderSchema),
     defaultValues: devPrefill?.rejectOrder ?? { reason: "" },

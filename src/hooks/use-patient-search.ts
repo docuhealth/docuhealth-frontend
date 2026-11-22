@@ -6,8 +6,8 @@ import { formatHin, HIN_DIGITS } from "@/lib/format";
  * A HIN being typed and the patients it matches, once it's whole. The only match is picked
  * already; with several, `pick` chooses one. `lookup` is the feature's own HIN lookup query.
  */
-export function usePatientSearch<Patient extends { id: string }, Key extends QueryKey>(
-  lookup: (hin: string) => UseQueryOptions<{ items: Patient[] }, Error, { items: Patient[] }, Key>,
+export function usePatientSearch<Patient extends { id: string }, FnData, Key extends QueryKey>(
+  lookup: (hin: string) => UseQueryOptions<FnData, Error, { items: Patient[] }, Key>,
   initialHin = "",
 ): PatientSearch<Patient> {
   const [hin, setHin] = useState(initialHin);

@@ -203,8 +203,8 @@ function UploadResultForm({
                       {error && <p className="mt-1 type-caption text-error-500">{error.message}</p>}
                     </td>
                     <td className="py-3 pt-4 pr-3">
-                      {typed !== "" && Number.isFinite(number) ? (
-                        <FlagTag flag={flagFor(test, number)} range />
+                      {typed !== "" && Number.isFinite(number) && flagFor(test, number) ? (
+                        <FlagTag flag={flagFor(test, number)!} range />
                       ) : (
                         <span className="text-fg-caption">—</span>
                       )}

@@ -48,7 +48,7 @@ export function SampleCollectionDialog({
 }
 
 function SampleCollectionForm({ order, onSaved }: { order: TestOrder; onSaved: () => void }) {
-  const logSample = useLogSampleCollection(order.id);
+  const logSample = useLogSampleCollection(order);
   const [requestedAt] = useState(() => new Date(order.requestedAt));
   const [schema] = useState(() => sampleCollectionSchema(requestedAt));
   // Read once on mount: saving updates the order, which mustn't flip this mid-save.

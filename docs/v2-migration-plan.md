@@ -47,7 +47,11 @@ Built as `src/features/staff/` (routes compose it into each dashboard).
       accept, reject, imaging time and report upload on `api/radiology/*`. Checked on staging (reads
       only, to leave shared staging data alone). Waiting on the backend: date filters, single-order
       endpoint, HIN lookup, "New"/"Appt" fields (gaps file, section 7)
-- [ ] Lab Scientist (+ lab administration page)
+- [x] Lab Scientist: overview, test records (4 tabs), order page with results, appointments,
+      awaiting approval, booking; accept, reject, sample time and results sent per test on
+      `api/lab/*`. Checked on staging (reads). Waiting on the backend: item-level list filter,
+      approved/returning figures, HIN lookup for lab staff, dates (gaps file, section 7)
+- [ ] Lab administration page (lab admin's result approvals: real endpoints exist, no design yet)
 - [ ] Hospital Admin (+ ward management, audit logs, wallet)
 
 ## Phase 3: Pharmacy

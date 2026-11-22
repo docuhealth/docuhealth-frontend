@@ -18,22 +18,26 @@ export const stageStatusLabels = {
 
 /**
  * How `value` compares with the test's reference range: outside it is low or high, and more than
- * half the range's width past an end is critical.
+ * half the range's width past an end is critical. `null` when the test has no numeric range.
  */
-export function flagFor(test: LabTest, value: number): ResultFlag {
-  const margin = (test.referenceHigh - test.referenceLow) / 2;
-  if (value < test.referenceLow) {
-    return value < test.referenceLow - margin ? "critical_low" : "low";
-  }
-  if (value > test.referenceHigh) {
-    return value > test.referenceHigh + margin ? "critical_high" : "high";
-  }
+export function flagFor(test: LabTest, value: number): ResultFlag | null {
+  const { referenceLow: low, referenceHigh: high } = test;
+  if (low === null || high === null) return null;
+  const margin = (high - low) / 2;
+  if (value < low) return value < low - margin ? "critical_low" : "low";
+  if (value > high) return value > high + margin ? "critical_high" : "high";
   return "normal";
 }
 
-/** e.g. "13.0 – 17.0 g/dL". */
+/** e.g. "13.0 – 17.0 g/dL", or the test's own wording when its range isn't numeric. */
 export function referenceRange(test: LabTest) {
-  return `${test.referenceLow} – ${test.referenceHigh}${test.unit ? ` ${test.unit}` : ""}`;
+  const unit = test.unit ? ` ${test.unit}` : "";
+  if (test.referenceLow !== null && test.referenceHigh !== null) {
+    return `${test.referenceLow} – ${test.referenceHigh}${unit}`;
+  }
+  if (test.referenceLow !== null) return `≥ ${test.referenceLow}${unit}`;
+  if (test.referenceHigh !== null) return `≤ ${test.referenceHigh}${unit}`;
+  return test.referenceText ?? "—";
 }
 
 /** e.g. "Haemoglobin, PCV" for the summary; the test's name alone when there's one. */
