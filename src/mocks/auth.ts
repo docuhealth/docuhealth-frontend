@@ -12,6 +12,8 @@ const staffScenarios: Record<string, { role: string; isAdmin: boolean; firstLogi
   radiology: { role: "radiologist", isAdmin: false },
   lab: { role: "lab_scientist", isAdmin: false },
   pharmacy: { role: "pharmacist", isAdmin: false },
+  doctor: { role: "doctor", isAdmin: false },
+  nurse: { role: "nurse", isAdmin: false },
   firstlogin: { role: "doctor", isAdmin: true, firstLogin: true },
 };
 

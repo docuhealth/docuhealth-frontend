@@ -12,7 +12,7 @@ dashboard is connected; the newest are at the bottom.
 | 4   | Old `api/hospitals/*` paths are gone: is production the same?        | Needs an answer           | `api/hospitals/*` → `api/auth/staff…` |
 | 5   | Staff list filters work but aren't in the schema                     | Low                       | `GET /api/auth/staff`                 |
 | 6   | No endpoint for unread notification and message counts               | Medium                    | Top bar and sidebar badges            |
-| 7   | The redesigned dashboards need endpoints and fields that don't exist | Blocker for those screens | Receptionist, lab, admin, pharmacy    |
+| 7   | The redesigned dashboards need endpoints and fields that don't exist | Blocker for those screens | Every dashboard                       |
 
 ---
 
@@ -197,6 +197,13 @@ call-by-call table is in `docs/api-mapping-redesigned-dashboards.md`. These are 
    badge, the source (appointment or doctor request), the doctor's note, and the patient's HMO flag.
 6. **Booking permission.** Confirm radiologists may `POST /api/hospital-ops/appointments/book` for
    themselves.
+
+### Doctor and nurse
+
+1. **One visit.** There's no `GET` for a single admission or check-in, so a patient page finds its visit by paging `GET /api/hospital-ops/patients?status=…` (100 at a time). Please add `GET /api/hospital-ops/admissions/{sqid}` and `GET /api/hospital-ops/check-ins/{sqid}`.
+2. **Search by HIN.** `GET /api/hospital-ops/patients` and `GET /api/hospital-ops/admissions` search by name only; a HIN finds nothing. Clinical staff look patients up by HIN.
+3. **Patient lists' response schema.** `GET /api/hospital-ops/patients` has no response schema and no documented `page`/`size`; each list's rows differ (`status`, `ward_info`, `bed_info`, `requested_by_info`, `closed_by_info`, `discharged_by_info`, `discharge_date`).
+4. **Visit records.** `WorkflowRecordEvent.record` is untyped, so the timeline shows each record's fields generically. A typed record per `record_type` would let it show them properly.
 
 ### Pharmacy
 

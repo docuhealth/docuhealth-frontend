@@ -1,5 +1,13 @@
 import { z } from "zod";
 import { type PatientSex, sexOf } from "@/lib/patient-record";
+import {
+  durationOf,
+  durationSchema,
+  frequencyOf,
+  personSchema,
+  type VitalSigns,
+  vitalSignsSchema,
+} from "@/lib/clinical";
 import { fullName, optionalText, staffProfileSchema, text } from "@/lib/staff-profile";
 
 // The pharmacy dashboard's screen models, then the real API's shapes (docs/api/openapi.json, and
@@ -68,10 +76,7 @@ export type Prescription = {
   /** Noted with the drugs; TODO(api): untyped, so only plain text is read. */
   allergies: string[];
   /** The patient's latest vitals, as the hospital recorded them. */
-  vitals: {
-    at: string;
-    readings: { label: string; value: string }[];
-  } | null;
+  vitals: VitalSigns | null;
 };
 
 export type PrescriptionList = {
@@ -128,46 +133,6 @@ const patientInfo = z
     sex: sexOf(info.gender),
   }));
 
-/** Someone named on a record (`*_by_info`, `dispensed_by`). */
-const person = z
-  .object({ firstname: text, lastname: text, role: optionalText })
-  .nullish()
-  .transform((info) => {
-    const name = info && fullName(info.firstname, info.lastname);
-    if (!name) return null;
-    return info.role === "doctor" ? `Dr. ${name}` : name;
-  });
-
-const frequencyLabels: Record<string, string> = {
-  stat: "Immediately (stat)",
-  once: "Once",
-  od: "Once daily",
-  bd: "Twice daily",
-  tds: "Three times daily",
-  qid: "Four times daily",
-  prn: "As needed",
-  mane: "Every morning",
-  nocte: "Every night",
-  alt_days: "Every other day",
-  weekly: "Weekly",
-  monthly: "Monthly",
-};
-
-/** "q6h" → "Every 6 hours"; the API's other codes by name. */
-function frequencyOf(code: string | null) {
-  if (!code) return null;
-  const hourly = /^q(\d+)h$/.exec(code);
-  if (hourly) return hourly[1] === "1" ? "Every hour" : `Every ${hourly[1]} hours`;
-  return frequencyLabels[code] ?? code;
-}
-
-/** `{value: 3, rate: "days"}` or `{value: 1, rate: "Month"}` → "3 days", "1 month". */
-function durationOf(duration: { value: number; rate: string } | null | undefined) {
-  if (!duration) return null;
-  const unit = duration.rate.toLowerCase().replace(/s$/, "");
-  return `${duration.value} ${duration.value === 1 ? unit : `${unit}s`}`;
-}
-
 const drugStatusOf = (status: string): DrugStatus =>
   status === "dispensed" || status === "unavailable" ? status : "pending";
 
@@ -183,7 +148,7 @@ const drugItem = z
   .object({
     sqid: z.string(),
     status: z.string(),
-    dispensed_by: person,
+    dispensed_by: personSchema,
     dispensed_at: dateTime.nullish(),
     unavailable_reason: optionalText,
     drug_record: z.object({
@@ -194,7 +159,7 @@ const drugItem = z
       quantity: z.union([z.number(), z.string()]).nullish(),
       unit: optionalText,
       frequency: optionalText,
-      duration: z.object({ value: z.coerce.number(), rate: text }).nullish(),
+      duration: durationSchema,
       allergies: z.unknown(),
     }),
   })
@@ -216,37 +181,6 @@ const drugItem = z
     };
   });
 
-const vitalLabels = [
-  ["blood_pressure", "Blood pressure", ""],
-  ["temp", "Temperature", " °C"],
-  ["heart_rate", "Heart rate", " bpm"],
-  ["resp_rate", "Respiratory rate", " /min"],
-  ["spo2", "SpO₂", "%"],
-  ["height", "Height", " cm"],
-  ["weight", "Weight", " kg"],
-  ["bmi", "BMI", ""],
-] as const;
-
-const vitals = z
-  .object({
-    created_at: dateTime,
-    blood_pressure: z.union([z.string(), z.number()]).nullish(),
-    temp: z.union([z.string(), z.number()]).nullish(),
-    heart_rate: z.union([z.string(), z.number()]).nullish(),
-    resp_rate: z.union([z.string(), z.number()]).nullish(),
-    spo2: z.union([z.string(), z.number()]).nullish(),
-    height: z.union([z.string(), z.number()]).nullish(),
-    weight: z.union([z.string(), z.number()]).nullish(),
-    bmi: z.union([z.string(), z.number()]).nullish(),
-  })
-  .transform((reading) => ({
-    at: reading.created_at,
-    readings: vitalLabels.flatMap(([key, label, unit]) => {
-      const value = reading[key];
-      return value == null || value === "" ? [] : [{ label, value: `${value}${unit}` }];
-    }),
-  }));
-
 /** `DrugOrderRead`: a doctor's prescription, with its drugs. */
 export const prescriptionSchema = z
   .object({
@@ -254,11 +188,11 @@ export const prescriptionSchema = z
     aggregate_status: optionalText,
     created_at: dateTime,
     patient_info: patientInfo,
-    ordered_by_info: person,
+    ordered_by_info: personSchema,
     hospital_info: z.object({ name: text, email: optionalText }).nullish(),
     drugs_info: z.array(drugItem),
     // TODO(api): typed as a string in the schema; an object (or null) in practice.
-    latest_vitals: vitals.nullish().catch(null),
+    latest_vitals: vitalSignsSchema.nullish().catch(null),
   })
   .transform((order): Prescription => ({
     id: order.sqid,

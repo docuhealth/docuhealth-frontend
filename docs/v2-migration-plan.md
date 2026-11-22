@@ -26,7 +26,7 @@ Newsletter form, the mocked outpatient list).
 - [x] Login routing: an arm's admin (e.g. the lab admin) lands on the arm's dashboard, not the
       hospital admin's
 - [x] Pharmacists land on the pharmacy dashboard (phase 3)
-- [ ] Doctors and nurses still land on the admin dashboard until phase 4
+- [x] Doctors and nurses land on their own dashboards (phase 4.1)
 
 ## Phase 1: Shared staff pages
 
@@ -90,12 +90,21 @@ Built as `src/features/staff/` (routes compose it into each dashboard).
 
 ## Phase 4: Doctor and Nurse
 
-- [ ] Shared: patient lists, patient page, encounter timeline, discharged record, pickers
-- [ ] Doctor: overview, encounter queue, SOAP note, orders, admission / transfer / referral, care
-      tasks, discharge, result review, progress and handover notes
-- [ ] Nurse: overview and vitals requests, nursing encounter, task queue and charts, admission
-      note, case notes, care plans, vitals, discharge checklist, assign appointments, handover
-- [ ] If time allows: medication history, care activity feed, issued-task history
+Built in seven steps, one commit each; what v1 does and the endpoints behind it are in
+`docs/phase-4-doctor-nurse.md`.
+
+- [x] 4.1 Shared base: doctor and nurse shells and login routing, patient lists (admitted,
+      checked in, checked out, discharged), patient page (details, latest vitals, ongoing drugs,
+      visit records incl. discharge forms). Checked on staging as the doctor (reads). Pickers come
+      with the steps that use them
+- [ ] 4.2 Nurse front line: nursing encounter queue, overview with vitals requests, vitals form
+- [ ] 4.3 Doctor front line: doctor queue, outpatient patient page, SOAP note, vitals request
+- [ ] 4.4 Doctor orders: lab, scan and drug orders, admission request, transfer, referral
+- [ ] 4.5 Inpatient care: doctor care tasks, nurse task queue and charts, Tasks page
+- [ ] 4.6 Notes: admission note, case notes, care plans, vitals history, progress notes, shared
+      SOAP notes, handovers
+- [ ] 4.7 Discharge, results, overviews: doctor discharge form, nurse discharge checklist, result
+      review, doctor overview, assign appointments
 
 ## Phase 5: Super admin (`admin.` subdomain)
 
