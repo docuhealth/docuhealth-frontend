@@ -4,6 +4,7 @@ import healthIconUrl from "@/assets/svgs/health.svg";
 import messagesIconUrl from "@/assets/svgs/messages.svg";
 import patientIconUrl from "@/assets/svgs/patient.svg";
 import settingsIconUrl from "@/assets/svgs/settings.svg";
+import staffIconUrl from "@/assets/svgs/staff.svg";
 import { DashboardSidebar, type NavGroup } from "@/components/dashboard/dashboard-sidebar";
 
 /** The doctor dashboard's navigation. */
@@ -13,6 +14,7 @@ export function DoctorSidebar({ unreadMessages }: { unreadMessages: number }) {
       label: "General",
       items: [
         { to: "/hospital/doctor", label: "Overview", icon: dashboardIconUrl },
+        { to: "/hospital/doctor/encounters", label: "Doctor Encounter", icon: staffIconUrl },
         { to: "/hospital/doctor/patients", label: "Patient Mgt.", icon: patientIconUrl },
         { to: "/hospital/doctor/appointments", label: "Appointments", icon: appointmentIconUrl },
       ],

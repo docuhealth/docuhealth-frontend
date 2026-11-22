@@ -45,6 +45,7 @@ import { Route as HospitalAdminWalletRouteImport } from './routes/hospital/admin
 import { Route as HospitalAdminWardsRouteImport } from './routes/hospital/admin/wards'
 import { Route as HospitalDoctorIndexRouteImport } from './routes/hospital/doctor/index'
 import { Route as HospitalDoctorAppointmentsRouteImport } from './routes/hospital/doctor/appointments'
+import { Route as HospitalDoctorEncountersRouteImport } from './routes/hospital/doctor/encounters'
 import { Route as HospitalDoctorHelpRouteImport } from './routes/hospital/doctor/help'
 import { Route as HospitalDoctorMessagesRouteImport } from './routes/hospital/doctor/messages'
 import { Route as HospitalDoctorPersonnelRouteImport } from './routes/hospital/doctor/personnel'
@@ -281,6 +282,12 @@ const HospitalDoctorAppointmentsRoute =
   HospitalDoctorAppointmentsRouteImport.update({
     id: '/appointments',
     path: '/appointments',
+    getParentRoute: () => HospitalDoctorRoute,
+  } as any)
+const HospitalDoctorEncountersRoute =
+  HospitalDoctorEncountersRouteImport.update({
+    id: '/encounters',
+    path: '/encounters',
     getParentRoute: () => HospitalDoctorRoute,
   } as any)
 const HospitalDoctorHelpRoute = HospitalDoctorHelpRouteImport.update({
@@ -628,6 +635,7 @@ export interface FileRoutesByFullPath {
   '/hospital/admin/wallet': typeof HospitalAdminWalletRoute
   '/hospital/admin/wards': typeof HospitalAdminWardsRoute
   '/hospital/doctor/appointments': typeof HospitalDoctorAppointmentsRoute
+  '/hospital/doctor/encounters': typeof HospitalDoctorEncountersRoute
   '/hospital/doctor/help': typeof HospitalDoctorHelpRoute
   '/hospital/doctor/messages': typeof HospitalDoctorMessagesRoute
   '/hospital/doctor/personnel': typeof HospitalDoctorPersonnelRoute
@@ -710,6 +718,7 @@ export interface FileRoutesByTo {
   '/hospital/admin/wallet': typeof HospitalAdminWalletRoute
   '/hospital/admin/wards': typeof HospitalAdminWardsRoute
   '/hospital/doctor/appointments': typeof HospitalDoctorAppointmentsRoute
+  '/hospital/doctor/encounters': typeof HospitalDoctorEncountersRoute
   '/hospital/doctor/help': typeof HospitalDoctorHelpRoute
   '/hospital/doctor/messages': typeof HospitalDoctorMessagesRoute
   '/hospital/doctor/personnel': typeof HospitalDoctorPersonnelRoute
@@ -803,6 +812,7 @@ export interface FileRoutesById {
   '/hospital/admin/wallet': typeof HospitalAdminWalletRoute
   '/hospital/admin/wards': typeof HospitalAdminWardsRoute
   '/hospital/doctor/appointments': typeof HospitalDoctorAppointmentsRoute
+  '/hospital/doctor/encounters': typeof HospitalDoctorEncountersRoute
   '/hospital/doctor/help': typeof HospitalDoctorHelpRoute
   '/hospital/doctor/messages': typeof HospitalDoctorMessagesRoute
   '/hospital/doctor/personnel': typeof HospitalDoctorPersonnelRoute
@@ -896,6 +906,7 @@ export interface FileRouteTypes {
     | '/hospital/admin/wallet'
     | '/hospital/admin/wards'
     | '/hospital/doctor/appointments'
+    | '/hospital/doctor/encounters'
     | '/hospital/doctor/help'
     | '/hospital/doctor/messages'
     | '/hospital/doctor/personnel'
@@ -978,6 +989,7 @@ export interface FileRouteTypes {
     | '/hospital/admin/wallet'
     | '/hospital/admin/wards'
     | '/hospital/doctor/appointments'
+    | '/hospital/doctor/encounters'
     | '/hospital/doctor/help'
     | '/hospital/doctor/messages'
     | '/hospital/doctor/personnel'
@@ -1070,6 +1082,7 @@ export interface FileRouteTypes {
     | '/hospital/admin/wallet'
     | '/hospital/admin/wards'
     | '/hospital/doctor/appointments'
+    | '/hospital/doctor/encounters'
     | '/hospital/doctor/help'
     | '/hospital/doctor/messages'
     | '/hospital/doctor/personnel'
@@ -1398,6 +1411,13 @@ declare module '@tanstack/react-router' {
       path: '/appointments'
       fullPath: '/hospital/doctor/appointments'
       preLoaderRoute: typeof HospitalDoctorAppointmentsRouteImport
+      parentRoute: typeof HospitalDoctorRoute
+    }
+    '/hospital/doctor/encounters': {
+      id: '/hospital/doctor/encounters'
+      path: '/encounters'
+      fullPath: '/hospital/doctor/encounters'
+      preLoaderRoute: typeof HospitalDoctorEncountersRouteImport
       parentRoute: typeof HospitalDoctorRoute
     }
     '/hospital/doctor/help': {
@@ -1867,6 +1887,7 @@ const HospitalAdminRouteWithChildren = HospitalAdminRoute._addFileChildren(
 
 interface HospitalDoctorRouteChildren {
   HospitalDoctorAppointmentsRoute: typeof HospitalDoctorAppointmentsRoute
+  HospitalDoctorEncountersRoute: typeof HospitalDoctorEncountersRoute
   HospitalDoctorHelpRoute: typeof HospitalDoctorHelpRoute
   HospitalDoctorMessagesRoute: typeof HospitalDoctorMessagesRoute
   HospitalDoctorPersonnelRoute: typeof HospitalDoctorPersonnelRoute
@@ -1878,6 +1899,7 @@ interface HospitalDoctorRouteChildren {
 
 const HospitalDoctorRouteChildren: HospitalDoctorRouteChildren = {
   HospitalDoctorAppointmentsRoute: HospitalDoctorAppointmentsRoute,
+  HospitalDoctorEncountersRoute: HospitalDoctorEncountersRoute,
   HospitalDoctorHelpRoute: HospitalDoctorHelpRoute,
   HospitalDoctorMessagesRoute: HospitalDoctorMessagesRoute,
   HospitalDoctorPersonnelRoute: HospitalDoctorPersonnelRoute,

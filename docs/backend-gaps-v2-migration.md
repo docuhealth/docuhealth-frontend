@@ -207,6 +207,9 @@ call-by-call table is in `docs/api-mapping-redesigned-dashboards.md`. These are 
 5. **Vitals requests: who asked.** `VitalSignsRequest.staff_info` is the nurse it's meant for; nothing says which doctor asked. Please add `requested_by_info`.
 6. **`bmi` in `VitalSignsWrite`.** BMI is read back on vitals but can't be sent; the UI shows it worked out from height and weight. Confirm the backend computes it.
 7. **Visit records.** `WorkflowRecordEvent.record` is untyped, so the timeline shows each record's fields generically. A typed record per `record_type` would let it show them properly.
+8. **"My consultations".** `GET /api/hospital-ops/check-ins/doctor-queue` has no filter for the doctor who claimed a check-in, so the UI reads the whole active list to know which consultations are the signed-in doctor's (only they may write notes and orders). A `claimed_by=me` filter would do.
+9. **SOAP note write fields.** `POST /api/hospital-ops/soap-notes`: `vital_signs` is an integer, but vitals are identified by sqid everywhere else, so the UI can't attach the latest vitals; `referred_docuhealhosp` is misspelt (the read side says `referred_docuhealth_hosp`); `investigation_docs` takes URLs, with no upload endpoint for the files. The form leaves these out for now.
+10. **SOAP notes across patients.** `GET /api/records/soap-notes` is 403 for doctors; fine if it's meant for admins, but say so.
 
 ### Pharmacy
 

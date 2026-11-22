@@ -102,7 +102,11 @@ Built in seven steps, one commit each; what v1 does and the endpoints behind it 
       requests to take, admitted patients flagged without an admission note), one vitals form for
       every clinical screen. Checked on staging as the nurse (reads: 36 requests, 15 admitted, 87
       sent to doctor; nothing claimed or recorded)
-- [ ] 4.3 Doctor front line: doctor queue, outpatient patient page, SOAP note, vitals request
+- [x] 4.3 Doctor front line: Doctor Encounter queue (waiting / in consultation / seen; see a
+      patient, end, resume, check out), the doctor's patient page tabs (encounter notes with added
+      notes, lab results) and consultation actions (new encounter note in two steps, request vitals
+      from a nurse, end consultation). Checked on staging as the doctor (reads; the queue was
+      empty). Not yet in the note: investigation files, referral, next appointment
 - [ ] 4.4 Doctor orders: lab, scan and drug orders, admission request, transfer, referral
 - [ ] 4.5 Inpatient care: doctor care tasks, nurse task queue and charts, Tasks page
 - [ ] 4.6 Notes: admission note, case notes, care plans, vitals history, progress notes, shared
