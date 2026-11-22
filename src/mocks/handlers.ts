@@ -5,6 +5,7 @@ import { authHandlers } from "@/mocks/auth";
 import { clinicalHandlers } from "@/mocks/clinical";
 import { hospitalAdminHandlers } from "@/mocks/hospital-admin";
 import { labScientistHandlers } from "@/mocks/lab-scientist";
+import { nurseHandlers } from "@/mocks/nurse";
 import { pharmacyHandlers } from "@/mocks/pharmacy";
 import { radiologistHandlers } from "@/mocks/radiologist";
 import { receptionistHandlers } from "@/mocks/receptionist";
@@ -21,6 +22,7 @@ export const handlers: RequestHandler[] = [
   ...receptionistHandlers,
   ...radiologistHandlers,
   ...labScientistHandlers,
+  ...nurseHandlers,
   ...pharmacyHandlers,
   ...staffHandlers,
 ];

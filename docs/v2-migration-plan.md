@@ -97,7 +97,11 @@ Built in seven steps, one commit each; what v1 does and the endpoints behind it 
       checked in, checked out, discharged), patient page (details, latest vitals, ongoing drugs,
       visit records incl. discharge forms). Checked on staging as the doctor (reads). Pickers come
       with the steps that use them
-- [ ] 4.2 Nurse front line: nursing encounter queue, overview with vitals requests, vitals form
+- [x] 4.2 Nurse front line: nursing encounter queue (pending / sent to doctor / closed; claim,
+      assess with vitals and triage, send to doctor or close, reopen), overview (doctors' vitals
+      requests to take, admitted patients flagged without an admission note), one vitals form for
+      every clinical screen. Checked on staging as the nurse (reads: 36 requests, 15 admitted, 87
+      sent to doctor; nothing claimed or recorded)
 - [ ] 4.3 Doctor front line: doctor queue, outpatient patient page, SOAP note, vitals request
 - [ ] 4.4 Doctor orders: lab, scan and drug orders, admission request, transfer, referral
 - [ ] 4.5 Inpatient care: doctor care tasks, nurse task queue and charts, Tasks page

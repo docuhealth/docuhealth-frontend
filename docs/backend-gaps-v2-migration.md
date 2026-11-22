@@ -203,7 +203,10 @@ call-by-call table is in `docs/api-mapping-redesigned-dashboards.md`. These are 
 1. **One visit.** There's no `GET` for a single admission or check-in, so a patient page finds its visit by paging `GET /api/hospital-ops/patients?status=…` (100 at a time). Please add `GET /api/hospital-ops/admissions/{sqid}` and `GET /api/hospital-ops/check-ins/{sqid}`.
 2. **Search by HIN.** `GET /api/hospital-ops/patients` and `GET /api/hospital-ops/admissions` search by name only; a HIN finds nothing. Clinical staff look patients up by HIN.
 3. **Patient lists' response schema.** `GET /api/hospital-ops/patients` has no response schema and no documented `page`/`size`; each list's rows differ (`status`, `ward_info`, `bed_info`, `requested_by_info`, `closed_by_info`, `discharged_by_info`, `discharge_date`).
-4. **Visit records.** `WorkflowRecordEvent.record` is untyped, so the timeline shows each record's fields generically. A typed record per `record_type` would let it show them properly.
+4. **Queue holders.** `NurseCheckInQueue.reserved_by` / `claimed_by` / `escalated_by` / `latest_vitals` are typed as strings but are objects (or null). The UI decides "claimed by you" by comparing the holder's sqid with the signed-in member's; please type them, with the staff sqid.
+5. **Vitals requests: who asked.** `VitalSignsRequest.staff_info` is the nurse it's meant for; nothing says which doctor asked. Please add `requested_by_info`.
+6. **`bmi` in `VitalSignsWrite`.** BMI is read back on vitals but can't be sent; the UI shows it worked out from height and weight. Confirm the backend computes it.
+7. **Visit records.** `WorkflowRecordEvent.record` is untyped, so the timeline shows each record's fields generically. A typed record per `record_type` would let it show them properly.
 
 ### Pharmacy
 

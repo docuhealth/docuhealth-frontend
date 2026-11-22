@@ -58,6 +58,7 @@ import { Route as HospitalLabScientistPersonnelRouteImport } from './routes/hosp
 import { Route as HospitalLabScientistSettingsRouteImport } from './routes/hospital/lab-scientist/settings'
 import { Route as HospitalNurseIndexRouteImport } from './routes/hospital/nurse/index'
 import { Route as HospitalNurseAppointmentsRouteImport } from './routes/hospital/nurse/appointments'
+import { Route as HospitalNurseEncountersRouteImport } from './routes/hospital/nurse/encounters'
 import { Route as HospitalNurseHelpRouteImport } from './routes/hospital/nurse/help'
 import { Route as HospitalNurseMessagesRouteImport } from './routes/hospital/nurse/messages'
 import { Route as HospitalNursePersonnelRouteImport } from './routes/hospital/nurse/personnel'
@@ -355,6 +356,11 @@ const HospitalNurseAppointmentsRoute =
     path: '/appointments',
     getParentRoute: () => HospitalNurseRoute,
   } as any)
+const HospitalNurseEncountersRoute = HospitalNurseEncountersRouteImport.update({
+  id: '/encounters',
+  path: '/encounters',
+  getParentRoute: () => HospitalNurseRoute,
+} as any)
 const HospitalNurseHelpRoute = HospitalNurseHelpRouteImport.update({
   id: '/help',
   path: '/help',
@@ -633,6 +639,7 @@ export interface FileRoutesByFullPath {
   '/hospital/lab-scientist/personnel': typeof HospitalLabScientistPersonnelRoute
   '/hospital/lab-scientist/settings': typeof HospitalLabScientistSettingsRoute
   '/hospital/nurse/appointments': typeof HospitalNurseAppointmentsRoute
+  '/hospital/nurse/encounters': typeof HospitalNurseEncountersRoute
   '/hospital/nurse/help': typeof HospitalNurseHelpRoute
   '/hospital/nurse/messages': typeof HospitalNurseMessagesRoute
   '/hospital/nurse/personnel': typeof HospitalNursePersonnelRoute
@@ -714,6 +721,7 @@ export interface FileRoutesByTo {
   '/hospital/lab-scientist/personnel': typeof HospitalLabScientistPersonnelRoute
   '/hospital/lab-scientist/settings': typeof HospitalLabScientistSettingsRoute
   '/hospital/nurse/appointments': typeof HospitalNurseAppointmentsRoute
+  '/hospital/nurse/encounters': typeof HospitalNurseEncountersRoute
   '/hospital/nurse/help': typeof HospitalNurseHelpRoute
   '/hospital/nurse/messages': typeof HospitalNurseMessagesRoute
   '/hospital/nurse/personnel': typeof HospitalNursePersonnelRoute
@@ -806,6 +814,7 @@ export interface FileRoutesById {
   '/hospital/lab-scientist/personnel': typeof HospitalLabScientistPersonnelRoute
   '/hospital/lab-scientist/settings': typeof HospitalLabScientistSettingsRoute
   '/hospital/nurse/appointments': typeof HospitalNurseAppointmentsRoute
+  '/hospital/nurse/encounters': typeof HospitalNurseEncountersRoute
   '/hospital/nurse/help': typeof HospitalNurseHelpRoute
   '/hospital/nurse/messages': typeof HospitalNurseMessagesRoute
   '/hospital/nurse/personnel': typeof HospitalNursePersonnelRoute
@@ -898,6 +907,7 @@ export interface FileRouteTypes {
     | '/hospital/lab-scientist/personnel'
     | '/hospital/lab-scientist/settings'
     | '/hospital/nurse/appointments'
+    | '/hospital/nurse/encounters'
     | '/hospital/nurse/help'
     | '/hospital/nurse/messages'
     | '/hospital/nurse/personnel'
@@ -979,6 +989,7 @@ export interface FileRouteTypes {
     | '/hospital/lab-scientist/personnel'
     | '/hospital/lab-scientist/settings'
     | '/hospital/nurse/appointments'
+    | '/hospital/nurse/encounters'
     | '/hospital/nurse/help'
     | '/hospital/nurse/messages'
     | '/hospital/nurse/personnel'
@@ -1070,6 +1081,7 @@ export interface FileRouteTypes {
     | '/hospital/lab-scientist/personnel'
     | '/hospital/lab-scientist/settings'
     | '/hospital/nurse/appointments'
+    | '/hospital/nurse/encounters'
     | '/hospital/nurse/help'
     | '/hospital/nurse/messages'
     | '/hospital/nurse/personnel'
@@ -1477,6 +1489,13 @@ declare module '@tanstack/react-router' {
       path: '/appointments'
       fullPath: '/hospital/nurse/appointments'
       preLoaderRoute: typeof HospitalNurseAppointmentsRouteImport
+      parentRoute: typeof HospitalNurseRoute
+    }
+    '/hospital/nurse/encounters': {
+      id: '/hospital/nurse/encounters'
+      path: '/encounters'
+      fullPath: '/hospital/nurse/encounters'
+      preLoaderRoute: typeof HospitalNurseEncountersRouteImport
       parentRoute: typeof HospitalNurseRoute
     }
     '/hospital/nurse/help': {
@@ -1903,6 +1922,7 @@ const HospitalLabScientistRouteWithChildren =
 
 interface HospitalNurseRouteChildren {
   HospitalNurseAppointmentsRoute: typeof HospitalNurseAppointmentsRoute
+  HospitalNurseEncountersRoute: typeof HospitalNurseEncountersRoute
   HospitalNurseHelpRoute: typeof HospitalNurseHelpRoute
   HospitalNurseMessagesRoute: typeof HospitalNurseMessagesRoute
   HospitalNursePersonnelRoute: typeof HospitalNursePersonnelRoute
@@ -1914,6 +1934,7 @@ interface HospitalNurseRouteChildren {
 
 const HospitalNurseRouteChildren: HospitalNurseRouteChildren = {
   HospitalNurseAppointmentsRoute: HospitalNurseAppointmentsRoute,
+  HospitalNurseEncountersRoute: HospitalNurseEncountersRoute,
   HospitalNurseHelpRoute: HospitalNurseHelpRoute,
   HospitalNurseMessagesRoute: HospitalNurseMessagesRoute,
   HospitalNursePersonnelRoute: HospitalNursePersonnelRoute,
