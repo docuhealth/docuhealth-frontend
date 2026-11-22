@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { staffDetailQuery } from "@/features/hospital-admin/api/queries";
-import { permissionLabels, sexLabels, staffRoles } from "@/features/hospital-admin/api/schemas";
+import { permissionLabels, roleName, sexLabels } from "@/features/hospital-admin/api/schemas";
 import { type Period, periodLabels } from "@/lib/period";
 import { PeriodSelect } from "@/components/dashboard/period-select";
 import { PersonAvatar } from "@/components/dashboard/person-avatar";
@@ -27,9 +27,13 @@ import {
   StaffChangeDialogs,
   type StaffChangeStep,
 } from "@/features/hospital-admin/components/staff-change-dialogs";
+import { Figure } from "@/components/dashboard/figure";
 import { StatCard, StatGrid } from "@/components/dashboard/stat-card";
 import { StatusPill } from "@/components/dashboard/status-pill";
 import { ageOn, firstName, formatAppointment, formatDate } from "@/lib/format";
+
+/** For figures and details the API doesn't send yet. TODO(api). */
+const NOT_YET = "Not available yet";
 
 /**
  * One staff member's profile: who they are, their activity in `period`, and what their role
@@ -47,7 +51,7 @@ export function StaffProfile({
 }) {
   const { data: member } = useSuspenseQuery(staffDetailQuery(staffId, period));
   const [step, setStep] = useState<StaffChangeStep>();
-  const role = staffRoles[member.role].one;
+  const role = roleName(member.role);
   // "This Month" → "This month", as a note under a number.
   const periodName = periodLabels[period][0] + periodLabels[period].slice(1).toLowerCase();
   const { stats } = member;
@@ -79,8 +83,8 @@ export function StaffProfile({
               )}
             </div>
             <p className="flex flex-wrap items-center gap-x-3 gap-y-1 type-body-sm-regular text-fg-caption [&>span+span]:border-l [&>span+span]:border-divider [&>span+span]:pl-3">
-              <span>Staff ID: {member.staffCode}</span>
-              <span>{role}</span>
+              {member.staffCode && <span>Staff ID: {member.staffCode}</span>}
+              {member.role && <span>{role}</span>}
               {member.sex && member.sex !== "prefer_not_to_say" && (
                 <span>{sexLabels[member.sex]}</span>
               )}
@@ -115,30 +119,32 @@ export function StaffProfile({
         <StatCard
           icon={<UsersIcon />}
           label="Total patients seen"
-          value={stats.patientsSeen}
-          note={periodName}
+          value={<Figure value={stats?.patientsSeen ?? null} />}
+          note={stats ? periodName : NOT_YET}
         />
         <StatCard
           icon={<UserCheckIcon />}
           label="Appointments completed"
-          value={stats.appointmentsCompleted}
-          note="Under their ongoing care"
+          value={<Figure value={stats?.appointmentsCompleted ?? null} />}
+          note={stats ? "Under their ongoing care" : NOT_YET}
         />
         <StatCard
           icon={<CalendarCheckIcon />}
           label={`Appointments ${period === "today" ? "today" : periodName.toLowerCase()}`}
-          value={stats.appointments}
+          value={<Figure value={stats?.appointments ?? null} />}
           note={
-            stats.nextAppointmentAt
-              ? `Next at ${formatAppointment(new Date(stats.nextAppointmentAt))}`
-              : "None coming up"
+            !stats
+              ? NOT_YET
+              : stats.nextAppointmentAt
+                ? `Next at ${formatAppointment(new Date(stats.nextAppointmentAt))}`
+                : "None coming up"
           }
         />
         <StatCard
           icon={<CalendarBlankIcon />}
           label="Follow-ups requested"
-          value={stats.followUpsRequested}
-          note={`${stats.followUpsPending} still pending`}
+          value={<Figure value={stats?.followUpsRequested ?? null} />}
+          note={stats ? `${stats.followUpsPending} still pending` : NOT_YET}
         />
       </StatGrid>
 
@@ -155,7 +161,7 @@ export function StaffProfile({
               {member.sex ? sexLabels[member.sex] : "—"}
             </InfoRow>
             <InfoRow icon={<PhoneIcon />} label="Phone Number">
-              {member.phone}
+              {member.phone || "—"}
             </InfoRow>
             <InfoRow icon={<CalendarBlankIcon />} label="Date of Birth">
               {member.dateOfBirth
@@ -166,7 +172,7 @@ export function StaffProfile({
               {member.email}
             </InfoRow>
             <InfoRow icon={<CalendarPlusIcon />} label="Joined at">
-              {formatDate(new Date(member.addedAt))}
+              {member.addedAt ? formatDate(new Date(member.addedAt)) : "—"}
             </InfoRow>
             <InfoRow icon={<UserPlusIcon />} label="Added by">
               {member.addedBy ?? "—"}
@@ -176,10 +182,18 @@ export function StaffProfile({
 
         <ProfileCard
           title="Role and access"
-          description={`What ${firstName(member.name)} can do in DocuHealth as a ${role.toLowerCase()}`}
+          description={
+            member.role
+              ? `What ${firstName(member.name)} can do in DocuHealth as a ${role.toLowerCase()}`
+              : `What ${firstName(member.name)} can do in DocuHealth`
+          }
         >
+          {/* TODO(api): what each role may do isn't available from the API yet. */}
+          {!member.permissions && (
+            <p className="py-10 text-center type-caption text-fg-caption">{NOT_YET}</p>
+          )}
           <ul className="flex flex-col divide-y">
-            {member.permissions.map(({ permission, granted }) => {
+            {member.permissions?.map(({ permission, granted }) => {
               const { label, description } = permissionLabels[permission];
               return (
                 <li key={permission} className="flex items-center gap-3 py-4">

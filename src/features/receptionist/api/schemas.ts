@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { type PatientRecord, patientRecordSchema, sexOf } from "@/lib/patient-record";
 import { fullName, optionalText, staffProfileSchema, text } from "@/lib/staff-profile";
 
 const count = z.number().int().nonnegative();
@@ -342,57 +343,12 @@ export type RegisteredPatient = z.infer<typeof registeredPatientSchema>;
 
 const dateTime = z.iso.datetime({ offset: true });
 
-const sexOf = (gender: string | null): Sex =>
-  gender === "male" || gender === "female" ? gender : "prefer_not_to_say";
-
-/** The app's sex → the API's gender. */
-export const genderOf = (sex: Sex) => (sex === "prefer_not_to_say" ? "unknown" : sex);
-
 const sentence = (value: string) =>
   value.charAt(0).toUpperCase() + value.slice(1).toLowerCase().replaceAll("_", " ");
 
 /** `GET /api/patients/{hin}/details`: a registered patient. */
-export const patientDetailsSchema = z
-  .object({
-    hin: z.string(),
-    firstname: text,
-    lastname: text,
-    middlename: optionalText,
-    dob: z.string(),
-    gender: optionalText,
-    phone_num: optionalText,
-    email: optionalText,
-    contact_email: optionalText,
-    house_no: optionalText,
-    street: optionalText,
-    city: optionalText,
-    state: optionalText,
-    country: optionalText,
-    payment_provider: z.object({ type: optionalText }).nullish(),
-  })
-  .transform((patient) => ({
-    id: patient.hin,
-    name: fullName(patient.firstname, patient.lastname) || patient.hin,
-    hin: patient.hin,
-    dateOfBirth: patient.dob,
-    sex: sexOf(patient.gender),
-    avatarUrl: null,
-    phone: patient.phone_num,
-    email: patient.email ?? patient.contact_email,
-    address:
-      [
-        [patient.house_no, patient.street].filter(Boolean).join(" "),
-        patient.city,
-        patient.state,
-        patient.country,
-      ]
-        .filter(Boolean)
-        .join(", ") || null,
-    /** TODO(api): the API's `company` has no match in the design's coverage list. */
-    coverage:
-      (["hmo", "private"] as const).find((type) => type === patient.payment_provider?.type) ?? null,
-  }));
-export type PatientDetails = z.infer<typeof patientDetailsSchema>;
+export const patientDetailsSchema = patientRecordSchema;
+export type PatientDetails = PatientRecord;
 
 /** The patient lookup's match. */
 export const toFoundPatient = (patient: PatientDetails): FoundPatient => ({
@@ -540,11 +496,3 @@ export const createdDependantSchema = z.object({
 
 /** Replies to writes whose body the app doesn't use. */
 export const anyResponseSchema = z.unknown();
-
-/** An action the design has but the API can't do yet. TODO(api): see the backend gaps file. */
-export class NotAvailableYetError extends Error {
-  constructor(what: string) {
-    super(`${what} isn’t available yet. It’s waiting on the backend.`);
-    this.name = "NotAvailableYetError";
-  }
-}

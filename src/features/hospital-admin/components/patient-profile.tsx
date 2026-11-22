@@ -29,6 +29,7 @@ import { CountTab, CountTabsList } from "@/components/dashboard/count-tabs";
 import { FilterSelect } from "@/components/dashboard/filter-select";
 import { PersonAvatar } from "@/components/dashboard/person-avatar";
 import { InfoRow, ProfileCard } from "@/components/dashboard/profile-card";
+import { Figure } from "@/components/dashboard/figure";
 import { StatCard, StatGrid } from "@/components/dashboard/stat-card";
 import { ageOn, formatDate, formatDayAndTime } from "@/lib/format";
 
@@ -36,9 +37,12 @@ const coverageTones = {
   hmo: "bg-success-100 text-success-500",
   nhis: "bg-info-100 text-info-500",
   private: "bg-line text-fg-body",
-} as const satisfies Record<PatientDetail["coverage"], string>;
+} as const satisfies Record<NonNullable<PatientDetail["coverage"]>, string>;
 
 const DAY = 24 * 60 * 60 * 1000;
+
+/** For what the API doesn't send yet. TODO(api). */
+const NOT_YET = "Not available yet";
 
 /** How far back the check-in history goes. */
 const historyRanges = {
@@ -60,10 +64,15 @@ export function PatientProfile({ patientId }: { patientId: string }) {
   const { data: patient } = useSuspenseQuery(patientDetailQuery(patientId));
   // When the page opened, for "Today" and the history's date range.
   const [now] = useState(() => new Date());
-  const birth = new Date(patient.dateOfBirth);
+  const birth = patient.dateOfBirth ? new Date(patient.dateOfBirth) : null;
+  // TODO(api): the admin's patient endpoint has no visit history (or last visit, check-in or
+  // upcoming appointment), so those say "Not available yet" rather than "none".
+  const known = patient.visits !== null;
+  const visits = patient.visits ?? [];
+  const none = known ? "No records to display" : NOT_YET;
   const counts = {
-    appointment: patient.visits.filter(({ kind }) => kind === "appointment").length,
-    check_in: patient.visits.filter(({ kind }) => kind === "check_in").length,
+    appointment: visits.filter(({ kind }) => kind === "appointment").length,
+    check_in: visits.filter(({ kind }) => kind === "check_in").length,
   };
 
   return (
@@ -76,15 +85,17 @@ export function PatientProfile({ patientId }: { patientId: string }) {
           <div className="flex min-w-0 flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="type-h3">{patient.name}</h1>
-              <span
-                className={`rounded-[4px] px-2 py-0.5 type-body-sm-regular ${coverageTones[patient.coverage]}`}
-              >
-                {coverageLabels[patient.coverage]}
-              </span>
+              {patient.coverage && (
+                <span
+                  className={`rounded-[4px] px-2 py-0.5 type-body-sm-regular ${coverageTones[patient.coverage]}`}
+                >
+                  {coverageLabels[patient.coverage]}
+                </span>
+              )}
             </div>
             <p className="flex flex-wrap items-center gap-x-3 gap-y-1 type-body-sm-regular text-fg-caption [&>span+span]:border-l [&>span+span]:border-divider [&>span+span]:pl-3">
               <span>HIN-{patient.hin}</span>
-              <span>{ageOn(birth, now)} yrs</span>
+              {birth && <span>{ageOn(birth, now)} yrs</span>}
               {patient.sex !== "prefer_not_to_say" && <span>{sexLabels[patient.sex]}</span>}
             </p>
           </div>
@@ -103,11 +114,13 @@ export function PatientProfile({ patientId }: { patientId: string }) {
         <StatCard
           icon={<UserIcon />}
           label="Total visits"
-          value={patient.visits.length}
+          value={<Figure value={known ? visits.length : null} />}
           note={
-            patient.visits.length === 0
-              ? "No visit records to display"
-              : `${plural(counts.appointment, "appointment")} · ${plural(counts.check_in, "check-in")}`
+            !known
+              ? NOT_YET
+              : visits.length === 0
+                ? "No visit records to display"
+                : `${plural(counts.appointment, "appointment")} · ${plural(counts.check_in, "check-in")}`
           }
         />
         <DateStat
@@ -115,21 +128,21 @@ export function PatientProfile({ patientId }: { patientId: string }) {
           label="Last Visit"
           at={patient.lastVisitAt}
           now={now}
-          none="No visit records to display"
+          none={known ? "No visit records to display" : NOT_YET}
         />
         <DateStat
           icon={<ClockIcon />}
           label="Last Check-in"
           at={patient.lastCheckInAt}
           now={now}
-          none="No records to display"
+          none={none}
         />
         <DateStat
           icon={<CalendarCheckIcon />}
           label="Upcoming Appointment"
           at={patient.upcomingAppointmentAt}
           now={now}
-          none="No records to display"
+          none={none}
         />
       </StatGrid>
 
@@ -140,7 +153,7 @@ export function PatientProfile({ patientId }: { patientId: string }) {
         >
           <dl className="flex flex-col">
             <InfoRow icon={<CalendarBlankIcon />} label="Date of Birth">
-              {formatDate(birth)} ({ageOn(birth, now)} years)
+              {birth ? `${formatDate(birth)} (${ageOn(birth, now)} years)` : "—"}
             </InfoRow>
             <InfoRow icon={<PhoneIcon />} label="Phone Number">
               {patient.phone ?? "—"}
@@ -157,7 +170,7 @@ export function PatientProfile({ patientId }: { patientId: string }) {
           </dl>
         </ProfileCard>
 
-        <CheckInHistory visits={patient.visits} counts={counts} now={now} />
+        <CheckInHistory visits={visits} known={known} counts={counts} now={now} />
       </div>
     </div>
   );
@@ -195,10 +208,13 @@ function DateStat({
 /** The patient's past appointments and check-ins, by kind and how far back. */
 function CheckInHistory({
   visits,
+  known,
   counts,
   now,
 }: {
-  visits: PatientDetail["visits"];
+  visits: NonNullable<PatientDetail["visits"]>;
+  /** Whether the API sent the history at all. TODO(api). */
+  known: boolean;
   counts: Record<VisitKind, number>;
   now: Date;
 }) {
@@ -244,11 +260,15 @@ function CheckInHistory({
           <span className="mb-3 grid size-12 place-content-center rounded-full bg-line text-fg-caption">
             <CalendarXIcon className="size-6" />
           </span>
-          <p className="type-h5">{visits.length === 0 ? "No visits yet" : "No visits found"}</p>
+          <p className="type-h5">
+            {!known ? NOT_YET : visits.length === 0 ? "No visits yet" : "No visits found"}
+          </p>
           <p className="type-body-sm-regular text-fg-caption">
-            {visits.length === 0
-              ? "No visit records to display"
-              : "None match this tab and date range."}
+            {!known
+              ? "Visit history is waiting on the backend."
+              : visits.length === 0
+                ? "No visit records to display"
+                : "None match this tab and date range."}
           </p>
         </div>
       ) : (

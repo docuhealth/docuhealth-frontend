@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { DashboardOverview } from "@/features/hospital-admin/api/schemas";
 import { BannerPhotoMenu } from "@/features/hospital-admin/components/banner-photo-menu";
 import { StatBanner } from "@/components/dashboard/stat-banner";
+import { Figure } from "@/components/dashboard/figure";
 import { StatCard } from "@/components/dashboard/stat-card";
 
 /**
@@ -16,9 +17,13 @@ export function OverviewBanner({
   stats: DashboardOverview["stats"];
   bannerUrl: string | null;
 }) {
-  const change = stats.addedThisMonth - stats.addedLastMonth;
+  // TODO(api): no joining dates yet, so no month-on-month change either.
+  const change =
+    stats.addedThisMonth === null || stats.addedLastMonth === null
+      ? null
+      : stats.addedThisMonth - stats.addedLastMonth;
 
-  const cards: { icon: ReactNode; label: string; value: number; note: ReactNode }[] = [
+  const cards: { icon: ReactNode; label: string; value: number | null; note: ReactNode }[] = [
     {
       icon: <UsersIcon />,
       label: "Total Staff",
@@ -29,16 +34,19 @@ export function OverviewBanner({
       icon: <UserPlusIcon />,
       label: "Added this month",
       value: stats.addedThisMonth,
-      note: (
-        <>
-          {change >= 0 ? (
-            <span className="text-success-500">+{change} more</span>
-          ) : (
-            <span className="text-error-500">{-change} fewer</span>
-          )}{" "}
-          vs last month
-        </>
-      ),
+      note:
+        change === null ? (
+          "Not available yet"
+        ) : (
+          <>
+            {change >= 0 ? (
+              <span className="text-success-500">+{change} more</span>
+            ) : (
+              <span className="text-error-500">{-change} fewer</span>
+            )}{" "}
+            vs last month
+          </>
+        ),
     },
     {
       icon: <ShieldCheckIcon />,
@@ -57,7 +65,7 @@ export function OverviewBanner({
   return (
     <StatBanner imageUrl={bannerUrl} action={<BannerPhotoMenu hasCustomPhoto={!!bannerUrl} />}>
       {cards.map((card) => (
-        <StatCard key={card.label} {...card} />
+        <StatCard key={card.label} {...card} value={<Figure value={card.value} />} />
       ))}
     </StatBanner>
   );

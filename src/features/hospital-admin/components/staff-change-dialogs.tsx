@@ -11,7 +11,7 @@ import { useUpdateStaffMember } from "@/features/hospital-admin/api/mutations";
 import {
   type StaffMember,
   type StaffMemberChange,
-  staffRoles,
+  roleName,
 } from "@/features/hospital-admin/api/schemas";
 import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { getErrorMessage } from "@/lib/api";
@@ -95,8 +95,8 @@ export function StaffChangeDialogs({
           onClose={close}
         >
           <DialogDescription className="type-body-sm-regular text-fg-body">
-            {name} will keep their account and their role as {staffRoles[member.role].one}, but
-            won’t be able to manage staff anymore.
+            {name} will keep their account and their role as {roleName(member.role)}, but won’t be
+            able to manage staff anymore.
           </DialogDescription>
         </ConfirmDialog>
       )}

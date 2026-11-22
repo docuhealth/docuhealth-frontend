@@ -7,7 +7,7 @@ import {
   sexLabels,
   type StaffFilter,
   type StaffMember,
-  staffRoles,
+  roleName,
   staffStatusLabels,
 } from "@/features/hospital-admin/api/schemas";
 import { DashboardTable, PersonCell } from "@/components/dashboard/dashboard-table";
@@ -15,6 +15,7 @@ import { StaffActionsMenu } from "@/features/hospital-admin/components/staff-act
 import { StatusPill } from "@/components/dashboard/status-pill";
 import { TablePagination } from "@/components/dashboard/table-pagination";
 import { formatTimeAgo } from "@/lib/format";
+import { NotAvailableYetError } from "@/lib/not-available";
 
 // The design's layout on wide cards: Name ~28%, the others 14% each.
 const columns = {
@@ -49,11 +50,13 @@ export function StaffDirectory({
   onPageChange: (page: number) => void;
   selection?: StaffSelection;
 }) {
-  const { data, isError } = useQuery(staffListQuery(search, page, filter));
+  const { data, error } = useQuery(staffListQuery(search, page, filter));
   const items = data?.items ?? [];
 
-  const empty = isError
-    ? "We couldn’t load your staff. Try again in a moment."
+  const empty = error
+    ? error instanceof NotAvailableYetError
+      ? error.message
+      : "We couldn’t load your staff. Try again in a moment."
     : data?.items.length === 0 &&
       (search || filter !== "all" ? "No staff match your search." : "No staff added yet.");
 
@@ -120,9 +123,9 @@ export function StaffDirectory({
               <TableCell>
                 <StaffPerson member={member} />
               </TableCell>
-              <TableCell>{staffRoles[member.role].one}</TableCell>
+              <TableCell>{roleName(member.role)}</TableCell>
               <TableCell>{member.phone}</TableCell>
-              <TableCell>{formatTimeAgo(new Date(member.addedAt))}</TableCell>
+              <TableCell>{addedAgo(member)}</TableCell>
               <TableCell>
                 <StaffStatus member={member} />
               </TableCell>
@@ -167,9 +170,9 @@ export function StaffDirectory({
                     <Detail label="Status">
                       <StaffStatus member={member} />
                     </Detail>
-                    <Detail label="Role/Dept">{staffRoles[member.role].one}</Detail>
+                    <Detail label="Role/Dept">{roleName(member.role)}</Detail>
                     <Detail label="Phone no.">{member.phone}</Detail>
-                    <Detail label="Added">{formatTimeAgo(new Date(member.addedAt))}</Detail>
+                    <Detail label="Added">{addedAgo(member)}</Detail>
                     <Detail label="Sex">{member.sex ? sexLabels[member.sex] : "—"}</Detail>
                   </dl>
                 </li>
@@ -190,6 +193,10 @@ export function StaffDirectory({
     </>
   );
 }
+
+/** "3 days ago", or a dash while the API doesn't say when they joined. TODO(api). */
+const addedAgo = (member: StaffMember) =>
+  member.addedAt ? formatTimeAgo(new Date(member.addedAt)) : "—";
 
 function StaffPerson({ member }: { member: StaffMember }) {
   return (

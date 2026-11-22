@@ -149,8 +149,9 @@ export function StaffManagement() {
             <div className="flex items-center gap-3">
               {data && (
                 <p className="type-caption text-fg-caption">
-                  {plural(data.summary.staff, "staff", "staff")} ·{" "}
-                  {plural(data.summary.admins, "admin")}
+                  {plural(data.summary.staff, "staff", "staff")}
+                  {/* TODO(api): the admin count, once the API says who's an admin. */}
+                  {data.summary.admins !== null && ` · ${plural(data.summary.admins, "admin")}`}
                 </p>
               )}
               <Separator orientation="vertical" className="h-4! self-center! bg-divider" />

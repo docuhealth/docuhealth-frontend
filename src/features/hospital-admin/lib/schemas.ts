@@ -33,7 +33,7 @@ export const addFacilitySchema = z.object({
 export type AddFacilityInput = z.input<typeof addFacilitySchema>;
 export type AddFacilityValues = z.output<typeof addFacilitySchema>;
 
-type StaffRole = StaffMember["role"];
+type StaffRole = NonNullable<StaffMember["role"]>;
 
 /** The Add Staff dialog, both steps: who they are, then their login and welcome message. */
 export const addStaffSchema = z.object({

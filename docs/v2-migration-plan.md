@@ -58,7 +58,14 @@ Built as `src/features/staff/` (routes compose it into each dashboard).
       `api/lab/*`. Checked on staging (reads). Waiting on the backend: item-level list filter,
       approved/returning figures, HIN lookup for lab staff, dates (gaps file, section 7)
 - [ ] Lab administration page (lab admin's result approvals: real endpoints exist, no design yet)
-- [ ] Hospital Admin (+ ward management, audit logs, wallet)
+- [x] Hospital Admin: overview (team size, staff by role, queue), staff management (search,
+      on team / removed, remove and undo, add staff), staff profile, patient management (4 tabs,
+      search, counts), patient profile, banner photo on the real API. Checked on staging (reads).
+      Not available yet: admin access, joining dates, facility count, check-in stats, patient
+      filters and sorting, staff activity and permissions, patient visit history. Blocked by the
+      API: adding a facility needs a name and address the design doesn't ask for (gaps file,
+      section 7)
+- [ ] Hospital Admin: ward management, audit logs, wallet (no designs yet)
 
 ## Phase 3: Pharmacy
 

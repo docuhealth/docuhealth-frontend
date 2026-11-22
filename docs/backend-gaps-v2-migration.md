@@ -171,7 +171,9 @@ call-by-call table is in `docs/api-mapping-redesigned-dashboards.md`. These are 
 8. **Missing row fields.** Check-in time on `outpatient_discharge` rows; visit type (appointment/emergency/walk-in/follow-up) on check-ins; `checked_in_by`. Also a response schema for this endpoint.
 9. **Admin patient profile.** Allow hospital admins `GET /api/patients/{hin}/details` (or confirm `/info` is meant for admins), and add assigned doctor, last visit, last check-in, upcoming appointment and a visit history list.
 10. **Undo after remove.** Clarify whether `staff/reactivate` restores a _removed_ member, or whether removal is final.
-11. **Staff creation.** Confirm how passwords work on `staff/create` (the UI sends a password; the API doesn't accept one). Confirm the role list: `records_officer` doesn't exist in the API.
+11. **Staff creation.** Confirm how passwords work on `staff/create`: the Add Staff dialog asks for one and puts it in the welcome message, but the API doesn't accept one, so the password in the email won't work. (The UI now uses the API's role list; "Records officer" is gone.)
+12. **Add facility.** `POST /api/auth/facility/arms` requires the facility's `name`, `street`, `city`, `state` and `country`, which the Add Facility dialog doesn't ask for (design kept as is). Please make them optional (defaulting to the hospital's own address, say); until then adding a facility fails with those fields' errors.
+13. **Staff list filters.** `GET /api/auth/staff` ignores `is_active`, so the Staff Management filters (On team / Removed) read the whole team and filter in the browser. Fine for now; a filter would be needed for large hospitals.
 
 ### Radiologist
 

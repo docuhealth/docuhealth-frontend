@@ -5,7 +5,7 @@ import { SuccessDialog } from "@/components/success-dialog";
 import { Button } from "@/components/ui/button";
 import { DialogDescription } from "@/components/ui/dialog";
 import { useSetStaffStatus } from "@/features/hospital-admin/api/mutations";
-import { type StaffMember, staffRoles } from "@/features/hospital-admin/api/schemas";
+import { roleName, type StaffMember } from "@/features/hospital-admin/api/schemas";
 import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { PersonAvatar } from "@/components/dashboard/person-avatar";
 import { getErrorMessage } from "@/lib/api";
@@ -135,7 +135,7 @@ export function RemoveStaffFlow({
               <div className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate type-body-sm-regular text-fg-heading">{member.name}</span>
                 <span className="truncate type-caption text-fg-caption">
-                  {staffRoles[member.role].one}
+                  {roleName(member.role)}
                 </span>
               </div>
               <Button

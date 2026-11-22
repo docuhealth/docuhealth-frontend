@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { request } from "@/lib/api";
+import { NotAvailableYetError } from "@/lib/not-available";
+import { genderOf } from "@/lib/patient-record";
 import { absoluteUrl } from "@/lib/sections";
 import { receptionistKeys } from "@/features/receptionist/api/queries";
 import {
@@ -7,10 +9,8 @@ import {
   type CancellationReason,
   createdDependantSchema,
   type DependentLinked,
-  genderOf,
   type GuardianVerification,
   guardianVerificationLabels,
-  NotAvailableYetError,
   patientDetailsSchema,
   type Relationship,
   relationshipLabels,

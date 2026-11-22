@@ -71,7 +71,8 @@ function profileOf(account: StaffAccount) {
   return { staff_info: account, hospital_info: hospital, hospital_theme: hospitalTheme };
 }
 
-const colleagues = (
+/** The hospital's team (besides whoever is signed in), which the admin can add to and remove from. */
+export const colleagues: StaffAccount[] = (
   [
     ["Raphael", "Jonnas", "doctor", "male", true],
     ["Sarah", "Adeyemi", "doctor", "female", true],
@@ -300,8 +301,3 @@ export const staffHandlers = [
 ];
 
 let pendingEmail: string | null = null;
-
-/** The profile the dashboard behind `request` gets, e.g. after the hospital's look changes. */
-export function staffProfileResponse(request: Request) {
-  return profileOf(accountFor(request));
-}

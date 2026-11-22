@@ -22,6 +22,7 @@ import {
   maskHin,
   minutesBetween,
 } from "@/lib/format";
+import { NotAvailableYetError } from "@/lib/not-available";
 
 // The design's layout on wide cards: Patient ~27%, the details sharing what's left.
 const width = {
@@ -59,13 +60,21 @@ const tabColumns: Record<PatientTab, { label: string; className: string }[]> = {
   ],
 };
 
+/** "—" for a detail the API doesn't send yet. TODO(api). */
+const NONE = "—";
+
+/** How long between two moments, or a dash when either is missing. */
+function took(from: string | null, to: string | null) {
+  return from && to ? formatDuration(minutesBetween(new Date(from), new Date(to))) : NONE;
+}
+
 /** A visit's details, in the order of its tab's columns. */
 function detailsOf(visit: PatientVisit, now: Date): ReactNode[] {
   switch (visit.status) {
     case "admitted":
       return [
-        <Lines key="ward" first={visit.ward} second={`Bed ${visit.bed}`} />,
-        visit.admittedBy,
+        <Lines key="ward" first={visit.ward ?? NONE} second={visit.bed && `Bed ${visit.bed}`} />,
+        visit.admittedBy ?? NONE,
         <When key="admitted" at={visit.admittedAt} now={now} />,
         <Pill key="stay">{formatDayOfStay(new Date(visit.admittedAt), now)}</Pill>,
       ];
@@ -73,32 +82,28 @@ function detailsOf(visit: PatientVisit, now: Date): ReactNode[] {
       return [
         <Lines
           key="type"
-          first={visitTypeLabels[visit.visitType]}
+          first={visit.visitType ? visitTypeLabels[visit.visitType] : NONE}
           second={visit.bed && `Bed ${visit.bed}`}
         />,
-        visit.checkedInBy,
+        visit.checkedInBy ?? NONE,
         <When key="in" at={visit.checkedInAt} now={now} />,
-        <Pill key="wait">{formatDuration(visit.waitMinutes)}</Pill>,
+        <Pill key="wait">
+          {visit.waitMinutes === null ? NONE : formatDuration(visit.waitMinutes)}
+        </Pill>,
       ];
     case "checked_out":
       return [
-        visit.checkedOutBy,
+        visit.checkedOutBy ?? NONE,
         <When key="out" at={visit.checkedOutAt} now={now} />,
-        <Pill key="took">
-          {formatDuration(
-            minutesBetween(new Date(visit.checkedInAt), new Date(visit.checkedOutAt)),
-          )}
-        </Pill>,
+        <Pill key="took">{took(visit.checkedInAt, visit.checkedOutAt)}</Pill>,
       ];
     case "discharged":
       return [
-        <Lines key="ward" first={visit.ward} second={`Bed ${visit.bed}`} />,
-        visit.dischargedBy,
+        <Lines key="ward" first={visit.ward ?? NONE} second={visit.bed && `Bed ${visit.bed}`} />,
+        visit.dischargedBy ?? NONE,
         <When key="admitted" at={visit.admittedAt} now={now} />,
         <When key="discharged" at={visit.dischargedAt} now={now} />,
-        <Pill key="stay">
-          {formatDuration(minutesBetween(new Date(visit.admittedAt), new Date(visit.dischargedAt)))}
-        </Pill>,
+        <Pill key="stay">{took(visit.admittedAt, visit.dischargedAt)}</Pill>,
       ];
   }
 }
@@ -117,14 +122,16 @@ export function PatientList({
   filtered: boolean;
   onPageChange: (page: number) => void;
 }) {
-  const { data, isError } = useQuery(patientListQuery(params));
+  const { data, error } = useQuery(patientListQuery(params));
   // When the page opened, for "Today" and lengths of stay.
   const [now] = useState(() => new Date());
   const items = data?.items ?? [];
   const columns = tabColumns[params.tab];
 
-  const empty = isError
-    ? "We couldn’t load these patients. Try again in a moment."
+  const empty = error
+    ? error instanceof NotAvailableYetError
+      ? error.message
+      : "We couldn’t load these patients. Try again in a moment."
     : data?.items.length === 0 &&
       (filtered ? "No patients match your search." : "No patients here yet.");
 
@@ -200,14 +207,14 @@ export function PatientList({
 }
 
 function Patient({ patient }: { patient: PatientVisit["patient"] }) {
-  const age = ageOn(new Date(patient.dateOfBirth));
+  const age = patient.dateOfBirth && ageOn(new Date(patient.dateOfBirth));
   return (
     <PersonCell
       name={patient.name}
       avatarUrl={patient.avatarUrl}
       detail={[
         `HIN ${maskHin(patient.hin)}`,
-        `${age} yrs`,
+        age !== null && `${age} yrs`,
         patient.sex !== "prefer_not_to_say" && sexLabels[patient.sex],
       ]
         .filter(Boolean)
@@ -226,7 +233,8 @@ function Lines({ first, second }: { first: ReactNode; second?: ReactNode }) {
   );
 }
 
-function When({ at, now }: { at: string; now: Date }) {
+function When({ at, now }: { at: string | null; now: Date }) {
+  if (!at) return NONE;
   const { day, time } = formatDayAndTime(new Date(at), now);
   return <Lines first={day} second={time} />;
 }

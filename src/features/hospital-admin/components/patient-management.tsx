@@ -26,6 +26,7 @@ import {
 } from "@/features/hospital-admin/api/schemas";
 import { type Period } from "@/lib/period";
 import { CountTab, CountTabsList } from "@/components/dashboard/count-tabs";
+import { Figure } from "@/components/dashboard/figure";
 import { FilterSelect } from "@/components/dashboard/filter-select";
 import { PatientList } from "@/features/hospital-admin/components/patient-list";
 import { PeriodSelect } from "@/components/dashboard/period-select";
@@ -109,25 +110,25 @@ export function PatientManagement({
         <StatCard
           icon={<UserIcon />}
           label="Total check-in"
-          value={stats.totalCheckIns.toLocaleString("en-GB")}
+          value={<Figure value={stats.totalCheckIns} />}
           note="All patients on record"
         />
         <StatCard
           icon={<UserPlusIcon />}
           label="New check-ins"
-          value={stats.newCheckIns.toLocaleString("en-GB")}
+          value={<Figure value={stats.newCheckIns} />}
           note={<Change by={stats.newCheckInsChange} since="last week" />}
         />
         <StatCard
           icon={<CalendarCheckIcon />}
           label="Check-ins this month"
-          value={stats.checkInsThisMonth.toLocaleString("en-GB")}
+          value={<Figure value={stats.checkInsThisMonth} />}
           note={<Change by={stats.checkInsThisMonthChange} since="yesterday" />}
         />
         <StatCard
           icon={<ArrowsClockwiseIcon />}
           label="Returning Patients"
-          value={stats.returningPatients.toLocaleString("en-GB")}
+          value={<Figure value={stats.returningPatients} />}
           note="Visited before today"
         />
       </StatGrid>
@@ -226,8 +227,12 @@ export function PatientManagement({
   );
 }
 
-/** "+12 vs last week" in green with an up arrow, or the drop in red with a down arrow. */
-function Change({ by, since }: { by: number; since: string }) {
+/**
+ * "+12 vs last week" in green with an up arrow, or the drop in red with a down arrow; "Not
+ * available yet" while there's no figure.
+ */
+function Change({ by, since }: { by: number | null; since: string }) {
+  if (by === null) return <>Not available yet</>;
   const Arrow = by >= 0 ? ArrowCircleUpIcon : ArrowCircleDownIcon;
   return (
     <span
