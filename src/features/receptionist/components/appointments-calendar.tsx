@@ -10,6 +10,7 @@ import {
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { StatCard, StatGrid } from "@/components/dashboard/stat-card";
+import { Change, Figure } from "@/components/dashboard/figure";
 import { Trend } from "@/components/dashboard/trend";
 import { Button } from "@/components/ui/button";
 import { appointmentCalendarQuery } from "@/features/receptionist/api/queries";
@@ -205,7 +206,7 @@ function Summary({
         icon={<CalendarBlankIcon />}
         label={`Booked this ${noun}`}
         value={summary.booked.toLocaleString("en-GB")}
-        note={<Trend change={summary.bookedChange} since={since} />}
+        note={<Change change={summary.bookedChange} since={since} />}
       />
       <StatCard
         icon={<UserCheckIcon />}
@@ -218,7 +219,9 @@ function Summary({
         label="Cancelled"
         value={summary.cancelled.toLocaleString("en-GB")}
         note={
-          cancelledChange === 0 ? (
+          cancelledChange === null ? (
+            "Not available yet"
+          ) : cancelledChange === 0 ? (
             `Same as ${since}`
           ) : (
             // Fewer cancellations is the good news here.
@@ -234,8 +237,12 @@ function Summary({
       <StatCard
         icon={<CalendarDotsIcon />}
         label="Open slots left"
-        value={summary.openSlots.toLocaleString("en-GB")}
-        note={`Of ${summary.totalSlots.toLocaleString("en-GB")} ${slots} slots`}
+        value={<Figure value={summary.openSlots} />}
+        note={
+          summary.totalSlots === null
+            ? "Not available yet"
+            : `Of ${summary.totalSlots.toLocaleString("en-GB")} ${slots} slots`
+        }
       />
     </StatGrid>
   );

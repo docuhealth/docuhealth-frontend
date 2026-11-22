@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { staffProfileSchema } from "@/lib/staff-profile";
+import { fullName, optionalText, staffProfileSchema, text } from "@/lib/staff-profile";
 
 const count = z.number().int().nonnegative();
 
@@ -17,18 +17,19 @@ export const receptionistProfileSchema = staffProfileSchema.transform(({ user, h
 export type ReceptionistProfile = z.infer<typeof receptionistProfileSchema>;
 
 /** Headline numbers; each `…Change` is a percentage against the period before. */
-export const receptionOverviewSchema = z.object({
+const receptionOverviewSchema = z.object({
+  // `null` where the API has no figure yet (TODO(api)).
   /** In the period asked for, compared with the one before it. */
-  totalCheckIns: count,
-  totalCheckInsChange: z.number(),
+  totalCheckIns: count.nullable(),
+  totalCheckInsChange: z.number().nullable(),
   /** Right now, compared with an hour ago. */
   waitingInQueue: count,
-  waitingInQueueChange: z.number(),
+  waitingInQueueChange: z.number().nullable(),
   /** Today, compared with yesterday. */
-  checkedInToday: count,
-  checkedInTodayChange: z.number(),
+  checkedInToday: count.nullable(),
+  checkedInTodayChange: z.number().nullable(),
   appointmentsToday: count,
-  appointmentsTodayChange: z.number(),
+  appointmentsTodayChange: z.number().nullable(),
 });
 export type ReceptionOverview = z.infer<typeof receptionOverviewSchema>;
 
@@ -46,10 +47,10 @@ export const appointmentStatusLabels = {
   in_progress: "In-Progress",
   cancelled: "Cancelled",
 } as const;
-export type AppointmentStatus = keyof typeof appointmentStatusLabels;
+type AppointmentStatus = keyof typeof appointmentStatusLabels;
 
 /** One day's (or the later) appointments; `counts` covers every tab whatever the search. */
-export const appointmentListSchema = z.object({
+const appointmentListSchema = z.object({
   counts: z.object({ today: count, tomorrow: count, upcoming: count }),
   items: z.array(
     z.object({
@@ -71,7 +72,7 @@ export const appointmentListSchema = z.object({
 });
 export type AppointmentList = z.infer<typeof appointmentListSchema>;
 
-export const appointmentSchema = appointmentListSchema.shape.items.element;
+const appointmentSchema = appointmentListSchema.shape.items.element;
 export type Appointment = z.infer<typeof appointmentSchema>;
 
 /** Why an appointment is being cancelled, in the order the cancel dialog offers them. */
@@ -86,7 +87,7 @@ export const cancellationReasonLabels = {
 export type CancellationReason = keyof typeof cancellationReasonLabels;
 
 /** One appointment opened from the calendar, with what the front desk needs to manage it. */
-export const appointmentDetailSchema = appointmentSchema.extend({
+const appointmentDetailSchema = appointmentSchema.extend({
   patient: z.object({
     id: z.string(),
     name: z.string(),
@@ -112,7 +113,7 @@ export type Sex = keyof typeof sexLabels;
 const sex = z.enum(Object.keys(sexLabels) as [Sex, ...Sex[]]);
 
 /** An appointment on the Appointments page, with enough of the patient to tell them apart. */
-export const calendarAppointmentSchema = appointmentSchema.extend({
+const calendarAppointmentSchema = appointmentSchema.extend({
   patient: appointmentSchema.shape.patient.extend({
     /** Digits only. */
     hin: z.string(),
@@ -126,19 +127,20 @@ export type CalendarAppointment = z.infer<typeof calendarAppointmentSchema>;
  * The Appointments page: every appointment from `from` up to `to` (cancelled ones too, earliest
  * first), and that span's numbers.
  */
-export const appointmentCalendarSchema = z.object({
+const appointmentCalendarSchema = z.object({
   summary: z.object({
     /** Every appointment in the span, cancelled ones included. */
     booked: count,
+    // `null` where the API has no figure yet (TODO(api)).
     /** Percentage against the span of the same length before. */
-    bookedChange: z.number(),
+    bookedChange: z.number().nullable(),
     checkedIn: count,
     cancelled: count,
     /** How many more (or, negative, fewer) were cancelled than in the span before. */
-    cancelledChange: z.number().int(),
-    openSlots: count,
+    cancelledChange: z.number().int().nullable(),
+    openSlots: count.nullable(),
     /** Every slot the front desk can book in the span. */
-    totalSlots: count,
+    totalSlots: count.nullable(),
   }),
   items: z.array(calendarAppointmentSchema),
 });
@@ -153,7 +155,7 @@ export const queueStatusLabels = {
 export type QueueStatus = keyof typeof queueStatusLabels;
 
 /** Patients checked in and waiting, longest wait first. */
-export const receptionQueueSchema = z.object({
+const receptionQueueSchema = z.object({
   items: z.array(
     z.object({
       id: z.string(),
@@ -173,10 +175,8 @@ export const receptionQueueSchema = z.object({
 export type ReceptionQueue = z.infer<typeof receptionQueueSchema>;
 export type QueueEntry = ReceptionQueue["items"][number];
 
-export const queueEntrySchema = receptionQueueSchema.shape.items.element;
-
 /** Registered patients whose HIN matches the one looked up (one, or none). */
-export const patientLookupSchema = z.object({
+const patientLookupSchema = z.object({
   items: z.array(
     z.object({
       id: z.string(),
@@ -227,7 +227,7 @@ export type LinkedPerson = z.infer<typeof linkedPersonSchema>;
  * One patient's profile for the front desk. A patient with `proxies` is a dependent, whose
  * account someone else manages; anyone else may manage `dependents` of their own.
  */
-export const patientProfileSchema = z.object({
+const patientProfileSchema = z.object({
   id: z.string(),
   name: z.string(),
   /** Digits only. */
@@ -235,7 +235,8 @@ export const patientProfileSchema = z.object({
   dateOfBirth: z.iso.date(),
   sex,
   avatarUrl: z.url().nullable(),
-  coverage: z.enum(Object.keys(coverageLabels) as [Coverage, ...Coverage[]]),
+  /** `null` when the API's value has no match here. */
+  coverage: z.enum(Object.keys(coverageLabels) as [Coverage, ...Coverage[]]).nullable(),
   phone: z.string().nullable(),
   email: z.email().nullable(),
   address: z.string().nullable(),
@@ -268,7 +269,7 @@ export const requestStatusLabels = {
 type RequestStatus = keyof typeof requestStatusLabels;
 
 /** A follow-up a doctor asked the front desk to book, waiting for the patient to agree a time. */
-export const appointmentRequestSchema = z.object({
+const appointmentRequestSchema = z.object({
   id: z.string(),
   /** e.g. "Follow-up visit". */
   reason: z.string(),
@@ -283,7 +284,7 @@ export const appointmentRequestSchema = z.object({
 export type AppointmentRequest = z.infer<typeof appointmentRequestSchema>;
 
 /** What the front desk reviews before a patient in the queue leaves. */
-export const checkOutSummarySchema = z.object({
+const checkOutSummarySchema = z.object({
   patient: z.object({
     id: z.string(),
     name: z.string(),
@@ -315,11 +316,8 @@ export const guardianVerificationLabels = {
 } as const;
 export type GuardianVerification = keyof typeof guardianVerificationLabels;
 
-/** Where the verification code for a new guardian's phone went. */
-export const phoneVerificationSentSchema = z.object({ phone: z.string() });
-
 /** A child linked to a guardian: the child (new or existing) and who they're linked to. */
-export const dependentLinkedSchema = z.object({
+const dependentLinkedSchema = z.object({
   child: z.object({
     id: z.string(),
     name: z.string(),
@@ -330,16 +328,223 @@ export const dependentLinkedSchema = z.object({
 });
 export type DependentLinked = z.infer<typeof dependentLinkedSchema>;
 
-/** Where the verification code for a new patient's email went. */
-export const verificationSentSchema = z.object({ email: z.email() });
-
-/** Proof the new patient's email was verified, sent along when registering them. */
-export const emailVerifiedSchema = z.object({ verificationToken: z.string() });
-
 /** The patient just registered, and the HIN they'll use from now on. */
-export const registeredPatientSchema = z.object({
+const registeredPatientSchema = z.object({
   id: z.string(),
   /** Digits only. */
   hin: z.string(),
 });
 export type RegisteredPatient = z.infer<typeof registeredPatientSchema>;
+
+// ---------------------------------------------------------------------------------------------
+// The real API's shapes (docs/api/openapi.json) and how they become the models above. TODO(api)
+// marks what the API doesn't send yet; see docs/backend-gaps-v2-migration.md, section 7.
+
+const dateTime = z.iso.datetime({ offset: true });
+
+const sexOf = (gender: string | null): Sex =>
+  gender === "male" || gender === "female" ? gender : "prefer_not_to_say";
+
+/** The app's sex → the API's gender. */
+export const genderOf = (sex: Sex) => (sex === "prefer_not_to_say" ? "unknown" : sex);
+
+const sentence = (value: string) =>
+  value.charAt(0).toUpperCase() + value.slice(1).toLowerCase().replaceAll("_", " ");
+
+/** `GET /api/patients/{hin}/details`: a registered patient. */
+export const patientDetailsSchema = z
+  .object({
+    hin: z.string(),
+    firstname: text,
+    lastname: text,
+    middlename: optionalText,
+    dob: z.string(),
+    gender: optionalText,
+    phone_num: optionalText,
+    email: optionalText,
+    contact_email: optionalText,
+    house_no: optionalText,
+    street: optionalText,
+    city: optionalText,
+    state: optionalText,
+    country: optionalText,
+    payment_provider: z.object({ type: optionalText }).nullish(),
+  })
+  .transform((patient) => ({
+    id: patient.hin,
+    name: fullName(patient.firstname, patient.lastname) || patient.hin,
+    hin: patient.hin,
+    dateOfBirth: patient.dob,
+    sex: sexOf(patient.gender),
+    avatarUrl: null,
+    phone: patient.phone_num,
+    email: patient.email ?? patient.contact_email,
+    address:
+      [
+        [patient.house_no, patient.street].filter(Boolean).join(" "),
+        patient.city,
+        patient.state,
+        patient.country,
+      ]
+        .filter(Boolean)
+        .join(", ") || null,
+    /** TODO(api): the API's `company` has no match in the design's coverage list. */
+    coverage:
+      (["hmo", "private"] as const).find((type) => type === patient.payment_provider?.type) ?? null,
+  }));
+export type PatientDetails = z.infer<typeof patientDetailsSchema>;
+
+/** The patient lookup's match. */
+export const toFoundPatient = (patient: PatientDetails): FoundPatient => ({
+  id: patient.id,
+  name: patient.name,
+  hin: patient.hin,
+  dateOfBirth: patient.dateOfBirth,
+  sex: patient.sex,
+  avatarUrl: patient.avatarUrl,
+  phone: patient.phone,
+  email: patient.email,
+});
+
+/** The profile page; TODO(api): visits, links and the doctor aren't available to the front desk. */
+export const toPatientProfile = (patient: PatientDetails): PatientProfile => ({
+  ...toFoundPatient(patient),
+  coverage: patient.coverage,
+  address: patient.address,
+  assignedDoctor: null,
+  lastVisit: null,
+  lastCheckIn: null,
+  upcomingAppointment: null,
+  visits: [],
+  dependents: [],
+  proxies: [],
+});
+
+/** `HospitalAppointment`, as the API returns it. */
+const appointmentRead = z.object({
+  sqid: z.string(),
+  status: z.string(),
+  scheduled_time: dateTime,
+  type: optionalText,
+  note: optionalText,
+  staff: z.object({ firstname: text, lastname: text }).nullish(),
+  patient: z.object({
+    hin: text,
+    firstname: text,
+    lastname: text,
+    phone_num: optionalText,
+    email: optionalText,
+    dob: z.string().nullish(),
+    gender: optionalText,
+  }),
+});
+type AppointmentRead = z.infer<typeof appointmentRead>;
+
+export const appointmentPageSchema = z.object({
+  count: count,
+  results: z.array(appointmentRead),
+});
+
+/** Only a list's total, e.g. `?size=1` to count a tab. */
+export const countOnlySchema = z.object({ count: count }).transform(({ count }) => count);
+
+/**
+ * The API's appointment status → the design's. TODO(api): appointments don't record arrival or
+ * check-in, so "Arrived" and "In-Progress" never show; a completed one shows as "Checked In".
+ */
+const statusOfAppointment: Record<string, AppointmentStatus> = {
+  pending: "upcoming",
+  confirmed: "upcoming",
+  completed: "checked_in",
+  cancelled: "cancelled",
+};
+
+export const toAppointment = (appointment: AppointmentRead): Appointment => ({
+  id: appointment.sqid,
+  at: appointment.scheduled_time,
+  patient: {
+    id: appointment.patient.hin,
+    name: fullName(appointment.patient.firstname, appointment.patient.lastname),
+    phone: appointment.patient.phone_num ?? "",
+    avatarUrl: null,
+  },
+  // TODO(api): no reason field; the type ("consultation") stands in.
+  reason: appointment.type ? sentence(appointment.type) : "Appointment",
+  status: statusOfAppointment[appointment.status] ?? "upcoming",
+});
+
+export const toCalendarAppointment = (appointment: AppointmentRead): CalendarAppointment => {
+  const base = toAppointment(appointment);
+  return {
+    ...base,
+    patient: {
+      ...base.patient,
+      hin: appointment.patient.hin,
+      dateOfBirth: appointment.patient.dob ?? "1900-01-01",
+      sex: sexOf(appointment.patient.gender),
+    },
+  };
+};
+
+export const toAppointmentDetail = (appointment: AppointmentRead): AppointmentDetail => ({
+  ...toAppointment(appointment),
+  patient: {
+    id: appointment.patient.hin,
+    name: fullName(appointment.patient.firstname, appointment.patient.lastname),
+    hin: appointment.patient.hin,
+    phone: appointment.patient.phone_num,
+    email: appointment.patient.email,
+  },
+  // The API says who the appointment is with, not who booked it.
+  bookedWith: appointment.staff
+    ? fullName(appointment.staff.firstname, appointment.staff.lastname)
+    : "Front desk",
+  note: appointment.note,
+});
+
+/** `GET /api/hospital-ops/patients?status=outpatient`: open check-ins. */
+export const outpatientPageSchema = z.object({
+  results: z.array(
+    z.object({
+      sqid: z.string(),
+      status: optionalText,
+      patient_info: z.object({ hin: text, firstname: text, lastname: text }),
+      created_at: dateTime.nullish(),
+    }),
+  ),
+});
+
+/** A check-in's status → the queue's. */
+export function queueStatusOf(status: string | null): QueueStatus {
+  if (!status || status === "pending") return "pending";
+  if (status === "doctor_seen" || status === "closed") return "completed";
+  return "in_progress";
+}
+
+/** `POST /api/auth/signup/verify-code` → the token step 3 needs. */
+export const signupTokenSchema = z
+  .object({ signup_token: z.string() })
+  .transform(({ signup_token }) => ({ verificationToken: signup_token }));
+
+/** `POST /api/auth/signup/desk/complete`: the new patient (no id, so the HIN stands in). */
+export const signedUpPatientSchema = z
+  .object({ hin: z.string() })
+  .transform(({ hin }): RegisteredPatient => ({ id: hin, hin }));
+
+/** `POST /api/patients/{hin}/dependants`: the new child. */
+export const createdDependantSchema = z.object({
+  hin: z.string(),
+  firstname: text,
+  lastname: text,
+});
+
+/** Replies to writes whose body the app doesn't use. */
+export const anyResponseSchema = z.unknown();
+
+/** An action the design has but the API can't do yet. TODO(api): see the backend gaps file. */
+export class NotAvailableYetError extends Error {
+  constructor(what: string) {
+    super(`${what} isn’t available yet. It’s waiting on the backend.`);
+    this.name = "NotAvailableYetError";
+  }
+}

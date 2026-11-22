@@ -38,7 +38,7 @@ import {
   useVerifyPatientEmail,
   useVerifyPhone,
 } from "@/features/receptionist/api/mutations";
-import { sexLabels } from "@/features/receptionist/api/schemas";
+import { type Sex, sexLabels } from "@/features/receptionist/api/schemas";
 import { devPrefill } from "@/features/receptionist/lib/dev-prefill";
 import {
   CODE_LENGTH,
@@ -139,9 +139,15 @@ export function RegisterPatientForm({
     if (step === 2) form.setFocus("code");
   }, [form, step]);
 
+  /** Step 1's answers; the API takes them all when it sends the code. */
+  function signupDetails() {
+    const { firstName, lastName, otherName, gender, email, phone } = form.getValues();
+    return { firstName, lastName, otherName, sex: gender as Sex, email, phone };
+  }
+
   async function continueToVerify() {
     if (!(await form.trigger([...registerPatientSteps[1]]))) return;
-    sendCode.mutate(form.getValues(guardian ? "phone" : "email"), {
+    sendCode.mutate(signupDetails(), {
       onSuccess: () => {
         form.resetField("code", { defaultValue: devPrefill?.registerPatient.code ?? "" });
         setStep(2);
@@ -165,7 +171,7 @@ export function RegisterPatientForm({
   }
 
   function resendCode() {
-    sendCode.mutate(codeSentTo, {
+    sendCode.mutate(signupDetails(), {
       onSuccess: () => toast.success(`We sent a new code to ${codeSentTo}.`),
       onError: (error) => toast.error(getErrorMessage(error)),
     });

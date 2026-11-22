@@ -1,36 +1,13 @@
 import { HttpResponse, http } from "msw";
 import { env } from "@/env";
 import type {
-  DependentLinked,
-  AppointmentCalendar,
-  CalendarAppointment,
-  AppointmentDetail,
   AppointmentList,
-  AppointmentRequest,
-  CheckOutSummary,
-  LinkedPerson,
-  PatientLookup,
   PatientProfile,
-  ReceptionOverview,
   ReceptionQueue,
-  RegisteredPatient,
   Sex,
 } from "@/features/receptionist/api/schemas";
 
 const api = (path: string) => `${env.VITE_API_URL}${path}`;
-
-const overview: ReceptionOverview = {
-  totalCheckIns: 2486,
-  totalCheckInsChange: 12,
-  waitingInQueue: 8,
-  waitingInQueueChange: -33,
-  checkedInToday: 24,
-  checkedInTodayChange: 9,
-  appointmentsToday: 36,
-  appointmentsTodayChange: 6,
-};
-
-const periodScale = { today: 0.15, week: 1, month: 4 } as const;
 
 /** `days` from today at `time` ("09:30"). */
 function at(days: number, time: string) {
@@ -175,36 +152,6 @@ function patientFacts({ id, name }: { id: string; name: string }): {
   };
 }
 
-function calendarAppointment(appointment: Appointment): CalendarAppointment {
-  const { hin, dateOfBirth, sex } = patientFacts(appointment.patient);
-  return { ...appointment, patient: { ...appointment.patient, hin, dateOfBirth, sex } };
-}
-
-function appointmentDetail(appointment: Appointment): AppointmentDetail {
-  const { id, name, phone } = appointment.patient;
-  const extras = appointmentExtras.get(appointment.id);
-  const { hin, registeredPatient } = patientFacts(appointment.patient);
-  return {
-    ...appointment,
-    patient: {
-      id,
-      name,
-      hin,
-      phone,
-      email: registeredPatient?.email ?? `${name.toLowerCase().replace(/\s+/g, ".")}@gmail.com`,
-    },
-    bookedWith: extras?.bookedWith ?? "Front desk",
-    note: extras ? extras.note : appointment.reason,
-  };
-}
-
-/** Bookable slots a day: every half hour from 08:00 to 18:00. */
-const SLOTS_PER_DAY = 20;
-
-function between(from: Date, to: Date) {
-  return appointments.filter(({ at }) => new Date(at) >= from && new Date(at) < to);
-}
-
 const queue: ReceptionQueue["items"] = (
   [
     ["Chinonso Okafor", "DH-28491", "Check-up", "completed", 12],
@@ -223,33 +170,6 @@ const queue: ReceptionQueue["items"] = (
   status,
   waitMinutes,
 }));
-
-// Chinonso's doctor wants to see them again; everyone else in the queue has nothing to book.
-const appointmentRequests: (AppointmentRequest & { patientId: string })[] = [
-  {
-    id: "request-1",
-    patientId: "patient-1",
-    reason: "Follow-up visit",
-    requestedBy: "Dr. Adebayo",
-    requestedAt: at(0, "10:12"),
-    proposedAt: at(14, "10:00"),
-    note: "Review blood pressure two weeks after the medication change.",
-    status: "pending",
-  },
-];
-
-/** A request as the API sends it, without the mock's link to its patient. */
-function withoutPatient(request: AppointmentRequest & { patientId: string }): AppointmentRequest {
-  return {
-    id: request.id,
-    reason: request.reason,
-    requestedBy: request.requestedBy,
-    requestedAt: request.requestedAt,
-    proposedAt: request.proposedAt,
-    note: request.note,
-    status: request.status,
-  };
-}
 
 /** `age` years old, with a birthday a month ago so the age shown stays `age`. */
 function bornYearsAgo(age: number) {
@@ -320,32 +240,6 @@ const registered: MockPatient[] = (
   };
 });
 
-function linked(patient: MockPatient, relationship: string | null): LinkedPerson {
-  return {
-    id: patient.id,
-    name: patient.name,
-    avatarUrl: patient.avatarUrl,
-    dateOfBirth: patient.dateOfBirth,
-    sex: patient.sex,
-    relationship,
-    lastVisitAt: patient.lastVisit?.at ?? null,
-  };
-}
-
-/** A patient's profile, with the people linked to their account. */
-function patientProfile({ dependentIds, ...patient }: MockPatient): PatientProfile {
-  return {
-    ...patient,
-    dependents: registered
-      .filter(({ id }) => dependentIds.some((dependent) => dependent.id === id))
-      .map((dependent) => linked(dependent, null)),
-    proxies: registered.flatMap((proxy) => {
-      const link = proxy.dependentIds.find(({ id }) => id === patient.id);
-      return link ? [linked(proxy, link.relationship)] : [];
-    }),
-  };
-}
-
 /** A patient just registered at the front desk, with nothing on record yet. */
 function newPatientRecord(id: string, hin: string, name: string, sex: Sex): MockPatient {
   return {
@@ -368,321 +262,274 @@ function newPatientRecord(id: string, hin: string, name: string, sex: Sex): Mock
   };
 }
 
-/** Which tab an appointment falls under, by its calendar day. */
-function dayOf(appointment: Appointment) {
-  const date = new Date(appointment.at);
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  if (date.toDateString() === new Date().toDateString()) return "today";
-  if (date.toDateString() === tomorrow.toDateString()) return "tomorrow";
-  return date > tomorrow ? "upcoming" : "past";
-}
-
 function matches(search: string | null, ...values: string[]) {
   const term = search?.trim().toLowerCase();
   return !term || values.some((value) => value.toLowerCase().includes(term));
 }
 
+/** The design's appointment status → the API's. */
+const apiStatusOf: Record<Appointment["status"], string> = {
+  upcoming: "pending",
+  arrived: "confirmed",
+  checked_in: "completed",
+  in_progress: "confirmed",
+  cancelled: "cancelled",
+};
+
+const hospitalInfo = { name: "Lagos University Teaching Hospital", email: null, sqid: "pm9XGQd" };
+
+const splitName = (name: string) => {
+  const [firstname = "", ...rest] = name.split(" ");
+  return { firstname, lastname: rest.join(" ") };
+};
+
+/** `HospitalAppointment`, as the API returns it. */
+function readAppointment(appointment: Appointment) {
+  const { hin, dateOfBirth, sex, registeredPatient } = patientFacts(appointment.patient);
+  const extras = appointmentExtras.get(appointment.id);
+  return {
+    id: 0,
+    sqid: appointment.id,
+    status: apiStatusOf[appointment.status],
+    scheduled_time: appointment.at,
+    staff: { sqid: "doctor-1", firstname: "Sarah", lastname: "Adeyemi", role: "doctor" },
+    patient: {
+      hin,
+      ...splitName(appointment.patient.name),
+      middlename: null,
+      dob: dateOfBirth,
+      gender: sex === "prefer_not_to_say" ? "unknown" : sex,
+      phone_num: appointment.patient.phone,
+      email:
+        registeredPatient?.email ??
+        `${appointment.patient.name.toLowerCase().replace(/\s+/g, ".")}@email.com`,
+    },
+    note: extras ? extras.note : null,
+    type: appointment.reason,
+    hospital_info: hospitalInfo,
+    closed_at: null,
+    closed_by_info: null,
+  };
+}
+
+/** Whether an appointment falls in the API's `timeframe`: today, after today, or before it. */
+function inTimeframe(at: string, timeframe: string | null) {
+  const date = new Date(at);
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start.getTime() + 24 * 60 * 60_000);
+  if (timeframe === "today") return date >= start && date < end;
+  if (timeframe === "upcoming") return date >= end;
+  return date < start;
+}
+
+/** `GET /api/patients/{hin}/details`, as the API returns it. */
+function readPatient(patient: MockPatient) {
+  return {
+    dob: patient.dateOfBirth,
+    gender: patient.sex === "prefer_not_to_say" ? "unknown" : patient.sex,
+    phone_num: patient.phone,
+    ...splitName(patient.name),
+    middlename: null,
+    hin: patient.hin,
+    street: patient.address ? "24 Allen Avenue" : null,
+    city: patient.address ? "Ikeja" : null,
+    state: patient.address ? "Lagos" : null,
+    country: patient.address ? "Nigeria" : null,
+    email: patient.email,
+    contact_email: null,
+    payment_provider: {
+      type: patient.coverage === "nhis" ? "company" : patient.coverage,
+      provider: null,
+      member_id: null,
+      updated_at: null,
+    },
+  };
+}
+
+/** A queue entry's status → the API's check-in status. */
+const checkInStatusOf = {
+  pending: "pending",
+  in_progress: "doctor_active",
+  completed: "doctor_seen",
+};
+
 /** The code every "emailed" verification code is, so registration can be clicked through. */
 const VERIFICATION_CODE = "123456";
 
+/** Desk signups started, by their email or phone. */
+const signups = new Map<
+  string,
+  { firstname: string; lastname: string; gender: string; token?: string }
+>();
+
 export const receptionistHandlers = [
-  http.get(api("/hospital/reception/overview"), ({ request }) => {
-    const period = new URL(request.url).searchParams.get("period");
-    const scale = periodScale[period === "today" || period === "month" ? period : "week"];
-    return HttpResponse.json({
-      ...overview,
-      totalCheckIns: Math.round(overview.totalCheckIns * scale),
-      waitingInQueue: queue.length,
-    } satisfies ReceptionOverview);
-  }),
-  http.get(api("/hospital/reception/appointments"), ({ request }) => {
+  http.get(api("/api/hospital-ops/appointments"), ({ request }) => {
     const params = new URL(request.url).searchParams;
-    const day = params.get("day") ?? "today";
-    const count = (tab: string) => appointments.filter((a) => dayOf(a) === tab).length;
-    return HttpResponse.json({
-      counts: { today: count("today"), tomorrow: count("tomorrow"), upcoming: count("upcoming") },
-      items: appointments.filter(
-        (appointment) =>
-          dayOf(appointment) === day &&
-          matches(params.get("search"), appointment.patient.name, appointment.patient.phone),
-      ),
-    } satisfies AppointmentList);
-  }),
-  http.get(api("/hospital/reception/appointments/calendar"), ({ request }) => {
-    const params = new URL(request.url).searchParams;
-    const from = new Date(params.get("from") ?? "");
-    const to = new Date(params.get("to") ?? "");
-    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime()) || to <= from) {
-      return HttpResponse.json({ message: "Pick a valid date range" }, { status: 400 });
+    const timeframe = params.get("timeframe");
+    if (!timeframe) {
+      return HttpResponse.json({ timeframe: "This query parameter is required." }, { status: 400 });
     }
-    const items = between(from, to);
-    const before = between(new Date(from.getTime() - (to.getTime() - from.getTime())), from);
-    const cancelled = (list: Appointment[]) =>
-      list.filter(({ status }) => status === "cancelled").length;
-    const days = Math.round((to.getTime() - from.getTime()) / 86_400_000);
-    const totalSlots = days * SLOTS_PER_DAY;
-    return HttpResponse.json({
-      summary: {
-        booked: items.length,
-        bookedChange: before.length
-          ? Math.round(((items.length - before.length) / before.length) * 100)
-          : 0,
-        checkedIn: items.filter(({ status }) =>
-          ["arrived", "checked_in", "in_progress"].includes(status),
-        ).length,
-        cancelled: cancelled(items),
-        cancelledChange: cancelled(items) - cancelled(before),
-        openSlots: Math.max(0, totalSlots - (items.length - cancelled(items))),
-        totalSlots,
-      },
-      items: items.map(calendarAppointment),
-    } satisfies AppointmentCalendar);
-  }),
-  http.get(api("/hospital/reception/appointments/:id"), ({ params }) => {
-    const appointment = appointments.find(({ id }) => id === params.id);
-    if (!appointment)
-      return HttpResponse.json({ message: "Appointment not found" }, { status: 404 });
-    return HttpResponse.json(appointmentDetail(appointment));
-  }),
-  http.post(api("/hospital/reception/appointments/:id/reschedule"), async ({ params, request }) => {
-    const appointment = appointments.find(({ id }) => id === params.id);
-    if (!appointment)
-      return HttpResponse.json({ message: "Appointment not found" }, { status: 404 });
-    if (appointment.status !== "upcoming") {
-      return HttpResponse.json(
-        { message: "Only upcoming appointments can be rescheduled." },
-        { status: 409 },
-      );
-    }
-    const { at, note } = (await request.json()) as { at: string; note: string };
-    appointment.at = at;
-    appointments.sort((a, b) => a.at.localeCompare(b.at));
-    appointmentExtras.set(appointment.id, {
-      note: note.trim() || null,
-      bookedWith: appointmentExtras.get(appointment.id)?.bookedWith ?? "Front desk",
-    });
-    return HttpResponse.json(appointmentDetail(appointment));
-  }),
-  http.post(api("/hospital/reception/appointments/:id/cancel"), async ({ params, request }) => {
-    const { reason } = (await request.json()) as { reason?: string };
-    if (!reason) return HttpResponse.json({ message: "Give a reason" }, { status: 400 });
-    const appointment = appointments.find(({ id }) => id === params.id);
-    if (!appointment)
-      return HttpResponse.json({ message: "Appointment not found" }, { status: 404 });
-    if (appointment.status !== "upcoming") {
-      return HttpResponse.json(
-        { message: "Only upcoming appointments can be cancelled." },
-        { status: 409 },
-      );
-    }
-    appointment.status = "cancelled";
-    return HttpResponse.json(appointmentDetail(appointment));
-  }),
-  http.get(api("/hospital/reception/queue"), ({ request }) => {
-    const search = new URL(request.url).searchParams.get("search");
-    return HttpResponse.json({
-      items: queue.filter((entry) => matches(search, entry.patient.name, entry.patient.hin)),
-    } satisfies ReceptionQueue);
-  }),
-  http.get(api("/hospital/reception/patients"), ({ request }) => {
-    const hin = new URL(request.url).searchParams.get("hin")?.replace(/\D/g, "");
-    return HttpResponse.json({
-      items: registered
-        .filter((patient) => patient.hin === hin)
-        .map(({ id, name, hin, dateOfBirth, sex, avatarUrl, phone, email }) => ({
-          id,
-          name,
-          hin,
-          dateOfBirth,
-          sex,
-          avatarUrl,
-          phone,
-          email,
-        })),
-    } satisfies PatientLookup);
-  }),
-  http.post(api("/hospital/reception/patient-verifications"), async ({ request }) => {
-    const { email } = (await request.json()) as { email: string };
-    return HttpResponse.json({ email });
-  }),
-  http.post(api("/hospital/reception/patient-verifications/check"), async ({ request }) => {
-    const { email, code } = (await request.json()) as { email: string; code: string };
-    if (code !== VERIFICATION_CODE) {
-      return HttpResponse.json(
-        { message: "That code isn’t right. Check it and try again." },
-        {
-          status: 400,
-        },
-      );
-    }
-    return HttpResponse.json({ verificationToken: `verified:${email}` });
-  }),
-  http.post(api("/hospital/reception/patients"), async ({ request }) => {
-    const patient = (await request.json()) as {
-      firstName: string;
-      lastName: string;
-      sex: Sex;
-      email: string;
-      phone: string;
-    };
-    const id = `registered-${registered.length + 1}`;
-    const hin = String(40_000_000_000 + registered.length);
-    registered.push({
-      id,
-      name: `${patient.firstName} ${patient.lastName}`,
-      hin,
-      dateOfBirth: bornYearsAgo(30),
-      sex: patient.sex,
-      avatarUrl: null,
-      coverage: "private",
-      phone: patient.phone,
-      email: patient.email,
-      address: null,
-      assignedDoctor: null,
-      lastVisit: null,
-      lastCheckIn: null,
-      upcomingAppointment: null,
-      visits: [],
-      dependentIds: [],
-    });
-    return HttpResponse.json({ id, hin } satisfies RegisteredPatient, { status: 201 });
-  }),
-  http.post(api("/hospital/reception/appointments"), async ({ request }) => {
-    const { patientId, at, note } = (await request.json()) as {
-      patientId: string;
-      at: string;
-      note: string;
-    };
-    const profile = registered.find(({ id }) => id === patientId);
-    const name =
-      profile?.name ?? queue.find(({ patient }) => patient.id === patientId)?.patient.name;
-    if (!name) return HttpResponse.json({ message: "Patient not found" }, { status: 404 });
-    const appointment: Appointment = {
-      id: `appointment-${appointments.length + 1}`,
-      at,
-      patient: {
-        id: patientId,
-        name,
-        phone: profile?.phone ?? "+2348095512093",
-        avatarUrl: profile?.avatarUrl ?? null,
-      },
-      reason: "Consultation",
-      status: "upcoming",
-    };
-    appointments.push(appointment);
-    appointments.sort((a, b) => a.at.localeCompare(b.at));
-    appointmentExtras.set(appointment.id, { note: note.trim() || null, bookedWith: "Front desk" });
-    if (profile) profile.upcomingAppointment = { at, department: "General Medicine" };
-    return HttpResponse.json(appointment, { status: 201 });
-  }),
-  http.post(api("/hospital/reception/phone-verifications"), async ({ request }) => {
-    const { phone } = (await request.json()) as { phone: string };
-    return HttpResponse.json({ phone });
-  }),
-  http.post(api("/hospital/reception/phone-verifications/check"), async ({ request }) => {
-    const { phone, code } = (await request.json()) as { phone: string; code: string };
-    if (code !== VERIFICATION_CODE) {
-      return HttpResponse.json(
-        { message: "That code isn’t right. Check it and try again." },
-        { status: 400 },
-      );
-    }
-    return HttpResponse.json({ verificationToken: `verified:${phone}` });
-  }),
-  http.post(api("/hospital/reception/guardians"), async ({ request }) => {
-    const guardian = (await request.json()) as {
-      firstName: string;
-      lastName: string;
-      sex: Sex;
-      email: string | null;
-      phone: string;
-    };
-    const id = `registered-${registered.length + 1}`;
-    const hin = String(40_000_000_000 + registered.length);
-    registered.push({
-      ...newPatientRecord(id, hin, `${guardian.firstName} ${guardian.lastName}`, guardian.sex),
-      dateOfBirth: bornYearsAgo(35),
-      phone: guardian.phone,
-      email: guardian.email,
-    });
-    return HttpResponse.json({ id, hin } satisfies RegisteredPatient, { status: 201 });
-  }),
-  http.post(api("/hospital/reception/dependents"), async ({ request }) => {
-    const link = (await request.json()) as {
-      guardianId: string;
-      child:
-        { id: string } | { firstName: string; lastName: string; dateOfBirth: string; sex: Sex };
-      relationship: string;
-    };
-    const guardian = registered.find(({ id }) => id === link.guardianId);
-    if (!guardian) return HttpResponse.json({ message: "Guardian not found" }, { status: 404 });
-    const existingId = "id" in link.child ? link.child.id : null;
-    let child = registered.find(({ id }) => id === existingId);
-    if ("firstName" in link.child) {
-      const { firstName, lastName, dateOfBirth, sex } = link.child;
-      const id = `registered-${registered.length + 1}`;
-      child = {
-        ...newPatientRecord(
-          id,
-          String(40_000_000_000 + registered.length),
-          `${firstName} ${lastName}`,
-          sex,
+    const from = params.get("scheduled_time_gte");
+    const to = params.get("scheduled_time_lte");
+    const status = params.get("status");
+    const page = Number(params.get("page") ?? 1);
+    const size = Number(params.get("size") ?? 10);
+    const matching = appointments.filter(
+      (appointment) =>
+        inTimeframe(appointment.at, timeframe) &&
+        (!from || appointment.at >= from) &&
+        (!to || appointment.at <= to) &&
+        (!status || apiStatusOf[appointment.status] === status) &&
+        matches(
+          params.get("search"),
+          appointment.patient.name,
+          appointment.patient.phone,
+          patientFacts(appointment.patient).hin,
         ),
-        dateOfBirth,
-      };
-      registered.push(child);
+    );
+    return HttpResponse.json({
+      count: matching.length,
+      next: null,
+      previous: null,
+      results: matching.slice((page - 1) * size, page * size).map(readAppointment),
+    });
+  }),
+  http.get(api("/api/patients/:hin/details"), ({ params }) => {
+    const patient = registered.find(({ hin }) => hin === params.hin);
+    if (!patient) {
+      return HttpResponse.json(
+        { detail: "No PatientProfile matches the given query." },
+        { status: 404 },
+      );
     }
-    if (!child) return HttpResponse.json({ message: "Child not found" }, { status: 404 });
-    const childId = child.id;
-    if (!guardian.dependentIds.some(({ id }) => id === childId)) {
-      guardian.dependentIds.push({ id: childId, relationship: link.relationship });
+    return HttpResponse.json(readPatient(patient));
+  }),
+  http.get(api("/api/hospital-ops/patients"), ({ request }) => {
+    const params = new URL(request.url).searchParams;
+    if (params.get("status") !== "outpatient") {
+      return HttpResponse.json({ count: 0, next: null, previous: null, results: [] });
     }
+    const size = Number(params.get("size") ?? 10);
+    const matching = queue.filter((entry) =>
+      matches(params.get("search"), entry.patient.name, entry.patient.hin),
+    );
+    return HttpResponse.json({
+      count: matching.length,
+      next: null,
+      previous: null,
+      results: matching.slice(0, size).map((entry) => ({
+        sqid: entry.id,
+        status: checkInStatusOf[entry.status],
+        patient_info: {
+          hin: entry.patient.hin,
+          ...splitName(entry.patient.name),
+          gender: "unknown",
+          dob: "1990-01-01",
+        },
+        created_at: new Date(Date.now() - entry.waitMinutes * 60_000).toISOString(),
+      })),
+    });
+  }),
+  http.post(api("/api/hospital-ops/check-ins/:sqid/close"), ({ params }) => {
+    const index = queue.findIndex(({ id }) => id === params.sqid);
+    if (index === -1) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    queue.splice(index, 1);
+    return new HttpResponse(null, { status: 200 });
+  }),
+  // As the API does: a desk signup needs a date of birth, which the design's form doesn't ask for.
+  http.post(api("/api/auth/signup/desk"), async ({ request }) => {
+    const body = (await request.json()) as {
+      firstname: string;
+      lastname: string;
+      gender: string;
+      dob?: string;
+      email?: string;
+      phone?: string;
+      verify_by?: "email" | "phone";
+    };
+    if (!body.dob) return HttpResponse.json({ dob: ["This field is required."] }, { status: 400 });
+    const contact = (body.verify_by === "phone" ? body.phone : body.email) ?? "";
+    signups.set(contact, {
+      firstname: body.firstname,
+      lastname: body.lastname,
+      gender: body.gender,
+    });
+    return HttpResponse.json({ detail: "Code sent." });
+  }),
+  http.post(api("/api/auth/signup/verify-code"), async ({ request }) => {
+    const { email, phone, verify_by, code } = (await request.json()) as {
+      email?: string;
+      phone?: string;
+      verify_by?: string;
+      code: string;
+    };
+    const signup = signups.get((verify_by === "phone" ? phone : email) ?? "");
+    if (code !== VERIFICATION_CODE || !signup) {
+      return HttpResponse.json({ detail: "Invalid or expired code." }, { status: 400 });
+    }
+    signup.token = `signup-${registered.length + 1}`;
+    return HttpResponse.json({ signup_token: signup.token });
+  }),
+  http.post(api("/api/auth/signup/desk/complete"), async ({ request }) => {
+    const { signup_token } = (await request.json()) as { signup_token: string };
+    const signup = [...signups.values()].find(({ token }) => token === signup_token);
+    if (!signup) return HttpResponse.json({ detail: "Invalid signup token." }, { status: 400 });
+    const hin = String(40_000_000_000 + registered.length);
+    const sex =
+      signup.gender === "male" || signup.gender === "female" ? signup.gender : "prefer_not_to_say";
+    registered.push(
+      newPatientRecord(
+        `registered-${registered.length + 1}`,
+        hin,
+        `${signup.firstname} ${signup.lastname}`,
+        sex,
+      ),
+    );
     return HttpResponse.json(
       {
-        child: { id: child.id, name: child.name, hin: child.hin },
-        guardian: { id: guardian.id, name: guardian.name },
-      } satisfies DependentLinked,
+        hin,
+        firstname: signup.firstname,
+        lastname: signup.lastname,
+        gender: signup.gender,
+        dob: bornYearsAgo(30),
+      },
       { status: 201 },
     );
   }),
-  http.get(api("/hospital/reception/patients/:id"), ({ params }) => {
-    const patient = registered.find(({ id }) => id === params.id);
-    if (!patient) return HttpResponse.json({ message: "Patient not found" }, { status: 404 });
-    return HttpResponse.json(patientProfile(patient));
-  }),
-  http.get(api("/hospital/reception/queue/:id/check-out-summary"), ({ params }) => {
-    const entry = queue.find(({ id }) => id === params.id);
-    if (!entry) return HttpResponse.json({ message: "Not in the queue" }, { status: 404 });
-    const { id, name, hin } = entry.patient;
-    return HttpResponse.json({
-      patient: {
-        id,
-        name,
-        hin: hin.replace(/\D/g, ""),
-        phone: "0809 551 2093",
-        email: `${name.toLowerCase().replace(" ", ".")}@gmail.com`,
+  http.post(api("/api/patients/:hin/dependants"), async ({ params, request }) => {
+    const guardian = registered.find(({ hin }) => hin === params.hin);
+    if (!guardian) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    const body = (await request.json()) as {
+      firstname: string;
+      lastname: string;
+      dob: string;
+      gender: string;
+      relationship: string;
+    };
+    const hin = String(40_000_000_000 + registered.length);
+    const sex =
+      body.gender === "male" || body.gender === "female" ? body.gender : "prefer_not_to_say";
+    const child = newPatientRecord(
+      `registered-${registered.length + 1}`,
+      hin,
+      `${body.firstname} ${body.lastname}`,
+      sex,
+    );
+    child.dateOfBirth = body.dob;
+    registered.push(child);
+    guardian.dependentIds.push({ id: child.id, relationship: body.relationship });
+    return HttpResponse.json(
+      {
+        firstname: body.firstname,
+        lastname: body.lastname,
+        middlename: null,
+        dob: body.dob,
+        gender: body.gender,
+        hin,
+        id_card_generated: false,
       },
-      appointmentRequests: appointmentRequests
-        .filter(({ patientId }) => patientId === id)
-        .map(withoutPatient),
-    } satisfies CheckOutSummary);
-  }),
-  http.post(
-    api("/hospital/reception/appointment-requests/:id/:answer"),
-    ({ params: { id, answer } }) => {
-      const found = appointmentRequests.find((request) => request.id === id);
-      if (!found || (answer !== "confirm" && answer !== "cancel")) {
-        return HttpResponse.json({ message: "Request not found" }, { status: 404 });
-      }
-      found.status = answer === "confirm" ? "confirmed" : "cancelled";
-      return HttpResponse.json(withoutPatient(found));
-    },
-  ),
-  http.post(api("/hospital/reception/queue/:id/check-out"), ({ params }) => {
-    const index = queue.findIndex(({ id }) => id === params.id);
-    const [entry] = index === -1 ? [] : queue.splice(index, 1);
-    if (!entry) return HttpResponse.json({ message: "Not in the queue" }, { status: 404 });
-    return HttpResponse.json(entry);
+      { status: 201 },
+    );
   }),
 ];

@@ -232,7 +232,6 @@ export const staffHandlers = [
     return HttpResponse.json(page(matching, request));
   }),
   http.get(api("/api/hospital-ops/appointments/staff"), listAppointments),
-  http.get(api("/api/hospital-ops/appointments"), listAppointments),
   http.post(api("/api/hospital-ops/appointments/book"), async ({ request }) => {
     const body = (await request.json()) as {
       patient: string;
@@ -241,9 +240,12 @@ export const staffHandlers = [
       note?: string | null;
       scheduled_time: string;
     };
-    if (!body.patient || !body.staff || !body.scheduled_time) {
+    // As the API does: `staff` (who the appointment is with) is required.
+    if (!body.staff)
+      return HttpResponse.json({ staff: ["This field is required."] }, { status: 400 });
+    if (!body.patient || !body.scheduled_time) {
       return HttpResponse.json(
-        { detail: "patient, staff and scheduled_time are required." },
+        { detail: "patient and scheduled_time are required." },
         { status: 400 },
       );
     }

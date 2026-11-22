@@ -42,7 +42,13 @@ Built as `src/features/staff/` (routes compose it into each dashboard).
 
 - [x] Every dashboard's profile (top bar, greeting, banner) from `GET /api/auth/staff/profile`
 
-- [ ] Receptionist (+ admission requests page)
+- [x] Receptionist: overview (queue and today's appointments), appointments (3 tabs, search),
+      calendar, appointment page, queue with check-out, HIN lookup, patient profile, desk
+      registration and dependants on the real API. Checked on staging (reads). Blocked by the API:
+      registration needs a date of birth and booking needs a staff member, which the design doesn't
+      ask for (shows the API's error). Not available yet: reschedule, cancel, follow-up requests,
+      linking an existing child, most overview figures (gaps file, section 7)
+- [ ] Receptionist admission requests page (no design yet)
 - [x] Radiologist: overview counts, scan records (4 tabs), order page, schedule, uploads, booking;
       accept, reject, imaging time and report upload on `api/radiology/*`. Checked on staging (reads
       only, to leave shared staging data alone). Waiting on the backend: date filters, single-order

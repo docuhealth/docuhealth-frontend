@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { StaffAppointments } from "@/features/staff/components/staff-appointments";
 import { renderWithProviders } from "@/test/render";
@@ -26,10 +26,13 @@ describe("StaffAppointments", () => {
     const { user } = renderWithProviders(<StaffAppointments scope="hospital" />);
     const table = await screen.findByRole("table");
 
+    // The hospital's appointments (the front desk's mock data).
     await user.click(screen.getByRole("tab", { name: /Upcoming/ }));
-    expect(await within(table).findByText("Olumide Ajayi")).toBeInTheDocument();
+    expect(await within(table).findByText("Halima Abubakar")).toBeInTheDocument();
     await user.click(screen.getByRole("tab", { name: /Past/ }));
-    expect(await within(table).findByText("Amina Yusuf")).toBeInTheDocument();
-    expect(within(table).getByText("Cancelled")).toBeInTheDocument();
+    await waitFor(() =>
+      expect(within(table).queryByText("Halima Abubakar")).not.toBeInTheDocument(),
+    );
+    expect(within(table).getAllByRole("row").length).toBeGreaterThan(1);
   });
 });

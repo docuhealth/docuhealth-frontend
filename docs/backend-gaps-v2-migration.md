@@ -137,13 +137,13 @@ call-by-call table is in `docs/api-mapping-redesigned-dashboards.md`. These are 
 4. **Appointment reschedule and cancel.** Add `POST /api/hospital-ops/appointments/{sqid}/reschedule {scheduled_time, note}` and `…/cancel {reason, details}` for receptionists, notifying the patient. Or confirm the receptionist may use `PATCH …/{sqid}/assign` for rescheduling.
 5. **Single appointment.** Add `GET /api/hospital-ops/appointments/{sqid}`.
 6. **Appointment ↔ check-in link.** Add arrived/checked-in state on appointments (or a `check_in` reference) so the UI's `arrived/checked_in/in_progress` statuses have a source.
-7. **Booking without choosing staff.** Either make `staff` optional on `appointments/book` (front-desk/unassigned booking), or the UI must add a doctor picker.
+7. **Booking without choosing staff.** Make `staff` optional on `appointments/book` (front-desk/unassigned booking). The redesigned booking dialog has no doctor picker (design kept as is), so front-desk booking fails with `staff: This field is required.` until then.
 8. **Slots.** Hospital appointment capacity (`open_slots`, `total_slots` for a date range) for the calendar summary, or the design drops those numbers.
 9. **Search by HIN** on `GET /api/hospital-ops/appointments` (and a `patient=<hin>` filter), so a profile can show the upcoming appointment.
 10. **Front-desk patient profile.** A receptionist patient endpoint (or extend `/api/patients/{hin}/details`) with `last_visit {at, department}`, `last_check_in {at, status}`, `upcoming_appointment`, `assigned_doctor`, visit history (check-ins + appointments, with in/out times), `dependants[]` and `proxies[]` (with relationship, dob, gender, last visit), and a photo URL.
 11. **Doctor follow-up requests.** An endpoint for doctors to request a follow-up appointment and for the front desk to list (per patient) and confirm/cancel them. Nothing exists today.
 12. **Link an existing patient as a dependant** (`POST /api/patients/{hin}/dependants` with an existing child HIN), and clarify what `confirmed_by` should contain (enum?).
-13. **DOB at desk signup** is required, but the v2 patient form doesn't collect it. That's a UI change, not a backend ask, unless the backend can relax it.
+13. **DOB at desk signup.** `POST /api/auth/signup/desk` requires `dob`, but the redesigned registration form has no date-of-birth field (design kept as is). Please make `dob` optional (the patient can add it later); until then, desk registration fails with `dob: This field is required.`
 14. **Coverage values.** API `company` vs UI `nhis`: agree on one list.
 15. `GET /api/records/patients/{hin}/soap-notes/shared` returns **500** for the receptionist (ValueError). Bug report.
 

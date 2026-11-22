@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { PeriodSelect } from "@/components/dashboard/period-select";
 import { StatBanner } from "@/components/dashboard/stat-banner";
+import { Figure } from "@/components/dashboard/figure";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { CheckmarkCircleIcon, ClockFadingIcon } from "@/components/hugeicons";
 import { labOverviewQuery, labProfileQuery } from "@/features/lab-scientist/api/queries";
@@ -66,13 +67,13 @@ export function LabDashboard({
         <StatCard
           icon={<CheckmarkCircleIcon />}
           label="Approved Results"
-          value={<Unavailable value={overview.approvedResults} />}
+          value={<Figure value={overview.approvedResults} />}
           note={overview.approvedResults === null ? "Not available yet" : capitalize(span)}
         />
         <StatCard
           icon={<ArrowCounterClockwiseIcon />}
           label="Returning Patients"
-          value={<Unavailable value={overview.returningPatients} />}
+          value={<Figure value={overview.returningPatients} />}
           note={overview.returningPatients === null ? "Not available yet" : "Visited before today"}
         />
       </StatBanner>
@@ -87,13 +88,4 @@ export function LabDashboard({
 
 function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
-/** A count, or a muted dash while the API has no figure for it (TODO(api)). */
-function Unavailable({ value }: { value: number | null }) {
-  return value === null ? (
-    <span className="text-fg-caption">—</span>
-  ) : (
-    <>{value.toLocaleString("en-GB")}</>
-  );
 }

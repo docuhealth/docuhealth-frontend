@@ -48,7 +48,7 @@ const coverageTones = {
   hmo: "bg-success-100 text-success-500",
   nhis: "bg-info-100 text-info-500",
   private: "bg-line text-fg-body",
-} as const satisfies Record<Profile["coverage"], string>;
+} as const satisfies Record<NonNullable<Profile["coverage"]>, string>;
 
 const DAY = 24 * 60 * 60 * 1000;
 /** How far back "Total visits" counts. */
@@ -97,11 +97,13 @@ export function PatientProfile({ patientId }: { patientId: string }) {
           <div className="flex min-w-0 flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="type-h3">{patient.name}</h1>
-              <span
-                className={`rounded-[4px] px-2 py-0.5 type-body-sm-regular ${coverageTones[patient.coverage]}`}
-              >
-                {coverageLabels[patient.coverage]}
-              </span>
+              {patient.coverage && (
+                <span
+                  className={`rounded-[4px] px-2 py-0.5 type-body-sm-regular ${coverageTones[patient.coverage]}`}
+                >
+                  {coverageLabels[patient.coverage]}
+                </span>
+              )}
               {isDependent && (
                 <span className="rounded-[4px] bg-warning-100 px-2 py-0.5 type-body-sm-regular text-warning-700">
                   Dependent

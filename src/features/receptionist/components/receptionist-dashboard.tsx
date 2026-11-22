@@ -10,7 +10,7 @@ import { useState } from "react";
 import { PeriodSelect } from "@/components/dashboard/period-select";
 import { StatBanner } from "@/components/dashboard/stat-banner";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { Trend } from "@/components/dashboard/trend";
+import { Change, Figure } from "@/components/dashboard/figure";
 import { Button } from "@/components/ui/button";
 import {
   receptionistProfileQuery,
@@ -80,27 +80,27 @@ export function ReceptionistDashboard({
         <StatCard
           icon={<UserIcon />}
           label="Total Check-ins"
-          value={overview.totalCheckIns.toLocaleString("en-GB")}
-          note={<Trend change={overview.totalCheckInsChange} since={previousPeriod[period]} />}
+          value={<Figure value={overview.totalCheckIns} />}
+          note={<Change change={overview.totalCheckInsChange} since={previousPeriod[period]} />}
         />
         <StatCard
           icon={<ClockIcon />}
           label="Waiting in Queue"
           value={overview.waitingInQueue}
           // A shorter queue is the good news here.
-          note={<Trend change={overview.waitingInQueueChange} since="last hour" goodWhen="down" />}
+          note={<Change change={overview.waitingInQueueChange} since="last hour" goodWhen="down" />}
         />
         <StatCard
           icon={<CalendarCheckIcon />}
           label="Checked In Today"
-          value={overview.checkedInToday}
-          note={<Trend change={overview.checkedInTodayChange} since="yesterday" />}
+          value={<Figure value={overview.checkedInToday} />}
+          note={<Change change={overview.checkedInTodayChange} since="yesterday" />}
         />
         <StatCard
           icon={<CalendarDotsIcon />}
           label="Today’s Appointments"
           value={overview.appointmentsToday}
-          note={<Trend change={overview.appointmentsTodayChange} since="yesterday" />}
+          note={<Change change={overview.appointmentsTodayChange} since="yesterday" />}
         />
       </StatBanner>
 
