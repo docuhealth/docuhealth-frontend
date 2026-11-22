@@ -50,7 +50,8 @@ describe("DoctorQueue", () => {
 
 describe("DoctorPatientActions", () => {
   const consultation = {
-    checkInId: "dc-2",
+    kind: "check_in" as const,
+    id: "dc-2",
     hin: "4200000000002",
     patientName: "Ngozi Eze",
     status: "doctor_active",
@@ -59,7 +60,11 @@ describe("DoctorPatientActions", () => {
   it("writes an encounter note in two steps, which then shows in the notes", async () => {
     const { user } = renderWithRouter(
       <>
-        <DoctorPatientActions consultation={consultation} myId={myId} />
+        <DoctorPatientActions
+          visit={consultation}
+          myId={myId}
+          ownHospital="Lagos University Teaching Hospital"
+        />
         <EncounterNotes hin={consultation.hin} />
       </>,
     );
@@ -87,9 +92,14 @@ describe("DoctorPatientActions", () => {
 
   it("asks a nurse for the patient's vitals", async () => {
     const { user } = renderWithRouter(
-      <DoctorPatientActions consultation={consultation} myId={myId} />,
+      <DoctorPatientActions
+        visit={consultation}
+        myId={myId}
+        ownHospital="Lagos University Teaching Hospital"
+      />,
     );
-    await user.click(await screen.findByRole("button", { name: "Request vitals" }));
+    await user.click(await screen.findByRole("button", { name: /More/ }));
+    await user.click(await screen.findByRole("menuitem", { name: "Request vitals" }));
     const dialog = await screen.findByRole("dialog", { name: "Request vitals" });
     await user.type(within(dialog).getByLabelText("Note"), "Recheck temperature");
     await user.click(within(dialog).getByRole("button", { name: "Send request" }));
@@ -99,8 +109,9 @@ describe("DoctorPatientActions", () => {
   it("only offers to see the patient when the consultation isn't mine", async () => {
     renderWithRouter(
       <DoctorPatientActions
-        consultation={{ ...consultation, checkInId: "dc-1", status: "doctor_idle" }}
+        visit={{ ...consultation, id: "dc-1", status: "doctor_idle" }}
         myId={myId}
+        ownHospital="Lagos University Teaching Hospital"
       />,
     );
     expect(await screen.findByRole("button", { name: "See patient" })).toBeInTheDocument();

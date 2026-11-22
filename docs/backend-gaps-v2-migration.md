@@ -210,6 +210,9 @@ call-by-call table is in `docs/api-mapping-redesigned-dashboards.md`. These are 
 8. **"My consultations".** `GET /api/hospital-ops/check-ins/doctor-queue` has no filter for the doctor who claimed a check-in, so the UI reads the whole active list to know which consultations are the signed-in doctor's (only they may write notes and orders). A `claimed_by=me` filter would do.
 9. **SOAP note write fields.** `POST /api/hospital-ops/soap-notes`: `vital_signs` is an integer, but vitals are identified by sqid everywhere else, so the UI can't attach the latest vitals; `referred_docuhealhosp` is misspelt (the read side says `referred_docuhealth_hosp`); `investigation_docs` takes URLs, with no upload endpoint for the files. The form leaves these out for now.
 10. **SOAP notes across patients.** `GET /api/records/soap-notes` is 403 for doctors; fine if it's meant for admins, but say so.
+11. **Repeat lab orders.** `POST /api/lab/test-orders/create` refuses a test ordered lately with a 400 `duplicate_warning` (resent with `ignore_duplicate_warning: true`); the warning's shape isn't in the schema. Please document it (a message, and which tests).
+12. **Catalogue searches.** `GET /api/radiology/scans` and `GET /api/pharmacy/drugs/autocomplete` return plain lists, though the schema lists `page`/`size`. Fine as they are; please make the schema match.
+13. **Drug duration units.** `ValueRate.rate` is free text on drug orders (staging has `days`, `Day`, `Month`), while care tasks use an enum (`hours|days|weeks|months`). The UI sends `days|weeks|months`; please make it an enum.
 
 ### Pharmacy
 

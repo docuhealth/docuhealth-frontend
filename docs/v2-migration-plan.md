@@ -107,7 +107,12 @@ Built in seven steps, one commit each; what v1 does and the endpoints behind it 
       notes, lab results) and consultation actions (new encounter note in two steps, request vitals
       from a nurse, end consultation). Checked on staging as the doctor (reads; the queue was
       empty). Not yet in the note: investigation files, referral, next appointment
-- [ ] 4.4 Doctor orders: lab, scan and drug orders, admission request, transfer, referral
+- [x] 4.4 Doctor orders: lab tests (category or search, repeat-order warning), scans (catalogue
+      search), prescriptions (catalogue drug or typed, dose, route, frequency, duration,
+      allergies), admission request and transfer (ward, then a free bed), referral (another
+      DocuHealth hospital, with a reason). From a consultation that's the doctor's, or an active
+      admission. Checked on staging as the doctor (reads: 79 lab tests, scans, drugs, hospitals,
+      wards; nothing ordered)
 - [ ] 4.5 Inpatient care: doctor care tasks, nurse task queue and charts, Tasks page
 - [ ] 4.6 Notes: admission note, case notes, care plans, vitals history, progress notes, shared
       SOAP notes, handovers

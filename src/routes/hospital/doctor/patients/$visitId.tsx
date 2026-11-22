@@ -18,7 +18,7 @@ export const Route = createFileRoute("/hospital/doctor/patients/$visitId")({
   component: VisitPage,
 });
 
-/** The patient page, with the doctor's tabs and, on a check-in, the consultation's actions. */
+/** The patient page, with the doctor's tabs and actions (consultation, orders, moves). */
 function VisitPage() {
   const { visitId } = Route.useParams();
   const { list } = Route.useSearch();
@@ -27,19 +27,19 @@ function VisitPage() {
     <PatientPage
       list={list}
       visitId={visitId}
-      actions={(visit) =>
-        visit.kind === "check_in" && (
-          <DoctorPatientActions
-            myId={profile.user.id}
-            consultation={{
-              checkInId: visit.id,
-              hin: visit.patient.hin,
-              patientName: visit.patient.name,
-              status: visit.status,
-            }}
-          />
-        )
-      }
+      actions={(visit) => (
+        <DoctorPatientActions
+          myId={profile.user.id}
+          ownHospital={profile.hospital.name}
+          visit={{
+            kind: visit.kind,
+            id: visit.id,
+            hin: visit.patient.hin,
+            patientName: visit.patient.name,
+            status: visit.status,
+          }}
+        />
+      )}
       tabs={(visit) => [
         {
           value: "notes",
