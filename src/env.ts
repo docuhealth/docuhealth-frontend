@@ -21,6 +21,12 @@ const envSchema = z.object({
     .enum(["true", "false"])
     .default("false")
     .transform((v) => v === "true"),
+  // Dev server only: send API calls to the page's own origin, which proxies /api to VITE_API_URL
+  // (vite.config.ts). The API's CORS then doesn't matter, so every *.localhost section works.
+  VITE_API_PROXY: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((v) => v === "true" && import.meta.env.DEV),
 });
 
 const parsed = envSchema.safeParse(import.meta.env);
@@ -30,3 +36,6 @@ if (!parsed.success) {
 }
 
 export const env = parsed.data;
+
+/** Where requests go: the API itself, or (proxied on the dev server) the page's own origin. */
+export const apiBaseUrl = env.VITE_API_PROXY ? "" : env.VITE_API_URL;

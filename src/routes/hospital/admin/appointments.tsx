@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SectionPlaceholder } from "@/components/dashboard/section-placeholder";
+import { StaffAppointments } from "@/features/staff/components/staff-appointments";
 
-// TODO(design): build this page once it's designed.
 export const Route = createFileRoute("/hospital/admin/appointments")({
   component: AppointmentsPage,
 });
 
 function AppointmentsPage() {
-  return <SectionPlaceholder title="Appointments" />;
+  return (
+    <>
+      <title>Appointments · DocuHealth</title>
+      <StaffAppointments scope="hospital" />
+    </>
+  );
 }

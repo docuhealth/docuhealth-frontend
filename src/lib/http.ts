@@ -1,9 +1,9 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
-import { env } from "@/env";
+import { apiBaseUrl } from "@/env";
 import { type NextStep, useAuthStore } from "@/stores/auth-store";
 
 export const http = axios.create({
-  baseURL: env.VITE_API_URL,
+  baseURL: apiBaseUrl,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
@@ -37,7 +37,7 @@ async function refreshAccessToken(): Promise<string> {
   if (!session) throw new Error("No session to refresh");
 
   const { data } = await axios.post<RefreshResponse>(
-    `${env.VITE_API_URL}/api/auth/refresh`,
+    `${apiBaseUrl}/api/auth/refresh`,
     session.refreshToken ? { refreshToken: session.refreshToken } : {},
     { withCredentials: true },
   );

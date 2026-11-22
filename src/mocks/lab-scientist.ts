@@ -3,7 +3,6 @@ import { env } from "@/env";
 import type {
   FoundPatient,
   LabOverview,
-  LabProfile,
   LabTest,
   PendingApprovals,
   TestAppointments,
@@ -14,19 +13,6 @@ import type {
 } from "@/features/lab-scientist/api/schemas";
 
 const api = (path: string) => `${env.VITE_API_URL}${path}`;
-
-const profile: LabProfile = {
-  hospital: { name: "Lagos University Teaching Hospital", bannerUrl: null },
-  user: {
-    title: null,
-    firstName: "Emeka",
-    lastName: "Obi",
-    email: "emeka.obi@luth.example.com",
-    avatarUrl: null,
-  },
-  unreadNotifications: 1,
-  unreadMessages: 3,
-};
 
 /** This week's numbers; the other periods scale them (pending tests don't). */
 const overview: LabOverview = {
@@ -316,7 +302,6 @@ function knownPatients(): FoundPatient[] {
 }
 
 export const labScientistHandlers = [
-  http.get(api("/hospital/lab/profile"), () => HttpResponse.json(profile)),
   http.get(api("/hospital/lab/overview"), ({ request }) => {
     const scale = periodScale[periodOf(request)];
     return HttpResponse.json({

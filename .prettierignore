@@ -8,3 +8,4 @@ package-lock.json
 # generated — not meant to be hand-edited
 src/routeTree.gen.ts
 public/mockServiceWorker.js
+docs/api/

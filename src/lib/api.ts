@@ -84,3 +84,13 @@ function messageFromBody(body: unknown, field?: string): string | undefined {
   }
   return messageFromBody(record.data);
 }
+
+/**
+ * A page of a DRF list endpoint (`{count, next, previous, results}`), as `{total, items}`. Pass
+ * the page and size you asked for as `page`/`size` query params.
+ */
+export function paginated<TItem extends z.ZodType>(item: TItem) {
+  return z
+    .object({ count: z.number().int().nonnegative(), results: z.array(item) })
+    .transform(({ count, results }) => ({ total: count, items: results }));
+}

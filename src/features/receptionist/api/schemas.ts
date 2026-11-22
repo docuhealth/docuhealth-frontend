@@ -1,25 +1,19 @@
 import { z } from "zod";
+import { staffProfileSchema } from "@/lib/staff-profile";
 
 const count = z.number().int().nonnegative();
 
-/** The signed-in receptionist and their hospital, for the dashboard's shell and greeting. */
-export const receptionistProfileSchema = z.object({
-  hospital: z.object({
-    name: z.string(),
-    /** e.g. "LUTH". */
-    shortName: z.string(),
-    /** The banner photo the hospital's admin chose; `null` shows the default one. */
-    bannerUrl: z.url().nullable(),
-  }),
-  user: z.object({
-    firstName: z.string(),
-    lastName: z.string(),
-    email: z.email(),
-    avatarUrl: z.url().nullable(),
-  }),
-  unreadNotifications: count,
-  unreadMessages: count,
-});
+/**
+ * The signed-in member and their hospital, for the dashboard's shell and greeting, from
+ * `GET /api/auth/staff/profile`. TODO(api): there's no endpoint for unread notification and
+ * message counts yet, so they're 0; the API has no title (e.g. "Dr.") either.
+ */
+export const receptionistProfileSchema = staffProfileSchema.transform(({ user, hospital }) => ({
+  hospital: { name: hospital.name, bannerUrl: hospital.bannerUrl },
+  user: { firstName: user.firstName, lastName: user.lastName, email: user.email, avatarUrl: null },
+  unreadNotifications: 0,
+  unreadMessages: 0,
+}));
 export type ReceptionistProfile = z.infer<typeof receptionistProfileSchema>;
 
 /** Headline numbers; each `…Change` is a percentage against the period before. */

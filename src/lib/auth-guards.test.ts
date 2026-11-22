@@ -44,8 +44,22 @@ describe("getPostLoginDestination", () => {
     expect(getPostLoginDestination(staff("radiologist"))).toBe("/hospital/radiologist");
     expect(getPostLoginDestination(staff("lab_scientist"))).toBe("/hospital/lab-scientist");
     expect(getPostLoginDestination(staff("doctor", true))).toBe("/hospital/admin");
-    // An admin gets the admin dashboard whatever their role.
+    // A hospital admin gets the admin dashboard whatever their role.
     expect(getPostLoginDestination(staff("receptionist", true))).toBe("/hospital/admin");
+  });
+
+  it("sends an arm's admin to the arm's dashboard, as staging's lab admin logs in", () => {
+    const labAdmin = session({
+      accountType: "staff",
+      actingAs: [
+        {
+          facility: { id: "FG3M84A", name: "Lord Is Good Laboratory", type: "laboratory" },
+          staff_role: "lab_scientist",
+          is_admin: true,
+        },
+      ],
+    });
+    expect(getPostLoginDestination(labAdmin)).toBe("/hospital/lab-scientist");
   });
 
   it("sends a pending gate step before any dashboard", () => {

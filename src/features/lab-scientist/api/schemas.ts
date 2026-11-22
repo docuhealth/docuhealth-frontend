@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { staffProfileSchema } from "@/lib/staff-profile";
 import type { Period } from "@/lib/period";
 
 const count = z.number().int().nonnegative();
@@ -8,24 +9,23 @@ function enumOf<T extends Record<string, string>>(labels: T) {
   return z.enum(Object.keys(labels) as [keyof T & string, ...(keyof T & string)[]]);
 }
 
-/** The signed-in lab scientist and their hospital, for the dashboard's shell and greeting. */
-export const labProfileSchema = z.object({
-  hospital: z.object({
-    name: z.string(),
-    /** The banner photo the hospital's admin chose; `null` shows the default one. */
-    bannerUrl: z.url().nullable(),
-  }),
-  user: z.object({
-    /** e.g. "Dr."; `null` when they don't use one. */
-    title: z.string().nullable(),
-    firstName: z.string(),
-    lastName: z.string(),
-    email: z.email(),
-    avatarUrl: z.url().nullable(),
-  }),
-  unreadNotifications: count,
-  unreadMessages: count,
-});
+/**
+ * The signed-in member and their hospital, for the dashboard's shell and greeting, from
+ * `GET /api/auth/staff/profile`. TODO(api): there's no endpoint for unread notification and
+ * message counts yet, so they're 0; the API has no title (e.g. "Dr.") either.
+ */
+export const labProfileSchema = staffProfileSchema.transform(({ user, hospital }) => ({
+  hospital: { name: hospital.name, bannerUrl: hospital.bannerUrl },
+  user: {
+    title: null as string | null,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    avatarUrl: null as string | null,
+  },
+  unreadNotifications: 0,
+  unreadMessages: 0,
+}));
 export type LabProfile = z.infer<typeof labProfileSchema>;
 
 /** Headline numbers for the period asked for. */

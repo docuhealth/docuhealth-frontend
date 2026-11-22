@@ -115,7 +115,12 @@ export type Dashboard =
   | "/hospital/radiologist"
   | "/hospital/lab-scientist";
 
-/** Staff roles with a dashboard of their own; admins of any role get the admin dashboard. */
+/**
+ * Staff roles with a dashboard of their own. A hospital's admins get the admin dashboard whatever
+ * their role, but an admin of one of its arms (lab, radiology, pharmacy) runs that arm: the lab's
+ * admin is `{staff_role: "lab_scientist", is_admin: true, facility: {type: "laboratory"}}` and
+ * uses the lab dashboard.
+ */
 const roleDashboards: Partial<Record<string, Dashboard>> = {
   receptionist: "/hospital/receptionist",
   radiologist: "/hospital/radiologist",
@@ -140,8 +145,11 @@ export function getPostLoginDestination(
   const staffEntry = session.actingAs?.find(isStaffActingAs);
   if (session.accountType === "staff" || staffEntry) {
     const role = staffEntry?.staff_role ?? staffEntry?.role ?? session.user.role;
-    const roleDashboard = staffEntry && !staffEntry.is_admin ? roleDashboards[role] : undefined;
-    // TODO(api): doctors, nurses and the other roles have no dashboard yet, so they get the admin one.
+    const facilityType = staffEntry?.facility?.type ?? staffEntry?.facility_type ?? "hospital";
+    const hospitalAdmin = staffEntry?.is_admin && facilityType === "hospital";
+    const roleDashboard = staffEntry && !hospitalAdmin ? roleDashboards[role] : undefined;
+    // TODO: doctors, nurses and pharmacists get their own dashboards in the v2 migration (phases 3
+    // and 4); until then they land on the admin one.
     return roleDashboard ?? "/hospital/admin";
   }
 

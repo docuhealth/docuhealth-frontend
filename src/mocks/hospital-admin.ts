@@ -1,10 +1,10 @@
 import { HttpResponse, http } from "msw";
 import { env } from "@/env";
+import { hospitalTheme, staffProfileResponse } from "@/mocks/staff";
 import { permissionLabels } from "@/features/hospital-admin/api/schemas";
 import type {
   DashboardOverview,
   FacilityType,
-  HospitalProfile,
   PatientDetail,
   PatientFilterOptions,
   PatientList,
@@ -18,20 +18,6 @@ import type {
 } from "@/features/hospital-admin/api/schemas";
 
 const api = (path: string) => `${env.VITE_API_URL}${path}`;
-
-const profile: HospitalProfile = {
-  name: "Lagos University Teaching Hospital",
-  bannerUrl: null,
-  admin: {
-    firstName: "Folake",
-    lastName: "Adeyemi",
-    title: "Dr.",
-    email: "folake.adeyemi@luth.example.com",
-    avatarUrl: null,
-  },
-  unreadNotifications: 1,
-  unreadMessages: 3,
-};
 
 const overview: DashboardOverview = {
   stats: {
@@ -403,19 +389,18 @@ function matches(search: string | null, ...values: string[]) {
 }
 
 export const hospitalAdminHandlers = [
-  http.get(api("/hospital/profile"), () => HttpResponse.json(profile)),
   http.put(api("/hospital/banner"), async ({ request }) => {
     const file = (await request.formData()).get("file");
     if (!(file instanceof File)) {
       return HttpResponse.json({ message: "Choose a photo to upload" }, { status: 400 });
     }
     // Lives until the page reloads, like the rest of the mock data.
-    profile.bannerUrl = URL.createObjectURL(file);
-    return HttpResponse.json(profile);
+    hospitalTheme.bg_image = URL.createObjectURL(file);
+    return HttpResponse.json(staffProfileResponse(request));
   }),
-  http.delete(api("/hospital/banner"), () => {
-    profile.bannerUrl = null;
-    return HttpResponse.json(profile);
+  http.delete(api("/hospital/banner"), ({ request }) => {
+    hospitalTheme.bg_image = null;
+    return HttpResponse.json(staffProfileResponse(request));
   }),
   http.get(api("/hospital/dashboard"), () => HttpResponse.json(overview)),
   http.post(api("/hospital/facilities"), async ({ request }) => {

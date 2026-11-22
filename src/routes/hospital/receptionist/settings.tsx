@@ -1,11 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SectionPlaceholder } from "@/components/dashboard/section-placeholder";
+import { staffProfileQuery } from "@/features/staff/api/queries";
+import { StaffSettings } from "@/features/staff/components/staff-settings";
 
-// TODO(design): build this page once it's designed.
 export const Route = createFileRoute("/hospital/receptionist/settings")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(staffProfileQuery()),
   component: SettingsPage,
 });
 
 function SettingsPage() {
-  return <SectionPlaceholder title="Settings" />;
+  return (
+    <>
+      <title>Settings · DocuHealth</title>
+      <StaffSettings />
+    </>
+  );
 }

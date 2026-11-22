@@ -16,9 +16,6 @@ import { greetingName } from "@/features/radiologist/lib/names";
 import { greetingFor } from "@/lib/format";
 import type { Period } from "@/lib/period";
 
-/** The stat cards' notes say which period their numbers cover. */
-const inPeriod = { today: "today", week: "this week", month: "this month" } as const;
-
 /** The radiologist's home page: the period's numbers, the scan schedule, uploads and orders. */
 export function RadiologistDashboard({
   period,
@@ -31,7 +28,6 @@ export function RadiologistDashboard({
   const { data: overview } = useSuspenseQuery(radiologyOverviewQuery(period));
   // When the page opened; the greeting doesn't need to tick over while it stays open.
   const [now] = useState(() => new Date());
-  const span = inPeriod[period];
 
   return (
     <div className="flex flex-col gap-8">
@@ -57,25 +53,26 @@ export function RadiologistDashboard({
           icon={<XRayIcon />}
           label="Imaging Requests"
           value={overview.imagingRequests.toLocaleString("en-GB")}
-          note={`All requests ${span}`}
+          // TODO(api): the orders can't be filtered by date yet, so these count every order so far.
+          note="All requests so far"
         />
         <StatCard
           icon={<ClockFadingIcon />}
           label="Pending Orders"
           value={overview.pendingOrders.toLocaleString("en-GB")}
-          note="Currently being handled"
+          note="Waiting to be accepted"
         />
         <StatCard
           icon={<CheckmarkCircleIcon />}
           label="Completed Scan"
           value={overview.completedScans.toLocaleString("en-GB")}
-          note={capitalize(span)}
+          note="All completed so far"
         />
         <StatCard
           icon={<ClockIcon />}
           label="Scans In Progress"
           value={overview.scansInProgress.toLocaleString("en-GB")}
-          note={capitalize(span)}
+          note="Being scanned now"
         />
       </StatBanner>
 
@@ -87,8 +84,4 @@ export function RadiologistDashboard({
       <ScanRecords title="Scan Records" />
     </div>
   );
-}
-
-function capitalize(text: string) {
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }

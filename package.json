@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:staging": "vite --mode staging --port 5180",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b",
@@ -20,7 +21,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "knip": "knip",
-    "prepare": "husky"
+    "prepare": "husky",
+    "api:schema": "node scripts/fetch-api-schema.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

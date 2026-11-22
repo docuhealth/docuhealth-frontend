@@ -43,7 +43,7 @@ function stepsFor(order: ScanOrder): Step[] {
         received,
         {
           title: "Request rejected",
-          detail: order.rejection
+          detail: order.rejection?.at
             ? `${formatDateCommaTime(new Date(order.rejection.at))} · by radiology`
             : "By radiology",
           state: "rejected",

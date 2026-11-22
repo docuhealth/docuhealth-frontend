@@ -51,7 +51,7 @@ export function ReceptionistDashboard({
           </h1>
           <p className="type-body-sm-regular text-fg-caption">
             Here’s what’s happening at{" "}
-            <strong className="font-semibold text-fg-heading">{profile.hospital.shortName}</strong>{" "}
+            <strong className="font-semibold text-fg-heading">{profile.hospital.name}</strong>{" "}
             today.
           </p>
         </div>

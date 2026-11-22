@@ -11,7 +11,6 @@ import type {
   LinkedPerson,
   PatientLookup,
   PatientProfile,
-  ReceptionistProfile,
   ReceptionOverview,
   ReceptionQueue,
   RegisteredPatient,
@@ -19,18 +18,6 @@ import type {
 } from "@/features/receptionist/api/schemas";
 
 const api = (path: string) => `${env.VITE_API_URL}${path}`;
-
-const profile: ReceptionistProfile = {
-  hospital: { name: "Lagos University Teaching Hospital", shortName: "LUTH", bannerUrl: null },
-  user: {
-    firstName: "Kemi",
-    lastName: "Adewale",
-    email: "kemi.adewale@luth.example.com",
-    avatarUrl: null,
-  },
-  unreadNotifications: 1,
-  unreadMessages: 3,
-};
 
 const overview: ReceptionOverview = {
   totalCheckIns: 2486,
@@ -400,7 +387,6 @@ function matches(search: string | null, ...values: string[]) {
 const VERIFICATION_CODE = "123456";
 
 export const receptionistHandlers = [
-  http.get(api("/hospital/reception/profile"), () => HttpResponse.json(profile)),
   http.get(api("/hospital/reception/overview"), ({ request }) => {
     const period = new URL(request.url).searchParams.get("period");
     const scale = periodScale[period === "today" || period === "month" ? period : "week"];

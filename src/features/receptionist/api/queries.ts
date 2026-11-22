@@ -36,7 +36,7 @@ export const receptionistKeys = {
 export const receptionistProfileQuery = () =>
   queryOptions({
     queryKey: receptionistKeys.profile(),
-    queryFn: () => request(receptionistProfileSchema, { url: "/hospital/reception/profile" }),
+    queryFn: () => request(receptionistProfileSchema, { url: "/api/auth/staff/profile" }),
   });
 
 export const receptionOverviewQuery = (period: Period) =>

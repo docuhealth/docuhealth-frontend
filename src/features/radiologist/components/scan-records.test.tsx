@@ -13,14 +13,16 @@ async function tableRows() {
 }
 
 describe("ScanRecords", () => {
-  it("shows a page of pending orders, the newest unopened ones marked New", async () => {
+  // TODO(api): the API has no "seen" flag, so no order shows as "New"; each shows how long it's
+  // waited instead.
+  it("shows a page of pending orders and how long each has waited", async () => {
     renderWithRouter(<ScanRecords />);
 
     expect(await screen.findByRole("tab", { name: /Pending Order\s*20/ })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /Completed Scan\s*32/ })).toBeInTheDocument();
     const rows = await tableRows();
     expect(rows).toHaveLength(8);
-    expect(within(rows[0]!).getByText("New")).toBeInTheDocument();
+    expect(within(rows[0]!).getByText("2h ago")).toBeInTheDocument();
     expect(within(rows[2]!).getByText("1d ago")).toBeInTheDocument();
     expect(screen.getByText("Showing 1 to 8 of 20 entries")).toBeInTheDocument();
   });
@@ -97,16 +99,18 @@ describe("ScanRecords", () => {
 });
 
 describe("dashboard cards", () => {
-  it("lists this week's booked scans", async () => {
+  it("lists the appointments booked from today to the end of the week", async () => {
     renderWithProviders(<ScanScheduleCard />);
-    expect(await screen.findByText("Chidi Okafor")).toBeInTheDocument();
-    // Booked twelve days out, so only in this month's view.
-    expect(screen.queryByText("Joyce Sarah")).not.toBeInTheDocument();
+    expect(await screen.findByText("Daniel Martins")).toBeInTheDocument();
+    expect(screen.getByText("Fatima Bello")).toBeInTheDocument();
+    // Yesterday's isn't coming up.
+    expect(screen.queryByText("Chinonso Okafor")).not.toBeInTheDocument();
   });
 
   it("shows each recent upload's status", async () => {
     renderWithProviders(<RecentUploadsCard />);
-    const row = (await screen.findByText("Amaka Eze")).closest("tr")!;
+    // The second-newest report is still waiting for the doctor; the fourth was sent back.
+    const row = (await screen.findByText("Chioma Nwosu")).closest("tr")!;
     expect(within(row).getByText("Processing")).toBeInTheDocument();
     expect(screen.getByText("Failed")).toBeInTheDocument();
   });

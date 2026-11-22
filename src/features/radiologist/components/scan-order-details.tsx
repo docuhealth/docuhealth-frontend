@@ -244,7 +244,7 @@ function SummaryCards({ order }: { order: ScanOrder }) {
     completed: order.result
       ? `Result uploaded ${formatDateCommaTime(new Date(order.result.uploadedAt))}`
       : "Result uploaded",
-    rejected: order.rejection ? formatDateCommaTime(new Date(order.rejection.at)) : "",
+    rejected: order.rejection?.at ? formatDateCommaTime(new Date(order.rejection.at)) : "",
   }[order.stage];
 
   const imaging = order.scheduledAt ? new Date(order.scheduledAt) : null;

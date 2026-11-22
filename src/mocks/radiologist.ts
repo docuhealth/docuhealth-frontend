@@ -1,113 +1,37 @@
 import { HttpResponse, http } from "msw";
 import { env } from "@/env";
-import {
-  type ReporterSpecialty,
-  reporterSpecialtyLabels,
-  type ScanModality,
-  scanModalityLabels,
-} from "@/features/radiologist/api/schemas";
-import type {
-  FoundPatient,
-  RadiologistProfile,
-  RadiologyOverview,
-  RecentUploads,
-  ScanOrder,
-  ScanRecord,
-  ScanRecordList,
-  ScanResult,
-  ScanSchedule,
-  ScanStage,
-} from "@/features/radiologist/api/schemas";
+import type { ScanStage } from "@/features/radiologist/api/schemas";
+import { readMultipart } from "@/mocks/multipart";
+
+// The radiologist's endpoints, faked with the real API's paths and shapes (`ScanOrderItemRead`,
+// `PatientBasicInfo`; docs/api/openapi.json), so the app's parsers run against the real format.
 
 const api = (path: string) => `${env.VITE_API_URL}${path}`;
 
-const profile: RadiologistProfile = {
-  hospital: { name: "Lagos University Teaching Hospital", bannerUrl: null },
-  user: {
-    title: "Dr.",
-    firstName: "Emeka",
-    lastName: "Obi",
-    email: "emeka.obi@luth.example.com",
-    avatarUrl: null,
-  },
-  unreadNotifications: 1,
-  unreadMessages: 3,
-};
-
-/** This week's numbers; the other periods scale them. */
-const overview: RadiologyOverview = {
-  imagingRequests: 24,
-  pendingOrders: 12,
-  completedScans: 4,
-  scansInProgress: 6,
-};
-
-const periodScale = { today: 0.25, week: 1, month: 4 } as const;
-
-function scaleFor(request: Request) {
-  const period = new URL(request.url).searchParams.get("period");
-  return period === "today" || period === "month" ? period : "week";
-}
-
 const HOUR = 60 * 60_000;
-const DAY = 24 * HOUR;
+const MINUTE = 60_000;
 
-/** `days` from today (negative for the past) at `time` ("09:30"). */
-function at(days: number, time: string) {
-  const [hours = 0, minutes = 0] = time.split(":").map(Number);
-  const date = new Date();
-  date.setDate(date.getDate() + days);
-  date.setHours(hours, minutes, 0, 0);
-  return date.toISOString();
-}
+const hospital = {
+  name: "Lagos University Teaching Hospital",
+  email: "records@luth.example.com",
+  sqid: "pm9XGQd",
+};
 
-const patient = (index: number, name: string) => ({
-  id: `patient-${index}`,
-  name,
-  avatarUrl: null,
-  hin: String(54_137_284_910 + index * 7_919_301),
-});
+type Patient = { hin: string; firstname: string; lastname: string; gender: string; dob: string };
 
-const schedule: ScanSchedule["items"] = (
+const patient = (index: number, name: string, dob: string, gender: string): Patient => {
+  const [firstname = "", lastname = ""] = name.split(" ");
+  return { hin: String(54_137_284_910 + index * 7_919_301), firstname, lastname, gender, dob };
+};
+
+/** People who've been booked in before; Chidi Okafor is 541-452-042-11. */
+const bookedPatients = (
   [
-    [0, "10:30", "Chidi Okafor", "Chest X-ray"],
-    [0, "12:00", "Tunde Adeyemi", "Brain MRI"],
-    [1, "09:00", "Amina Yusuf", "Abdominal CT"],
-    [1, "11:00", "Chioma Nwosu", "Pelvic ultrasound"],
-    [2, "10:30", "Emeka Uche", "Chest X-ray"],
-    [3, "10:30", "David Bello", "Chest X-ray"],
-    [5, "14:00", "Hauwa Garba", "Spine MRI"],
-    [12, "09:30", "Joyce Sarah", "Mammogram"],
-    [20, "11:00", "Adeyemi Samuel", "Bone density scan"],
+    ["Chidi Okafor", "1988-04-12", "male"],
+    ["Tunde Adeyemi", "1997-05-11", "male"],
+    ["Amina Yusuf", "1990-01-15", "female"],
   ] as const
-).map(([days, time, name, scanType], index) => ({
-  id: `schedule-${index + 1}`,
-  at: at(days, time),
-  patient: patient(index + 1, name),
-  scanType,
-}));
-
-const uploads: RecentUploads["items"] = (
-  [
-    [0, "10:42", "Chidi Okafor", "Chest X-ray", "successful"],
-    [0, "10:45", "Amaka Eze", "Brain MRI", "processing"],
-    [-1, "10:38", "Amina Yusuf", "Abdominal CT", "successful"],
-    [-2, "10:38", "Chioma Nwosu", "Knee X-ray", "successful"],
-    [-3, "09:50", "Emeka Uche", "Brain MRI", "failed"],
-    [-3, "10:38", "David Bello", "Mammogram", "successful"],
-    [-9, "15:20", "Ruth Etim", "Pelvic X-ray", "successful"],
-    [-20, "11:05", "Victor Udo", "Spine MRI", "successful"],
-  ] as const
-).map(([days, time, name, scanType, status], index) => ({
-  id: `upload-${index + 1}`,
-  uploadedAt: at(days, time),
-  patient: { id: `patient-${index + 1}`, name },
-  scanType,
-  status,
-}));
-
-/** How far ahead (or back, for uploads) each period reaches. */
-const periodDays = { today: 1, week: 7, month: 31 } as const;
+).map(([name, dob, gender], index) => patient(index + 1, name, dob, gender));
 
 const recordPatients = [
   ["Yemi Ojo", "1974-03-02", "male"],
@@ -121,24 +45,32 @@ const recordPatients = [
   ["Ngozi Eze", "1989-12-01", "female"],
   ["Ibrahim Musa", "1965-08-22", "male"],
   ["Fatima Bello", "1992-10-15", "female"],
-  ["Segun Oladipo", "1983-11-27", "prefer_not_to_say"],
+  ["Segun Oladipo", "1983-11-27", "unknown"],
 ] as const;
-const scanTypes = [
-  "Chest X-ray",
-  "Abdominal CT",
-  "Brain MRI",
-  "Pelvic ultrasound",
-  "Spine MRI",
-  "Knee X-ray",
-  "Pelvic X-ray",
-  "Bone density scan",
-  "Mammogram",
-];
-const doctors = ["Dr. Raphael Jonnas", "Dr. Sarah Adeyemi", "Dr. Ibrahim Sani", "Dr. Tola Bello"];
+
+/** Each scan's LOINC parts: modality, region imaged and (if any) contrast timing. */
+const scans: Record<string, [modality: string, regions: string[], timing: string[]]> = {
+  "Chest X-ray": ["XR", ["Chest"], []],
+  "Abdominal CT": ["CT", ["Abdomen"], ["WO"]],
+  "Brain MRI": ["MR", ["Brain"], ["W"]],
+  "Pelvic ultrasound": ["US", ["Pelvis"], []],
+  "Spine MRI": ["MR", ["Spine"], ["WO"]],
+  "Knee X-ray": ["XR", ["Knee"], []],
+  "Pelvic X-ray": ["XR", ["Pelvis"], []],
+  "Bone density scan": ["DXA", ["Hip", "Spine"], []],
+  Mammogram: ["MG", ["Breast"], []],
+};
+const scanNames = Object.keys(scans);
+const doctors = [
+  ["Raphael", "Jonnas"],
+  ["Sarah", "Adeyemi"],
+  ["Ibrahim", "Sani"],
+  ["Tola", "Bello"],
+] as const;
 
 /**
  * Hours ago each tab's orders were requested; how many there are sets the tab's count. All fall
- * within the last week, so "This Week" shows every one and "Today" only the newest.
+ * within the last week.
  */
 const stageAges: Record<ScanStage, number[]> = {
   pending: [
@@ -149,345 +81,271 @@ const stageAges: Record<ScanStage, number[]> = {
   rejected: [40, 100, 160],
 };
 
+type ScanResult = {
+  sqid: string;
+  clinical_indication: string;
+  findings: string[];
+  impression: string[];
+  recommendation: string[];
+  attachments: string[];
+  extra_comment: string | null;
+  reporter_name: string;
+  reporter_specialty: string;
+  reported_at: string;
+  status: "pending" | "approved" | "rejected";
+  rejection_reason: null;
+  created_at: string;
+};
+
+type Item = {
+  sqid: string;
+  patient: Patient;
+  scan: string;
+  doctor: readonly [string, string];
+  requestedAt: string;
+  status: "pending" | "in_progress" | "image_collected" | "completed" | "rejected";
+  image_collected_at: string | null;
+  rejection_reason: string | null;
+  results: ScanResult[];
+};
+
+const after = (from: string, minutes: number) =>
+  new Date(new Date(from).getTime() + minutes * MINUTE).toISOString();
+
 let next = 0;
-const records: ScanRecord[] = (Object.entries(stageAges) as [ScanStage, number[]][]).flatMap(
+const items: Item[] = (Object.entries(stageAges) as [ScanStage, number[]][]).flatMap(
   ([stage, ages]) =>
     ages.map((hoursAgo, index) => {
       const n = next++;
-      const [name, dateOfBirth, sex] = recordPatients[n % recordPatients.length]!;
+      const [name, dob, gender] = recordPatients[n % recordPatients.length]!;
+      const scan = scanNames[n % scanNames.length]!;
+      const requestedAt = new Date(Date.now() - hoursAgo * HOUR).toISOString();
+      const id = `scan-order-${n + 1}`;
+      // The newest in-progress scan has no images yet; the others do.
+      const collected =
+        stage === "completed" || (stage === "in_progress" && index > 0)
+          ? after(requestedAt, stage === "completed" ? 90 : 26 * 60)
+          : null;
       return {
-        id: `scan-order-${n + 1}`,
-        patient: { ...patient(100 + n, name), dateOfBirth, sex },
-        scanType: scanTypes[n % scanTypes.length]!,
-        requestedBy: doctors[n % doctors.length]!,
-        requestedAt: new Date(Date.now() - hoursAgo * HOUR).toISOString(),
-        stage,
-        // The two most recent pending orders haven't been opened yet.
-        seen: stage !== "pending" || index >= 2,
-        // The newest in-progress scan was booked; the doctors asked for the rest.
-        progress: stage === "in_progress" ? (index === 0 ? "appointment" : "doctor_request") : null,
+        sqid: id,
+        patient: patient(100 + n, name, dob, gender),
+        scan,
+        doctor: doctors[n % doctors.length]!,
+        requestedAt,
+        status: stage === "in_progress" && collected ? "image_collected" : stage,
+        image_collected_at: collected,
+        rejection_reason:
+          stage === "rejected"
+            ? "The requested scan doesn’t match the clinical question. Please confirm the imaging type with the requesting doctor and send a new request."
+            : null,
+        // A few reports are still waiting for the doctor, and one was sent back.
+        results:
+          stage === "completed"
+            ? [
+                reportFor(
+                  id,
+                  scan,
+                  after(requestedAt, 180),
+                  index % 7 === 1 ? "pending" : index % 7 === 3 ? "rejected" : "approved",
+                ),
+              ]
+            : [],
       };
     }),
 );
 
-/** How each scan type breaks down on its order: modality, body part, contrast. */
-const scanParts: Record<string, [string, string, string | null]> = {
-  "Chest X-ray": ["X-ray", "Chest", null],
-  "Abdominal CT": ["CT scan", "Abdomen", "non-contrast"],
-  "Brain MRI": ["MRI", "Brain", "with contrast"],
-  "Pelvic ultrasound": ["Ultrasound", "Pelvis", null],
-  "Spine MRI": ["MRI", "Spine", "non-contrast"],
-  "Knee X-ray": ["X-ray", "Knee", null],
-  "Pelvic X-ray": ["X-ray", "Pelvis", null],
-  "Bone density scan": ["DEXA scan", "Hip and spine", null],
-  Mammogram: ["Mammogram", "Breast", null],
-};
-
-const MINUTE = 60_000;
-
-/** What's been done to orders on the dev server, by order id; it replaces the generated data. */
-const uploadedResults = new Map<string, ScanResult>();
-const acceptedAt = new Map<string, string>();
-const loggedImaging = new Map<string, string>();
-const rejections = new Map<string, NonNullable<ScanOrder["rejection"]>>();
-
-/** A record from the list, filled out with what its own page shows. */
-function orderFor(record: ScanRecord, index: number): ScanOrder {
-  const [modality, bodyPart, contrast] = scanParts[record.scanType] ?? ["Scan", "Chest", null];
-  const requested = new Date(record.requestedAt).getTime();
-  const after = (minutes: number) => new Date(requested + minutes * MINUTE).toISOString();
-  const accepted = record.stage === "in_progress" || record.stage === "completed";
-  const part = bodyPart.toLowerCase();
-
+function reportFor(id: string, scan: string, at: string, status: ScanResult["status"]): ScanResult {
+  const [modality, regions] = scans[scan] ?? ["", []];
   return {
-    id: record.id,
-    stage: record.stage,
-    patient: { ...record.patient, hmo: index % 3 !== 2 },
-    modality,
-    bodyPart,
-    contrast,
-    requestedBy: record.requestedBy,
-    requestedAt: record.requestedAt,
-    provider: { name: "Downtown Medical Clinic", email: "records@downtownclinic.example.com" },
-    note: "Persistent cough and shortness of breath for 3 weeks. History of smoking (20 pack-years).",
-    acceptedAt: acceptedAt.get(record.id) ?? (accepted ? after(30) : null),
-    scheduledAt:
-      loggedImaging.get(record.id) ??
-      // Accepted here, with no time logged yet.
-      (acceptedAt.has(record.id)
-        ? null
-        : record.stage === "in_progress"
-          ? after(26 * 60)
-          : accepted
-            ? after(90)
-            : null),
-    rejection:
-      rejections.get(record.id) ??
-      (record.stage === "rejected"
-        ? {
-            at: after(60),
-            reason:
-              "The requested scan doesn’t match the clinical question. Please confirm the imaging type with the requesting doctor and send a new request.",
-          }
-        : null),
-    result:
-      uploadedResults.get(record.id) ??
-      (record.stage === "completed"
-        ? {
-            uploadedAt: after(180),
-            reportedBy: { name: "Dr. Emeka Obi", specialty: "Radiologist" },
-            examination: `${contrast ? `${contrast[0]!.toUpperCase()}${contrast.slice(1)} ` : ""}${modality} of the ${part}`,
-            clinicalIndication:
-              "Evaluation of persistent cough and shortness of breath for 3 weeks, with a history of smoking (20 pack-years).",
-            technique: `Standard ${modality} images of the ${part} were obtained in the axial, coronal and sagittal planes.`,
-            findings: [
-              "No acute abnormality is seen.",
-              `Structures around the ${part} included in the study are unremarkable.`,
-            ],
-            impression:
-              "6 mm nodule, likely benign but requiring follow-up. Recommend a repeat low-dose study in 6 months to assess stability.",
-            recommendations:
-              "Follow-up imaging in 6 months to monitor the nodule. Smoking cessation counselling strongly advised.",
-            comment: null,
-            files: [
-              {
-                id: `${record.id}-images`,
-                name: `${bodyPart} ${modality} images`,
-                kind: "images",
-                sizeBytes: 24_300_000,
-                uploadedAt: after(180),
-                url: `https://files.docuhealth.example/${record.id}/images.zip`,
-              },
-              {
-                id: `${record.id}-report`,
-                name: "Radiology report (PDF)",
-                kind: "pdf",
-                sizeBytes: 412_000,
-                uploadedAt: after(180),
-                url: `https://files.docuhealth.example/${record.id}/report.pdf`,
-              },
-            ],
-          }
-        : null),
+    sqid: `${id}-result`,
+    clinical_indication:
+      "Evaluation of persistent cough and shortness of breath for 3 weeks, with a history of smoking (20 pack-years).",
+    findings: [
+      "No acute abnormality is seen.",
+      `Structures around the ${regions.join(" and ").toLowerCase()} are unremarkable.`,
+    ],
+    impression: ["6 mm nodule, likely benign but requiring follow-up."],
+    recommendation: ["Follow-up imaging in 6 months to monitor the nodule."],
+    attachments: [
+      `https://files.docuhealth.example/${id}/${encodeURIComponent(`${regions[0]} ${modality} images`)}`,
+      `https://files.docuhealth.example/${id}/${encodeURIComponent("Radiology report (PDF)")}`,
+    ],
+    extra_comment: null,
+    reporter_name: "Dr. Emeka Obi",
+    reporter_specialty: "Radiologist",
+    reported_at: at,
+    status,
+    rejection_reason: null,
+    created_at: at,
   };
 }
 
-function matches(search: string | null, ...values: string[]) {
+/** `ScanOrderItemRead`, as the API returns it. */
+function read(item: Item) {
+  const [modality, regions, timing] = scans[item.scan] ?? ["", [], []];
+  const part = (type: string, name: string, index: number) => ({
+    sqid: `${item.sqid}-part-${index}`,
+    part_number: `LP${100000 + index}-0`,
+    part_type: type,
+    part_name: name,
+    preferred_name: name,
+    sequence_order: "A",
+    rid: null,
+  });
+  return {
+    sqid: item.sqid,
+    order_info: {
+      sqid: `${item.sqid}-order`,
+      patient_info: item.patient,
+      hospital_info: hospital,
+      ordered_by_info: {
+        sqid: `doctor-${item.doctor[1]}`,
+        firstname: item.doctor[0],
+        lastname: item.doctor[1],
+        role: "doctor",
+        specialization: null,
+      },
+      created_at: item.requestedAt,
+    },
+    scan_info: {
+      sqid: `scan-${item.scan}`,
+      loinc_code: "00000-0",
+      name: item.scan,
+      parts: [
+        ...timing.map((name, index) => part("Rad.Timing", name, index)),
+        ...regions.map((name, index) =>
+          part("Rad.Anatomic Location.Region Imaged", name, 10 + index),
+        ),
+        part("Rad.Modality.Modality Type", modality, 20),
+      ],
+    },
+    results: item.results,
+    created_at: item.requestedAt,
+    status: item.status,
+    rejection_reason: item.rejection_reason,
+    image_collected_at: item.image_collected_at,
+  };
+}
+
+/** The API's tab filter: "in_progress" covers scans whose images are in too. */
+function atStatus(item: Item, status: string | null) {
+  return status === "in_progress"
+    ? item.status === "in_progress" || item.status === "image_collected"
+    : item.status === status;
+}
+
+function matches(search: string | null, item: Item) {
   const term = search?.trim().toLowerCase();
-  return !term || values.some((value) => value.toLowerCase().includes(term));
+  return (
+    !term ||
+    [`${item.patient.firstname} ${item.patient.lastname}`, item.patient.hin, item.scan].some(
+      (value) => value.toLowerCase().includes(term),
+    )
+  );
 }
 
-/** The order's record and index, or a response saying why it can't be changed. */
-function changeable(id: unknown, stage: ScanStage, message: string) {
-  const index = records.findIndex((record) => record.id === id);
-  const record = records[index];
-  if (!record) {
-    return { error: HttpResponse.json({ message: "Scan order not found." }, { status: 404 }) };
+/** The item, or a response saying why it can't be changed. */
+function changeable(id: unknown, allowed: Item["status"][], message: string) {
+  const item = items.find(({ sqid }) => sqid === id);
+  if (!item) return { error: HttpResponse.json({ detail: "Not found." }, { status: 404 }) };
+  if (!allowed.includes(item.status)) {
+    return { error: HttpResponse.json({ detail: message }, { status: 400 }) };
   }
-  if (record.stage !== stage) {
-    return { error: HttpResponse.json({ message }, { status: 409 }) };
-  }
-  return { record, index };
-}
-
-/**
- * Everyone the radiology mock knows, for looking a HIN up when booking: the patients on the
- * schedule (Chidi Okafor is 541-452-042-11) and on the scan orders.
- */
-function knownPatients(): FoundPatient[] {
-  const seen = new Map<string, FoundPatient>();
-  for (const { patient } of schedule) {
-    seen.set(patient.hin, {
-      ...patient,
-      dateOfBirth: "1990-01-15",
-      phone: null,
-      email: `${patient.name.toLowerCase().replace(/\s+/g, ".")}@email.com`,
-    });
-  }
-  for (const { patient } of records) {
-    const { sex: _sex, ...rest } = patient;
-    seen.set(patient.hin, { ...rest, phone: null, email: null });
-  }
-  return [...seen.values()];
+  return { item };
 }
 
 export const radiologistHandlers = [
-  http.get(api("/hospital/radiology/patients"), ({ request }) => {
-    const hin = new URL(request.url).searchParams.get("hin")?.replace(/\D/g, "");
-    return HttpResponse.json({
-      items: knownPatients().filter((patient) => patient.hin === hin),
-    });
-  }),
-  http.post(api("/hospital/radiology/appointments"), async ({ request }) => {
-    // The dialog leaves the scan type and body part out for now.
-    const { patientId, modality, bodyPart, at } = (await request.json()) as {
-      patientId: string;
-      modality?: ScanModality;
-      bodyPart?: string;
-      at: string;
-    };
-    const found = knownPatients().find(({ id }) => id === patientId);
-    if (!found) return HttpResponse.json({ message: "Patient not found" }, { status: 404 });
-    const appointment: ScanSchedule["items"][number] = {
-      id: `schedule-${schedule.length + 1}`,
-      at,
-      patient: { id: found.id, name: found.name, avatarUrl: found.avatarUrl, hin: found.hin },
-      scanType: modality
-        ? [bodyPart, scanModalityLabels[modality]].filter(Boolean).join(" ")
-        : "Scan appointment",
-    };
-    schedule.push(appointment);
-    schedule.sort((a, b) => a.at.localeCompare(b.at));
-    return HttpResponse.json(appointment, { status: 201 });
-  }),
-  http.post(api("/hospital/radiology/scan-orders/:id/accept"), ({ params }) => {
-    const found = changeable(params.id, "pending", "Only a pending order can be accepted.");
-    if (found.error) return found.error;
-    const { record, index } = found;
-    record.stage = "in_progress";
-    record.seen = true;
-    record.progress = "doctor_request";
-    acceptedAt.set(record.id, new Date().toISOString());
-    return HttpResponse.json(orderFor(record, index));
-  }),
-  http.post(api("/hospital/radiology/scan-orders/:id/reject"), async ({ params, request }) => {
-    const found = changeable(params.id, "pending", "Only a pending order can be rejected.");
-    if (found.error) return found.error;
-    const { record, index } = found;
-    const { reason } = (await request.json()) as { reason: string };
-    record.stage = "rejected";
-    record.seen = true;
-    rejections.set(record.id, { at: new Date().toISOString(), reason });
-    return HttpResponse.json(orderFor(record, index));
-  }),
-  http.put(api("/hospital/radiology/scan-orders/:id/imaging-time"), async ({ params, request }) => {
-    const found = changeable(
-      params.id,
-      "in_progress",
-      "Only a scan in progress can have its imaging time logged.",
-    );
-    if (found.error) return found.error;
-    const { record, index } = found;
-    const { scheduledAt } = (await request.json()) as { scheduledAt: string };
-    loggedImaging.set(record.id, scheduledAt);
-    return HttpResponse.json(orderFor(record, index));
-  }),
-  http.post(api("/hospital/radiology/scan-orders/:id/result"), async ({ params, request }) => {
-    const found = changeable(
-      params.id,
-      "in_progress",
-      "Only a scan in progress can have its result uploaded.",
-    );
-    if (found.error) return found.error;
-    const { record, index } = found;
-
-    const form = await request.formData();
-    const text = (key: string) => {
-      const value = form.get(key);
-      return typeof value === "string" ? value.trim() : "";
-    };
-    const reportedAt = text("reportedAt") || new Date().toISOString();
-    const order = orderFor(record, index);
-    uploadedResults.set(record.id, {
-      uploadedAt: reportedAt,
-      reportedBy: {
-        name: text("reporterName"),
-        specialty:
-          reporterSpecialtyLabels[text("specialty") as ReporterSpecialty] ?? text("specialty"),
-      },
-      examination: [order.contrast, order.modality, "of the", order.bodyPart.toLowerCase()]
-        .filter(Boolean)
-        .join(" "),
-      clinicalIndication: text("clinicalIndication"),
-      technique: null,
-      findings: text("findings")
-        .split(/\n+/)
-        .map((line) => line.trim())
-        .filter(Boolean),
-      impression: text("impression"),
-      recommendations: text("recommendations"),
-      comment: text("comment") || null,
-      files: form.getAll("attachments").flatMap((file, fileIndex) =>
-        // Not `instanceof File`: in tests the file comes from another realm.
-        typeof file !== "string"
-          ? [
-              {
-                id: `${record.id}-upload-${fileIndex + 1}`,
-                name: file.name,
-                kind: file.type === "application/pdf" ? ("pdf" as const) : ("images" as const),
-                sizeBytes: file.size,
-                uploadedAt: reportedAt,
-                url: `https://files.docuhealth.example/${record.id}/${encodeURIComponent(file.name)}`,
-              },
-            ]
-          : [],
-      ),
-    });
-    record.stage = "completed";
-    return HttpResponse.json(orderFor(record, index));
-  }),
-  http.get(api("/hospital/radiology/scan-orders/:id"), ({ params }) => {
-    const index = records.findIndex((record) => record.id === params.id);
-    if (index === -1) {
-      return HttpResponse.json({ message: "Scan order not found." }, { status: 404 });
-    }
-    return HttpResponse.json(orderFor(records[index]!, index));
-  }),
-  http.get(api("/hospital/radiology/profile"), () => HttpResponse.json(profile)),
-  http.get(api("/hospital/radiology/overview"), ({ request }) => {
-    const scale = periodScale[scaleFor(request)];
-    return HttpResponse.json(
-      Object.fromEntries(
-        Object.entries(overview).map(([key, value]) => [key, Math.round(value * scale)]),
-      ) as RadiologyOverview,
-    );
-  }),
-  http.get(api("/hospital/radiology/schedule"), ({ request }) => {
-    const until = Date.now() + periodDays[scaleFor(request)] * DAY;
-    return HttpResponse.json({
-      items: schedule.filter((item) => new Date(item.at).getTime() < until),
-    } satisfies ScanSchedule);
-  }),
-  http.get(api("/hospital/radiology/uploads"), ({ request }) => {
-    const since = Date.now() - periodDays[scaleFor(request)] * DAY;
-    return HttpResponse.json({
-      items: uploads.filter((item) => new Date(item.uploadedAt).getTime() > since),
-    } satisfies RecentUploads);
-  }),
-  http.get(api("/hospital/radiology/scan-orders"), ({ request }) => {
+  http.get(api("/api/radiology/orders/items"), ({ request }) => {
     const params = new URL(request.url).searchParams;
-    const stage = (params.get("stage") ?? "pending") as ScanStage;
+    const status = params.get("status");
+    if (!["pending", "in_progress", "completed", "rejected"].includes(status ?? "")) {
+      return HttpResponse.json({ status: "Invalid status" }, { status: 400 });
+    }
     const page = Number(params.get("page") ?? 1);
-    const pageSize = Number(params.get("pageSize") ?? 8);
-    const direction = params.get("sort") === "oldest" ? -1 : 1;
-    const period = params.get("period");
-    const since =
-      period === "today" || period === "week" || period === "month"
-        ? Date.now() - periodDays[period] * DAY
-        : 0;
-    const inPeriod = records.filter((record) => new Date(record.requestedAt).getTime() > since);
-
-    const matching = inPeriod
-      .filter(
-        (record) =>
-          record.stage === stage &&
-          matches(params.get("search"), record.patient.name, record.patient.hin, record.scanType),
-      )
-      .sort(
-        (a, b) =>
-          (new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()) * direction,
-      );
-    const count = (of: ScanStage) => inPeriod.filter((record) => record.stage === of).length;
-
+    const size = Number(params.get("size") ?? 10);
+    const matching = items
+      .filter((item) => atStatus(item, status) && matches(params.get("search"), item))
+      .sort((a, b) => b.requestedAt.localeCompare(a.requestedAt));
     return HttpResponse.json({
-      counts: {
-        pending: count("pending"),
-        in_progress: count("in_progress"),
-        completed: count("completed"),
-        rejected: count("rejected"),
-      },
-      total: matching.length,
-      items: matching.slice((page - 1) * pageSize, page * pageSize),
-    } satisfies ScanRecordList);
+      count: matching.length,
+      next: null,
+      previous: null,
+      results: matching.slice((page - 1) * size, page * size).map(read),
+    });
+  }),
+  http.patch(api("/api/radiology/orders/items/:sqid/accept"), ({ params }) => {
+    const found = changeable(params.sqid, ["pending"], "Only a pending order can be accepted.");
+    if (found.error) return found.error;
+    found.item.status = "in_progress";
+    return HttpResponse.json(read(found.item));
+  }),
+  http.patch(api("/api/radiology/orders/items/:sqid/reject"), async ({ params, request }) => {
+    const found = changeable(params.sqid, ["pending"], "Only a pending order can be rejected.");
+    if (found.error) return found.error;
+    const { rejection_reason } = (await request.json()) as { rejection_reason: string };
+    Object.assign(found.item, { status: "rejected", rejection_reason });
+    return HttpResponse.json(read(found.item));
+  }),
+  http.patch(
+    api("/api/radiology/orders/items/:sqid/collection-time"),
+    async ({ params, request }) => {
+      const found = changeable(
+        params.sqid,
+        ["in_progress", "image_collected"],
+        "Only an accepted order's images can be logged.",
+      );
+      if (found.error) return found.error;
+      const { image_collected_at } = (await request.json()) as { image_collected_at: string };
+      Object.assign(found.item, { status: "image_collected", image_collected_at });
+      return HttpResponse.json(read(found.item));
+    },
+  ),
+  http.post(api("/api/radiology/results"), async ({ request }) => {
+    const form = await readMultipart(request);
+    const found = changeable(
+      form.get("order_item"),
+      ["in_progress", "image_collected"],
+      "Only an accepted order takes a report.",
+    );
+    if (found.error) return found.error;
+    const now = new Date().toISOString();
+    const result: ScanResult = {
+      sqid: `${found.item.sqid}-result-${found.item.results.length + 1}`,
+      clinical_indication: form.get("clinical_indication") ?? "",
+      findings: form.getAll("findings"),
+      impression: form.getAll("impression"),
+      recommendation: form.getAll("recommendation"),
+      attachments: form
+        .fileNames("attachments")
+        .map(
+          (name) =>
+            `https://files.docuhealth.example/${found.item.sqid}/${encodeURIComponent(name)}`,
+        ),
+      extra_comment: form.get("extra_comment"),
+      reporter_name: form.get("reporter_name") ?? "",
+      reporter_specialty: form.get("reporter_specialty") ?? "",
+      reported_at: form.get("reported_at") ?? now,
+      status: "pending",
+      rejection_reason: null,
+      created_at: now,
+    };
+    found.item.results.push(result);
+    found.item.status = "completed";
+    return HttpResponse.json(result, { status: 201 });
+  }),
+  http.get(api("/api/radiology/patients"), ({ request }) => {
+    const params = new URL(request.url).searchParams;
+    const size = Number(params.get("size") ?? 10);
+    const everyone = new Map<string, Patient>();
+    for (const person of [...bookedPatients, ...items.map((item) => item.patient)]) {
+      everyone.set(person.hin, person);
+    }
+    const results = [...everyone.values()];
+    return HttpResponse.json({
+      count: results.length,
+      next: null,
+      previous: null,
+      results: results.slice(0, size),
+    });
   }),
 ];

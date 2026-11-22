@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { staffProfileSchema } from "@/lib/staff-profile";
 
 /** Staff roles, with the singular and plural names screens show for them. */
 export const staffRoles = {
@@ -27,22 +28,24 @@ export const facilitySchema = z.object({
 
 const count = z.number().int().nonnegative();
 
-/** The signed-in admin's hospital, shown in the dashboard's sidebar and top bar. */
-export const hospitalProfileSchema = z.object({
-  name: z.string(),
-  /** The photo the admin uploaded for the dashboard banner; `null` shows the default one. */
-  bannerUrl: z.url().nullable(),
-  admin: z.object({
-    firstName: z.string(),
-    lastName: z.string(),
-    /** e.g. "Dr." */
-    title: z.string().nullable(),
-    email: z.email(),
-    avatarUrl: z.url().nullable(),
-  }),
-  unreadNotifications: count,
-  unreadMessages: count,
-});
+/**
+ * The signed-in member and their hospital, for the dashboard's shell and greeting, from
+ * `GET /api/auth/staff/profile`. TODO(api): there's no endpoint for unread notification and
+ * message counts yet, so they're 0; the API has no title (e.g. "Dr.") either.
+ */
+export const hospitalProfileSchema = staffProfileSchema.transform(({ user, hospital }) => ({
+  name: hospital.name,
+  bannerUrl: hospital.bannerUrl,
+  admin: {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    title: null as string | null,
+    email: user.email,
+    avatarUrl: null as string | null,
+  },
+  unreadNotifications: 0,
+  unreadMessages: 0,
+}));
 export type HospitalProfile = z.infer<typeof hospitalProfileSchema>;
 
 export const dashboardOverviewSchema = z.object({

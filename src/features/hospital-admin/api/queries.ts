@@ -38,7 +38,7 @@ export const hospitalAdminKeys = {
 export const hospitalProfileQuery = () =>
   queryOptions({
     queryKey: hospitalAdminKeys.profile(),
-    queryFn: () => request(hospitalProfileSchema, { url: "/hospital/profile" }),
+    queryFn: () => request(hospitalProfileSchema, { url: "/api/auth/staff/profile" }),
   });
 
 export const dashboardOverviewQuery = (period: Period) =>

@@ -36,7 +36,7 @@ export const testOrderQuery = (id: string) =>
 export const labProfileQuery = () =>
   queryOptions({
     queryKey: labKeys.profile(),
-    queryFn: () => request(labProfileSchema, { url: "/hospital/lab/profile" }),
+    queryFn: () => request(labProfileSchema, { url: "/api/auth/staff/profile" }),
   });
 
 export const labOverviewQuery = (period: Period) =>

@@ -46,16 +46,30 @@ The mock login picks a scenario from the email's first part (any password works)
 | `firstlogin@…` | —                         | `/first-login` gate       |
 | `reception@…`  | —                         | Receptionist dashboard    |
 | `radiology@…`  | —                         | Radiologist dashboard     |
+| `lab@…`        | —                         | Lab scientist dashboard   |
 | anything else  | Patient portal            | Admin dashboard (doctor)  |
 
 Any verification code works except `000000`, which returns "Invalid OTP". On the dev server with
 mocks on, the dashboards also open without logging in; production builds always require a session.
+
+### Against the staging API
+
+`npm run dev:staging` serves the app on port 5180 against the real staging API, with mocks off
+(settings in `.env.staging`). The dev server proxies `/api` to staging, so the `hospital.` and
+`admin.` sections work on `*.localhost` even though staging's CORS doesn't allow those origins.
+Log in with a real staging account.
+
+The backend's OpenAPI schema is the reference for every feature's `api/` folder. `npm run
+api:schema` saves it to `docs/api/` (`openapi.json`, plus `endpoints.md` to grep). The migration
+from v1 is tracked in `docs/v2-migration-plan.md`.
 
 ## Scripts
 
 | Command                           | Does                                         |
 | --------------------------------- | -------------------------------------------- |
 | `npm run dev`                     | Dev server                                   |
+| `npm run dev:staging`             | Dev server on the staging API, mocks off     |
+| `npm run api:schema`              | Save the backend's OpenAPI schema to `docs/` |
 | `npm run build` / `preview`       | Type-check + production build / serve it     |
 | `npm run typecheck`               | `tsc -b`                                     |
 | `npm run lint` / `lint:fix`       | oxlint (warnings fail)                       |

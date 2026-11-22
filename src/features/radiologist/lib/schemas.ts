@@ -12,7 +12,7 @@ const required = (message: string) => z.string().trim().min(1, message);
 const longText = (message: string) => required(message).max(4000, "Keep this to 4,000 characters");
 
 /** The largest file a result can carry. */
-export const MAX_ATTACHMENT_BYTES = 50 * 1024 * 1024;
+const MAX_ATTACHMENT_BYTES = 50 * 1024 * 1024;
 
 /** The Upload Test Result dialog, all three steps. */
 export const uploadResultSchema = z
