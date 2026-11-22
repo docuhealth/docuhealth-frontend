@@ -107,6 +107,17 @@ export function isStaffActingAs(entry: ActingAsEntry): entry is StaffActingAs {
   );
 }
 
+/**
+ * Whether the signed-in staff member is an admin of their facility, e.g. the lab's admin, who
+ * approves the lab scientists' results.
+ */
+function isFacilityAdmin(session: Session | null) {
+  return !!session?.actingAs?.find(isStaffActingAs)?.is_admin;
+}
+
+/** Whether the signed-in staff member is their facility's admin (see `isFacilityAdmin`). */
+export const useIsFacilityAdmin = () => useAuthStore((state) => isFacilityAdmin(state.session));
+
 /** The dashboards a signed-in user can land on. */
 export type Dashboard =
   | "/patient"

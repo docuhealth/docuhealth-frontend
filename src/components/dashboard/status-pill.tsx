@@ -5,6 +5,7 @@ const tones = {
   success: "bg-success-100 text-success-500",
   info: "bg-info-100 text-info-500",
   neutral: "bg-line text-fg-body",
+  error: "bg-error-100 text-error-500",
 };
 
 /** A short status on a tinted background, led by a dot in the same color. */

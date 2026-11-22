@@ -146,6 +146,7 @@ call-by-call table is in `docs/api-mapping-redesigned-dashboards.md`. These are 
 13. **DOB at desk signup.** `POST /api/auth/signup/desk` requires `dob`, but the redesigned registration form has no date-of-birth field (design kept as is). Please make `dob` optional (the patient can add it later); until then, desk registration fails with `dob: This field is required.`
 14. **Coverage values.** API `company` vs UI `nhis`: agree on one list.
 15. `GET /api/records/patients/{hin}/soap-notes/shared` returns **500** for the receptionist (ValueError). Bug report.
+16. **Admission requests: `processed_by_info`.** The schema marks it required, but older accepted and rejected requests return `null` (seen on staging). Please mark it nullable, or backfill it.
 
 ### Lab scientist
 
@@ -157,7 +158,9 @@ call-by-call table is in `docs/api-mapping-redesigned-dashboards.md`. These are 
 6. **Booking permission.** Confirm lab scientists may `POST /api/hospital-ops/appointments/book`, and consider a test reference on lab appointments (the `type` is free text today).
 7. **Single-call result upload.** Optionally accept `specimen_collected_at` in `result/submit` to save a round trip.
 8. **`is_admin` in the staff profile**, so the UI can show lab-admin approval actions without the login payload.
-9. Spec fixes: `result_info` should be typed as an object; `GET /api/lab/dashboard` needs a response schema.
+9. **Order-level result review.** The lab admin approves or returns results one test at a time (`PATCH /api/lab/test-orders/items/{item}/result/approve-by-lab-admin` and `…/reject-by-lab-admin`); the UI reviews a whole order by sending one request per test. An order-level endpoint would save the round trips and keep an order from being half approved if one request fails.
+10. **Typed `result_info`.** It's typed as a string in the schema but is an object (values, interpretation, status…). A typed schema, with its `status` values (`pending`, `lab_admin_rejected`, `accepted`…), would let the UI show where each result stands.
+11. Spec fixes: `result_info` should be typed as an object; `GET /api/lab/dashboard` needs a response schema.
 
 ### Hospital admin
 
@@ -174,6 +177,10 @@ call-by-call table is in `docs/api-mapping-redesigned-dashboards.md`. These are 
 11. **Staff creation.** Confirm how passwords work on `staff/create`: the Add Staff dialog asks for one and puts it in the welcome message, but the API doesn't accept one, so the password in the email won't work. (The UI now uses the API's role list; "Records officer" is gone.)
 12. **Add facility.** `POST /api/auth/facility/arms` requires the facility's `name`, `street`, `city`, `state` and `country`, which the Add Facility dialog doesn't ask for (design kept as is). Please make them optional (defaulting to the hospital's own address, say); until then adding a facility fails with those fields' errors.
 13. **Staff list filters.** `GET /api/auth/staff` ignores `is_active`, so the Staff Management filters (On team / Removed) read the whole team and filter in the browser. Fine for now; a filter would be needed for large hospitals.
+14. **Wallet.** There's no wallet endpoint (balance, transactions, top-up). The admin's Wallet page shows the balance as "Not available yet" and offers the subscription plans, which do exist.
+15. **Subscribing.** `POST /api/payments/subscribe` is documented as returning a `Subscription`, but v1 relied on an `authorization_url` (Paystack checkout) in the reply. Please document it, and confirm `plan` takes the `paystack_plan_code` (as v1 sent) rather than the plan's `sqid`. The UI opens the link when it's there. (Not tried on staging, to avoid starting a real payment.)
+16. **Current subscription.** `FacilityProfile.subscription` (in `GET /api/auth/facility`) is typed as a string, but v1 reads it as `{status, plan_name}`. Please type it. The status enum also differs from v1 (`non_renewing` vs `non-renewing`; no `past_due`/`expired`).
+17. **Audit logs.** `GET /api/audits/audit-logs` has no search, date or staff filter, and `before_state`/`after_state` are untyped. Fine for now; filters would help as logs grow.
 
 ### Radiologist
 

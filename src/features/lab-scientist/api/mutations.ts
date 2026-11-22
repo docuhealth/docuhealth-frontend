@@ -151,3 +151,40 @@ export function useBookTestAppointment() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: labKeys.all }),
   });
 }
+
+/** Where a result's lab admin review is sent: the API addresses tests (items) directly here. */
+const reviewUrl = (itemId: string, verdict: "approve" | "reject") =>
+  `/api/lab/test-orders/items/${encodeURIComponent(itemId)}/result/${verdict}-by-lab-admin`;
+
+/** The lab admin approves every result of the order that's waiting for them. */
+export function useApproveResults(order: TestOrder) {
+  return useMutation({
+    mutationFn: () =>
+      Promise.all(
+        itemsAt(order, "result_ready").map((item) =>
+          request(anyResponseSchema, { method: "PATCH", url: reviewUrl(item.id, "approve") }),
+        ),
+      ),
+    onSuccess: useOrderChanged(order.id),
+  });
+}
+
+/**
+ * The lab admin sends the waiting results back, saying why; the lab scientist sees the reason,
+ * and those tests go back to in progress for a new sample and result.
+ */
+export function useReturnResults(order: TestOrder) {
+  return useMutation({
+    mutationFn: ({ reason }: RejectOrderValues) =>
+      Promise.all(
+        itemsAt(order, "result_ready").map((item) =>
+          request(anyResponseSchema, {
+            method: "PATCH",
+            url: reviewUrl(item.id, "reject"),
+            data: { rejection_reason: reason },
+          }),
+        ),
+      ),
+    onSuccess: useOrderChanged(order.id),
+  });
+}

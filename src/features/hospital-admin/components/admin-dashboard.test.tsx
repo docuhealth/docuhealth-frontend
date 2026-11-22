@@ -3,10 +3,16 @@ import { describe, expect, it } from "vitest";
 import { AdminDashboard } from "@/features/hospital-admin/components/admin-dashboard";
 import { renderWithRouter } from "@/test/render";
 
+// The overview waits on nine requests (the team, each role, the profile), which can take longer
+// than the default second when the suite runs in parallel.
+const OVERVIEW_LOAD = { timeout: 5000 };
+
 describe("AdminDashboard", () => {
   it("shows the team's size, and dashes for the numbers the API doesn't send yet", async () => {
     renderWithRouter(<AdminDashboard period="month" onPeriodChange={() => {}} />);
-    const total = (await screen.findByText("Total Staff")).closest("div")!.parentElement!;
+    const total = (await screen.findByText("Total Staff", {}, OVERVIEW_LOAD)).closest(
+      "div",
+    )!.parentElement!;
     // The signed-in member plus 11 colleagues.
     expect(total).toHaveTextContent("12");
     expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(3);
@@ -15,7 +21,7 @@ describe("AdminDashboard", () => {
 
   it("uploads a banner photo, then deletes it", async () => {
     const { user } = renderWithRouter(<AdminDashboard period="month" onPeriodChange={() => {}} />);
-    await screen.findByText("Total Staff");
+    await screen.findByText("Total Staff", {}, OVERVIEW_LOAD);
     const photo = new File(["banner"], "ward.png", { type: "image/png" });
     await user.upload(screen.getByLabelText("Banner photo"), photo);
     expect(await screen.findByText("Banner photo updated.")).toBeInTheDocument();

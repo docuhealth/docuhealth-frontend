@@ -40,12 +40,20 @@ export function AwaitingApprovalCard() {
       ) : (
         <ul aria-label="Results awaiting approval" className="mt-2 border-t">
           {data?.items.slice(0, PREVIEW_ROWS).map((item) => (
-            <li key={item.id} className="flex items-center gap-3 border-b py-3">
+            <li
+              key={`${item.id}-${item.testType}`}
+              className="relative flex items-center gap-3 border-b py-3"
+            >
               <TestTubeBadge />
               <div className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate type-body-sm-regular text-fg-heading">
+                <Link
+                  to="/hospital/lab-scientist/test-orders/$orderId"
+                  params={{ orderId: item.id }}
+                  // The whole row opens the order.
+                  className="truncate type-body-sm-regular text-fg-heading after:absolute after:inset-0 hover:underline"
+                >
                   {item.testType}
-                </span>
+                </Link>
                 <span className="truncate type-caption text-fg-caption">
                   {item.patient.name} · {relativeDay(new Date(item.enteredAt), now)}
                 </span>

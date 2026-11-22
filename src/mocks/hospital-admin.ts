@@ -19,15 +19,36 @@ function pick<T>(list: readonly T[], index: number): T {
   return item;
 }
 
-const wards = (
+type MockBed = { sqid: string; bed_number: number; status: "available" | "occupied" | "requested" };
+type MockWard = { sqid: string; name: string; beds: MockBed[] };
+
+/** `count` beds for a ward, the first `taken` of them occupied. */
+const bedsFor = (ward: string, count: number, taken = 0): MockBed[] =>
+  Array.from({ length: count }, (_, index) => ({
+    sqid: `${ward}-bed-${index + 1}`,
+    bed_number: index + 1,
+    status: index < taken ? "occupied" : "available",
+  }));
+
+const wards: MockWard[] = (
   [
-    ["general", "General ward", 20],
-    ["emergency", "Emergency ward", 12],
-    ["maternity", "Maternity ward", 16],
-    ["icu", "ICU ward", 8],
-    ["surgical", "Surgical ward", 14],
+    ["general", "General ward", 20, 6],
+    ["emergency", "Emergency ward", 12, 11],
+    ["maternity", "Maternity ward", 16, 3],
+    ["icu", "ICU ward", 8, 8],
+    // No one in it, so it can be deleted.
+    ["surgical", "Surgical ward", 14, 0],
   ] as const
-).map(([sqid, name, beds]) => ({ sqid, name, total_beds: beds }));
+).map(([sqid, name, count, taken]) => ({ sqid, name, beds: bedsFor(sqid, count, taken) }));
+
+/** `Ward`, as the API returns it. */
+const readWard = (ward: MockWard) => ({
+  sqid: ward.sqid,
+  name: ward.name,
+  total_beds: ward.beds.length,
+  available_beds: ward.beds.filter((bed) => bed.status === "available").length,
+  beds: ward.beds,
+});
 
 /** Someone named on a record (`*_by_info`). */
 const person = (sqid: string, firstname: string, lastname: string, role: string) => ({
@@ -156,6 +177,27 @@ async function staffIds(request: Request) {
   return staff_ids ?? [];
 }
 
+const plan = (sqid: string, name: string, price: number, interval: string, code: string) => ({
+  id: sqid === "plan-monthly" ? 2 : 1,
+  sqid,
+  name,
+  price,
+  interval,
+  description: `The ${interval} plan, with everything a hospital needs to get started.`,
+  features: ["Unlimited staff", "Patient records and admissions", "Lab and radiology"],
+  paystack_plan_code: code,
+  role: "hospital",
+  created_at: "2026-06-02T03:27:43.518050Z",
+  updated_at: "2026-06-02T03:37:58.107261Z",
+});
+const plans = [
+  plan("plan-monthly", "Monthly Plan", 10_000, "monthly", "PLN_monthly"),
+  plan("plan-annual", "Annual Plan", 117_000, "annually", "PLN_annual"),
+];
+
+/** The hospital's subscription; none (the free plan) until one is paid for. */
+let subscription: { plan_name: string; status: string } | null = null;
+
 export const hospitalAdminHandlers = [
   // Open check-ins are the front desk's queue; the receptionist's mock answers those.
   http.get(api("/api/hospital-ops/patients"), ({ request }) => {
@@ -178,14 +220,85 @@ export const hospitalAdminHandlers = [
     }
     return HttpResponse.json({ patient_info: patient, latest_vitals: null, ongoing_drugs: [] });
   }),
-  http.get(api("/api/hospital-ops/wards"), ({ request }) =>
-    HttpResponse.json(
-      page(
-        wards.map((ward) => ({ ...ward, available_beds: ward.total_beds - 2, beds: [] })),
-        request,
-      ),
-    ),
+  http.get(api("/api/hospital-ops/wards/manage"), ({ request }) =>
+    HttpResponse.json(page(wards.map(readWard), request)),
   ),
+  http.post(api("/api/hospital-ops/wards/manage"), async ({ request }) => {
+    const { name, total_beds } = (await request.json()) as { name?: string; total_beds?: number };
+    if (!name?.trim()) return HttpResponse.json(required("name"), { status: 400 });
+    const sqid = `ward-${wards.length + 1}`;
+    const ward = { sqid, name, beds: bedsFor(sqid, Number(total_beds ?? 0)) };
+    wards.push(ward);
+    return HttpResponse.json(readWard(ward), { status: 201 });
+  }),
+  http.patch(api("/api/hospital-ops/wards/manage/:sqid"), async ({ params, request }) => {
+    const ward = wards.find(({ sqid }) => sqid === params.sqid);
+    if (!ward) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    const { name, total_beds } = (await request.json()) as { name?: string; total_beds?: number };
+    const taken = ward.beds.filter((bed) => bed.status !== "available").length;
+    if (total_beds !== undefined && total_beds < taken) {
+      return HttpResponse.json(
+        { total_beds: [`Cannot be less than the ${taken} beds in use.`] },
+        { status: 400 },
+      );
+    }
+    if (name) ward.name = name;
+    if (total_beds !== undefined) {
+      const kept = ward.beds.filter((bed) => bed.status !== "available");
+      const free = bedsFor(ward.sqid, total_beds)
+        .slice(kept.length)
+        .map((bed, index) => ({
+          ...bed,
+          bed_number: kept.length + index + 1,
+        }));
+      ward.beds = [...kept, ...free];
+    }
+    return HttpResponse.json(readWard(ward));
+  }),
+  http.delete(api("/api/hospital-ops/wards/manage/:sqid"), ({ params }) => {
+    const index = wards.findIndex(({ sqid }) => sqid === params.sqid);
+    const ward = wards[index];
+    if (!ward) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    if (ward.beds.some((bed) => bed.status !== "available")) {
+      return HttpResponse.json(
+        { ward: ["A ward with occupied or requested beds can't be deleted."] },
+        { status: 400 },
+      );
+    }
+    wards.splice(index, 1);
+    return new HttpResponse(null, { status: 204 });
+  }),
+  http.get(api("/api/hospital-ops/wards/:sqid/beds"), ({ params }) => {
+    const ward = wards.find(({ sqid }) => sqid === params.sqid);
+    if (!ward) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    return HttpResponse.json(ward.beds);
+  }),
+  http.get(api("/api/auth/facility"), () =>
+    HttpResponse.json({
+      id: "pm9XGQd",
+      email: "admin@luth.example.com",
+      hospital_profile: { name: hospitalTheme.name, subscription, theme: hospitalTheme },
+    }),
+  ),
+  http.get(api("/api/payments/plans/role/:role"), ({ params }) =>
+    HttpResponse.json(params.role === "hospital" ? plans : []),
+  ),
+  http.post(api("/api/payments/subscribe"), async ({ request }) => {
+    const body = (await request.json()) as { plan?: string };
+    const chosen = plans.find(({ paystack_plan_code }) => paystack_plan_code === body.plan);
+    if (!chosen) return HttpResponse.json({ plan: ["Invalid plan."] }, { status: 400 });
+    // Paystack would take the payment; here it goes straight through.
+    subscription = { plan_name: chosen.name, status: "active" };
+    return HttpResponse.json(
+      {
+        sqid: "sub-1",
+        plan: body.plan,
+        status: "pending",
+        authorization_url: "https://checkout.paystack.com/mock",
+      },
+      { status: 201 },
+    );
+  }),
   http.patch(api("/api/auth/facility/branding"), async ({ request }) => {
     // In the browser the photo itself shows; under jsdom (tests) only its name can be read.
     const photo = await request

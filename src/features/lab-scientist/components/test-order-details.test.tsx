@@ -1,7 +1,8 @@
-import { screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { screen, waitFor, within } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 import { TestOrderDetails } from "@/features/lab-scientist/components/test-order-details";
 import { renderWithRouter } from "@/test/render";
+import { useAuthStore } from "@/stores/auth-store";
 
 // The mock's orders: 1–20 pending, 21–24 in progress (21 and 23 with their sample in),
 // 25–56 completed, 57–59 rejected. Each test uses its own.
@@ -84,5 +85,60 @@ describe("TestOrderDetails", () => {
     const results = await screen.findByRole("region", { name: "Results" });
     expect(within(results).getAllByText("Critical high")).toHaveLength(inputs.length);
     expect(screen.getByRole("region", { name: "Interpretation" })).toHaveTextContent("Very high.");
+  });
+
+  describe("as the lab's admin", () => {
+    function signInAsLabAdmin() {
+      useAuthStore.getState().setSession({
+        accessToken: "token",
+        accountType: "staff",
+        actingAs: [
+          {
+            staff_role: "lab_scientist",
+            is_admin: true,
+            facility: { id: "lab", type: "laboratory" },
+          },
+        ],
+        user: { id: "lab-admin", name: "Relam Triom", email: "relam@lab.example.com", role: "" },
+      });
+    }
+    afterEach(() => useAuthStore.getState().clearSession());
+
+    it("approves the results waiting for review", async () => {
+      signInAsLabAdmin();
+      const { user } = renderWithRouter(<TestOrderDetails orderId="test-order-31" />);
+      await user.click(await screen.findByRole("button", { name: "Approve results" }));
+      const dialog = await screen.findByRole("dialog", { name: "Approve results" });
+      await user.click(within(dialog).getByRole("button", { name: "Approve" }));
+      expect(await screen.findByText(/results are approved\./)).toBeInTheDocument();
+      // Nothing is left to review.
+      await waitFor(() =>
+        expect(screen.queryByRole("button", { name: "Approve results" })).not.toBeInTheDocument(),
+      );
+    });
+
+    it("returns results with a note, sending the test back to in progress", async () => {
+      signInAsLabAdmin();
+      const { user } = renderWithRouter(<TestOrderDetails orderId="test-order-36" />);
+      await user.click(await screen.findByRole("button", { name: "Return results" }));
+      const dialog = await screen.findByRole("dialog", { name: "Return results" });
+      await user.click(within(dialog).getByRole("button", { name: "Return results" }));
+      expect(
+        await within(dialog).findByText("Say why the results need redoing"),
+      ).toBeInTheDocument();
+
+      await user.type(within(dialog).getByLabelText(/Add note/), "The sample was haemolysed.");
+      await user.click(within(dialog).getByRole("button", { name: "Return results" }));
+      expect(await screen.findByText(/results are sent back to the lab\./)).toBeInTheDocument();
+      expect(
+        await screen.findByRole("button", { name: "Log sample collection" }),
+      ).toBeInTheDocument();
+    });
+
+    it("isn't offered to a lab scientist who isn't the admin", async () => {
+      renderWithRouter(<TestOrderDetails orderId="test-order-41" />);
+      expect(await screen.findByRole("heading", { level: 1 })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Approve results" })).not.toBeInTheDocument();
+    });
   });
 });

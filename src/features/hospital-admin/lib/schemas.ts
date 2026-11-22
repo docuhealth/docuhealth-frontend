@@ -60,3 +60,20 @@ export type AddStaffValues = z.output<typeof addStaffSchema>;
 
 /** The fields on Add Staff's first step, checked before it moves on to the second. */
 export const addStaffStepOne = ["firstName", "lastName", "phone", "role"] as const;
+
+/**
+ * The Create / Manage Ward dialog. `occupied` is how many beds are taken (0 for a new ward):
+ * a ward can't shrink below them.
+ */
+export const wardFormSchema = (occupied: number) =>
+  z.object({
+    name: required("Enter the ward’s name").max(100, "Keep the name to 100 characters"),
+    totalBeds: z.coerce
+      .number<string>("Enter how many beds it has")
+      .int("Use a whole number")
+      .min(1, "A ward needs at least one bed")
+      .min(occupied, `${occupied} beds are taken, so it needs at least ${occupied}`)
+      .max(500, "Use 500 beds or fewer"),
+  });
+export type WardFormInput = z.input<ReturnType<typeof wardFormSchema>>;
+export type WardFormValues = z.output<ReturnType<typeof wardFormSchema>>;

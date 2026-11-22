@@ -1,10 +1,13 @@
 import appointmentIconUrl from "@/assets/svgs/appointment.svg";
+import auditIconUrl from "@/assets/svgs/audit.svg";
+import bedIconUrl from "@/assets/svgs/bed.svg";
 import dashboardIconUrl from "@/assets/svgs/dashboard.svg";
 import healthIconUrl from "@/assets/svgs/health.svg";
 import messagesIconUrl from "@/assets/svgs/messages.svg";
 import patientIconUrl from "@/assets/svgs/patient.svg";
 import settingsIconUrl from "@/assets/svgs/settings.svg";
 import staffIconUrl from "@/assets/svgs/staff.svg";
+import walletIconUrl from "@/assets/svgs/wallet.svg";
 import { DashboardSidebar, type NavGroup } from "@/components/dashboard/dashboard-sidebar";
 
 /** The hospital admin dashboard's navigation. */
@@ -33,6 +36,9 @@ export function AdminSidebar({ unreadMessages }: { unreadMessages: number }) {
     {
       label: "Management",
       items: [
+        { to: "/hospital/admin/wards", label: "Ward Mgt.", icon: bedIconUrl },
+        { to: "/hospital/admin/audit-logs", label: "Audit logs", icon: auditIconUrl },
+        { to: "/hospital/admin/wallet", label: "Wallet", icon: walletIconUrl },
         { to: "/hospital/admin/personnel", label: "Health personnel", icon: healthIconUrl },
         { to: "/hospital/admin/settings", label: "Settings", icon: settingsIconUrl },
       ],

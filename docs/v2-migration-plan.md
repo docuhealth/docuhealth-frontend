@@ -48,7 +48,9 @@ Built as `src/features/staff/` (routes compose it into each dashboard).
       registration needs a date of birth and booking needs a staff member, which the design doesn't
       ask for (shows the API's error). Not available yet: reschedule, cancel, follow-up requests,
       linking an existing child, most overview figures (gaps file, section 7)
-- [ ] Receptionist admission requests page (no design yet)
+- [x] Receptionist admission requests (no design; built from v1 with v2's parts): pending,
+      admitted and rejected tabs, search; admit, or reject with a reason. Checked on staging
+      (reads: 47 admitted, 48 rejected)
 - [x] Radiologist: overview counts, scan records (4 tabs), order page, schedule, uploads, booking;
       accept, reject, imaging time and report upload on `api/radiology/*`. Checked on staging (reads
       only, to leave shared staging data alone). Waiting on the backend: date filters, single-order
@@ -57,7 +59,9 @@ Built as `src/features/staff/` (routes compose it into each dashboard).
       awaiting approval, booking; accept, reject, sample time and results sent per test on
       `api/lab/*`. Checked on staging (reads). Waiting on the backend: item-level list filter,
       approved/returning figures, HIN lookup for lab staff, dates (gaps file, section 7)
-- [ ] Lab administration page (lab admin's result approvals: real endpoints exist, no design yet)
+- [x] Lab admin result review (no design): Approve / Return results on the order page for the
+      lab's admin, "Awaiting Approval" rows open their order, audit logs in the lab admin's
+      sidebar. Checked on staging (reads; nothing approved)
 - [x] Hospital Admin: overview (team size, staff by role, queue), staff management (search,
       on team / removed, remove and undo, add staff), staff profile, patient management (4 tabs,
       search, counts), patient profile, banner photo on the real API. Checked on staging (reads).
@@ -65,7 +69,9 @@ Built as `src/features/staff/` (routes compose it into each dashboard).
       filters and sorting, staff activity and permissions, patient visit history. Blocked by the
       API: adding a facility needs a name and address the design doesn't ask for (gaps file,
       section 7)
-- [ ] Hospital Admin: ward management, audit logs, wallet (no designs yet)
+- [x] Hospital Admin (no designs): ward management (create, rename/resize, delete, beds),
+      audit logs (lab and radiology downloads), wallet (subscription plans and choosing one;
+      balance not available yet: no wallet API). Checked on staging (reads; no plan bought)
 
 ## Phase 3: Pharmacy
 

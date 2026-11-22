@@ -94,3 +94,11 @@ export const rejectOrderSchema = z.object({
   ),
 });
 export type RejectOrderValues = z.infer<typeof rejectOrderSchema>;
+
+/** The lab admin's Return Results dialog: why, for the lab scientist who'll redo them. */
+export const returnResultsSchema = z.object({
+  reason: required("Say why the results need redoing").max(
+    1000,
+    "Keep the note to 1,000 characters",
+  ),
+});

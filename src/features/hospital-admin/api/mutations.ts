@@ -3,11 +3,14 @@ import { request } from "@/lib/api";
 import { NotAvailableYetError } from "@/lib/not-available";
 import { absoluteUrl } from "@/lib/sections";
 import type { StaffRole } from "@/lib/staff-profile";
-import { hospitalAdminKeys } from "@/features/hospital-admin/api/queries";
+import { hospitalAdminKeys, WARDS_URL } from "@/features/hospital-admin/api/queries";
 import {
   anyResponseSchema,
   type FacilityType,
   type StaffMemberChange,
+  type SubscriptionPlan,
+  subscribeResponseSchema,
+  wardSchema,
 } from "@/features/hospital-admin/api/schemas";
 
 // The hospital admin's actions on the real API. Those the design has but the API can't do yet
@@ -171,5 +174,54 @@ export function useSetStaffStatus() {
     mutationFn: ({ ids, status }: { ids: string[]; status: "on_team" | "removed" }) =>
       setStatus(ids, status),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: hospitalAdminKeys.all }),
+  });
+}
+
+const wardUrl = (id: string) => `${WARDS_URL}/${encodeURIComponent(id)}`;
+
+/**
+ * Create a ward (no `id`) or change one's name and size. The API adds or removes beds to match
+ * `totalBeds`, and refuses fewer beds than are taken.
+ */
+export function useSaveWard() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, name, totalBeds }: { id?: string; name: string; totalBeds: number }) =>
+      request(wardSchema, {
+        method: id ? "PATCH" : "POST",
+        url: id ? wardUrl(id) : WARDS_URL,
+        data: { name, total_beds: totalBeds },
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: hospitalAdminKeys.all }),
+  });
+}
+
+/** Delete a ward and its beds; the API refuses while any bed is taken or requested. */
+export function useDeleteWard() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => request(anyResponseSchema, { method: "DELETE", url: wardUrl(id) }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: hospitalAdminKeys.all }),
+  });
+}
+
+/**
+ * Start paying for `plan`. The API sends back Paystack's checkout link, where the admin pays;
+ * the subscription goes live once Paystack tells the API. TODO(api): the link isn't in the API's
+ * schema (v1 relied on it), so without one this just refreshes the plan.
+ */
+export function useSubscribe() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (plan: SubscriptionPlan) =>
+      request(subscribeResponseSchema, {
+        method: "POST",
+        url: "/api/payments/subscribe",
+        data: { plan: plan.code },
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: hospitalAdminKeys.subscription() }),
   });
 }

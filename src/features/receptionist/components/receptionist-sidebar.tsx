@@ -1,3 +1,4 @@
+import admissionIconUrl from "@/assets/svgs/admission.svg";
 import appointmentIconUrl from "@/assets/svgs/appointment.svg";
 import dashboardIconUrl from "@/assets/svgs/dashboard.svg";
 import healthIconUrl from "@/assets/svgs/health.svg";
@@ -21,6 +22,11 @@ export function ReceptionistSidebar({ unreadMessages }: { unreadMessages: number
           to: "/hospital/receptionist/appointments",
           label: "Appointments",
           icon: appointmentIconUrl,
+        },
+        {
+          to: "/hospital/receptionist/admissions",
+          label: "Admissions",
+          icon: admissionIconUrl,
         },
       ],
     },

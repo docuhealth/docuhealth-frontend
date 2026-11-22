@@ -25,6 +25,10 @@ import { testOrderQuery } from "@/features/lab-scientist/api/queries";
 import { sexLabel, type TestOrder } from "@/features/lab-scientist/api/schemas";
 import { AcceptOrderFlow } from "@/features/lab-scientist/components/accept-order-flow";
 import { RejectOrderFlow } from "@/features/lab-scientist/components/reject-order-flow";
+import {
+  ApproveResultsDialog,
+  ReturnResultsDialog,
+} from "@/features/lab-scientist/components/review-results-flow";
 import { SampleCollectionDialog } from "@/features/lab-scientist/components/sample-collection-dialog";
 import {
   RejectionReason,
@@ -32,8 +36,14 @@ import {
 } from "@/features/lab-scientist/components/test-order-progress";
 import { TestOrderResult } from "@/features/lab-scientist/components/test-order-result";
 import { UploadResultFlow } from "@/features/lab-scientist/components/upload-result-flow";
-import { stageStatusLabels, stageTones, testNames } from "@/features/lab-scientist/lib/stage";
+import {
+  resultsAwaitingReview,
+  stageStatusLabels,
+  stageTones,
+  testNames,
+} from "@/features/lab-scientist/lib/stage";
 import { ageOn, formatDateCommaTime, formatDay, formatTime } from "@/lib/format";
+import { useIsFacilityAdmin } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
 
 /**
@@ -46,6 +56,8 @@ export function TestOrderDetails({ orderId }: { orderId: string }) {
   const [now] = useState(() => new Date());
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const openOrClose = (which: Dialog) => (open: boolean) => setDialog(open ? which : null);
+  // The lab's admin reviews results before the requesting doctor sees them.
+  const reviewing = useIsFacilityAdmin() && resultsAwaitingReview(order).length > 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -53,7 +65,11 @@ export function TestOrderDetails({ orderId }: { orderId: string }) {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <PatientHeading patient={order.patient} now={now} />
         <div className="flex w-full flex-wrap gap-4 *:flex-1 sm:w-auto sm:*:flex-none">
-          <StageButtons order={order} onOpen={setDialog} />
+          {reviewing && <ReviewButtons onOpen={setDialog} />}
+          {/* Once every test has a result, the review is all there is to do. */}
+          {!(reviewing && order.stage === "completed") && (
+            <StageButtons order={order} onOpen={setDialog} />
+          )}
         </div>
       </div>
 
@@ -89,12 +105,16 @@ export function TestOrderDetails({ orderId }: { orderId: string }) {
         open={dialog === "upload"}
         onOpenChange={openOrClose("upload")}
       />
+      {dialog === "approve" && (
+        <ApproveResultsDialog order={order} onClose={() => setDialog(null)} />
+      )}
+      {dialog === "return" && <ReturnResultsDialog order={order} onClose={() => setDialog(null)} />}
     </div>
   );
 }
 
 /** The dialogs the order's buttons open. */
-type Dialog = "accept" | "reject" | "sample" | "upload";
+type Dialog = "accept" | "reject" | "sample" | "upload" | "approve" | "return";
 
 function PatientHeading({ patient, now }: { patient: TestOrder["patient"]; now: Date }) {
   const details = [
@@ -136,6 +156,26 @@ function maskedHin(hin: string) {
 const buttonBase = "h-12 gap-2 px-4 has-data-[icon=inline-start]:pl-4";
 const outlineButton = cn(buttonBase, "bg-card type-body-sm-medium text-fg-heading");
 const primaryButton = cn(buttonBase, "type-heading-sm");
+
+/** The lab admin's verdict on results waiting for them. */
+function ReviewButtons({ onOpen }: { onOpen: (dialog: Dialog) => void }) {
+  return (
+    <>
+      <Button
+        variant="outline"
+        className={cn(outlineButton, "text-error-500 hover:text-error-700")}
+        onClick={() => onOpen("return")}
+      >
+        <CancelIcon data-icon="inline-start" className="size-5" />
+        Return results
+      </Button>
+      <Button className={primaryButton} onClick={() => onOpen("approve")}>
+        <TickIcon data-icon="inline-start" className="size-5" />
+        Approve results
+      </Button>
+    </>
+  );
+}
 
 /** What the lab can do with the order at its stage. */
 function StageButtons({ order, onOpen }: { order: TestOrder; onOpen: (dialog: Dialog) => void }) {

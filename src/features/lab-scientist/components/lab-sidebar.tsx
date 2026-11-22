@@ -1,13 +1,26 @@
 import appointmentIconUrl from "@/assets/svgs/appointment.svg";
+import auditIconUrl from "@/assets/svgs/audit.svg";
 import dashboardIconUrl from "@/assets/svgs/dashboard.svg";
 import healthIconUrl from "@/assets/svgs/health.svg";
 import labIconUrl from "@/assets/svgs/lab.svg";
 import messagesIconUrl from "@/assets/svgs/messages.svg";
 import settingsIconUrl from "@/assets/svgs/settings.svg";
-import { DashboardSidebar, type NavGroup } from "@/components/dashboard/dashboard-sidebar";
+import {
+  DashboardSidebar,
+  type NavGroup,
+  type NavItem,
+} from "@/components/dashboard/dashboard-sidebar";
+import { useIsFacilityAdmin } from "@/stores/auth-store";
 
 /** The lab scientist dashboard's navigation. */
 export function LabSidebar({ unreadMessages }: { unreadMessages: number }) {
+  // The lab's admin also sees who downloaded its results.
+  const admin = useIsFacilityAdmin();
+  const auditLogs: NavItem = {
+    to: "/hospital/lab-scientist/audit-logs",
+    label: "Audit logs",
+    icon: auditIconUrl,
+  };
   const groups: NavGroup[] = [
     {
       label: "General",
@@ -35,6 +48,7 @@ export function LabSidebar({ unreadMessages }: { unreadMessages: number }) {
     {
       label: "Management",
       items: [
+        ...(admin ? [auditLogs] : []),
         {
           to: "/hospital/lab-scientist/personnel",
           label: "Health personnel",

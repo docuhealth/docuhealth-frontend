@@ -5,6 +5,7 @@ import { type Period } from "@/lib/period";
 import { staffRoleLabels, type StaffRole } from "@/lib/staff-profile";
 import {
   countOnlySchema,
+  facilitySubscriptionSchema,
   type DashboardOverview,
   hospitalProfileSchema,
   type PatientDetail,
@@ -23,11 +24,15 @@ import {
   type StaffList,
   type StaffMember,
   staffPageSchema,
+  subscriptionPlansSchema,
   toPatientDetail,
   toPatientVisit,
   toQueueEntry,
   toStaffDetail,
   toStaffMember,
+  wardBedsSchema,
+  type WardList,
+  wardManagePageSchema,
   wardPageSchema,
 } from "@/features/hospital-admin/api/schemas";
 
@@ -49,10 +54,14 @@ export const hospitalAdminKeys = {
   patients: (params: PatientListParams) => [...hospitalAdminKeys.all, "patients", params] as const,
   patient: (id: string) => [...hospitalAdminKeys.all, "patient", id] as const,
   patientFilterOptions: () => [...hospitalAdminKeys.all, "patient-filter-options"] as const,
+  wards: (page: number) => [...hospitalAdminKeys.all, "wards", page] as const,
+  wardBeds: (id: string) => [...hospitalAdminKeys.all, "ward-beds", id] as const,
+  subscription: () => [...hospitalAdminKeys.all, "subscription"] as const,
 };
 
 const STAFF_URL = "/api/auth/staff";
 const PATIENTS_URL = "/api/hospital-ops/patients";
+export const WARDS_URL = "/api/hospital-ops/wards/manage";
 
 export const hospitalProfileQuery = () =>
   queryOptions({
@@ -248,7 +257,8 @@ export const patientFilterOptionsQuery = () =>
     queryKey: hospitalAdminKeys.patientFilterOptions(),
     queryFn: async (): Promise<PatientFilterOptions> => {
       const [wards, doctors] = await Promise.all([
-        request(wardPageSchema, { url: "/api/hospital-ops/wards", params: { page: 1, size: 100 } }),
+        // The admin's own list; the staff one (`/wards`) may refuse admins.
+        request(wardPageSchema, { url: WARDS_URL, params: { page: 1, size: 100 } }),
         request(staffPageSchema, {
           url: STAFF_URL,
           params: { role: "doctor", page: 1, size: 100 },
@@ -269,4 +279,41 @@ export const patientDetailQuery = (id: string) =>
       toPatientDetail(
         await request(patientInfoSchema, { url: `/api/patients/${encodeURIComponent(id)}/info` }),
       ),
+  });
+
+export const WARDS_PAGE_SIZE = 12;
+
+/** A page of the hospital's wards, with their beds. */
+export const wardListQuery = (page: number) =>
+  queryOptions({
+    queryKey: hospitalAdminKeys.wards(page),
+    queryFn: async (): Promise<WardList> => {
+      const { count, results } = await request(wardManagePageSchema, {
+        url: WARDS_URL,
+        params: { page, size: WARDS_PAGE_SIZE },
+      });
+      return { total: count, items: results };
+    },
+    placeholderData: keepPreviousData,
+  });
+
+/** One ward's beds as they are now, for its Manage dialog. */
+export const wardBedsQuery = (id: string) =>
+  queryOptions({
+    queryKey: hospitalAdminKeys.wardBeds(id),
+    queryFn: () =>
+      request(wardBedsSchema, { url: `/api/hospital-ops/wards/${encodeURIComponent(id)}/beds` }),
+  });
+
+/** The hospital's plan and the plans it can choose. */
+export const subscriptionQuery = () =>
+  queryOptions({
+    queryKey: hospitalAdminKeys.subscription(),
+    queryFn: async () => {
+      const [current, plans] = await Promise.all([
+        request(facilitySubscriptionSchema, { url: "/api/auth/facility" }),
+        request(subscriptionPlansSchema, { url: "/api/payments/plans/role/hospital" }),
+      ]);
+      return { current, plans };
+    },
   });

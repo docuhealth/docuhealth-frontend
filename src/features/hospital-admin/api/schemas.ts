@@ -547,3 +547,135 @@ export const toPatientDetail = (patient: PatientRecord): PatientDetail => ({
   upcomingAppointmentAt: null,
   visits: null,
 });
+
+// ---------------------------------------------------------------------------------------------
+// Ward management (`/api/hospital-ops/wards/manage`).
+
+export const bedStatusLabels = {
+  available: "Available",
+  occupied: "Occupied",
+  requested: "Requested",
+} as const;
+export type BedStatus = keyof typeof bedStatusLabels;
+
+export type Ward = {
+  id: string;
+  name: string;
+  totalBeds: number;
+  availableBeds: number;
+  /** Beds taken or asked for by a doctor's admission request. */
+  occupiedBeds: number;
+  beds: { id: string; number: number; status: BedStatus }[];
+};
+
+export type WardList = { total: number; items: Ward[] };
+
+const bedStatusOf = (status: string): BedStatus =>
+  status === "available" || status === "requested" ? status : "occupied";
+
+const wardBed = z
+  .object({ sqid: z.string(), bed_number: z.coerce.number(), status: z.string() })
+  .transform((bed) => ({ id: bed.sqid, number: bed.bed_number, status: bedStatusOf(bed.status) }));
+
+/** `Ward`, as the API returns it. */
+export const wardSchema = z
+  .object({
+    sqid: z.string(),
+    name: text,
+    total_beds: count,
+    available_beds: count,
+    beds: z.array(wardBed).catch([]),
+  })
+  .transform((ward): Ward => ({
+    id: ward.sqid,
+    name: ward.name,
+    totalBeds: ward.total_beds,
+    availableBeds: ward.available_beds,
+    occupiedBeds: Math.max(0, ward.total_beds - ward.available_beds),
+    beds: [...ward.beds].sort((a, b) => a.number - b.number),
+  }));
+
+export const wardManagePageSchema = z.object({ count: count, results: z.array(wardSchema) });
+
+/** `GET /api/hospital-ops/wards/{ward}/beds`: the ward's beds, as they are now. */
+export const wardBedsSchema = z
+  .array(wardBed)
+  .transform((beds) => [...beds].sort((a, b) => a.number - b.number));
+
+// ---------------------------------------------------------------------------------------------
+// Wallet and subscription (`/api/payments/*`, `GET /api/auth/facility`). TODO(api): there's no
+// wallet (balance or transactions) in the API yet.
+
+const planIntervalLabels: Record<string, string> = {
+  daily: "day",
+  weekly: "week",
+  monthly: "month",
+  quarterly: "quarter",
+  biannually: "6 months",
+  annually: "year",
+};
+
+export type SubscriptionPlan = {
+  id: string;
+  name: string;
+  /** In naira. */
+  price: number;
+  /** "month", "year"… */
+  per: string;
+  description: string | null;
+  features: string[];
+  /** What subscribing sends; `null` for a plan that can't be bought online. */
+  code: string | null;
+};
+
+export const subscriptionPlansSchema = z.array(
+  z
+    .object({
+      sqid: z.string(),
+      name: text,
+      price: z.coerce.number(),
+      interval: text,
+      description: optionalText,
+      features: z.array(z.string()).catch([]),
+      paystack_plan_code: optionalText,
+    })
+    .transform((plan): SubscriptionPlan => ({
+      id: plan.sqid,
+      name: plan.name,
+      price: plan.price,
+      per: planIntervalLabels[plan.interval] ?? plan.interval,
+      description: plan.description,
+      features: plan.features,
+      code: plan.paystack_plan_code,
+    })),
+);
+
+export type CurrentSubscription = { planName: string | null; status: string | null } | null;
+
+/**
+ * The hospital's subscription, from `GET /api/auth/facility`. TODO(api): typed as a string but
+ * read as `{status, plan_name}` by v1; `null` while there's none (the free plan).
+ */
+export const facilitySubscriptionSchema = z
+  .object({
+    hospital_profile: z
+      .object({
+        subscription: z
+          .union([z.object({ plan_name: optionalText, status: optionalText }).loose(), z.string()])
+          .nullish(),
+      })
+      .loose()
+      .nullish(),
+  })
+  .loose()
+  .transform(({ hospital_profile }): CurrentSubscription => {
+    const subscription = hospital_profile?.subscription;
+    if (!subscription) return null;
+    if (typeof subscription === "string") return { planName: subscription, status: null };
+    return { planName: subscription.plan_name, status: subscription.status };
+  });
+
+/** `POST /api/payments/subscribe`; the Paystack checkout link, if the API sends one. */
+export const subscribeResponseSchema = z
+  .object({ authorization_url: z.url().nullish(), status: optionalText })
+  .loose();

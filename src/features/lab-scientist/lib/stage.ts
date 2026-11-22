@@ -1,4 +1,9 @@
-import type { LabTest, ResultFlag, TestStage } from "@/features/lab-scientist/api/schemas";
+import type {
+  LabTest,
+  ResultFlag,
+  TestOrder,
+  TestStage,
+} from "@/features/lab-scientist/api/schemas";
 
 /** Each stage's color, shared by its pill and the order page's status card. */
 export const stageTones = {
@@ -44,3 +49,7 @@ export function referenceRange(test: LabTest) {
 export function testNames(tests: LabTest[]) {
   return tests.map((test) => test.name).join(", ");
 }
+
+/** The order's tests whose result waits for the lab admin. */
+export const resultsAwaitingReview = (order: TestOrder) =>
+  order.items.filter((item) => item.status === "result_ready");

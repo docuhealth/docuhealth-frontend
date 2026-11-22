@@ -394,4 +394,39 @@ export const labScientistHandlers = [
       return HttpResponse.json(read(found.order).items_info[0]?.result_info, { status: 201 });
     },
   ),
+  // The lab admin's review, addressed by the test (item) alone.
+  http.patch(api("/api/lab/test-orders/items/:item/result/approve-by-lab-admin"), ({ params }) => {
+    const item = reviewable(params.item);
+    if (!item) return reviewRefused();
+    item.status = "result_accepted_by_lab_admin";
+    if (item.result) item.result.status = "accepted";
+    return new HttpResponse(null, { status: 200 });
+  }),
+  http.patch(
+    api("/api/lab/test-orders/items/:item/result/reject-by-lab-admin"),
+    async ({ params, request }) => {
+      const item = reviewable(params.item);
+      if (!item) return reviewRefused();
+      const { rejection_reason } = (await request.json()) as { rejection_reason?: string };
+      if (!rejection_reason?.trim()) {
+        return HttpResponse.json(
+          { rejection_reason: ["This field may not be blank."] },
+          { status: 400 },
+        );
+      }
+      // As the API does: the test goes back to in progress, for a new sample and result.
+      Object.assign(item, { status: "in_progress", specimen_collected_at: null, result: null });
+      return HttpResponse.json({ rejection_reason });
+    },
+  ),
 ];
+
+/** A test whose result waits for the lab admin. */
+function reviewable(itemId: unknown) {
+  return orders
+    .flatMap((order) => order.items)
+    .find((item) => item.sqid === itemId && item.status === "result_ready");
+}
+
+const reviewRefused = () =>
+  HttpResponse.json({ detail: "Only a result awaiting review can be reviewed." }, { status: 400 });
