@@ -4,6 +4,7 @@ import { auditLogHandlers } from "@/mocks/audit-logs";
 import { authHandlers } from "@/mocks/auth";
 import { hospitalAdminHandlers } from "@/mocks/hospital-admin";
 import { labScientistHandlers } from "@/mocks/lab-scientist";
+import { pharmacyHandlers } from "@/mocks/pharmacy";
 import { radiologistHandlers } from "@/mocks/radiologist";
 import { receptionistHandlers } from "@/mocks/receptionist";
 import { staffHandlers } from "@/mocks/staff";
@@ -18,5 +19,6 @@ export const handlers: RequestHandler[] = [
   ...receptionistHandlers,
   ...radiologistHandlers,
   ...labScientistHandlers,
+  ...pharmacyHandlers,
   ...staffHandlers,
 ];

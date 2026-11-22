@@ -12,7 +12,7 @@ dashboard is connected; the newest are at the bottom.
 | 4   | Old `api/hospitals/*` paths are gone: is production the same?        | Needs an answer           | `api/hospitals/*` → `api/auth/staff…` |
 | 5   | Staff list filters work but aren't in the schema                     | Low                       | `GET /api/auth/staff`                 |
 | 6   | No endpoint for unread notification and message counts               | Medium                    | Top bar and sidebar badges            |
-| 7   | The redesigned dashboards need endpoints and fields that don't exist | Blocker for those screens | Receptionist, lab, hospital admin     |
+| 7   | The redesigned dashboards need endpoints and fields that don't exist | Blocker for those screens | Receptionist, lab, admin, pharmacy    |
 
 ---
 
@@ -197,3 +197,13 @@ call-by-call table is in `docs/api-mapping-redesigned-dashboards.md`. These are 
    badge, the source (appointment or doctor request), the doctor's note, and the patient's HMO flag.
 6. **Booking permission.** Confirm radiologists may `POST /api/hospital-ops/appointments/book` for
    themselves.
+
+### Pharmacy
+
+1. **Walk-in drug orders.** `POST /api/pharmacy/orders/create` needs a `check_in` or an `admission`, so a pharmacist can't sell to a walk-in customer (v1 sent `order_source: "walk_in"`, which the schema doesn't have). Please allow visit-free orders from the pharmacy, or say how walk-ins should be recorded. The walk-in order screen isn't built until then.
+2. **Trend response.** `GET /api/pharmacy/orders/trend` is documented as a page of orders, but returns `[{date, count}]`. Please fix the schema, and say what range each `period` covers.
+3. **Order status values.** `aggregate_status` has no enum (staging returns `pending`, `partial`, `all_dispensed`, `all_unavailable`), and the list's `status` filter only accepts `pending` and `dispensed`; anything else returns every order. Please document both, and allow filtering by `partial` / `all_unavailable`.
+4. **`latest_vitals`** is typed as a string but is an object (or null). Please type it.
+5. **Allergies** on a drug record are untyped (staging has `[]` and `["No allergies"]`). A typed list on the order (not per drug) would be clearer.
+6. **Pharmacy dashboard numbers.** There's no pharmacy dashboard endpoint; the overview counts lists with `size=1`. A summary (pending, settled, dispensed today/this month, recent patients) would save the calls.
+7. **Search** on `GET /api/pharmacy/orders` (patient name or HIN) would help as the list grows.

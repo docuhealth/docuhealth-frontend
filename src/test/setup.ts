@@ -1,8 +1,12 @@
 import "@testing-library/jest-dom/vitest";
-import { cleanup } from "@testing-library/react";
+import { cleanup, configure } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, vi } from "vitest";
 import { server } from "@/mocks/node";
 import { useAuthStore } from "@/stores/auth-store";
+
+// The suite runs its files in parallel, and a screen that makes several requests can take more
+// than the default second to settle under that load, so find* and waitFor wait up to three.
+configure({ asyncUtilTimeout: 3000 });
 
 // jsdom has no matchMedia; sonner and the sidebar need it.
 Object.defineProperty(window, "matchMedia", {

@@ -29,6 +29,7 @@ const people = {
   radiologist: ["o4AjeJt", "Emeka", "Obi", "radiologist", "male"],
   "lab-scientist": ["h9b7ulb", "Emeka", "Obi", "lab_scientist", "male"],
   admin: ["t1sDDoW", "Folake", "Adeyemi", "doctor", "female"],
+  pharmacy: ["9mPhRm1", "Amaka", "Eze", "pharmacist", "female"],
 } as const;
 type Dashboard = keyof typeof people;
 
@@ -60,7 +61,7 @@ type StaffAccount = {
 };
 
 function accountFor(request: Request): StaffAccount {
-  const match = /\/(radiologist|lab-scientist|admin|receptionist)(?:[/?#]|$)/.exec(
+  const match = /\/(radiologist|lab-scientist|admin|receptionist|pharmacy)(?:[/?#]|$)/.exec(
     request.referrer ? new URL(request.referrer).pathname : "",
   );
   return accounts[(match?.[1] as Dashboard | undefined) ?? "receptionist"];

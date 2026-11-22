@@ -124,7 +124,8 @@ export type Dashboard =
   | "/hospital/admin"
   | "/hospital/receptionist"
   | "/hospital/radiologist"
-  | "/hospital/lab-scientist";
+  | "/hospital/lab-scientist"
+  | "/hospital/pharmacy";
 
 /**
  * Staff roles with a dashboard of their own. A hospital's admins get the admin dashboard whatever
@@ -136,6 +137,7 @@ const roleDashboards: Partial<Record<string, Dashboard>> = {
   receptionist: "/hospital/receptionist",
   radiologist: "/hospital/radiologist",
   lab_scientist: "/hospital/lab-scientist",
+  pharmacist: "/hospital/pharmacy",
 };
 
 /**
@@ -159,8 +161,8 @@ export function getPostLoginDestination(
     const facilityType = staffEntry?.facility?.type ?? staffEntry?.facility_type ?? "hospital";
     const hospitalAdmin = staffEntry?.is_admin && facilityType === "hospital";
     const roleDashboard = staffEntry && !hospitalAdmin ? roleDashboards[role] : undefined;
-    // TODO: doctors, nurses and pharmacists get their own dashboards in the v2 migration (phases 3
-    // and 4); until then they land on the admin one.
+    // TODO: doctors and nurses get their own dashboards in the v2 migration (phase 4); until then
+    // they land on the admin one.
     return roleDashboard ?? "/hospital/admin";
   }
 

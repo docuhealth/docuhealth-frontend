@@ -25,7 +25,8 @@ Newsletter form, the mocked outpatient list).
 - [x] Backend gaps file started
 - [x] Login routing: an arm's admin (e.g. the lab admin) lands on the arm's dashboard, not the
       hospital admin's
-- [ ] Doctors, nurses and pharmacists still land on the admin dashboard until phases 3 and 4
+- [x] Pharmacists land on the pharmacy dashboard (phase 3)
+- [ ] Doctors and nurses still land on the admin dashboard until phase 4
 
 ## Phase 1: Shared staff pages
 
@@ -75,12 +76,17 @@ Built as `src/features/staff/` (routes compose it into each dashboard).
 
 ## Phase 3: Pharmacy
 
-- [ ] Shell and login routing
-- [ ] Overview: stats, dispensed-drugs trend, recent patients
-- [ ] Prescriptions: pending / settled
-- [ ] Prescription page: dispense or mark unavailable
-- [ ] Walk-in drug order (check the backend accepts it)
-- [ ] Appointments, Health Personnel, Settings
+- [x] Shell and login routing (`pharmacist` → `/hospital/pharmacy`)
+- [x] Overview: pending / settled prescriptions, drugs dispensed, recent patients; dispensed-drugs
+      chart (daily, weekly, monthly, yearly); recent patients table (24 hours to 3 months)
+- [x] Prescriptions: pending / settled, sort by latest or oldest
+- [x] Prescription page: drugs (tick to dispense or mark unavailable, with an optional reason),
+      who prescribed it, allergies, latest vitals
+- [ ] Walk-in drug order: not built. The API now needs a check-in or admission for every drug
+      order, and a walk-in has neither (gaps file, section 7, Pharmacy)
+- [x] Appointments, Health Personnel, Settings (shared staff pages)
+- [x] Checked on staging as the pharmacist (reads: 65 pending, 8 settled, 6 drugs dispensed;
+      nothing dispensed)
 
 ## Phase 4: Doctor and Nurse
 
