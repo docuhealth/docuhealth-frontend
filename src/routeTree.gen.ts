@@ -50,6 +50,7 @@ import { Route as HospitalDoctorHandoversRouteImport } from './routes/hospital/d
 import { Route as HospitalDoctorHelpRouteImport } from './routes/hospital/doctor/help'
 import { Route as HospitalDoctorMessagesRouteImport } from './routes/hospital/doctor/messages'
 import { Route as HospitalDoctorPersonnelRouteImport } from './routes/hospital/doctor/personnel'
+import { Route as HospitalDoctorResultsRouteImport } from './routes/hospital/doctor/results'
 import { Route as HospitalDoctorSettingsRouteImport } from './routes/hospital/doctor/settings'
 import { Route as HospitalLabScientistIndexRouteImport } from './routes/hospital/lab-scientist/index'
 import { Route as HospitalLabScientistAppointmentsRouteImport } from './routes/hospital/lab-scientist/appointments'
@@ -311,6 +312,11 @@ const HospitalDoctorMessagesRoute = HospitalDoctorMessagesRouteImport.update({
 const HospitalDoctorPersonnelRoute = HospitalDoctorPersonnelRouteImport.update({
   id: '/personnel',
   path: '/personnel',
+  getParentRoute: () => HospitalDoctorRoute,
+} as any)
+const HospitalDoctorResultsRoute = HospitalDoctorResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
   getParentRoute: () => HospitalDoctorRoute,
 } as any)
 const HospitalDoctorSettingsRoute = HospitalDoctorSettingsRouteImport.update({
@@ -658,6 +664,7 @@ export interface FileRoutesByFullPath {
   '/hospital/doctor/help': typeof HospitalDoctorHelpRoute
   '/hospital/doctor/messages': typeof HospitalDoctorMessagesRoute
   '/hospital/doctor/personnel': typeof HospitalDoctorPersonnelRoute
+  '/hospital/doctor/results': typeof HospitalDoctorResultsRoute
   '/hospital/doctor/settings': typeof HospitalDoctorSettingsRoute
   '/hospital/lab-scientist/appointments': typeof HospitalLabScientistAppointmentsRoute
   '/hospital/lab-scientist/audit-logs': typeof HospitalLabScientistAuditLogsRoute
@@ -744,6 +751,7 @@ export interface FileRoutesByTo {
   '/hospital/doctor/help': typeof HospitalDoctorHelpRoute
   '/hospital/doctor/messages': typeof HospitalDoctorMessagesRoute
   '/hospital/doctor/personnel': typeof HospitalDoctorPersonnelRoute
+  '/hospital/doctor/results': typeof HospitalDoctorResultsRoute
   '/hospital/doctor/settings': typeof HospitalDoctorSettingsRoute
   '/hospital/lab-scientist/appointments': typeof HospitalLabScientistAppointmentsRoute
   '/hospital/lab-scientist/audit-logs': typeof HospitalLabScientistAuditLogsRoute
@@ -841,6 +849,7 @@ export interface FileRoutesById {
   '/hospital/doctor/help': typeof HospitalDoctorHelpRoute
   '/hospital/doctor/messages': typeof HospitalDoctorMessagesRoute
   '/hospital/doctor/personnel': typeof HospitalDoctorPersonnelRoute
+  '/hospital/doctor/results': typeof HospitalDoctorResultsRoute
   '/hospital/doctor/settings': typeof HospitalDoctorSettingsRoute
   '/hospital/lab-scientist/appointments': typeof HospitalLabScientistAppointmentsRoute
   '/hospital/lab-scientist/audit-logs': typeof HospitalLabScientistAuditLogsRoute
@@ -938,6 +947,7 @@ export interface FileRouteTypes {
     | '/hospital/doctor/help'
     | '/hospital/doctor/messages'
     | '/hospital/doctor/personnel'
+    | '/hospital/doctor/results'
     | '/hospital/doctor/settings'
     | '/hospital/lab-scientist/appointments'
     | '/hospital/lab-scientist/audit-logs'
@@ -1024,6 +1034,7 @@ export interface FileRouteTypes {
     | '/hospital/doctor/help'
     | '/hospital/doctor/messages'
     | '/hospital/doctor/personnel'
+    | '/hospital/doctor/results'
     | '/hospital/doctor/settings'
     | '/hospital/lab-scientist/appointments'
     | '/hospital/lab-scientist/audit-logs'
@@ -1120,6 +1131,7 @@ export interface FileRouteTypes {
     | '/hospital/doctor/help'
     | '/hospital/doctor/messages'
     | '/hospital/doctor/personnel'
+    | '/hospital/doctor/results'
     | '/hospital/doctor/settings'
     | '/hospital/lab-scientist/appointments'
     | '/hospital/lab-scientist/audit-logs'
@@ -1482,6 +1494,13 @@ declare module '@tanstack/react-router' {
       path: '/personnel'
       fullPath: '/hospital/doctor/personnel'
       preLoaderRoute: typeof HospitalDoctorPersonnelRouteImport
+      parentRoute: typeof HospitalDoctorRoute
+    }
+    '/hospital/doctor/results': {
+      id: '/hospital/doctor/results'
+      path: '/results'
+      fullPath: '/hospital/doctor/results'
+      preLoaderRoute: typeof HospitalDoctorResultsRouteImport
       parentRoute: typeof HospitalDoctorRoute
     }
     '/hospital/doctor/settings': {
@@ -1949,6 +1968,7 @@ interface HospitalDoctorRouteChildren {
   HospitalDoctorHelpRoute: typeof HospitalDoctorHelpRoute
   HospitalDoctorMessagesRoute: typeof HospitalDoctorMessagesRoute
   HospitalDoctorPersonnelRoute: typeof HospitalDoctorPersonnelRoute
+  HospitalDoctorResultsRoute: typeof HospitalDoctorResultsRoute
   HospitalDoctorSettingsRoute: typeof HospitalDoctorSettingsRoute
   HospitalDoctorIndexRoute: typeof HospitalDoctorIndexRoute
   HospitalDoctorPatientsVisitIdRoute: typeof HospitalDoctorPatientsVisitIdRoute
@@ -1962,6 +1982,7 @@ const HospitalDoctorRouteChildren: HospitalDoctorRouteChildren = {
   HospitalDoctorHelpRoute: HospitalDoctorHelpRoute,
   HospitalDoctorMessagesRoute: HospitalDoctorMessagesRoute,
   HospitalDoctorPersonnelRoute: HospitalDoctorPersonnelRoute,
+  HospitalDoctorResultsRoute: HospitalDoctorResultsRoute,
   HospitalDoctorSettingsRoute: HospitalDoctorSettingsRoute,
   HospitalDoctorIndexRoute: HospitalDoctorIndexRoute,
   HospitalDoctorPatientsVisitIdRoute: HospitalDoctorPatientsVisitIdRoute,

@@ -44,3 +44,17 @@ export const changePasswordSchema = z
     path: ["newPassword"],
   });
 export type ChangePasswordValues = z.infer<typeof changePasswordSchema>;
+
+/** Giving an appointment to a doctor: who, and when (not in the past). */
+export const assignAppointmentSchema = z
+  .object({
+    doctor: z.string().min(1, "Choose the doctor"),
+    date: z.string().min(1, "Choose the date"),
+    time: z.string().min(1, "Choose the time"),
+    note: z.string().trim().max(1000, "Keep the note to 1,000 characters"),
+  })
+  .refine(({ date, time }) => !date || !time || new Date(`${date}T${time}`) > new Date(), {
+    message: "Choose a time that hasn’t passed",
+    path: ["time"],
+  });
+export type AssignAppointmentValues = z.infer<typeof assignAppointmentSchema>;

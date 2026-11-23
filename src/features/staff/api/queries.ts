@@ -14,7 +14,23 @@ export const staffKeys = {
   profile: () => [...staffKeys.all, "profile"] as const,
   directory: (params: StaffDirectoryParams) => [...staffKeys.all, "directory", params] as const,
   appointments: (params: AppointmentParams) => [...staffKeys.all, "appointments", params] as const,
+  doctors: () => [...staffKeys.all, "doctors"] as const,
 };
+
+/** The hospital's active doctors, to give an appointment to. */
+export const doctorsQuery = () =>
+  queryOptions({
+    queryKey: staffKeys.doctors(),
+    queryFn: async () => {
+      const { items } = await request(staffDirectorySchema, {
+        url: "/api/auth/staff",
+        params: { role: "doctor", size: 100 },
+      });
+      return items
+        .filter(({ active }) => active)
+        .map(({ id, name }) => ({ id, name: `Dr. ${name}` }));
+    },
+  });
 
 export const staffProfileQuery = () =>
   queryOptions({

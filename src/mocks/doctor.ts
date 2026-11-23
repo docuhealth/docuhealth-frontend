@@ -168,9 +168,69 @@ const labOrders = new Map([
           },
         ],
       },
+      {
+        sqid: "lab-order-2",
+        created_at: minutesAgo(60 * 5),
+        ordered_by_info: { ...colleague, specialization: null },
+        note: null,
+        aggregate_status: "completed",
+        items_info: [
+          {
+            sqid: "lab-item-2",
+            status: "result_accepted_by_lab_admin",
+            test_info: { sqid: "t-2", name: "Fasting Blood Glucose" },
+            result_info: {
+              interpretation: "Raised; consistent with poor control.",
+              parameters_info: [
+                { value: "146", parameter_info: { name: "Fasting Blood Glucose", unit: "mg/dL" } },
+              ],
+            },
+          },
+        ],
+      },
     ],
   ],
 ]);
+
+/** Scan reports waiting for a doctor, as `ScanOrderItemWithPendingResult`. */
+const pendingScans = [
+  {
+    sqid: "scan-item-1",
+    status: "image_collected",
+    order_info: {
+      sqid: "scan-order-1",
+      patient_info: {
+        hin: "4200000000002",
+        firstname: "Bisi",
+        lastname: "Adewale",
+        gender: "female",
+        dob: "1990-03-14",
+      },
+      ordered_by_info: { ...colleague, specialization: null },
+      created_at: minutesAgo(60 * 6),
+    },
+    scan_info: { sqid: "scan-1", name: "Chest X-ray, PA view" },
+    pending_result: {
+      sqid: "scan-result-1",
+      clinical_indication: "Cough for three weeks",
+      findings: ["Patchy opacity in the right lower zone"],
+      impression: ["Right lower lobe pneumonia"],
+      recommendation: ["Repeat after treatment"],
+      extra_comment: null,
+      reporter_name: "Emeka Obi",
+      reporter_specialty: "Radiology",
+      reported_at: minutesAgo(60 * 2),
+      status: "pending",
+    },
+  },
+];
+
+/** Every lab test order item, wherever it is. */
+const labItems = () => [...labOrders.values()].flat().flatMap((order) => order.items_info);
+
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const series = (values: number[]) =>
+  months.map((label, index) => ({ label, value: values[index] ?? 0 }));
 
 function page<T>(items: T[], request: Request) {
   const params = new URL(request.url).searchParams;
@@ -267,6 +327,85 @@ export const doctorHandlers = [
   }),
   http.get(api("/api/lab/patients/:hin/test-orders"), ({ params, request }) =>
     HttpResponse.json(page(labOrders.get(String(params.hin)) ?? [], request)),
+  ),
+  http.get(api("/api/lab/doctor-test-order-items"), ({ request }) => {
+    const status = new URL(request.url).searchParams.get("status");
+    // As the API does: `status` is required.
+    if (!status) return HttpResponse.json({ status: ["This field is required."] }, { status: 400 });
+    // As staging: the rows don't say the patient or the order.
+    const items = labItems()
+      .filter((item) => item.status === status)
+      .map(({ sqid, test_info, result_info }) => ({
+        sqid,
+        test: 2,
+        test_info,
+        status,
+        specimen_collected_at: minutesAgo(60 * 4),
+        rejection_reason: null,
+        result_info,
+      }));
+    return HttpResponse.json(page(items, request));
+  }),
+  http.patch(
+    api("/api/lab/test-orders/items/:sqid/result/:decision"),
+    async ({ params, request }) => {
+      // The doctor's decisions only; the lab admin's approval is the lab scientist mock's.
+      if (params.decision !== "approve-by-doctor" && params.decision !== "reject-by-doctor") return;
+      const item = labItems().find(({ sqid }) => sqid === params.sqid);
+      if (!item) return notFound();
+      if (item.status !== "result_accepted_by_lab_admin") {
+        return HttpResponse.json(
+          { detail: "Only results the lab admin has approved can be reviewed." },
+          { status: 400 },
+        );
+      }
+      if (params.decision === "reject-by-doctor") {
+        const { rejection_reason } = (await request.json()) as { rejection_reason?: string };
+        if (!rejection_reason) {
+          return HttpResponse.json(
+            { rejection_reason: ["This field is required."] },
+            { status: 400 },
+          );
+        }
+        item.status = "rejected";
+        return HttpResponse.json({ rejection_reason });
+      }
+      item.status = "result_accepted_by_doctor";
+      return HttpResponse.json({ sqid: item.sqid, status: item.status });
+    },
+  ),
+  http.get(api("/api/radiology/results/pending"), ({ request }) =>
+    HttpResponse.json(page(pendingScans, request)),
+  ),
+  http.patch(api("/api/radiology/results/:sqid/:decision"), async ({ params, request }) => {
+    const index = pendingScans.findIndex(
+      ({ pending_result }) => pending_result.sqid === params.sqid,
+    );
+    if (index < 0) return notFound();
+    if (params.decision === "reject") {
+      const { rejection_reason } = (await request.json()) as { rejection_reason?: string };
+      if (!rejection_reason) {
+        return HttpResponse.json(
+          { rejection_reason: ["This field is required."] },
+          { status: 400 },
+        );
+      }
+    }
+    pendingScans.splice(index, 1);
+    return HttpResponse.json({ sqid: params.sqid });
+  }),
+  http.get(api("/api/hospital-ops/dashboards/doctor"), () =>
+    HttpResponse.json({
+      summary: {
+        total_appointments: { value: 77, increase: 12 },
+        total_referrals: { value: 13, increase: -40 },
+        total_admissions: { value: 25, increase: 8 },
+      },
+      charts: {
+        admissions_overview: series([2, 3, 0, 1, 4, 1, 1, 2, 6, 3, 2, 0]),
+        discharged_patients: series([0, 2, 0, 0, 3, 0, 1, 1, 7, 10, 2, 0]),
+      },
+    }),
   ),
   http.post(api("/api/records/vital-signs/requests"), async ({ request }) => {
     const body = (await request.json()) as { patient_hin?: string; check_in?: string };

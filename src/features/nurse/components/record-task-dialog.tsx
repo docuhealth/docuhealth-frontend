@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { type TaskOccurrence, useRecordTask } from "@/features/nurse/api/tasks";
+import { DischargeChecklistForm } from "@/features/nurse/components/discharge-checklist-form";
 import { getErrorMessage } from "@/lib/api";
 import { careTaskTypeLabel } from "@/lib/care-tasks";
 import {
@@ -303,20 +304,25 @@ const output: FieldSpec[] = [
 ];
 
 /**
- * Record a claimed care task: the vital signs asked for, or the type's own details. A medication
- * is confirmed instead, and the discharge checklist has its own form.
+ * Record a claimed care task: the vital signs asked for, the discharge checklist (on an
+ * admission's own queue, which knows the admission), or the type's own details. A medication is
+ * confirmed instead.
  */
 export function RecordTaskDialog({
   task,
+  admissionId,
   onClose,
 }: {
   task: TaskOccurrence | null;
+  admissionId: string | null;
   onClose: () => void;
 }) {
   return (
     <FormDialog open={!!task} onOpenChange={(open) => !open && onClose()}>
       {task &&
-        (task.type === "vital_signs" ? (
+        (task.type === "nurse_in_patient_discharge" && admissionId ? (
+          <DischargeChecklistForm task={task} admissionId={admissionId} onDone={onClose} />
+        ) : task.type === "vital_signs" ? (
           <VitalsTaskForm task={task} onDone={onClose} />
         ) : (
           <DetailsTaskForm task={task} onDone={onClose} />

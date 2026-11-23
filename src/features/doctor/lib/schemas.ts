@@ -116,7 +116,7 @@ const positive = (label: string) =>
     .refine((value) => Number(value) > 0, `Enter the ${label} as a number above 0`);
 
 /** One drug on a prescription; `code` is set when it's picked from the catalogue. */
-const drugRowSchema = z.object({
+export const drugRowSchema = z.object({
   code: z.string(),
   name: z.string().trim().min(1, "Pick or type the drug"),
   strength: z.string().trim(),

@@ -70,3 +70,29 @@ export function useCloseAppointment() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: staffKeys.all }),
   });
 }
+
+/** Give an appointment to a doctor, at a date and time (the nurse's, from their appointments). */
+export function useAssignAppointment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      doctorId,
+      at,
+      type,
+      note,
+    }: {
+      id: string;
+      doctorId: string;
+      at: Date;
+      type: string;
+      note: string;
+    }) =>
+      request(anyResponseSchema, {
+        method: "PATCH",
+        url: `/api/hospital-ops/appointments/${encodeURIComponent(id)}/assign`,
+        data: { doctor_id: doctorId, scheduled_time: at.toISOString(), type, note },
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: staffKeys.all }),
+  });
+}

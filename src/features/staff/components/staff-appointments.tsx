@@ -14,6 +14,7 @@ import { DialogDescription } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Tabs } from "@/components/ui/tabs";
 import { useCloseAppointment } from "@/features/staff/api/mutations";
+import { AssignAppointmentDialog } from "@/features/staff/components/assign-appointment-dialog";
 import {
   APPOINTMENTS_PAGE_SIZE,
   type AppointmentParams,
@@ -50,15 +51,23 @@ const columns = { when: "w-32", type: "w-[16%]", staff: "w-[18%]", status: "w-28
 /**
  * Appointments by Today / Upcoming / Past, searchable and narrowed to a date range. `scope`
  * "mine" lists the signed-in member's own; "hospital" every appointment (the hospital admin).
- * Open ones can be closed once the visit is done.
+ * Open ones can be closed once the visit is done, and with `canAssign` (the nurse) given to a
+ * doctor.
  */
-export function StaffAppointments({ scope }: { scope: AppointmentParams["scope"] }) {
+export function StaffAppointments({
+  scope,
+  canAssign = false,
+}: {
+  scope: AppointmentParams["scope"];
+  canAssign?: boolean;
+}) {
   const [timeframe, setTimeframe] = useState<AppointmentTimeframe>("today");
   const [search, setSearch] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [page, setPage] = useState(1);
   const [closing, setClosing] = useState<Appointment | null>(null);
+  const [assigning, setAssigning] = useState<Appointment | null>(null);
   const term = useDebouncedValue(search.trim());
   const { data, isError } = useQuery(
     appointmentListQuery({ scope, timeframe, page, search: term, from, to }),
@@ -148,7 +157,7 @@ export function StaffAppointments({ scope }: { scope: AppointmentParams["scope"]
                 className: `${columns.staff} type-body-sm-regular`,
               },
               { label: "Status", className: `${columns.status} type-body-sm-regular` },
-              { label: "Actions", hideLabel: true, className: columns.action },
+              { label: "Actions", hideLabel: true, className: canAssign ? "w-44" : columns.action },
             ]}
             empty={empty}
           >
@@ -168,7 +177,11 @@ export function StaffAppointments({ scope }: { scope: AppointmentParams["scope"]
                   <Status status={appointment.status} />
                 </TableCell>
                 <TableCell className="text-right">
-                  <CloseButton appointment={appointment} onClick={() => setClosing(appointment)} />
+                  <RowActions
+                    appointment={appointment}
+                    onClose={() => setClosing(appointment)}
+                    onAssign={canAssign ? () => setAssigning(appointment) : undefined}
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -186,9 +199,10 @@ export function StaffAppointments({ scope }: { scope: AppointmentParams["scope"]
                     <div className="min-w-0 flex-1 type-body-sm-regular">
                       <Patient appointment={appointment} />
                     </div>
-                    <CloseButton
+                    <RowActions
                       appointment={appointment}
-                      onClick={() => setClosing(appointment)}
+                      onClose={() => setClosing(appointment)}
+                      onAssign={canAssign ? () => setAssigning(appointment) : undefined}
                     />
                   </div>
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-3 pl-10 @md:grid-cols-4">
@@ -220,6 +234,9 @@ export function StaffAppointments({ scope }: { scope: AppointmentParams["scope"]
       </section>
 
       {closing && <CloseAppointmentDialog appointment={closing} onClose={() => setClosing(null)} />}
+      {canAssign && (
+        <AssignAppointmentDialog appointment={assigning} onClose={() => setAssigning(null)} />
+      )}
     </div>
   );
 }
@@ -258,8 +275,36 @@ function CloseAppointmentDialog({
   );
 }
 
-function CloseButton({ appointment, onClick }: { appointment: Appointment; onClick: () => void }) {
+/** An open appointment's buttons: Assign (when offered) and Close. */
+function RowActions({
+  appointment,
+  onClose,
+  onAssign,
+}: {
+  appointment: Appointment;
+  onClose: () => void;
+  onAssign?: () => void;
+}) {
   if (appointment.status === "completed" || appointment.status === "cancelled") return null;
+  return (
+    <div className="inline-flex gap-2">
+      {onAssign && (
+        <Button
+          variant="outline"
+          size="sm"
+          aria-label={`Assign ${appointment.patient.name}’s appointment to a doctor`}
+          onClick={onAssign}
+          className="bg-card type-caption-semibold font-sans text-fg-heading"
+        >
+          Assign
+        </Button>
+      )}
+      <CloseButton appointment={appointment} onClick={onClose} />
+    </div>
+  );
+}
+
+function CloseButton({ appointment, onClick }: { appointment: Appointment; onClick: () => void }) {
   return (
     <Button
       variant="outline"

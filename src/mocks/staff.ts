@@ -286,6 +286,37 @@ export const staffHandlers = [
       { status: 201 },
     );
   }),
+  http.patch(api("/api/hospital-ops/appointments/:sqid/assign"), async ({ params, request }) => {
+    const appointment = appointments.find(({ sqid }) => sqid === params.sqid);
+    if (!appointment) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    const body = (await request.json()) as {
+      doctor_id?: string;
+      scheduled_time?: string;
+      note?: string;
+      type?: string;
+    };
+    if (!body.doctor_id || !body.scheduled_time) {
+      return HttpResponse.json(
+        { [body.doctor_id ? "scheduled_time" : "doctor_id"]: ["This field is required."] },
+        { status: 400 },
+      );
+    }
+    const doctor = colleagues.find(
+      ({ sqid, role }) => sqid === body.doctor_id && role === "doctor",
+    );
+    if (!doctor) return HttpResponse.json({ doctor_id: ["Not a doctor here."] }, { status: 400 });
+    Object.assign(appointment, {
+      scheduled_time: body.scheduled_time,
+      note: body.note || null,
+      staff: {
+        sqid: doctor.sqid,
+        firstname: doctor.firstname,
+        lastname: doctor.lastname,
+        role: doctor.role,
+      },
+    });
+    return HttpResponse.json(body);
+  }),
   http.post(api("/api/hospital-ops/appointments/:sqid/close"), ({ params, request }) => {
     const me = accountFor(request);
     const appointment = appointments.find(({ sqid }) => sqid === params.sqid);

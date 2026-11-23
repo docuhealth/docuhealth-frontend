@@ -209,7 +209,37 @@ export const encounterNotePageSchema = z.object({
   results: z.array(encounterNoteSchema),
 });
 
-/** `LabTestOrder`, with each test's result once it's in (TODO(api): `result_info` is untyped). */
+/** A lab test's result (TODO(api): `result_info` is untyped): its values, with units, and the
+ * interpretation. Nothing until it's in. */
+export const labResultSchema = z
+  .object({
+    interpretation: optionalText,
+    parameters_info: z
+      .array(
+        z.object({
+          value: z.union([z.string(), z.number()]).nullish(),
+          parameter_info: z.object({ name: text, unit: optionalText }).nullish(),
+        }),
+      )
+      .catch([]),
+  })
+  .nullish()
+  .catch(null)
+  .transform((result) => ({
+    values: (result?.parameters_info ?? []).flatMap(({ value, parameter_info }) =>
+      parameter_info?.name && value != null && value !== ""
+        ? [
+            {
+              name: parameter_info.name,
+              value: parameter_info.unit ? `${value} ${parameter_info.unit}` : String(value),
+            },
+          ]
+        : [],
+    ),
+    interpretation: result?.interpretation ?? null,
+  }));
+
+/** `LabTestOrder`, with each test's result once it's in. */
 export const labOrderPageSchema = z.object({
   count: count,
   results: z.array(
@@ -224,20 +254,7 @@ export const labOrderPageSchema = z.object({
             sqid: z.string(),
             status: text,
             test_info: z.object({ name: text }),
-            result_info: z
-              .object({
-                interpretation: optionalText,
-                parameters_info: z
-                  .array(
-                    z.object({
-                      value: z.union([z.string(), z.number()]).nullish(),
-                      parameter_info: z.object({ name: text, unit: optionalText }).nullish(),
-                    }),
-                  )
-                  .catch([]),
-              })
-              .nullish()
-              .catch(null),
+            result_info: labResultSchema,
           }),
         ),
       })
@@ -250,17 +267,7 @@ export const labOrderPageSchema = z.object({
           id: item.sqid,
           name: item.test_info.name,
           status: item.status,
-          values: (item.result_info?.parameters_info ?? []).flatMap(({ value, parameter_info }) =>
-            parameter_info?.name && value != null && value !== ""
-              ? [
-                  {
-                    name: parameter_info.name,
-                    value: parameter_info.unit ? `${value} ${parameter_info.unit}` : String(value),
-                  },
-                ]
-              : [],
-          ),
-          interpretation: item.result_info?.interpretation ?? null,
+          ...item.result_info,
         })),
       })),
   ),

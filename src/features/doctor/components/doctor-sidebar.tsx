@@ -2,6 +2,7 @@ import admissionIconUrl from "@/assets/svgs/admission.svg";
 import appointmentIconUrl from "@/assets/svgs/appointment.svg";
 import dashboardIconUrl from "@/assets/svgs/dashboard.svg";
 import healthIconUrl from "@/assets/svgs/health.svg";
+import labIconUrl from "@/assets/svgs/lab.svg";
 import messagesIconUrl from "@/assets/svgs/messages.svg";
 import patientIconUrl from "@/assets/svgs/patient.svg";
 import settingsIconUrl from "@/assets/svgs/settings.svg";
@@ -17,6 +18,7 @@ export function DoctorSidebar({ unreadMessages }: { unreadMessages: number }) {
         { to: "/hospital/doctor", label: "Overview", icon: dashboardIconUrl },
         { to: "/hospital/doctor/encounters", label: "Doctor Encounter", icon: staffIconUrl },
         { to: "/hospital/doctor/handovers", label: "Handover notes", icon: admissionIconUrl },
+        { to: "/hospital/doctor/results", label: "Results", icon: labIconUrl },
         { to: "/hospital/doctor/patients", label: "Patient Mgt.", icon: patientIconUrl },
         { to: "/hospital/doctor/appointments", label: "Appointments", icon: appointmentIconUrl },
       ],

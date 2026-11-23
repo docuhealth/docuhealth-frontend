@@ -131,8 +131,15 @@ Built in seven steps, one commit each; what v1 does and the endpoints behind it 
       on staging (reads: the pages, and every kind's rows parsed in a test)
 - [x] Fixed: switching a list's kind (notes, charts, received/sent handovers) no longer shows the
       last kind's rows under the new heading while it loads
-- [ ] 4.7 Discharge, results, overviews: doctor discharge form, nurse discharge checklist, result
-      review, doctor overview, assign appointments
+- [x] 4.7 Discharge, results, overviews: the doctor discharges an admission in two steps (the
+      stay's summary; condition, care instructions, investigations, drugs to take home, follow-up),
+      which gives the nurses a discharge checklist task (final vitals, checks, condition,
+      education), recorded from the patient's page; a Results page for lab results and scan reports
+      to approve or reject (lab results also from the patient's Lab results tab); the doctor's
+      overview (waiting patients, appointments, referrals, admissions, admissions and discharges by
+      month); the nurse assigns an appointment to a doctor. Checked on staging (reads: every new
+      reply parsed in a test)
+- [x] Phase 4 done
 
 ## Phase 5: Super admin (`admin.` subdomain)
 

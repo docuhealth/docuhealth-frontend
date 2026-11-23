@@ -1,7 +1,7 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { StaffAppointments } from "@/features/staff/components/staff-appointments";
-import { renderWithProviders } from "@/test/render";
+import { pickOption, renderWithProviders } from "@/test/render";
 
 describe("StaffAppointments", () => {
   it("lists today's appointments and closes one, which leaves its row without a Close button", async () => {
@@ -34,5 +34,26 @@ describe("StaffAppointments", () => {
       expect(within(table).queryByText("Halima Abubakar")).not.toBeInTheDocument(),
     );
     expect(within(table).getAllByRole("row").length).toBeGreaterThan(1);
+  });
+
+  it("lets the nurse give an appointment to a doctor", async () => {
+    const { user } = renderWithProviders(<StaffAppointments scope="mine" canAssign />);
+    await user.click(await screen.findByRole("tab", { name: /Upcoming/ }));
+    const table = await screen.findByRole("table");
+    const row = (await within(table).findByText("Olumide Ajayi")).closest("tr")!;
+    await user.click(
+      within(row).getByRole("button", { name: "Assign Olumide Ajayi’s appointment to a doctor" }),
+    );
+    const dialog = await screen.findByRole("dialog", { name: "Assign to a doctor" });
+    await user.click(within(dialog).getByRole("button", { name: "Assign" }));
+    expect(await within(dialog).findByText("Choose the doctor")).toBeInTheDocument();
+
+    await user.click(within(dialog).getByRole("combobox", { name: /Doctor/ }));
+    await pickOption("Dr. Sarah Adeyemi");
+    await user.click(within(dialog).getByRole("button", { name: "Assign" }));
+    expect(
+      await screen.findByText("Olumide Ajayi’s appointment is with Dr. Sarah Adeyemi."),
+    ).toBeInTheDocument();
+    expect(await within(row).findByText("Sarah Adeyemi", { exact: false })).toBeInTheDocument();
   });
 });

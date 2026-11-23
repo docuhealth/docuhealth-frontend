@@ -57,6 +57,8 @@ const appointmentSchema = z
     status: appointment.status,
     // e.g. "follow_up" → "Follow up".
     type: appointment.type && sentenceCase(appointment.type.replaceAll("_", " ")),
+    /** The API's own type, e.g. `consultation`, kept when the appointment is reassigned. */
+    typeCode: appointment.type,
     note: appointment.note,
     patient: {
       name: fullName(appointment.patient.firstname, appointment.patient.lastname),

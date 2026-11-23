@@ -4,6 +4,7 @@ import { StatusPill } from "@/components/dashboard/status-pill";
 import { TablePagination } from "@/components/dashboard/table-pagination";
 import { LAB_ORDERS_PAGE_SIZE, labOrdersQuery } from "@/features/doctor/api/queries";
 import type { LabOrder } from "@/features/doctor/api/schemas";
+import { ReviewButtons } from "@/features/doctor/components/review-buttons";
 import { formatDayAndTime } from "@/lib/format";
 
 /** A test's status in words, and how it's colored. */
@@ -15,12 +16,15 @@ const testStatus: Record<
   in_progress: { label: "In progress", tone: "info" },
   sample_collected: { label: "Sample taken", tone: "info" },
   result_ready: { label: "Awaiting lab approval", tone: "info" },
-  result_accepted_by_lab_admin: { label: "Result ready", tone: "success" },
+  result_accepted_by_lab_admin: { label: "Ready for your review", tone: "warning" },
   result_accepted_by_doctor: { label: "Reviewed", tone: "success" },
   rejected: { label: "Rejected", tone: "error" },
 };
 
-/** The patient's lab tests at this hospital, newest first, with results once they're in. */
+/**
+ * The patient's lab tests at this hospital, newest first, with results once they're in; one the
+ * lab admin has approved waits for the doctor to approve or reject.
+ */
 export function LabResults({ hin }: { hin: string }) {
   const [page, setPage] = useState(1);
   const { data, isError } = useQuery(labOrdersQuery(hin, page));
@@ -87,6 +91,9 @@ function OrderCard({ order, now }: { order: LabOrder; now: Date }) {
               )}
               {test.interpretation && (
                 <p className="type-body-sm-regular text-fg-body">{test.interpretation}</p>
+              )}
+              {test.status === "result_accepted_by_lab_admin" && (
+                <ReviewButtons kind="lab" id={test.id} name={`the ${test.name} result`} />
               )}
             </li>
           );

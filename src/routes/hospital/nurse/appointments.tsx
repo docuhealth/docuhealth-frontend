@@ -9,7 +9,7 @@ function AppointmentsPage() {
   return (
     <>
       <title>Appointments · DocuHealth</title>
-      <StaffAppointments scope="mine" />
+      <StaffAppointments scope="mine" canAssign />
     </>
   );
 }

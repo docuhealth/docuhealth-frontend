@@ -308,6 +308,11 @@ export const careTaskHandlers = [
     if (found.error) return found.error;
     const body = (await request.json()) as Record<string, unknown>;
     const { task } = found.occurrence;
+    if (task.task_type === "nurse_in_patient_discharge") {
+      for (const field of ["admission_id", "patient", "final_vital_signs", "education_given"]) {
+        if (!body[field]) return refuse(`${field}: This field is required.`);
+      }
+    }
     if (task.task_type === "vital_signs") {
       const asked = task.config.parameters as string[];
       const extra = Object.keys(body).filter(
@@ -319,6 +324,41 @@ export const careTaskHandlers = [
     chart(found.occurrence, body);
     return HttpResponse.json({ sqid: found.occurrence.sqid, status: "completed" });
   }),
+  http.post(
+    api("/api/hospital-ops/admissions/:sqid/doctor-discharge-form"),
+    async ({ params, request }) => {
+      const body = (await request.json()) as Record<string, unknown>;
+      for (const field of [
+        "patient",
+        "chief_complaint",
+        "primary_diagnosis",
+        "secondary_diagnosis",
+        "comorbidities",
+        "treatment_plan",
+        "hospital_course_note",
+        "care_instructions",
+        "condition_at_discharge",
+      ]) {
+        if (!body[field]) {
+          return HttpResponse.json({ [field]: ["This field is required."] }, { status: 400 });
+        }
+      }
+      // As v1 found on staging: the clinic is always sent (null at this hospital or with none).
+      if (body.follow_up_clinic === undefined) {
+        return HttpResponse.json(
+          { follow_up_clinic: ["This field is required."] },
+          { status: 400 },
+        );
+      }
+      // The nurse then completes the discharge.
+      addTask(String(params.sqid), {
+        task_type: "nurse_in_patient_discharge",
+        priority: "high",
+        instructions: "Complete the discharge checklist.",
+      });
+      return HttpResponse.json({ sqid: `discharge-${Date.now()}`, ...body }, { status: 201 });
+    },
+  ),
   http.get(api("/api/records/admissions/:sqid/charts/:chart"), ({ params }) => {
     const entries = charts.get(`${String(params.sqid)}:${String(params.chart)}`) ?? [];
     return HttpResponse.json({

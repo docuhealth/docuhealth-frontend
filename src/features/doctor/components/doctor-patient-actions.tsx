@@ -33,6 +33,7 @@ import {
 } from "@/features/doctor/api/mutations";
 import { myConsultationsQuery, nursesQuery } from "@/features/doctor/api/queries";
 import { CareTaskDialog } from "@/features/doctor/components/care-task-dialog";
+import { DischargeDialog } from "@/features/doctor/components/discharge-dialog";
 import { EncounterNoteDialog } from "@/features/doctor/components/encounter-note-dialog";
 import { LabOrderDialog } from "@/features/doctor/components/lab-order-dialog";
 import { BedDialog, ReferralDialog } from "@/features/doctor/components/move-dialogs";
@@ -56,7 +57,16 @@ export type DoctorVisit = {
 type Consultation = { checkInId: string; hin: string; patientName: string };
 
 type Dialog =
-  "note" | "vitals" | "lab" | "scan" | "drugs" | "admit" | "transfer" | "refer" | "task";
+  | "note"
+  | "vitals"
+  | "lab"
+  | "scan"
+  | "drugs"
+  | "admit"
+  | "transfer"
+  | "refer"
+  | "task"
+  | "discharge";
 
 const outline = "h-12 gap-2 bg-card px-5 type-body-sm-medium";
 
@@ -66,7 +76,7 @@ const outline = "h-12 gap-2 bg-card px-5 type-body-sm-medium";
  *   write an encounter note, order tests, scans and drugs, ask a nurse for vitals, request
  *   admission, refer out, end it.
  * - An active admission: set care tasks for the nurses, order, transfer to another bed, refer
- *   out.
+ *   out, discharge.
  */
 export function DoctorPatientActions({
   visit,
@@ -149,6 +159,11 @@ export function DoctorPatientActions({
             </DropdownMenuItem>
           )}
           <DropdownMenuItem onSelect={() => setDialog("refer")}>Refer out</DropdownMenuItem>
+          {!isCheckIn && (
+            <DropdownMenuItem onSelect={() => setDialog("discharge")}>
+              Discharge patient
+            </DropdownMenuItem>
+          )}
           {isCheckIn && (
             <DropdownMenuItem
               disabled={end.isPending}
@@ -172,6 +187,15 @@ export function DoctorPatientActions({
         <Button className="h-12 px-5 type-heading-sm" onClick={() => setDialog("task")}>
           New care task
         </Button>
+      )}
+      {!isCheckIn && (
+        <DischargeDialog
+          open={dialog === "discharge"}
+          onOpenChange={toggle("discharge")}
+          admissionId={id}
+          hin={hin}
+          patientName={patientName}
+        />
       )}
       {!isCheckIn && (
         <CareTaskDialog

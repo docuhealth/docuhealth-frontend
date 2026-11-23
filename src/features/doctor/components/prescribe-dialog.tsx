@@ -34,7 +34,9 @@ import {
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { getErrorMessage } from "@/lib/api";
 
-type Form = UseFormReturn<PrescriptionInput, unknown, PrescriptionValues>;
+/** A form with prescription rows (`drugs`), as `DrugRow` fills them. */
+export type DrugsForm = UseFormReturn<PrescriptionInput, unknown, PrescriptionValues>;
+type Form = DrugsForm;
 
 /** Prescribe drugs for the pharmacy to dispense: one row per drug, then any allergies. */
 export function PrescribeDialog({
@@ -162,7 +164,8 @@ function PrescribeForm({
   );
 }
 
-function DrugRow({
+/** One drug: picked from the catalogue (or typed), with its dose, route, frequency and duration. */
+export function DrugRow({
   form,
   index,
   errors,

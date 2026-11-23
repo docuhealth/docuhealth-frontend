@@ -156,9 +156,9 @@ export function TaskQueue({ admissionId = null }: { admissionId?: string | null 
         >
           Confirm given
         </Button>
-      ) : task.type === "nurse_in_patient_discharge" ? (
-        // TODO(v2 migration, phase 4.7): the discharge checklist.
-        <span className="type-caption text-fg-caption">Discharge checklist: coming soon</span>
+      ) : task.type === "nurse_in_patient_discharge" && !admissionId ? (
+        // TODO(api): task rows don't say their admission, which the checklist needs.
+        <span className="type-caption text-fg-caption">From the patient’s page</span>
       ) : (
         <Button
           size="sm"
@@ -280,7 +280,11 @@ export function TaskQueue({ admissionId = null }: { admissionId?: string | null 
         />
       )}
 
-      <RecordTaskDialog task={recording} onClose={() => setRecording(null)} />
+      <RecordTaskDialog
+        task={recording}
+        admissionId={admissionId}
+        onClose={() => setRecording(null)}
+      />
       {escalating && <EscalateDialog task={escalating} onClose={() => setEscalating(null)} />}
       {missing && <MissedDialog task={missing} onClose={() => setMissing(null)} />}
     </section>
