@@ -231,11 +231,21 @@ export function IndividualInfoForm({
                   <FieldLabel htmlFor="acceptTerms" className="font-normal! text-fg-body">
                     <span>
                       By continuing, you agree to our{" "}
-                      <a href="/terms" className="text-primary underline underline-offset-2">
+                      <a
+                        href="/terms-and-conditions"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary underline underline-offset-2"
+                      >
                         Terms
                       </a>{" "}
                       and{" "}
-                      <a href="/privacy" className="text-primary underline underline-offset-2">
+                      <a
+                        href="/privacy-policy"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary underline underline-offset-2"
+                      >
                         Privacy Policy
                       </a>
                       .

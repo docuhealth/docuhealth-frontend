@@ -146,14 +146,19 @@ nurses and the other roles have no dashboard yet, so they land on the admin one.
 
 ### Patients and public site
 
-| Path                        | Page                                           |
-| --------------------------- | ---------------------------------------------- |
-| `/`                         | Landing page                                   |
-| `/login`                    | Patient login                                  |
-| `/register`                 | Choose an account type                         |
-| `/register?type=individual` | Patient sign-up                                |
-| `/forgot-password`          | Patient password reset                         |
-| `/design-system`            | Live color, typography and component reference |
+| Path                                                            | Page                                           |
+| --------------------------------------------------------------- | ---------------------------------------------- |
+| `/`                                                             | Landing page                                   |
+| `/our-mission`, `/our-vision`                                   | Mission and vision                             |
+| `/docuhealth-news`                                              | News (`#slug` for one story)                   |
+| `/docuhealth-api`                                               | The DocuHealth API, and how to ask for it      |
+| `/terms-and-conditions`                                         | Terms (`?for=patient` or `?for=hospital`)      |
+| `/privacy-policy`, `/legal-notice`, `/api-terms-and-conditions` | Legal pages                                    |
+| `/login`                                                        | Patient login                                  |
+| `/register`                                                     | Choose an account type                         |
+| `/register?type=individual`                                     | Patient sign-up                                |
+| `/forgot-password`                                              | Patient password reset                         |
+| `/design-system`                                                | Live color, typography and component reference |
 
 ```
 Sign up:   / → /register → choose an account type

@@ -156,8 +156,14 @@ Built in seven steps, one commit each; what v1 does and the endpoints behind it 
 
 ## Phase 6: Landing pages
 
-- [ ] Mission, Vision, News, DocuHealth API, Privacy, Terms, API Terms, Legal Notice
-- [ ] Contact form on the real endpoints
+- [x] Mission, Vision, News, DocuHealth API, Privacy, Terms (patient and hospital tabs), API
+      Terms, Legal Notice, at v1's paths, from v1's text with the landing page's parts (no
+      design); the navbar, footer and home news cards link to them, and sign-up's Terms and
+      Privacy links open them
+- [x] Contact form: blocked by the API. v1 posted to `/api/hospitals/inquiries` and
+      `/api/individuals/inquiries`, which are gone (404 on staging), and the API has no contact
+      or newsletter endpoint. The contact section stays as designed (phone, email, partner sign-up);
+      the footer's newsletter says sign-up isn't available yet instead of faking success
 
 ## Phase 7: Before launch
 

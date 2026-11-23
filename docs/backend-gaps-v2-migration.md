@@ -251,3 +251,7 @@ call-by-call table is in `docs/api-mapping-redesigned-dashboards.md`. These are 
 6. **Activating and deactivating.** The schema takes hospital sqids (`{facilities: []}`) and patient HINs (`{hins: []}`); v1 sent `{hins}` for hospitals and `{patient_ids}` for patients. The UI follows the schema; it wasn't tried on staging, to avoid switching off shared accounts. Please confirm.
 7. **Plans.** There's no way to retire or delete a plan, and `test` plans are listed with the real ones. A new plan has no `paystack_plan_code` until Paystack has it; please say whether the API creates the Paystack plan, and when.
 8. **Overview totals** have no change against the period before (the hospital admin's and doctor's dashboards do), and `start_date`/`end_date` aren't explained.
+
+### Public site
+
+1. **Contact and newsletter.** v1's contact form posted to `/api/hospitals/inquiries` and `/api/individuals/inquiries`, which staging no longer has (404), and there's no newsletter endpoint. Please add a contact (or enquiry) endpoint and a newsletter sign-up; the footer's newsletter says it isn't available until then.

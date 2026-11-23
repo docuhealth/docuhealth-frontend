@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { CaretDownIcon, CaretRightIcon, ListIcon, XIcon } from "@phosphor-icons/react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import logoUrl from "@/assets/logos/logo.svg";
 import {
   Accordion,
@@ -17,20 +17,25 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { LandingContainer } from "@/features/landing/components/landing-container";
+import { LandingLink } from "@/features/landing/components/landing-link";
+import { type LandingHref, splitHref } from "@/features/landing/lib/href";
 import { cn } from "@/lib/utils";
 
-const companyLinks = [
-  { label: "About Us", href: "#about" },
-  { label: "Our Mission", href: "#about" },
-  { label: "Careers", href: "#careers" },
-] as const;
+const companyLinks: { label: string; href: LandingHref }[] = [
+  { label: "About Us", href: "/#about" },
+  { label: "Our Mission", href: "/our-mission" },
+  { label: "Our Vision", href: "/our-vision" },
+  { label: "DocuHealth API", href: "/docuhealth-api" },
+  // TODO(design): there's no careers page yet.
+  { label: "Careers", href: "/#careers" },
+];
 
-const navLinks = [
-  { label: "Products", href: "#products" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Contact Us", href: "#contact" },
-  { label: "Blog", href: "#news" },
-] as const;
+const navLinks: { label: string; href: LandingHref }[] = [
+  { label: "Products", href: "/#products" },
+  { label: "FAQ", href: "/#faq" },
+  { label: "Contact Us", href: "/#contact" },
+  { label: "Blog", href: "/docuhealth-news" },
+];
 
 function Logo() {
   return (
@@ -43,29 +48,27 @@ function Logo() {
 
 function MobileNav() {
   const [open, setOpen] = useState(false);
-  const pendingHash = useRef<string | null>(null);
+  const pending = useRef<LandingHref | null>(null);
+  const navigate = useNavigate();
 
   // The open sheet locks page scrolling, so a link's jump is lost if the browser follows it right
   // away. Close first, then go once the sheet has unmounted and released the lock.
-  function handleLinkClick(event: MouseEvent<HTMLAnchorElement>) {
-    event.preventDefault();
-    pendingHash.current = event.currentTarget.hash;
-    setOpen(false);
+  function linkClick(href: LandingHref) {
+    return (event: MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      pending.current = href;
+      setOpen(false);
+    };
   }
 
   function handleCloseAutoFocus(event: Event) {
-    const hash = pendingHash.current;
-    if (!hash) return;
-    pendingHash.current = null;
+    const href = pending.current;
+    if (!href) return;
+    pending.current = null;
 
     // Leave focus at the destination, not back on the menu button at the top of the page.
     event.preventDefault();
-    requestAnimationFrame(() => {
-      const target = document.querySelector(hash);
-      if (!target) return;
-      target.scrollIntoView();
-      window.location.hash = hash;
-    });
+    requestAnimationFrame(() => void navigate(splitHref(href)));
   }
 
   return (
@@ -102,28 +105,28 @@ function MobileNav() {
               </AccordionTrigger>
               <AccordionContent className="flex flex-col pt-0 pb-2">
                 {companyLinks.map((item) => (
-                  <a
+                  <LandingLink
                     key={item.label}
                     href={item.href}
-                    onClick={handleLinkClick}
+                    onClick={linkClick(item.href)}
                     className="flex min-h-11 items-center type-body text-fg-body transition-colors hover:text-primary"
                   >
                     {item.label}
-                  </a>
+                  </LandingLink>
                 ))}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
 
           {navLinks.map((item) => (
-            <a
+            <LandingLink
               key={item.label}
               href={item.href}
-              onClick={handleLinkClick}
+              onClick={linkClick(item.href)}
               className="flex min-h-14 items-center border-b border-line type-title-sm text-fg-heading transition-colors last:border-b-0 hover:text-primary"
             >
               {item.label}
-            </a>
+            </LandingLink>
           ))}
         </nav>
 
@@ -186,25 +189,25 @@ export function Navbar() {
               >
                 {companyLinks.map((item) => (
                   <DropdownMenuItem key={item.label} asChild>
-                    <a
+                    <LandingLink
                       href={item.href}
                       className="cursor-pointer px-3 py-2.5 type-body-sm-regular transition-colors focus:bg-primary/5 focus:text-primary"
                     >
                       {item.label}
-                    </a>
+                    </LandingLink>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
 
             {navLinks.map((item) => (
-              <a
+              <LandingLink
                 key={item.label}
                 href={item.href}
                 className="type-body-sm-tight text-fg-heading transition-colors hover:text-primary"
               >
                 {item.label}
-              </a>
+              </LandingLink>
             ))}
           </nav>
 

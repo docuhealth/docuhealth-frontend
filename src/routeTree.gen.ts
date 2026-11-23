@@ -11,8 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as ApiTermsAndConditionsRouteImport } from './routes/api-terms-and-conditions'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
+import { Route as DocuhealthApiRouteImport } from './routes/docuhealth-api'
+import { Route as DocuhealthNewsRouteImport } from './routes/docuhealth-news'
+import { Route as LegalNoticeRouteImport } from './routes/legal-notice'
+import { Route as OurMissionRouteImport } from './routes/our-mission'
+import { Route as OurVisionRouteImport } from './routes/our-vision'
 import { Route as PatientRouteImport } from './routes/patient'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as TermsAndConditionsRouteImport } from './routes/terms-and-conditions'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
@@ -124,14 +132,54 @@ const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTermsAndConditionsRoute = ApiTermsAndConditionsRouteImport.update({
+  id: '/api-terms-and-conditions',
+  path: '/api-terms-and-conditions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DesignSystemRoute = DesignSystemRouteImport.update({
   id: '/design-system',
   path: '/design-system',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocuhealthApiRoute = DocuhealthApiRouteImport.update({
+  id: '/docuhealth-api',
+  path: '/docuhealth-api',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocuhealthNewsRoute = DocuhealthNewsRouteImport.update({
+  id: '/docuhealth-news',
+  path: '/docuhealth-news',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalNoticeRoute = LegalNoticeRouteImport.update({
+  id: '/legal-notice',
+  path: '/legal-notice',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OurMissionRoute = OurMissionRouteImport.update({
+  id: '/our-mission',
+  path: '/our-mission',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OurVisionRoute = OurVisionRouteImport.update({
+  id: '/our-vision',
+  path: '/our-vision',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PatientRoute = PatientRouteImport.update({
   id: '/patient',
   path: '/patient',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsAndConditionsRoute = TermsAndConditionsRouteImport.update({
+  id: '/terms-and-conditions',
+  path: '/terms-and-conditions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
@@ -688,8 +736,16 @@ const HospitalReceptionistPatientsPatientIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api-terms-and-conditions': typeof ApiTermsAndConditionsRoute
   '/design-system': typeof DesignSystemRoute
+  '/docuhealth-api': typeof DocuhealthApiRoute
+  '/docuhealth-news': typeof DocuhealthNewsRoute
+  '/legal-notice': typeof LegalNoticeRoute
+  '/our-mission': typeof OurMissionRoute
+  '/our-vision': typeof OurVisionRoute
   '/patient': typeof PatientRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
@@ -793,8 +849,16 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api-terms-and-conditions': typeof ApiTermsAndConditionsRoute
   '/design-system': typeof DesignSystemRoute
+  '/docuhealth-api': typeof DocuhealthApiRoute
+  '/docuhealth-news': typeof DocuhealthNewsRoute
+  '/legal-notice': typeof LegalNoticeRoute
+  '/our-mission': typeof OurMissionRoute
+  '/our-vision': typeof OurVisionRoute
   '/patient': typeof PatientRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
@@ -890,8 +954,16 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteWithChildren
+  '/api-terms-and-conditions': typeof ApiTermsAndConditionsRoute
   '/design-system': typeof DesignSystemRoute
+  '/docuhealth-api': typeof DocuhealthApiRoute
+  '/docuhealth-news': typeof DocuhealthNewsRoute
+  '/legal-notice': typeof LegalNoticeRoute
+  '/our-mission': typeof OurMissionRoute
+  '/our-vision': typeof OurVisionRoute
   '/patient': typeof PatientRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
@@ -998,8 +1070,16 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/api-terms-and-conditions'
     | '/design-system'
+    | '/docuhealth-api'
+    | '/docuhealth-news'
+    | '/legal-notice'
+    | '/our-mission'
+    | '/our-vision'
     | '/patient'
+    | '/privacy-policy'
+    | '/terms-and-conditions'
     | '/forgot-password'
     | '/login'
     | '/register'
@@ -1103,8 +1183,16 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/api-terms-and-conditions'
     | '/design-system'
+    | '/docuhealth-api'
+    | '/docuhealth-news'
+    | '/legal-notice'
+    | '/our-mission'
+    | '/our-vision'
     | '/patient'
+    | '/privacy-policy'
+    | '/terms-and-conditions'
     | '/forgot-password'
     | '/login'
     | '/register'
@@ -1199,8 +1287,16 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_auth'
+    | '/api-terms-and-conditions'
     | '/design-system'
+    | '/docuhealth-api'
+    | '/docuhealth-news'
+    | '/legal-notice'
+    | '/our-mission'
+    | '/our-vision'
     | '/patient'
+    | '/privacy-policy'
+    | '/terms-and-conditions'
     | '/_auth/forgot-password'
     | '/_auth/login'
     | '/_auth/register'
@@ -1307,8 +1403,16 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRouteWithChildren
+  ApiTermsAndConditionsRoute: typeof ApiTermsAndConditionsRoute
   DesignSystemRoute: typeof DesignSystemRoute
+  DocuhealthApiRoute: typeof DocuhealthApiRoute
+  DocuhealthNewsRoute: typeof DocuhealthNewsRoute
+  LegalNoticeRoute: typeof LegalNoticeRoute
+  OurMissionRoute: typeof OurMissionRoute
+  OurVisionRoute: typeof OurVisionRoute
   PatientRoute: typeof PatientRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  TermsAndConditionsRoute: typeof TermsAndConditionsRoute
   AdminAuthRoute: typeof AdminAuthRouteWithChildren
   AdminDashboardRoute: typeof AdminDashboardRouteWithChildren
   AgentAuthRoute: typeof AgentAuthRouteWithChildren
@@ -1340,6 +1444,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api-terms-and-conditions': {
+      id: '/api-terms-and-conditions'
+      path: '/api-terms-and-conditions'
+      fullPath: '/api-terms-and-conditions'
+      preLoaderRoute: typeof ApiTermsAndConditionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/design-system': {
       id: '/design-system'
       path: '/design-system'
@@ -1347,11 +1458,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DesignSystemRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/docuhealth-api': {
+      id: '/docuhealth-api'
+      path: '/docuhealth-api'
+      fullPath: '/docuhealth-api'
+      preLoaderRoute: typeof DocuhealthApiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docuhealth-news': {
+      id: '/docuhealth-news'
+      path: '/docuhealth-news'
+      fullPath: '/docuhealth-news'
+      preLoaderRoute: typeof DocuhealthNewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal-notice': {
+      id: '/legal-notice'
+      path: '/legal-notice'
+      fullPath: '/legal-notice'
+      preLoaderRoute: typeof LegalNoticeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/our-mission': {
+      id: '/our-mission'
+      path: '/our-mission'
+      fullPath: '/our-mission'
+      preLoaderRoute: typeof OurMissionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/our-vision': {
+      id: '/our-vision'
+      path: '/our-vision'
+      fullPath: '/our-vision'
+      preLoaderRoute: typeof OurVisionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/patient': {
       id: '/patient'
       path: '/patient'
       fullPath: '/patient'
       preLoaderRoute: typeof PatientRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms-and-conditions': {
+      id: '/terms-and-conditions'
+      path: '/terms-and-conditions'
+      fullPath: '/terms-and-conditions'
+      preLoaderRoute: typeof TermsAndConditionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth/forgot-password': {
@@ -2365,8 +2525,16 @@ const HospitalReceptionistRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
+  ApiTermsAndConditionsRoute: ApiTermsAndConditionsRoute,
   DesignSystemRoute: DesignSystemRoute,
+  DocuhealthApiRoute: DocuhealthApiRoute,
+  DocuhealthNewsRoute: DocuhealthNewsRoute,
+  LegalNoticeRoute: LegalNoticeRoute,
+  OurMissionRoute: OurMissionRoute,
+  OurVisionRoute: OurVisionRoute,
   PatientRoute: PatientRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
+  TermsAndConditionsRoute: TermsAndConditionsRoute,
   AdminAuthRoute: AdminAuthRouteWithChildren,
   AdminDashboardRoute: AdminDashboardRouteWithChildren,
   AgentAuthRoute: AgentAuthRouteWithChildren,

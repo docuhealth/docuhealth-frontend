@@ -9,16 +9,19 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LandingContainer } from "@/features/landing/components/landing-container";
+import { LandingLink } from "@/features/landing/components/landing-link";
+import { type LandingHref } from "@/features/landing/lib/href";
 
-const companyLinks = [
-  { label: "About us", href: "#about" },
-  { label: "Mission", href: "#about" },
-  { label: "Vision", href: "#about" },
-  { label: "DocuHealth API", href: "#products" },
-  { label: "Legal Notice", href: "#" },
-  { label: "Terms and Conditions", href: "#" },
-  { label: "Privacy policy", href: "#" },
-] as const;
+const companyLinks: { label: string; href: LandingHref }[] = [
+  { label: "About us", href: "/#about" },
+  { label: "Mission", href: "/our-mission" },
+  { label: "Vision", href: "/our-vision" },
+  { label: "News", href: "/docuhealth-news" },
+  { label: "DocuHealth API", href: "/docuhealth-api" },
+  { label: "Legal Notice", href: "/legal-notice" },
+  { label: "Terms and Conditions", href: "/terms-and-conditions" },
+  { label: "Privacy policy", href: "/privacy-policy" },
+];
 
 /** Phosphor's Facebook mark is round; the design uses the square one. */
 function FacebookSquareIcon() {
@@ -61,19 +64,12 @@ const newsletterInputClassName =
 export function Footer() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleSubscribe(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
-
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setName("");
-      setEmail("");
-      toast.success("Thank you for subscribing to our newsletter!");
-    }, 600);
+    // TODO(api): there's no newsletter endpoint yet; keep what they typed.
+    toast.info("Newsletter sign-up isn’t available yet. Please try again soon.");
   }
 
   return (
@@ -115,11 +111,7 @@ export function Footer() {
                   required
                 />
               </label>
-              <Button
-                type="submit"
-                loading={isSubmitting}
-                className="mt-2 h-11.5 w-fit gap-2.5 rounded-md px-4"
-              >
+              <Button type="submit" className="mt-2 h-11.5 w-fit gap-2.5 rounded-md px-4">
                 <span>Subscribe now</span>
                 <CaretRightIcon data-icon="inline-end" className="size-3.5" />
               </Button>
@@ -133,12 +125,12 @@ export function Footer() {
                 <ul className="mt-5.5 flex flex-col gap-2">
                   {companyLinks.map((link) => (
                     <li key={link.label}>
-                      <a
+                      <LandingLink
                         href={link.href}
                         className="type-body-sm-regular text-white transition-colors hover:text-white/70"
                       >
                         {link.label}
-                      </a>
+                      </LandingLink>
                     </li>
                   ))}
                 </ul>
