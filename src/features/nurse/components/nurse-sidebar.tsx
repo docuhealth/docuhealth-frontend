@@ -5,6 +5,7 @@ import messagesIconUrl from "@/assets/svgs/messages.svg";
 import patientIconUrl from "@/assets/svgs/patient.svg";
 import settingsIconUrl from "@/assets/svgs/settings.svg";
 import staffIconUrl from "@/assets/svgs/staff.svg";
+import taskIconUrl from "@/assets/svgs/audit.svg";
 import { DashboardSidebar, type NavGroup } from "@/components/dashboard/dashboard-sidebar";
 
 /** The nurse dashboard's navigation. */
@@ -15,6 +16,7 @@ export function NurseSidebar({ unreadMessages }: { unreadMessages: number }) {
       items: [
         { to: "/hospital/nurse", label: "Overview", icon: dashboardIconUrl },
         { to: "/hospital/nurse/encounters", label: "Nursing Encounter", icon: staffIconUrl },
+        { to: "/hospital/nurse/tasks", label: "Tasks", icon: taskIconUrl },
         { to: "/hospital/nurse/patients", label: "Patient Mgt.", icon: patientIconUrl },
         { to: "/hospital/nurse/appointments", label: "Appointments", icon: appointmentIconUrl },
       ],

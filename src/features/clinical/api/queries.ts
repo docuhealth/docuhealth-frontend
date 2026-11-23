@@ -1,7 +1,10 @@
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { request } from "@/lib/api";
 import {
+  type Chart,
+  chartPageSchema,
   clinicalProfileSchema,
+  fluidBalanceSchema,
   patientInfoSchema,
   type Visit,
   type VisitList,
@@ -21,6 +24,10 @@ export const clinicalKeys = {
     [...clinicalKeys.all, "visits", list, search, page] as const,
   visit: (list: VisitList, id: string) => [...clinicalKeys.all, "visit", list, id] as const,
   patientInfo: (hin: string) => [...clinicalKeys.all, "patient-info", hin] as const,
+  chart: (admissionId: string, chart: Chart, page: number) =>
+    [...clinicalKeys.all, "chart", admissionId, chart, page] as const,
+  fluidBalance: (admissionId: string) =>
+    [...clinicalKeys.all, "fluid-balance", admissionId] as const,
   records: (kind: Visit["kind"], id: string, page: number) =>
     [...clinicalKeys.all, "records", kind, id, page] as const,
 };
@@ -100,4 +107,30 @@ export const visitRecordsQuery = (kind: Visit["kind"], id: string, page: number)
       return { total: count, items: results };
     },
     placeholderData: keepPreviousData,
+  });
+
+export const CHART_PAGE_SIZE = 10;
+
+/** One of an admission's charts, newest first. */
+export const chartQuery = (admissionId: string, chart: Chart, page: number) =>
+  queryOptions({
+    queryKey: clinicalKeys.chart(admissionId, chart, page),
+    queryFn: async () => {
+      const { count, results } = await request(chartPageSchema, {
+        url: `/api/records/admissions/${encodeURIComponent(admissionId)}/charts/${chart}`,
+        params: { page, size: CHART_PAGE_SIZE },
+      });
+      return { total: count, items: results };
+    },
+    placeholderData: keepPreviousData,
+  });
+
+/** Today's fluid balance (from midnight UTC). */
+export const fluidBalanceQuery = (admissionId: string) =>
+  queryOptions({
+    queryKey: clinicalKeys.fluidBalance(admissionId),
+    queryFn: () =>
+      request(fluidBalanceSchema, {
+        url: `/api/records/admissions/${encodeURIComponent(admissionId)}/fluid-balance`,
+      }),
   });

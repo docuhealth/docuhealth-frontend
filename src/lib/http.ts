@@ -72,9 +72,11 @@ http.interceptors.response.use(undefined, async (error: AxiosError<GateErrorPayl
   }
 
   const config = error.config as RetriableConfig | undefined;
-  const isAuthCall = config?.url?.startsWith("/auth/") || config?.url?.startsWith("/api/auth/");
+  // A 401 from signing in, refreshing or out means the credentials themselves are wrong; any other
+  // (the staff profile under /api/auth/ included) means the access token expired, so refresh it.
+  const isCredentialCall = /\/auth\/(login|refresh|logout)\b/.test(config?.url ?? "");
 
-  if (status !== 401 || !config || config._retried || isAuthCall) {
+  if (status !== 401 || !config || config._retried || isCredentialCall) {
     throw error;
   }
 

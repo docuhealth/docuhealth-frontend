@@ -32,6 +32,7 @@ import {
   useRequestVitals,
 } from "@/features/doctor/api/mutations";
 import { myConsultationsQuery, nursesQuery } from "@/features/doctor/api/queries";
+import { CareTaskDialog } from "@/features/doctor/components/care-task-dialog";
 import { EncounterNoteDialog } from "@/features/doctor/components/encounter-note-dialog";
 import { LabOrderDialog } from "@/features/doctor/components/lab-order-dialog";
 import { BedDialog, ReferralDialog } from "@/features/doctor/components/move-dialogs";
@@ -54,7 +55,8 @@ export type DoctorVisit = {
 /** What the vitals request needs of a check-in. */
 type Consultation = { checkInId: string; hin: string; patientName: string };
 
-type Dialog = "note" | "vitals" | "lab" | "scan" | "drugs" | "admit" | "transfer" | "refer";
+type Dialog =
+  "note" | "vitals" | "lab" | "scan" | "drugs" | "admit" | "transfer" | "refer" | "task";
 
 const outline = "h-12 gap-2 bg-card px-5 type-body-sm-medium";
 
@@ -63,7 +65,8 @@ const outline = "h-12 gap-2 bg-card px-5 type-body-sm-medium";
  * - A check-in: before the consultation is theirs, see the patient (claim it). While it is,
  *   write an encounter note, order tests, scans and drugs, ask a nurse for vitals, request
  *   admission, refer out, end it.
- * - An active admission: order, transfer to another bed, refer out.
+ * - An active admission: set care tasks for the nurses, order, transfer to another bed, refer
+ *   out.
  */
 export function DoctorPatientActions({
   visit,
@@ -161,10 +164,22 @@ export function DoctorPatientActions({
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-      {isCheckIn && (
+      {isCheckIn ? (
         <Button className="h-12 px-5 type-heading-sm" onClick={() => setDialog("note")}>
           New encounter note
         </Button>
+      ) : (
+        <Button className="h-12 px-5 type-heading-sm" onClick={() => setDialog("task")}>
+          New care task
+        </Button>
+      )}
+      {!isCheckIn && (
+        <CareTaskDialog
+          open={dialog === "task"}
+          onOpenChange={toggle("task")}
+          admissionId={id}
+          patientName={patientName}
+        />
       )}
 
       {isCheckIn && (

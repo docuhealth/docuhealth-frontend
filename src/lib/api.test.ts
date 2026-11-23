@@ -44,6 +44,39 @@ describe("request", () => {
     });
     expect(useAuthStore.getState().session?.accessToken).toBe("mock-access");
   });
+
+  it("refreshes for the staff profile too (under /api/auth/), but not for a failed login", async () => {
+    useAuthStore.getState().setSession({
+      accessToken: "old",
+      refreshToken: "r",
+      user: { id: "u", name: "U", email: "u@example.com", role: "member" },
+    });
+    const profile = `${env.VITE_API_URL}/api/auth/staff/profile`;
+    server.use(
+      http.post(`${env.VITE_API_URL}/api/auth/refresh`, () =>
+        HttpResponse.json({ data: { access_token: "fresh" } }),
+      ),
+      http.get(profile, ({ request }) =>
+        request.headers.get("Authorization") === "Bearer fresh"
+          ? HttpResponse.json({ id: "me" })
+          : new HttpResponse(null, { status: 401 }),
+      ),
+      http.post(`${env.VITE_API_URL}/api/auth/login`, () =>
+        HttpResponse.json({ detail: "Invalid login credentials." }, { status: 401 }),
+      ),
+    );
+    await expect(
+      request(z.object({ id: z.string() }), { url: "/api/auth/staff/profile" }),
+    ).resolves.toEqual({ id: "me" });
+
+    useAuthStore.getState().setTokens({ accessToken: "stale" });
+    const login = await request(z.unknown(), { method: "POST", url: "/api/auth/login" }).catch(
+      (error: unknown) => error,
+    );
+    expect(getErrorMessage(login)).toBe("Invalid login credentials.");
+    // A wrong password doesn't trigger a refresh.
+    expect(useAuthStore.getState().session?.accessToken).toBe("stale");
+  });
 });
 
 describe("getErrorMessage", () => {

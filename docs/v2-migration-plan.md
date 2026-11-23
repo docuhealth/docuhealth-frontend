@@ -113,7 +113,16 @@ Built in seven steps, one commit each; what v1 does and the endpoints behind it 
       DocuHealth hospital, with a reason). From a consultation that's the doctor's, or an active
       admission. Checked on staging as the doctor (reads: 79 lab tests, scans, drugs, hospitals,
       wards; nothing ordered)
-- [ ] 4.5 Inpatient care: doctor care tasks, nurse task queue and charts, Tasks page
+- [x] 4.5 Inpatient care: the doctor sets care tasks on an admission (vital signs, medication,
+      fluids, procedure, glucose, IV fluid, seizure watch; start, frequency, until discharge or
+      for a set time, priority) and sees them under Care tasks; the nurse's task queue on the
+      admission and on a Tasks page for every patient (claim, record each type's details, confirm
+      a medication, release, escalate, mark missed); charts and today's fluid balance. The
+      discharge checklist task comes in 4.7. Checked on staging (reads: the doctor's task
+      history; the nurse's list against staging's own rows in a test)
+- [x] Fixed: an expired access token now refreshes for the staff profile too (it's under
+      /api/auth/, which skipped the refresh), so dashboards no longer fail after a while; a
+      sign-in that can't be refreshed shows "You're signed out" with a way back to log in
 - [ ] 4.6 Notes: admission note, case notes, care plans, vitals history, progress notes, shared
       SOAP notes, handovers
 - [ ] 4.7 Discharge, results, overviews: doctor discharge form, nurse discharge checklist, result

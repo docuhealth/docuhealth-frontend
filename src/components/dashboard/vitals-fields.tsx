@@ -31,9 +31,18 @@ const fields: { key: Key; label: string; unit?: string; placeholder: string; cor
 /**
  * The vital signs inputs, in a two-column grid, inside a form whose values have `vitals` (see
  * `vitalsFormSchema`; wrap the form in react-hook-form's `FormProvider`). BMI is worked out from
- * height and weight as they're typed. `core` marks the four a full set needs.
+ * height and weight as they're typed. `core` marks the four a full set needs; `only` shows just
+ * these (each then needed), e.g. the vital signs a care task asks for.
  */
-export function VitalsFields({ core = true, idPrefix }: { core?: boolean; idPrefix: string }) {
+export function VitalsFields({
+  core = true,
+  only,
+  idPrefix,
+}: {
+  core?: boolean;
+  only?: readonly Key[];
+  idPrefix: string;
+}) {
   const { register, control, formState } = useFormContext<{ vitals: VitalsFormValues }>();
   const [height, weight] = useWatch({ control, name: ["vitals.height", "vitals.weight"] });
   const bmi = bmiOf(height ?? "", weight ?? "");
@@ -41,37 +50,42 @@ export function VitalsFields({ core = true, idPrefix }: { core?: boolean; idPref
 
   return (
     <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2">
-      {fields.map(({ key, label, unit, placeholder, core: needed }) => {
-        const id = `${idPrefix}-${key}`;
-        const error = errors?.[key];
-        return (
-          <Field key={key} data-invalid={!!error}>
-            <FieldLabel htmlFor={id} className="gap-1">
-              {label} {core && needed && <RequiredMark />}
-            </FieldLabel>
-            <InputGroup className="bg-card">
-              <InputGroupInput
-                id={id}
-                inputMode={key === "blood_pressure" ? "text" : "decimal"}
-                autoComplete="off"
-                placeholder={placeholder}
-                aria-required={core && needed}
-                aria-invalid={!!error}
-                {...register(`vitals.${key}`)}
-              />
-              {unit && (
-                <InputGroupAddon align="inline-end">
-                  <InputGroupText>{unit}</InputGroupText>
-                </InputGroupAddon>
-              )}
-            </InputGroup>
-            <FieldError errors={[error]} />
-          </Field>
-        );
-      })}
-      <p className="type-body-sm-regular text-fg-caption sm:col-span-2">
-        BMI: {bmi === null ? "worked out from height and weight" : bmi}
-      </p>
+      {fields
+        .filter(({ key }) => !only || only.includes(key))
+        .map(({ key, label, unit, placeholder, core: coreField }) => {
+          const needed = only ? true : core && coreField;
+          const id = `${idPrefix}-${key}`;
+          const error = errors?.[key];
+          return (
+            <Field key={key} data-invalid={!!error}>
+              <FieldLabel htmlFor={id} className="gap-1">
+                {label} {needed && <RequiredMark />}
+              </FieldLabel>
+              <InputGroup className="bg-card">
+                <InputGroupInput
+                  id={id}
+                  inputMode={key === "blood_pressure" ? "text" : "decimal"}
+                  autoComplete="off"
+                  placeholder={placeholder}
+                  aria-required={needed}
+                  aria-invalid={!!error}
+                  {...register(`vitals.${key}`)}
+                />
+                {unit && (
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupText>{unit}</InputGroupText>
+                  </InputGroupAddon>
+                )}
+              </InputGroup>
+              <FieldError errors={[error]} />
+            </Field>
+          );
+        })}
+      {(!only || (only.includes("height") && only.includes("weight"))) && (
+        <p className="type-body-sm-regular text-fg-caption sm:col-span-2">
+          BMI: {bmi === null ? "worked out from height and weight" : bmi}
+        </p>
+      )}
     </div>
   );
 }

@@ -3,7 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { clinicalProfileQuery, visitQuery } from "@/features/clinical/api/queries";
 import { visitListSchema } from "@/features/clinical/api/schemas";
+import { AdmissionCharts } from "@/features/clinical/components/admission-charts";
 import { PatientPage } from "@/features/clinical/components/patient-page";
+import { CareTaskHistory } from "@/features/doctor/components/care-task-history";
 import { DoctorPatientActions } from "@/features/doctor/components/doctor-patient-actions";
 import { EncounterNotes } from "@/features/doctor/components/encounter-notes";
 import { LabResults } from "@/features/doctor/components/lab-results";
@@ -47,6 +49,20 @@ function VisitPage() {
           content: <EncounterNotes hin={visit.patient.hin} />,
         },
         { value: "lab", label: "Lab results", content: <LabResults hin={visit.patient.hin} /> },
+        ...(visit.kind === "admission"
+          ? [
+              {
+                value: "tasks",
+                label: "Care tasks",
+                content: <CareTaskHistory admissionId={visit.id} />,
+              },
+              {
+                value: "charts",
+                label: "Charts",
+                content: <AdmissionCharts admissionId={visit.id} />,
+              },
+            ]
+          : []),
       ]}
     />
   );

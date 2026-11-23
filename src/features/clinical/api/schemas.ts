@@ -242,6 +242,15 @@ function textOf(value: unknown): string | null {
   return null;
 }
 
+/** An untyped record's fields worth reading, as label and value, in the order sent. */
+function recordDetails(record: Record<string, unknown>) {
+  return Object.entries(record).flatMap(([key, value]) => {
+    if (hiddenKeys.has(key) || key.endsWith("_info") || key.endsWith("_at")) return [];
+    const shown = textOf(value);
+    return shown ? [{ label: labelOf(key), value: shown }] : [];
+  });
+}
+
 export type VisitRecord = {
   id: string;
   type: string;
@@ -270,11 +279,66 @@ export const visitRecordPageSchema = z.object({
         title: recordTypeLabels[event.record_type] ?? sentence(event.record_type),
         at: event.created_at,
         by: event.staff_info,
-        details: Object.entries(event.record ?? {}).flatMap(([key, value]) => {
-          if (hiddenKeys.has(key) || key.endsWith("_info") || key.endsWith("_at")) return [];
-          const shown = textOf(value);
-          return shown ? [{ label: labelOf(key), value: shown }] : [];
-        }),
+        details: recordDetails(event.record ?? {}),
       })),
   ),
 });
+
+/** An admission's charts, as the API names them. */
+export const chartLabels = {
+  "vital-signs": "Vital signs",
+  medications: "Medications",
+  "fluid-balance": "Fluid intake and output",
+  glucose: "Blood glucose",
+  "iv-fluids": "IV fluids",
+  procedures: "Procedures",
+  seizures: "Seizures",
+} as const;
+export type Chart = keyof typeof chartLabels;
+
+export type ChartEntry = {
+  id: string;
+  at: string | null;
+  by: string | null;
+  details: { label: string; value: string }[];
+};
+
+/** The staff named on a chart entry, under whichever key the chart uses. */
+const byKeys = ["recorded_by_info", "completed_by_info", "staff_info", "administered_by_info"];
+
+/**
+ * `GET /api/records/admissions/{sqid}/charts/{chart}`: a page of entries. TODO(api): there's no
+ * response schema, so each entry's fields are shown as sent.
+ */
+export const chartPageSchema = z.object({
+  count: count,
+  results: z.array(
+    z.record(z.string(), z.unknown()).transform((entry, context): ChartEntry => {
+      const id = entry.sqid ?? entry.id;
+      if (typeof id !== "string" && typeof id !== "number") {
+        context.addIssue({ code: "custom", message: "A chart entry without an id" });
+        return z.NEVER;
+      }
+      const at = [entry.recorded_at, entry.created_at, entry.completed_at].find(
+        (value): value is string => typeof value === "string",
+      );
+      const by = byKeys
+        .map((key) => personSchema.safeParse(entry[key]))
+        .find((parsed) => parsed.success && parsed.data)?.data;
+      return { id: String(id), at: at ?? null, by: by ?? null, details: recordDetails(entry) };
+    }),
+  ),
+});
+
+/** `GET /api/records/admissions/{sqid}/fluid-balance`: today's intake, output and balance (ml). */
+export const fluidBalanceSchema = z
+  .object({
+    total_intake: z.coerce.number(),
+    total_output: z.coerce.number(),
+    fluid_balance: z.coerce.number(),
+  })
+  .transform((balance) => ({
+    intake: balance.total_intake,
+    output: balance.total_output,
+    balance: balance.fluid_balance,
+  }));
