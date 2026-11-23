@@ -1,3 +1,4 @@
+import admissionIconUrl from "@/assets/svgs/admission.svg";
 import appointmentIconUrl from "@/assets/svgs/appointment.svg";
 import dashboardIconUrl from "@/assets/svgs/dashboard.svg";
 import healthIconUrl from "@/assets/svgs/health.svg";
@@ -16,6 +17,7 @@ export function NurseSidebar({ unreadMessages }: { unreadMessages: number }) {
       items: [
         { to: "/hospital/nurse", label: "Overview", icon: dashboardIconUrl },
         { to: "/hospital/nurse/encounters", label: "Nursing Encounter", icon: staffIconUrl },
+        { to: "/hospital/nurse/handovers", label: "Handover notes", icon: admissionIconUrl },
         { to: "/hospital/nurse/tasks", label: "Tasks", icon: taskIconUrl },
         { to: "/hospital/nurse/patients", label: "Patient Mgt.", icon: patientIconUrl },
         { to: "/hospital/nurse/appointments", label: "Appointments", icon: appointmentIconUrl },

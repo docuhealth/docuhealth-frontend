@@ -123,8 +123,14 @@ Built in seven steps, one commit each; what v1 does and the endpoints behind it 
 - [x] Fixed: an expired access token now refreshes for the staff profile too (it's under
       /api/auth/, which skipped the refresh), so dashboards no longer fail after a while; a
       sign-in that can't be refreshed shows "You're signed out" with a way back to log in
-- [ ] 4.6 Notes: admission note, case notes, care plans, vitals history, progress notes, shared
-      SOAP notes, handovers
+- [x] 4.6 Notes: a Notes tab on admissions (doctor: progress, admission and case notes; nurse:
+      admission notes, case notes, care plans, vital signs, progress notes) and the doctors' shared
+      notes on a nurse's check-in; the nurse writes the admission note (and can't work the
+      admission's tasks until it's written), case notes, care plans and vitals; the doctor writes
+      progress notes; both hand patients over to a colleague, with a Handover notes page. Checked
+      on staging (reads: the pages, and every kind's rows parsed in a test)
+- [x] Fixed: switching a list's kind (notes, charts, received/sent handovers) no longer shows the
+      last kind's rows under the new heading while it loads
 - [ ] 4.7 Discharge, results, overviews: doctor discharge form, nurse discharge checklist, result
       review, doctor overview, assign appointments
 

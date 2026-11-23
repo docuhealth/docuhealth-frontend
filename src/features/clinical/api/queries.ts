@@ -1,5 +1,6 @@
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { request } from "@/lib/api";
+import { keepPreviousPage } from "@/lib/keep-previous-page";
 import {
   type Chart,
   chartPageSchema,
@@ -122,7 +123,7 @@ export const chartQuery = (admissionId: string, chart: Chart, page: number) =>
       });
       return { total: count, items: results };
     },
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousPage(clinicalKeys.chart(admissionId, chart, page)),
   });
 
 /** Today's fluid balance (from midnight UTC). */

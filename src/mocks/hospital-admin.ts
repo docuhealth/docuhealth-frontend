@@ -118,7 +118,7 @@ const bedInfo = (index: number, status: string) => ({
 const rows: Record<string, Record<string, unknown>[]> = {
   inpatient: [2, 26, 43, 50, 75, 120, 200, 260].map((hours, index) => ({
     sqid: `admission-${index + 1}`,
-    status: "admitted",
+    status: "active",
     patient_info: pick(patients, index),
     requested_by_info: pick(doctors, index),
     ward_info: wardInfo(index % 3),

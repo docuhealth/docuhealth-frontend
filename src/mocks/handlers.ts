@@ -8,6 +8,7 @@ import { doctorHandlers } from "@/mocks/doctor";
 import { doctorOrderHandlers } from "@/mocks/doctor-orders";
 import { hospitalAdminHandlers } from "@/mocks/hospital-admin";
 import { labScientistHandlers } from "@/mocks/lab-scientist";
+import { noteHandlers } from "@/mocks/notes";
 import { nurseHandlers } from "@/mocks/nurse";
 import { pharmacyHandlers } from "@/mocks/pharmacy";
 import { radiologistHandlers } from "@/mocks/radiologist";
@@ -29,6 +30,7 @@ export const handlers: RequestHandler[] = [
   ...radiologistHandlers,
   ...labScientistHandlers,
   ...nurseHandlers,
+  ...noteHandlers,
   ...pharmacyHandlers,
   ...staffHandlers,
 ];

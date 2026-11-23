@@ -1,8 +1,11 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { visitQuery } from "@/features/clinical/api/queries";
+import { clinicalProfileQuery, visitQuery } from "@/features/clinical/api/queries";
 import { visitListSchema } from "@/features/clinical/api/schemas";
 import { AdmissionCharts } from "@/features/clinical/components/admission-charts";
+import { AdmissionNoteGate, NoteActions } from "@/features/clinical/components/note-actions";
+import { PatientNotes } from "@/features/clinical/components/patient-notes";
 import { PatientPage } from "@/features/clinical/components/patient-page";
 import { TaskQueue } from "@/features/nurse/components/task-queue";
 
@@ -16,21 +19,40 @@ export const Route = createFileRoute("/hospital/nurse/patients/$visitId")({
   component: VisitPage,
 });
 
-/** The patient page, with the nurse's tasks and charts on an admission. */
+/**
+ * The patient page, with the nurse's notes, tasks and charts on an admission (the tasks once the
+ * admission note is written), and the doctors' shared notes on a check-in.
+ */
 function VisitPage() {
   const { visitId } = Route.useParams();
   const { list } = Route.useSearch();
+  const { data: profile } = useSuspenseQuery(clinicalProfileQuery());
   return (
     <PatientPage
       list={list}
       visitId={visitId}
+      actions={(visit) => <NoteActions staff="nurse" visit={visit} myId={profile.user.id} />}
       tabs={(visit) =>
         visit.kind === "admission"
           ? [
               {
                 value: "tasks",
                 label: "Nursing tasks",
-                content: <TaskQueue admissionId={visit.id} />,
+                content: (
+                  <AdmissionNoteGate visit={visit}>
+                    <TaskQueue admissionId={visit.id} />
+                  </AdmissionNoteGate>
+                ),
+              },
+              {
+                value: "notes",
+                label: "Notes",
+                content: (
+                  <PatientNotes
+                    hin={visit.patient.hin}
+                    kinds={["admission", "case", "care-plan", "vitals", "progress"]}
+                  />
+                ),
               },
               {
                 value: "charts",
@@ -38,7 +60,13 @@ function VisitPage() {
                 content: <AdmissionCharts admissionId={visit.id} />,
               },
             ]
-          : []
+          : [
+              {
+                value: "notes",
+                label: "Doctors’ notes",
+                content: <PatientNotes hin={visit.patient.hin} kinds={["shared", "vitals"]} />,
+              },
+            ]
       }
     />
   );

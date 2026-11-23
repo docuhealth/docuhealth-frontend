@@ -9,6 +9,8 @@ import { CareTaskHistory } from "@/features/doctor/components/care-task-history"
 import { DoctorPatientActions } from "@/features/doctor/components/doctor-patient-actions";
 import { EncounterNotes } from "@/features/doctor/components/encounter-notes";
 import { LabResults } from "@/features/doctor/components/lab-results";
+import { NoteActions } from "@/features/clinical/components/note-actions";
+import { PatientNotes } from "@/features/clinical/components/patient-notes";
 
 export const Route = createFileRoute("/hospital/doctor/patients/$visitId")({
   validateSearch: z.object({
@@ -30,17 +32,20 @@ function VisitPage() {
       list={list}
       visitId={visitId}
       actions={(visit) => (
-        <DoctorPatientActions
-          myId={profile.user.id}
-          ownHospital={profile.hospital.name}
-          visit={{
-            kind: visit.kind,
-            id: visit.id,
-            hin: visit.patient.hin,
-            patientName: visit.patient.name,
-            status: visit.status,
-          }}
-        />
+        <>
+          <NoteActions staff="doctor" visit={visit} myId={profile.user.id} />
+          <DoctorPatientActions
+            myId={profile.user.id}
+            ownHospital={profile.hospital.name}
+            visit={{
+              kind: visit.kind,
+              id: visit.id,
+              hin: visit.patient.hin,
+              patientName: visit.patient.name,
+              status: visit.status,
+            }}
+          />
+        </>
       )}
       tabs={(visit) => [
         {
@@ -51,6 +56,14 @@ function VisitPage() {
         { value: "lab", label: "Lab results", content: <LabResults hin={visit.patient.hin} /> },
         ...(visit.kind === "admission"
           ? [
+              {
+                value: "progress",
+                label: "Notes",
+                // TODO(api): doctors can't read care plans or the vitals history yet.
+                content: (
+                  <PatientNotes hin={visit.patient.hin} kinds={["progress", "admission", "case"]} />
+                ),
+              },
               {
                 value: "tasks",
                 label: "Care tasks",

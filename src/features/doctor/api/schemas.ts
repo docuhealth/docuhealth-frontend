@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { personSchema, type VitalSigns, vitalSignsSchema } from "@/lib/clinical";
+import {
+  noteText,
+  personSchema,
+  soapSectionLabels,
+  type VitalSigns,
+  vitalSignsSchema,
+} from "@/lib/clinical";
 import { type PatientSex, sexOf } from "@/lib/patient-record";
 import { fullName, optionalText, staffMemberSchema, text } from "@/lib/staff-profile";
 
@@ -162,41 +168,6 @@ export const doctorQueuePageSchema = z.object({
   ),
 });
 
-/** A note field as text: lists one item per line; blank when there's nothing. */
-const noteText = z
-  .union([z.string(), z.array(z.unknown())])
-  .nullish()
-  .transform((value) => {
-    if (!value) return "";
-    if (Array.isArray(value)) {
-      return value
-        .map((item) => (typeof item === "string" ? item.trim() : ""))
-        .filter(Boolean)
-        .join("\n");
-    }
-    return value.trim();
-  });
-
-const sectionLabels = [
-  ["history_of_complain", "History of the complaint"],
-  ["past_med_history", "Past medical history"],
-  ["drug_history_allergies", "Drug history and allergies"],
-  ["family_history", "Family history"],
-  ["social_history", "Social history"],
-  ["other_history", "Other history"],
-  ["review", "Review of systems"],
-  ["general_exam", "General examination"],
-  ["systemic_exam", "Systemic examination"],
-  ["bedside_tests", "Bedside tests"],
-  ["investigations", "Investigations"],
-  ["differential_diagnosis", "Differential diagnosis"],
-  ["problems_list", "Problems"],
-  ["treatment_plan", "Treatment plan"],
-  ["care_instructions", "Care instructions"],
-  ["patient_education", "Patient education"],
-  ["referred_hosp", "Referred to"],
-] as const;
-
 /** `SoapNoteRead`. */
 const encounterNoteSchema = z
   .object({
@@ -210,7 +181,7 @@ const encounterNoteSchema = z
     additional_notes: z
       .array(z.object({ id: z.union([z.number(), z.string()]), note: text, created_at: dateTime }))
       .catch([]),
-    ...Object.fromEntries(sectionLabels.map(([key]) => [key, noteText])),
+    ...Object.fromEntries(soapSectionLabels.map(([key]) => [key, noteText])),
   })
   .transform((note): EncounterNote => {
     const fields = note as unknown as Record<string, string>;
@@ -221,7 +192,7 @@ const encounterNoteSchema = z
       chiefComplaint: note.chief_complaint,
       primaryDiagnosis: note.primary_diagnosis,
       sharedWithNurses: !!note.is_shared,
-      sections: sectionLabels.flatMap(([key, label]) =>
+      sections: soapSectionLabels.flatMap(([key, label]) =>
         fields[key] ? [{ label, text: fields[key] }] : [],
       ),
       nextAppointment: note.next_appointment_info?.scheduled_time ?? null,

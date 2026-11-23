@@ -84,3 +84,39 @@ export const vitalSignsSchema = z
       return value == null || value === "" ? [] : [{ label, value: `${value}${unit}` }];
     }),
   }));
+
+/** A note field as text: lists one item per line; blank when there's nothing. */
+export const noteText = z
+  .union([z.string(), z.array(z.unknown())])
+  .nullish()
+  .transform((value) => {
+    if (!value) return "";
+    if (Array.isArray(value)) {
+      return value
+        .map((item) => (typeof item === "string" ? item.trim() : ""))
+        .filter(Boolean)
+        .join("\n");
+    }
+    return value.trim();
+  });
+
+/** A SOAP (encounter) note's sections after the complaint and diagnosis, in order. */
+export const soapSectionLabels = [
+  ["history_of_complain", "History of the complaint"],
+  ["past_med_history", "Past medical history"],
+  ["drug_history_allergies", "Drug history and allergies"],
+  ["family_history", "Family history"],
+  ["social_history", "Social history"],
+  ["other_history", "Other history"],
+  ["review", "Review of systems"],
+  ["general_exam", "General examination"],
+  ["systemic_exam", "Systemic examination"],
+  ["bedside_tests", "Bedside tests"],
+  ["investigations", "Investigations"],
+  ["differential_diagnosis", "Differential diagnosis"],
+  ["problems_list", "Problems"],
+  ["treatment_plan", "Treatment plan"],
+  ["care_instructions", "Care instructions"],
+  ["patient_education", "Patient education"],
+  ["referred_hosp", "Referred to"],
+] as const;
