@@ -25,9 +25,15 @@ const copy = {
       "Enter your facility’s registered email and we’ll send you a code to reset your password.",
     loginTo: "/hospital/login",
   },
+  // The API wants no account type for DocuHealth's own admins.
+  dhadmin: {
+    accountType: null,
+    description: "Enter your admin email and we’ll send you a code to reset your password.",
+    loginTo: "/admin/login",
+  },
 } satisfies Record<
   string,
-  { accountType: AccountType; description: string; loginTo: LinkProps["to"] }
+  { accountType: AccountType | null; description: string; loginTo: LinkProps["to"] }
 >;
 
 /**
@@ -50,7 +56,7 @@ export function PasswordReset({ audience }: { audience: keyof typeof copy }) {
       const normalizedEmail = values.email.trim();
       await forgotPasswordMutation.mutateAsync({
         email: normalizedEmail,
-        account_type: accountType,
+        account_type: accountType ?? undefined,
       });
       setEmail(normalizedEmail);
       setStep("code");
@@ -64,7 +70,7 @@ export function PasswordReset({ audience }: { audience: keyof typeof copy }) {
       const response = await verifyOtpMutation.mutateAsync({
         email,
         otp: code,
-        account_type: accountType,
+        account_type: accountType ?? undefined,
       });
       setResetToken(response.resetToken);
       setStep("password");
@@ -101,7 +107,7 @@ export function PasswordReset({ audience }: { audience: keyof typeof copy }) {
         onResend={async () => {
           await forgotPasswordMutation.mutateAsync({
             email,
-            account_type: accountType,
+            account_type: accountType ?? undefined,
           });
         }}
       />

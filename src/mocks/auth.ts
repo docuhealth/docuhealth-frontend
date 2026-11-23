@@ -37,6 +37,16 @@ export const authHandlers = [
       );
     }
 
+    // A DocuHealth admin logs in without an account type, as on staging: `role` and nothing else.
+    if (!body.account_type && scenario === "dhadmin") {
+      return HttpResponse.json({
+        access_token: "mock-access-token",
+        refresh_token: "mock-refresh-token",
+        role: "dhadmin",
+        next_step: null,
+      });
+    }
+
     const isStaff = body.account_type === "staff";
     const staff = staffScenarios[scenario] ?? { role: "doctor", isAdmin: true };
     const nextStep = isStaff

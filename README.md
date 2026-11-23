@@ -232,8 +232,23 @@ agent section.
 
 ### DocuHealth admins
 
-Not built. The subdomain is reserved in `src/lib/sections.ts`, but `src/routes/admin/` doesn't
-exist yet, so `admin.<domain>` shows the 404 page.
+DocuHealth's own admins (the `dhadmin` role), on `admin.<domain>` (`src/features/dh-admin/`).
+
+| Path                         | Page                                                    |
+| ---------------------------- | ------------------------------------------------------- |
+| `/login`, `/forgot-password` | Log in and reset the password (no account type is sent) |
+| `/`                          | Overview: totals, registrations, subscriptions, revenue |
+| `/users`                     | Individuals and hospitals; deactivate and activate them |
+| `/applications`              | Facility applications by status; approve or reject      |
+| `/plans`                     | Subscription plans; add and edit                        |
+| `/settings`, `/help`         | Settings (change password) and help                     |
+
+```
+Log in:    /login → / (a dhadmin who logs in elsewhere is sent here too)
+Reset:     /forgot-password → email → code → new password → /login
+```
+
+With the mock API, log in as `dhadmin@…` with any password.
 
 ## Conventions
 

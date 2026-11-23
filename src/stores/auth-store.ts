@@ -118,8 +118,16 @@ function isFacilityAdmin(session: Session | null) {
 /** Whether the signed-in staff member is their facility's admin (see `isFacilityAdmin`). */
 export const useIsFacilityAdmin = () => useAuthStore((state) => isFacilityAdmin(state.session));
 
+/** The role a DocuHealth admin's login carries; they run the `admin.` section. */
+export const DOCUHEALTH_ADMIN_ROLE = "dhadmin";
+
+/** Whether the session is a DocuHealth admin's. */
+export const isDocuHealthAdmin = (session: Session | null) =>
+  session?.user.role === DOCUHEALTH_ADMIN_ROLE;
+
 /** The dashboards a signed-in user can land on. */
 export type Dashboard =
+  | "/admin"
   | "/patient"
   | "/hospital/admin"
   | "/hospital/receptionist"
@@ -151,6 +159,7 @@ export function getPostLoginDestination(
   session: Session | null,
 ): Dashboard | "/verify-nin" | "/hospital/first-login" | "/login" {
   if (!session) return "/login";
+  if (isDocuHealthAdmin(session)) return "/admin";
 
   if (session.nextStep === "nin_not_verified") {
     return "/verify-nin";

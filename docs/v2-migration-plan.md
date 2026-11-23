@@ -143,8 +143,16 @@ Built in seven steps, one commit each; what v1 does and the endpoints behind it 
 
 ## Phase 5: Super admin (`admin.` subdomain)
 
-- [ ] Login, password reset and routing for `dhadmin`
-- [ ] Overview, users (activate / deactivate), subscription plans, facility applications, settings
+- [x] Login, password reset and routing for `dhadmin`: `admin.<domain>/login` and
+      `/forgot-password` send no account type (as the API asks for DH admins); a dhadmin's session
+      lands on the admin section from any login, and logging out returns there
+- [x] Overview (users, hospitals, individuals, subscribed, revenue; registrations, subscriptions
+      and revenue by day, month or year; users by state; individuals with dependants), Users
+      (individuals and hospitals, search, deactivate / activate), Facility applications (by
+      status, documents, approve with a login link / reject with a reason), Subscription plans
+      (add, edit), Settings (change password). Built from v1 with v2's parts (no design).
+      Checked on staging (reads: every reply parsed in a test; the login page); nothing was
+      approved, rejected, switched off or changed on staging
 
 ## Phase 6: Landing pages
 

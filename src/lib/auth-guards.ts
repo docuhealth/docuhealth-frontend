@@ -14,6 +14,7 @@ import {
 const openWithoutSession = import.meta.env.DEV && env.VITE_ENABLE_MOCKS;
 
 function loginFor(page: string) {
+  if (page === "/admin") return "/admin/login";
   return page === "/patient" || page === "/verify-nin" ? "/login" : "/hospital/login";
 }
 

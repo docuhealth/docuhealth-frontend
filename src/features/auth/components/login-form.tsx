@@ -40,16 +40,26 @@ const copy = {
       to: "/hospital/register",
     },
   },
+  // DocuHealth's own admins: no account type (the API wants none for them), no sign-up.
+  dhadmin: {
+    title: "DocuHealth admin",
+    accountType: null,
+    schema: staffLoginSchema,
+    identifierLabel: "Email address",
+    identifierPlaceholder: "you@docuhealthservices.net",
+    forgotPasswordTo: "/admin/forgot-password",
+    signUp: null,
+  },
 } satisfies Record<
   string,
   {
     title: string;
-    accountType: AccountType;
+    accountType: AccountType | null;
     schema: typeof patientLoginSchema;
     identifierLabel: string;
     identifierPlaceholder: string;
     forgotPasswordTo: LinkProps["to"];
-    signUp: { prompt: string; linkText: string; to: LinkProps["to"] };
+    signUp: { prompt: string; linkText: string; to: LinkProps["to"] } | null;
   }
 >;
 
@@ -78,10 +88,10 @@ export function LoginForm({ audience }: { audience: keyof typeof copy }) {
       const response = await loginMutation.mutateAsync({
         identifier: values.identifier.trim(),
         password: values.password,
-        account_type: accountType,
+        account_type: accountType ?? undefined,
       });
       const session = buildSessionFromLoginResponse(response, {
-        accountType,
+        accountType: accountType ?? undefined,
         identifier: values.identifier.trim(),
       });
       useAuthStore.getState().setSession(session);
@@ -97,12 +107,16 @@ export function LoginForm({ audience }: { audience: keyof typeof copy }) {
       <AuthHeader
         title={title}
         description={
-          <>
-            {signUp.prompt}{" "}
-            <Link to={signUp.to} className="text-primary hover:underline">
-              {signUp.linkText}
-            </Link>
-          </>
+          signUp ? (
+            <>
+              {signUp.prompt}{" "}
+              <Link to={signUp.to} className="text-primary hover:underline">
+                {signUp.linkText}
+              </Link>
+            </>
+          ) : (
+            "Sign in to run DocuHealth."
+          )
         }
       />
 

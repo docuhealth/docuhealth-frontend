@@ -12,7 +12,7 @@ import {
   verifySignupCodeResponseSchema,
 } from "@/features/auth/api/schemas";
 import { request } from "@/lib/api";
-import { type AccountType, type Session } from "@/stores/auth-store";
+import { type AccountType, DOCUHEALTH_ADMIN_ROLE, type Session } from "@/stores/auth-store";
 
 export function buildSessionFromLoginResponse(
   payload: LoginResponse,
@@ -25,8 +25,10 @@ export function buildSessionFromLoginResponse(
   const firstStaffContext = payload.acting_as.find(
     (ctx) => ctx.type === "facility_staff" || Boolean(ctx.facility),
   );
-  const inferredAccountType: AccountType =
-    options.accountType ?? (firstStaffContext ? "staff" : "patient");
+  const isDocuHealthAdmin = payload.role === DOCUHEALTH_ADMIN_ROLE;
+  const inferredAccountType: AccountType | undefined = isDocuHealthAdmin
+    ? undefined
+    : (options.accountType ?? (firstStaffContext ? "staff" : "patient"));
 
   const fullName =
     payload.user?.name ??
@@ -50,7 +52,9 @@ export function buildSessionFromLoginResponse(
         firstStaffContext?.staff_role ??
         firstStaffContext?.role ??
         payload.user?.role ??
-        inferredAccountType,
+        payload.role ??
+        inferredAccountType ??
+        "member",
       hin: hinValue !== undefined && hinValue !== null ? String(hinValue) : null,
       phone: payload.user?.phone_num ?? null,
     },

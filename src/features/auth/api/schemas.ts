@@ -65,6 +65,8 @@ const loginPayloadCoreSchema = z.object({
   next_step: nextStepSchema,
   hin: z.union([z.string(), z.number()]).optional(),
   user: authUserPayloadSchema.optional(),
+  /** Only on a DocuHealth admin's login (`dhadmin`), which has no `acting_as` or `user`. */
+  role: z.string().optional(),
 });
 
 export const loginResponseSchema = unwrapEnvelope(loginPayloadCoreSchema);

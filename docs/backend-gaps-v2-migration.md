@@ -240,3 +240,14 @@ call-by-call table is in `docs/api-mapping-redesigned-dashboards.md`. These are 
 5. **Allergies** on a drug record are untyped (staging has `[]` and `["No allergies"]`). A typed list on the order (not per drug) would be clearer.
 6. **Pharmacy dashboard numbers.** There's no pharmacy dashboard endpoint; the overview counts lists with `size=1`. A summary (pending, settled, dispensed today/this month, recent patients) would save the calls.
 7. **Search** on `GET /api/pharmacy/orders` (patient name or HIN) would help as the list grows.
+
+### DocuHealth admin (`dhadmin`)
+
+1. **No admin profile.** A dhadmin's login returns only `role` and the tokens (no `user`, no `acting_as`), and there's no profile endpoint, so the top bar shows the email they typed and Settings can only change the password. Please add the admin's name and email to the login reply, or a profile endpoint.
+2. **Response schemas.** `GET /api/admin/users/{role}` and `GET /api/admin/dashboard/{states,sub-accounts,subscriptions,users,revenue}` have none. Seen on staging: users are `{full_name, email, phone_num, dob, gender, hin, is_active}` and hospitals `{sqid, name, profile_image, address, email, doctors, other_personnel, is_active}`; trends are `[{month, value}]`, with the bucket named `month` even for days and years.
+3. **Hospital rows.** `profile_image` is an object (`{id, url, path}`), and `address` comes back as `"None, None, None, None"` when empty. Please send the URL and `null`.
+4. **States.** `GET /api/admin/dashboard/states` isn't normalized: `ek`, `oy`, `novascotia`, `string` sit beside `ekiti`, `oyo`. Validating states at sign-up (or mapping them) would make the chart meaningful.
+5. **Who reviewed an application.** Approved applications on staging have `reviewed_by` and `reviewed_at` null. Please record them.
+6. **Activating and deactivating.** The schema takes hospital sqids (`{facilities: []}`) and patient HINs (`{hins: []}`); v1 sent `{hins}` for hospitals and `{patient_ids}` for patients. The UI follows the schema; it wasn't tried on staging, to avoid switching off shared accounts. Please confirm.
+7. **Plans.** There's no way to retire or delete a plan, and `test` plans are listed with the real ones. A new plan has no `paystack_plan_code` until Paystack has it; please say whether the API creates the Paystack plan, and when.
+8. **Overview totals** have no change against the period before (the hospital admin's and doctor's dashboards do), and `start_date`/`end_date` aren't explained.
