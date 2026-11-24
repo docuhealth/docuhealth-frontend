@@ -71,7 +71,7 @@ export function DocuhealthCoreProduct() {
             alt="Patient discharge record and lab result permissions"
             bodyClassName="mt-8"
             audience="For Patients"
-            name="DocuCore"
+            name="MyDocuHealth"
             tagline="Your lifelong health companion."
             description="View your results and summaries, track medications and appointments, and use secure messaging and telehealth. You decide who sees your health information."
           />
