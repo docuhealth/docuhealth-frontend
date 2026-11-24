@@ -18,7 +18,7 @@ dashboard is connected; the newest are at the bottom.
 
 ## 1. CORS: the v2 test site and subdomains are still blocked
 
-Reported on 18 Nov (`backend-handoff-2026-11-18.md`, item 2), still open on 21 Nov, and worse on
+Reported on 18 Nov, still open on 21 Nov, and worse on
 24 Nov 2026: the staging API now returns no `Access-Control-Allow-Origin` for **any** origin we
 tried, including `http://localhost:5173`, which it used to allow. Any browser app calling staging
 directly (v1 included, unless it proxies) can't read the replies.
@@ -48,7 +48,10 @@ the API from `*.v2.docuhealthservices.net`, and the super admin dashboard (`admi
       on staging.
 - [ ] Allow `https://admin.docuhealthservices.net` and `https://agent.docuhealthservices.net` on
       production before launch.
-- [ ] Ideally one regex for every app subdomain, two levels deep (see the 18 Nov handoff).
+- [ ] Ideally one regex for every app subdomain, two levels deep, e.g.
+      `CORS_ALLOWED_ORIGIN_REGEXES = [r"^https://([a-z0-9-]+\.){0,2}docuhealthservices\.net$"]`
+      (plus `r"^http://([a-z0-9-]+\.){0,2}localhost:5173$"` on staging only) and
+      `CORS_ALLOW_CREDENTIALS = True`.
 
 ---
 
@@ -129,8 +132,8 @@ notifications or messages endpoint in the schema, so the app shows 0 for both.
 
 The new receptionist, lab scientist and hospital admin dashboards were designed before their
 endpoints existed. We matched every call they make against the staging API: of 45 calls, 5 match an
-endpoint, 33 match partly (missing fields, filters or permissions) and 7 have no endpoint. The
-call-by-call table is in `docs/api-mapping-redesigned-dashboards.md`. These are the asks.
+endpoint, 33 match partly (missing fields, filters or permissions) and 7 have no endpoint. These
+are the asks.
 
 ### Receptionist
 

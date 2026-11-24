@@ -90,8 +90,7 @@ Built as `src/features/staff/` (routes compose it into each dashboard).
 
 ## Phase 4: Doctor and Nurse
 
-Built in seven steps, one commit each; what v1 does and the endpoints behind it are in
-`docs/phase-4-doctor-nurse.md`.
+Built in seven steps, one commit each, from v1's behaviour and the endpoints in `docs/api/`.
 
 - [x] 4.1 Shared base: doctor and nurse shells and login routing, patient lists (admitted,
       checked in, checked out, discharged), patient page (details, latest vitals, ongoing drugs,

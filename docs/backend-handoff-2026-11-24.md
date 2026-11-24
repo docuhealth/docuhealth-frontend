@@ -55,9 +55,17 @@ call by call, is in §7. The main ones:
 3. Discharge: the follow-up rules and the `condition_at_discharge` values. (§7 Doctor and nurse 26)
 4. Fix the OpenAPI schema where it doesn't match real replies: 15 endpoints have no response
    schema, and several fields typed as strings are objects (§3, and noted per dashboard in §7).
-5. From the 18 Nov handoff (`backend-handoff-2026-11-18.md`): please confirm what's fixed: patient
-   sign-up step 3 (500), one error shape, the auth questions, and building email links from the
-   URLs we send.
+5. Still open from our 18 Nov note, unless you've fixed them since:
+   - Patient sign-up step 3 (`POST /api/auth/signup/complete`) returned a 500 in
+     `keyed_nin_hash` (`'NoneType' object has no attribute 'encode'`), most likely a NIN-hashing
+     secret missing on staging.
+   - Errors come back as `{detail}`, `{message}` or DRF field errors. Is `detail` the standard?
+   - The refresh token: is it only an httpOnly cookie, and with which `Domain`/`SameSite`? It needs
+     `Domain=.docuhealthservices.net`, `SameSite=None` and `Secure` so the main site and the
+     `hospital.` site share one session.
+   - Emails should use the links we send (`login_url`, `redirect_url`), not a fixed domain, so a
+     sign-up on v2 gets v2 links. The facility email appends `?token=…&application=…` to
+     `redirect_url`.
 
 ## How we checked
 
