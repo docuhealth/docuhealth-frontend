@@ -34,8 +34,10 @@ cp .env.example .env.local   # mocks are on by default
 npm run dev
 ```
 
-With `VITE_ENABLE_MOCKS=true` the app runs against the MSW fake API in
+With `VITE_ENABLE_MOCKS=true` the dev server runs against the MSW fake API in
 `src/mocks/handlers.ts` (one file per feature, e.g. `src/mocks/hospital-admin.ts`) instead of the backend. Set `VITE_PREFILL_FORMS=true` in dev to pre-populate auth forms with sample data.
+Neither ever applies to a production build: `npm run build` leaves the mocks and their service
+worker out, whatever the env vars say.
 
 The mock login picks a scenario from the email's first part (any password works):
 
@@ -141,8 +143,9 @@ Paths below are what appears in the browser, on the base URL from the table abov
 
 Guards live in `src/lib/auth-guards.ts`. A dashboard needs a session for its role (anyone else is
 sent to their own dashboard), a pending gate step (`/verify-nin`, `/first-login`) comes before any
-dashboard, and login/sign-up pages send anyone already signed in to their dashboard. Doctors,
-nurses and the other roles have no dashboard yet, so they land on the admin one.
+dashboard, and login/sign-up pages send anyone already signed in to their dashboard. A hospital's
+admins get the admin dashboard; everyone else gets their role's (radiographers share the
+radiologist's), and a role with none yet gets `/no-dashboard`, never the admin's.
 
 ### Patients and public site
 
@@ -208,9 +211,10 @@ Register:  /register → submit facility details → approval → verification e
              → /verify?token=… → documents → admin details → done → main site /
            (a link without its token or application shows a "Link expired" notice)
 
-Log in:    /login → the role's dashboard: /admin (admins, and roles without a dashboard),
-           /receptionist, /radiologist, /lab-scientist  (or /first-login first if admin
-           details are missing)
+Log in:    /login → the role's dashboard: /admin (the hospital's admins), /receptionist,
+           /radiologist (and radiographers), /lab-scientist, /pharmacy, /doctor, /nurse, or
+           /no-dashboard for a role without one  (or /first-login first if admin details are
+           missing)
 
 Reset:     /forgot-password → email → code → new password → /login
 

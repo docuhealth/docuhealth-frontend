@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import { rmSync } from "node:fs";
 import { fileURLToPath, URL } from "node:url";
 import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
@@ -30,6 +31,16 @@ export default defineConfig(({ mode }) => {
       react(),
       babel({ presets: [reactCompilerPreset()] }),
       tailwindcss(),
+      // public/ is copied into every build; the mock API's service worker is for the dev server.
+      {
+        name: "drop-mock-service-worker",
+        apply: "build",
+        closeBundle() {
+          rmSync(fileURLToPath(new URL("./dist/mockServiceWorker.js", import.meta.url)), {
+            force: true,
+          });
+        },
+      },
     ],
     resolve: {
       alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },

@@ -1,34 +1,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export const accountKinds = ["patient", "staff"] as const;
-export type AccountKind = (typeof accountKinds)[number];
+const accountKinds = ["patient", "staff"] as const;
+type AccountKind = (typeof accountKinds)[number];
 export type AccountType = AccountKind;
 
-export const nextSteps = ["nin_not_verified", "admin_details_required"] as const;
+const nextSteps = ["nin_not_verified", "admin_details_required"] as const;
 export type NextStep = (typeof nextSteps)[number] | null;
 
-export const facilityTypes = [
-  "hospital",
-  "laboratory",
-  "radiology",
-  "pharmacy",
-  "observation",
-] as const;
-export type AuthFacilityType = (typeof facilityTypes)[number];
-
-export const staffRoles = [
-  "doctor",
-  "nurse",
-  "receptionist",
-  "lab_scientist",
-  "pharmacist",
-  "radiologist",
-  "radiographer",
-] as const;
-export type AuthStaffRole = (typeof staffRoles)[number];
-
-export type PatientActingAs = {
+type PatientActingAs = {
   as?: "self" | "dependant" | "proxy";
   type?: "self" | "proxy";
   hin?: string;
@@ -40,7 +20,7 @@ export type PatientActingAs = {
   ends_at?: string | null;
 };
 
-export type StaffActingAs = {
+type StaffActingAs = {
   type?: "facility_staff";
   facility?: {
     id: string;
@@ -56,7 +36,7 @@ export type StaffActingAs = {
 
 export type ActingAsEntry = PatientActingAs | StaffActingAs;
 
-export type User = {
+type User = {
   id: string;
   name: string;
   email: string;
@@ -98,7 +78,7 @@ export const useAuthStore = create<AuthState>()(
 );
 
 /** Type guard for staff `acting_as` entries (supports both nested `facility` and flat `facility_staff` shapes). */
-export function isStaffActingAs(entry: ActingAsEntry): entry is StaffActingAs {
+function isStaffActingAs(entry: ActingAsEntry): entry is StaffActingAs {
   return (
     "facility" in entry ||
     ("type" in entry && entry.type === "facility_staff") ||
@@ -135,7 +115,9 @@ export type Dashboard =
   | "/hospital/lab-scientist"
   | "/hospital/pharmacy"
   | "/hospital/doctor"
-  | "/hospital/nurse";
+  | "/hospital/nurse"
+  /** A staff role with no dashboard of its own yet. */
+  | "/hospital/no-dashboard";
 
 /**
  * Staff roles with a dashboard of their own. A hospital's admins get the admin dashboard whatever
@@ -146,6 +128,8 @@ export type Dashboard =
 const roleDashboards: Partial<Record<string, Dashboard>> = {
   receptionist: "/hospital/receptionist",
   radiologist: "/hospital/radiologist",
+  // Radiographers take the scans, so they share the radiology dashboard.
+  radiographer: "/hospital/radiologist",
   lab_scientist: "/hospital/lab-scientist",
   pharmacist: "/hospital/pharmacy",
   doctor: "/hospital/doctor",
@@ -173,8 +157,10 @@ export function getPostLoginDestination(
     const role = staffEntry?.staff_role ?? staffEntry?.role ?? session.user.role;
     const facilityType = staffEntry?.facility?.type ?? staffEntry?.facility_type ?? "hospital";
     const hospitalAdmin = staffEntry?.is_admin && facilityType === "hospital";
-    const roleDashboard = staffEntry && !hospitalAdmin ? roleDashboards[role] : undefined;
-    return roleDashboard ?? "/hospital/admin";
+    // A hospital's own account (no staff entry) and its admins run the hospital.
+    if (!staffEntry || hospitalAdmin) return "/hospital/admin";
+    // Anyone else gets their role's dashboard, never the admin's.
+    return roleDashboards[role] ?? "/hospital/no-dashboard";
   }
 
   return "/patient";

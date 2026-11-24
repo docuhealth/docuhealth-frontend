@@ -34,6 +34,7 @@ import { Route as HospitalAuthRouteImport } from './routes/hospital/_auth'
 import { Route as HospitalAdminRouteImport } from './routes/hospital/admin'
 import { Route as HospitalDoctorRouteImport } from './routes/hospital/doctor'
 import { Route as HospitalLabScientistRouteImport } from './routes/hospital/lab-scientist'
+import { Route as HospitalNoDashboardRouteImport } from './routes/hospital/no-dashboard'
 import { Route as HospitalNurseRouteImport } from './routes/hospital/nurse'
 import { Route as HospitalPharmacyRouteImport } from './routes/hospital/pharmacy'
 import { Route as HospitalRadiologistRouteImport } from './routes/hospital/radiologist'
@@ -245,6 +246,11 @@ const HospitalDoctorRoute = HospitalDoctorRouteImport.update({
 const HospitalLabScientistRoute = HospitalLabScientistRouteImport.update({
   id: '/hospital/lab-scientist',
   path: '/hospital/lab-scientist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HospitalNoDashboardRoute = HospitalNoDashboardRouteImport.update({
+  id: '/hospital/no-dashboard',
+  path: '/hospital/no-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HospitalNurseRoute = HospitalNurseRouteImport.update({
@@ -756,6 +762,7 @@ export interface FileRoutesByFullPath {
   '/hospital/admin': typeof HospitalAdminRouteWithChildren
   '/hospital/doctor': typeof HospitalDoctorRouteWithChildren
   '/hospital/lab-scientist': typeof HospitalLabScientistRouteWithChildren
+  '/hospital/no-dashboard': typeof HospitalNoDashboardRoute
   '/hospital/nurse': typeof HospitalNurseRouteWithChildren
   '/hospital/pharmacy': typeof HospitalPharmacyRouteWithChildren
   '/hospital/radiologist': typeof HospitalRadiologistRouteWithChildren
@@ -866,6 +873,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminDashboardIndexRoute
   '/agent': typeof AgentIndexRoute
   '/hospital': typeof HospitalIndexRoute
+  '/hospital/no-dashboard': typeof HospitalNoDashboardRoute
   '/admin/forgot-password': typeof AdminAuthForgotPasswordRoute
   '/admin/login': typeof AdminAuthLoginRoute
   '/admin/applications': typeof AdminDashboardApplicationsRoute
@@ -975,6 +983,7 @@ export interface FileRoutesById {
   '/hospital/admin': typeof HospitalAdminRouteWithChildren
   '/hospital/doctor': typeof HospitalDoctorRouteWithChildren
   '/hospital/lab-scientist': typeof HospitalLabScientistRouteWithChildren
+  '/hospital/no-dashboard': typeof HospitalNoDashboardRoute
   '/hospital/nurse': typeof HospitalNurseRouteWithChildren
   '/hospital/pharmacy': typeof HospitalPharmacyRouteWithChildren
   '/hospital/radiologist': typeof HospitalRadiologistRouteWithChildren
@@ -1090,6 +1099,7 @@ export interface FileRouteTypes {
     | '/hospital/admin'
     | '/hospital/doctor'
     | '/hospital/lab-scientist'
+    | '/hospital/no-dashboard'
     | '/hospital/nurse'
     | '/hospital/pharmacy'
     | '/hospital/radiologist'
@@ -1200,6 +1210,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/agent'
     | '/hospital'
+    | '/hospital/no-dashboard'
     | '/admin/forgot-password'
     | '/admin/login'
     | '/admin/applications'
@@ -1308,6 +1319,7 @@ export interface FileRouteTypes {
     | '/hospital/admin'
     | '/hospital/doctor'
     | '/hospital/lab-scientist'
+    | '/hospital/no-dashboard'
     | '/hospital/nurse'
     | '/hospital/pharmacy'
     | '/hospital/radiologist'
@@ -1420,6 +1432,7 @@ export interface RootRouteChildren {
   HospitalAdminRoute: typeof HospitalAdminRouteWithChildren
   HospitalDoctorRoute: typeof HospitalDoctorRouteWithChildren
   HospitalLabScientistRoute: typeof HospitalLabScientistRouteWithChildren
+  HospitalNoDashboardRoute: typeof HospitalNoDashboardRoute
   HospitalNurseRoute: typeof HospitalNurseRouteWithChildren
   HospitalPharmacyRoute: typeof HospitalPharmacyRouteWithChildren
   HospitalRadiologistRoute: typeof HospitalRadiologistRouteWithChildren
@@ -1603,6 +1616,13 @@ declare module '@tanstack/react-router' {
       path: '/hospital/lab-scientist'
       fullPath: '/hospital/lab-scientist'
       preLoaderRoute: typeof HospitalLabScientistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hospital/no-dashboard': {
+      id: '/hospital/no-dashboard'
+      path: '/hospital/no-dashboard'
+      fullPath: '/hospital/no-dashboard'
+      preLoaderRoute: typeof HospitalNoDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hospital/nurse': {
@@ -2542,6 +2562,7 @@ const rootRouteChildren: RootRouteChildren = {
   HospitalAdminRoute: HospitalAdminRouteWithChildren,
   HospitalDoctorRoute: HospitalDoctorRouteWithChildren,
   HospitalLabScientistRoute: HospitalLabScientistRouteWithChildren,
+  HospitalNoDashboardRoute: HospitalNoDashboardRoute,
   HospitalNurseRoute: HospitalNurseRouteWithChildren,
   HospitalPharmacyRoute: HospitalPharmacyRouteWithChildren,
   HospitalRadiologistRoute: HospitalRadiologistRouteWithChildren,

@@ -5,9 +5,5 @@
   "ignore": [
     // shadcn-generated design system: components are kept even before use.
     "src/components/ui/**",
-    // Shared test helper — remove from this list once the first component test uses it.
-    "src/test/render.tsx",
   ],
-  // Part of the agreed stack but not used by any screen yet — remove each entry once it is.
-  "ignoreDependencies": ["@testing-library/user-event"],
 }

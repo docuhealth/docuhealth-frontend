@@ -40,7 +40,6 @@ export const staffLoginSchema = z.object({
   password: z.string().min(1, "Enter your password"),
 });
 
-export const loginSchema = staffLoginSchema;
 export type LoginValues = z.infer<typeof patientLoginSchema>;
 
 export const forgotPasswordSchema = z.object({ email });
@@ -69,7 +68,6 @@ export const genderLabels = {
   male: "Male",
   female: "Female",
 } as const;
-export type Gender = keyof typeof genderLabels;
 const genders = ["male", "female"] as const;
 
 /** Step 1 of the individual sign-up. */
@@ -99,7 +97,7 @@ export const verifyCodeSchema = z.object({
 });
 export type VerifyCodeValues = z.infer<typeof verifyCodeSchema>;
 
-export const ninFieldSchema = z
+const ninFieldSchema = z
   .string()
   .transform((value) => value.replace(/\D/g, ""))
   .pipe(z.string().length(11, "Enter your 11-digit NIN"));

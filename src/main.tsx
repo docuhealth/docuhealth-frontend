@@ -17,8 +17,12 @@ if (env.VITE_SENTRY_DSN) {
   });
 }
 
+/**
+ * The fake API, on the dev server only: a production build never starts it (and leaves the mocks
+ * out of the bundle), whatever VITE_ENABLE_MOCKS says.
+ */
 async function enableMocks() {
-  if (!env.VITE_ENABLE_MOCKS) return;
+  if (!import.meta.env.DEV || !env.VITE_ENABLE_MOCKS) return;
   const { worker } = await import("@/mocks/browser");
   await worker.start({ onUnhandledFrame: "bypass" });
 }

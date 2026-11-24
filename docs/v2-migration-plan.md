@@ -167,8 +167,24 @@ Built in seven steps, one commit each; what v1 does and the endpoints behind it 
 
 ## Phase 7: Before launch
 
-- [ ] Mocks only in tests
-- [ ] Every role lands on its own dashboard and can't open another's
-- [ ] Staging and production settings checked
-- [ ] Full click-through per role on staging
-- [ ] Backend gaps file sent
+- [x] Mocks only in tests and on the dev server: a production build never starts the fake API
+      (it used to whenever `VITE_ENABLE_MOCKS=true`, which `.env.local` sets) and leaves out its
+      service worker; checked in a build with mocks switched on
+- [x] Every role lands on its own dashboard and can't open another's: a test checks every
+      dashboard against every role, and DocuHealth's admins against hospital staff. Fixed: a
+      non-admin staff role without a dashboard (e.g. radiographer) used to land on the hospital
+      admin's; radiographers now share the radiologist's, and any other role gets a "no dashboard
+      yet" page
+- [x] Staging and production settings checked: the build passes; CI's knip step was failing on old
+      unused auth exports (cleaned up); `.gitattributes` keeps Windows checkouts in LF so
+      `format:check` agrees with CI; Vercel serves every path from `index.html`. Production needs
+      `VITE_API_URL` (the production API: see gap 4), `VITE_ROOT_DOMAIN=docuhealthservices.net`,
+      and optionally `VITE_SENTRY_DSN`
+- [ ] Full click-through per role on staging. Done at the API level on 24 Nov: every role's
+      dashboard reads answer with that role's account (admin, receptionist, doctor, nurse, lab, lab
+      admin, pharmacist, radiologist, dhadmin), and each phase parsed staging's real replies. Still
+      needs a person to click through each dashboard in a browser, signed in as each role. The
+      Playwright end-to-end tests need `npx playwright install chromium` on this machine (CI
+      installs it)
+- [ ] Backend gaps file sent: up to date on 24 Nov (CORS is now worse: no origin is allowed); ready
+      to forward

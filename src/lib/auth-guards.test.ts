@@ -49,6 +49,17 @@ describe("getPostLoginDestination", () => {
     expect(getPostLoginDestination(staff("doctor", true))).toBe("/hospital/admin");
     // A hospital admin gets the admin dashboard whatever their role.
     expect(getPostLoginDestination(staff("receptionist", true))).toBe("/hospital/admin");
+    expect(getPostLoginDestination(staff("radiographer"))).toBe("/hospital/radiologist");
+    expect(
+      getPostLoginDestination(
+        session({ accountType: undefined, user: { ...session().user, role: "dhadmin" } }),
+      ),
+    ).toBe("/admin");
+  });
+
+  it("never gives a staff role without a dashboard the admin's", () => {
+    expect(getPostLoginDestination(staff("physiotherapist"))).toBe("/hospital/no-dashboard");
+    expect(getPostLoginDestination(staff("physiotherapist", true))).toBe("/hospital/admin");
   });
 
   it("sends an arm's admin to the arm's dashboard, as staging's lab admin logs in", () => {
@@ -91,6 +102,41 @@ describe("requireDashboard", () => {
     expect(redirectedTo(() => requireDashboard("/patient"), staff("radiologist"))).toBe(
       "/hospital/radiologist",
     );
+  });
+
+  it("keeps DocuHealth's admins and hospital staff out of each other's sections", () => {
+    const dhAdmin = session({
+      accountType: undefined,
+      user: { ...session().user, role: "dhadmin" },
+    });
+    expect(redirectedTo(() => requireDashboard("/admin"), null)).toBe("/admin/login");
+    expect(redirectedTo(() => requireDashboard("/admin"), dhAdmin)).toBeUndefined();
+    expect(redirectedTo(() => requireDashboard("/hospital/admin"), dhAdmin)).toBe("/admin");
+    expect(redirectedTo(() => requireDashboard("/patient"), dhAdmin)).toBe("/admin");
+    expect(redirectedTo(() => requireDashboard("/admin"), staff("doctor", true))).toBe(
+      "/hospital/admin",
+    );
+    expect(redirectedTo(() => requireDashboard("/admin"), session())).toBe("/patient");
+  });
+
+  it("checks every dashboard against every role", () => {
+    const roles = {
+      "/hospital/receptionist": staff("receptionist"),
+      "/hospital/radiologist": staff("radiologist"),
+      "/hospital/lab-scientist": staff("lab_scientist"),
+      "/hospital/pharmacy": staff("pharmacist"),
+      "/hospital/doctor": staff("doctor"),
+      "/hospital/nurse": staff("nurse"),
+      "/hospital/admin": staff("doctor", true),
+      "/patient": session(),
+    } as const;
+    for (const [own, user] of Object.entries(roles)) {
+      for (const dashboard of Object.keys(roles)) {
+        expect(redirectedTo(() => requireDashboard(dashboard as keyof typeof roles), user)).toBe(
+          dashboard === own ? undefined : own,
+        );
+      }
+    }
   });
 
   it("holds a dashboard back until its gate step is done", () => {

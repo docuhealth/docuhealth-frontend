@@ -78,16 +78,6 @@ export function useLogin() {
   });
 }
 
-export function useLogoutApi() {
-  return useMutation({
-    mutationFn: () =>
-      request(messageResponseSchema, {
-        method: "POST",
-        url: "/api/auth/logout",
-      }),
-  });
-}
-
 export function useVerifyOwnNin() {
   return useMutation({
     mutationFn: (data: { nin: string }) =>

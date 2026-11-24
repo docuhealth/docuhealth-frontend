@@ -22,13 +22,13 @@ function unwrapEnvelope<TSchema extends z.ZodType>(schema: TSchema) {
     });
 }
 
-export const nextStepSchema = z
+const nextStepSchema = z
   .enum(["nin_not_verified", "admin_details_required"])
   .nullable()
   .optional()
   .transform((val) => val ?? null);
 
-export const actingAsContextSchema = z.object({
+const actingAsContextSchema = z.object({
   type: z.enum(["self", "facility_staff", "proxy"]).optional(),
   as: z.enum(["self", "dependant", "proxy"]).optional(),
   hin: z.string().optional(),
@@ -47,7 +47,7 @@ export const actingAsContextSchema = z.object({
   patient_sqid: z.string().optional(),
 });
 
-export const authUserPayloadSchema = z.object({
+const authUserPayloadSchema = z.object({
   id: z.string().optional(),
   sqid: z.string().optional(),
   firstname: z.string().optional(),
@@ -85,7 +85,6 @@ export const verifySignupCodeResponseSchema = unwrapEnvelope(
     signup_token: z.string(),
   }),
 );
-export type VerifySignupCodeResponse = z.infer<typeof verifySignupCodeResponseSchema>;
 
 export const forgotPasswordVerifyResponseSchema = unwrapEnvelope(
   z.object({
@@ -97,7 +96,7 @@ export const forgotPasswordVerifyResponseSchema = unwrapEnvelope(
   resetToken: inner.access_token ?? inner.reset_token ?? inner.token ?? null,
 }));
 
-export const facilityTypeApiSchema = z.enum([
+const facilityTypeApiSchema = z.enum([
   "hospital",
   "laboratory",
   "radiology",
@@ -106,7 +105,7 @@ export const facilityTypeApiSchema = z.enum([
 ]);
 export type FacilityTypeApi = z.infer<typeof facilityTypeApiSchema>;
 
-export const staffRoleApiSchema = z.enum([
+const staffRoleApiSchema = z.enum([
   "doctor",
   "nurse",
   "receptionist",
@@ -137,7 +136,6 @@ export const applicationPartSavedSchema = unwrapEnvelope(
     email_verified: z.boolean().optional(),
   }),
 );
-export type ApplicationPartSaved = z.infer<typeof applicationPartSavedSchema>;
 
 export const facilityRegisteredSchema = unwrapEnvelope(
   z.object({
@@ -150,4 +148,3 @@ export const facilityRegisteredSchema = unwrapEnvelope(
     created_at: z.string().optional(),
   }),
 );
-export type FacilityRegistered = z.infer<typeof facilityRegisteredSchema>;

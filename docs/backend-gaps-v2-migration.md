@@ -4,30 +4,33 @@ From the frontend team, while connecting the v2 dashboards to `https://api-stagi
 Each item says what we found, how to check it, and what we need. Items are added as each
 dashboard is connected; the newest are at the bottom.
 
-| #   | Issue                                                                | Severity                  | Endpoint(s)                           |
-| --- | -------------------------------------------------------------------- | ------------------------- | ------------------------------------- |
-| 1   | CORS still rejects the v2 test site and every subdomain              | Blocker                   | All endpoints                         |
-| 2   | Staging still serves Django debug pages (incl. the URL list)         | High (security)           | All endpoints                         |
-| 3   | 15 GET endpoints have no response schema in the OpenAPI doc          | Medium                    | Dashboards, charts, events and more   |
-| 4   | Old `api/hospitals/*` paths are gone: is production the same?        | Needs an answer           | `api/hospitals/*` → `api/auth/staff…` |
-| 5   | Staff list filters work but aren't in the schema                     | Low                       | `GET /api/auth/staff`                 |
-| 6   | No endpoint for unread notification and message counts               | Medium                    | Top bar and sidebar badges            |
-| 7   | The redesigned dashboards need endpoints and fields that don't exist | Blocker for those screens | Every dashboard                       |
+| #   | Issue                                                                 | Severity                  | Endpoint(s)                           |
+| --- | --------------------------------------------------------------------- | ------------------------- | ------------------------------------- |
+| 1   | CORS now allows no origin at all (it used to allow localhost:5173)    | Blocker                   | All endpoints                         |
+| 2   | Staging still serves Django debug pages (incl. the URL list)          | High (security)           | All endpoints                         |
+| 3   | 15 GET endpoints have no response schema in the OpenAPI doc           | Medium                    | Dashboards, charts, events and more   |
+| 4   | Old `api/hospitals/*` paths are gone: is production the same?         | Needs an answer           | `api/hospitals/*` → `api/auth/staff…` |
+| 5   | Staff list filters work but aren't in the schema                      | Low                       | `GET /api/auth/staff`                 |
+| 6   | No endpoint for unread notification and message counts                | Medium                    | Top bar and sidebar badges            |
+| 7   | Each dashboard's missing endpoints and fields (receptionist to admin) | Blocker for those screens | Every dashboard and the public site   |
 
 ---
 
 ## 1. CORS: the v2 test site and subdomains are still blocked
 
-Reported on 18 Nov (`backend-handoff-2026-11-18.md`, item 2) and still open on 21 Nov 2026. The
-staging API returns no `Access-Control-Allow-Origin` for:
+Reported on 18 Nov (`backend-handoff-2026-11-18.md`, item 2), still open on 21 Nov, and worse on
+24 Nov 2026: the staging API now returns no `Access-Control-Allow-Origin` for **any** origin we
+tried, including `http://localhost:5173`, which it used to allow. Any browser app calling staging
+directly (v1 included, unless it proxies) can't read the replies.
 
-| Origin                                           | Allowed? |
-| ------------------------------------------------ | -------- |
-| `https://v2.docuhealthservices.net`              | **No**   |
-| `https://hospital.v2.docuhealthservices.net`     | **No**   |
-| `https://admin.docuhealthservices.net`           | **No**   |
-| `http://hospital.localhost:5173`                 | **No**   |
-| `http://localhost:5180` (any port but 5173/5174) | **No**   |
+| Origin                                       | Allowed? (24 Nov) |
+| -------------------------------------------- | ----------------- |
+| `https://v2.docuhealthservices.net`          | **No**            |
+| `https://hospital.v2.docuhealthservices.net` | **No**            |
+| `https://admin.docuhealthservices.net`       | **No**            |
+| `https://www.docuhealthservices.net`         | **No**            |
+| `http://localhost:5173`                      | **No** (was yes)  |
+| `http://hospital.localhost:5173`             | **No**            |
 
 To reproduce:
 
@@ -52,7 +55,7 @@ the API from `*.v2.docuhealthservices.net`, and the super admin dashboard (`admi
 ## 2. Staging still serves Django debug pages
 
 Any unknown path, for example `GET /api/zz-not-a-route`, returns Django's debug 404 page. It lists
-the server's URL patterns. A 500 returns the full stack trace.
+the server's URL patterns. A 500 returns the full stack trace. Still the case on 24 Nov 2026.
 
 **Ask:**
 
@@ -122,7 +125,7 @@ notifications or messages endpoint in the schema, so the app shows 0 for both.
 
 ---
 
-## 7. Redesigned dashboards: what's missing
+## 7. Each dashboard: what's missing
 
 The new receptionist, lab scientist and hospital admin dashboards were designed before their
 endpoints existed. We matched every call they make against the staging API: of 45 calls, 5 match an

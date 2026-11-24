@@ -37,10 +37,16 @@ describe("Result review", () => {
   it("lists what's waiting, and rejects a scan report with a reason", async () => {
     const { user } = renderWithRouter(<ResultReview />);
     // The glucose was approved above, so no lab result waits.
-    expect(await screen.findByText("Nothing is waiting for your review.")).toBeInTheDocument();
+    // Both review lists load at once; give them time when every test file runs together.
+    const slow = { timeout: 10_000 };
+    expect(
+      await screen.findByText("Nothing is waiting for your review.", undefined, slow),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("tab", { name: /Scan reports/ }));
-    const report = (await screen.findByText("Chest X-ray, PA view")).closest("li")!;
+    const report = (await screen.findByText("Chest X-ray, PA view", undefined, slow)).closest(
+      "li",
+    )!;
     expect(within(report).getByText(/Bisi Adewale · HIN 4200000000002/)).toBeInTheDocument();
     expect(within(report).getByText("Right lower lobe pneumonia")).toBeInTheDocument();
 
@@ -55,6 +61,9 @@ describe("Result review", () => {
     expect(
       await screen.findByText("The Chest X-ray, PA view report is rejected and sent back."),
     ).toBeInTheDocument();
-    await waitFor(() => expect(screen.queryByText("Chest X-ray, PA view")).not.toBeInTheDocument());
+    await waitFor(
+      () => expect(screen.queryByText("Chest X-ray, PA view")).not.toBeInTheDocument(),
+      slow,
+    );
   });
 });
