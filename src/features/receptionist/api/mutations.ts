@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { request } from "@/lib/api";
+import { codeSentResponseSchema, request } from "@/lib/api";
 import { NotAvailableYetError } from "@/lib/not-available";
 import { genderOf } from "@/lib/patient-record";
-import { absoluteUrl } from "@/lib/sections";
 import { receptionistKeys } from "@/features/receptionist/api/queries";
 import {
   anyResponseSchema,
@@ -55,17 +54,19 @@ type SignupDetails = {
   lastName: string;
   otherName: string;
   sex: Sex;
+  /** ISO date (`YYYY-MM-DD`). */
+  dateOfBirth: string;
   email: string;
   phone: string;
 };
 
 /**
  * Start a desk signup: the API takes every detail now and sends the code to the email (or, for
- * a guardian, the phone). TODO(api): it also requires a date of birth, which the design's form
- * doesn't ask for, so the API refuses until it's optional or the form asks.
+ * a guardian, the phone), and says where (masked) in `destination`. It answers the same whether
+ * or not the contact already has an account; the code step tells (409 `account_exists`).
  */
 function startSignup(details: SignupDetails, verifyBy: "email" | "phone") {
-  return request(anyResponseSchema, {
+  return request(codeSentResponseSchema, {
     method: "POST",
     url: "/api/auth/signup/desk",
     data: {
@@ -73,10 +74,10 @@ function startSignup(details: SignupDetails, verifyBy: "email" | "phone") {
       lastname: details.lastName,
       middlename: details.otherName || undefined,
       gender: genderOf(details.sex),
+      dob: details.dateOfBirth,
       email: details.email || undefined,
       phone: details.phone || undefined,
       verify_by: verifyBy,
-      login_url: absoluteUrl("/login"),
     },
   });
 }

@@ -19,7 +19,7 @@ export const CODE_LENGTH = 6;
 
 /**
  * The Register Patient dialog, all three steps: who the patient is, the code sent to their
- * email, then their NIN and the password for their account.
+ * email, then their NIN and the password for their account. The API needs a date of birth.
  */
 const patientFields = {
   firstName: required("Enter the patient's first name"),
@@ -27,6 +27,10 @@ const patientFields = {
   otherName: z.string().trim(),
   // Empty until one is picked, so the select can start blank.
   gender: z.string().pipe(z.enum(Object.keys(sexLabels) as [Sex, ...Sex[]], "Select a gender")),
+  dateOfBirth: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a date as DD/MM/YYYY")
+    .refine((date) => date <= toIsoDate(new Date()), "That date hasn’t come yet"),
   email: z.email("Enter a valid email address"),
   phone: z
     .string()
@@ -70,7 +74,7 @@ export const registerGuardianSchema = z
 
 /** The fields on each step, checked before it moves on. */
 export const registerPatientSteps = {
-  1: ["firstName", "lastName", "otherName", "gender", "email", "phone"],
+  1: ["firstName", "lastName", "otherName", "gender", "dateOfBirth", "email", "phone"],
   2: ["code"],
 } as const;
 

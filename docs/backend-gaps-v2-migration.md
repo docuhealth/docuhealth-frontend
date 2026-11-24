@@ -149,7 +149,7 @@ are the asks.
 10. **Front-desk patient profile.** A receptionist patient endpoint (or extend `/api/patients/{hin}/details`) with `last_visit {at, department}`, `last_check_in {at, status}`, `upcoming_appointment`, `assigned_doctor`, visit history (check-ins + appointments, with in/out times), `dependants[]` and `proxies[]` (with relationship, dob, gender, last visit), and a photo URL.
 11. **Doctor follow-up requests.** An endpoint for doctors to request a follow-up appointment and for the front desk to list (per patient) and confirm/cancel them. Nothing exists today.
 12. **Link an existing patient as a dependant** (`POST /api/patients/{hin}/dependants` with an existing child HIN), and clarify what `confirmed_by` should contain (enum?).
-13. **DOB at desk signup.** `POST /api/auth/signup/desk` requires `dob`, but the redesigned registration form has no date-of-birth field (design kept as is). Please make `dob` optional (the patient can add it later); until then, desk registration fails with `dob: This field is required.`
+13. ~~**DOB at desk signup.**~~ Settled by the onboarding guide (24 Nov): `dob` is required, so the registration form now asks for it.
 14. **Coverage values.** API `company` vs UI `nhis`: agree on one list.
 15. `GET /api/records/patients/{hin}/soap-notes/shared` returns **500** for the receptionist (ValueError). Bug report.
 16. **Admission requests: `processed_by_info`.** The schema marks it required, but older accepted and rejected requests return `null` (seen on staging). Please mark it nullable, or backfill it.
@@ -180,8 +180,8 @@ are the asks.
 8. **Missing row fields.** Check-in time on `outpatient_discharge` rows; visit type (appointment/emergency/walk-in/follow-up) on check-ins; `checked_in_by`. Also a response schema for this endpoint.
 9. **Admin patient profile.** Allow hospital admins `GET /api/patients/{hin}/details` (or confirm `/info` is meant for admins), and add assigned doctor, last visit, last check-in, upcoming appointment and a visit history list.
 10. **Undo after remove.** Clarify whether `staff/reactivate` restores a _removed_ member, or whether removal is final.
-11. **Staff creation.** Confirm how passwords work on `staff/create`: the Add Staff dialog asks for one and puts it in the welcome message, but the API doesn't accept one, so the password in the email won't work. (The UI now uses the API's role list; "Records officer" is gone.)
-12. **Add facility.** `POST /api/auth/facility/arms` requires the facility's `name`, `street`, `city`, `state` and `country`, which the Add Facility dialog doesn't ask for (design kept as is). Please make them optional (defaulting to the hospital's own address, say); until then adding a facility fails with those fields' errors.
+11. ~~**Staff creation.**~~ Settled by the onboarding guide (24 Nov): the API emails a temporary password, so the Add Staff dialog no longer sets one.
+12. ~~**Add facility.**~~ Settled by the onboarding guide (24 Nov): name and address are required, so the Add Facility dialog now asks for them (country is Nigeria).
 13. **Staff list filters.** `GET /api/auth/staff` ignores `is_active`, so the Staff Management filters (On team / Removed) read the whole team and filter in the browser. Fine for now; a filter would be needed for large hospitals.
 14. **Wallet.** There's no wallet endpoint (balance, transactions, top-up). The admin's Wallet page shows the balance as "Not available yet" and offers the subscription plans, which do exist.
 15. **Subscribing.** `POST /api/payments/subscribe` is documented as returning a `Subscription`, but v1 relied on an `authorization_url` (Paystack checkout) in the reply. Please document it, and confirm `plan` takes the `paystack_plan_code` (as v1 sent) rather than the plan's `sqid`. The UI opens the link when it's there. (Not tried on staging, to avoid starting a real payment.)
@@ -254,10 +254,24 @@ are the asks.
 3. **Hospital rows.** `profile_image` is an object (`{id, url, path}`), and `address` comes back as `"None, None, None, None"` when empty. Please send the URL and `null`.
 4. **States.** `GET /api/admin/dashboard/states` isn't normalized: `ek`, `oy`, `novascotia`, `string` sit beside `ekiti`, `oyo`. Validating states at sign-up (or mapping them) would make the chart meaningful.
 5. **Who reviewed an application.** Approved applications on staging have `reviewed_by` and `reviewed_at` null. Please record them.
-6. **Activating and deactivating.** The schema takes hospital sqids (`{facilities: []}`) and patient HINs (`{hins: []}`); v1 sent `{hins}` for hospitals and `{patient_ids}` for patients. The UI follows the schema; it wasn't tried on staging, to avoid switching off shared accounts. Please confirm.
+6. **Activating and deactivating.** The schema takes hospital sqids (`{facilities: []}`) and patient HINs (`{hins: []}`); v1 sent `{hins}` for hospitals and `{patient_ids}` for patients. The UI follows the schema. The onboarding guide (24 Nov) confirms `{facilities}` for hospitals; patients' `{hins}` still to confirm.
 7. **Plans.** There's no way to retire or delete a plan, and `test` plans are listed with the real ones. A new plan has no `paystack_plan_code` until Paystack has it; please say whether the API creates the Paystack plan, and when.
 8. **Overview totals** have no change against the period before (the hospital admin's and doctor's dashboards do), and `start_date`/`end_date` aren't explained.
 
 ### Public site
 
 1. **Contact and newsletter.** v1's contact form posted to `/api/hospitals/inquiries` and `/api/individuals/inquiries`, which staging no longer has (404), and there's no newsletter endpoint. Please add a contact (or enquiry) endpoint and a newsletter sign-up; the footer's newsletter says it isn't available until then.
+
+### One-time codes (from the 24 Nov SMS handoff)
+
+1. **`Retry-After` behind CORS.** A resend that comes too soon is a 429 with `Retry-After`, but a
+   browser on another origin can't read that header unless the API exposes it
+   (`CORS_EXPOSE_HEADERS = ["Retry-After"]`). Until then the app counts down 60 seconds.
+2. **`destination` isn't documented.** `signup`, `signup/desk` and `signup/upgrade` are documented
+   as returning their request body; please add `destination` (and say whether it's top-level or
+   under `data`). The app reads either, and shows what was typed if it's missing.
+3. **409 `account_exists`** on `signup/verify-code` isn't in the schema either.
+4. **Email links.** The server now refuses `login_url`, `redirect_url` and `verify_url` outside an
+   allowed list. Please make sure that list has the v2 sites (`v2.docuhealthservices.net` and its
+   `hospital.`, `admin.` subdomains), or facility applications, staff creation and arms from v2
+   fail with "This link must point to a Docuhealth site."

@@ -5,24 +5,23 @@ const escape = (text: string) =>
   text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 /**
- * The default welcome message for a new team member, as editor HTML: a greeting, their login
- * details in bold, and the admin's name. Blank values keep the design's "[Name]" placeholders.
+ * The default welcome message for a new team member, as editor HTML: a greeting, the email they
+ * log in with in bold, and the admin's name. The API emails them a temporary password with it, so
+ * the message doesn't carry one. Blank values keep the design's "[Name]" placeholders.
  */
 export function welcomeMessage({
   name,
   email,
-  password,
   from,
 }: {
   name: string;
   email: string;
-  password: string;
   from: string;
 }) {
   return [
     `<p>Hi ${escape(name.trim() || "[Name]")},</p>`,
-    "<p>Welcome onboard! You can log into your private dashboard using the login credentials below. Kindly note that you can reset your password once you log in.</p>",
-    `<p><strong>Email: ${escape(email.trim())}<br>Password: ${escape(password)}</strong></p>`,
+    "<p>Welcome onboard! You can log into your private dashboard with the email below and the temporary password we’ll send you separately. Kindly change your password once you log in.</p>",
+    `<p><strong>Email: ${escape(email.trim())}</strong></p>`,
     `<p>${escape(from)}</p>`,
   ].join("");
 }

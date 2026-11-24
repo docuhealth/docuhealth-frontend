@@ -20,8 +20,50 @@ const staffScenarios: Record<string, { role: string; isAdmin: boolean; firstLogi
 /** Codes (OTP) the mock always rejects, to try the error path. */
 const WRONG_CODE = "000000";
 
-const invalidCode = () =>
-  HttpResponse.json({ detail: "Invalid OTP", status: "error" }, { status: 400 });
+/** As the API does: a wrong, expired or used code is a field error on `code`. */
+const invalidCode = () => HttpResponse.json({ code: ["Invalid OTP"] }, { status: 400 });
+
+/**
+ * Sign-up scenarios, by the contact's first part, as for login: `exists@…` already has an
+ * account (the right code answers 409 `account_exists`), and `wait@…` is refused a second code
+ * (429 with `Retry-After`) until the page reloads.
+ */
+const selfSignups = new Set<string>();
+const codesSent = new Set<string>();
+
+function tooSoon(contact: string) {
+  if (!contact.toLowerCase().startsWith("wait@")) return null;
+  if (!codesSent.has(contact)) {
+    codesSent.add(contact);
+    return null;
+  }
+  return HttpResponse.json(
+    { detail: "Request was throttled." },
+    { status: 429, headers: { "Retry-After": "75" } },
+  );
+}
+
+/** Where a code went, masked as the API reports it: `a***@example.com`, `+234••••••1234`. */
+export function maskContact(contact: string) {
+  if (contact.includes("@")) {
+    const [name = "", domain] = contact.split("@");
+    return `${name.slice(0, 1)}***@${domain}`;
+  }
+  const digits = contact.replace(/\D/g, "");
+  return `+234••••••${digits.slice(-4)}`;
+}
+
+const accountExists = () =>
+  HttpResponse.json(
+    {
+      code: "account_exists",
+      detail: "An account already uses this contact. Log in or reset your password.",
+    },
+    { status: 409 },
+  );
+
+const identifierRequired = () =>
+  HttpResponse.json({ identifier: ["This field is required."] }, { status: 400 });
 
 export const authHandlers = [
   http.post(api("/api/auth/login"), async ({ request }) => {
@@ -105,13 +147,31 @@ export const authHandlers = [
     HttpResponse.json({ status: "success", message: "Admin profile completed" }),
   ),
 
-  http.post(api("/api/auth/signup"), () =>
-    HttpResponse.json({ status: "success", message: "Verification code sent" }),
-  ),
+  http.post(api("/api/auth/signup"), async ({ request }) => {
+    const body = (await request.json()) as {
+      email?: string;
+      phone?: string;
+      verify_by?: "email" | "phone";
+    };
+    const contact = (body.verify_by === "phone" ? body.phone : body.email) ?? "";
+    const refused = tooSoon(contact);
+    if (refused) return refused;
+    selfSignups.add(contact);
+    return HttpResponse.json({ message: "We sent you a code.", destination: maskContact(contact) });
+  }),
 
+  // Desk sign-ups fall through to the receptionist mock, which keeps their details.
   http.post(api("/api/auth/signup/verify-code"), async ({ request }) => {
-    const { code } = (await request.json()) as { code?: string };
-    if (code === WRONG_CODE) return invalidCode();
+    const body = (await request.clone().json()) as {
+      email?: string;
+      phone?: string;
+      verify_by?: "email" | "phone";
+      code?: string;
+    };
+    const contact = (body.verify_by === "phone" ? body.phone : body.email) ?? "";
+    if (!selfSignups.has(contact)) return undefined;
+    if (body.code === WRONG_CODE) return invalidCode();
+    if (contact.toLowerCase().startsWith("exists@")) return accountExists();
     return HttpResponse.json({
       status: "success",
       data: { signup_token: "mock-signup-token" },
@@ -131,12 +191,18 @@ export const authHandlers = [
     }),
   ),
 
-  http.post(api("/api/auth/forgot-password"), () =>
-    HttpResponse.json({ status: "success", message: "OTP sent" }),
-  ),
+  // The same answer whether or not the account exists, as the API does.
+  http.post(api("/api/auth/forgot-password"), async ({ request }) => {
+    const { identifier } = (await request.json()) as { identifier?: string };
+    if (!identifier) return identifierRequired();
+    const refused = tooSoon(identifier);
+    if (refused) return refused;
+    return HttpResponse.json({ message: "If an account exists for this contact, we sent a code." });
+  }),
 
   http.post(api("/api/auth/forgot-password/verify-otp"), async ({ request }) => {
-    const { otp } = (await request.json()) as { otp?: string };
+    const { identifier, otp } = (await request.json()) as { identifier?: string; otp?: string };
+    if (!identifier) return identifierRequired();
     if (otp === WRONG_CODE) return invalidCode();
     return HttpResponse.json({
       status: "success",

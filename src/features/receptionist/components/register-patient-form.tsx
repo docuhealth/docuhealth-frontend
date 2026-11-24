@@ -10,6 +10,7 @@ import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { useEffect, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
+import { DateInput } from "@/components/date-input";
 import {
   FormDialogBody,
   FormDialogFooter,
@@ -48,7 +49,8 @@ import {
   registerPatientSchema,
   registerPatientSteps,
 } from "@/features/receptionist/lib/schemas";
-import { getErrorMessage } from "@/lib/api";
+import { formatWait, useResendCooldown } from "@/hooks/use-resend-cooldown";
+import { errorCode, getErrorMessage } from "@/lib/api";
 
 type Step = 1 | 2 | 3;
 
@@ -72,6 +74,8 @@ const steps = {
     },
   },
 } as const satisfies Record<Variant, Record<Step, { title: string; description: string }>>;
+
+const TODAY = new Date();
 
 // Every step's body is as tall as the first, so the dialog doesn't jump between them.
 const bodyMinHeight = "28rem";
@@ -112,6 +116,9 @@ export function RegisterPatientForm({
   const pending = guardian ? registerGuardian.isPending : registerPatient.isPending;
   const [step, setStep] = useState<Step>(1);
   const [verificationToken, setVerificationToken] = useState<string>();
+  // Where the code went, masked, as the API reports it.
+  const [sentTo, setSentTo] = useState("");
+  const cooldown = useResendCooldown();
 
   const form = useForm<RegisterPatientInput, unknown, RegisterPatientValues>({
     resolver: zodResolver(guardian ? registerGuardianSchema : registerPatientSchema),
@@ -120,6 +127,7 @@ export function RegisterPatientForm({
       lastName: "",
       otherName: "",
       gender: "",
+      dateOfBirth: "",
       email: "",
       phone: "",
       code: "",
@@ -131,8 +139,8 @@ export function RegisterPatientForm({
   const { errors } = form.formState;
   const email = useWatch({ control: form.control, name: "email" });
   const phone = useWatch({ control: form.control, name: "phone" });
-  // Where the code goes: the guardian's phone, or the patient's email.
-  const codeSentTo = guardian ? phone : email;
+  // Where the code goes (the guardian's phone, or the patient's email) until the API says.
+  const codeSentTo = sentTo || (guardian ? phone : email);
 
   // The code is the only thing to do on step 2, so start typing straight away.
   useEffect(() => {
@@ -141,14 +149,15 @@ export function RegisterPatientForm({
 
   /** Step 1's answers; the API takes them all when it sends the code. */
   function signupDetails() {
-    const { firstName, lastName, otherName, gender, email, phone } = form.getValues();
-    return { firstName, lastName, otherName, sex: gender as Sex, email, phone };
+    const { firstName, lastName, otherName, gender, dateOfBirth, email, phone } = form.getValues();
+    return { firstName, lastName, otherName, sex: gender as Sex, dateOfBirth, email, phone };
   }
 
   async function continueToVerify() {
     if (!(await form.trigger([...registerPatientSteps[1]]))) return;
     sendCode.mutate(signupDetails(), {
-      onSuccess: () => {
+      onSuccess: ({ destination }) => {
+        setSentTo(destination ?? "");
         form.resetField("code", { defaultValue: devPrefill?.registerPatient.code ?? "" });
         setStep(2);
       },
@@ -164,7 +173,13 @@ export function RegisterPatientForm({
         setVerificationToken(verificationToken);
         setStep(3);
       },
-      onError: (error: Error) => form.setError("code", { message: getErrorMessage(error) }),
+      onError: (error: Error) =>
+        form.setError("code", {
+          message:
+            errorCode(error) === "account_exists"
+              ? `${codeSentTo} already has a DocuHealth account. Find the patient by their HIN instead.`
+              : getErrorMessage(error),
+        }),
     };
     if (guardian) verifyPhone.mutate({ phone, code }, onVerified);
     else verifyEmail.mutate({ email, code }, onVerified);
@@ -172,15 +187,31 @@ export function RegisterPatientForm({
 
   function resendCode() {
     sendCode.mutate(signupDetails(), {
-      onSuccess: () => toast.success(`We sent a new code to ${codeSentTo}.`),
-      onError: (error) => toast.error(getErrorMessage(error)),
+      onSuccess: ({ destination }) => {
+        if (destination) setSentTo(destination);
+        cooldown.started();
+        toast.success(`We sent a new code to ${destination ?? codeSentTo}.`);
+      },
+      onError: (error) => {
+        if (!cooldown.refused(error)) toast.error(getErrorMessage(error));
+      },
     });
   }
 
   function onSubmit(values: RegisterPatientValues) {
     if (!verificationToken) return;
-    const { firstName, lastName, otherName, gender, email, phone, nin, password } = values;
-    const details = { firstName, lastName, otherName, sex: gender, phone, nin, password };
+    const { firstName, lastName, otherName, gender, dateOfBirth, email, phone, nin, password } =
+      values;
+    const details = {
+      firstName,
+      lastName,
+      otherName,
+      sex: gender,
+      dateOfBirth,
+      phone,
+      nin,
+      password,
+    };
     const callbacks = {
       onSuccess: ({ id, hin }: { id: string; hin: string }) =>
         onRegistered({ id, hin, name: `${firstName} ${lastName}`, phone, email }),
@@ -212,8 +243,8 @@ export function RegisterPatientForm({
         description={
           step === 2
             ? guardian
-              ? `Enter the ${CODE_LENGTH}-digit code we sent to ${phone}.`
-              : `Enter the ${CODE_LENGTH} digit code sent to ${email}`
+              ? `Enter the ${CODE_LENGTH}-digit code we sent to ${codeSentTo}.`
+              : `Enter the ${CODE_LENGTH} digit code sent to ${codeSentTo}`
             : steps[variant][step].description
         }
         // A longer flow shows its own progress along the footer instead.
@@ -303,6 +334,29 @@ export function RegisterPatientForm({
             />
           </div>
 
+          <Controller
+            name="dateOfBirth"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="patientDateOfBirth" className="gap-1">
+                  Date of birth <RequiredMark />
+                </FieldLabel>
+                <DateInput
+                  ref={field.ref}
+                  id="patientDateOfBirth"
+                  name={field.name}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  max={TODAY}
+                  invalid={fieldState.invalid}
+                />
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
+
           <Field data-invalid={!!errors.email}>
             <FieldLabel htmlFor="patientEmail" className="gap-1">
               Email {!guardian && <RequiredMark />}
@@ -389,10 +443,12 @@ export function RegisterPatientForm({
             <button
               type="button"
               onClick={resendCode}
-              disabled={sendCode.isPending}
+              disabled={sendCode.isPending || cooldown.secondsLeft > 0}
               className="text-primary underline underline-offset-2 disabled:opacity-50"
             >
-              Resend Code
+              {cooldown.secondsLeft > 0
+                ? `Resend Code in ${formatWait(cooldown.secondsLeft)}`
+                : "Resend Code"}
             </button>
           </p>
         </FormDialogBody>

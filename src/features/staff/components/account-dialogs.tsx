@@ -34,6 +34,7 @@ import {
   type NewEmailValues,
   newEmailSchema,
 } from "@/features/staff/lib/schemas";
+import { formatWait, useResendCooldown } from "@/hooks/use-resend-cooldown";
 import { getErrorMessage } from "@/lib/api";
 
 type DialogProps = { open: boolean; onOpenChange: (open: boolean) => void };
@@ -214,6 +215,7 @@ function EmailCodeForm({
 }) {
   const verify = useVerifyEmailChangeCode();
   const resend = useSendEmailChangeCode();
+  const cooldown = useResendCooldown();
   const form = useForm<EmailCodeValues>({
     resolver: zodResolver(emailCodeSchema),
     defaultValues: { code: "" },
@@ -277,16 +279,25 @@ function EmailCodeForm({
           Didn’t get it?{" "}
           <button
             type="button"
-            disabled={resend.isPending}
+            disabled={resend.isPending || cooldown.secondsLeft > 0}
             onClick={() =>
               resend.mutate(email, {
-                onSuccess: () => toast.success("We sent a new code."),
-                onError: (error) => toast.error(getErrorMessage(error)),
+                onSuccess: () => {
+                  cooldown.started();
+                  toast.success("We sent a new code.");
+                },
+                onError: (error) => {
+                  if (!cooldown.refused(error)) toast.error(getErrorMessage(error));
+                },
               })
             }
             className="text-primary underline underline-offset-2 disabled:opacity-50"
           >
-            {resend.isPending ? "Sending…" : "Send it again"}
+            {resend.isPending
+              ? "Sending…"
+              : cooldown.secondsLeft > 0
+                ? `Send it again in ${formatWait(cooldown.secondsLeft)}`
+                : "Send it again"}
           </button>
         </p>
       </FormDialogBody>

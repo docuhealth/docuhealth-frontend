@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { request } from "@/lib/api";
 import { NotAvailableYetError } from "@/lib/not-available";
+import { DEFAULT_COUNTRY } from "@/lib/locations";
 import { absoluteUrl } from "@/lib/sections";
 import type { StaffRole } from "@/lib/staff-profile";
 import { hospitalAdminKeys, WARDS_URL } from "@/features/hospital-admin/api/queries";
@@ -87,9 +88,8 @@ const adminRoleOf: Record<FacilityType, StaffRole> = {
 };
 
 /**
- * Add a facility and invite the admin who will manage it. TODO(api): the API also requires the
- * facility's name and address, which the design's dialog doesn't ask for, so it refuses until
- * they're optional or the dialog asks.
+ * Add a facility (an arm of the hospital: one per type) and invite the admin who will manage it;
+ * the API emails them a temporary password and a link to the hospital login.
  */
 export function useAddFacility() {
   const queryClient = useQueryClient();
@@ -97,9 +97,11 @@ export function useAddFacility() {
   return useMutation({
     mutationFn: ({
       type,
+      facility,
       admin,
     }: {
       type: FacilityType;
+      facility: { name: string; state: string; city: string; street: string };
       admin: { firstName: string; lastName: string; phone: string; email: string };
     }) =>
       request(anyResponseSchema, {
@@ -107,6 +109,11 @@ export function useAddFacility() {
         url: "/api/auth/facility/arms",
         data: {
           facility_type: type,
+          name: facility.name,
+          street: facility.street,
+          city: facility.city,
+          state: facility.state,
+          country: DEFAULT_COUNTRY,
           admin: {
             email: admin.email,
             profile: {
@@ -116,7 +123,7 @@ export function useAddFacility() {
               role: adminRoleOf[type],
             },
           },
-          login_url: absoluteUrl("/login"),
+          login_url: absoluteUrl("/hospital/login"),
         },
       }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: hospitalAdminKeys.all }),
@@ -124,9 +131,9 @@ export function useAddFacility() {
 }
 
 /**
- * Add a team member; the API emails them `message` (HTML) with a link to log in. TODO(api): it
- * takes no password and can't make them an admin, so asking for admin access fails before
- * anything is created, and the password typed is not sent.
+ * Add a team member; the API emails them `message` (HTML) with a temporary password and a link to
+ * the hospital login. TODO(api): it can't make them an admin, so asking for admin access fails
+ * before anything is created.
  */
 export function useAddStaff() {
   const queryClient = useQueryClient();
@@ -139,7 +146,6 @@ export function useAddStaff() {
       role: StaffRole;
       isAdmin: boolean;
       email: string;
-      password: string;
       message: string;
     }) => {
       if (member.isAdmin) throw new NotAvailableYetError("Adding staff as admins");
@@ -155,7 +161,7 @@ export function useAddStaff() {
             role: member.role,
           },
           invitation_message: member.message,
-          login_url: absoluteUrl("/login"),
+          login_url: absoluteUrl("/hospital/login"),
         },
       });
     },

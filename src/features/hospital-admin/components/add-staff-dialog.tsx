@@ -1,4 +1,4 @@
-import { CaretRightIcon, EnvelopeSimpleIcon, LockSimpleIcon } from "@phosphor-icons/react";
+import { CaretRightIcon, EnvelopeSimpleIcon } from "@phosphor-icons/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { PasswordGroupInput } from "@/components/password-group-input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import {
   Select,
@@ -97,20 +96,19 @@ function AddStaffForm({ onAdded }: { onAdded: () => void }) {
       role: "",
       isAdmin: false,
       email: "",
-      password: "",
       message: "",
     },
   });
   const { errors } = form.formState;
-  const [firstName, email, password] = useWatch({
+  const [firstName, email] = useWatch({
     control: form.control,
-    name: ["firstName", "email", "password"],
+    name: ["firstName", "email"],
   });
 
   useEffect(() => {
     if (messageEdited) return;
-    form.setValue("message", welcomeMessage({ name: firstName, email, password, from: signature }));
-  }, [form, messageEdited, firstName, email, password, signature]);
+    form.setValue("message", welcomeMessage({ name: firstName, email, from: signature }));
+  }, [form, messageEdited, firstName, email, signature]);
 
   async function continueToStepTwo() {
     if (await form.trigger([...addStaffStepOne])) setStep(2);
@@ -270,26 +268,6 @@ function AddStaffForm({ onAdded }: { onAdded: () => void }) {
               />
             </InputGroup>
             <FieldError errors={[errors.email]} />
-          </Field>
-
-          <Field data-invalid={!!errors.password}>
-            <FieldLabel htmlFor="staffPassword" className="gap-1">
-              Password <RequiredMark />
-            </FieldLabel>
-            <InputGroup className="bg-card">
-              <InputGroupAddon>
-                <LockSimpleIcon className="size-5" />
-              </InputGroupAddon>
-              <PasswordGroupInput
-                id="staffPassword"
-                autoComplete="new-password"
-                placeholder="Enter password"
-                aria-required
-                aria-invalid={!!errors.password}
-                {...form.register("password")}
-              />
-            </InputGroup>
-            <FieldError errors={[errors.password]} />
           </Field>
 
           <Controller

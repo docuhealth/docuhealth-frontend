@@ -137,7 +137,7 @@ describe("AppointmentsCalendar", () => {
 
   // TODO(api): desk signup requires a date of birth, which the design's form doesn't ask for, so
   // step 1 shows the API's error until that changes.
-  it("starts registering a walk-in nobody has on file, and shows the API's error", async () => {
+  it("registers a walk-in nobody has on file, with their date of birth", async () => {
     const { user } = renderWithProviders(
       <AppointmentsCalendar view="month" date={new Date()} onNavigate={() => {}} />,
     );
@@ -163,8 +163,59 @@ describe("AppointmentsCalendar", () => {
     await pickOption("Female");
     await fill(/Email/, "ada.obi@email.com");
     await fill(/Phone Number/, "+2348031112233");
+    await user.clear(screen.getByLabelText(/Date of birth/));
     await user.click(screen.getByRole("button", { name: "Continue" }));
-    expect(await screen.findByText("dob: This field is required.")).toBeInTheDocument();
+    expect(await screen.findByText("Enter a date as DD/MM/YYYY")).toBeInTheDocument();
+    await fill(/Date of birth/, "12/04/1990");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    // Step 2: the code, sent where the API says (masked).
+    expect(
+      await screen.findByText("Enter the 6 digit code sent to a***@email.com"),
+    ).toBeInTheDocument();
+    const code = screen.getByLabelText("Verification code");
+    await user.clear(code);
+    await user.type(code, "123456");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    expect(
+      await screen.findByRole("dialog", { name: "Contact & account details" }),
+    ).toBeInTheDocument();
+  });
+
+  it("tells the receptionist when the patient already has an account", async () => {
+    const { user } = renderWithProviders(
+      <AppointmentsCalendar view="month" date={new Date()} onNavigate={() => {}} />,
+    );
+    await user.click(await screen.findByRole("button", { name: "New Appointment" }));
+    const hin = await screen.findByLabelText(/Enter HIN/);
+    await user.clear(hin);
+    await user.type(hin, "99999999999");
+    await user.click(await screen.findByRole("button", { name: "Register new patient" }));
+
+    await screen.findByRole("dialog", { name: "Patient Information" });
+    const fill = async (label: RegExp, value: string) => {
+      const field = screen.getByLabelText(label);
+      await user.clear(field);
+      await user.type(field, value);
+    };
+    await fill(/First name/, "Ada");
+    await fill(/Last name/, "Obi");
+    await user.click(screen.getByRole("combobox", { name: /Gender/ }));
+    await pickOption("Female");
+    await fill(/Date of birth/, "12/04/1990");
+    await fill(/Email/, "exists@email.com");
+    await fill(/Phone Number/, "+2348031112233");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    const code = await screen.findByLabelText("Verification code");
+    await user.clear(code);
+    await user.type(code, "123456");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    expect(
+      await screen.findByText(
+        "e***@email.com already has a DocuHealth account. Find the patient by their HIN instead.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("lists each patient's age, sex and HIN, and copies the HIN without opening the appointment", async () => {

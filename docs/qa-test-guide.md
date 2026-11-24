@@ -47,6 +47,11 @@ checks apply on `https://v2.docuhealthservices.net` and `https://hospital.v2.doc
   | `dhadmin@test.com`    | DocuHealth admin (on the `admin.` login)          |
   | `wrong@test.com`      | Fails with "Invalid login credentials"            |
 
+  On sign-up, desk registration and password reset, two more emails try the new code rules:
+  `exists@test.com` already has an account (after the code you're sent to log in, or at the desk
+  told to look them up by HIN), and `wait@test.com` is refused a second code, so "Resend Code"
+  counts down.
+
   There's no demo lab admin; test the lab admin on staging. Demo forms come pre-filled; clear a
   field before typing. Demo data resets when the page reloads.
 
@@ -60,7 +65,7 @@ payment). Do the write-heavy testing in demo mode.
 ### What to report
 
 For each bug: the role, the URL, the steps, what you expected, what happened, and a screenshot.
-If the screen shows an error message from the API (e.g. `dob: This field is required.`), copy it
+If the screen shows an error message from the API (e.g. `staff: This field is required.`), copy it
 exactly.
 
 ---
@@ -108,6 +113,9 @@ with a code, password) and the top bar (name, greeting, log out). Check them onc
       dashboard.
 - [ ] A staff role with no dashboard sees "your dashboard isn't ready yet" with Log out.
 - [ ] Wrong password shows an error; Forgot password sends a code and lets you set a new password.
+      Patients can reset with their email or phone number; staff with their email only.
+- [ ] Every code screen says where the code went (masked, e.g. `a***@example.com`), and "Resend
+      Code" counts down if you ask again too soon.
 - [ ] Log out returns to the login page; the back button doesn't reopen the dashboard.
 - [ ] On staging, a tab left open for a long time (e.g. over lunch) still works when you click
       around (the session refreshes), or shows "You're signed out" with a way back to log in.
@@ -115,7 +123,9 @@ with a code, password) and the top bar (name, greeting, log out). Check them onc
 ### Hospital admin
 
 - [ ] Dashboard: team size, staff by role, today's queue.
-- [ ] Staff Mgt.: search, On team / Removed, open a staff profile, remove and **Undo**, add staff.
+- [ ] Staff Mgt.: search, On team / Removed, open a staff profile, remove and **Undo**, add staff
+      (no password: the new member is emailed a temporary one, with a link to the hospital login).
+- [ ] Add Facility: type, the facility's name and address, and its admin.
 - [ ] Patient Mgt.: the four tabs with counts, search, open a patient profile.
 - [ ] Ward Mgt.: create a ward, rename or resize, delete, see beds.
 - [ ] Audit logs: list, lab and radiology downloads.
@@ -123,18 +133,18 @@ with a code, password) and the top bar (name, greeting, log out). Check them onc
 - [ ] Settings: change the banner photo.
 - **Known gaps:** admin access toggle, joining dates, facility count, check-in stats, patient
   filters and sorting, staff activity, patient visit history, wallet balance ("Not available
-  yet"). **Add facility** fails with the API's address errors. Staff added here don't get a working
-  password by email.
+  yet").
 
 ### Receptionist
 
 - [ ] Dashboard: queue and today's appointments; check a patient out.
-- [ ] Patient Mgt.: HIN lookup, profile, **Check in**, register a patient, add a dependant.
+- [ ] Patient Mgt.: HIN lookup, profile, **Check in**, register a patient (with date of birth),
+      add a dependant.
 - [ ] Appointments: three tabs, search, calendar, open an appointment, book one.
 - [ ] Admissions: Pending / Admitted / Rejected, search, admit, reject with a reason.
 - **Known gaps:** most overview figures, reschedule and cancel, follow-up requests, linking an
-  existing child. **Registering a patient** fails with `dob: This field is required.` and
-  **booking** fails with `staff: This field is required.` until the backend changes them.
+  existing child. **Booking** fails with `staff: This field is required.` until the backend
+  changes it.
 
 ### Doctor
 
@@ -193,6 +203,8 @@ with a code, password) and the top bar (name, greeting, log out). Check them onc
 - [ ] Overview: totals, charts by day / month / year, users by state.
 - [ ] Users: individuals and hospitals, search, deactivate and activate (demo mode only).
 - [ ] Facility applications: by status, documents, approve, reject with a reason (demo mode only).
+- [ ] Register a facility: the three steps (details, location, admin) for a facility registered in
+      person (demo mode only). The old `agent.` address now opens this page.
 - [ ] Subscription plans: add, edit.
 - [ ] Settings: change password.
 - **Known gaps:** the top bar shows the email used to log in (the API sends no name); "reviewed

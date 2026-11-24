@@ -2,30 +2,27 @@ import { describe, expect, it } from "vitest";
 import { messageText, welcomeMessage } from "@/features/hospital-admin/lib/welcome-message";
 
 describe("welcomeMessage", () => {
-  it("greets them and puts their login details in bold", () => {
+  it("greets them, puts their login email in bold and says the password comes by email", () => {
     const html = welcomeMessage({
       name: "Joe",
       email: "joe@luth.example.com",
-      password: "Password123!",
       from: "Dr. Folake Adeyemi",
     });
     expect(html).toContain("<p>Hi Joe,</p>");
-    expect(html).toContain(
-      "<strong>Email: joe@luth.example.com<br>Password: Password123!</strong>",
-    );
+    expect(html).toContain("<strong>Email: joe@luth.example.com</strong>");
+    expect(html).toContain("the temporary password we’ll send you separately");
+    expect(html).not.toContain("Password:");
     expect(html).toContain("<p>Dr. Folake Adeyemi</p>");
   });
 
   it("keeps a [Name] placeholder until there's a name", () => {
-    expect(welcomeMessage({ name: " ", email: "", password: "", from: "Ada" })).toContain(
-      "<p>Hi [Name],</p>",
-    );
+    expect(welcomeMessage({ name: " ", email: "", from: "Ada" })).toContain("<p>Hi [Name],</p>");
   });
 
   it("escapes what people type so it stays text", () => {
-    const html = welcomeMessage({ name: "<b>Jo</b>", email: "", password: "a&b", from: "Ada" });
+    const html = welcomeMessage({ name: "<b>Jo</b>", email: "a&b@x.com", from: "Ada" });
     expect(html).toContain("Hi &lt;b&gt;Jo&lt;/b&gt;,");
-    expect(html).toContain("Password: a&amp;b");
+    expect(html).toContain("Email: a&amp;b@x.com");
   });
 });
 

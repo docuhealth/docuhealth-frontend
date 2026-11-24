@@ -12,14 +12,17 @@ import { AuthHeader } from "@/features/auth/components/auth-header";
 import { StepProgress } from "@/features/auth/components/step-progress";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import { OTP_LENGTH, verifyCodeSchema, type VerifyCodeValues } from "@/features/auth/lib/schemas";
+import { formatWait, useResendCooldown } from "@/hooks/use-resend-cooldown";
 import { getErrorMessage } from "@/lib/api";
 
 /**
- * Confirms the email address with the code we sent to it — a sign-up step, or the middle of a
- * password reset, or admin email verification. The step bar shows only when `step` and `totalSteps` are given.
+ * Confirms an email address or phone number with the code we sent to it — a sign-up step, the
+ * middle of a password reset, or admin email verification. The step bar shows only when `step`
+ * and `totalSteps` are given. After a resend, or when the API says it's too soon, "Resend Code"
+ * waits and counts down.
  */
 export function VerifyCodeForm({
-  email,
+  sentTo,
   step,
   totalSteps,
   title = "Verify account",
@@ -28,13 +31,14 @@ export function VerifyCodeForm({
   onVerified,
   onResend,
 }: {
-  email: string;
+  /** Where the code went, as the API reports it (`a***@example.com`, `+234••••••1234`). */
+  sentTo: string;
   step?: number;
   totalSteps?: number;
   title?: string;
   /** Prompt and target of the "Log in" link under the button. Pass `null` to hide. */
   login?: { prompt: string; to: LinkProps["to"] } | null;
-  /** Go back to the step where the email was entered. */
+  /** Go back to the step where the email or phone was entered. */
   onChangeEmail?: () => void;
   onVerified: (code: string) => void | Promise<void>;
   onResend?: () => void | Promise<void>;
@@ -45,6 +49,7 @@ export function VerifyCodeForm({
   });
   const { isSubmitting } = form.formState;
   const [isResending, setIsResending] = useState(false);
+  const cooldown = useResendCooldown();
 
   // The code is the only thing to do on this step, so start typing straight away.
   useEffect(() => form.setFocus("code"), [form]);
@@ -55,15 +60,16 @@ export function VerifyCodeForm({
 
   async function resendCode() {
     if (!onResend) {
-      toast.success(`We sent a new code to ${email}.`);
+      toast.success(`We sent a new code to ${sentTo}.`);
       return;
     }
     try {
       setIsResending(true);
       await onResend();
-      toast.success(`We sent a new code to ${email}.`);
+      cooldown.started();
+      toast.success(`We sent a new code to ${sentTo}.`);
     } catch (error) {
-      toast.error(getErrorMessage(error));
+      if (!cooldown.refused(error)) toast.error(getErrorMessage(error));
     } finally {
       setIsResending(false);
     }
@@ -80,7 +86,7 @@ export function VerifyCodeForm({
           title={title}
           description={
             <>
-              Enter the {OTP_LENGTH}-digit code we sent to {email}.
+              Enter the {OTP_LENGTH}-digit code we sent to {sentTo}.
               {onChangeEmail && (
                 <>
                   {" "}
@@ -134,14 +140,18 @@ export function VerifyCodeForm({
           />
 
           <p className="text-center type-body-sm-regular text-muted-foreground">
-            Didn’t receive the email?{" "}
+            Didn’t receive the code?{" "}
             <button
               type="button"
-              disabled={isResending}
+              disabled={isResending || cooldown.secondsLeft > 0}
               onClick={() => void resendCode()}
               className="text-primary underline underline-offset-2 disabled:opacity-50"
             >
-              {isResending ? "Sending..." : "Resend Code"}
+              {isResending
+                ? "Sending..."
+                : cooldown.secondsLeft > 0
+                  ? `Resend Code in ${formatWait(cooldown.secondsLeft)}`
+                  : "Resend Code"}
             </button>
           </p>
         </div>

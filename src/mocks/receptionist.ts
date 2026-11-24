@@ -1,5 +1,6 @@
 import { HttpResponse, http } from "msw";
 import { env } from "@/env";
+import { maskContact } from "@/mocks/auth";
 import type {
   AppointmentList,
   PatientProfile,
@@ -437,7 +438,7 @@ export const receptionistHandlers = [
     queue.splice(index, 1);
     return new HttpResponse(null, { status: 200 });
   }),
-  // As the API does: a desk signup needs a date of birth, which the design's form doesn't ask for.
+  // As the API does: a desk signup needs a date of birth, and says where the code went.
   http.post(api("/api/auth/signup/desk"), async ({ request }) => {
     const body = (await request.json()) as {
       firstname: string;
@@ -455,7 +456,7 @@ export const receptionistHandlers = [
       lastname: body.lastname,
       gender: body.gender,
     });
-    return HttpResponse.json({ detail: "Code sent." });
+    return HttpResponse.json({ detail: "We sent you a code.", destination: maskContact(contact) });
   }),
   http.post(api("/api/auth/signup/verify-code"), async ({ request }) => {
     const { email, phone, verify_by, code } = (await request.json()) as {
@@ -464,9 +465,17 @@ export const receptionistHandlers = [
       verify_by?: string;
       code: string;
     };
-    const signup = signups.get((verify_by === "phone" ? phone : email) ?? "");
+    const contact = (verify_by === "phone" ? phone : email) ?? "";
+    const signup = signups.get(contact);
     if (code !== VERIFICATION_CODE || !signup) {
-      return HttpResponse.json({ detail: "Invalid or expired code." }, { status: 400 });
+      return HttpResponse.json({ code: ["Wrong, expired or used code."] }, { status: 400 });
+    }
+    // `exists@…` already has an account: the right code gives no token.
+    if (contact.toLowerCase().startsWith("exists@")) {
+      return HttpResponse.json(
+        { code: "account_exists", detail: "An account already uses this contact." },
+        { status: 409 },
+      );
     }
     signup.token = `signup-${registered.length + 1}`;
     return HttpResponse.json({ signup_token: signup.token });

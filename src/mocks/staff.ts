@@ -211,7 +211,7 @@ export const staffHandlers = [
     const me = accountFor(request);
     const { otp } = (await request.json()) as { otp: string };
     if (otp === WRONG_CODE || !pendingEmail) {
-      return HttpResponse.json({ detail: "Invalid OTP", status: "error" }, { status: 400 });
+      return HttpResponse.json({ code: ["Invalid OTP"] }, { status: 400 });
     }
     me.email = pendingEmail;
     pendingEmail = null;

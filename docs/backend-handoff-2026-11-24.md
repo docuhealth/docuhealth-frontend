@@ -8,25 +8,24 @@ details and a way to reproduce it.
 
 ## A. Blocks launch
 
-| #   | What                                                                                                                                                                                                                                                                                                           | Where (§) |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| 1   | **CORS allows no website at all.** Since about 24 Nov, staging answers no browser origin, not even `localhost:5173`, which worked before. No deployed site can call the API. Please allow `*.docuhealthservices.net` (two levels deep, e.g. `hospital.v2.…`) on staging, and the new subdomains on production. | §1        |
-| 2   | **Which API is production?** v2 is built on staging's paths (`api/auth/staff…`, `api/hospital-ops/…`). The old `api/hospitals/*` paths are gone on staging. Does production have the new paths, and what's its URL?                                                                                            | §4        |
-| 3   | **Debug pages are public.** Staging still shows Django's debug page (URL list, stack traces). Set `DEBUG = False` and return JSON errors.                                                                                                                                                                      | §2        |
+| #   | What                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Where (§) |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| 1   | **CORS allows no website at all.** Since about 24 Nov, staging answers no browser origin, not even `localhost:5173`, which worked before. No deployed site can call the API. Please allow `*.docuhealthservices.net` (two levels deep, e.g. `hospital.v2.…`) on staging, and the new subdomains on production. With it: expose `Retry-After` (`CORS_EXPOSE_HEADERS`), and allow the same sites in the email-link check, or sign-ups from v2 get "This link must point to a Docuhealth site." | §1        |
+| 2   | **Which API is production?** v2 is built on staging's paths (`api/auth/staff…`, `api/hospital-ops/…`). The old `api/hospitals/*` paths are gone on staging. Does production have the new paths, and what's its URL?                                                                                                                                                                                                                                                                          | §4        |
+| 3   | **Debug pages are public.** Staging still shows Django's debug page (URL list, stack traces). Set `DEBUG = False` and return JSON errors.                                                                                                                                                                                                                                                                                                                                                    | §2        |
 
 ## B. Forms that fail today because the API asks for more than the screen does
 
-The designs were kept as they are, so these show the API's error until the field is optional.
+Your onboarding guide settled three of these, and the forms now ask for what the API needs: the
+receptionist's registration asks for a date of birth, Add Facility asks for the facility's name and
+address, and Add Staff no longer sets a password (the API emails a temporary one). These remain:
 
-| #   | Screen                                  | The API's error / what's wrong                                                                                                                 | §                                       |
-| --- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| 4   | Receptionist: register a patient        | `dob: This field is required.` Please make `dob` optional on `signup/desk`.                                                                    | §7 Receptionist 13                      |
-| 5   | Receptionist: book an appointment       | `staff: This field is required.` Please make `staff` optional on `appointments/book`.                                                          | §7 Receptionist 7                       |
-| 6   | Hospital admin: add a facility          | Needs name, street, city, state, country. Please make them optional.                                                                           | §7 Hospital admin 12                    |
-| 7   | Hospital admin: add staff               | The dialog sets a password and emails it, but the API ignores it, so the emailed password won't work. How should new staff get their password? | §7 Hospital admin 11                    |
-| 8   | Doctor/nurse/receptionist: shared notes | `GET /api/records/patients/{hin}/soap-notes/shared` returns **500** (ValueError).                                                              | §7 Receptionist 15, Doctor and nurse 18 |
-| 9   | Pharmacy: walk-in customer              | Every drug order needs a check-in or admission, so a walk-in can't be served. Not built until this is decided.                                 | §7 Pharmacy 1                           |
-| 10  | Public site: contact and newsletter     | v1's `/api/…/inquiries` return 404; there's no newsletter endpoint.                                                                            | §7 Public site 1                        |
+| #   | Screen                                  | The API's error / what's wrong                                                                                 | §                                       |
+| --- | --------------------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| 4   | Receptionist: book an appointment       | `staff: This field is required.` Please make `staff` optional on `appointments/book`.                          | §7 Receptionist 7                       |
+| 5   | Doctor/nurse/receptionist: shared notes | `GET /api/records/patients/{hin}/soap-notes/shared` returns **500** (ValueError).                              | §7 Receptionist 15, Doctor and nurse 18 |
+| 6   | Pharmacy: walk-in customer              | Every drug order needs a check-in or admission, so a walk-in can't be served. Not built until this is decided. | §7 Pharmacy 1                           |
+| 7   | Public site: contact and newsletter     | v1's `/api/…/inquiries` return 404; there's no newsletter endpoint.                                            | §7 Public site 1                        |
 
 ## C. Missing data: the screen shows "—" or "Not available yet"
 
@@ -66,6 +65,22 @@ call by call, is in §7. The main ones:
    - Emails should use the links we send (`login_url`, `redirect_url`), not a fixed domain, so a
      sign-up on v2 gets v2 links. The facility email appends `?token=…&application=…` to
      `redirect_url`.
+
+## E. Your four handoffs of 24 Nov
+
+- **Records placement** and **pharmacy partner removal:** nothing to change in v2. It already uses
+  the new records addresses, reads none of the removed drug fields, and never had partner screens.
+  v1 (still live) does call the old addresses and has partner pages.
+- **Onboarding:** v2 already followed it. Changed since: new staff and facility admins are sent the
+  hospital login (they were sent the patients' one), and registering a facility in person moved
+  into the DocuHealth admin section, since only DocuHealth admins may do it. Still to build: detach
+  an arm, link an existing facility, name an admin for a facility without one.
+- **SMS and one-time codes:** done in v2. Forgot password sends `identifier` (patients can use a
+  phone; staff use their email), sign-up no longer sends `login_url` and shows `destination`, a
+  409 `account_exists` sends the patient to log in (or, at the desk, to look them up by HIN), and
+  "Resend code" waits and counts down after a 429. Two asks: `destination` isn't in the schema
+  (we read it from the body or `data`), and the browser can only read `Retry-After` once CORS
+  exposes it (until then we wait 60 seconds).
 
 ## How we checked
 

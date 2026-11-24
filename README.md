@@ -226,18 +226,15 @@ section, which is `admin.<domain>`.
 
 ### Field agents
 
-| Path                 | Page                                                 |
-| -------------------- | ---------------------------------------------------- |
-| `/`                  | Redirects to `/register-hospital` (later: dashboard) |
-| `/register-hospital` | Register a hospital on its behalf                    |
+The API only lets DocuHealth's admins register a facility in person for now, so the page is in
+the admin section (`admin.<domain>/register-facility`, behind their login). Every path on
+`agent.<domain>` (e.g. an old `/register-hospital` link) redirects there. When field agents get
+their own login, the page can move back.
 
 ```
-Register a hospital:  /register-hospital
-  hospital details → location → admin details → done (we email the admin) → main site /
+Register a facility:  admin.<domain>/register-facility
+  details → location → admin details → done (the admin is emailed a temporary password) → /admin
 ```
-
-There's no agent login or dashboard yet, so this page is open to anyone, and no page links to the
-agent section.
 
 ### DocuHealth admins
 

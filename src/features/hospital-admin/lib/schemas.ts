@@ -14,7 +14,10 @@ const phone = z
   .regex(/^\+?\d[\d\s-]{6,}$/, "Enter a valid phone number");
 const email = z.email("Enter a valid email address");
 
-/** The Add Facility dialog: which facility, and the admin we invite to run it. */
+/**
+ * The Add Facility dialog: which facility, its own name and address (the API needs them), and
+ * the admin we invite to run it.
+ */
 export const addFacilitySchema = z.object({
   // Empty until one is picked, so the select can start blank.
   type: z
@@ -25,6 +28,10 @@ export const addFacilitySchema = z.object({
         "Select a facility",
       ),
     ),
+  name: required("Enter the facility's name"),
+  state: required("Select a state"),
+  city: required("Select a city / LGA"),
+  street: required("Enter the street address"),
   firstName: required("Enter the admin's first name"),
   lastName: required("Enter the admin's last name"),
   phone,
@@ -45,7 +52,6 @@ export const addStaffSchema = z.object({
     .pipe(z.enum(Object.keys(staffRoles) as [StaffRole, ...StaffRole[]], "Select a role")),
   isAdmin: z.boolean(),
   email,
-  password: z.string().min(8, "Use at least 8 characters"),
   /** HTML from the message editor. */
   message: z
     .string()

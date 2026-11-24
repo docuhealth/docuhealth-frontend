@@ -11,7 +11,7 @@ import {
   type StaffRoleApi,
   verifySignupCodeResponseSchema,
 } from "@/features/auth/api/schemas";
-import { request } from "@/lib/api";
+import { codeSentResponseSchema, request } from "@/lib/api";
 import { type AccountType, DOCUHEALTH_ADMIN_ROLE, type Session } from "@/stores/auth-store";
 
 export function buildSessionFromLoginResponse(
@@ -117,13 +117,13 @@ export interface StartPatientSignupInput {
   email?: string;
   phone?: string;
   verify_by?: "email" | "phone";
-  login_url: string;
 }
 
+/** Step 1: the API texts or emails a code, and says where (masked) in `destination`. */
 export function useStartPatientSignup() {
   return useMutation({
     mutationFn: (data: StartPatientSignupInput) =>
-      request(messageResponseSchema, {
+      request(codeSentResponseSchema, {
         method: "POST",
         url: "/api/auth/signup",
         data,
@@ -167,7 +167,8 @@ export function useCompletePatientSignup() {
 }
 
 export interface ForgotPasswordInput {
-  email: string;
+  /** An email, or for a patient account a phone number in any common form. */
+  identifier: string;
   account_type?: AccountType | null;
 }
 
@@ -183,7 +184,8 @@ export function useForgotPassword() {
 }
 
 export interface VerifyForgotPasswordOtpInput {
-  email: string;
+  /** The same identifier and account type the code was asked for with. */
+  identifier: string;
   otp: string;
   account_type?: AccountType | null;
 }

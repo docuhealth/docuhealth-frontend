@@ -1,4 +1,5 @@
-import { useNavigate } from "@tanstack/react-router";
+import { UserCircleCheckIcon } from "@phosphor-icons/react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -7,22 +8,28 @@ import {
   useStartPatientSignup,
   useVerifyPatientSignupCode,
 } from "@/features/auth/api/mutations";
+import { Button } from "@/components/ui/button";
 import { AccountCreatedDialog } from "@/features/auth/components/account-created-dialog";
 import { AccountDetailsForm } from "@/features/auth/components/account-details-form";
+import { AuthNotice } from "@/features/auth/components/auth-header";
 import { IndividualInfoForm } from "@/features/auth/components/individual-info-form";
 import { VerifyCodeForm } from "@/features/auth/components/verify-code-form";
 import type { AccountDetailsValues, IndividualInfoValues } from "@/features/auth/lib/schemas";
-import { getErrorMessage } from "@/lib/api";
-import { absoluteUrl } from "@/lib/sections";
+import { errorCode, getErrorMessage } from "@/lib/api";
 import { getPostLoginDestination, useAuthStore } from "@/stores/auth-store";
 
 const TOTAL_STEPS = 3;
 
-/** The individual sign-up flow; keeps each step's answers while the user moves between steps. */
+/**
+ * The individual sign-up flow; keeps each step's answers while the user moves between steps.
+ * The API answers step 1 the same whether or not the contact has an account; only the right code
+ * tells (409 `account_exists`), and then the person is sent to log in or reset their password.
+ */
 export function IndividualSignUp() {
   const navigate = useNavigate();
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | "exists">(1);
   const [info, setInfo] = useState<IndividualInfoValues>();
+  const [sentTo, setSentTo] = useState("");
   const [signupToken, setSignupToken] = useState<string>();
   const [hin, setHin] = useState<string>();
 
@@ -31,7 +38,7 @@ export function IndividualSignUp() {
   const completeSignupMutation = useCompletePatientSignup();
 
   async function sendSignupCode(values: IndividualInfoValues) {
-    await startSignupMutation.mutateAsync({
+    const { destination } = await startSignupMutation.mutateAsync({
       firstname: values.firstName.trim(),
       lastname: values.lastName.trim(),
       middlename: values.otherName.trim() || undefined,
@@ -40,8 +47,8 @@ export function IndividualSignUp() {
       email: values.email.trim(),
       phone: values.phone.trim(),
       verify_by: "email",
-      login_url: absoluteUrl("/login"),
     });
+    setSentTo(destination ?? values.email.trim());
   }
 
   async function handleStartSignup(values: IndividualInfoValues) {
@@ -65,7 +72,8 @@ export function IndividualSignUp() {
       setSignupToken(response.signup_token);
       setStep(3);
     } catch (error) {
-      toast.error(getErrorMessage(error));
+      if (errorCode(error) === "account_exists") setStep("exists");
+      else toast.error(getErrorMessage(error));
     }
   }
 
@@ -89,6 +97,27 @@ export function IndividualSignUp() {
     }
   }
 
+  if (step === "exists") {
+    return (
+      <div className="flex flex-col gap-8">
+        <AuthNotice icon={<UserCircleCheckIcon />} title="You already have an account">
+          <p className="type-body-sm-regular text-muted-foreground">
+            {sentTo} already belongs to a DocuHealth account. Log in, or reset your password if
+            you’ve forgotten it.
+          </p>
+        </AuthNotice>
+        <div className="flex flex-col gap-3">
+          <Button asChild className="h-12 w-full">
+            <Link to="/login">Log in</Link>
+          </Button>
+          <Button asChild variant="outline" className="h-12 w-full bg-card">
+            <Link to="/forgot-password">Reset password</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (step === 3 && info) {
     return (
       <>
@@ -108,7 +137,7 @@ export function IndividualSignUp() {
   if (step === 2 && info) {
     return (
       <VerifyCodeForm
-        email={info.email}
+        sentTo={sentTo}
         step={2}
         totalSteps={TOTAL_STEPS}
         onChangeEmail={() => setStep(1)}

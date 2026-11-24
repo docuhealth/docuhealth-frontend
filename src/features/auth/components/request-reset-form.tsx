@@ -6,28 +6,35 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { AuthFooter, AuthHeader } from "@/features/auth/components/auth-header";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
-import { forgotPasswordSchema, type ForgotPasswordValues } from "@/features/auth/lib/schemas";
+import {
+  forgotPasswordSchema,
+  type ForgotPasswordValues,
+  patientForgotPasswordSchema,
+} from "@/features/auth/lib/schemas";
 
-/** The email field that starts a password reset. */
+/** The email (or, with `allowPhone`, email or phone) field that starts a password reset. */
 export function RequestResetForm({
   description,
   submitLabel,
   loginTo,
-  defaultEmail,
+  allowPhone = false,
+  defaultIdentifier,
   onSubmit,
 }: {
   description: string;
   submitLabel: string;
   loginTo: LinkProps["to"];
-  /** Email entered on an earlier visit to this step. */
-  defaultEmail?: string;
+  /** Patients can reset by phone; staff and DocuHealth admins can't. */
+  allowPhone?: boolean;
+  /** What was entered on an earlier visit to this step. */
+  defaultIdentifier?: string;
   onSubmit: (values: ForgotPasswordValues) => void | Promise<void>;
 }) {
   const form = useForm<ForgotPasswordValues>({
-    resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: defaultEmail
-      ? { email: defaultEmail }
-      : (devPrefill?.forgotPassword ?? { email: "" }),
+    resolver: zodResolver(allowPhone ? patientForgotPasswordSchema : forgotPasswordSchema),
+    defaultValues: defaultIdentifier
+      ? { identifier: defaultIdentifier }
+      : (devPrefill?.forgotPassword ?? { identifier: "" }),
   });
   const { errors, isSubmitting } = form.formState;
 
@@ -37,18 +44,20 @@ export function RequestResetForm({
 
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <FieldGroup>
-          <Field data-invalid={!!errors.email}>
-            <FieldLabel htmlFor="email">Email address</FieldLabel>
+          <Field data-invalid={!!errors.identifier}>
+            <FieldLabel htmlFor="identifier">
+              {allowPhone ? "Email address or phone number" : "Email address"}
+            </FieldLabel>
             <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="you@example.com"
-              aria-invalid={!!errors.email}
+              id="identifier"
+              type={allowPhone ? "text" : "email"}
+              autoComplete={allowPhone ? "username" : "email"}
+              placeholder={allowPhone ? "you@example.com or 0803 123 4567" : "you@example.com"}
+              aria-invalid={!!errors.identifier}
               className="bg-card"
-              {...form.register("email")}
+              {...form.register("identifier")}
             />
-            <FieldError errors={[errors.email]} />
+            <FieldError errors={[errors.identifier]} />
           </Field>
 
           <Button type="submit" loading={isSubmitting} className="h-12 w-full">

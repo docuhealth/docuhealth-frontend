@@ -1,7 +1,7 @@
 import { CaretRightIcon, EnvelopeSimpleIcon } from "@phosphor-icons/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { RequiredMark } from "@/components/required-mark";
 import { SuccessDialog } from "@/components/success-dialog";
@@ -31,12 +31,15 @@ import {
   addFacilitySchema,
 } from "@/features/hospital-admin/lib/schemas";
 import { getErrorMessage } from "@/lib/api";
+import { getLgasForState, NIGERIA_STATES } from "@/lib/locations";
 
 type AddedFacility = { facility: string; admin: string };
 
+const stateItems = Object.fromEntries(NIGERIA_STATES.map((state) => [state, state]));
+
 /**
- * "Add Facilities" modal: pick a facility and the admin who will manage it. Once it's added,
- * the form closes and a "Facility Added!" confirmation takes its place.
+ * "Add Facilities" modal: pick a facility, give its name and address, and the admin who will
+ * manage it. Once it's added, the form closes and a "Facility Added!" confirmation takes its place.
  */
 export function AddFacilityDialog({
   open,
@@ -78,6 +81,10 @@ function AddFacilityForm({ onAdded }: { onAdded: (facility: AddedFacility) => vo
     resolver: zodResolver(addFacilitySchema),
     defaultValues: devPrefill?.addFacility ?? {
       type: "",
+      name: "",
+      state: "",
+      city: "",
+      street: "",
       firstName: "",
       lastName: "",
       phone: "",
@@ -85,14 +92,16 @@ function AddFacilityForm({ onAdded }: { onAdded: (facility: AddedFacility) => vo
     },
   });
   const { errors } = form.formState;
+  const state = useWatch({ control: form.control, name: "state" });
+  const cityItems = Object.fromEntries(getLgasForState(state).map((lga) => [lga, lga]));
 
-  function onSubmit({ type, ...admin }: AddFacilityValues) {
+  function onSubmit({ type, name, state, city, street, ...admin }: AddFacilityValues) {
     addFacility.mutate(
-      { type, admin },
+      { type, facility: { name, state, city, street }, admin },
       {
         onSuccess: () =>
           onAdded({
-            facility: facilityTypeLabels[type],
+            facility: `${name} (${facilityTypeLabels[type]})`,
             admin: `${admin.firstName} ${admin.lastName}`,
           }),
         onError: (error) => toast.error(getErrorMessage(error)),
@@ -108,7 +117,7 @@ function AddFacilityForm({ onAdded }: { onAdded: (facility: AddedFacility) => vo
     >
       <FormDialogHeader
         title="Add Facilities"
-        description="Choose a facility and who will manage it."
+        description="Choose a facility, where it is, and who will manage it."
       />
 
       <FormDialogBody>
@@ -147,6 +156,118 @@ function AddFacilityForm({ onAdded }: { onAdded: (facility: AddedFacility) => vo
             </Field>
           )}
         />
+
+        <Field data-invalid={!!errors.name}>
+          <FieldLabel htmlFor="facilityName" className="gap-1">
+            Facility name <RequiredMark />
+          </FieldLabel>
+          <Input
+            id="facilityName"
+            autoComplete="off"
+            placeholder="E.g. LUTH Pharmacy"
+            aria-required
+            aria-invalid={!!errors.name}
+            className="bg-card"
+            {...form.register("name")}
+          />
+          <FieldError errors={[errors.name]} />
+        </Field>
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <Controller
+            name="state"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="facilityState" className="gap-1">
+                  State <RequiredMark />
+                </FieldLabel>
+                <Select
+                  name={field.name}
+                  items={stateItems}
+                  value={field.value || null}
+                  onValueChange={(value) => {
+                    field.onChange(value ?? "");
+                    form.setValue("city", "");
+                  }}
+                >
+                  <SelectTrigger
+                    id="facilityState"
+                    aria-required
+                    aria-invalid={fieldState.invalid}
+                    onBlur={field.onBlur}
+                    className="w-full bg-card"
+                  >
+                    <SelectValue placeholder="Select state" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {NIGERIA_STATES.map((name) => (
+                      <SelectItem key={name} value={name}>
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
+
+          <Controller
+            name="city"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="facilityCity" className="gap-1">
+                  City / LGA <RequiredMark />
+                </FieldLabel>
+                <Select
+                  name={field.name}
+                  items={cityItems}
+                  value={field.value || null}
+                  onValueChange={(value) => field.onChange(value ?? "")}
+                  disabled={!state}
+                >
+                  <SelectTrigger
+                    id="facilityCity"
+                    aria-required
+                    aria-invalid={fieldState.invalid}
+                    onBlur={field.onBlur}
+                    className="w-full bg-card"
+                  >
+                    <SelectValue
+                      placeholder={state ? "Select city / LGA" : "Select a state first"}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.keys(cityItems).map((lga) => (
+                      <SelectItem key={lga} value={lga}>
+                        {lga}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
+        </div>
+
+        <Field data-invalid={!!errors.street}>
+          <FieldLabel htmlFor="facilityStreet" className="gap-1">
+            Street address <RequiredMark />
+          </FieldLabel>
+          <Input
+            id="facilityStreet"
+            autoComplete="off"
+            placeholder="E.g. 1-5 Ishaga Road"
+            aria-required
+            aria-invalid={!!errors.street}
+            className="bg-card"
+            {...form.register("street")}
+          />
+          <FieldError errors={[errors.street]} />
+        </Field>
 
         <Field data-invalid={!!errors.firstName}>
           <FieldLabel htmlFor="adminFirstName" className="gap-1">

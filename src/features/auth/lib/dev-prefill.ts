@@ -59,7 +59,7 @@ export const devPrefill = enabled
         password,
         confirmPassword: password,
       } satisfies AccountDetailsInput,
-      forgotPassword: { email } satisfies ForgotPasswordValues,
+      forgotPassword: { identifier: email } satisfies ForgotPasswordValues,
       resetPassword: { password, confirmPassword: password } satisfies ResetPasswordValues,
       facilityDocuments: {
         country: DEFAULT_COUNTRY,

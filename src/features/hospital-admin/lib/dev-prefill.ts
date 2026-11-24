@@ -11,6 +11,10 @@ export const devPrefill = enabled
   ? {
       addFacility: {
         type: "pharmacy",
+        name: "LUTH Pharmacy",
+        state: "Lagos",
+        city: "Mushin",
+        street: "Idi-Araba",
         firstName: "Chinedu",
         lastName: "Obi",
         phone: "080-123-456-78",
@@ -23,7 +27,6 @@ export const devPrefill = enabled
         role: "nurse",
         isAdmin: false,
         email: "ngozi.okafor@luth.example.com",
-        password: "Welcome123!",
         // Filled from the template once the dialog opens.
         message: "",
       } satisfies AddStaffInput,

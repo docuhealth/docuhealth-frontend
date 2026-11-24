@@ -2,7 +2,7 @@ import { HttpResponse, http } from "msw";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import { env } from "@/env";
-import { ApiSchemaError, getErrorMessage, request } from "@/lib/api";
+import { ApiSchemaError, errorCode, getErrorMessage, request, retryAfterSeconds } from "@/lib/api";
 import { server } from "@/mocks/node";
 import { useAuthStore } from "@/stores/auth-store";
 
@@ -103,10 +103,38 @@ describe("getErrorMessage", () => {
     );
   });
 
+  it("reads a wrong code on the `code` field, but not a `code` label", async () => {
+    expect(await messageFor(400, { code: ["Wrong or expired code."] })).toBe(
+      "Wrong or expired code.",
+    );
+    expect(
+      await messageFor(409, { code: "account_exists", detail: "You already have an account." }),
+    ).toBe("You already have an account.");
+  });
+
   it("falls back to the status text when the body says nothing useful", async () => {
     server.use(http.get(url, () => new HttpResponse("<html>Server Error</html>", { status: 500 })));
     const error = await request(z.unknown(), { url: "/thing" }).catch((e) => e);
     expect(getErrorMessage(error)).toBe("Request failed with status code 500");
+  });
+
+  it("reads an error's code and how long a 429 asks us to wait", async () => {
+    server.use(
+      http.get(url, () =>
+        HttpResponse.json(
+          { detail: "Request was throttled." },
+          { status: 429, headers: { "Retry-After": "87" } },
+        ),
+      ),
+    );
+    const throttled = await request(z.unknown(), { url: "/thing" }).catch((e) => e);
+    expect(retryAfterSeconds(throttled)).toBe(87);
+    expect(errorCode(throttled)).toBeUndefined();
+
+    server.use(http.get(url, () => HttpResponse.json({ code: "account_exists" }, { status: 409 })));
+    const exists = await request(z.unknown(), { url: "/thing" }).catch((e) => e);
+    expect(errorCode(exists)).toBe("account_exists");
+    expect(retryAfterSeconds(exists)).toBeNull();
   });
 
   it("explains a request that never got an answer (offline, CORS)", async () => {

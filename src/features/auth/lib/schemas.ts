@@ -42,7 +42,21 @@ export const staffLoginSchema = z.object({
 
 export type LoginValues = z.infer<typeof patientLoginSchema>;
 
-export const forgotPasswordSchema = z.object({ email });
+/** A staff or DocuHealth admin reset: email only (the API can't reset staff by phone). */
+export const forgotPasswordSchema = z.object({
+  identifier: z.string().trim().min(1, "Enter your email address").pipe(email),
+});
+/** A patient reset: their email, or their phone (the API texts the code to Nigerian numbers). */
+export const patientForgotPasswordSchema = z.object({
+  identifier: z
+    .string()
+    .trim()
+    .min(1, "Enter your email address or phone number")
+    .refine(
+      (val) => email.safeParse(val).success || phone.safeParse(val).success,
+      "Enter a valid email address or phone number",
+    ),
+});
 export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
 
 export const resetPasswordSchema = z

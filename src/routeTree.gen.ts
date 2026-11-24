@@ -28,7 +28,7 @@ import { Route as AuthVerifyNinRouteImport } from './routes/_auth/verify-nin'
 import { Route as AdminAuthRouteImport } from './routes/admin/_auth'
 import { Route as AdminDashboardRouteImport } from './routes/admin/_dashboard'
 import { Route as AgentIndexRouteImport } from './routes/agent/index'
-import { Route as AgentAuthRouteImport } from './routes/agent/_auth'
+import { Route as AgentSplatRouteImport } from './routes/agent/$'
 import { Route as HospitalIndexRouteImport } from './routes/hospital/index'
 import { Route as HospitalAuthRouteImport } from './routes/hospital/_auth'
 import { Route as HospitalAdminRouteImport } from './routes/hospital/admin'
@@ -45,9 +45,9 @@ import { Route as AdminDashboardIndexRouteImport } from './routes/admin/_dashboa
 import { Route as AdminDashboardApplicationsRouteImport } from './routes/admin/_dashboard/applications'
 import { Route as AdminDashboardHelpRouteImport } from './routes/admin/_dashboard/help'
 import { Route as AdminDashboardPlansRouteImport } from './routes/admin/_dashboard/plans'
+import { Route as AdminDashboardRegisterFacilityRouteImport } from './routes/admin/_dashboard/register-facility'
 import { Route as AdminDashboardSettingsRouteImport } from './routes/admin/_dashboard/settings'
 import { Route as AdminDashboardUsersRouteImport } from './routes/admin/_dashboard/users'
-import { Route as AgentAuthRegisterHospitalRouteImport } from './routes/agent/_auth/register-hospital'
 import { Route as HospitalAuthFirstLoginRouteImport } from './routes/hospital/_auth/first-login'
 import { Route as HospitalAuthForgotPasswordRouteImport } from './routes/hospital/_auth/forgot-password'
 import { Route as HospitalAuthLoginRouteImport } from './routes/hospital/_auth/login'
@@ -218,9 +218,9 @@ const AgentIndexRoute = AgentIndexRouteImport.update({
   path: '/agent/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AgentAuthRoute = AgentAuthRouteImport.update({
-  id: '/agent/_auth',
-  path: '/agent',
+const AgentSplatRoute = AgentSplatRouteImport.update({
+  id: '/agent/$',
+  path: '/agent/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HospitalIndexRoute = HospitalIndexRouteImport.update({
@@ -304,6 +304,12 @@ const AdminDashboardPlansRoute = AdminDashboardPlansRouteImport.update({
   path: '/plans',
   getParentRoute: () => AdminDashboardRoute,
 } as any)
+const AdminDashboardRegisterFacilityRoute =
+  AdminDashboardRegisterFacilityRouteImport.update({
+    id: '/register-facility',
+    path: '/register-facility',
+    getParentRoute: () => AdminDashboardRoute,
+  } as any)
 const AdminDashboardSettingsRoute = AdminDashboardSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -314,12 +320,6 @@ const AdminDashboardUsersRoute = AdminDashboardUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminDashboardRoute,
 } as any)
-const AgentAuthRegisterHospitalRoute =
-  AgentAuthRegisterHospitalRouteImport.update({
-    id: '/register-hospital',
-    path: '/register-hospital',
-    getParentRoute: () => AgentAuthRoute,
-  } as any)
 const HospitalAuthFirstLoginRoute = HospitalAuthFirstLoginRouteImport.update({
   id: '/first-login',
   path: '/first-login',
@@ -757,7 +757,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/verify-nin': typeof AuthVerifyNinRoute
   '/admin': typeof AdminDashboardRouteWithChildren
-  '/agent': typeof AgentAuthRouteWithChildren
+  '/agent/$': typeof AgentSplatRoute
   '/hospital': typeof HospitalAuthRouteWithChildren
   '/hospital/admin': typeof HospitalAdminRouteWithChildren
   '/hospital/doctor': typeof HospitalDoctorRouteWithChildren
@@ -774,9 +774,9 @@ export interface FileRoutesByFullPath {
   '/admin/applications': typeof AdminDashboardApplicationsRoute
   '/admin/help': typeof AdminDashboardHelpRoute
   '/admin/plans': typeof AdminDashboardPlansRoute
+  '/admin/register-facility': typeof AdminDashboardRegisterFacilityRoute
   '/admin/settings': typeof AdminDashboardSettingsRoute
   '/admin/users': typeof AdminDashboardUsersRoute
-  '/agent/register-hospital': typeof AgentAuthRegisterHospitalRoute
   '/hospital/first-login': typeof HospitalAuthFirstLoginRoute
   '/hospital/forgot-password': typeof HospitalAuthForgotPasswordRoute
   '/hospital/login': typeof HospitalAuthLoginRoute
@@ -871,17 +871,18 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/verify-nin': typeof AuthVerifyNinRoute
   '/admin': typeof AdminDashboardIndexRoute
-  '/agent': typeof AgentIndexRoute
+  '/agent/$': typeof AgentSplatRoute
   '/hospital': typeof HospitalIndexRoute
   '/hospital/no-dashboard': typeof HospitalNoDashboardRoute
+  '/agent': typeof AgentIndexRoute
   '/admin/forgot-password': typeof AdminAuthForgotPasswordRoute
   '/admin/login': typeof AdminAuthLoginRoute
   '/admin/applications': typeof AdminDashboardApplicationsRoute
   '/admin/help': typeof AdminDashboardHelpRoute
   '/admin/plans': typeof AdminDashboardPlansRoute
+  '/admin/register-facility': typeof AdminDashboardRegisterFacilityRoute
   '/admin/settings': typeof AdminDashboardSettingsRoute
   '/admin/users': typeof AdminDashboardUsersRoute
-  '/agent/register-hospital': typeof AgentAuthRegisterHospitalRoute
   '/hospital/first-login': typeof HospitalAuthFirstLoginRoute
   '/hospital/forgot-password': typeof HospitalAuthForgotPasswordRoute
   '/hospital/login': typeof HospitalAuthLoginRoute
@@ -978,7 +979,7 @@ export interface FileRoutesById {
   '/_auth/verify-nin': typeof AuthVerifyNinRoute
   '/admin/_auth': typeof AdminAuthRouteWithChildren
   '/admin/_dashboard': typeof AdminDashboardRouteWithChildren
-  '/agent/_auth': typeof AgentAuthRouteWithChildren
+  '/agent/$': typeof AgentSplatRoute
   '/hospital/_auth': typeof HospitalAuthRouteWithChildren
   '/hospital/admin': typeof HospitalAdminRouteWithChildren
   '/hospital/doctor': typeof HospitalDoctorRouteWithChildren
@@ -995,9 +996,9 @@ export interface FileRoutesById {
   '/admin/_dashboard/applications': typeof AdminDashboardApplicationsRoute
   '/admin/_dashboard/help': typeof AdminDashboardHelpRoute
   '/admin/_dashboard/plans': typeof AdminDashboardPlansRoute
+  '/admin/_dashboard/register-facility': typeof AdminDashboardRegisterFacilityRoute
   '/admin/_dashboard/settings': typeof AdminDashboardSettingsRoute
   '/admin/_dashboard/users': typeof AdminDashboardUsersRoute
-  '/agent/_auth/register-hospital': typeof AgentAuthRegisterHospitalRoute
   '/hospital/_auth/first-login': typeof HospitalAuthFirstLoginRoute
   '/hospital/_auth/forgot-password': typeof HospitalAuthForgotPasswordRoute
   '/hospital/_auth/login': typeof HospitalAuthLoginRoute
@@ -1094,7 +1095,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/verify-nin'
     | '/admin'
-    | '/agent'
+    | '/agent/$'
     | '/hospital'
     | '/hospital/admin'
     | '/hospital/doctor'
@@ -1111,9 +1112,9 @@ export interface FileRouteTypes {
     | '/admin/applications'
     | '/admin/help'
     | '/admin/plans'
+    | '/admin/register-facility'
     | '/admin/settings'
     | '/admin/users'
-    | '/agent/register-hospital'
     | '/hospital/first-login'
     | '/hospital/forgot-password'
     | '/hospital/login'
@@ -1208,17 +1209,18 @@ export interface FileRouteTypes {
     | '/register'
     | '/verify-nin'
     | '/admin'
-    | '/agent'
+    | '/agent/$'
     | '/hospital'
     | '/hospital/no-dashboard'
+    | '/agent'
     | '/admin/forgot-password'
     | '/admin/login'
     | '/admin/applications'
     | '/admin/help'
     | '/admin/plans'
+    | '/admin/register-facility'
     | '/admin/settings'
     | '/admin/users'
-    | '/agent/register-hospital'
     | '/hospital/first-login'
     | '/hospital/forgot-password'
     | '/hospital/login'
@@ -1314,7 +1316,7 @@ export interface FileRouteTypes {
     | '/_auth/verify-nin'
     | '/admin/_auth'
     | '/admin/_dashboard'
-    | '/agent/_auth'
+    | '/agent/$'
     | '/hospital/_auth'
     | '/hospital/admin'
     | '/hospital/doctor'
@@ -1331,9 +1333,9 @@ export interface FileRouteTypes {
     | '/admin/_dashboard/applications'
     | '/admin/_dashboard/help'
     | '/admin/_dashboard/plans'
+    | '/admin/_dashboard/register-facility'
     | '/admin/_dashboard/settings'
     | '/admin/_dashboard/users'
-    | '/agent/_auth/register-hospital'
     | '/hospital/_auth/first-login'
     | '/hospital/_auth/forgot-password'
     | '/hospital/_auth/login'
@@ -1427,7 +1429,7 @@ export interface RootRouteChildren {
   TermsAndConditionsRoute: typeof TermsAndConditionsRoute
   AdminAuthRoute: typeof AdminAuthRouteWithChildren
   AdminDashboardRoute: typeof AdminDashboardRouteWithChildren
-  AgentAuthRoute: typeof AgentAuthRouteWithChildren
+  AgentSplatRoute: typeof AgentSplatRoute
   HospitalAuthRoute: typeof HospitalAuthRouteWithChildren
   HospitalAdminRoute: typeof HospitalAdminRouteWithChildren
   HospitalDoctorRoute: typeof HospitalDoctorRouteWithChildren
@@ -1576,11 +1578,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/agent/_auth': {
-      id: '/agent/_auth'
-      path: '/agent'
-      fullPath: '/agent'
-      preLoaderRoute: typeof AgentAuthRouteImport
+    '/agent/$': {
+      id: '/agent/$'
+      path: '/agent/$'
+      fullPath: '/agent/$'
+      preLoaderRoute: typeof AgentSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hospital/': {
@@ -1695,6 +1697,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardPlansRouteImport
       parentRoute: typeof AdminDashboardRoute
     }
+    '/admin/_dashboard/register-facility': {
+      id: '/admin/_dashboard/register-facility'
+      path: '/register-facility'
+      fullPath: '/admin/register-facility'
+      preLoaderRoute: typeof AdminDashboardRegisterFacilityRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
     '/admin/_dashboard/settings': {
       id: '/admin/_dashboard/settings'
       path: '/settings'
@@ -1708,13 +1717,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/users'
       preLoaderRoute: typeof AdminDashboardUsersRouteImport
       parentRoute: typeof AdminDashboardRoute
-    }
-    '/agent/_auth/register-hospital': {
-      id: '/agent/_auth/register-hospital'
-      path: '/register-hospital'
-      fullPath: '/agent/register-hospital'
-      preLoaderRoute: typeof AgentAuthRegisterHospitalRouteImport
-      parentRoute: typeof AgentAuthRoute
     }
     '/hospital/_auth/first-login': {
       id: '/hospital/_auth/first-login'
@@ -2278,6 +2280,7 @@ interface AdminDashboardRouteChildren {
   AdminDashboardApplicationsRoute: typeof AdminDashboardApplicationsRoute
   AdminDashboardHelpRoute: typeof AdminDashboardHelpRoute
   AdminDashboardPlansRoute: typeof AdminDashboardPlansRoute
+  AdminDashboardRegisterFacilityRoute: typeof AdminDashboardRegisterFacilityRoute
   AdminDashboardSettingsRoute: typeof AdminDashboardSettingsRoute
   AdminDashboardUsersRoute: typeof AdminDashboardUsersRoute
   AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
@@ -2287,6 +2290,7 @@ const AdminDashboardRouteChildren: AdminDashboardRouteChildren = {
   AdminDashboardApplicationsRoute: AdminDashboardApplicationsRoute,
   AdminDashboardHelpRoute: AdminDashboardHelpRoute,
   AdminDashboardPlansRoute: AdminDashboardPlansRoute,
+  AdminDashboardRegisterFacilityRoute: AdminDashboardRegisterFacilityRoute,
   AdminDashboardSettingsRoute: AdminDashboardSettingsRoute,
   AdminDashboardUsersRoute: AdminDashboardUsersRoute,
   AdminDashboardIndexRoute: AdminDashboardIndexRoute,
@@ -2294,18 +2298,6 @@ const AdminDashboardRouteChildren: AdminDashboardRouteChildren = {
 
 const AdminDashboardRouteWithChildren = AdminDashboardRoute._addFileChildren(
   AdminDashboardRouteChildren,
-)
-
-interface AgentAuthRouteChildren {
-  AgentAuthRegisterHospitalRoute: typeof AgentAuthRegisterHospitalRoute
-}
-
-const AgentAuthRouteChildren: AgentAuthRouteChildren = {
-  AgentAuthRegisterHospitalRoute: AgentAuthRegisterHospitalRoute,
-}
-
-const AgentAuthRouteWithChildren = AgentAuthRoute._addFileChildren(
-  AgentAuthRouteChildren,
 )
 
 interface HospitalAuthRouteChildren {
@@ -2557,7 +2549,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsAndConditionsRoute: TermsAndConditionsRoute,
   AdminAuthRoute: AdminAuthRouteWithChildren,
   AdminDashboardRoute: AdminDashboardRouteWithChildren,
-  AgentAuthRoute: AgentAuthRouteWithChildren,
+  AgentSplatRoute: AgentSplatRoute,
   HospitalAuthRoute: HospitalAuthRouteWithChildren,
   HospitalAdminRoute: HospitalAdminRouteWithChildren,
   HospitalDoctorRoute: HospitalDoctorRouteWithChildren,

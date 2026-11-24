@@ -79,7 +79,7 @@ describe("RegisterPatientDialog", () => {
   });
 
   // TODO(api): desk signup requires a date of birth, which the design's form doesn't ask for.
-  it("offers to create a guardian when nobody has the HIN, and shows the API's error", async () => {
+  it("offers to create a guardian when nobody has the HIN, and texts them a code", async () => {
     const { user } = renderWithProviders(<Harness />);
 
     await user.click(screen.getByRole("radio", { name: /Kid \(Dependent\)/ }));
@@ -97,8 +97,16 @@ describe("RegisterPatientDialog", () => {
     await choose(user, /Gender/, "Female");
     await user.clear(screen.getByLabelText(/Email/));
     await fill(user, /Phone Number/, "0803 412 7781");
+    await user.clear(screen.getByLabelText(/Date of birth/));
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    // The API needs a date of birth, so the form asks for it.
+    expect(await screen.findByText("Enter a date as DD/MM/YYYY")).toBeInTheDocument();
+    await fill(user, /Date of birth/, "30/09/1988");
     await user.click(screen.getByRole("button", { name: "Continue" }));
 
-    expect(await screen.findByText("dob: This field is required.")).toBeInTheDocument();
+    // The code goes to the phone, masked as the API reports it.
+    expect(
+      await screen.findByText("Enter the 6-digit code we sent to +234••••••7781."),
+    ).toBeInTheDocument();
   });
 });

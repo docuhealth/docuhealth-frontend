@@ -66,23 +66,28 @@ export function FacilityVerification({
 
   const facilityType: OrganisationType | undefined = appInfo?.facility_type;
 
+  /** Save the admin; the API emails them a code unless it's the official email. Throws. */
+  async function sendAdminDetails(values: AdminDetailsValues) {
+    return setAdminMutation.mutateAsync({
+      application,
+      token,
+      email: values.email.trim(),
+      facility_type: facilityType,
+      part: facilityType,
+      profile: {
+        firstname: values.firstName.trim(),
+        lastname: values.lastName.trim(),
+        phone_num: values.phone.trim(),
+        role: values.role,
+        gender: values.gender,
+        specialization: values.specialization?.trim() || undefined,
+      },
+    });
+  }
+
   async function saveAdminDetails(values: AdminDetailsValues) {
     try {
-      const response = await setAdminMutation.mutateAsync({
-        application,
-        token,
-        email: values.email.trim(),
-        facility_type: facilityType,
-        part: facilityType,
-        profile: {
-          firstname: values.firstName.trim(),
-          lastname: values.lastName.trim(),
-          phone_num: values.phone.trim(),
-          role: values.role,
-          gender: values.gender,
-          specialization: values.specialization?.trim() || undefined,
-        },
-      });
+      const response = await sendAdminDetails(values);
       setAdmin(values);
       if (response.email_verified === false) {
         setStep("admin-otp");
@@ -164,7 +169,7 @@ export function FacilityVerification({
   if (step === "admin-otp" && admin) {
     return (
       <VerifyCodeForm
-        email={admin.email}
+        sentTo={admin.email}
         step={1}
         totalSteps={TOTAL_STEPS}
         title="Verify admin email"
@@ -172,7 +177,7 @@ export function FacilityVerification({
         onChangeEmail={() => setStep("admin")}
         onVerified={handleVerifyAdminOtp}
         onResend={async () => {
-          await saveAdminDetails(admin);
+          await sendAdminDetails(admin);
         }}
       />
     );

@@ -793,7 +793,8 @@
     "/api/auth/email/send-otp": {
       "post": {
         "operationId": "api_auth_email_send_otp_create",
-        "summary": "Send OTP to new user email",
+        "description": "Send `new_email`. A 6-digit code goes to it, valid for 10 minutes. Asking again sends a fresh code after a wait (60, 120, 240, then 300 seconds) and at most 10 times in 24 hours; a wait is a 429 with `Retry-After`.",
+        "summary": "Send a code to a new email",
         "tags": [
           "Auth"
         ],
@@ -839,7 +840,8 @@
     "/api/auth/email/verify-otp": {
       "patch": {
         "operationId": "api_auth_email_verify_otp_partial_update",
-        "summary": "Verify OTP sent to new email",
+        "description": "Send the 6-digit `otp` sent to the new email. The account's email changes to it. A wrong, expired or used code is a 400 on `code`. After five wrong codes, ask for a new one.",
+        "summary": "Check the code sent to a new email",
         "tags": [
           "Auth"
         ],
@@ -1001,7 +1003,7 @@
     "/api/auth/facility-applications/admin": {
       "post": {
         "operationId": "api_auth_facility_applications_admin_create",
-        "description": "Public, step 2. Send the `application` and `token` from the emailed link, the admin's `email` and their `profile` (names, phone, gender and a staff role the facility type allows). For an observation facility, send this once for each part, with `facility_type` (`laboratory` or `radiology`) and that part's own details in `part` (`name`, `street`, `city`, `state`, `country`, `email` and optional `phone`). A 6-digit code goes to the admin's email, unless it is the official email the link already proved. Send again to get a fresh code (one a minute, five a day). An email a staff account already uses is refused, and so is the other part's admin email.",
+        "description": "Public, step 2. Send the `application` and `token` from the emailed link, the admin's `email` and their `profile` (names, phone, gender and a staff role the facility type allows). For an observation facility, send this once for each part, with `facility_type` (`laboratory` or `radiology`) and that part's own details in `part` (`name`, `street`, `city`, `state`, `country`, `email` and optional `phone`). A 6-digit code goes to the admin's email, unless it is the official email the link already proved. Send again to get a fresh code after a wait (60, 120, 240, then 300 seconds), at most 10 times in 24 hours; a wait is a 429 with `Retry-After`. An email a staff account already uses is refused, and so is the other part's admin email.",
         "summary": "Give a facility application's first admin",
         "tags": [
           "Facility Onboarding"
@@ -1046,7 +1048,7 @@
     "/api/auth/facility-applications/admin/verify": {
       "post": {
         "operationId": "api_auth_facility_applications_admin_verify_create",
-        "description": "Public. Send the `application`, the `token` from the emailed link and the `code` sent to the admin's email. For an observation facility, also send the part (`facility_type`). A code works once and for 10 minutes.",
+        "description": "Public. Send the `application`, the `token` from the emailed link and the `code` sent to the admin's email. For an observation facility, also send the part (`facility_type`). A code works once and for 10 minutes, and the one before it keeps working until its own expiry. A wrong, expired or used code is a 400 on `code`; after five wrong codes, ask for a new one.",
         "summary": "Verify a facility application admin's email",
         "tags": [
           "Facility Onboarding"
@@ -1481,7 +1483,8 @@
     "/api/auth/forgot-password": {
       "post": {
         "operationId": "api_auth_forgot_password_create",
-        "description": "Send `account_type` (`patient` or `staff`), because one email can be both a patient and a staff account. Leave it out only for a DH admin account. Send the same `account_type` to the OTP check.",
+        "description": "Send `identifier` (an email, or for a patient account a phone number in any common form) and `account_type` (`patient` or `staff`), because one email can be both a patient and a staff account. Leave `account_type` out only for a DH admin account. Staff accounts cannot reset by phone. The answer is always the same 200, whether or not an account exists: if one does, a 6-digit code goes to that email or phone. Asking again sends a fresh code after a wait (60, 120, 240, then 300 seconds) and at most 10 times in 24 hours; the earlier code keeps working until it expires after 10 minutes. Send the same `identifier` and `account_type` to the code check.",
+        "summary": "Forgot password: ask for a code",
         "tags": [
           "Auth"
         ],
@@ -1525,6 +1528,8 @@
     "/api/auth/forgot-password/verify-otp": {
       "post": {
         "operationId": "api_auth_forgot_password_verify_otp_create",
+        "description": "Send the same `identifier` and `account_type` as the request for a code, and the 6-digit `otp`. Returns an access token for `/api/auth/reset-password`. A wrong, expired or used code is a 400 on `code`. After five wrong codes both the current and the earlier code stop working: ask for a new one.",
+        "summary": "Forgot password: check the code",
         "tags": [
           "Auth"
         ],
@@ -1568,7 +1573,7 @@
     "/api/auth/login": {
       "post": {
         "operationId": "api_auth_login_create",
-        "description": "Send `identifier` (an email, a phone number, or a HIN for patients), the password, and `account_type` (`patient` from the patient app, `staff` from the staff app). Without `account_type`, if the details match both a patient and a staff account, nobody is logged in: the 409 response has code `account_type_required` and lists `account_types`; ask again with one. An unknown identifier and a wrong password give the same 401. The response lists `acting_as`: for staff, their facility and role; for patients, themselves, their dependants and the patients they are a proxy for. `next_step` names what the account must do before anything else, or is null: `admin_details_required` (a converted hospital account sends its details to `/api/auth/first-login`) or `nin_not_verified` (a patient sends their NIN to `/api/auth/nin/verify`). Until then every other endpoint answers 403 with that code, except changing the password.",
+        "description": "Send `identifier` (an email, a phone number in any common form such as `0803...` or `+234 803...`, or a HIN for patients), the password, and `account_type` (`patient` from the patient app, `staff` from the staff app). Without `account_type`, if the details match both a patient and a staff account, nobody is logged in: the 409 response has code `account_type_required` and lists `account_types`; ask again with one. An unknown identifier and a wrong password give the same 401. The response lists `acting_as`: for staff, their facility and role; for patients, themselves, their dependants and the patients they are a proxy for. `next_step` names what the account must do before anything else, or is null: `admin_details_required` (a converted hospital account sends its details to `/api/auth/first-login`) or `nin_not_verified` (a patient sends their NIN to `/api/auth/nin/verify`). Until then every other endpoint answers 403 with that code, except changing the password.",
         "summary": "Login a user",
         "tags": [
           "Auth"
@@ -1744,7 +1749,8 @@
     "/api/auth/resend-otp": {
       "post": {
         "operationId": "api_auth_resend_otp_create",
-        "summary": "Resend verification OTP on signup",
+        "description": "Only for an old account kept because it has records. Send the account's `email` and optionally `verify_url` (a Docuhealth link put in the email). The answer is always the same 200, for a known, unknown or finished account: a code is sent only to an unfinished one, after a wait (60, 120, 240, then 300 seconds) and at most 10 times in 24 hours.",
+        "summary": "Send a code to finish an unfinished old account",
         "tags": [
           "Auth"
         ],
@@ -1832,7 +1838,7 @@
     "/api/auth/signup": {
       "post": {
         "operationId": "api_auth_signup_create",
-        "description": "Send names, gender, date of birth, `login_url`, and an `email`, a `phone`, or both. A 6-digit code goes to the contact named in `verify_by` (`email` or `phone`); without it, to the email if one was given, otherwise the phone. Only that contact becomes the login. The other one is saved on the patient's profile as contact details. No account is made yet. Sending again with the same contact sends a fresh code (one a minute, five a day) and the old one stops working. The answer is always the same: if the contact already has a patient account, no code is sent and its owner is emailed a way to log in. Text messages are not sent yet.",
+        "description": "Send names, gender, date of birth, and an `email`, a `phone`, or both. A 6-digit code goes to the contact named in `verify_by` (`email` or `phone`); without it, to the email if one was given, otherwise the phone. Only that contact becomes the login. The other one is saved on the patient's profile as contact details. No account is made yet. The answer is the same whether or not the contact already has an account: a code is sent either way, and `destination` names where it went, masked (`+234••••••1234` or `a***@example.com`). Sending again with the same contact sends a fresh code after a wait (60, 120, 240, then 300 seconds) and at most 10 times in 24 hours; a wait is a 429 with `Retry-After`. The code before it keeps working until it expires after 10 minutes. A 503 means the code could not be sent. A phone can be typed in any common form and is saved as `+2348031234567`; a value that is not a valid number is a 400 on `phone`. A phone the code goes to must be in a country codes can be sent to, Nigeria today (400 on `phone` otherwise); the other contact can be from any country.",
         "summary": "Patient signup, step 1: details",
         "tags": [
           "Auth"
@@ -1922,7 +1928,7 @@
     "/api/auth/signup/desk": {
       "post": {
         "operationId": "api_auth_signup_desk_create",
-        "description": "For a receptionist registering an adult who is with them. The same body and the same answer as patient signup step 1 (`/api/auth/signup`): the code goes to the patient's own email or phone, and the patient reads it out. Step 2 is `/api/auth/signup/verify-code`, as for any signup. No hospital file is made for the patient.",
+        "description": "For a receptionist registering an adult who is with them. The same body and the same answer as patient signup step 1 (`/api/auth/signup`): the code goes to the patient's own email or phone, and the patient reads it out. Step 2 is `/api/auth/signup/verify-code`, as for any signup, and a contact that already has an account is found out only there (409 `account_exists`). No hospital file is made for the patient.",
         "summary": "Register a patient at the desk, step 1: details",
         "tags": [
           "Auth"
@@ -2016,7 +2022,7 @@
     "/api/auth/signup/upgrade": {
       "post": {
         "operationId": "api_auth_signup_upgrade_create",
-        "description": "Sent by a guardian for one of their dependants (`dependant` is the dependant's HIN). Send the dependant's own `email`, `phone` or both, with `verify_by` and `login_url`, as in patient signup step 1. The code goes to that contact. The dependant then sends it to `/api/auth/signup/verify-code` and finishes at `/api/auth/signup/upgrade/complete`. The answer is always the same.",
+        "description": "Sent by a guardian for one of their dependants (`dependant` is the dependant's HIN). Send the dependant's own `email`, `phone` or both, with `verify_by`, as in patient signup step 1. The code goes to that contact. The dependant then sends it to `/api/auth/signup/verify-code` and finishes at `/api/auth/signup/upgrade/complete`. The answer is always the same, and names the masked `destination`; a contact that already has an account is found out only at the code (409 `account_exists`).",
         "summary": "Give a dependant their own account, step 1: the contact",
         "tags": [
           "Auth"
@@ -2108,7 +2114,7 @@
     "/api/auth/signup/verify-code": {
       "post": {
         "operationId": "api_auth_signup_verify_code_create",
-        "description": "Send the same contact as step 1 (with `verify_by` if it was sent) and the code. Returns `signup_token` for step 3. Starting step 1 again makes the token stop working.",
+        "description": "Send the same contact as step 1 (with `verify_by` if it was sent) and the code. Returns `signup_token` for step 3. Starting step 1 again makes the token stop working. A wrong, expired or used code is a 400 on `code`; after five wrong codes both the current and the earlier code stop working, so ask for a new one. If the contact already has a patient account, the right code gives no token: the answer is 409 with code `account_exists`, and the person should log in or reset their password.",
         "summary": "Patient signup, step 2: the code",
         "tags": [
           "Auth"
@@ -2153,6 +2159,8 @@
     "/api/auth/signup/verify-otp": {
       "post": {
         "operationId": "api_auth_signup_verify_otp_create",
+        "description": "Only for an old account kept because it has records. Send the `email` and the 6-digit `otp` from `/api/auth/resend-otp`. A wrong, expired or used code is a 400 on `code`; after five wrong codes, ask for a new one.",
+        "summary": "Finish an unfinished old account with its emailed code",
         "tags": [
           "Auth"
         ],
@@ -8020,7 +8028,6 @@
     "/api/pharmacy/patients/drug-records": {
       "get": {
         "operationId": "api_pharmacy_patients_drug_records_list",
-        "description": "Feed the read serializer a page-wide latest-vitals map.\n\nThe serializer falls back to a per-order lookup when no map is given, so\nthis only changes list endpoints: one vitals query for the whole page\ninstead of one per order. The map is keyed on the patient and the order's\nhospital together, so each order gets the reading from its own hospital.",
         "summary": "Get all drug records for a patient",
         "parameters": [
           {
@@ -8055,7 +8062,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedDrugOrderReadList"
+                  "$ref": "#/components/schemas/PaginatedPatientDrugRecordList"
                 }
               }
             },
@@ -10882,8 +10889,7 @@
           },
           "phone": {
             "type": "string",
-            "default": "",
-            "maxLength": 20
+            "default": ""
           },
           "email": {
             "type": "string",
@@ -12630,7 +12636,7 @@
             "maxLength": 50
           },
           "status": {
-            "$ref": "#/components/schemas/DrugRecordReadStatusEnum"
+            "$ref": "#/components/schemas/Status2a7Enum"
           },
           "created_at": {
             "type": "string",
@@ -12646,15 +12652,6 @@
           "route",
           "sqid"
         ]
-      },
-      "DrugRecordReadStatusEnum": {
-        "enum": [
-          "ongoing",
-          "completed",
-          "stopped"
-        ],
-        "type": "string",
-        "description": "* `ongoing` - Ongoing\n* `completed` - Completed\n* `stopped` - Stopped"
       },
       "EmergencyStandingOrderEnum": {
         "enum": [
@@ -12800,8 +12797,7 @@
             "format": "email"
           },
           "phone": {
-            "type": "string",
-            "maxLength": 20
+            "type": "string"
           },
           "message": {
             "type": "string"
@@ -12904,8 +12900,7 @@
           },
           "phone": {
             "type": "string",
-            "default": "",
-            "maxLength": 20
+            "default": ""
           },
           "email": {
             "type": "string",
@@ -13066,8 +13061,7 @@
           },
           "phone": {
             "type": "string",
-            "default": "",
-            "maxLength": 20
+            "default": ""
           },
           "facility_type": {
             "$ref": "#/components/schemas/FacilityTypeB40Enum"
@@ -13132,8 +13126,7 @@
             "maxLength": 100
           },
           "phone_num": {
-            "type": "string",
-            "maxLength": 20
+            "type": "string"
           },
           "gender": {
             "$ref": "#/components/schemas/Gender0e3Enum"
@@ -13216,9 +13209,9 @@
       "ForgotPassword": {
         "type": "object",
         "properties": {
-          "email": {
+          "identifier": {
             "type": "string",
-            "format": "email"
+            "description": "The account's email, or for a patient account its phone number."
           },
           "account_type": {
             "nullable": true,
@@ -13233,7 +13226,7 @@
           }
         },
         "required": [
-          "email"
+          "identifier"
         ]
       },
       "FrequencyEnum": {
@@ -15857,6 +15850,37 @@
           }
         }
       },
+      "PaginatedPatientDrugRecordList": {
+        "type": "object",
+        "required": [
+          "count",
+          "results"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "example": 123
+          },
+          "next": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "example": "http://api.example.org/accounts/?page=4"
+          },
+          "previous": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "example": "http://api.example.org/accounts/?page=2"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PatientDrugRecord"
+            }
+          }
+        }
+      },
       "PaginatedPatientTaskReadList": {
         "type": "object",
         "required": [
@@ -16720,8 +16744,7 @@
           },
           "phone": {
             "type": "string",
-            "default": "",
-            "maxLength": 20
+            "default": ""
           },
           "email": {
             "type": "string",
@@ -16902,6 +16925,89 @@
           "gender",
           "hin",
           "lastname"
+        ]
+      },
+      "PatientDrugRecord": {
+        "type": "object",
+        "description": "One drug a patient has, as the patient sees it. A drug from a pharmacy\norder also says whether it was given out, never who gave it out. Both are\nnull for a drug that never went through a pharmacy.",
+        "properties": {
+          "sqid": {
+            "type": "string",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "strength": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          },
+          "route": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "dose_form": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          },
+          "quantity": {
+            "type": "number",
+            "format": "double"
+          },
+          "unit": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 50
+          },
+          "frequency": {
+            "$ref": "#/components/schemas/FrequencyEnum"
+          },
+          "duration": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ValueRate"
+              }
+            ],
+            "nullable": true
+          },
+          "allergies": {},
+          "rxnorm": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 50
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status2a7Enum"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "fulfillment_status": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "dispensed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "required": [
+          "created_at",
+          "dispensed_at",
+          "frequency",
+          "fulfillment_status",
+          "name",
+          "quantity",
+          "route",
+          "sqid"
         ]
       },
       "PatientEmergency": {
@@ -18935,8 +19041,7 @@
             "maxLength": 100
           },
           "phone_num": {
-            "type": "string",
-            "maxLength": 20
+            "type": "string"
           },
           "role": {
             "$ref": "#/components/schemas/Role56fEnum"
@@ -18985,16 +19090,10 @@
             "format": "email"
           },
           "phone": {
-            "type": "string",
-            "maxLength": 20
+            "type": "string"
           },
           "verify_by": {
             "$ref": "#/components/schemas/VerifyByEnum"
-          },
-          "login_url": {
-            "type": "string",
-            "format": "uri",
-            "description": "Where to log in, for the email sent when the contact already has an account."
           },
           "dependant": {
             "type": "string",
@@ -19002,8 +19101,7 @@
           }
         },
         "required": [
-          "dependant",
-          "login_url"
+          "dependant"
         ]
       },
       "StartPatientSignup": {
@@ -19015,8 +19113,7 @@
             "format": "email"
           },
           "phone": {
-            "type": "string",
-            "maxLength": 20
+            "type": "string"
           },
           "verify_by": {
             "$ref": "#/components/schemas/VerifyByEnum"
@@ -19039,19 +19136,13 @@
           "dob": {
             "type": "string",
             "format": "date"
-          },
-          "login_url": {
-            "type": "string",
-            "format": "uri",
-            "description": "Where to log in, for the email sent when the contact already has an account."
           }
         },
         "required": [
           "dob",
           "firstname",
           "gender",
-          "lastname",
-          "login_url"
+          "lastname"
         ]
       },
       "StateFunnel": {
@@ -19070,6 +19161,15 @@
           "state",
           "value"
         ]
+      },
+      "Status2a7Enum": {
+        "enum": [
+          "ongoing",
+          "completed",
+          "stopped"
+        ],
+        "type": "string",
+        "description": "* `ongoing` - Ongoing\n* `completed` - Completed\n* `stopped` - Stopped"
       },
       "Status552Enum": {
         "enum": [
@@ -19663,8 +19763,7 @@
           },
           "phone": {
             "type": "string",
-            "default": "",
-            "maxLength": 20
+            "default": ""
           },
           "email": {
             "type": "string",
@@ -19903,9 +20002,9 @@
       "VerifyForgotPasswordOTP": {
         "type": "object",
         "properties": {
-          "email": {
+          "identifier": {
             "type": "string",
-            "format": "email"
+            "description": "The account's email, or for a patient account its phone number."
           },
           "account_type": {
             "nullable": true,
@@ -19926,7 +20025,7 @@
           }
         },
         "required": [
-          "email",
+          "identifier",
           "otp"
         ]
       },
@@ -19972,8 +20071,7 @@
             "format": "email"
           },
           "phone": {
-            "type": "string",
-            "maxLength": 20
+            "type": "string"
           },
           "verify_by": {
             "$ref": "#/components/schemas/VerifyByEnum"

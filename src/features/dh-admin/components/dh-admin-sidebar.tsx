@@ -1,5 +1,6 @@
 import admissionIconUrl from "@/assets/svgs/admission.svg";
 import dashboardIconUrl from "@/assets/svgs/dashboard.svg";
+import hospitalIconUrl from "@/assets/svgs/hospital-01.svg";
 import patientIconUrl from "@/assets/svgs/patient.svg";
 import settingsIconUrl from "@/assets/svgs/settings.svg";
 import walletIconUrl from "@/assets/svgs/wallet.svg";
@@ -14,6 +15,7 @@ export function DhAdminSidebar() {
         { to: "/admin", label: "Overview", icon: dashboardIconUrl },
         { to: "/admin/users", label: "Users", icon: patientIconUrl },
         { to: "/admin/applications", label: "Facility applications", icon: admissionIconUrl },
+        { to: "/admin/register-facility", label: "Register a facility", icon: hospitalIconUrl },
         { to: "/admin/plans", label: "Subscription plans", icon: walletIconUrl },
       ],
     },

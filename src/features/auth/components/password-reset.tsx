@@ -16,35 +16,45 @@ import type { AccountType } from "@/stores/auth-store";
 const copy = {
   individual: {
     accountType: "patient" as AccountType,
-    description: "Enter your registered email and we’ll send you a code to reset your password.",
+    description:
+      "Enter your registered email or phone number and we’ll send you a code to reset your password.",
     loginTo: "/login",
+    allowPhone: true,
   },
   hospital: {
     accountType: "staff" as AccountType,
     description:
       "Enter your facility’s registered email and we’ll send you a code to reset your password.",
     loginTo: "/hospital/login",
+    allowPhone: false,
   },
   // The API wants no account type for DocuHealth's own admins.
   dhadmin: {
     accountType: null,
     description: "Enter your admin email and we’ll send you a code to reset your password.",
     loginTo: "/admin/login",
+    allowPhone: false,
   },
 } satisfies Record<
   string,
-  { accountType: AccountType | null; description: string; loginTo: LinkProps["to"] }
+  {
+    accountType: AccountType | null;
+    description: string;
+    loginTo: LinkProps["to"];
+    allowPhone: boolean;
+  }
 >;
 
 /**
- * Password reset: email, then the code we send to it, then the new password. Keeps the email
- * so "Change" can go back to it. `audience` picks the copy and which login to return to.
+ * Password reset: email (or a patient's phone), then the code we send to it, then the new
+ * password. Keeps what was entered so "Change" can go back to it. `audience` picks the copy and
+ * which login to return to. The API answers the same whether or not the account exists.
  */
 export function PasswordReset({ audience }: { audience: keyof typeof copy }) {
-  const { accountType, description, loginTo } = copy[audience];
+  const { accountType, description, loginTo, allowPhone } = copy[audience];
   const navigate = useNavigate();
-  const [step, setStep] = useState<"email" | "code" | "password">("email");
-  const [email, setEmail] = useState("");
+  const [step, setStep] = useState<"identifier" | "code" | "password">("identifier");
+  const [identifier, setIdentifier] = useState("");
   const [resetToken, setResetToken] = useState<string | null>(null);
 
   const forgotPasswordMutation = useForgotPassword();
@@ -53,12 +63,12 @@ export function PasswordReset({ audience }: { audience: keyof typeof copy }) {
 
   async function requestReset(values: ForgotPasswordValues) {
     try {
-      const normalizedEmail = values.email.trim();
+      const entered = values.identifier.trim();
       await forgotPasswordMutation.mutateAsync({
-        email: normalizedEmail,
+        identifier: entered,
         account_type: accountType ?? undefined,
       });
-      setEmail(normalizedEmail);
+      setIdentifier(entered);
       setStep("code");
     } catch (error) {
       toast.error(getErrorMessage(error));
@@ -68,7 +78,7 @@ export function PasswordReset({ audience }: { audience: keyof typeof copy }) {
   async function verifyCode(code: string) {
     try {
       const response = await verifyOtpMutation.mutateAsync({
-        email,
+        identifier,
         otp: code,
         account_type: accountType ?? undefined,
       });
@@ -99,14 +109,14 @@ export function PasswordReset({ audience }: { audience: keyof typeof copy }) {
   if (step === "code") {
     return (
       <VerifyCodeForm
-        email={email}
-        title="Verify your email"
+        sentTo={identifier}
+        title={allowPhone ? "Enter your code" : "Verify your email"}
         login={{ prompt: "Remember your password?", to: loginTo }}
-        onChangeEmail={() => setStep("email")}
+        onChangeEmail={() => setStep("identifier")}
         onVerified={verifyCode}
         onResend={async () => {
           await forgotPasswordMutation.mutateAsync({
-            email,
+            identifier,
             account_type: accountType ?? undefined,
           });
         }}
@@ -119,7 +129,8 @@ export function PasswordReset({ audience }: { audience: keyof typeof copy }) {
       description={description}
       submitLabel="Send code"
       loginTo={loginTo}
-      defaultEmail={email}
+      allowPhone={allowPhone}
+      defaultIdentifier={identifier}
       onSubmit={requestReset}
     />
   );

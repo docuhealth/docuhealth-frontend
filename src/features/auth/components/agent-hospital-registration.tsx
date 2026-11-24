@@ -1,4 +1,3 @@
-import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { SuccessDialog } from "@/components/success-dialog";
@@ -16,9 +15,12 @@ import { absoluteUrl } from "@/lib/sections";
 
 const TOTAL_STEPS = 3;
 
-/** A field agent registers a hospital: details, location, then the admin who sets it up. */
-export function AgentHospitalRegistration() {
-  const navigate = useNavigate();
+/**
+ * Registering a facility in person: details, location, then its admin. No codes: the facility is
+ * active at once, and the admin is emailed a temporary password. The API only lets DocuHealth's
+ * admins do this for now, so it lives in the admin section. `onDone` closes it.
+ */
+export function AgentHospitalRegistration({ onDone }: { onDone: () => void }) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [details, setDetails] = useState<HospitalDetailsValues>();
   const [location, setLocation] = useState<HospitalLocationValues>();
@@ -59,7 +61,7 @@ export function AgentHospitalRegistration() {
     }
   }
 
-  const leave = () => void navigate({ to: "/" });
+  const leave = onDone;
 
   if (step === 3 && details && location) {
     return (

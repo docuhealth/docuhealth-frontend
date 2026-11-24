@@ -48,20 +48,48 @@ export function getErrorMessage(error: unknown): string {
   return "Something went wrong";
 }
 
-/** Fields that only describe the response, never what went wrong. */
+/** The machine-readable `code` of an API error (e.g. `account_exists`), if it has one. */
+export function errorCode(error: unknown): string | undefined {
+  if (!isAxiosError(error)) return undefined;
+  const code = (error.response?.data as { code?: unknown } | undefined)?.code;
+  return typeof code === "string" ? code : undefined;
+}
+
+/** The API refused because of too many requests (429), e.g. a code resent too soon. */
+export function isThrottled(error: unknown): boolean {
+  return isAxiosError(error) && error.response?.status === 429;
+}
+
+/**
+ * How many seconds a 429 asks us to wait (its `Retry-After` header). `null` for any other error,
+ * or when the header isn't there or the browser can't read it.
+ */
+export function retryAfterSeconds(error: unknown): number | null {
+  if (!isAxiosError(error) || !isThrottled(error) || !error.response) return null;
+  const header = Number(error.response.headers["retry-after"]);
+  return Number.isFinite(header) && header > 0 ? Math.ceil(header) : null;
+}
+
+/**
+ * Fields that only describe the response, never what went wrong, when their value is a plain
+ * label (`"code": "account_exists"`). As a list they're a field error (`"code": ["Wrong code"]`).
+ */
 const envelopeKeys = new Set(["status", "code", "success", "status_code"]);
+
+/** Field errors that read fine without the field's name: a one-time code is the only field. */
+const unnamedFields = new Set(["non_field_errors", "code", "otp"]);
 
 /**
  * The first readable message in an error body. Covers `{ message }`, `{ detail }` (Django REST
  * Framework), `{ error: "…" | { message } }`, and DRF field errors (`{ nin: ["…"] }`), which are
- * shown as "nin: …" unless they're `non_field_errors`.
+ * shown as "nin: …" unless they're `non_field_errors` or a one-time code's.
  */
 function messageFromBody(body: unknown, field?: string): string | undefined {
   if (typeof body === "string") {
     const text = body.trim();
     // An HTML error page (e.g. a Django 500) is no use in a toast.
     if (!text || text.startsWith("<")) return undefined;
-    return field && field !== "non_field_errors" ? `${field.replaceAll("_", " ")}: ${text}` : text;
+    return field && !unnamedFields.has(field) ? `${field.replaceAll("_", " ")}: ${text}` : text;
   }
   if (Array.isArray(body)) {
     for (const item of body) {
@@ -78,7 +106,7 @@ function messageFromBody(body: unknown, field?: string): string | undefined {
     if (message) return message;
   }
   for (const [key, value] of Object.entries(record)) {
-    if (envelopeKeys.has(key) || key === "data") continue;
+    if ((envelopeKeys.has(key) && !Array.isArray(value)) || key === "data") continue;
     const message = messageFromBody(value, key);
     if (message) return message;
   }
@@ -94,3 +122,15 @@ export function paginated<TItem extends z.ZodType>(item: TItem) {
     .object({ count: z.number().int().nonnegative(), results: z.array(item) })
     .transform(({ count, results }) => ({ total: count, items: results }));
 }
+
+/**
+ * A one-time code was sent (sign-up, desk sign-up): `destination` is where to, masked (`a***@example.com`,
+ * `+234••••••1234`). TODO(api): the schema doesn't document it, so it's read from the body or
+ * its `data`, and may be missing.
+ */
+export const codeSentResponseSchema = z
+  .looseObject({
+    destination: z.string().optional(),
+    data: z.looseObject({ destination: z.string().optional() }).nullish(),
+  })
+  .transform((body) => ({ destination: body.destination ?? body.data?.destination ?? null }));

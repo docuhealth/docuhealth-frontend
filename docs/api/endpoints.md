@@ -1,6 +1,6 @@
 # API endpoints
 
-From `https://api-staging.docuhealthservices.net/api/raw`, fetched 2026-11-21 by `npm run api:schema`.
+From `https://api-staging.docuhealthservices.net/api/raw`, fetched 2026-11-24 by `npm run api:schema`.
 Request and response shapes are in `openapi.json` (`components.schemas`).
 
 | Method | Path |
