@@ -1,6 +1,6 @@
 import { CaretDownIcon } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,6 +10,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { hasAdmissionNoteQuery } from "@/features/clinical/api/notes";
 import type { Visit } from "@/features/clinical/api/schemas";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
+import { EmptyState } from "@/components/empty-state";
+import { AdmissionNotePrompt } from "@/features/clinical/components/admission-note-prompt";
 import { HandoverDialog } from "@/features/clinical/components/handover-dialog";
 import {
   AdmissionNoteDialog,
@@ -50,7 +53,18 @@ export function NoteActions({
 }) {
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const hasAdmissionNote = useHasAdmissionNote(visit);
-  if (visit.kind !== "admission" || visit.status !== "active") return null;
+  const isOpenAdmission = visit.kind === "admission" && visit.status === "active";
+  // As in v1: a nurse who opens a newly admitted patient is asked for the admission note once.
+  const [prompting, setPrompting] = useState(false);
+  const prompted = useRef(false);
+  useEffect(() => {
+    if (role !== "nurse" || !isOpenAdmission || hasAdmissionNote !== false || prompted.current) {
+      return;
+    }
+    prompted.current = true;
+    setPrompting(true);
+  }, [role, isOpenAdmission, hasAdmissionNote]);
+  if (!isOpenAdmission) return null;
 
   const target = { hin: visit.patient.hin, admissionId: visit.id, patientName: visit.patient.name };
   const toggle = (which: Dialog) => (open: boolean) => setDialog(open ? which : null);
@@ -98,6 +112,11 @@ export function NoteActions({
         </>
       ) : null}
 
+      <AdmissionNotePrompt
+        patient={prompting ? { hin: visit.patient.hin, name: visit.patient.name } : null}
+        admissionId={visit.id}
+        onClose={() => setPrompting(false)}
+      />
       <AdmissionNoteDialog
         open={dialog === "admission"}
         onOpenChange={toggle("admission")}
@@ -131,16 +150,32 @@ export function NoteActions({
 
 /**
  * The nurse's work on a new admission waits for its admission note: until it's written, this
- * shows why instead of `children`.
+ * shows why instead of `children`, with the button to write it.
  */
 export function AdmissionNoteGate({ visit, children }: { visit: Visit; children: ReactNode }) {
   const hasAdmissionNote = useHasAdmissionNote(visit);
+  const [writing, setWriting] = useState(false);
   if (hasAdmissionNote || visit.status !== "active") return children;
   return (
-    <p className="rounded-xl border bg-card px-4 py-10 text-center type-body-sm-regular text-fg-caption">
-      {hasAdmissionNote === false
-        ? "Write the admission note first: the nursing tasks open once it’s saved."
-        : "Loading…"}
-    </p>
+    <div className="rounded-xl border bg-card px-4">
+      {hasAdmissionNote === false ? (
+        <EmptyState
+          title="Write the admission note first"
+          description="The nursing tasks open once it’s saved."
+          action={
+            <Button className={primary} onClick={() => setWriting(true)}>
+              Write admission note
+            </Button>
+          }
+        />
+      ) : (
+        <ListSkeleton className="py-4" />
+      )}
+      <AdmissionNoteDialog
+        open={writing}
+        onOpenChange={setWriting}
+        target={{ hin: visit.patient.hin, admissionId: visit.id, patientName: visit.patient.name }}
+      />
+    </div>
   );
 }

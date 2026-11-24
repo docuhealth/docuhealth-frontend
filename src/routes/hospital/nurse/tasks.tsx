@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { AdmissionNotePrompt } from "@/features/clinical/components/admission-note-prompt";
 import { TaskQueue } from "@/features/nurse/components/task-queue";
 
 export const Route = createFileRoute("/hospital/nurse/tasks")({
@@ -6,6 +8,8 @@ export const Route = createFileRoute("/hospital/nurse/tasks")({
 });
 
 function TasksPage() {
+  // A claim refused for a missing admission note offers to write it.
+  const [needsNote, setNeedsNote] = useState<{ hin: string; name: string } | null>(null);
   return (
     <div className="flex flex-col gap-6">
       <title>Tasks · DocuHealth</title>
@@ -15,7 +19,8 @@ function TasksPage() {
           Care tasks for every admitted patient, overdue and due first.
         </p>
       </div>
-      <TaskQueue />
+      <TaskQueue onAdmissionNoteNeeded={setNeedsNote} />
+      <AdmissionNotePrompt patient={needsNote} onClose={() => setNeedsNote(null)} />
     </div>
   );
 }

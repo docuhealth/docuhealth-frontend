@@ -52,11 +52,18 @@ describe("Notes on an admission", () => {
     const { user } = renderWithRouter(
       <Admission staff="nurse" visitId="admission-1" kinds={["admission", "vitals"]} />,
     );
+    // As in v1, opening a newly admitted patient asks for the note straight away.
+    const prompt = await screen.findByRole("dialog", { name: "Add the nursing admission note" });
+    expect(within(prompt).getByText(/Yemi Ojo was newly admitted/)).toBeInTheDocument();
+    await user.click(within(prompt).getByRole("button", { name: "Cancel" }));
+
     await user.click(await screen.findByRole("tab", { name: "Nursing tasks" }));
-    expect(await screen.findByText(/Write the admission note first/)).toBeInTheDocument();
+    expect(await screen.findByText("Write the admission note first")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Record vitals" })).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Write admission note" }));
+    await user.click(
+      within(screen.getByRole("tabpanel")).getByRole("button", { name: "Write admission note" }),
+    );
     const dialog = await screen.findByRole("dialog", { name: "Admission note" });
     await user.click(within(dialog).getByRole("button", { name: "Save admission note" }));
     expect(await within(dialog).findByText("Enter the blood pressure")).toBeInTheDocument();

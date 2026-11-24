@@ -98,9 +98,14 @@ export function DoctorPatientActions({
   const toggle = (which: Dialog) => (open: boolean) => setDialog(open ? which : null);
 
   if (isCheckIn) {
-    if (status === "closed") return null;
+    if (status === "closed") return <Reason>Checked out: nothing more to do on this visit.</Reason>;
     if (!mine?.has(id)) {
-      if (status !== "doctor_idle" && status !== "doctor_seen") return null;
+      if (status === "doctor_active") {
+        return <Reason>Another doctor is seeing this patient.</Reason>;
+      }
+      if (status !== "doctor_idle" && status !== "doctor_seen") {
+        return <Reason>With the nurses: you can see them once they’re sent to a doctor.</Reason>;
+      }
       return (
         <Button
           className="h-12 px-5 type-heading-sm"
@@ -116,9 +121,25 @@ export function DoctorPatientActions({
         </Button>
       );
     }
+  } else if (status === "awaiting_nurse_discharge") {
+    // Discharged by the doctor, waiting for the nurses: no more orders, but care tasks still go
+    // to the nurses until they discharge the patient (as in v1).
+    return (
+      <>
+        <Reason>Discharged: waiting for the nurses’ discharge checklist.</Reason>
+        <Button className="h-12 px-5 type-heading-sm" onClick={() => setDialog("task")}>
+          New care task
+        </Button>
+        <CareTaskDialog
+          open={dialog === "task"}
+          onOpenChange={toggle("task")}
+          admissionId={id}
+          patientName={patientName}
+        />
+      </>
+    );
   } else if (status !== "active") {
-    // Awaiting the nurse's discharge, or discharged: nothing more to order.
-    return null;
+    return <Reason>Discharged: nothing more to order.</Reason>;
   }
 
   return (
@@ -363,4 +384,9 @@ function VitalsRequestForm({
       </FormDialogFooter>
     </form>
   );
+}
+
+/** Why there's nothing (or little) to do here, where the actions would be. */
+function Reason({ children }: { children: string }) {
+  return <p className="max-w-xs self-center type-body-sm-regular text-fg-caption">{children}</p>;
 }

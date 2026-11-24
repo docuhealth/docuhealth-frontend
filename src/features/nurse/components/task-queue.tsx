@@ -34,6 +34,7 @@ import { RecordTaskDialog } from "@/features/nurse/components/record-task-dialog
 import { getErrorMessage } from "@/lib/api";
 import { careTaskTypeLabel, type Priority, priorityLabels, priorityTones } from "@/lib/care-tasks";
 import { formatDayAndTime, maskHin } from "@/lib/format";
+import { needsAdmissionNote } from "@/lib/clinical";
 
 const tabs = Object.keys(taskTabLabels) as TaskTab[];
 
@@ -60,9 +61,17 @@ const emptyIn = {
 /**
  * Care task occurrences, for one admission or (on the Tasks page) every patient: to do (claim
  * one), in progress (record it, confirm a medication, release, escalate, mark missed), and done.
- * The API only lets the nurse who claimed a task act on it after that.
+ * The API only lets the nurse who claimed a task act on it after that. A claim the API refuses
+ * because the patient's admission note isn't written goes to `onAdmissionNoteNeeded`, which offers
+ * to write it, instead of only showing the error.
  */
-export function TaskQueue({ admissionId = null }: { admissionId?: string | null }) {
+export function TaskQueue({
+  admissionId = null,
+  onAdmissionNoteNeeded,
+}: {
+  admissionId?: string | null;
+  onAdmissionNoteNeeded?: (patient: { hin: string; name: string }) => void;
+}) {
   const [tab, setTab] = useState<TaskTab>("pending");
   const [page, setPage] = useState(1);
   const [recording, setRecording] = useState<TaskOccurrence | null>(null);
@@ -88,7 +97,13 @@ export function TaskQueue({ admissionId = null }: { admissionId?: string | null 
       { id: task.id, action },
       {
         onSuccess: () => toast.success(done),
-        onError: (error) => toast.error(getErrorMessage(error)),
+        onError: (error) => {
+          if (action === "claim" && onAdmissionNoteNeeded && needsAdmissionNote(error)) {
+            onAdmissionNoteNeeded(task.patient);
+          } else {
+            toast.error(getErrorMessage(error));
+          }
+        },
       },
     );
   }
@@ -204,7 +219,7 @@ export function TaskQueue({ admissionId = null }: { admissionId?: string | null 
             ...(showPatient
               ? [{ label: "Patient", className: "w-[20%] type-body-sm-regular" }]
               : []),
-            { label: "When", className: "w-36 type-body-sm-regular" },
+            { label: "When", className: "w-40 type-body-sm-regular" },
             { label: "Priority", className: "w-24 type-body-sm-regular" },
             {
               label: tab === "history" ? "Outcome" : "Status",
@@ -242,9 +257,11 @@ export function TaskQueue({ admissionId = null }: { admissionId?: string | null 
                   </TableCell>
                 )}
                 <TableCell>
+                  {/* The date over the time, so a long date never runs into Priority. */}
                   <div className="flex flex-col items-start gap-1">
-                    <span className="text-fg-heading">
-                      {day}, {time}
+                    <span className="flex flex-col">
+                      <span className="text-fg-heading">{day}</span>
+                      <span className="type-caption text-fg-caption">{time}</span>
                     </span>
                     {task.timing && tab === "pending" && (
                       <StatusPill tone={timingTones[task.timing]}>

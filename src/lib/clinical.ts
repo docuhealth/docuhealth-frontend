@@ -1,3 +1,4 @@
+import { isAxiosError } from "axios";
 import { z } from "zod";
 import { fullName, optionalText, text } from "@/lib/staff-profile";
 
@@ -120,3 +121,13 @@ export const soapSectionLabels = [
   ["patient_education", "Patient education"],
   ["referred_hosp", "Referred to"],
 ] as const;
+
+/**
+ * The API refused a nurse's task because the admission's nursing admission note isn't written
+ * yet. TODO(api): the refusal isn't documented, so it's told by its code or its words.
+ */
+export function needsAdmissionNote(error: unknown) {
+  if (!isAxiosError(error)) return false;
+  const text = JSON.stringify(error.response?.data ?? "").toLowerCase();
+  return /admission[ _-]?note/.test(text);
+}
