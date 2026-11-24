@@ -12,8 +12,8 @@ import {
   type TestAppointments,
   type TestRecordList,
   type TestRecordParams,
-  type TestStage,
-  testStageLabels,
+  type TestTab,
+  testTabLabels,
   toTestRecord,
 } from "@/features/lab-scientist/api/schemas";
 
@@ -140,7 +140,7 @@ export const pendingApprovalsQuery = () =>
 /** Rows per page in the table and cards per page in the grid (two rows of three). */
 export const TEST_RECORDS_PAGE_SIZES = { list: 7, grid: 6 } as const;
 
-const stages = Object.keys(testStageLabels) as TestStage[];
+const tabs = Object.keys(testTabLabels) as TestTab[];
 
 /** One page of a tab's orders, and every tab's count. TODO(api): `period` isn't applied. */
 export const testRecordListQuery = (params: TestRecordParams) =>
@@ -148,14 +148,20 @@ export const testRecordListQuery = (params: TestRecordParams) =>
     ...allOrdersQuery(),
     select: (entries): TestRecordList => {
       const term = params.search.trim().toLowerCase();
-      const records = entries.map(({ order }) => toTestRecord(order));
+      const records = entries.map(({ order, awaitingApproval }) => ({
+        ...toTestRecord(order),
+        awaitingApproval: awaitingApproval.length > 0,
+      }));
+      // Result Approval: orders with a result the lab's admin hasn't approved or returned yet.
+      const inTab = (record: (typeof records)[number], tab: TestTab) =>
+        tab === "result_approval" ? record.awaitingApproval : record.stage === tab;
       const counts = Object.fromEntries(
-        stages.map((stage) => [stage, records.filter((record) => record.stage === stage).length]),
-      ) as Record<TestStage, number>;
+        tabs.map((tab) => [tab, records.filter((record) => inTab(record, tab)).length]),
+      ) as Record<TestTab, number>;
       const matching = records
         .filter(
           (record) =>
-            record.stage === params.stage &&
+            inTab(record, params.stage) &&
             (!term ||
               [record.patient.name, record.patient.hin, record.testType].some((value) =>
                 value.toLowerCase().includes(term),

@@ -76,6 +76,13 @@ export const testStageLabels = {
 } as const;
 export type TestStage = keyof typeof testStageLabels;
 
+/**
+ * The Test orders tabs: each stage, plus (for the lab's admin, as in v1) the orders with a
+ * result waiting for their approval.
+ */
+export const testTabLabels = { ...testStageLabels, result_approval: "Result Approval" } as const;
+export type TestTab = keyof typeof testTabLabels;
+
 /** Why a test in progress is under way: booked as an appointment, or a doctor asked for it. */
 export const testProgressLabels = {
   appointment: "Appt",
@@ -86,7 +93,7 @@ export const testSortLabels = { latest: "Latest", oldest: "Oldest" } as const;
 export type TestSort = keyof typeof testSortLabels;
 
 export type TestRecordParams = {
-  stage: TestStage;
+  stage: TestTab;
   search: string;
   sort: TestSort;
   page: number;
@@ -112,7 +119,7 @@ export type TestRecord = {
 
 /** One page of a tab's test orders; `counts` covers every tab whatever the search. */
 export type TestRecordList = {
-  counts: Record<TestStage, number>;
+  counts: Record<TestTab, number>;
   total: number;
   items: TestRecord[];
 };

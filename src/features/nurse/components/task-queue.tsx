@@ -35,6 +35,7 @@ import { getErrorMessage } from "@/lib/api";
 import { careTaskTypeLabel, type Priority, priorityLabels, priorityTones } from "@/lib/care-tasks";
 import { formatDayAndTime, maskHin } from "@/lib/format";
 import { needsAdmissionNote } from "@/lib/clinical";
+import { cn } from "@/lib/utils";
 
 const tabs = Object.keys(taskTabLabels) as TaskTab[];
 
@@ -213,7 +214,11 @@ export function TaskQueue({
 
       <div className="overflow-x-auto">
         <DashboardTable
-          className="min-w-[46rem] type-body-sm-regular [&_tbody_tr:last-child]:border-b"
+          // Wide enough that Task keeps ~18rem beside the fixed columns; narrower cards scroll.
+          className={cn(
+            showPatient ? "min-w-[62rem]" : "min-w-[52rem]",
+            "type-body-sm-regular [&_tbody_tr:last-child]:border-b",
+          )}
           columns={[
             { label: "Task", className: "type-body-sm-regular" },
             ...(showPatient

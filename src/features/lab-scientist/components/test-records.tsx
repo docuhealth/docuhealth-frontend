@@ -17,8 +17,9 @@ import {
   type TestRecord,
   type TestSort,
   testSortLabels,
-  type TestStage,
+  type TestTab,
   testStageLabels,
+  testTabLabels,
   sexLabel,
 } from "@/features/lab-scientist/api/schemas";
 import {
@@ -35,8 +36,9 @@ import type { Period } from "@/lib/period";
 import { cn } from "@/lib/utils";
 import { EmptyState } from "@/components/empty-state";
 import { ListSkeleton } from "@/components/dashboard/skeletons";
+import { useIsFacilityAdmin } from "@/stores/auth-store";
 
-const stages = Object.keys(testStageLabels) as TestStage[];
+const stages = Object.keys(testStageLabels) as TestTab[];
 
 type View = "list" | "grid";
 
@@ -54,7 +56,8 @@ const emptyIn = {
   in_progress: "No tests in progress.",
   completed: "No completed tests yet.",
   rejected: "No rejected test orders.",
-} as const satisfies Record<TestStage, string>;
+  result_approval: "No results are waiting for your approval.",
+} as const satisfies Record<TestTab, string>;
 
 /**
  * Every test order sent to the lab in the period, by stage, searchable and sortable; as a table
@@ -67,7 +70,10 @@ export function TestRecords({
   period: Period;
   onPeriodChange: (period: Period) => void;
 }) {
-  const [stage, setStage] = useState<TestStage>("pending");
+  const [stage, setStage] = useState<TestTab>("pending");
+  // The lab's admin also gets a Result Approval tab (as in v1).
+  const admin = useIsFacilityAdmin();
+  const tabs = admin ? [...stages, "result_approval" as const] : stages;
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<TestSort>("latest");
   const [page, setPage] = useState(1);
@@ -167,16 +173,16 @@ export function TestRecords({
       <Tabs
         value={stage}
         onValueChange={(next) => {
-          setStage(next as TestStage);
+          setStage(next as TestTab);
           setPage(1);
         }}
         className="mt-2 gap-0"
       >
         {/* Ruled edge to edge, past the card's padding. */}
         <CountTabsList className="-mx-4 w-auto px-4">
-          {stages.map((value) => (
+          {tabs.map((value) => (
             <CountTab key={value} value={value} count={data?.counts[value]}>
-              {testStageLabels[value]}
+              {testTabLabels[value]}
             </CountTab>
           ))}
         </CountTabsList>
