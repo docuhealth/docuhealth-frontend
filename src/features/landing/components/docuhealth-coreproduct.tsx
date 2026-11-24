@@ -4,6 +4,8 @@ import providerImageUrl from "@/assets/images/core-product-provider.png";
 import { LandingContainer } from "@/features/landing/components/landing-container";
 import { SectionHeading } from "@/features/landing/components/section-heading";
 import { cn } from "@/lib/utils";
+import { RevealGroup, RevealItem } from "@/features/landing/components/motion";
+import { liftOnHover } from "@/features/landing/lib/motion";
 
 type ProductCardProps = {
   image: string;
@@ -28,7 +30,13 @@ function ProductCard({
   description,
 }: ProductCardProps) {
   return (
-    <article className="flex flex-1 flex-col rounded-lg bg-card px-4 pb-5 shadow-card sm:px-6">
+    <RevealItem
+      as="article"
+      className={cn(
+        "flex flex-1 flex-col rounded-lg bg-card px-4 pb-5 shadow-card sm:px-6",
+        liftOnHover,
+      )}
+    >
       <img src={image} alt={alt} className={cn("w-full", imageClassName)} />
       <div className={bodyClassName}>
         <p className="type-body-sm-medium text-primary uppercase">{audience}</p>
@@ -37,7 +45,7 @@ function ProductCard({
         </h3>
         <p className="mt-2.5 type-body-tight text-fg-body">{description}</p>
       </div>
-    </article>
+    </RevealItem>
   );
 }
 
@@ -53,7 +61,10 @@ export function DocuhealthCoreProduct() {
         description="Explore DocuHealth’s core products, their features, and how they help simplify healthcare management."
       />
 
-      <div className="mx-auto mt-12 grid max-w-290 grid-cols-1 gap-5 lg:grid-cols-2">
+      <RevealGroup
+        className="mx-auto mt-12 grid max-w-290 grid-cols-1 gap-5 lg:grid-cols-2"
+        stagger={0.14}
+      >
         <ProductCard
           image={providerImageUrl}
           alt="Patient record timeline for providers"
@@ -65,7 +76,7 @@ export function DocuhealthCoreProduct() {
           description="Keep one unified patient record and documentation across your facility. Share medical summaries and lab results securely with other providers, and manage billing and insurance claims in the same place. Communicate seamlessly with pharmacies and other care teams."
         />
 
-        <div className="flex flex-col gap-5">
+        <RevealGroup className="flex flex-col gap-5" stagger={0.14}>
           <ProductCard
             image={patientsImageUrl}
             alt="Patient discharge record and lab result permissions"
@@ -84,8 +95,8 @@ export function DocuhealthCoreProduct() {
             tagline="For insurers, HMOs and direct-pay patients.."
             description="Verify and adjudicate claims in real time. Keep reimbursements transparent and detect fraud early. Use analytics dashboards to optimize your financial performance and services."
           />
-        </div>
-      </div>
+        </RevealGroup>
+      </RevealGroup>
     </LandingContainer>
   );
 }

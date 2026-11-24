@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/accordion";
 import { LandingContainer } from "@/features/landing/components/landing-container";
 import { SectionHeading } from "@/features/landing/components/section-heading";
+import { Reveal } from "@/features/landing/components/motion";
 
 const faqs = [
   {
@@ -47,7 +48,7 @@ export function FaqSection() {
         description="See the answers to some of the frequent questions we're being asked about DocuHealth."
       />
 
-      <div className="mx-auto mt-10 max-w-175">
+      <Reveal className="mx-auto mt-10 max-w-175" delay={0.1}>
         <Accordion type="single" collapsible defaultValue="item-0">
           {faqs.map((faq, index) => (
             <AccordionItem
@@ -60,7 +61,7 @@ export function FaqSection() {
             </AccordionItem>
           ))}
         </Accordion>
-      </div>
+      </Reveal>
     </LandingContainer>
   );
 }

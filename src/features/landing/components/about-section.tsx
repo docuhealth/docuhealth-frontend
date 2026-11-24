@@ -3,6 +3,9 @@ import avatar1Url from "@/assets/avatars/about-doctor-1.jpg";
 import avatar2Url from "@/assets/avatars/about-doctor-2.jpg";
 import avatar3Url from "@/assets/avatars/about-doctor-3.jpg";
 import { Avatar, AvatarGroup, AvatarImage } from "@/components/ui/avatar";
+import { motion } from "motion/react";
+import { Reveal } from "@/features/landing/components/motion";
+import { ease } from "@/features/landing/lib/motion";
 
 const avatars = [
   { src: avatar1Url, alt: "Healthcare professional" },
@@ -68,17 +71,38 @@ export function AboutSection() {
       <div className="relative mx-auto max-w-360 px-4 pt-32 pb-20 lg:pt-40 lg:pb-40">
         {/* Architectural grid: side rails, a top rule, and a marker where they cross */}
         <div aria-hidden className="pointer-events-none absolute inset-0">
-          <span className="absolute inset-y-0 left-4 w-px bg-white/10 lg:left-21" />
-          <span className="absolute inset-y-0 right-4 w-px bg-white/10 lg:right-21" />
-          <span className="absolute inset-x-0 top-23.5 h-px bg-white/10" />
+          <motion.span
+            className="absolute inset-y-0 left-4 w-px origin-top bg-white/10 lg:left-21"
+            initial={{ scaleY: 0 }}
+            whileInView={{ scaleY: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.4, ease }}
+          />
+          <motion.span
+            className="absolute inset-y-0 right-4 w-px origin-top bg-white/10 lg:right-21"
+            initial={{ scaleY: 0 }}
+            whileInView={{ scaleY: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.4, ease, delay: 0.1 }}
+          />
+          <motion.span
+            className="absolute inset-x-0 top-23.5 h-px origin-center bg-white/10"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2, ease }}
+          />
           <span className="absolute top-23.5 left-4 size-1.5 -translate-1/2 bg-white/10 lg:left-21" />
           <span className="absolute top-23.5 right-4 size-1.5 translate-x-1/2 -translate-y-1/2 bg-white/10 lg:right-21" />
         </div>
 
         <div className="relative flex flex-col items-center text-center">
-          <span className="rounded-full bg-white/10 px-4 py-1.75 type-body-sm-medium tracking-widest text-white uppercase">
+          <Reveal
+            as="span"
+            className="rounded-full bg-white/10 px-4 py-1.75 type-body-sm-medium tracking-widest text-white uppercase"
+          >
             About Us
-          </span>
+          </Reveal>
 
           <div ref={paragraphRef} className="mt-12 max-w-220 type-statement">
             <span

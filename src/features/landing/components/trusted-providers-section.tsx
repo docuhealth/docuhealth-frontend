@@ -1,6 +1,8 @@
 import { LandingContainer } from "@/features/landing/components/landing-container";
 import { SectionHeading } from "@/features/landing/components/section-heading";
 import { cn } from "@/lib/utils";
+import { CountUp, RevealGroup, RevealItem } from "@/features/landing/components/motion";
+import { liftOnHover } from "@/features/landing/lib/motion";
 
 function HospitalGlyph() {
   return (
@@ -38,7 +40,13 @@ function Testimonial({
   badgeClassName: string;
 }) {
   return (
-    <article className="flex min-h-62.5 flex-col justify-between gap-6 rounded-lg bg-card p-5 shadow-card">
+    <RevealItem
+      as="article"
+      className={cn(
+        "flex min-h-62.5 flex-col justify-between gap-6 rounded-lg bg-card p-5 shadow-card",
+        liftOnHover,
+      )}
+    >
       <p className="type-accent-h4 text-fg-heading">{quote}</p>
       <div className="flex items-center gap-3">
         <span
@@ -54,16 +62,18 @@ function Testimonial({
           <p className="mt-1 type-body-sm-regular text-fg-body">{position}</p>
         </div>
       </div>
-    </article>
+    </RevealItem>
   );
 }
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="flex min-h-62.5 flex-col items-center justify-center rounded-lg bg-fg-heading p-5 pb-8 text-center text-white">
-      <p className="type-stat-lg">{value}</p>
+    <RevealItem className="flex min-h-62.5 flex-col items-center justify-center rounded-lg bg-fg-heading p-5 pb-8 text-center text-white">
+      <p className="type-stat-lg">
+        <CountUp value={value} />
+      </p>
       <p className="mt-2 type-body-lg">{label}</p>
-    </div>
+    </RevealItem>
   );
 }
 
@@ -79,7 +89,7 @@ export function TrustedProvidersSection() {
         description="Hear from the doctors, pharmacists and administrators who use DocuHealth every day."
       />
 
-      <div className="mt-14.5 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <RevealGroup className="mt-14.5 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         <Testimonial
           quote="“Before DocuHealth, we waited on paper files before every consultation. Now a patient’s history is on my screen when they walk in.”"
           name="Dr. [Name]"
@@ -101,7 +111,7 @@ export function TrustedProvidersSection() {
           badgeClassName="bg-blue-500"
         />
         <Stat value="15K+" label="Patient records unified" />
-      </div>
+      </RevealGroup>
     </LandingContainer>
   );
 }

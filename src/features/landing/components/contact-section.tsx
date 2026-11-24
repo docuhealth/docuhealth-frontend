@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { LandingContainer } from "@/features/landing/components/landing-container";
 import { SectionHeading } from "@/features/landing/components/section-heading";
 import { cn } from "@/lib/utils";
+import { RevealGroup, RevealItem } from "@/features/landing/components/motion";
+import { liftOnHover } from "@/features/landing/lib/motion";
 
 const contactChannels = [
   {
@@ -63,13 +65,17 @@ export function ContactSection() {
         descriptionClassName="max-w-120"
       />
 
-      <div className="mt-11 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <RevealGroup className="mt-11 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {contactChannels.map((channel) => {
           const Icon = channel.icon;
           return (
-            <article
+            <RevealItem
+              as="article"
               key={channel.label}
-              className="flex flex-col items-start rounded-lg bg-card p-5 shadow-card"
+              className={cn(
+                "flex flex-col items-start rounded-lg bg-card p-5 shadow-card",
+                liftOnHover,
+              )}
             >
               <span className="flex size-10 items-center justify-center rounded-md bg-primary/10 text-primary">
                 <Icon className="size-5" />
@@ -94,10 +100,10 @@ export function ContactSection() {
                   </a>
                 )}
               </Button>
-            </article>
+            </RevealItem>
           );
         })}
-      </div>
+      </RevealGroup>
     </LandingContainer>
   );
 }

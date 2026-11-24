@@ -2,6 +2,8 @@ import { MapPinAreaIcon } from "@phosphor-icons/react";
 import locationMapImageUrl from "@/assets/images/location-map.png";
 import { LandingContainer } from "@/features/landing/components/landing-container";
 import { cn } from "@/lib/utils";
+import { Reveal, RevealGroup, RevealItem } from "@/features/landing/components/motion";
+import { liftOnHover } from "@/features/landing/lib/motion";
 
 const offices = [
   {
@@ -25,44 +27,55 @@ export function WhereWeOperateSection() {
     <LandingContainer className="pt-20 lg:pt-40">
       <div className="mx-auto flex max-w-310 flex-col items-start justify-between gap-12 lg:flex-row lg:gap-10">
         <div className="w-full lg:max-w-120">
-          <h2 className="type-section text-fg-heading">
+          <Reveal as="h2" className="type-section text-fg-heading">
             Where we <strong>operate</strong>
-          </h2>
+          </Reveal>
 
-          <p className="mt-4 type-lead text-fg-body">
+          <Reveal as="p" delay={0.1} className="mt-4 type-lead text-fg-body">
             DocuHealth is active in Lagos, Ogun and Osun states, with our head office in Lagos. We
             are growing steadily, and more states are coming soon.
-          </p>
+          </Reveal>
 
-          <div className="mt-10 flex flex-col gap-5">
+          <RevealGroup className="mt-10 flex flex-col gap-5" stagger={0.12}>
             {offices.map((office) => (
-              <div key={office.title} className="rounded-lg bg-card px-3 py-2.5 shadow-card">
+              <RevealItem
+                key={office.title}
+                className={cn("rounded-lg bg-card px-3 py-2.5 shadow-card", liftOnHover)}
+              >
                 <p className="type-title-sm text-fg-heading">{office.title}</p>
                 <p className="mt-1 flex items-center gap-1.5 type-body-sm-regular text-fg-body">
                   <MapPinAreaIcon className="size-4 shrink-0" />
                   <span>{office.address}</span>
                 </p>
-              </div>
+              </RevealItem>
             ))}
-          </div>
+          </RevealGroup>
 
-          <ul className="mt-10 flex flex-col gap-3">
+          <RevealGroup as="ul" className="mt-10 flex flex-col gap-3" stagger={0.08}>
             {legendItems.map((item) => (
-              <li key={item.label} className="flex items-center gap-3">
+              <RevealItem
+                as="li"
+                key={item.label}
+                x={-16}
+                y={0}
+                className="flex items-center gap-3"
+              >
                 <span className={cn("size-4 shrink-0 rounded-[3px]", item.swatchClassName)} />
                 <span className="type-accent-h4 text-fg-heading">{item.label}</span>
-              </li>
+              </RevealItem>
             ))}
-          </ul>
+          </RevealGroup>
         </div>
 
-        <img
-          src={locationMapImageUrl}
-          alt="Map of Nigeria highlighting active DocuHealth states in Lagos, Ogun, and Osun"
-          width={620}
-          height={564}
-          className="w-full lg:w-155 lg:shrink-0"
-        />
+        <Reveal y={32} scale={0.97} className="w-full lg:w-155 lg:shrink-0">
+          <img
+            src={locationMapImageUrl}
+            alt="Map of Nigeria highlighting active DocuHealth states in Lagos, Ogun, and Osun"
+            width={620}
+            height={564}
+            className="w-full"
+          />
+        </Reveal>
       </div>
     </LandingContainer>
   );

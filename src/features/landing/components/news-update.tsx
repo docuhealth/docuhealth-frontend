@@ -3,6 +3,9 @@ import { LandingContainer } from "@/features/landing/components/landing-containe
 import { LandingLink } from "@/features/landing/components/landing-link";
 import { SectionHeading } from "@/features/landing/components/section-heading";
 import { news } from "@/features/landing/content/pages";
+import { RevealGroup, RevealItem } from "@/features/landing/components/motion";
+import { liftOnHover } from "@/features/landing/lib/motion";
+import { cn } from "@/lib/utils";
 
 /** The news with a picture, for the cards. */
 const articles = news.filter((article) => article.image);
@@ -21,9 +24,13 @@ export function NewsUpdatesSection() {
         descriptionClassName="max-w-110"
       />
 
-      <div className="mt-11 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <RevealGroup className="mt-11 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {articles.map((article) => (
-          <article key={article.slug} className="flex flex-col rounded-lg bg-card p-4 shadow-card">
+          <RevealItem
+            as="article"
+            key={article.slug}
+            className={cn("flex flex-col rounded-lg bg-card p-4 shadow-card", liftOnHover)}
+          >
             <img
               src={article.image?.src}
               alt={article.image?.alt}
@@ -44,9 +51,9 @@ export function NewsUpdatesSection() {
               Read More
               <CaretRightIcon className="size-3.5" />
             </LandingLink>
-          </article>
+          </RevealItem>
         ))}
-      </div>
+      </RevealGroup>
     </LandingContainer>
   );
 }

@@ -9,6 +9,7 @@ import {
 import dataPrivacyImageUrl from "@/assets/images/data-privacy.png";
 import { LandingContainer } from "@/features/landing/components/landing-container";
 import { cn } from "@/lib/utils";
+import { Reveal, RevealGroup, RevealItem } from "@/features/landing/components/motion";
 
 function RoleBadgeIcon({ className }: { className?: string }) {
   return (
@@ -52,21 +53,24 @@ export function DataPrivacySection() {
     <LandingContainer className="pt-20 lg:pt-40">
       <div className="flex flex-col items-start justify-between gap-12 lg:flex-row lg:gap-10">
         <div className="w-full lg:max-w-132.5">
-          <h2 className="type-section text-fg-heading">
+          <Reveal as="h2" className="type-section text-fg-heading">
             Data <strong>Privacy & Security</strong>
-          </h2>
+          </Reveal>
 
-          <p className="mt-4 type-lead text-fg-body">
+          <Reveal as="p" delay={0.1} className="mt-4 type-lead text-fg-body">
             At DocuHealth we follow global healthcare security standards. Every record is encrypted,
             access is limited by role, and nothing is shared without the patient’s permission.
-          </p>
+          </Reveal>
 
-          <ul className="mt-5.5">
+          <RevealGroup as="ul" className="mt-5.5" stagger={0.08}>
             {securityFeatures.map((feature) => {
               const Icon = feature.icon;
               return (
-                <li
+                <RevealItem
+                  as="li"
                   key={feature.title}
+                  x={-20}
+                  y={0}
                   className="flex items-center gap-3 border-b border-line py-5"
                 >
                   <span
@@ -78,19 +82,21 @@ export function DataPrivacySection() {
                     <Icon className="size-5" />
                   </span>
                   <span className="type-accent-h4 text-fg-heading">{feature.title}</span>
-                </li>
+                </RevealItem>
               );
             })}
-          </ul>
+          </RevealGroup>
         </div>
 
-        <img
-          src={dataPrivacyImageUrl}
-          alt="Patient record access permissions and approval prompt"
-          width={610}
-          height={568}
-          className="w-full lg:w-152.5 lg:shrink-0"
-        />
+        <Reveal y={32} scale={0.97} className="w-full lg:w-152.5 lg:shrink-0">
+          <img
+            src={dataPrivacyImageUrl}
+            alt="Patient record access permissions and approval prompt"
+            width={610}
+            height={568}
+            className="w-full"
+          />
+        </Reveal>
       </div>
     </LandingContainer>
   );

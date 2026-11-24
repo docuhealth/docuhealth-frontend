@@ -34,6 +34,31 @@ globalThis.ResizeObserver ??= class {
   disconnect() {}
 };
 
+// jsdom has no IntersectionObserver; the landing page's scroll animations use it. Everything
+// counts as in view at once, so animated content shows straight away.
+class IntersectionObserverStub {
+  readonly root = null;
+  readonly rootMargin = "";
+  readonly thresholds = [];
+  private readonly callback: IntersectionObserverCallback;
+  constructor(callback: IntersectionObserverCallback) {
+    this.callback = callback;
+  }
+  observe(target: Element) {
+    this.callback(
+      [{ isIntersecting: true, intersectionRatio: 1, target } as IntersectionObserverEntry],
+      this as unknown as IntersectionObserver,
+    );
+  }
+  unobserve() {}
+  disconnect() {}
+  takeRecords() {
+    return [];
+  }
+}
+globalThis.IntersectionObserver ??=
+  IntersectionObserverStub as unknown as typeof IntersectionObserver;
+
 // Any request without a handler fails the test instead of hitting the network.
 beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
 afterEach(() => {

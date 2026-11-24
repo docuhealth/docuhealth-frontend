@@ -6,6 +6,7 @@ import { DocuhealthCoreProduct } from "@/features/landing/components/docuhealth-
 import { FaqSection } from "@/features/landing/components/faq-section";
 import { Footer } from "@/features/landing/components/footer";
 import { HeroPage } from "@/features/landing/components/hero-page";
+import { LandingMotion } from "@/features/landing/components/motion";
 import { Navbar } from "@/features/landing/components/navbar";
 import { NewsUpdatesSection } from "@/features/landing/components/news-update";
 import { TrustedProvidersSection } from "@/features/landing/components/trusted-providers-section";
@@ -18,21 +19,23 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   return (
     // The design sets Inter at its default optical size at every text size.
-    <div className="[font-optical-sizing:none]">
-      <Navbar />
-      <main>
-        <title>DocuHealth</title>
-        <HeroPage />
-        <AboutSection />
-        <DocuhealthCoreProduct />
-        <DataPrivacySection />
-        <WhereWeOperateSection />
-        <NewsUpdatesSection />
-        <TrustedProvidersSection />
-        <FaqSection />
-        <ContactSection />
-      </main>
-      <Footer />
-    </div>
+    <LandingMotion>
+      <div className="[font-optical-sizing:none]">
+        <Navbar />
+        <main>
+          <title>DocuHealth</title>
+          <HeroPage />
+          <AboutSection />
+          <DocuhealthCoreProduct />
+          <DataPrivacySection />
+          <WhereWeOperateSection />
+          <NewsUpdatesSection />
+          <TrustedProvidersSection />
+          <FaqSection />
+          <ContactSection />
+        </main>
+        <Footer />
+      </div>
+    </LandingMotion>
   );
 }

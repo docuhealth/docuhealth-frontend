@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { LandingContainer } from "@/features/landing/components/landing-container";
 import { LandingLink } from "@/features/landing/components/landing-link";
 import { type LandingHref } from "@/features/landing/lib/href";
+import { Reveal } from "@/features/landing/components/motion";
+import { FooterWordmark } from "@/features/landing/components/footer-wordmark";
 
 const companyLinks: { label: string; href: LandingHref }[] = [
   { label: "About us", href: "/#about" },
@@ -74,9 +76,9 @@ export function Footer() {
 
   return (
     <footer className="bg-fg-heading text-white">
-      <LandingContainer className="py-16 lg:py-25">
+      <LandingContainer className="overflow-hidden pt-16 lg:pt-25">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[392px_1fr] lg:gap-32">
-          <div className="rounded-xl bg-card p-6 text-fg-heading">
+          <Reveal className="rounded-xl bg-card p-6 text-fg-heading">
             <h3 className="type-title-xl">
               Subscribe to our
               <br />
@@ -116,7 +118,7 @@ export function Footer() {
                 <CaretRightIcon data-icon="inline-end" className="size-3.5" />
               </Button>
             </form>
-          </div>
+          </Reveal>
 
           <div className="flex flex-col justify-between gap-12">
             <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
@@ -202,6 +204,7 @@ export function Footer() {
             </div>
           </div>
         </div>
+        <FooterWordmark />
       </LandingContainer>
     </footer>
   );
