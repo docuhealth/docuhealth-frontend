@@ -1,6 +1,13 @@
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterProvider,
+} from "@tanstack/react-router";
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { DashboardTable } from "@/components/dashboard/dashboard-table";
+import { RoutePending } from "@/components/dashboard/skeletons";
 import { EmptyState } from "@/components/empty-state";
 
 const columns = [{ label: "Patient" }, { label: "Status" }, { label: "Ward", className: "hidden" }];
@@ -55,5 +62,33 @@ describe("EmptyState", () => {
     expect(screen.getByText("No staff yet")).toBeInTheDocument();
     expect(screen.getByText("Add your first team member.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Add Staff" })).toBeInTheDocument();
+  });
+});
+
+describe("RoutePending", () => {
+  /** What the placeholder shows for a page at `path` (an internal path, e.g. /hospital/...). */
+  async function pendingAt(path: string) {
+    const router = createRouter({
+      routeTree: createRootRoute({ component: RoutePending }),
+      history: createMemoryHistory({ initialEntries: [path] }),
+    });
+    const { container } = render(<RouterProvider router={router} />);
+    await router.load();
+    return container;
+  }
+
+  it("shapes itself like the page: a dashboard, a form, or nothing on the public site", async () => {
+    const dashboard = await pendingAt("/hospital/nurse/tasks");
+    expect(within(dashboard).getAllByRole("row", { hidden: true }).length).toBeGreaterThan(0);
+
+    const form = await pendingAt("/register");
+    expect(within(form).getByLabelText("Loading")).toBeInTheDocument();
+    expect(within(form).queryAllByRole("row", { hidden: true })).toHaveLength(0);
+
+    const admin = await pendingAt("/admin/login");
+    expect(within(admin).queryAllByRole("row", { hidden: true })).toHaveLength(0);
+
+    const landing = await pendingAt("/our-mission");
+    expect(landing).toBeEmptyDOMElement();
   });
 });

@@ -23,6 +23,7 @@ import {
   individualInfoSchema,
   type IndividualInfoValues,
 } from "@/features/auth/lib/schemas";
+import { LoginPrompt } from "@/features/auth/components/auth-header";
 
 const TODAY = new Date();
 
@@ -261,6 +262,7 @@ export function IndividualInfoForm({
             Continue
             <CaretRightIcon data-icon="inline-end" />
           </Button>
+          <LoginPrompt to="/login" />
         </FieldGroup>
       </form>
     </div>

@@ -60,6 +60,8 @@ describe("Password reset", () => {
 describe("Patient sign-up", () => {
   it("shows where the code went, and sends an existing account to log in", async () => {
     const { user } = renderWithRouter(<IndividualSignUp />);
+    // Every sign-up step offers the way back to log in, under its button.
+    expect(await screen.findByRole("link", { name: "Log in" })).toHaveAttribute("href", "/login");
     await fill(user, await screen.findByLabelText(/First name/), "Ada");
     await fill(user, screen.getByLabelText(/Last name/), "Okonkwo");
     await user.click(screen.getByRole("combobox", { name: /Gender/ }));

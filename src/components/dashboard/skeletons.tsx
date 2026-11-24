@@ -1,3 +1,4 @@
+import { useRouterState } from "@tanstack/react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -88,11 +89,8 @@ export function CardSkeleton({ lines = 4, className }: { lines?: number; classNa
   );
 }
 
-/**
- * A whole dashboard page while its route loads: the heading, a row of stat cards and a table.
- * The router shows it for any page that takes more than a moment.
- */
-export function PageSkeleton() {
+/** A whole dashboard page while its route loads: the heading, a row of stat cards and a table. */
+function PageSkeleton() {
   return (
     <output aria-label="Loading" className="flex flex-col gap-8 p-4 sm:p-8">
       <div className="flex flex-col gap-2">
@@ -110,4 +108,41 @@ export function PageSkeleton() {
       </div>
     </output>
   );
+}
+
+/** A login or sign-up form while its page loads: a title, a few fields and the button. */
+function FormSkeleton() {
+  return (
+    <output aria-label="Loading" className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <Bone className="h-6 w-48" />
+        <Bone className="h-3.5 w-64 max-w-full" />
+      </div>
+      {Array.from({ length: 3 }, (_, field) => (
+        <div key={field} className="flex flex-col gap-2">
+          <Bone className="h-3 w-24" />
+          <Bone className="h-12 w-full" />
+        </div>
+      ))}
+      <Bone className="h-12 w-full" />
+    </output>
+  );
+}
+
+// Internal paths (sections are path prefixes inside the app): the staff dashboards and
+// DocuHealth's admin section, and the login and sign-up pages.
+const dashboardPath =
+  /^\/(hospital\/(admin|doctor|nurse|receptionist|lab-scientist|radiologist|pharmacy)|admin)(\/|$)/;
+const authPath =
+  /\/(login|forgot-password|register|register-hospital|verify|verify-nin|first-login)$/;
+
+/**
+ * What the router shows while a page that takes more than a moment loads, shaped like that page:
+ * a dashboard's heading, stat cards and table; a login or sign-up form; nothing on the public site.
+ */
+export function RoutePending() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  if (authPath.test(pathname)) return <FormSkeleton />;
+  if (dashboardPath.test(pathname)) return <PageSkeleton />;
+  return null;
 }

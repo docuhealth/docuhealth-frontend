@@ -15,6 +15,7 @@ import {
   type AccountDetailsInput,
   type AccountDetailsValues,
 } from "@/features/auth/lib/schemas";
+import { LoginPrompt } from "@/features/auth/components/auth-header";
 
 /** Last step of the individual sign-up: NIN and the password for the new account. */
 export function AccountDetailsForm({
@@ -111,6 +112,7 @@ export function AccountDetailsForm({
             Register
             <CaretRightIcon data-icon="inline-end" />
           </Button>
+          <LoginPrompt to="/login" />
         </FieldGroup>
       </form>
     </div>

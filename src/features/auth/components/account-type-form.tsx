@@ -18,6 +18,7 @@ import {
   type AccountType,
   type AccountTypeValues,
 } from "@/features/auth/lib/schemas";
+import { LoginPrompt } from "@/features/auth/components/auth-header";
 
 const options: { value: AccountType; title: string; description: string; icon: Icon }[] = [
   {
@@ -100,6 +101,7 @@ export function AccountTypeForm({ onContinue }: { onContinue: (type: AccountType
         Continue
         <CaretRightIcon data-icon="inline-end" />
       </Button>
+      <LoginPrompt to="/login" />
     </form>
   );
 }

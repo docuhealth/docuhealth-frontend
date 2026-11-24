@@ -28,6 +28,7 @@ import {
 } from "@/features/auth/lib/schemas";
 import { getErrorMessage } from "@/lib/api";
 import { absoluteUrl } from "@/lib/sections";
+import { LoginPrompt } from "@/features/auth/components/auth-header";
 
 /** Provider sign-up: the facility's details, submitted for approval in one step. */
 export function ProviderInfoForm() {
@@ -185,6 +186,7 @@ export function ProviderInfoForm() {
             Continue
             <CaretRightIcon data-icon="inline-end" />
           </Button>
+          <LoginPrompt prompt="Already registered your facility?" to="/hospital/login" />
         </FieldGroup>
       </form>
 

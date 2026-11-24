@@ -1,6 +1,6 @@
 import { CaretRightIcon } from "@phosphor-icons/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, type LinkProps } from "@tanstack/react-router";
+import type { LinkProps } from "@tanstack/react-router";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { AuthHeader } from "@/features/auth/components/auth-header";
+import { AuthHeader, LoginPrompt } from "@/features/auth/components/auth-header";
 import { StepProgress } from "@/features/auth/components/step-progress";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import { OTP_LENGTH, verifyCodeSchema, type VerifyCodeValues } from "@/features/auth/lib/schemas";
@@ -161,14 +161,7 @@ export function VerifyCodeForm({
             Verify
             <CaretRightIcon data-icon="inline-end" />
           </Button>
-          {login && (
-            <p className="text-center type-body-sm-regular text-muted-foreground">
-              {login.prompt}{" "}
-              <Link to={login.to} className="text-primary underline underline-offset-2">
-                Log in
-              </Link>
-            </p>
-          )}
+          {login && <LoginPrompt prompt={login.prompt} to={login.to} />}
         </div>
       </form>
     </div>

@@ -65,3 +65,24 @@ export function AuthFooter({
     </>
   );
 }
+
+/**
+ * "Already have an account? Log in", just under a sign-up step's button, so someone who already
+ * has one can get to the login page from any step. `to` is the login that fits the sign-up.
+ */
+export function LoginPrompt({
+  prompt = "Already have an account?",
+  to,
+}: {
+  prompt?: string;
+  to: LinkProps["to"];
+}) {
+  return (
+    <p className="text-center type-body-sm-regular text-muted-foreground">
+      {prompt}{" "}
+      <Link to={to} className="text-primary underline underline-offset-2">
+        Log in
+      </Link>
+    </p>
+  );
+}
