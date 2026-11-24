@@ -52,8 +52,14 @@ describe("Notes on an admission", () => {
     const { user } = renderWithRouter(
       <Admission staff="nurse" visitId="admission-1" kinds={["admission", "vitals"]} />,
     );
-    // As in v1, opening a newly admitted patient asks for the note straight away.
-    const prompt = await screen.findByRole("dialog", { name: "Add the nursing admission note" });
+    // As in v1, opening a newly admitted patient asks for the note straight away. It waits on
+    // the visit and its notes, so give it time when every test file runs together.
+    const slow = { timeout: 10_000 };
+    const prompt = await screen.findByRole(
+      "dialog",
+      { name: "Add the nursing admission note" },
+      slow,
+    );
     expect(within(prompt).getByText(/Yemi Ojo was newly admitted/)).toBeInTheDocument();
     await user.click(within(prompt).getByRole("button", { name: "Cancel" }));
 
@@ -77,7 +83,9 @@ describe("Notes on an admission", () => {
     await user.type(within(dialog).getByLabelText("Allergies"), "Penicillin\nLatex");
     await user.click(within(dialog).getByRole("radio", { name: "Walks with help" }));
     await user.click(within(dialog).getByRole("button", { name: "Save admission note" }));
-    expect(await screen.findByText("Yemi Ojo’s admission note is saved.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Yemi Ojo’s admission note is saved.", undefined, slow),
+    ).toBeInTheDocument();
 
     expect(await screen.findByText("The task queue")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Record vitals" })).toBeInTheDocument();

@@ -155,7 +155,23 @@ export function NoteActions({
 export function AdmissionNoteGate({ visit, children }: { visit: Visit; children: ReactNode }) {
   const hasAdmissionNote = useHasAdmissionNote(visit);
   const [writing, setWriting] = useState(false);
-  if (hasAdmissionNote || visit.status !== "active") return children;
+  // Mounted whatever the gate shows: saving the note opens the gate, and the form must still be
+  // there to finish (confirm, clear its draft) after that.
+  const noteDialog = (
+    <AdmissionNoteDialog
+      open={writing}
+      onOpenChange={setWriting}
+      target={{ hin: visit.patient.hin, admissionId: visit.id, patientName: visit.patient.name }}
+    />
+  );
+  if (hasAdmissionNote || visit.status !== "active") {
+    return (
+      <>
+        {children}
+        {noteDialog}
+      </>
+    );
+  }
   return (
     <div className="rounded-xl border bg-card px-4">
       {hasAdmissionNote === false ? (
@@ -171,11 +187,7 @@ export function AdmissionNoteGate({ visit, children }: { visit: Visit; children:
       ) : (
         <ListSkeleton className="py-4" />
       )}
-      <AdmissionNoteDialog
-        open={writing}
-        onOpenChange={setWriting}
-        target={{ hin: visit.patient.hin, admissionId: visit.id, patientName: visit.patient.name }}
-      />
+      {noteDialog}
     </div>
   );
 }
