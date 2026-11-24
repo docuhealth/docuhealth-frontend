@@ -12,6 +12,8 @@ import {
 } from "@/features/doctor/api/results";
 import { ReviewButtons } from "@/features/doctor/components/review-buttons";
 import { formatDayAndTime } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 const tabLabels = { lab: "Lab results", scans: "Scan reports" } as const;
 type Tab = keyof typeof tabLabels;
@@ -54,9 +56,9 @@ export function ResultReview() {
       </Tabs>
 
       {empty || !current.data ? (
-        <p className="py-10 text-center type-body-sm-regular text-fg-caption">
-          {empty || "Loading…"}
-        </p>
+        <div>
+          {empty ? <EmptyState compact description={empty} /> : <ListSkeleton className="py-4" />}
+        </div>
       ) : (
         <ul className="flex flex-col divide-y">
           {tab === "lab"

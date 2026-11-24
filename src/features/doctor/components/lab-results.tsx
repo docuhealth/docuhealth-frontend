@@ -6,6 +6,8 @@ import { LAB_ORDERS_PAGE_SIZE, labOrdersQuery } from "@/features/doctor/api/quer
 import type { LabOrder } from "@/features/doctor/api/schemas";
 import { ReviewButtons } from "@/features/doctor/components/review-buttons";
 import { formatDayAndTime } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 /** A test's status in words, and how it's colored. */
 const testStatus: Record<
@@ -38,9 +40,9 @@ export function LabResults({ hin }: { hin: string }) {
   return (
     <section aria-label="Lab results" className="flex flex-col gap-4">
       {empty || !data ? (
-        <p className="rounded-xl border bg-card py-10 text-center type-body-sm-regular text-fg-caption">
-          {empty || "Loading…"}
-        </p>
+        <div className="rounded-xl border bg-card px-4">
+          {empty ? <EmptyState compact description={empty} /> : <ListSkeleton className="py-4" />}
+        </div>
       ) : (
         data.items.map((order) => <OrderCard key={order.id} order={order} now={now} />)
       )}

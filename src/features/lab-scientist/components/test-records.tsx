@@ -33,6 +33,8 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { ageOn, formatDateDotTime, formatDayAndTime, maskHin } from "@/lib/format";
 import type { Period } from "@/lib/period";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 const stages = Object.keys(testStageLabels) as TestStage[];
 
@@ -213,6 +215,7 @@ export function TestRecords({
                 { label: "Status", className: `${columns.status} type-body-sm-regular` },
                 { label: "Actions", hideLabel: true, className: columns.action },
               ]}
+              loading={!data}
               empty={empty}
             >
               {items.map((record) => (
@@ -240,7 +243,9 @@ export function TestRecords({
 
           <div className="mt-4 border-t @4xl:hidden">
             {empty ? (
-              <p className="py-10 text-center type-caption text-fg-caption">{empty}</p>
+              <EmptyState compact description={empty} />
+            ) : !data ? (
+              <ListSkeleton className="py-4" />
             ) : (
               <ul aria-label="Test records">
                 {items.map((record) => (
@@ -309,7 +314,7 @@ function ViewToggle({ value, onChange }: { value: View; onChange: (view: View) =
 /** One card per order, as many to a row as the section fits (three on a wide page). */
 function RecordGrid({ items, empty, now }: { items: TestRecord[]; empty: ReactNode; now: Date }) {
   if (empty) {
-    return <p className="py-10 text-center type-caption text-fg-caption">{empty}</p>;
+    return <EmptyState compact description={empty} />;
   }
   return (
     <ul

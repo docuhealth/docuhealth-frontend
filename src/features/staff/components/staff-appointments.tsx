@@ -30,6 +30,8 @@ import {
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { getErrorMessage } from "@/lib/api";
 import { formatDayAndTime } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 const timeframes = Object.keys(appointmentTimeframeLabels) as AppointmentTimeframe[];
 
@@ -159,6 +161,7 @@ export function StaffAppointments({
               { label: "Status", className: `${columns.status} type-body-sm-regular` },
               { label: "Actions", hideLabel: true, className: canAssign ? "w-44" : columns.action },
             ]}
+            loading={!data}
             empty={empty}
           >
             {items.map((appointment) => (
@@ -190,7 +193,9 @@ export function StaffAppointments({
 
         <div className="mt-4 border-t @3xl:hidden">
           {empty ? (
-            <p className="py-10 text-center type-caption text-fg-caption">{empty}</p>
+            <EmptyState compact description={empty} />
+          ) : !data ? (
+            <ListSkeleton className="py-4" />
           ) : (
             <ul aria-label="Appointments">
               {items.map((appointment) => (

@@ -12,6 +12,8 @@ import {
 import { CHART_PAGE_SIZE, chartQuery, fluidBalanceQuery } from "@/features/clinical/api/queries";
 import { type Chart, chartLabels } from "@/features/clinical/api/schemas";
 import { formatDayAndTime } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 const ml = (value: number) => `${value.toLocaleString("en-GB")} ml`;
 
@@ -69,9 +71,9 @@ export function AdmissionCharts({ admissionId }: { admissionId: string }) {
           />
         </div>
         {empty || !data ? (
-          <p className="py-10 text-center type-body-sm-regular text-fg-caption">
-            {empty || "Loading…"}
-          </p>
+          <div>
+            {empty ? <EmptyState compact description={empty} /> : <ListSkeleton className="py-4" />}
+          </div>
         ) : (
           <Accordion type="multiple" className="flex flex-col border-t">
             {data.items.map((entry) => {

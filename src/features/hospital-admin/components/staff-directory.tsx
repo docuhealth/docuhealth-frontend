@@ -16,6 +16,8 @@ import { StatusPill } from "@/components/dashboard/status-pill";
 import { TablePagination } from "@/components/dashboard/table-pagination";
 import { formatTimeAgo } from "@/lib/format";
 import { NotAvailableYetError } from "@/lib/not-available";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 // The design's layout on wide cards: Name ~28%, the others 14% each.
 const columns = {
@@ -112,6 +114,7 @@ export function StaffDirectory({
             { label: "Sex", className: columns.sex },
             { label: "Actions", hideLabel: true, className: columns.actions },
           ]}
+          loading={!data}
           empty={empty}
         >
           {items.map((member) => (
@@ -140,7 +143,9 @@ export function StaffDirectory({
 
       <div className="mt-4 border-t @3xl:hidden">
         {empty ? (
-          <p className="py-10 text-center type-caption text-fg-caption">{empty}</p>
+          <EmptyState compact description={empty} />
+        ) : !data ? (
+          <ListSkeleton className="py-4" />
         ) : (
           <>
             {selection && items.length > 0 && (

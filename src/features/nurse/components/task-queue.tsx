@@ -212,6 +212,7 @@ export function TaskQueue({ admissionId = null }: { admissionId?: string | null 
             },
             { label: "Actions", hideLabel: true, className: "w-44" },
           ]}
+          loading={!data}
           empty={empty}
         >
           {items.map((task) => {

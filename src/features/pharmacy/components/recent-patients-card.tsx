@@ -51,6 +51,7 @@ export function RecentPatientsCard() {
           { label: "Patient", className: "type-body-sm-regular" },
           { label: "Last given drugs", className: "w-36 type-body-sm-regular" },
         ]}
+        loading={!data}
         empty={empty}
       >
         {data?.items.map((patient) => (

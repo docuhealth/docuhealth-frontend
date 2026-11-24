@@ -132,3 +132,19 @@ export function useUploadScanResult(orderId: string) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: radiologistKeys.all }),
   });
 }
+
+/**
+ * Record in the audit trail that a scan report was downloaded or printed (the API has one event
+ * for both). Fire and forget: a failed entry is only reported to the console, never in the way
+ * of the download.
+ */
+export function useLogReportDownload() {
+  return useMutation({
+    mutationFn: (resultId: string) =>
+      request(anyResponseSchema, {
+        method: "POST",
+        url: `/api/radiology/audit-logs/${encodeURIComponent(resultId)}/downloads`,
+      }),
+    onError: (error) => console.warn("Couldn’t log the report download", error),
+  });
+}

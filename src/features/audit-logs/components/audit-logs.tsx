@@ -11,6 +11,8 @@ import { Tabs } from "@/components/ui/tabs";
 import { AUDIT_LOGS_PAGE_SIZE, auditLogListQuery } from "@/features/audit-logs/api/queries";
 import { type AuditLog, type AuditType, auditTypeLabels } from "@/features/audit-logs/api/schemas";
 import { formatDayAndTime, maskHin } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 const types = Object.keys(auditTypeLabels) as AuditType[];
 
@@ -85,6 +87,7 @@ export function AuditLogs({ description }: { description: string }) {
               { label: recordLabel[type], className: "type-body-sm-regular" },
               { label: "Details", hideLabel: true, className: "w-24" },
             ]}
+            loading={!data}
             empty={empty}
           >
             {items.map((log) => (
@@ -107,7 +110,9 @@ export function AuditLogs({ description }: { description: string }) {
 
         <div className="mt-4 border-t @3xl:hidden">
           {empty ? (
-            <p className="py-10 text-center type-caption text-fg-caption">{empty}</p>
+            <EmptyState compact description={empty} />
+          ) : !data ? (
+            <ListSkeleton className="py-4" />
           ) : (
             <ul aria-label="Downloads">
               {items.map((log) => (

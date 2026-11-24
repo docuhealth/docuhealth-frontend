@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup, configure } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, vi } from "vitest";
+import { clearAllDrafts } from "@/lib/form-drafts";
 import { server } from "@/mocks/node";
 import { useAuthStore } from "@/stores/auth-store";
 
@@ -39,5 +40,7 @@ afterEach(() => {
   cleanup();
   server.resetHandlers();
   useAuthStore.getState().clearSession();
+  // Saved form drafts would otherwise carry one test's typing into the next.
+  clearAllDrafts();
 });
 afterAll(() => server.close());

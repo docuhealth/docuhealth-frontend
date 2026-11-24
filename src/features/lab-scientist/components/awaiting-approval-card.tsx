@@ -7,6 +7,8 @@ import { pendingApprovalsQuery } from "@/features/lab-scientist/api/queries";
 import { PendingTag } from "@/features/lab-scientist/components/status-tag";
 import { TestTubeBadge } from "@/features/lab-scientist/components/test-name";
 import { formatDay, formatTime } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 /** How many results the card shows. */
 const PREVIEW_ROWS = 6;
@@ -36,7 +38,9 @@ export function AwaitingApprovalCard() {
       }
     >
       {empty ? (
-        <p className="py-10 text-center type-body-sm-regular text-fg-caption">{empty}</p>
+        <EmptyState compact description={empty} />
+      ) : !data ? (
+        <ListSkeleton className="py-4" />
       ) : (
         <ul aria-label="Results awaiting approval" className="mt-2 border-t">
           {data?.items.slice(0, PREVIEW_ROWS).map((item) => (

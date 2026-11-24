@@ -20,6 +20,8 @@ import {
 } from "@/features/clinical/api/schemas";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { ageOn, formatDayAndTime, maskHin } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 const lists = Object.keys(visitListLabels) as VisitList[];
 
@@ -113,6 +115,7 @@ export function ClinicalPatients({
               ...columns.map((label) => ({ label, className: "w-[16%] type-body-sm-regular" })),
               { label: "Actions", hideLabel: true, className: "w-24" },
             ]}
+            loading={!data}
             empty={empty}
           >
             {items.map((visit) => (
@@ -135,7 +138,9 @@ export function ClinicalPatients({
 
         <div className="mt-4 border-t @4xl:hidden">
           {empty ? (
-            <p className="py-10 text-center type-caption text-fg-caption">{empty}</p>
+            <EmptyState compact description={empty} />
+          ) : !data ? (
+            <ListSkeleton className="py-4" />
           ) : (
             <ul aria-label="Patients">
               {items.map((visit) => (

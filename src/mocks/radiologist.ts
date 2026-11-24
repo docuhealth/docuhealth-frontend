@@ -348,4 +348,10 @@ export const radiologistHandlers = [
       results: results.slice(0, size),
     });
   }),
+  // Records that a report left the system (downloaded or printed); there's no body.
+  http.post(api("/api/radiology/audit-logs/:resultSqid/downloads"), ({ params }) => {
+    const known = items.some((item) => item.results.some(({ sqid }) => sqid === params.resultSqid));
+    if (!known) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    return new HttpResponse(null, { status: 200 });
+  }),
 ];

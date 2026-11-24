@@ -168,6 +168,8 @@ export type TestOrder = {
   rejection: { at: string | null; reason: string } | null;
   /** Set once every test has a result. */
   result: {
+    /** The results' sqids (one per test), e.g. to log a download of them. */
+    ids: string[];
     uploadedAt: string;
     /** Numbers where the value is one, else the text (e.g. "Positive"). */
     values: { loinc: string; value: number | string }[];
@@ -231,6 +233,8 @@ const item = z.object({
   rejection_reason: optionalText,
   result_info: z
     .object({
+      // TODO(api): `result_info` is untyped in the schema; v1 reads its `sqid` too.
+      sqid: z.string().nullish(),
       created_at: dateTime,
       parameters_info: z
         .array(z.object({ parameter_info: parameter.partial(), value: z.unknown() }))
@@ -330,6 +334,7 @@ export const labOrderSchema = z
       result:
         stage === "completed" && results.length > 0
           ? {
+              ids: results.flatMap((result) => (result.sqid ? [result.sqid] : [])),
               uploadedAt: results
                 .map((result) => result.created_at)
                 .sort()

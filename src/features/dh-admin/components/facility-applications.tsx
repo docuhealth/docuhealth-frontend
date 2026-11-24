@@ -33,6 +33,8 @@ import {
 } from "@/features/dh-admin/api/schemas";
 import { getErrorMessage } from "@/lib/api";
 import { formatDateCommaTime } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 const statuses = Object.keys(applicationStatusLabels) as ApplicationStatus[];
 
@@ -87,9 +89,9 @@ export function FacilityApplications() {
         </Tabs>
 
         {empty || !data ? (
-          <p className="py-10 text-center type-body-sm-regular text-fg-caption">
-            {empty || "Loading…"}
-          </p>
+          <div>
+            {empty ? <EmptyState compact description={empty} /> : <ListSkeleton className="py-4" />}
+          </div>
         ) : (
           <Accordion type="multiple" className="flex flex-col">
             {data.items.map((application) => (

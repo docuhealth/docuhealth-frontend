@@ -32,6 +32,8 @@ import {
 } from "@/features/hospital-admin/lib/schemas";
 import { getErrorMessage } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 const bedTones = {
   available: "success",
@@ -77,7 +79,9 @@ export function WardManagement() {
           {data ? `${data.total} ${data.total === 1 ? "ward" : "wards"}` : "Loading wards…"}
         </p>
         {empty ? (
-          <p className="py-10 text-center type-caption text-fg-caption">{empty}</p>
+          <EmptyState compact description={empty} />
+        ) : !data ? (
+          <ListSkeleton className="py-4" />
         ) : (
           <ul aria-label="Wards" className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {data?.items.map((ward) => (

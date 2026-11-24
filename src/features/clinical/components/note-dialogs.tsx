@@ -33,6 +33,8 @@ import {
 } from "@/features/clinical/lib/note-schemas";
 import { getErrorMessage } from "@/lib/api";
 import { emptyVitals } from "@/lib/vitals-form";
+import { DraftNotice } from "@/components/draft-notice";
+import { useFormDraft } from "@/hooks/use-form-draft";
 
 /** The admission a note is written on. */
 type NoteTarget = { hin: string; admissionId: string; patientName: string };
@@ -74,12 +76,19 @@ function TextNoteForm({
     defaultValues: Object.fromEntries(fields.map(({ name }) => [name, ""])),
   });
   const { errors } = form.formState;
+  // Unsent notes survive a refresh, but only while the tab is open: they're health information.
+  const draft = useFormDraft(form, {
+    form: `notes:${kind}:${target.admissionId}`,
+    fields: fields.map(({ name }) => name),
+    storage: "session",
+  });
 
   function onSubmit(values: Record<string, string>) {
     write.mutate(
       { hin: target.hin, admissionId: target.admissionId, values },
       {
         onSuccess: () => {
+          draft.clear();
           toast.success(done);
           onDone();
         },
@@ -96,6 +105,7 @@ function TextNoteForm({
     >
       <FormDialogHeader title={title} description={`${description} ${target.patientName}.`} />
       <FormDialogBody>
+        <DraftNotice restored={draft.restored} onDiscard={draft.discard} />
         {fields.map(({ name, label, placeholder, required, list }) => {
           const id = `${kind}-${name}`;
           const error = errors[name];
@@ -161,12 +171,18 @@ function AdmissionNoteForm({ target, onDone }: { target: NoteTarget; onDone: () 
     },
   });
   const { errors } = form.formState;
+  const draft = useFormDraft(form, {
+    form: `notes:admission:${target.admissionId}`,
+    fields: ["vitals", "allergies", "mobility", "nutrition", "fallRisk", "skin", "concern"],
+    storage: "session",
+  });
 
   function onSubmit(values: AdmissionNoteValues) {
     write.mutate(
       { ...values, hin: target.hin, admissionId: target.admissionId },
       {
         onSuccess: () => {
+          draft.clear();
           toast.success(`${target.patientName}’s admission note is saved.`);
           onDone();
         },
@@ -192,6 +208,7 @@ function AdmissionNoteForm({ target, onDone }: { target: NoteTarget; onDone: () 
           description={`${target.patientName}’s vitals and nursing assessment on arrival.`}
         />
         <FormDialogBody>
+          <DraftNotice restored={draft.restored} onDiscard={draft.discard} />
           <VitalsFields idPrefix="admissionNote" />
 
           <Field data-invalid={!!errors.concern}>

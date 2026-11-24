@@ -28,6 +28,8 @@ import { plansQuery } from "@/features/dh-admin/api/queries";
 import { type Plan, planIntervalLabels, planRoleLabels } from "@/features/dh-admin/api/schemas";
 import { type PlanValues, planSchema } from "@/features/dh-admin/lib/schemas";
 import { getErrorMessage } from "@/lib/api";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
+import { EmptyState } from "@/components/empty-state";
 
 const naira = (amount: number) => `₦${amount.toLocaleString("en-GB")}`;
 
@@ -59,13 +61,19 @@ export function SubscriptionPlans() {
       </div>
 
       {isError || !data || data.length === 0 ? (
-        <p className="rounded-xl border bg-card py-10 text-center type-body-sm-regular text-fg-caption">
-          {isError
-            ? "We couldn’t load the plans. Try again in a moment."
-            : data
-              ? "No plans yet."
-              : "Loading…"}
-        </p>
+        <div className="rounded-xl border bg-card px-4">
+          {isError ? (
+            <EmptyState compact description="We couldn’t load the plans. Try again in a moment." />
+          ) : data ? (
+            <EmptyState
+              compact
+              title="No plans yet"
+              description="Add a plan for hospitals to choose."
+            />
+          ) : (
+            <ListSkeleton className="py-4" />
+          )}
+        </div>
       ) : (
         <ul aria-label="Plans" className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {data.map((plan) => (

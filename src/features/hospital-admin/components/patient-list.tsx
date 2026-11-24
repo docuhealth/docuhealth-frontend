@@ -23,6 +23,8 @@ import {
   minutesBetween,
 } from "@/lib/format";
 import { NotAvailableYetError } from "@/lib/not-available";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 // The design's layout on wide cards: Patient ~27%, the details sharing what's left.
 const width = {
@@ -146,6 +148,7 @@ export function PatientList({
             ...columns,
             { label: "Actions", hideLabel: true, className: "w-24" },
           ]}
+          loading={!data}
           empty={empty}
         >
           {items.map((visit) => (
@@ -168,7 +171,9 @@ export function PatientList({
 
       <div className="mt-4 border-t @5xl:hidden">
         {empty ? (
-          <p className="py-10 text-center type-caption text-fg-caption">{empty}</p>
+          <EmptyState compact description={empty} />
+        ) : !data ? (
+          <ListSkeleton className="py-4" />
         ) : (
           <ul aria-label="Patients">
             {items.map((visit) => (

@@ -32,7 +32,9 @@ import { ScanOrderResult } from "@/features/radiologist/components/scan-order-re
 import { AcceptOrderFlow } from "@/features/radiologist/components/accept-order-flow";
 import { ImagingTimeDialog } from "@/features/radiologist/components/imaging-time-dialog";
 import { RejectOrderFlow } from "@/features/radiologist/components/reject-order-flow";
+import { ReportExportButtons } from "@/features/radiologist/components/report-export-buttons";
 import { UploadResultFlow } from "@/features/radiologist/components/upload-result-flow";
+import { maskedHin } from "@/features/radiologist/lib/names";
 import { stageStatusLabels, stageTones } from "@/features/radiologist/lib/stage";
 import { ageOn, formatDateCommaTime, formatDay, formatTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -136,11 +138,6 @@ function PatientHeading({ patient, now }: { patient: ScanOrder["patient"]; now: 
   );
 }
 
-/** "HIN-12456••••••": the first five digits, the rest hidden. */
-function maskedHin(hin: string) {
-  return `HIN-${hin.slice(0, 5)}${"•".repeat(Math.max(0, hin.length - 5))}`;
-}
-
 const buttonBase = "h-12 gap-2 px-4 has-data-[icon=inline-start]:pl-4";
 const outlineButton = cn(buttonBase, "bg-card type-body-sm-medium text-fg-heading");
 const primaryButton = cn(buttonBase, "type-heading-sm");
@@ -192,14 +189,11 @@ function StageButtons({ order, onOpen }: { order: ScanOrder; onOpen: (dialog: Di
             <ViewIcon data-icon="inline-start" className="size-5" />
             View original preview
           </Button>
-          <Button variant="outline" className={outlineButton} onClick={notBuilt("Printing")}>
-            <PrinterIcon data-icon="inline-start" className="size-5" />
-            Print out
-          </Button>
-          <Button className={primaryButton} onClick={notBuilt("Downloading the report")}>
-            <UploadIcon data-icon="inline-start" className="size-5" />
-            Download
-          </Button>
+          <ReportExportButtons
+            order={order}
+            printClassName={outlineButton}
+            downloadClassName={primaryButton}
+          />
         </>
       );
     case "rejected":

@@ -11,3 +11,8 @@ export function displayName(user: User) {
 export function greetingName(user: User) {
   return user.title ? `${user.title} ${user.firstName}` : user.firstName;
 }
+
+/** "HIN-12456••••••": the first five digits, the rest hidden. */
+export function maskedHin(hin: string) {
+  return `HIN-${hin.slice(0, 5)}${"•".repeat(Math.max(0, hin.length - 5))}`;
+}

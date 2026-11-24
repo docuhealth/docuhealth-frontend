@@ -226,7 +226,13 @@ const scanOrderSchema = z.object({
   /** The radiologist's report; set once the order is completed. */
   result: z
     .object({
+      /** The report's sqid, e.g. to log a download of it. */
+      id: z.string(),
+      /** The requesting doctor's review: `pending`, `approved` or `rejected`. */
+      status: z.string(),
       uploadedAt: z.iso.datetime(),
+      /** When the reporter says they reported it. */
+      reportedAt: z.iso.datetime(),
       reportedBy: z.object({ name: z.string(), specialty: z.string() }),
       examination: z.string(),
       clinicalIndication: z.string(),
@@ -315,6 +321,7 @@ const resultRead = z.object({
   extra_comment: optionalText,
   reporter_name: text,
   reporter_specialty: text,
+  reported_at: dateTime.nullish(),
   status: z.string(),
   created_at: dateTime,
 });
@@ -390,7 +397,10 @@ export const scanOrderItemSchema = z
       result:
         stage === "completed" && latest
           ? {
+              id: latest.sqid,
+              status: latest.status,
               uploadedAt: latest.created_at,
+              reportedAt: latest.reported_at ?? latest.created_at,
               reportedBy: { name: latest.reporter_name, specialty: latest.reporter_specialty },
               examination: item.scan_info.name,
               clinicalIndication: latest.clinical_indication,

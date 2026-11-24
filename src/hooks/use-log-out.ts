@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { request } from "@/lib/api";
+import { clearAllDrafts } from "@/lib/form-drafts";
 import { isDocuHealthAdmin, useAuthStore } from "@/stores/auth-store";
 
 /** Ends the session, revokes the refresh cookie, drops cached data and goes to the appropriate login. */
@@ -13,6 +14,8 @@ export function useLogOut() {
     const { session } = useAuthStore.getState();
     await request(z.unknown(), { method: "POST", url: "/api/auth/logout" }).catch(() => undefined);
     useAuthStore.getState().clearSession();
+    // The next person on this computer must never see this one's unsent input.
+    clearAllDrafts();
     await navigate({
       to: isDocuHealthAdmin(session)
         ? "/admin/login"

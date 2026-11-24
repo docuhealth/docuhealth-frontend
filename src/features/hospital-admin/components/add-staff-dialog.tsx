@@ -37,6 +37,8 @@ import {
 } from "@/features/hospital-admin/lib/schemas";
 import { welcomeMessage } from "@/features/hospital-admin/lib/welcome-message";
 import { getErrorMessage } from "@/lib/api";
+import { DraftNotice } from "@/components/draft-notice";
+import { useFormDraft } from "@/hooks/use-form-draft";
 
 const roleLabels = Object.fromEntries(
   Object.entries(staffRoles).map(([role, { one }]) => [role, one]),
@@ -100,6 +102,11 @@ function AddStaffForm({ onAdded }: { onAdded: () => void }) {
     },
   });
   const { errors } = form.formState;
+  // The welcome message follows the details, so only the details are kept.
+  const draft = useFormDraft(form, {
+    form: "hospital-admin:add-staff",
+    fields: ["firstName", "lastName", "phone", "role", "isAdmin", "email"],
+  });
   const [firstName, email] = useWatch({
     control: form.control,
     name: ["firstName", "email"],
@@ -116,7 +123,10 @@ function AddStaffForm({ onAdded }: { onAdded: () => void }) {
 
   function onSubmit(member: AddStaffValues) {
     addStaff.mutate(member, {
-      onSuccess: onAdded,
+      onSuccess: () => {
+        draft.clear();
+        onAdded();
+      },
       onError: (error) => toast.error(getErrorMessage(error)),
     });
   }
@@ -143,6 +153,7 @@ function AddStaffForm({ onAdded }: { onAdded: () => void }) {
 
       {step === 1 ? (
         <FormDialogBody>
+          <DraftNotice restored={draft.restored} onDiscard={draft.discard} />
           <Field data-invalid={!!errors.firstName}>
             <FieldLabel htmlFor="staffFirstName" className="gap-1">
               First name <RequiredMark />

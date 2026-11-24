@@ -28,6 +28,8 @@ import {
   historySchema,
 } from "@/features/doctor/lib/schemas";
 import { getErrorMessage } from "@/lib/api";
+import { DraftNotice } from "@/components/draft-notice";
+import { useFormDraft } from "@/hooks/use-form-draft";
 
 type Key = FieldPath<EncounterNoteValues>;
 
@@ -169,6 +171,12 @@ function NoteForm({
     resolver: zodResolver(encounterNoteSchema),
     defaultValues: emptyEncounterNote,
   });
+  // Unsent notes survive a refresh, but only while the tab is open: they're health information.
+  const draft = useFormDraft(form, {
+    form: `doctor:encounter-note:${checkInId}`,
+    fields: Object.keys(emptyEncounterNote) as (keyof EncounterNoteValues)[],
+    storage: "session",
+  });
 
   // Read here, so the form re-renders as they change.
   const { errors } = form.formState;
@@ -183,6 +191,7 @@ function NoteForm({
       { hin, checkInId, note },
       {
         onSuccess: () => {
+          draft.clear();
           toast.success(`${patientName}’s encounter note is saved.`);
           onSaved();
         },
@@ -214,6 +223,7 @@ function NoteForm({
         progress={{ step: step + 1, total: 2 }}
       />
       <FormDialogBody>
+        <DraftNotice restored={draft.restored} onDiscard={draft.discard} />
         {(steps[step] ?? []).map((field) => (
           <NoteField key={field.name} form={form} error={errors[field.name]} {...field} />
         ))}

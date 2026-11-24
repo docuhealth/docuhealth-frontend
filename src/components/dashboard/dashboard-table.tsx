@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { EmptyState } from "@/components/empty-state";
 import {
   Table,
   TableBody,
@@ -8,12 +9,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PersonAvatar } from "@/components/dashboard/person-avatar";
+import { TableRowsSkeleton } from "@/components/dashboard/skeletons";
 import { cn } from "@/lib/utils";
 
 /**
  * A dashboard card's table: grey header row with rounded top corners, 12px text throughout.
- * `empty` replaces the rows (e.g. "No patients match …") when it's given; `compact` rows are
- * 52px tall instead of 60px; `plainHeader` drops the grey header for lines above and below it.
+ * `empty` replaces the rows (e.g. "No patients match …") with the shared empty state when it's
+ * given; `loading` shows skeleton rows (as many as `loadingRows`) until the first page arrives;
+ * `compact` rows are 52px tall instead of 60px; `plainHeader` drops the grey header for lines
+ * above and below it.
  *
  * Columns have fixed widths except the one without a width class, which takes the rest. To fit
  * narrow cards, give a column `hidden @lg:table-cell` (etc.) — on its header via `columns` and on
@@ -22,6 +26,8 @@ import { cn } from "@/lib/utils";
 export function DashboardTable({
   columns,
   empty,
+  loading = false,
+  loadingRows = 5,
   compact,
   plainHeader,
   className,
@@ -33,6 +39,8 @@ export function DashboardTable({
    */
   columns: { label: string; hideLabel?: boolean; header?: ReactNode; className?: string }[];
   empty?: ReactNode;
+  loading?: boolean;
+  loadingRows?: number;
   compact?: boolean;
   plainHeader?: boolean;
   className?: string;
@@ -70,13 +78,15 @@ export function DashboardTable({
             ))}
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody aria-busy={(loading && !empty) || undefined}>
           {empty ? (
             <TableRow className="hover:bg-transparent">
-              <TableCell colSpan={columns.length} className="py-10! text-center text-fg-caption">
-                {empty}
+              <TableCell colSpan={columns.length} className="py-2! whitespace-normal">
+                <EmptyState compact description={empty} />
               </TableCell>
             </TableRow>
+          ) : loading ? (
+            <TableRowsSkeleton columns={columns} rows={loadingRows} />
           ) : (
             children
           )}

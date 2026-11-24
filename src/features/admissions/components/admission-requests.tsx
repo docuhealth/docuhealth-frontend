@@ -31,6 +31,8 @@ import {
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { getErrorMessage } from "@/lib/api";
 import { ageOn, formatDayAndTime, maskHin } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 const statuses = Object.keys(admissionStatusLabels) as AdmissionStatus[];
 
@@ -146,6 +148,7 @@ export function AdmissionRequests() {
                 ? [{ label: "Actions", hideLabel: true, className: columns.action }]
                 : [{ label: "Outcome", className: `${columns.outcome} type-body-sm-regular` }]),
             ]}
+            loading={!data}
             empty={empty}
           >
             {items.map((request) => (
@@ -174,7 +177,9 @@ export function AdmissionRequests() {
 
         <div className="mt-4 border-t @4xl:hidden">
           {empty ? (
-            <p className="py-10 text-center type-caption text-fg-caption">{empty}</p>
+            <EmptyState compact description={empty} />
+          ) : !data ? (
+            <ListSkeleton className="py-4" />
           ) : (
             <ul aria-label="Admission requests">
               {items.map((request) => (

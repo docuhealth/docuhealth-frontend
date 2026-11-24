@@ -49,6 +49,7 @@ export function QueueCard() {
           { label: "Status", className: columns.status },
           { label: "Wait time", className: columns.wait },
         ]}
+        loading={!data}
         empty={
           isError
             ? "We couldn’t load the queue. Try again in a moment."

@@ -30,6 +30,8 @@ import { type VitalsRequestValues, vitalsRequestSchema } from "@/features/nurse/
 import { getErrorMessage } from "@/lib/api";
 import { formatDayAndTime, greetingFor, maskHin } from "@/lib/format";
 import { emptyVitals } from "@/lib/vitals-form";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 /** The nurse's home page: vitals the doctors have asked for, and who's admitted. */
 export function NurseOverview({ firstName }: { firstName: string }) {
@@ -65,9 +67,9 @@ function VitalsRequestsCard({ now }: { now: Date }) {
   return (
     <DashboardCard title={`Vitals requests${data ? ` (${data.total})` : ""}`}>
       {empty || !data ? (
-        <p className="py-10 text-center type-body-sm-regular text-fg-caption">
-          {empty || "Loading…"}
-        </p>
+        <div>
+          {empty ? <EmptyState compact description={empty} /> : <ListSkeleton className="py-4" />}
+        </div>
       ) : (
         <ul aria-label="Vitals requests" className="mt-3 border-t">
           {data.items.map((request) => {
@@ -188,9 +190,9 @@ function AdmittedCard({ now }: { now: Date }) {
   return (
     <DashboardCard title={`Admitted patients${data ? ` (${data.total})` : ""}`}>
       {empty || !data ? (
-        <p className="py-10 text-center type-body-sm-regular text-fg-caption">
-          {empty || "Loading…"}
-        </p>
+        <div>
+          {empty ? <EmptyState compact description={empty} /> : <ListSkeleton className="py-4" />}
+        </div>
       ) : (
         <ul aria-label="Admitted patients" className="mt-3 border-t">
           {data.items.map((admission) => {

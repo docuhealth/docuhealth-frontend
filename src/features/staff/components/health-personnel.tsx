@@ -9,6 +9,8 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { STAFF_DIRECTORY_PAGE_SIZE, staffDirectoryQuery } from "@/features/staff/api/queries";
 import { type StaffMember, type StaffRole, staffRoleLabels } from "@/lib/staff-profile";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 const roleFilter = { all: "All roles", ...staffRoleLabels } as const;
 type RoleFilter = keyof typeof roleFilter;
@@ -76,6 +78,7 @@ export function HealthPersonnel() {
               { label: "Gender", className: `${columns.detail} type-body-sm-regular` },
               { label: "Status", className: `${columns.status} type-body-sm-regular` },
             ]}
+            loading={!data}
             empty={empty}
           >
             {items.map((member) => (
@@ -96,7 +99,9 @@ export function HealthPersonnel() {
 
         <div className="mt-4 border-t @3xl:hidden">
           {empty ? (
-            <p className="py-10 text-center type-caption text-fg-caption">{empty}</p>
+            <EmptyState compact description={empty} />
+          ) : !data ? (
+            <ListSkeleton className="py-4" />
           ) : (
             <ul aria-label="Staff">
               {items.map((member) => (

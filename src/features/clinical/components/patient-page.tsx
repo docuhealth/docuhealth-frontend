@@ -16,6 +16,7 @@ import type { Visit, VisitList } from "@/features/clinical/api/schemas";
 import { VisitStatus } from "@/features/clinical/components/clinical-patients";
 import { VisitRecords } from "@/features/clinical/components/visit-records";
 import { ageOn, formatDate, formatDateCommaTime } from "@/lib/format";
+import { CardSkeleton } from "@/components/dashboard/skeletons";
 
 const coverageLabels = { hmo: "HMO Patient", private: "Private Patient" } as const;
 
@@ -167,7 +168,7 @@ function PatientDetails({ visit, now }: { visit: Visit; now: Date }) {
               We couldn’t load the vitals. Try again in a moment.
             </p>
           ) : !info ? (
-            <p className="py-2 type-body-sm-regular text-fg-caption">Loading…</p>
+            <CardSkeleton lines={3} />
           ) : !info.latestVitals || info.latestVitals.readings.length === 0 ? (
             <p className="py-2 type-body-sm-regular text-fg-caption">No vitals recorded.</p>
           ) : (
@@ -183,10 +184,10 @@ function PatientDetails({ visit, now }: { visit: Visit; now: Date }) {
         </ProfileCard>
 
         <ProfileCard title="Ongoing medication" description="Drugs the patient is currently on.">
-          {!info || info.ongoingDrugs.length === 0 ? (
-            <p className="py-2 type-body-sm-regular text-fg-caption">
-              {info ? "No ongoing medication." : "Loading…"}
-            </p>
+          {!info ? (
+            <CardSkeleton lines={3} />
+          ) : info.ongoingDrugs.length === 0 ? (
+            <p className="py-2 type-body-sm-regular text-fg-caption">No ongoing medication.</p>
           ) : (
             <ul className="flex flex-col divide-y">
               {info.ongoingDrugs.map((drug) => (

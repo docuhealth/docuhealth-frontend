@@ -64,6 +64,7 @@ export function ReceptionQueueCard() {
           { label: "Wait time", className: columns.wait },
           { label: "Action", className: columns.action },
         ]}
+        loading={!data}
         empty={
           isError
             ? "We couldn’t load the queue. Try again in a moment."

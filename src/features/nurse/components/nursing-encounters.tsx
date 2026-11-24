@@ -19,6 +19,8 @@ import {
 import { AssessmentDialog } from "@/features/nurse/components/assessment-dialog";
 import { getErrorMessage } from "@/lib/api";
 import { ageOn, formatDayAndTime, formatDuration, maskHin, minutesBetween } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 const tabs = Object.keys(queueTabLabels) as QueueTab[];
 
@@ -161,6 +163,7 @@ export function NursingEncounters({ me }: { me: Me }) {
               ...columns.map((label) => ({ label, className: "w-[18%] type-body-sm-regular" })),
               { label: "Actions", hideLabel: true, className: "w-28" },
             ]}
+            loading={!data}
             empty={empty}
           >
             {items.map((entry) => (
@@ -181,7 +184,9 @@ export function NursingEncounters({ me }: { me: Me }) {
 
         <div className="mt-4 border-t @3xl:hidden">
           {empty ? (
-            <p className="py-10 text-center type-caption text-fg-caption">{empty}</p>
+            <EmptyState compact description={empty} />
+          ) : !data ? (
+            <ListSkeleton className="py-4" />
           ) : (
             <ul aria-label="Check-ins">
               {items.map((entry) => (

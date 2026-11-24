@@ -19,6 +19,8 @@ import type { EncounterNote } from "@/features/doctor/api/schemas";
 import { type AdditionalNoteValues, additionalNoteSchema } from "@/features/doctor/lib/schemas";
 import { getErrorMessage } from "@/lib/api";
 import { formatDateCommaTime, formatDayAndTime } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 /**
  * The patient's encounter (SOAP) notes, newest first; each opens to the whole note and any
@@ -37,9 +39,9 @@ export function EncounterNotes({ hin }: { hin: string }) {
   return (
     <section aria-label="Encounter notes" className="rounded-xl border bg-card px-4 py-2">
       {empty || !data ? (
-        <p className="py-10 text-center type-body-sm-regular text-fg-caption">
-          {empty || "Loading…"}
-        </p>
+        <div>
+          {empty ? <EmptyState compact description={empty} /> : <ListSkeleton className="py-4" />}
+        </div>
       ) : (
         <Accordion type="multiple" className="flex flex-col">
           {data.items.map((note) => {

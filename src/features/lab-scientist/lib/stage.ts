@@ -1,3 +1,4 @@
+import { pdfFileName } from "@/lib/export-element";
 import type {
   LabTest,
   ResultFlag,
@@ -53,3 +54,29 @@ export function testNames(tests: LabTest[]) {
 /** The order's tests whose result waits for the lab admin. */
 export const resultsAwaitingReview = (order: TestOrder) =>
   order.items.filter((item) => item.status === "result_ready");
+
+/**
+ * Why the order's results can't be printed or downloaded; `null` when they can. As in v1, only
+ * results that are in can leave: every test has one (awaiting the lab admin, or approved), never
+ * a pending, in-progress, sample-collected or rejected order.
+ */
+export function resultExportBlocker(order: TestOrder): string | null {
+  if (order.stage !== "completed") return "Results can be printed once every test has one.";
+  if (!order.result) return "The results aren’t in yet.";
+  return null;
+}
+
+/** The PDF's name: patient, tests and hospital, e.g. "ada_obi_full_blood_count_luth.pdf". */
+export function resultFileName(order: TestOrder) {
+  const tests = [
+    ...new Set(order.items.filter((item) => item.status !== "rejected").map((item) => item.name)),
+  ];
+  return pdfFileName(order.patient.name, tests.join(" ") || "lab test", order.provider.name);
+}
+
+/** Where a test's result stands in its review, for the official report. */
+export const resultReviewLabels: Record<string, string> = {
+  result_ready: "Result ready",
+  result_accepted_by_lab_admin: "Approved by the lab",
+  result_accepted_by_doctor: "Approved by the doctor",
+};

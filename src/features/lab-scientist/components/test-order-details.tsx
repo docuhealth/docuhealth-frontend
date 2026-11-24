@@ -25,6 +25,7 @@ import { testOrderQuery } from "@/features/lab-scientist/api/queries";
 import { sexLabel, type TestOrder } from "@/features/lab-scientist/api/schemas";
 import { AcceptOrderFlow } from "@/features/lab-scientist/components/accept-order-flow";
 import { RejectOrderFlow } from "@/features/lab-scientist/components/reject-order-flow";
+import { ResultExportButtons } from "@/features/lab-scientist/components/result-export-buttons";
 import {
   ApproveResultsDialog,
   ReturnResultsDialog,
@@ -36,6 +37,7 @@ import {
 } from "@/features/lab-scientist/components/test-order-progress";
 import { TestOrderResult } from "@/features/lab-scientist/components/test-order-result";
 import { UploadResultFlow } from "@/features/lab-scientist/components/upload-result-flow";
+import { maskedHin } from "@/features/lab-scientist/lib/names";
 import {
   resultsAwaitingReview,
   stageStatusLabels,
@@ -148,11 +150,6 @@ function PatientHeading({ patient, now }: { patient: TestOrder["patient"]; now: 
   );
 }
 
-/** "HIN-12456••••••": the first five digits, the rest hidden. */
-function maskedHin(hin: string) {
-  return `HIN-${hin.slice(0, 5)}${"•".repeat(Math.max(0, hin.length - 5))}`;
-}
-
 const buttonBase = "h-12 gap-2 px-4 has-data-[icon=inline-start]:pl-4";
 const outlineButton = cn(buttonBase, "bg-card type-body-sm-medium text-fg-heading");
 const primaryButton = cn(buttonBase, "type-heading-sm");
@@ -223,14 +220,11 @@ function StageButtons({ order, onOpen }: { order: TestOrder; onOpen: (dialog: Di
             <ViewIcon data-icon="inline-start" className="size-5" />
             View original preview
           </Button>
-          <Button variant="outline" className={outlineButton} onClick={notBuilt("Printing")}>
-            <PrinterIcon data-icon="inline-start" className="size-5" />
-            Print out
-          </Button>
-          <Button className={primaryButton} onClick={notBuilt("Downloading the results")}>
-            <UploadIcon data-icon="inline-start" className="size-5" />
-            Download
-          </Button>
+          <ResultExportButtons
+            order={order}
+            printClassName={outlineButton}
+            downloadClassName={primaryButton}
+          />
         </>
       );
     case "rejected":

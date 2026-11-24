@@ -51,6 +51,8 @@ import {
 } from "@/features/receptionist/lib/schemas";
 import { formatWait, useResendCooldown } from "@/hooks/use-resend-cooldown";
 import { errorCode, getErrorMessage } from "@/lib/api";
+import { DraftNotice } from "@/components/draft-notice";
+import { useFormDraft } from "@/hooks/use-form-draft";
 
 type Step = 1 | 2 | 3;
 
@@ -137,6 +139,11 @@ export function RegisterPatientForm({
     },
   });
   const { errors } = form.formState;
+  // Step 1's details survive a refresh; the code, NIN and password are never kept.
+  const draft = useFormDraft(form, {
+    form: `receptionist:register-${variant}`,
+    fields: [...registerPatientSteps[1]],
+  });
   const email = useWatch({ control: form.control, name: "email" });
   const phone = useWatch({ control: form.control, name: "phone" });
   // Where the code goes (the guardian's phone, or the patient's email) until the API says.
@@ -213,8 +220,10 @@ export function RegisterPatientForm({
       password,
     };
     const callbacks = {
-      onSuccess: ({ id, hin }: { id: string; hin: string }) =>
-        onRegistered({ id, hin, name: `${firstName} ${lastName}`, phone, email }),
+      onSuccess: ({ id, hin }: { id: string; hin: string }) => {
+        draft.clear();
+        onRegistered({ id, hin, name: `${firstName} ${lastName}`, phone, email });
+      },
       onError: (error: Error) => toast.error(getErrorMessage(error)),
     };
     if (guardian) {
@@ -253,6 +262,7 @@ export function RegisterPatientForm({
 
       {step === 1 && (
         <FormDialogBody minHeight={bodyMinHeight}>
+          <DraftNotice restored={draft.restored} onDiscard={draft.discard} />
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <Field data-invalid={!!errors.firstName}>
               <FieldLabel htmlFor="patientFirstName" className="gap-1">

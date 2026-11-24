@@ -15,6 +15,8 @@ import {
   handoversQuery,
 } from "@/features/clinical/api/handovers";
 import { formatDayAndTime } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 const directionLabels = { received: "Received", sent: "Sent" } as const;
 type Direction = keyof typeof directionLabels;
@@ -54,9 +56,9 @@ export function HandoverHistory({ staff: role, myId }: { staff: HandoverRole; my
         )}
       </div>
       {empty || !data ? (
-        <p className="py-10 text-center type-body-sm-regular text-fg-caption">
-          {empty || "Loading…"}
-        </p>
+        <div>
+          {empty ? <EmptyState compact description={empty} /> : <ListSkeleton className="py-4" />}
+        </div>
       ) : (
         <Accordion type="multiple" className="flex flex-col border-t">
           {data.items.map((handover) => {

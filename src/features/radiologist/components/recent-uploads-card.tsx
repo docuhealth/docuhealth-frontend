@@ -57,6 +57,7 @@ export function RecentUploadsCard() {
           { label: "Status", className: `${columns.status} type-body-sm-regular` },
           { label: "Open", hideLabel: true, className: columns.action },
         ]}
+        loading={!data}
         empty={
           isError
             ? "We couldn’t load the uploads. Try again in a moment."

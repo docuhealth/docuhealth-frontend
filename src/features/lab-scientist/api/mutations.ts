@@ -188,3 +188,26 @@ export function useReturnResults(order: TestOrder) {
     onSuccess: useOrderChanged(order.id),
   });
 }
+
+/**
+ * Record in the lab's audit trail that the order's results were downloaded or printed (the API
+ * has one event for both), one entry per result. Fire and forget: a failed entry is only
+ * reported to the console, never in the way of the download.
+ */
+export function useLogResultDownload() {
+  return useMutation({
+    mutationFn: async (resultIds: string[]) => {
+      const outcomes = await Promise.allSettled(
+        resultIds.map((id) =>
+          request(anyResponseSchema, {
+            method: "POST",
+            url: `/api/lab/audit-logs/${encodeURIComponent(id)}/downloads`,
+          }),
+        ),
+      );
+      const failed = outcomes.find((outcome) => outcome.status === "rejected");
+      if (failed) throw failed.reason;
+    },
+    onError: (error) => console.warn("Couldn’t log the results download", error),
+  });
+}

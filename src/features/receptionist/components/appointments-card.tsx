@@ -18,6 +18,8 @@ import { AppointmentDetailsDialog } from "@/features/receptionist/components/app
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { StatusTag } from "@/features/receptionist/components/status-tag";
 import { formatClockTime, formatShortDay } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 type Appointment = AppointmentList["items"][number];
 
@@ -69,7 +71,9 @@ export function AppointmentsCard() {
       </Tabs>
 
       {empty ? (
-        <p className="py-10 text-center type-body-sm-regular text-fg-caption">{empty}</p>
+        <EmptyState compact description={empty} />
+      ) : !data ? (
+        <ListSkeleton className="py-4" />
       ) : (
         <>
           {/* Column labels; widths match AppointmentRow's. Screen readers get each row whole. */}

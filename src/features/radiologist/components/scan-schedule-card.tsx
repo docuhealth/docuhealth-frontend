@@ -56,6 +56,7 @@ export function ScanScheduleCard() {
           { label: "Scan Type", className: `${columns.scan} type-body-sm-regular` },
           { label: "Open", hideLabel: true, className: columns.action },
         ]}
+        loading={!data}
         empty={
           isError
             ? "We couldn’t load the schedule. Try again in a moment."

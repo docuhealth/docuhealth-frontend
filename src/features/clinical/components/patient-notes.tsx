@@ -16,6 +16,8 @@ import {
   patientNotesQuery,
 } from "@/features/clinical/api/notes";
 import { formatDayAndTime } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 /** Why a kind of note couldn't be loaded, in words. */
 function failure(error: unknown) {
@@ -64,9 +66,9 @@ export function PatientNotes({ hin, kinds }: { hin: string; kinds: readonly Note
         )}
       </div>
       {empty || !data ? (
-        <p className="py-10 text-center type-body-sm-regular text-fg-caption">
-          {empty || "Loading…"}
-        </p>
+        <div>
+          {empty ? <EmptyState compact description={empty} /> : <ListSkeleton className="py-4" />}
+        </div>
       ) : (
         <Accordion type="multiple" className="flex flex-col border-t">
           {data.items.map((note) => {

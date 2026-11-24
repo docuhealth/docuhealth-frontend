@@ -15,6 +15,7 @@ import {
   waitingCountQuery,
 } from "@/features/doctor/api/overview";
 import { greetingFor } from "@/lib/format";
+import { CardSkeleton } from "@/components/dashboard/skeletons";
 
 const number = (value: number | undefined) =>
   value === undefined ? "…" : value.toLocaleString("en-GB");
@@ -125,7 +126,7 @@ function MonthsCard({
           We couldn’t load the chart. Try again in a moment.
         </p>
       ) : !months ? (
-        <p className="py-16 text-center type-body-sm-regular text-fg-caption">Loading…</p>
+        <CardSkeleton lines={5} />
       ) : (
         <BarChart
           bars={months.map(({ label, value }) => ({ key: label, label, longLabel: label, value }))}

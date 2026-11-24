@@ -17,6 +17,8 @@ import {
   type TrendPoint,
   trendPeriodLabels,
 } from "@/features/dh-admin/api/schemas";
+import { CardSkeleton } from "@/components/dashboard/skeletons";
+import { EmptyState } from "@/components/empty-state";
 
 const DAY = 24 * 60 * 60_000;
 const naira = (amount: number) => `₦${amount.toLocaleString("en-GB")}`;
@@ -138,10 +140,12 @@ export function DhAdminOverview() {
         />
         <TrendCard trend="revenue" title="Revenue" describe={naira} />
         <DashboardCard title="Where users are">
-          {!data ? (
+          {isError ? (
             <p className="py-16 text-center type-body-sm-regular text-fg-caption">
-              {isError ? "We couldn’t load this." : "Loading…"}
+              We couldn’t load this.
             </p>
+          ) : !data ? (
+            <CardSkeleton lines={5} />
           ) : (
             <Shares
               label="Users by state"
@@ -202,9 +206,9 @@ function TrendCard({
           We couldn’t load this. Try again in a moment.
         </p>
       ) : !data ? (
-        <p className="py-16 text-center type-body-sm-regular text-fg-caption">Loading…</p>
+        <CardSkeleton lines={5} />
       ) : bars.length === 0 ? (
-        <p className="py-16 text-center type-body-sm-regular text-fg-caption">Nothing yet.</p>
+        <EmptyState compact description="Nothing yet." />
       ) : (
         <BarChart
           key={period}

@@ -32,6 +32,8 @@ import {
 } from "@/features/hospital-admin/lib/schemas";
 import { getErrorMessage } from "@/lib/api";
 import { getLgasForState, NIGERIA_STATES } from "@/lib/locations";
+import { DraftNotice } from "@/components/draft-notice";
+import { useFormDraft } from "@/hooks/use-form-draft";
 
 type AddedFacility = { facility: string; admin: string };
 
@@ -92,6 +94,10 @@ function AddFacilityForm({ onAdded }: { onAdded: (facility: AddedFacility) => vo
     },
   });
   const { errors } = form.formState;
+  const draft = useFormDraft(form, {
+    form: "hospital-admin:add-facility",
+    fields: ["type", "name", "state", "city", "street", "firstName", "lastName", "phone", "email"],
+  });
   const state = useWatch({ control: form.control, name: "state" });
   const cityItems = Object.fromEntries(getLgasForState(state).map((lga) => [lga, lga]));
 
@@ -99,11 +105,13 @@ function AddFacilityForm({ onAdded }: { onAdded: (facility: AddedFacility) => vo
     addFacility.mutate(
       { type, facility: { name, state, city, street }, admin },
       {
-        onSuccess: () =>
+        onSuccess: () => {
+          draft.clear();
           onAdded({
             facility: `${name} (${facilityTypeLabels[type]})`,
             admin: `${admin.firstName} ${admin.lastName}`,
-          }),
+          });
+        },
         onError: (error) => toast.error(getErrorMessage(error)),
       },
     );
@@ -121,6 +129,7 @@ function AddFacilityForm({ onAdded }: { onAdded: (facility: AddedFacility) => vo
       />
 
       <FormDialogBody>
+        <DraftNotice restored={draft.restored} onDiscard={draft.discard} />
         <Controller
           name="type"
           control={form.control}

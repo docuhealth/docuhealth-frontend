@@ -419,6 +419,14 @@ export const labScientistHandlers = [
       return HttpResponse.json({ rejection_reason });
     },
   ),
+  // Records that a result left the system (downloaded or printed); there's no body.
+  http.post(api("/api/lab/audit-logs/:resultSqid/downloads"), ({ params }) => {
+    const known = orders.some((order) =>
+      order.items.some((item) => item.result?.sqid === params.resultSqid),
+    );
+    if (!known) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    return new HttpResponse(null, { status: 200 });
+  }),
 ];
 
 /** A test whose result waits for the lab admin. */

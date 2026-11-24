@@ -35,6 +35,7 @@ export function CareTaskHistory({ admissionId }: { admissionId: string }) {
             { label: "Priority", className: "w-24 type-body-sm-regular" },
             { label: "Status", className: "w-28 type-body-sm-regular" },
           ]}
+          loading={!data}
           empty={empty}
         >
           {data?.items.map((task) => {

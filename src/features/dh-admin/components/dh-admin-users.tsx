@@ -96,6 +96,7 @@ export function DhAdminUsers() {
               { label: "Status", className: "w-28 type-body-sm-regular" },
               { label: "Actions", hideLabel: true, className: "w-32" },
             ]}
+            loading={!patients.data}
             empty={empty}
           >
             {(patients.data?.items ?? []).map((user) => (
@@ -136,6 +137,7 @@ export function DhAdminUsers() {
               { label: "Status", className: "w-28 type-body-sm-regular" },
               { label: "Actions", hideLabel: true, className: "w-32" },
             ]}
+            loading={!hospitals.data}
             empty={empty}
           >
             {(hospitals.data?.items ?? []).map((hospital) => (

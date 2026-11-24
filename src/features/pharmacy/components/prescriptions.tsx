@@ -18,6 +18,8 @@ import {
 import type { Prescription } from "@/features/pharmacy/api/schemas";
 import { PrescriptionStatusPill } from "@/features/pharmacy/components/prescription-status";
 import { ageOn, formatDayAndTime, maskHin } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/dashboard/skeletons";
 
 const tabLabels = { pending: "Pending", settled: "Settled" } as const satisfies Record<
   PrescriptionTab,
@@ -110,6 +112,7 @@ export function Prescriptions() {
               { label: "Status", className: "w-32 type-body-sm-regular" },
               { label: "Actions", hideLabel: true, className: "w-24" },
             ]}
+            loading={!data}
             empty={empty}
           >
             {items.map((prescription) => (
@@ -137,7 +140,9 @@ export function Prescriptions() {
 
         <div className="mt-4 border-t @3xl:hidden">
           {empty ? (
-            <p className="py-10 text-center type-caption text-fg-caption">{empty}</p>
+            <EmptyState compact description={empty} />
+          ) : !data ? (
+            <ListSkeleton className="py-4" />
           ) : (
             <ul aria-label="Prescriptions">
               {items.map((prescription) => (

@@ -62,6 +62,7 @@ export function TestAppointmentsCard() {
           { label: "Test Type", className: `${columns.test} type-body-sm-regular` },
           { label: "Open", hideLabel: true, className: columns.action },
         ]}
+        loading={!data}
         empty={
           isError
             ? "We couldn’t load the appointments. Try again in a moment."
