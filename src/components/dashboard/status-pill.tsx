@@ -8,13 +8,18 @@ const tones = {
   error: "bg-error-100 text-error-500",
 };
 
-/** A short status on a tinted background, led by a dot in the same color. */
+/**
+ * A short status on a tinted background, led by a dot in the same color. It stays on one line
+ * where there's room; in a narrow column (e.g. a phone list's grid) a long status ("Awaiting nurse
+ * discharge") wraps inside the pill instead of spilling out of it.
+ */
 export function StatusPill({ tone, children }: { tone: keyof typeof tones; children: ReactNode }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-[4px] px-1.5 py-0.5 type-caption-semibold whitespace-nowrap ${tones[tone]}`}
+      className={`inline-flex max-w-full items-start gap-1.5 rounded-[4px] px-1.5 py-0.5 type-caption-semibold text-pretty ${tones[tone]}`}
     >
-      <span aria-hidden className="size-1 rounded-full bg-current" />
+      {/* Centred on the first line, however many lines the status takes. */}
+      <span aria-hidden className="mt-[0.45lh] size-1 shrink-0 rounded-full bg-current" />
       {children}
     </span>
   );

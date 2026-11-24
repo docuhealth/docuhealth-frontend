@@ -112,7 +112,11 @@ export function ClinicalPatients({
             className="type-body-sm-regular [&_tbody_tr:last-child]:border-b"
             columns={[
               { label: "Patient", className: "type-body-sm-regular" },
-              ...columns.map((label) => ({ label, className: "w-[16%] type-body-sm-regular" })),
+              // Status fits its longest pill ("Awaiting nurse discharge") on one line.
+              ...columns.map((label) => ({
+                label,
+                className: `${label === "Status" ? "w-48" : "w-[16%]"} type-body-sm-regular`,
+              })),
               { label: "Actions", hideLabel: true, className: "w-24" },
             ]}
             loading={!data}
