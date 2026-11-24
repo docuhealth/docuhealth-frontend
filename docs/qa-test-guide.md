@@ -180,15 +180,30 @@ with a code, password) and the top bar (name, greeting, log out). Check them onc
 - [ ] Test orders: four tabs; open an order; accept or reject; sample time; send results per test.
 - [ ] Book an appointment.
 - [ ] Lab admin only: Awaiting Approval, approve or return results, Audit logs in the sidebar.
+- [ ] A finished order (results ready or approved): **Print** opens the print dialog with the
+      official report; **Download** saves an A4 PDF named `patient_test_hospital.pdf`. The report
+      shows the hospital, the patient (masked HIN, age, sex), each test's values, units, ranges and
+      flags, and the interpretation.
+- [ ] Unfinished orders (pending, in progress, sample collected, rejected) have no Print or
+      Download; an order whose results aren't in yet shows them greyed out with the reason.
+- [ ] Each print or download appears in the lab admin's **Audit logs** (on staging).
 - **Known gaps:** approved and returning-patient figures, date filters, patient lookup by HIN.
+  The report shows the hospital's initials, not its logo, and not who uploaded the result (the
+  API doesn't send either).
 
 ### Radiologist
 
 - [ ] Overview counts.
 - [ ] Scan orders: four tabs; open an order; accept or reject; imaging time; upload the report.
 - [ ] Schedule and book an appointment.
+- [ ] A completed scan with a report: **Print** and **Download** (A4 PDF) of the official report:
+      findings, impression, recommendations, who reported it, and the attached files' names. Each
+      attached file can also be downloaded on its own.
+- [ ] No Print or Download before the report is in, or when the doctor sent the report back.
+- [ ] Each print or download appears in the hospital admin's **Audit logs** → radiology (on
+      staging).
 - **Known gaps:** date filters and sorting, the "New" badge, booking only finds patients who
-  already have a radiology order.
+  already have a radiology order. The report shows the hospital's initials, not its logo.
 
 ### Pharmacist
 
@@ -225,7 +240,27 @@ with a code, password) and the top bar (name, greeting, log out). Check them onc
 ## 4. Also check
 
 - [ ] Phone width (about 375 px): menus, tables and dialogs fit without sideways scrolling.
-- [ ] Slow network (DevTools → Network → Slow 4G): loading states show, nothing flashes the wrong
-      list.
-- [ ] Empty states: a list with nothing in it says so.
+- [ ] Slow network (DevTools → Network → Slow 4G): while data loads, tables show grey
+      placeholder rows in their columns' shape, cards and lists show placeholder blocks, and a page
+      that takes a moment shows a placeholder page. No "Loading…" text, and nothing flashes the
+      wrong list.
+- [ ] Empty states: a table, list or chart with nothing in it shows the same picture (an open
+      tray with a magnifier) and says why it's empty, e.g. search staff for "zzzz".
+
+### Saved drafts
+
+Unsent input comes back after a refresh, so try each form: type, refresh (or close the tab and
+reopen it), open the form again.
+
+- [ ] Registration and admin forms (receptionist's Register patient, Add Staff, Add Facility):
+      the details come back with "We restored what you’d typed before." and **Discard**. Also
+      after closing the browser, for up to 24 hours.
+- [ ] Clinical notes (doctor's encounter note; nurse's admission note; progress notes, case notes
+      and care plans): they come back after a refresh, but **not** after closing the tab.
+- [ ] Never restored: NIN, passwords, verification codes.
+- [ ] **Discard** empties those fields; sending the form clears the draft, so opening it again
+      starts blank.
+- [ ] Log out, log in as someone else on the same computer: none of the first person's drafts
+      appear. A session that expires keeps the draft until the same person signs back in.
+- [ ] One patient's note draft never shows on another patient's note.
 - [ ] Errors: turn the network off, click an action: a clear message, no blank screen.
