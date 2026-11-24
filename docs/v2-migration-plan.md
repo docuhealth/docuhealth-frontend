@@ -183,8 +183,12 @@ Built in seven steps, one commit each; what v1 does and the endpoints behind it 
 - [ ] Full click-through per role on staging. Done at the API level on 24 Nov: every role's
       dashboard reads answer with that role's account (admin, receptionist, doctor, nurse, lab, lab
       admin, pharmacist, radiologist, dhadmin), and each phase parsed staging's real replies. Still
-      needs a person to click through each dashboard in a browser, signed in as each role. The
-      Playwright end-to-end tests need `npx playwright install chromium` on this machine (CI
-      installs it)
-- [ ] Backend gaps file sent: up to date on 24 Nov (CORS is now worse: no origin is allowed); ready
-      to forward
+      needs a person to click through each dashboard in a browser, signed in as each role: the
+      steps are in [`qa-test-guide.md`](qa-test-guide.md)
+- [ ] Playwright end-to-end tests up to date. Run on 24 Nov: 17 of 45 pass. Before the migration
+      (`1182645`) 13 already failed: every `auth.spec.ts` test (the login and sign-up forms changed
+      on 13 Nov) and 5 dashboard tests. The migration's Phase 2 rewiring broke 15 more in
+      `hospital-admin.spec.ts` and `receptionist.spec.ts` (new mock data and screens). The specs
+      need rewriting to today's screens; CI's e2e job fails until then
+- [ ] Backend gaps file sent: up to date on 24 Nov (CORS is now worse: no origin is allowed); the
+      short version to forward is [`backend-handoff-2026-11-24.md`](backend-handoff-2026-11-24.md)
