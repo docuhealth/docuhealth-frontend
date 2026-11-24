@@ -13,6 +13,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -28,6 +30,13 @@ const companyLinks: { label: string; href: LandingHref }[] = [
   { label: "DocuHealth API", href: "/docuhealth-api" },
   // TODO(design): there's no careers page yet.
   { label: "Careers", href: "/#careers" },
+];
+
+/** The footer's legal pages, also under Our Company, so the menu has every company page. */
+const legalLinks: { label: string; href: LandingHref }[] = [
+  { label: "Legal Notice", href: "/legal-notice" },
+  { label: "Terms and Conditions", href: "/terms-and-conditions" },
+  { label: "Privacy Policy", href: "/privacy-policy" },
 ];
 
 const navLinks: { label: string; href: LandingHref }[] = [
@@ -114,6 +123,17 @@ function MobileNav() {
                     {item.label}
                   </LandingLink>
                 ))}
+                <p className="mt-2 border-t pt-3 pb-1 type-caption text-fg-caption">Legal</p>
+                {legalLinks.map((item) => (
+                  <LandingLink
+                    key={item.label}
+                    href={item.href}
+                    onClick={linkClick(item.href)}
+                    className="flex min-h-11 items-center type-body text-fg-body transition-colors hover:text-primary"
+                  >
+                    {item.label}
+                  </LandingLink>
+                ))}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -188,6 +208,20 @@ export function Navbar() {
                 className="min-w-52 p-1.5 shadow-lg"
               >
                 {companyLinks.map((item) => (
+                  <DropdownMenuItem key={item.label} asChild>
+                    <LandingLink
+                      href={item.href}
+                      className="cursor-pointer px-3 py-2.5 type-body-sm-regular transition-colors focus:bg-primary/5 focus:text-primary"
+                    >
+                      {item.label}
+                    </LandingLink>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="px-3 pt-2 pb-1 type-caption text-fg-caption">
+                  Legal
+                </DropdownMenuLabel>
+                {legalLinks.map((item) => (
                   <DropdownMenuItem key={item.label} asChild>
                     <LandingLink
                       href={item.href}

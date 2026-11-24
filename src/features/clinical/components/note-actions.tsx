@@ -25,6 +25,18 @@ type Dialog = "admission" | "case" | "care-plan" | "progress" | "vitals" | "hand
 const outline = "h-12 gap-2 bg-card px-5 type-body-sm-medium";
 const primary = "h-12 px-5 type-heading-sm";
 
+/**
+ * Whether the nurses still work on this admission: while it's active, and after the doctor's
+ * discharge until the nurses complete theirs (the discharge checklist is a nursing task, and the
+ * API wants the admission note before any of them).
+ */
+function nursesStillOn(visit: Visit) {
+  return (
+    visit.kind === "admission" &&
+    (visit.status === "active" || visit.status === "awaiting_nurse_discharge")
+  );
+}
+
 /** Whether the nurse has written this admission's admission note; undefined while checking. */
 function useHasAdmissionNote(visit: Visit) {
   const isAdmission = visit.kind === "admission";
@@ -53,7 +65,11 @@ export function NoteActions({
 }) {
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const hasAdmissionNote = useHasAdmissionNote(visit);
-  const isOpenAdmission = visit.kind === "admission" && visit.status === "active";
+  // The doctor writes on an active admission; the nurses until they've discharged the patient.
+  const isOpenAdmission =
+    role === "nurse"
+      ? nursesStillOn(visit)
+      : visit.kind === "admission" && visit.status === "active";
   // As in v1: a nurse who opens a newly admitted patient is asked for the admission note once.
   const [prompting, setPrompting] = useState(false);
   const prompted = useRef(false);
@@ -164,7 +180,7 @@ export function AdmissionNoteGate({ visit, children }: { visit: Visit; children:
       target={{ hin: visit.patient.hin, admissionId: visit.id, patientName: visit.patient.name }}
     />
   );
-  if (hasAdmissionNote || visit.status !== "active") {
+  if (hasAdmissionNote || !nursesStillOn(visit)) {
     return (
       <>
         {children}

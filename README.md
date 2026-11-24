@@ -59,7 +59,9 @@ mocks on, the dashboards also open without logging in; production builds always 
 `npm run dev:staging` serves the app on port 5180 against the real staging API, with mocks off
 (settings in `.env.staging`). The dev server proxies `/api` to staging, so the `hospital.` and
 `admin.` sections work on `*.localhost` even though staging's CORS doesn't allow those origins.
-Log in with a real staging account.
+Log in with a real staging account. The local URLs, demo logins and how demo mode differs are in
+[`docs/local-testing.md`](docs/local-testing.md); QA's checklist for the live test site is
+[`docs/qa-test-guide.md`](docs/qa-test-guide.md).
 
 The backend's OpenAPI schema is the reference for every feature's `api/` folder. `npm run
 api:schema` saves it to `docs/api/` (`openapi.json`, plus `endpoints.md` to grep). The migration
