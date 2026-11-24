@@ -82,7 +82,9 @@ export function ContactSection() {
               </span>
 
               <p className="mt-7.5 type-body-sm-medium text-fg-caption">{channel.label}</p>
-              <p className="mt-2.5 type-title-lg wrap-anywhere text-fg-heading">{channel.value}</p>
+              <p className="mt-2.5 type-title-sm wrap-anywhere text-fg-heading sm:type-title-lg">
+                {channel.value}
+              </p>
               <p className={cn("mt-2 type-body-tight text-fg-body", channel.descriptionClassName)}>
                 {channel.description}
               </p>
