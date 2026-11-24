@@ -78,7 +78,7 @@ export function Footer() {
     <footer className="bg-fg-heading text-white">
       <LandingContainer className="overflow-hidden pt-16 lg:pt-25">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[392px_1fr] lg:gap-32">
-          <Reveal className="rounded-xl bg-card p-6 text-fg-heading">
+          <Reveal className="self-start rounded-xl bg-card p-6 text-fg-heading">
             <h3 className="type-title-xl">
               Subscribe to our
               <br />
@@ -178,28 +178,34 @@ export function Footer() {
                 to.
               </p>
 
-              <div className="flex flex-wrap items-center gap-6">
+              {/* The CAC certificate on top, large enough to read; FHIR and NDPR side by side under it. */}
+              <div className="flex w-full max-w-80 shrink-0 flex-col gap-3 sm:w-80">
                 <img
                   src="https://res.cloudinary.com/drhfrgahv/image/upload/v1778081304/WhatsApp_Image_2026-05-04_at_08.37.36_g8lo95.jpg"
                   alt="DocuHealth Federal Republic of Nigeria Certificate"
-                  width={108}
-                  height={80}
-                  className="h-20 w-27 bg-white object-cover"
+                  width={1280}
+                  height={936}
+                  loading="lazy"
+                  className="h-auto w-full rounded-sm bg-white object-contain"
                 />
-                <img
-                  src="https://res.cloudinary.com/drhfrgahv/image/upload/v1762777826/docuhealth_fhir_zdtw2p.jpg"
-                  alt="DocuHealth FHIR"
-                  width={135}
-                  height={80}
-                  className="h-20 w-34 bg-white object-contain"
-                />
-                <img
-                  src="https://res.cloudinary.com/drhfrgahv/image/upload/v1762777839/docuhealth_ndpr_audit_lwqlq8.jpg"
-                  alt="DocuHealth NDPR Audit"
-                  width={80}
-                  height={80}
-                  className="size-20 bg-white object-contain"
-                />
+                <div className="grid grid-cols-2 gap-3">
+                  <img
+                    src="https://res.cloudinary.com/drhfrgahv/image/upload/v1762777826/docuhealth_fhir_zdtw2p.jpg"
+                    alt="DocuHealth FHIR"
+                    width={554}
+                    height={329}
+                    loading="lazy"
+                    className="h-28 w-full rounded-sm bg-white object-contain p-2"
+                  />
+                  <img
+                    src="https://res.cloudinary.com/drhfrgahv/image/upload/v1762777839/docuhealth_ndpr_audit_lwqlq8.jpg"
+                    alt="DocuHealth NDPR Audit"
+                    width={1280}
+                    height={1280}
+                    loading="lazy"
+                    className="h-28 w-full rounded-sm bg-white object-contain"
+                  />
+                </div>
               </div>
             </div>
           </div>
