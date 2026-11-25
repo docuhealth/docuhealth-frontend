@@ -3,6 +3,9 @@ import { admissionHandlers } from "@/mocks/admissions";
 import { patientHandlers } from "@/mocks/patient";
 import { patientAppointmentHandlers } from "@/mocks/patient-appointments";
 import { patientPendingHandlers } from "@/mocks/patient-pending";
+import { patientFamilyHandlers } from "@/mocks/patient-family";
+import { patientBillHandlers } from "@/mocks/patient-bills";
+import { patientSharingHandlers } from "@/mocks/patient-sharing";
 import { patientHealthHandlers } from "@/mocks/patient-health";
 import { patientResultHandlers } from "@/mocks/patient-results";
 import { patientMessageHandlers } from "@/mocks/patient-messages";
@@ -27,6 +30,8 @@ import { staffHandlers } from "@/mocks/staff";
 // with `http.get(\`${env.VITE_API_URL}/path\`, () => HttpResponse.json(...))`.
 export const handlers: RequestHandler[] = [
   ...authHandlers,
+  // Before the front desk's and records' `/api/patients/:hin/...` handlers.
+  ...patientFamilyHandlers,
   ...admissionHandlers,
   ...auditLogHandlers,
   ...careTaskHandlers,
@@ -44,6 +49,8 @@ export const handlers: RequestHandler[] = [
   ...patientHandlers,
   ...patientAppointmentHandlers,
   ...patientPendingHandlers,
+  ...patientBillHandlers,
+  ...patientSharingHandlers,
   ...patientHealthHandlers,
   ...patientResultHandlers,
   ...patientMessageHandlers,

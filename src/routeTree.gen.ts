@@ -40,8 +40,6 @@ import { Route as HospitalPharmacyRouteImport } from './routes/hospital/pharmacy
 import { Route as HospitalRadiologistRouteImport } from './routes/hospital/radiologist'
 import { Route as HospitalReceptionistRouteImport } from './routes/hospital/receptionist'
 import { Route as PatientIndexRouteImport } from './routes/patient/index'
-import { Route as PatientBillsRouteImport } from './routes/patient/bills'
-import { Route as PatientFamilyRouteImport } from './routes/patient/family'
 import { Route as PatientHelpRouteImport } from './routes/patient/help'
 import { Route as PatientMessagesRouteImport } from './routes/patient/messages'
 import { Route as PatientPersonnelRouteImport } from './routes/patient/personnel'
@@ -117,6 +115,10 @@ import { Route as HospitalReceptionistSettingsRouteImport } from './routes/hospi
 import { Route as HospitalReceptionistStaffRouteImport } from './routes/hospital/receptionist/staff'
 import { Route as PatientAppointmentsIndexRouteImport } from './routes/patient/appointments/index'
 import { Route as PatientAppointmentsAppointmentIdRouteImport } from './routes/patient/appointments/$appointmentId'
+import { Route as PatientBillsIndexRouteImport } from './routes/patient/bills/index'
+import { Route as PatientBillsBillIdRouteImport } from './routes/patient/bills/$billId'
+import { Route as PatientBillsHistoryRouteImport } from './routes/patient/bills/history'
+import { Route as PatientFamilyIndexRouteImport } from './routes/patient/family/index'
 import { Route as PatientHealthIndexRouteImport } from './routes/patient/health/index'
 import { Route as PatientHealthFacilitiesRouteImport } from './routes/patient/health/facilities'
 import { Route as PatientHealthMedicationsRouteImport } from './routes/patient/health/medications'
@@ -138,6 +140,8 @@ import { Route as HospitalRadiologistScanOrdersIndexRouteImport } from './routes
 import { Route as HospitalRadiologistScanOrdersOrderIdRouteImport } from './routes/hospital/radiologist/scan-orders/$orderId'
 import { Route as HospitalReceptionistPatientsIndexRouteImport } from './routes/hospital/receptionist/patients/index'
 import { Route as HospitalReceptionistPatientsPatientIdRouteImport } from './routes/hospital/receptionist/patients/$patientId'
+import { Route as PatientFamilyDependantsHinRouteImport } from './routes/patient/family/dependants/$hin'
+import { Route as PatientFamilyProxiesProxyIdRouteImport } from './routes/patient/family/proxies/$proxyId'
 import { Route as PatientHealthAllergiesIndexRouteImport } from './routes/patient/health/allergies/index'
 import { Route as PatientHealthAllergiesAllergyIdRouteImport } from './routes/patient/health/allergies/$allergyId'
 import { Route as PatientHealthCarePlansIndexRouteImport } from './routes/patient/health/care-plans/index'
@@ -309,16 +313,6 @@ const HospitalReceptionistRoute = HospitalReceptionistRouteImport.update({
 const PatientIndexRoute = PatientIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => PatientRoute,
-} as any)
-const PatientBillsRoute = PatientBillsRouteImport.update({
-  id: '/bills',
-  path: '/bills',
-  getParentRoute: () => PatientRoute,
-} as any)
-const PatientFamilyRoute = PatientFamilyRouteImport.update({
-  id: '/family',
-  path: '/family',
   getParentRoute: () => PatientRoute,
 } as any)
 const PatientHelpRoute = PatientHelpRouteImport.update({
@@ -729,6 +723,26 @@ const PatientAppointmentsAppointmentIdRoute =
     path: '/appointments/$appointmentId',
     getParentRoute: () => PatientRoute,
   } as any)
+const PatientBillsIndexRoute = PatientBillsIndexRouteImport.update({
+  id: '/bills/',
+  path: '/bills/',
+  getParentRoute: () => PatientRoute,
+} as any)
+const PatientBillsBillIdRoute = PatientBillsBillIdRouteImport.update({
+  id: '/bills/$billId',
+  path: '/bills/$billId',
+  getParentRoute: () => PatientRoute,
+} as any)
+const PatientBillsHistoryRoute = PatientBillsHistoryRouteImport.update({
+  id: '/bills/history',
+  path: '/bills/history',
+  getParentRoute: () => PatientRoute,
+} as any)
+const PatientFamilyIndexRoute = PatientFamilyIndexRouteImport.update({
+  id: '/family/',
+  path: '/family/',
+  getParentRoute: () => PatientRoute,
+} as any)
 const PatientHealthIndexRoute = PatientHealthIndexRouteImport.update({
   id: '/health/',
   path: '/health/',
@@ -849,6 +863,18 @@ const HospitalReceptionistPatientsPatientIdRoute =
     id: '/patients/$patientId',
     path: '/patients/$patientId',
     getParentRoute: () => HospitalReceptionistRoute,
+  } as any)
+const PatientFamilyDependantsHinRoute =
+  PatientFamilyDependantsHinRouteImport.update({
+    id: '/family/dependants/$hin',
+    path: '/family/dependants/$hin',
+    getParentRoute: () => PatientRoute,
+  } as any)
+const PatientFamilyProxiesProxyIdRoute =
+  PatientFamilyProxiesProxyIdRouteImport.update({
+    id: '/family/proxies/$proxyId',
+    path: '/family/proxies/$proxyId',
+    getParentRoute: () => PatientRoute,
   } as any)
 const PatientHealthAllergiesIndexRoute =
   PatientHealthAllergiesIndexRouteImport.update({
@@ -985,8 +1011,6 @@ export interface FileRoutesByFullPath {
   '/hospital/pharmacy': typeof HospitalPharmacyRouteWithChildren
   '/hospital/radiologist': typeof HospitalRadiologistRouteWithChildren
   '/hospital/receptionist': typeof HospitalReceptionistRouteWithChildren
-  '/patient/bills': typeof PatientBillsRoute
-  '/patient/family': typeof PatientFamilyRoute
   '/patient/help': typeof PatientHelpRoute
   '/patient/messages': typeof PatientMessagesRoute
   '/patient/personnel': typeof PatientPersonnelRoute
@@ -1056,6 +1080,8 @@ export interface FileRoutesByFullPath {
   '/hospital/receptionist/settings': typeof HospitalReceptionistSettingsRoute
   '/hospital/receptionist/staff': typeof HospitalReceptionistStaffRoute
   '/patient/appointments/$appointmentId': typeof PatientAppointmentsAppointmentIdRoute
+  '/patient/bills/$billId': typeof PatientBillsBillIdRoute
+  '/patient/bills/history': typeof PatientBillsHistoryRoute
   '/patient/health/facilities': typeof PatientHealthFacilitiesRoute
   '/patient/health/medications': typeof PatientHealthMedicationsRoute
   '/patient/health/timeline': typeof PatientHealthTimelineRoute
@@ -1069,6 +1095,8 @@ export interface FileRoutesByFullPath {
   '/hospital/radiologist/': typeof HospitalRadiologistIndexRoute
   '/hospital/receptionist/': typeof HospitalReceptionistIndexRoute
   '/patient/appointments/': typeof PatientAppointmentsIndexRoute
+  '/patient/bills/': typeof PatientBillsIndexRoute
+  '/patient/family/': typeof PatientFamilyIndexRoute
   '/patient/health/': typeof PatientHealthIndexRoute
   '/hospital/admin/patients/$patientId': typeof HospitalAdminPatientsPatientIdRoute
   '/hospital/admin/staff/$staffId': typeof HospitalAdminStaffStaffIdRoute
@@ -1078,6 +1106,8 @@ export interface FileRoutesByFullPath {
   '/hospital/pharmacy/prescriptions/$prescriptionId': typeof HospitalPharmacyPrescriptionsPrescriptionIdRoute
   '/hospital/radiologist/scan-orders/$orderId': typeof HospitalRadiologistScanOrdersOrderIdRoute
   '/hospital/receptionist/patients/$patientId': typeof HospitalReceptionistPatientsPatientIdRoute
+  '/patient/family/dependants/$hin': typeof PatientFamilyDependantsHinRoute
+  '/patient/family/proxies/$proxyId': typeof PatientFamilyProxiesProxyIdRoute
   '/patient/health/allergies/$allergyId': typeof PatientHealthAllergiesAllergyIdRoute
   '/patient/health/care-plans/$planId': typeof PatientHealthCarePlansPlanIdRoute
   '/patient/health/conditions/$conditionId': typeof PatientHealthConditionsConditionIdRoute
@@ -1124,8 +1154,6 @@ export interface FileRoutesByTo {
   '/agent/$': typeof AgentSplatRoute
   '/hospital': typeof HospitalIndexRoute
   '/hospital/no-dashboard': typeof HospitalNoDashboardRoute
-  '/patient/bills': typeof PatientBillsRoute
-  '/patient/family': typeof PatientFamilyRoute
   '/patient/help': typeof PatientHelpRoute
   '/patient/messages': typeof PatientMessagesRoute
   '/patient/personnel': typeof PatientPersonnelRoute
@@ -1194,6 +1222,8 @@ export interface FileRoutesByTo {
   '/hospital/receptionist/settings': typeof HospitalReceptionistSettingsRoute
   '/hospital/receptionist/staff': typeof HospitalReceptionistStaffRoute
   '/patient/appointments/$appointmentId': typeof PatientAppointmentsAppointmentIdRoute
+  '/patient/bills/$billId': typeof PatientBillsBillIdRoute
+  '/patient/bills/history': typeof PatientBillsHistoryRoute
   '/patient/health/facilities': typeof PatientHealthFacilitiesRoute
   '/patient/health/medications': typeof PatientHealthMedicationsRoute
   '/patient/health/timeline': typeof PatientHealthTimelineRoute
@@ -1206,6 +1236,8 @@ export interface FileRoutesByTo {
   '/hospital/radiologist': typeof HospitalRadiologistIndexRoute
   '/hospital/receptionist': typeof HospitalReceptionistIndexRoute
   '/patient/appointments': typeof PatientAppointmentsIndexRoute
+  '/patient/bills': typeof PatientBillsIndexRoute
+  '/patient/family': typeof PatientFamilyIndexRoute
   '/patient/health': typeof PatientHealthIndexRoute
   '/hospital/admin/patients/$patientId': typeof HospitalAdminPatientsPatientIdRoute
   '/hospital/admin/staff/$staffId': typeof HospitalAdminStaffStaffIdRoute
@@ -1215,6 +1247,8 @@ export interface FileRoutesByTo {
   '/hospital/pharmacy/prescriptions/$prescriptionId': typeof HospitalPharmacyPrescriptionsPrescriptionIdRoute
   '/hospital/radiologist/scan-orders/$orderId': typeof HospitalRadiologistScanOrdersOrderIdRoute
   '/hospital/receptionist/patients/$patientId': typeof HospitalReceptionistPatientsPatientIdRoute
+  '/patient/family/dependants/$hin': typeof PatientFamilyDependantsHinRoute
+  '/patient/family/proxies/$proxyId': typeof PatientFamilyProxiesProxyIdRoute
   '/patient/health/allergies/$allergyId': typeof PatientHealthAllergiesAllergyIdRoute
   '/patient/health/care-plans/$planId': typeof PatientHealthCarePlansPlanIdRoute
   '/patient/health/conditions/$conditionId': typeof PatientHealthConditionsConditionIdRoute
@@ -1272,8 +1306,6 @@ export interface FileRoutesById {
   '/hospital/pharmacy': typeof HospitalPharmacyRouteWithChildren
   '/hospital/radiologist': typeof HospitalRadiologistRouteWithChildren
   '/hospital/receptionist': typeof HospitalReceptionistRouteWithChildren
-  '/patient/bills': typeof PatientBillsRoute
-  '/patient/family': typeof PatientFamilyRoute
   '/patient/help': typeof PatientHelpRoute
   '/patient/messages': typeof PatientMessagesRoute
   '/patient/personnel': typeof PatientPersonnelRoute
@@ -1343,6 +1375,8 @@ export interface FileRoutesById {
   '/hospital/receptionist/settings': typeof HospitalReceptionistSettingsRoute
   '/hospital/receptionist/staff': typeof HospitalReceptionistStaffRoute
   '/patient/appointments/$appointmentId': typeof PatientAppointmentsAppointmentIdRoute
+  '/patient/bills/$billId': typeof PatientBillsBillIdRoute
+  '/patient/bills/history': typeof PatientBillsHistoryRoute
   '/patient/health/facilities': typeof PatientHealthFacilitiesRoute
   '/patient/health/medications': typeof PatientHealthMedicationsRoute
   '/patient/health/timeline': typeof PatientHealthTimelineRoute
@@ -1356,6 +1390,8 @@ export interface FileRoutesById {
   '/hospital/radiologist/': typeof HospitalRadiologistIndexRoute
   '/hospital/receptionist/': typeof HospitalReceptionistIndexRoute
   '/patient/appointments/': typeof PatientAppointmentsIndexRoute
+  '/patient/bills/': typeof PatientBillsIndexRoute
+  '/patient/family/': typeof PatientFamilyIndexRoute
   '/patient/health/': typeof PatientHealthIndexRoute
   '/hospital/admin/patients/$patientId': typeof HospitalAdminPatientsPatientIdRoute
   '/hospital/admin/staff/$staffId': typeof HospitalAdminStaffStaffIdRoute
@@ -1365,6 +1401,8 @@ export interface FileRoutesById {
   '/hospital/pharmacy/prescriptions/$prescriptionId': typeof HospitalPharmacyPrescriptionsPrescriptionIdRoute
   '/hospital/radiologist/scan-orders/$orderId': typeof HospitalRadiologistScanOrdersOrderIdRoute
   '/hospital/receptionist/patients/$patientId': typeof HospitalReceptionistPatientsPatientIdRoute
+  '/patient/family/dependants/$hin': typeof PatientFamilyDependantsHinRoute
+  '/patient/family/proxies/$proxyId': typeof PatientFamilyProxiesProxyIdRoute
   '/patient/health/allergies/$allergyId': typeof PatientHealthAllergiesAllergyIdRoute
   '/patient/health/care-plans/$planId': typeof PatientHealthCarePlansPlanIdRoute
   '/patient/health/conditions/$conditionId': typeof PatientHealthConditionsConditionIdRoute
@@ -1421,8 +1459,6 @@ export interface FileRouteTypes {
     | '/hospital/pharmacy'
     | '/hospital/radiologist'
     | '/hospital/receptionist'
-    | '/patient/bills'
-    | '/patient/family'
     | '/patient/help'
     | '/patient/messages'
     | '/patient/personnel'
@@ -1492,6 +1528,8 @@ export interface FileRouteTypes {
     | '/hospital/receptionist/settings'
     | '/hospital/receptionist/staff'
     | '/patient/appointments/$appointmentId'
+    | '/patient/bills/$billId'
+    | '/patient/bills/history'
     | '/patient/health/facilities'
     | '/patient/health/medications'
     | '/patient/health/timeline'
@@ -1505,6 +1543,8 @@ export interface FileRouteTypes {
     | '/hospital/radiologist/'
     | '/hospital/receptionist/'
     | '/patient/appointments/'
+    | '/patient/bills/'
+    | '/patient/family/'
     | '/patient/health/'
     | '/hospital/admin/patients/$patientId'
     | '/hospital/admin/staff/$staffId'
@@ -1514,6 +1554,8 @@ export interface FileRouteTypes {
     | '/hospital/pharmacy/prescriptions/$prescriptionId'
     | '/hospital/radiologist/scan-orders/$orderId'
     | '/hospital/receptionist/patients/$patientId'
+    | '/patient/family/dependants/$hin'
+    | '/patient/family/proxies/$proxyId'
     | '/patient/health/allergies/$allergyId'
     | '/patient/health/care-plans/$planId'
     | '/patient/health/conditions/$conditionId'
@@ -1560,8 +1602,6 @@ export interface FileRouteTypes {
     | '/agent/$'
     | '/hospital'
     | '/hospital/no-dashboard'
-    | '/patient/bills'
-    | '/patient/family'
     | '/patient/help'
     | '/patient/messages'
     | '/patient/personnel'
@@ -1630,6 +1670,8 @@ export interface FileRouteTypes {
     | '/hospital/receptionist/settings'
     | '/hospital/receptionist/staff'
     | '/patient/appointments/$appointmentId'
+    | '/patient/bills/$billId'
+    | '/patient/bills/history'
     | '/patient/health/facilities'
     | '/patient/health/medications'
     | '/patient/health/timeline'
@@ -1642,6 +1684,8 @@ export interface FileRouteTypes {
     | '/hospital/radiologist'
     | '/hospital/receptionist'
     | '/patient/appointments'
+    | '/patient/bills'
+    | '/patient/family'
     | '/patient/health'
     | '/hospital/admin/patients/$patientId'
     | '/hospital/admin/staff/$staffId'
@@ -1651,6 +1695,8 @@ export interface FileRouteTypes {
     | '/hospital/pharmacy/prescriptions/$prescriptionId'
     | '/hospital/radiologist/scan-orders/$orderId'
     | '/hospital/receptionist/patients/$patientId'
+    | '/patient/family/dependants/$hin'
+    | '/patient/family/proxies/$proxyId'
     | '/patient/health/allergies/$allergyId'
     | '/patient/health/care-plans/$planId'
     | '/patient/health/conditions/$conditionId'
@@ -1707,8 +1753,6 @@ export interface FileRouteTypes {
     | '/hospital/pharmacy'
     | '/hospital/radiologist'
     | '/hospital/receptionist'
-    | '/patient/bills'
-    | '/patient/family'
     | '/patient/help'
     | '/patient/messages'
     | '/patient/personnel'
@@ -1778,6 +1822,8 @@ export interface FileRouteTypes {
     | '/hospital/receptionist/settings'
     | '/hospital/receptionist/staff'
     | '/patient/appointments/$appointmentId'
+    | '/patient/bills/$billId'
+    | '/patient/bills/history'
     | '/patient/health/facilities'
     | '/patient/health/medications'
     | '/patient/health/timeline'
@@ -1791,6 +1837,8 @@ export interface FileRouteTypes {
     | '/hospital/radiologist/'
     | '/hospital/receptionist/'
     | '/patient/appointments/'
+    | '/patient/bills/'
+    | '/patient/family/'
     | '/patient/health/'
     | '/hospital/admin/patients/$patientId'
     | '/hospital/admin/staff/$staffId'
@@ -1800,6 +1848,8 @@ export interface FileRouteTypes {
     | '/hospital/pharmacy/prescriptions/$prescriptionId'
     | '/hospital/radiologist/scan-orders/$orderId'
     | '/hospital/receptionist/patients/$patientId'
+    | '/patient/family/dependants/$hin'
+    | '/patient/family/proxies/$proxyId'
     | '/patient/health/allergies/$allergyId'
     | '/patient/health/care-plans/$planId'
     | '/patient/health/conditions/$conditionId'
@@ -2074,20 +2124,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/patient/'
       preLoaderRoute: typeof PatientIndexRouteImport
-      parentRoute: typeof PatientRoute
-    }
-    '/patient/bills': {
-      id: '/patient/bills'
-      path: '/bills'
-      fullPath: '/patient/bills'
-      preLoaderRoute: typeof PatientBillsRouteImport
-      parentRoute: typeof PatientRoute
-    }
-    '/patient/family': {
-      id: '/patient/family'
-      path: '/family'
-      fullPath: '/patient/family'
-      preLoaderRoute: typeof PatientFamilyRouteImport
       parentRoute: typeof PatientRoute
     }
     '/patient/help': {
@@ -2615,6 +2651,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PatientAppointmentsAppointmentIdRouteImport
       parentRoute: typeof PatientRoute
     }
+    '/patient/bills/': {
+      id: '/patient/bills/'
+      path: '/bills'
+      fullPath: '/patient/bills/'
+      preLoaderRoute: typeof PatientBillsIndexRouteImport
+      parentRoute: typeof PatientRoute
+    }
+    '/patient/bills/$billId': {
+      id: '/patient/bills/$billId'
+      path: '/bills/$billId'
+      fullPath: '/patient/bills/$billId'
+      preLoaderRoute: typeof PatientBillsBillIdRouteImport
+      parentRoute: typeof PatientRoute
+    }
+    '/patient/bills/history': {
+      id: '/patient/bills/history'
+      path: '/bills/history'
+      fullPath: '/patient/bills/history'
+      preLoaderRoute: typeof PatientBillsHistoryRouteImport
+      parentRoute: typeof PatientRoute
+    }
+    '/patient/family/': {
+      id: '/patient/family/'
+      path: '/family'
+      fullPath: '/patient/family/'
+      preLoaderRoute: typeof PatientFamilyIndexRouteImport
+      parentRoute: typeof PatientRoute
+    }
     '/patient/health/': {
       id: '/patient/health/'
       path: '/health'
@@ -2762,6 +2826,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HospitalReceptionistPatientsPatientIdRouteImport
       parentRoute: typeof HospitalReceptionistRoute
     }
+    '/patient/family/dependants/$hin': {
+      id: '/patient/family/dependants/$hin'
+      path: '/family/dependants/$hin'
+      fullPath: '/patient/family/dependants/$hin'
+      preLoaderRoute: typeof PatientFamilyDependantsHinRouteImport
+      parentRoute: typeof PatientRoute
+    }
+    '/patient/family/proxies/$proxyId': {
+      id: '/patient/family/proxies/$proxyId'
+      path: '/family/proxies/$proxyId'
+      fullPath: '/patient/family/proxies/$proxyId'
+      preLoaderRoute: typeof PatientFamilyProxiesProxyIdRouteImport
+      parentRoute: typeof PatientRoute
+    }
     '/patient/health/allergies/': {
       id: '/patient/health/allergies/'
       path: '/health/allergies'
@@ -2908,8 +2986,6 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface PatientRouteChildren {
-  PatientBillsRoute: typeof PatientBillsRoute
-  PatientFamilyRoute: typeof PatientFamilyRoute
   PatientHelpRoute: typeof PatientHelpRoute
   PatientMessagesRoute: typeof PatientMessagesRoute
   PatientPersonnelRoute: typeof PatientPersonnelRoute
@@ -2917,12 +2993,18 @@ interface PatientRouteChildren {
   PatientSharingRoute: typeof PatientSharingRoute
   PatientIndexRoute: typeof PatientIndexRoute
   PatientAppointmentsAppointmentIdRoute: typeof PatientAppointmentsAppointmentIdRoute
+  PatientBillsBillIdRoute: typeof PatientBillsBillIdRoute
+  PatientBillsHistoryRoute: typeof PatientBillsHistoryRoute
   PatientHealthFacilitiesRoute: typeof PatientHealthFacilitiesRoute
   PatientHealthMedicationsRoute: typeof PatientHealthMedicationsRoute
   PatientHealthTimelineRoute: typeof PatientHealthTimelineRoute
   PatientHealthTrendsRoute: typeof PatientHealthTrendsRoute
   PatientAppointmentsIndexRoute: typeof PatientAppointmentsIndexRoute
+  PatientBillsIndexRoute: typeof PatientBillsIndexRoute
+  PatientFamilyIndexRoute: typeof PatientFamilyIndexRoute
   PatientHealthIndexRoute: typeof PatientHealthIndexRoute
+  PatientFamilyDependantsHinRoute: typeof PatientFamilyDependantsHinRoute
+  PatientFamilyProxiesProxyIdRoute: typeof PatientFamilyProxiesProxyIdRoute
   PatientHealthAllergiesAllergyIdRoute: typeof PatientHealthAllergiesAllergyIdRoute
   PatientHealthCarePlansPlanIdRoute: typeof PatientHealthCarePlansPlanIdRoute
   PatientHealthConditionsConditionIdRoute: typeof PatientHealthConditionsConditionIdRoute
@@ -2944,8 +3026,6 @@ interface PatientRouteChildren {
 }
 
 const PatientRouteChildren: PatientRouteChildren = {
-  PatientBillsRoute: PatientBillsRoute,
-  PatientFamilyRoute: PatientFamilyRoute,
   PatientHelpRoute: PatientHelpRoute,
   PatientMessagesRoute: PatientMessagesRoute,
   PatientPersonnelRoute: PatientPersonnelRoute,
@@ -2953,12 +3033,18 @@ const PatientRouteChildren: PatientRouteChildren = {
   PatientSharingRoute: PatientSharingRoute,
   PatientIndexRoute: PatientIndexRoute,
   PatientAppointmentsAppointmentIdRoute: PatientAppointmentsAppointmentIdRoute,
+  PatientBillsBillIdRoute: PatientBillsBillIdRoute,
+  PatientBillsHistoryRoute: PatientBillsHistoryRoute,
   PatientHealthFacilitiesRoute: PatientHealthFacilitiesRoute,
   PatientHealthMedicationsRoute: PatientHealthMedicationsRoute,
   PatientHealthTimelineRoute: PatientHealthTimelineRoute,
   PatientHealthTrendsRoute: PatientHealthTrendsRoute,
   PatientAppointmentsIndexRoute: PatientAppointmentsIndexRoute,
+  PatientBillsIndexRoute: PatientBillsIndexRoute,
+  PatientFamilyIndexRoute: PatientFamilyIndexRoute,
   PatientHealthIndexRoute: PatientHealthIndexRoute,
+  PatientFamilyDependantsHinRoute: PatientFamilyDependantsHinRoute,
+  PatientFamilyProxiesProxyIdRoute: PatientFamilyProxiesProxyIdRoute,
   PatientHealthAllergiesAllergyIdRoute: PatientHealthAllergiesAllergyIdRoute,
   PatientHealthCarePlansPlanIdRoute: PatientHealthCarePlansPlanIdRoute,
   PatientHealthConditionsConditionIdRoute:

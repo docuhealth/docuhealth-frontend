@@ -93,7 +93,7 @@ export function Segments<T extends string>({
           aria-selected={option.value === value}
           onClick={() => onChange(option.value)}
           className={cn(
-            "flex-1 rounded-md px-4 py-1.5 type-body-sm-regular transition-colors",
+            "flex-1 rounded-md px-4 py-1.5 type-body-sm-regular whitespace-nowrap transition-colors",
             option.value === value
               ? "bg-card text-fg-heading shadow-sm"
               : "text-fg-caption hover:text-fg-heading",

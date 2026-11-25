@@ -345,3 +345,18 @@ states on staging and live (the mock dev server fills them with demo data).
     the method), a plain-language explanation, and each value's history for the trend.
 12. **Facilities and immunizations.** A facility's location and photo; immunization records
     (vaccine, doses with date, brand, batch, who gave them, where; the next dose due).
+13. **Bills and payments.** No patient billing exists: outstanding balance per facility with due
+    date, bills (invoice number, services charged, amount billed, paid by the patient, HMO
+    contribution, outstanding), payment history (method, reference, declined attempts), and
+    paying (card through the processor, bank transfer details per facility, POS), with a receipt.
+14. **Sharing and consent.** No endpoint to share a record: start a share (facility, person,
+    record parts, duration, reason) confirmed by a one-time code, get the access code and
+    secure link, list and stop active shares, the access history (who viewed what, when), and the
+    patient's privacy settings.
+15. **Family & proxy (wired on the real API).** Gaps: no way to change a proxy's powers without
+    ending the grant (the app's "Save changes" waits for one); no HIN lookup before sending a proxy
+    request, so the proxy's name is only known after; `duration_days` has no "no end" (the app sends
+    36 500); a dependant has no relationship, primary contact or consent in the reply; no titles
+    ("Mrs."); and a dependant's photo, due vaccines and growth (weight, height, BMI with
+    percentiles) have no source. `GET /api/patients/guardianship` (25 Nov handoff) isn't in the
+    published schema yet.

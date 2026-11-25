@@ -104,5 +104,6 @@ Appointments (with booking, reschedule and cancel) and Messages. The real API se
 appointments (read only), medicines, vitals and check-ins; the rest (lab details, scan reports,
 allergies, care plans, immunizations, documents, bills, booking, messages…) shows demo data in
 `npm run dev` and empty states on live, until the endpoints in the gaps doc's "Patient dashboard
-(25 Nov)" section exist. Bills & payments, Family & proxy, Sharing & privacy, Health personnel,
-Settings and Help have no design yet.
+(25 Nov)" section exist. Family & proxy is wired on the real API (dependants, proxies, requests).
+Bills & payments and Sharing & privacy are built on pending data. Health personnel, Settings and
+Help have no design yet.

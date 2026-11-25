@@ -16,6 +16,12 @@ import { renderWithRouter } from "@/test/render";
 // today, and one current and one past medicine.
 
 beforeEach(() => {
+  // No proxy requests here (they'd open first in Needs Your Attention): see family.test.tsx.
+  server.use(
+    http.get(`${env.VITE_API_URL}/api/patients/proxies/held`, () =>
+      HttpResponse.json({ count: 0, next: null, previous: null, results: [] }),
+    ),
+  );
   useAuthStore.getState().setSession({
     accessToken: "token",
     accountType: "patient",

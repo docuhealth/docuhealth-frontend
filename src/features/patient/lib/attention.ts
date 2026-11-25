@@ -1,10 +1,13 @@
+import type { ProxyGrant } from "@/features/patient/api/family";
 import type { DrugRecord, VisitSummary } from "@/features/patient/api/schemas";
+import { liveGrants } from "@/features/patient/lib/family";
 
 /** One of the home page's "Needs your attention" tabs. */
 export type AttentionItem =
   | { key: "results"; label: string; value: string; newCount: number; visit: VisitSummary }
   | { key: "medications"; label: string; value: string; newCount: number; drugs: DrugRecord[] }
-  | { key: "prescription"; label: string; value: string; newCount: number; drug: DrugRecord };
+  | { key: "prescription"; label: string; value: string; newCount: number; drug: DrugRecord }
+  | { key: "proxy"; label: string; value: string; newCount: number; grant: ProxyGrant };
 
 const READY = new Set([
   "result_ready",
@@ -60,4 +63,25 @@ export function attentionItems(
     });
   }
   return items;
+}
+
+/**
+ * Requests to be someone's proxy that are waiting for the patient's answer, from the grants they
+ * hold: the oldest first (it expires soonest), counting all of them on its tab.
+ */
+export function proxyRequestItems(held: ProxyGrant[], now = new Date()): AttentionItem[] {
+  const requests = liveGrants(held, now)
+    .filter((grant) => grant.status === "pending")
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const first = requests[0];
+  if (!first) return [];
+  return [
+    {
+      key: "proxy",
+      label: "Proxy request",
+      value: first.grantedBy.name,
+      newCount: requests.length,
+      grant: first,
+    },
+  ];
 }

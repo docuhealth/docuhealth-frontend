@@ -5,6 +5,7 @@ import {
   type Icon,
   PillIcon,
   ReceiptIcon,
+  UserIcon,
 } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
@@ -18,6 +19,7 @@ import {
   CurrentMedicinesPanel,
   PrescriptionPanel,
 } from "@/features/patient/components/medicines-panel";
+import { ProxyRequestPanel } from "@/features/patient/components/proxy-request-panel";
 import type { AttentionItem } from "@/features/patient/lib/attention";
 import { formatNaira } from "@/features/patient/lib/lab-results";
 
@@ -25,11 +27,12 @@ const icons: Record<AttentionItem["key"], Icon> = {
   results: FlaskIcon,
   medications: PillIcon,
   prescription: ReceiptIcon,
+  proxy: UserIcon,
 };
 
 /**
- * "Needs your attention" on the patient's home: a row of tabs (results, medicines, bill,
- * prescription), arrows to step through them, and the chosen one's panel. `items` is `undefined`
+ * "Needs your attention" on the patient's home: a row of tabs (a proxy request, results,
+ * medicines, bill, prescription), arrows to step through them, and the chosen one's panel. `items` is `undefined`
  * while loading.
  */
 export function NeedsAttention({
@@ -135,5 +138,7 @@ function SelectedPanel({ item, labResults }: { item: AttentionItem; labResults: 
       return <CurrentMedicinesPanel drugs={item.drugs} />;
     case "prescription":
       return <PrescriptionPanel drug={item.drug} fresh={item.newCount > 0} />;
+    case "proxy":
+      return <ProxyRequestPanel grant={item.grant} />;
   }
 }
