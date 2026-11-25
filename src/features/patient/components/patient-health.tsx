@@ -12,6 +12,7 @@ import radiologyIconUrl from "@/assets/svgs/radiology.svg";
 import visitsIconUrl from "@/assets/svgs/visits.svg";
 import vitalSignsIconUrl from "@/assets/svgs/vital-signs.svg";
 import { Button } from "@/components/ui/button";
+import { allergiesQuery, carePlansQuery, healthProfileQuery } from "@/features/patient/api/pending";
 import { appointmentsQuery, drugsQuery } from "@/features/patient/api/queries";
 import { HealthSummary } from "@/features/patient/components/health-summary";
 import { HealthToolbar } from "@/features/patient/components/health-toolbar";
@@ -32,6 +33,12 @@ export function PatientHealth() {
   const visits = useVisits().data;
   const appointments = useQuery(appointmentsQuery()).data;
   const drugs = useQuery(drugsQuery()).data;
+  // TODO(api): blood group, genotype, documents, immunizations, allergies and care plans are
+  // pending records (api/pending.ts): demo data on the mock server, empty elsewhere.
+  const profile = useQuery(healthProfileQuery()).data;
+  const allergies = (useQuery(allergiesQuery()).data ?? []).filter((allergy) => allergy.active);
+  const carePlans = useQuery(carePlansQuery()).data ?? [];
+  const activePlans = carePlans.filter((plan) => plan.status === "active");
   const [search, setSearch] = useState("");
 
   const conditions = visits ? conditionsOf(visits) : [];
@@ -71,8 +78,14 @@ export function PatientHealth() {
       detail: drugs?.length ? `${current} current · ${past} past` : null,
       to: "/patient/health/medications",
     },
-    // TODO(api): no immunization records (or doses due) for patients yet.
-    { label: "Immunizations", icon: immunizationIconUrl, detail: null },
+    {
+      label: "Immunizations",
+      icon: immunizationIconUrl,
+      detail: profile?.immunizations.doses ? plural(profile.immunizations.doses, "dose") : null,
+      badge: profile?.immunizations.due
+        ? { label: `${profile.immunizations.due} due`, tone: "warning" }
+        : null,
+    },
     {
       label: "Diagnoses & conditions",
       icon: diagnosisIconUrl,
@@ -84,13 +97,18 @@ export function PatientHealth() {
     {
       label: "Allergies",
       icon: allergiesRecordIconUrl,
-      detail: null,
+      detail: allergies.length ? `${allergies.length} recorded` : null,
       to: "/patient/health/allergies",
     },
     {
       label: "Care plans",
       icon: carePlansIconUrl,
-      detail: null,
+      detail:
+        activePlans.length === 1
+          ? activePlans[0]!.name
+          : carePlans.length
+            ? `${activePlans.length} active · ${carePlans.length - activePlans.length} ended`
+            : null,
       to: "/patient/health/care-plans",
     },
     {
@@ -115,8 +133,12 @@ export function PatientHealth() {
           icon={<img src={documentsIconUrl} alt="" className="size-5.5" />}
           iconClass="bg-info-100"
           title="Documents"
-          // TODO(api): patients can't upload or list documents yet.
-          detail="No files yet · upload reports, prescriptions or scans"
+          // TODO(api): patients can't upload or list documents yet; the count is pending.
+          detail={
+            profile?.documents
+              ? `${plural(profile.documents, "file")} · reports, prescriptions and scans`
+              : "No files yet · upload reports, prescriptions or scans"
+          }
           action={
             <Button variant="outline" className="h-10 px-5" onClick={notYet("Uploading documents")}>
               Upload
@@ -140,7 +162,18 @@ export function PatientHealth() {
         />
       </div>
 
-      <HealthSummary activeConditions={activeConditions} />
+      <HealthSummary
+        bloodGroup={profile?.bloodGroup ?? null}
+        genotype={profile?.genotype ?? null}
+        activeConditions={activeConditions}
+        allergies={
+          allergies.length
+            ? allergies.length === 1
+              ? allergies[0]!.name
+              : `${allergies[0]!.name}, +${allergies.length - 1} more`
+            : null
+        }
+      />
 
       <section aria-labelledby="records-heading" className="flex flex-col gap-3">
         <h2 id="records-heading" className="type-title-sm text-fg-heading">

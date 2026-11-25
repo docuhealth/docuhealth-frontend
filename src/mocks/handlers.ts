@@ -1,6 +1,7 @@
 import type { RequestHandler } from "msw";
 import { admissionHandlers } from "@/mocks/admissions";
 import { patientHandlers } from "@/mocks/patient";
+import { patientPendingHandlers } from "@/mocks/patient-pending";
 import { auditLogHandlers } from "@/mocks/audit-logs";
 import { authHandlers } from "@/mocks/auth";
 import { careTaskHandlers } from "@/mocks/care-tasks";
@@ -36,5 +37,6 @@ export const handlers: RequestHandler[] = [
   ...noteHandlers,
   ...pharmacyHandlers,
   ...patientHandlers,
+  ...patientPendingHandlers,
   ...staffHandlers,
 ];

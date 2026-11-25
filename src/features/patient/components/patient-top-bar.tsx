@@ -24,8 +24,8 @@ import { notYet } from "@/features/patient/lib/not-yet";
 import { useLogOut } from "@/hooks/use-log-out";
 
 /**
- * The patient's top bar: the page's title over a line (their HIN, or counts), or a way back to
- * the list on a detail page; search; notifications; and the account menu.
+ * The patient's top bar: a back arrow on record pages, the page's title over a line (their HIN,
+ * counts, or where back goes); search; notifications; and the account menu.
  */
 export function PatientTopBar({ heading, name }: { heading: PageHeadingValue; name: string }) {
   const logOut = useLogOut();
@@ -44,16 +44,17 @@ export function PatientTopBar({ heading, name }: { heading: PageHeadingValue; na
       </Button>
       {heading.back && (
         <Button variant="ghost" size="icon" asChild className="-ml-2 shrink-0">
-          <Link to={heading.back.to} aria-label={heading.back.label}>
+          <Link to={heading.back.to} params={heading.back.params} aria-label={heading.back.label}>
             <CaretLeftIcon className="size-5" />
           </Link>
         </Button>
       )}
       <div className="flex min-w-0 flex-col">
         <p className="truncate type-title-sm text-fg-heading">{heading.title}</p>
-        {(heading.back?.label ?? heading.subtitle) && (
+        {/* A list page keeps its counts under the title; a detail page says where back goes. */}
+        {(heading.subtitle ?? heading.back?.label) && (
           <p className="truncate type-caption text-fg-caption">
-            {heading.back?.label ?? heading.subtitle}
+            {heading.subtitle ?? heading.back?.label}
           </p>
         )}
       </div>

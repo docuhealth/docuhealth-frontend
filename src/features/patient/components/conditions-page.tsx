@@ -1,7 +1,8 @@
-import { BookOpenIcon, FirstAidKitIcon } from "@phosphor-icons/react";
+import { BookOpenIcon } from "@phosphor-icons/react";
 import { useState } from "react";
+import conditionIconUrl from "@/assets/svgs/condition-detail-icon.svg";
 import { ListSkeleton } from "@/components/dashboard/skeletons";
-import { StatusPill } from "@/components/dashboard/status-pill";
+import { ConditionStatusTag } from "@/features/patient/components/condition-status-tag";
 import { PageHeading } from "@/features/patient/components/page-heading";
 import { PatientEmpty } from "@/features/patient/components/patient-empty";
 import {
@@ -10,13 +11,13 @@ import {
   ReportChange,
   Segments,
 } from "@/features/patient/components/patient-ui";
-import { dated } from "@/features/patient/lib/dated";
+import { conditionLine } from "@/features/patient/lib/conditions";
 import { conditionsOf } from "@/features/patient/lib/records";
 import { useVisits } from "@/features/patient/lib/use-visits";
 
 /**
- * Diagnoses from the patient's visits. TODO(api): conditions have no status, so the latest
- * visit's diagnosis counts as active and earlier ones as past.
+ * Diagnoses from the patient's visits. TODO(api): conditions have no status, so the newest
+ * diagnosis counts as active and earlier ones as past.
  */
 export function ConditionsPage() {
   const { data, isError } = useVisits();
@@ -31,6 +32,7 @@ export function ConditionsPage() {
       <PageHeading
         title="Conditions"
         subtitle={data ? `${active.length} active · ${past.length} past` : null}
+        back={{ to: "/patient/health", label: "Back to Health" }}
       />
       <Segments
         label="Conditions"
@@ -54,15 +56,11 @@ export function ConditionsPage() {
           {shown.map((condition) => (
             <RecordRow
               key={condition.id}
-              icon={<FirstAidKitIcon />}
+              icon={<img src={conditionIconUrl} alt="" className="size-5" />}
               title={condition.name}
-              detail={dated(condition.at)}
+              detail={conditionLine(condition)}
               meta={[condition.facility, condition.clinician].filter(Boolean).join(" · ")}
-              status={
-                <StatusPill tone={condition.active ? "error" : "success"}>
-                  {condition.active ? "Active" : "Resolved"}
-                </StatusPill>
-              }
+              status={<ConditionStatusTag active={condition.active} />}
               to="/patient/health/conditions/$conditionId"
               params={{ conditionId: condition.id }}
             />

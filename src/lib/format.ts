@@ -6,8 +6,17 @@ export function greetingFor(date: Date) {
   return "Good evening";
 }
 
-const weekday = new Intl.DateTimeFormat("en-GB", { weekday: "long" });
-const dayMonthYear = new Intl.DateTimeFormat("en-GB", {
+/**
+ * An en-GB date format that writes September "Sep", as the designs do: newer browsers (ICU 72+)
+ * write "Sept" for en-GB.
+ */
+function britishDate(options: Intl.DateTimeFormatOptions) {
+  const format = new Intl.DateTimeFormat("en-GB", options);
+  return { format: (date: Date) => format.format(date).replace(/\bSept\b/, "Sep") };
+}
+
+const weekday = britishDate({ weekday: "long" });
+const dayMonthYear = britishDate({
   day: "numeric",
   month: "long",
   year: "numeric",
@@ -56,7 +65,7 @@ export function initials(name: string) {
   return (first + last).toUpperCase();
 }
 
-const fullDate = new Intl.DateTimeFormat("en-GB", {
+const fullDate = britishDate({
   day: "2-digit",
   month: "short",
   year: "numeric",
@@ -78,7 +87,7 @@ export function ageOn(birth: Date, on = new Date()) {
   return on.getFullYear() - birth.getFullYear() - (birthdayPassed ? 0 : 1);
 }
 
-const appointmentDay = new Intl.DateTimeFormat("en-GB", {
+const appointmentDay = britishDate({
   day: "numeric",
   month: "short",
   year: "numeric",
@@ -155,7 +164,7 @@ export function formatClockTime(date: Date) {
   return clockTime.format(date);
 }
 
-const dayMonth = new Intl.DateTimeFormat("en-GB", {
+const dayMonth = britishDate({
   weekday: "short",
   day: "numeric",
   month: "short",
@@ -166,7 +175,7 @@ export function formatShortDay(date: Date) {
   return dayMonth.format(date);
 }
 
-const shortDayMonth = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" });
+const shortDayMonth = britishDate({ day: "numeric", month: "short" });
 
 /** e.g. "15 Oct". */
 export function formatDayMonth(date: Date) {
@@ -184,7 +193,7 @@ export function formatHin(value: string) {
     .join("-");
 }
 
-const twoDigitDay = new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short" });
+const twoDigitDay = britishDate({ day: "2-digit", month: "short" });
 
 /** e.g. "08 Oct, 2026". */
 export function formatDateWithComma(date: Date) {

@@ -75,6 +75,47 @@ const orderList = z.unknown().transform((value): { name: string; status: string 
   });
 });
 
+/** One set of vital signs from the patient's history (`GET /api/records/vital-signs/mine`). */
+export const vitalReadingSchema = z
+  .object({
+    sqid: z.string(),
+    created_at: z.string(),
+    blood_pressure: optionalText,
+    temp: number,
+    resp_rate: number,
+    heart_rate: number,
+    height: number,
+    weight: number,
+    spo2: number,
+    bmi: number,
+    staff_info: clinician,
+    hospital_info: facility,
+  })
+  .transform((reading) => ({
+    id: reading.sqid,
+    at: reading.created_at,
+    bloodPressure: reading.blood_pressure,
+    temperature: reading.temp,
+    breathingRate: reading.resp_rate,
+    heartRate: reading.heart_rate,
+    height: reading.height,
+    weight: reading.weight,
+    spo2: reading.spo2,
+    bmi: reading.bmi,
+    recordedBy: reading.staff_info?.name ?? null,
+    facility: reading.hospital_info,
+  }));
+export type VitalReading = z.output<typeof vitalReadingSchema>;
+
+/** Free text the schema leaves untyped (`treatment_plan`, `care_instructions`): a string or null. */
+const looseText = z
+  .unknown()
+  .transform((value) => (typeof value === "string" && value.trim() ? value.trim() : null));
+
+const additionalNote = z
+  .object({ note: optionalText, created_at: optionalText })
+  .transform((entry) => ({ note: entry.note, at: entry.created_at }));
+
 /** One visit summary: who saw the patient where, what they found, and what they ordered. */
 export const visitSummarySchema = z
   .object({
@@ -88,6 +129,9 @@ export const visitSummarySchema = z
     lab_tests_info: orderList,
     scans_info: orderList,
     drug_orders_info: orderList,
+    treatment_plan: looseText,
+    care_instructions: looseText,
+    additional_notes: z.array(additionalNote).nullish(),
   })
   .transform((visit) => ({
     id: visit.id,
@@ -100,6 +144,15 @@ export const visitSummarySchema = z
     labTests: visit.lab_tests_info,
     scans: visit.scans_info,
     drugs: visit.drug_orders_info,
+    /** The clinician's note for the patient: the treatment plan, care instructions, then notes. */
+    note:
+      [
+        visit.treatment_plan,
+        visit.care_instructions,
+        ...(visit.additional_notes ?? []).map((entry) => entry.note),
+      ]
+        .filter(Boolean)
+        .join("\n\n") || null,
   }));
 export type VisitSummary = z.output<typeof visitSummarySchema>;
 

@@ -1,37 +1,28 @@
 import { HeartbeatIcon } from "@phosphor-icons/react";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import trendsIconUrl from "@/assets/svgs/trends.svg";
 import { ListSkeleton } from "@/components/dashboard/skeletons";
-import type { Vitals } from "@/features/patient/api/schemas";
+import { vitalsQuery } from "@/features/patient/api/queries";
 import { PageHeading } from "@/features/patient/components/page-heading";
 import { PatientEmpty } from "@/features/patient/components/patient-empty";
-import { RecordList, RecordRow, SectionLabel } from "@/features/patient/components/patient-ui";
+import { VitalEarlierReadings } from "@/features/patient/components/vital-earlier-readings";
 import { VitalTile } from "@/features/patient/components/vital-tile";
-import { dated } from "@/features/patient/lib/dated";
-import { bloodPressureNote, bmiNote, type ReadingNote } from "@/features/patient/lib/records";
-import { useVisits } from "@/features/patient/lib/use-visits";
+import {
+  groupReadings,
+  vitalKeys,
+  vitalLabels,
+  vitalTile,
+  vitalUnits,
+} from "@/features/patient/lib/vitals";
+import { formatDay } from "@/lib/format";
 
-const vitalTiles: {
-  label: string;
-  unit: string;
-  read: (vitals: Vitals) => number | string | null;
-  note?: (vitals: Vitals) => ReadingNote | null;
-}[] = [
-  {
-    label: "Blood pressure",
-    unit: "mmHg",
-    read: (v) => v.bloodPressure,
-    note: (v) => bloodPressureNote(v.bloodPressure),
-  },
-  { label: "Pulse", unit: "bpm", read: (v) => v.heartRate },
-  { label: "Temperature", unit: "°C", read: (v) => v.temperature },
-  { label: "Weight", unit: "kg", read: (v) => v.weight },
-  { label: "BMI", unit: "kg/m²", read: (v) => v.bmi, note: (v) => bmiNote(v.bmi) },
-];
-
-/** The newest reading of each vital sign, and earlier sets by visit. */
+/** The newest reading of each vital sign, then earlier readings by day and facility. */
 export function VitalSignsPage() {
-  const { data, isError } = useVisits();
-  const withVitals = (data ?? []).filter((visit) => visit.vitals);
-  const latest = withVitals[0];
+  const { data, isError } = useQuery(vitalsQuery());
+  const latest = data?.[0];
+  // The newest day's readings are the tiles; the rest are earlier.
+  const earlier = groupReadings(data ?? []).slice(1);
 
   return (
     <div className="flex flex-col gap-6">
@@ -41,9 +32,10 @@ export function VitalSignsPage() {
           !data
             ? null
             : latest
-              ? `Last recorded ${dated(latest.vitals!.at)}${latest.facility ? ` · ${latest.facility}` : ""}`
+              ? `Last recorded ${formatDay(new Date(latest.at))}${latest.facility ? ` · ${latest.facility}` : ""}`
               : "No readings yet"
         }
+        back={{ to: "/patient/health", label: "Back to Health" }}
       />
       {!data && !isError ? (
         <ListSkeleton />
@@ -55,38 +47,32 @@ export function VitalSignsPage() {
         />
       ) : (
         <>
-          <ul className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-            {vitalTiles.map((tile) => (
-              <VitalTile
-                key={tile.label}
-                label={tile.label}
-                value={tile.read(latest.vitals!)}
-                unit={tile.unit}
-                note={tile.note?.(latest.vitals!) ?? null}
-              />
-            ))}
+          <div className="flex justify-end">
+            <Link
+              to="/patient/health/vitals/trends"
+              aria-label="Trends"
+              title="Trends"
+              className="grid size-9 place-content-center rounded-md border bg-card transition-colors hover:border-primary/40"
+            >
+              <img src={trendsIconUrl} alt="" className="size-4.5" />
+            </Link>
+          </div>
+          <ul aria-label="Latest readings" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {vitalKeys.map((key) => {
+              const tile = vitalTile(data ?? [], key);
+              return (
+                <VitalTile
+                  key={key}
+                  vital={key}
+                  label={vitalLabels[key]}
+                  value={tile.value}
+                  unit={vitalUnits[key]}
+                  note={tile.note}
+                />
+              );
+            })}
           </ul>
-          {withVitals.length > 1 && (
-            <>
-              <SectionLabel>Earlier readings</SectionLabel>
-              <RecordList label="Earlier readings">
-                {withVitals.slice(1).map((visit) => (
-                  <RecordRow
-                    key={visit.id}
-                    title={dated(visit.vitals!.at)}
-                    detail={[
-                      visit.facility,
-                      visit.vitals!.bloodPressure && `BP ${visit.vitals!.bloodPressure}`,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                    to="/patient/health/visits/$visitId"
-                    params={{ visitId: visit.id }}
-                  />
-                ))}
-              </RecordList>
-            </>
-          )}
+          {earlier.length > 0 && <VitalEarlierReadings groups={earlier} />}
         </>
       )}
     </div>

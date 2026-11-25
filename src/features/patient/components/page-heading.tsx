@@ -5,7 +5,7 @@ import { createContext, type ReactNode, use, useEffect, useState } from "react";
 export type PageHeadingValue = {
   title: string;
   subtitle?: string | null;
-  back?: { to: LinkProps["to"]; label: string };
+  back?: { to: LinkProps["to"]; params?: LinkProps["params"]; label: string };
 };
 
 const HeadingContext = createContext<{ set: (heading: PageHeadingValue) => void } | null>(null);
@@ -33,12 +33,18 @@ export function PageHeading({ title, subtitle, back }: PageHeadingValue) {
   const set = context?.set;
   const backTo = back?.to;
   const backLabel = back?.label;
+  // Params by value, so a new object each render doesn't set the heading again.
+  const backParams = JSON.stringify(back?.params ?? null);
   useEffect(() => {
+    const params = JSON.parse(backParams) as LinkProps["params"] | null;
     set?.({
       title,
       subtitle,
-      back: backTo && backLabel ? { to: backTo, label: backLabel } : undefined,
+      back:
+        backTo && backLabel
+          ? { to: backTo, label: backLabel, ...(params ? { params } : {}) }
+          : undefined,
     });
-  }, [set, title, subtitle, backTo, backLabel]);
+  }, [set, title, subtitle, backTo, backLabel, backParams]);
   return <title>{`${title} · DocuHealth`}</title>;
 }

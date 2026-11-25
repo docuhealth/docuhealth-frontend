@@ -2,7 +2,7 @@ import type { Appointment, Vitals, VisitSummary } from "@/features/patient/api/s
 
 // Working out the screens' views from the patient's visits, appointments and vitals.
 
-/** A diagnosis from a visit. TODO(api): no condition status; the latest visit's count as active. */
+/** A diagnosis from a visit. TODO(api): no condition status; the latest diagnosed visit's counts as active. */
 export type Condition = {
   id: string;
   name: string;
@@ -13,7 +13,8 @@ export type Condition = {
 };
 
 export function conditionsOf(visits: VisitSummary[]): Condition[] {
-  const latest = visits[0]?.id;
+  // The newest visit that recorded a diagnosis (a visit for a scan or a lab test may not).
+  const latest = visits.find((visit) => visit.diagnosis)?.id;
   return visits.flatMap((visit) =>
     visit.diagnosis
       ? [
@@ -77,6 +78,23 @@ export function bmiNote(bmi: number | null): ReadingNote | null {
   if (bmi < 25) return { label: "Healthy", lead: "Healthy", tone: "good" };
   if (bmi < 30) return { label: "Just above healthy", lead: "Just above", tone: "near" };
   return { label: "Above healthy", lead: "Above", tone: "watch" };
+}
+
+/**
+ * Where a blood glucose reading (mmol/L) sits against the usual target for when it was taken:
+ * 4–7 before a meal, under 8.5 after one.
+ */
+export function glucoseNote(
+  reading: { value: number; context: string } | null,
+): ReadingNote | null {
+  if (!reading) return null;
+  const top = reading.context.includes("after") ? 8.5 : 7;
+  const suffix = ` · ${reading.context}`;
+  if (reading.value < 4)
+    return { label: `Below target${suffix}`, lead: "Below target", tone: "watch" };
+  if (reading.value <= top)
+    return { label: `Within target${suffix}`, lead: "Within target", tone: "good" };
+  return { label: `Above target${suffix}`, lead: "Above target", tone: "watch" };
 }
 
 /** The next appointment still to come (not cancelled or done), if any. */

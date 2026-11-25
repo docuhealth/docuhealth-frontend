@@ -68,3 +68,16 @@ dashboard; it needs checking with a patient account.
 - The remaining screens: appointments, messages, bills, family & proxy, sharing & privacy,
   health personnel, settings, the other record lists, and the components sheet.
 - The backend's answer on the missing data above (it goes in the gaps file once confirmed).
+
+## Built (25 Nov, second pass)
+
+Every screen in the designs now has its populated and empty state: Home, Health, Conditions (+
+details), Allergies (+ details), Care plans (+ details), Visits (+ summary, + no-summary), Vital
+signs, Trends, Medications (+ dispensing and prescription dialogs, PDF download), Scans (+ report
+ready, + awaiting report, + image viewer). Record pages have a back arrow.
+
+Data: the real API gives visit summaries, appointments, drug records and the vitals history
+(`/api/records/vital-signs/mine`). Everything else the designs show is in
+`src/features/patient/api/pending.ts` (TODO(api)): demo data on the mock dev server
+(`src/mocks/patient-pending.ts`), empty on staging and live. The backend asks are in
+docs/backend-gaps-v2-migration.md, "Patient dashboard (25 Nov)".

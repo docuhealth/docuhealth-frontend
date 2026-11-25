@@ -1,24 +1,26 @@
-import { ScanIcon } from "@phosphor-icons/react";
+import { HospitalIcon, ScanIcon } from "@phosphor-icons/react";
 import { ListSkeleton } from "@/components/dashboard/skeletons";
 import { PageHeading } from "@/features/patient/components/page-heading";
 import { PatientEmpty } from "@/features/patient/components/patient-empty";
-import { DetailRows } from "@/features/patient/components/patient-ui";
-import { dated } from "@/features/patient/lib/dated";
-import { scansOf } from "@/features/patient/lib/records";
-import { useVisits } from "@/features/patient/lib/use-visits";
+import { ScanProgress } from "@/features/patient/components/scan-progress";
+import { ScanReportReady } from "@/features/patient/components/scan-report-ready";
+import { Tag } from "@/features/patient/components/tag";
+import { scanTag, scanTime } from "@/features/patient/lib/scans";
+import { useScans } from "@/features/patient/lib/use-scans";
+import { formatDay } from "@/lib/format";
 
-/** One scan: what was ordered, where, by whom. TODO(api): images and the report aren't shared. */
+/** One scan: its report and images once it's ready, or how far along it is. */
 export function ScanDetails({ scanId }: { scanId: string }) {
-  const { data } = useVisits();
-  const scan = data ? scansOf(data).find((candidate) => candidate.id === scanId) : undefined;
+  const { scans, isError } = useScans();
+  const scan = scans?.find((candidate) => candidate.id === scanId);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <PageHeading
         title="Scan details"
         back={{ to: "/patient/health/scans", label: "Back to Scan Results" }}
       />
-      {!data ? (
+      {!scans && !isError ? (
         <ListSkeleton />
       ) : !scan ? (
         <PatientEmpty
@@ -29,28 +31,23 @@ export function ScanDetails({ scanId }: { scanId: string }) {
       ) : (
         <>
           <div className="flex flex-col gap-1">
-            <p className="type-title text-fg-heading">{scan.name}</p>
-            <p className="type-caption text-fg-caption">
-              {[dated(scan.at), scan.facility].filter(Boolean).join(" · ")}
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="type-title text-fg-heading">{scan.name}</h1>
+              <Tag tone={scanTag(scan).tone}>{scanTag(scan).label}</Tag>
+            </div>
+            <p className="flex items-center gap-1.5 type-caption text-fg-caption">
+              <HospitalIcon aria-hidden className="size-3.5" />
+              {[
+                scan.state === "ready"
+                  ? formatDay(new Date(scan.scannedAt))
+                  : scanTime(scan.scannedAt),
+                scan.facility,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_22rem]">
-            <div className="rounded-xl border bg-card p-5">
-              <p className="type-body-sm-medium text-fg-heading">Report</p>
-              <p className="mt-2 rounded-lg bg-info-100 px-3 py-2 type-body-sm-regular text-info-500">
-                Images and the radiologist’s report will show here once they’re shared with you.
-                Your doctor will go through them with you.
-              </p>
-            </div>
-            <DetailRows
-              rows={[
-                ["Scan", scan.name],
-                ["Ordered by", scan.orderedBy],
-                ["Facility", scan.facility],
-                ["Ordered", dated(scan.at)],
-              ]}
-            />
-          </div>
+          {scan.state === "ready" ? <ScanReportReady scan={scan} /> : <ScanProgress scan={scan} />}
         </>
       )}
     </div>

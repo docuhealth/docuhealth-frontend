@@ -1,34 +1,46 @@
-import { CalendarBlankIcon, ClipboardTextIcon } from "@phosphor-icons/react";
+import { CalendarBlankIcon } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ListSkeleton } from "@/components/dashboard/skeletons";
-import { StatusPill } from "@/components/dashboard/status-pill";
+import { visitDetailsQuery } from "@/features/patient/api/pending";
 import { appointmentsQuery } from "@/features/patient/api/queries";
-import type { Appointment, VisitSummary } from "@/features/patient/api/schemas";
+import { FacilityFilter } from "@/features/patient/components/facility-filter";
 import { PageHeading } from "@/features/patient/components/page-heading";
 import { PatientEmpty } from "@/features/patient/components/patient-empty";
-import { RecordList, RecordRow, Segments } from "@/features/patient/components/patient-ui";
-import { dated } from "@/features/patient/lib/dated";
+import { VisitGroup } from "@/features/patient/components/visit-group";
+import { VisitTypeChips } from "@/features/patient/components/visit-type-chips";
 import { useVisits } from "@/features/patient/lib/use-visits";
-import { formatAppointment } from "@/lib/format";
+import {
+  filterVisits,
+  type VisitFilter,
+  visitFilters,
+  visitRows,
+} from "@/features/patient/lib/visits";
 
 /**
- * Upcoming appointments and past visits (one per visit summary). TODO(api): no visit type
- * (outpatient, admission, emergency), so the design's type filter isn't offered.
+ * Upcoming appointments and past visits in one list, by type. TODO(api): visit type and
+ * admission details come from the pending visit details; without them a visit shows only
+ * under "All visits".
  */
 export function VisitsPage() {
   const visits = useVisits();
   const appointments = useQuery(appointmentsQuery());
-  const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
+  const details = useQuery(visitDetailsQuery());
+  const [filter, setFilter] = useState<VisitFilter>("all");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [facility, setFacility] = useState<string | null>(null);
   // When the page opened: what counts as still to come.
   const [now] = useState(() => new Date());
-  const upcoming = (appointments.data ?? []).filter(
-    (a) => new Date(a.at) >= now && a.status !== "cancelled" && a.status !== "completed",
-  );
-  const past = visits.data ?? [];
+
   const loading =
     (!visits.data && !visits.isError) || (!appointments.data && !appointments.isError);
-  const nothing = !loading && upcoming.length === 0 && past.length === 0;
+  const rows = visitRows(visits.data ?? [], appointments.data ?? [], details.data ?? [], now);
+  const shown = filterVisits(rows, filter, facility);
+  const upcoming = rows.filter((row) => row.when === "upcoming").length;
+  const facilities = [
+    ...new Set(rows.map((row) => row.facility).filter((name): name is string => !!name)),
+  ];
+  const label = visitFilters.find((option) => option.value === filter)?.label;
 
   return (
     <div className="flex flex-col gap-6">
@@ -37,92 +49,43 @@ export function VisitsPage() {
         subtitle={
           loading
             ? null
-            : nothing
-              ? "No visits yet"
-              : `${upcoming.length} upcoming · ${past.length} past`
+            : rows.length
+              ? `${upcoming} upcoming · ${rows.length - upcoming} past`
+              : "No visits yet"
         }
+        back={{ to: "/patient/health", label: "Back to Health" }}
       />
-      {!nothing && (
-        <Segments
-          label="Visits"
-          value={tab}
-          onChange={setTab}
-          options={[
-            { value: "upcoming", label: `Upcoming (${upcoming.length})` },
-            { value: "past", label: `Past (${past.length})` },
-          ]}
+      <div className="flex flex-col gap-3">
+        <VisitTypeChips
+          value={filter}
+          onChange={setFilter}
+          filtersOpen={filtersOpen}
+          onToggleFilters={() => setFiltersOpen((open) => !open)}
         />
-      )}
+        {filtersOpen && (
+          <FacilityFilter facilities={facilities} value={facility} onChange={setFacility} />
+        )}
+      </div>
       {loading ? (
         <ListSkeleton />
-      ) : nothing ? (
+      ) : !rows.length ? (
         <PatientEmpty
           icon={<CalendarBlankIcon />}
           title="No visits yet"
           description="Your visits will show here after you are seen at a connected facility."
         />
-      ) : tab === "upcoming" ? (
-        <UpcomingVisits appointments={upcoming} />
+      ) : !shown.length ? (
+        <PatientEmpty
+          icon={<CalendarBlankIcon />}
+          title="No visits here"
+          description={`None of your visits match “${label}”${facility ? ` at ${facility}` : ""}.`}
+        />
       ) : (
-        <PastVisits visits={past} />
+        <div className="flex flex-col gap-4">
+          <VisitGroup label="Upcoming" rows={shown.filter((row) => row.when === "upcoming")} />
+          <VisitGroup label="Past" rows={shown.filter((row) => row.when === "past")} />
+        </div>
       )}
     </div>
-  );
-}
-
-function UpcomingVisits({ appointments }: { appointments: Appointment[] }) {
-  if (!appointments.length) {
-    return (
-      <PatientEmpty
-        icon={<CalendarBlankIcon />}
-        title="Nothing booked"
-        description="Your next visit will show here once it’s booked."
-      />
-    );
-  }
-  return (
-    <RecordList label="Upcoming visits">
-      {appointments.map((appointment) => (
-        <RecordRow
-          key={appointment.id}
-          title={
-            [appointment.type, appointment.clinician?.specialty].filter(Boolean).join(" · ") ||
-            "Appointment"
-          }
-          detail={[formatAppointment(new Date(appointment.at)), appointment.facility]
-            .filter(Boolean)
-            .join(" · ")}
-          status={<StatusPill tone="info">Booked</StatusPill>}
-        />
-      ))}
-    </RecordList>
-  );
-}
-
-function PastVisits({ visits }: { visits: VisitSummary[] }) {
-  if (!visits.length) {
-    return (
-      <PatientEmpty
-        icon={<ClipboardTextIcon />}
-        title="No past visits"
-        description="Your visits will show here after you are seen at a connected facility."
-      />
-    );
-  }
-  return (
-    <RecordList label="Past visits">
-      {visits.map((visit) => (
-        <RecordRow
-          key={visit.id}
-          title={visit.complaint ?? "Visit"}
-          detail={[dated(visit.at), visit.facility, visit.clinician?.name]
-            .filter(Boolean)
-            .join(" · ")}
-          status={<StatusPill tone="neutral">Summary</StatusPill>}
-          to="/patient/health/visits/$visitId"
-          params={{ visitId: visit.id }}
-        />
-      ))}
-    </RecordList>
   );
 }

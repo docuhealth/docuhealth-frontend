@@ -4,6 +4,7 @@ import {
   appointmentSchema,
   drugRecordSchema,
   visitSummarySchema,
+  vitalReadingSchema,
 } from "@/features/patient/api/schemas";
 
 // The patient's own records on the real API. Each list is read in one page of up to 100 and
@@ -17,6 +18,7 @@ const patientKeys = {
   visits: (hin: string) => [...patientKeys.all, "visits", hin] as const,
   appointments: () => [...patientKeys.all, "appointments"] as const,
   drugs: () => [...patientKeys.all, "drugs"] as const,
+  vitals: () => [...patientKeys.all, "vitals"] as const,
 };
 
 /** Every visit summary, newest first: diagnoses, vitals, lab tests, scans and drugs per visit. */
@@ -51,6 +53,18 @@ export const drugsQuery = () =>
     queryFn: () =>
       request(paginated(drugRecordSchema), {
         url: "/api/pharmacy/patients/drug-records",
+        params: PAGE,
+      }),
+    select: (page) => [...page.items].sort((a, b) => b.at.localeCompare(a.at)),
+  });
+
+/** Every set of vital signs recorded for the patient, newest first. */
+export const vitalsQuery = () =>
+  queryOptions({
+    queryKey: patientKeys.vitals(),
+    queryFn: () =>
+      request(paginated(vitalReadingSchema), {
+        url: "/api/records/vital-signs/mine",
         params: PAGE,
       }),
     select: (page) => [...page.items].sort((a, b) => b.at.localeCompare(a.at)),

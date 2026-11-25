@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { healthProfileQuery, labResultsQuery } from "@/features/patient/api/pending";
 import { appointmentsQuery, drugsQuery, visitsQuery } from "@/features/patient/api/queries";
 import { HealthSnapshot } from "@/features/patient/components/health-snapshot";
 import { NeedsAttention } from "@/features/patient/components/needs-attention";
@@ -14,6 +15,9 @@ export function PatientHome() {
   const visits = useQuery(visitsQuery(hin));
   const appointments = useQuery(appointmentsQuery());
   const drugs = useQuery(drugsQuery());
+  // TODO(api): lab values, bills and glucose are pending records (api/pending.ts).
+  const profile = useQuery(healthProfileQuery()).data;
+  const labResults = useQuery(labResultsQuery()).data ?? [];
 
   // A list that failed to load counts as empty, so the rest of the page still shows.
   const visitList = visits.data ?? (visits.isError ? [] : undefined);
@@ -29,9 +33,11 @@ export function PatientHome() {
         />
         <NeedsAttention
           items={visitList && drugList ? attentionItems(visitList, drugList) : undefined}
+          labResults={labResults}
+          outstandingBill={profile?.outstandingBill ?? null}
         />
       </div>
-      <HealthSnapshot visits={visitList} />
+      <HealthSnapshot visits={visitList} glucose={profile?.glucose ?? null} />
     </div>
   );
 }

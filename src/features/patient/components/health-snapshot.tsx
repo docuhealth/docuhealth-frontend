@@ -8,13 +8,25 @@ import {
 } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import { CardSkeleton } from "@/components/dashboard/skeletons";
+import type { HealthProfile } from "@/features/patient/api/pending";
 import type { VisitSummary } from "@/features/patient/api/schemas";
 import { SnapshotCard } from "@/features/patient/components/snapshot-card";
-import { bloodPressureNote, bmiNote, latestVitals } from "@/features/patient/lib/records";
+import {
+  bloodPressureNote,
+  bmiNote,
+  glucoseNote,
+  latestVitals,
+} from "@/features/patient/lib/records";
 import { formatDayMonth } from "@/lib/format";
 
 /** The patient's latest blood pressure, weight, BMI and glucose, from their visits' vitals. */
-export function HealthSnapshot({ visits }: { visits: VisitSummary[] | undefined }) {
+export function HealthSnapshot({
+  visits,
+  glucose,
+}: {
+  visits: VisitSummary[] | undefined;
+  glucose: HealthProfile["glucose"];
+}) {
   if (!visits) {
     return <CardSkeleton lines={8} className="rounded-xl border bg-card p-5" />;
   }
@@ -61,14 +73,13 @@ export function HealthSnapshot({ visits }: { visits: VisitSummary[] | undefined 
         note={
           weightChange != null && weight.previous
             ? {
-                icon:
-                  weightChange > 0 ? (
-                    <ArrowCircleUpIcon weight="fill" />
-                  ) : (
-                    <ArrowCircleDownIcon weight="fill" />
-                  ),
-                lead: `${Math.abs(weightChange)}kg`,
-                label: `${Math.abs(weightChange)}kg since ${formatDayMonth(new Date(weight.previous.at))}`,
+                icon: !weightChange ? undefined : weightChange > 0 ? (
+                  <ArrowCircleUpIcon weight="fill" />
+                ) : (
+                  <ArrowCircleDownIcon weight="fill" />
+                ),
+                lead: weightChange ? `${Math.abs(weightChange)}kg` : "No change",
+                label: `${weightChange ? `${Math.abs(weightChange)}kg` : "No change"} since ${formatDayMonth(new Date(weight.previous.at))}`,
                 tone: "brand",
               }
             : null
@@ -83,15 +94,15 @@ export function HealthSnapshot({ visits }: { visits: VisitSummary[] | undefined 
         at={bmi?.at ?? null}
         note={bmiNote(bmi?.bmi ?? null)}
       />
-      {/* TODO(api): blood glucose isn't one of the vital signs the API records. */}
+      {/* TODO(api): blood glucose isn't a vital sign the API records; it's in the pending profile. */}
       <SnapshotCard
         icon={<DropIcon weight="bold" />}
         tone="error"
         label="Blood glucose"
-        value={null}
+        value={glucose ? glucose.value.toFixed(1) : null}
         unit="mmol/L"
-        at={null}
-        note={null}
+        at={glucose?.at ?? null}
+        note={glucoseNote(glucose)}
       />
     </section>
   );

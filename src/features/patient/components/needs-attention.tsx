@@ -1,23 +1,25 @@
 import {
   CaretLeftIcon,
   CaretRightIcon,
-  CheckCircleIcon,
   FlaskIcon,
   type Icon,
   PillIcon,
   ReceiptIcon,
-  WalletIcon,
 } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { CardSkeleton } from "@/components/dashboard/skeletons";
 import { Button } from "@/components/ui/button";
-import { AttentionPanel, AttentionRow } from "@/features/patient/components/attention-panel";
+import type { LabResult } from "@/features/patient/api/pending";
+import { AllCaughtUp } from "@/features/patient/components/all-caught-up";
 import { AttentionTab } from "@/features/patient/components/attention-tab";
-import { Tag } from "@/features/patient/components/tag";
+import { LabResultsPanel } from "@/features/patient/components/lab-results-panel";
+import {
+  CurrentMedicinesPanel,
+  PrescriptionPanel,
+} from "@/features/patient/components/medicines-panel";
 import type { AttentionItem } from "@/features/patient/lib/attention";
-import { orderStatusLabel } from "@/features/patient/lib/records";
-import { formatDate, plural } from "@/lib/format";
+import { formatNaira } from "@/features/patient/lib/lab-results";
 
 const icons: Record<AttentionItem["key"], Icon> = {
   results: FlaskIcon,
@@ -30,7 +32,16 @@ const icons: Record<AttentionItem["key"], Icon> = {
  * prescription), arrows to step through them, and the chosen one's panel. `items` is `undefined`
  * while loading.
  */
-export function NeedsAttention({ items }: { items: AttentionItem[] | undefined }) {
+export function NeedsAttention({
+  items,
+  labResults,
+  outstandingBill,
+}: {
+  items: AttentionItem[] | undefined;
+  labResults: LabResult[];
+  /** Naira owed; null when there's none (or no billing yet). */
+  outstandingBill: number | null;
+}) {
   const [chosen, setChosen] = useState<AttentionItem["key"] | null>(null);
   const index = Math.max(
     0,
@@ -41,6 +52,18 @@ export function NeedsAttention({ items }: { items: AttentionItem[] | undefined }
     if (!items?.length) return;
     setChosen(items[(index + by + items.length) % items.length]!.key);
   };
+
+  const tab = (item: AttentionItem) => (
+    <AttentionTab
+      key={item.key}
+      icon={icons[item.key]}
+      label={item.label}
+      value={item.value}
+      newCount={item.newCount}
+      selected={item.key === selected?.key}
+      onSelect={() => setChosen(item.key)}
+    />
+  );
 
   return (
     <section aria-labelledby="attention-heading" className="flex flex-col gap-4">
@@ -87,106 +110,30 @@ export function NeedsAttention({ items }: { items: AttentionItem[] | undefined }
             aria-label="Needs your attention"
             className="flex [scrollbar-width:none] gap-3 overflow-x-auto"
           >
-            {items.map((item) => (
-              <AttentionTab
-                key={item.key}
-                icon={icons[item.key]}
-                label={item.label}
-                value={item.value}
-                newCount={item.newCount}
-                selected={item.key === selected.key}
-                onSelect={() => setChosen(item.key)}
-              />
-            ))}
-            {/* TODO(api): no billing for patients yet. */}
+            {items.filter((item) => item.key !== "prescription").map(tab)}
+            {/* TODO(api): bills come from the pending patient profile until billing exists. */}
             <AttentionTab
-              icon={WalletIcon}
+              icon={ReceiptIcon}
               label="Outstanding bill"
-              value="Not available yet"
-              muted
+              value={outstandingBill ? formatNaira(outstandingBill) : "Nothing owed"}
+              valueTone={outstandingBill ? "warning" : undefined}
             />
+            {items.filter((item) => item.key === "prescription").map(tab)}
           </div>
-          <SelectedPanel item={selected} />
+          <SelectedPanel item={selected} labResults={labResults} />
         </>
       )}
     </section>
   );
 }
 
-function SelectedPanel({ item }: { item: AttentionItem }) {
+function SelectedPanel({ item, labResults }: { item: AttentionItem; labResults: LabResult[] }) {
   switch (item.key) {
-    case "results": {
-      const { visit } = item;
-      return (
-        <AttentionPanel
-          icon={<FlaskIcon />}
-          tone="warning"
-          title="Recent results"
-          detail={`${plural(visit.labTests.length, "test")} from your visit on ${formatDate(new Date(visit.at))}`}
-          badge={item.newCount > 0 ? <Tag tone="success">New</Tag> : undefined}
-          link={{
-            to: "/patient/health/visits/$visitId",
-            params: { visitId: visit.id },
-            label: "View result",
-          }}
-        >
-          {visit.labTests.map((test) => (
-            <AttentionRow key={test.name} name={test.name}>
-              {/* TODO(api): no result values or reference ranges for patients yet. */}
-              <Tag tone={test.status === "pending" ? "warning" : "success"}>
-                {orderStatusLabel(test.status) ?? "—"}
-              </Tag>
-            </AttentionRow>
-          ))}
-        </AttentionPanel>
-      );
-    }
+    case "results":
+      return <LabResultsPanel visit={item.visit} results={labResults} fresh={item.newCount > 0} />;
     case "medications":
-      return (
-        <AttentionPanel
-          icon={<PillIcon />}
-          tone="info"
-          title="Current medications"
-          detail={`You’re on ${plural(item.drugs.length, "medicine")}`}
-          link={{ to: "/patient/health/medications", label: "View medications" }}
-        >
-          {item.drugs.map((drug) => (
-            <AttentionRow key={drug.id} name={drug.name}>
-              <span className="type-caption text-fg-caption">
-                Since {formatDate(new Date(drug.at))}
-              </span>
-            </AttentionRow>
-          ))}
-        </AttentionPanel>
-      );
+      return <CurrentMedicinesPanel drugs={item.drugs} />;
     case "prescription":
-      return (
-        <AttentionPanel
-          icon={<ReceiptIcon />}
-          tone="success"
-          title="Latest prescription"
-          detail={`Prescribed on ${formatDate(new Date(item.drug.at))}`}
-          badge={item.newCount > 0 ? <Tag tone="success">New</Tag> : undefined}
-          link={{ to: "/patient/health/medications", label: "View prescription" }}
-        >
-          <AttentionRow name={item.drug.name}>
-            <span className="type-caption text-fg-caption">{item.drug.how || "—"}</span>
-          </AttentionRow>
-        </AttentionPanel>
-      );
+      return <PrescriptionPanel drug={item.drug} fresh={item.newCount > 0} />;
   }
-}
-
-function AllCaughtUp() {
-  return (
-    <div className="flex flex-col items-center gap-3 rounded-xl border bg-card px-6 py-16 text-center">
-      <span className="grid size-16 place-content-center rounded-full bg-success-100">
-        <CheckCircleIcon weight="fill" className="size-10 text-success-500" />
-      </span>
-      <p className="type-title-sm text-fg-heading">You’re all caught up</p>
-      <p className="max-w-80 type-body-sm-regular text-fg-caption">
-        New results, medications and bills will show up here as soon as a facility shares them.
-      </p>
-    </div>
-  );
 }

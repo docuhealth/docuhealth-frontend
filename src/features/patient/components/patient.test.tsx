@@ -42,7 +42,7 @@ describe("Patient home", () => {
     expect(screen.getAllByText("Ready").length).toBeGreaterThan(0);
 
     const snapshot = screen.getByRole("region", { name: "Health Snapshot" });
-    expect(within(snapshot).getByText("128/82")).toBeInTheDocument();
+    expect(within(snapshot).getByText("128/80")).toBeInTheDocument();
     expect(snapshot).toHaveTextContent("Higher than healthy");
     // TODO(api): no glucose readings.
     expect(within(snapshot).getByText("Blood glucose")).toBeInTheDocument();
@@ -68,9 +68,9 @@ describe("Patient home, with nothing on record yet", () => {
 describe("Patient health", () => {
   it("counts each kind of record and links the ones with pages", async () => {
     renderWithRouter(<PatientHealth />);
-    expect(await screen.findByText("3 results")).toBeInTheDocument();
-    expect(screen.getByText("1 current · 1 past")).toBeInTheDocument();
-    expect(screen.getByText("3 visits")).toBeInTheDocument();
+    expect(await screen.findByText("5 results")).toBeInTheDocument();
+    expect(screen.getByText("1 current · 6 past")).toBeInTheDocument();
+    expect(screen.getByText("8 visits")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Diagnoses & conditions/ })).toHaveAttribute(
       "href",
       "/patient/health/conditions",
@@ -82,15 +82,14 @@ describe("Patient records", () => {
   it("lists the latest diagnosis as active and earlier ones as past", async () => {
     const { user } = renderWithRouter(<ConditionsPage />);
     expect(await screen.findByText("High blood pressure")).toBeInTheDocument();
-    await user.click(screen.getByRole("tab", { name: "Past (2)" }));
-    expect(await screen.findByText("Malaria")).toBeInTheDocument();
+    await user.click(screen.getByRole("tab", { name: "Past (5)" }));
+    expect((await screen.findAllByText("Malaria")).length).toBe(2);
     expect(screen.queryByText("High blood pressure")).not.toBeInTheDocument();
   });
 
-  it("splits visits into upcoming and past", async () => {
-    const { user } = renderWithRouter(<VisitsPage />);
-    expect(await screen.findByText("Booked")).toBeInTheDocument();
-    await user.click(screen.getByRole("tab", { name: "Past (3)" }));
+  it("lists upcoming and past visits together", async () => {
+    renderWithRouter(<VisitsPage />);
+    expect((await screen.findAllByText("Booked")).length).toBeGreaterThan(0);
     expect(await screen.findByText("Fever and body aches")).toBeInTheDocument();
   });
 

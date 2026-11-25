@@ -284,3 +284,40 @@ are the asks.
    emergency contact, but `signup/complete` takes only `signup_token`, `nin` and `password`, and no
    patient endpoint stores either (the profile update takes name and phone only). They're left out
    of the screen until the API takes them; please say if and where they'll go.
+
+### Patient dashboard (25 Nov)
+
+The patient screens are built to the designs. What the API serves to a signed-in patient today:
+visit summaries (`GET /api/records/summaries/{hin}`), appointments
+(`GET /api/hospital-ops/appointments/mine`), drug records
+(`GET /api/pharmacy/patients/drug-records`) and vital signs (`GET /api/records/vital-signs/mine`).
+Everything below has no patient endpoint. The app keeps the shape it needs in
+`src/features/patient/api/pending.ts`; until an endpoint exists those screens show their empty
+states on staging and live (the mock dev server fills them with demo data).
+
+1. **Allergies.** A list per patient: name, kind (food / medicine / material), reaction, severity
+   (severe / moderate / mild), active or past, facility, who recorded it, when, what to avoid, and
+   the care team's note. SOAP notes have a free-text `drug_history_allergies`; that isn't enough to
+   list them.
+2. **Care plans.** `GET /api/records/patients/{hin}/care-plans` is nurse-only. Patients need their
+   own: name, status (active / completed / stopped), facility, who set it, started, updated, next
+   review, ended, care team, the diagnosis it's for, a goal (target, latest reading, on track), and
+   its items (medicine, home monitoring, visit, test).
+3. **Lab result values.** A visit summary's `lab_tests_info` has each test's name and status only.
+   Patients need each test's values with unit and a normal / low / high flag (the home page's
+   "1 of 3 results slightly outside range").
+4. **Scan reports and images.** `scans_info` has name and status only. Patients need the progress
+   (scanned, images captured, specialist reviewing, report ready, with times), number of images and
+   their URLs, body part, type, who reported it and when, the impression and the full findings.
+5. **Visit type.** Each visit summary should say if it was outpatient, an admission (nights stayed,
+   discharged or not), an emergency or a lab-only visit, and list next steps (follow-up booked,
+   repeat tests). The Visits filter (Outpatient / Admissions / Emergency) depends on it.
+6. **Medicine details.** Drug records lack who prescribed them and where, the pharmacy, who
+   dispensed them, refills, payment status, plain-language instructions and the end date. Please
+   add them (or the prescribing visit's id) to `drug-records`, and type `lab_tests_info`,
+   `scans_info` and `drug_orders_info` in the summary schema (they're `string` but arrive as lists).
+7. **Patient profile.** Blood group, genotype, documents (list and upload), immunizations (doses
+   given and due), the outstanding bill across facilities, and blood glucose readings. None has a
+   patient endpoint. `GET /api/patients/dashboard` returns one SOAP note; please say what it's for.
+8. **Condition status.** A diagnosis has no active / resolved status, ICD code or plain-language
+   explanation, so the app treats the latest visit's diagnosis as active.

@@ -4,7 +4,8 @@ import { cn } from "@/lib/utils";
 
 /**
  * One tab in "Needs your attention": an icon, what it is and its headline (e.g. "Recent Results"
- * over "Full Blood Count"), with how many are new in a green badge. `muted` draws one with nothing to open.
+ * over "Full Blood Count"), with how many are new in a green badge. Without `onSelect` it's a fact
+ * with nothing to open (the outstanding bill), its value tinted by `valueTone`.
  */
 export function AttentionTab({
   icon: TabIcon,
@@ -12,7 +13,7 @@ export function AttentionTab({
   value,
   newCount = 0,
   selected = false,
-  muted = false,
+  valueTone,
   onSelect,
 }: {
   icon: Icon;
@@ -20,7 +21,7 @@ export function AttentionTab({
   value: string;
   newCount?: number;
   selected?: boolean;
-  muted?: boolean;
+  valueTone?: "warning";
   onSelect?: () => void;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
@@ -34,7 +35,7 @@ export function AttentionTab({
   }, [selected]);
   const body = (
     <>
-      <TabIcon className={cn("size-5 shrink-0", muted ? "text-fg-caption" : "text-fg-body")} />
+      <TabIcon className="size-5 shrink-0 text-fg-body" />
       <span className="flex min-w-0 flex-col">
         <span className="flex items-center gap-1.5 type-caption text-fg-caption">
           {label}
@@ -42,7 +43,7 @@ export function AttentionTab({
             <>
               <span
                 aria-hidden
-                className="grid size-3.5 place-content-center rounded-full bg-success-700 text-[0.5625rem] leading-none font-semibold text-white"
+                className="grid size-4 place-content-center rounded-full bg-success-700 type-caption-semibold text-white"
               >
                 {newCount}
               </span>
@@ -53,7 +54,7 @@ export function AttentionTab({
         <span
           className={cn(
             "truncate type-caption-medium",
-            muted ? "text-fg-caption" : "text-fg-heading",
+            valueTone === "warning" ? "text-warning-700" : "text-fg-heading",
           )}
         >
           {value}
@@ -64,7 +65,7 @@ export function AttentionTab({
   const className =
     "flex w-44 shrink-0 items-center gap-2 rounded-lg border border-transparent bg-card px-3 py-2 text-left";
 
-  if (muted) return <div className={className}>{body}</div>;
+  if (!onSelect) return <div className={className}>{body}</div>;
   return (
     <button
       ref={ref}

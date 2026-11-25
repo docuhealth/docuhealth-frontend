@@ -8,9 +8,20 @@ import { notYet } from "@/features/patient/lib/not-yet";
 
 /**
  * The Health page's summary: blood group, genotype, active conditions and allergies.
- * TODO(api): blood group, genotype and allergies aren't in any patient endpoint.
+ * TODO(api): blood group, genotype and allergies are pending records (api/pending.ts).
  */
-export function HealthSummary({ activeConditions }: { activeConditions: number | null }) {
+export function HealthSummary({
+  bloodGroup,
+  genotype,
+  activeConditions,
+  allergies,
+}: {
+  bloodGroup: string | null;
+  genotype: string | null;
+  activeConditions: number | null;
+  /** e.g. "Penicillin, +2 more". */
+  allergies: string | null;
+}) {
   return (
     <section aria-labelledby="summary-heading" className="flex flex-col gap-3">
       <div className="flex items-center justify-between rounded-lg bg-card px-4 py-3">
@@ -28,14 +39,14 @@ export function HealthSummary({ activeConditions }: { activeConditions: number |
         </button>
       </div>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <SummaryTile icon={bloodGroupIconUrl} label="Blood group" value={null} />
-        <SummaryTile icon={genotypeIconUrl} label="Genotype" value={null} />
+        <SummaryTile icon={bloodGroupIconUrl} label="Blood group" value={bloodGroup} />
+        <SummaryTile icon={genotypeIconUrl} label="Genotype" value={genotype} />
         <SummaryTile
           icon={conditionsIconUrl}
           label="Conditions"
           value={activeConditions ? `${activeConditions} Active` : null}
         />
-        <SummaryTile icon={allergiesIconUrl} label="Allergies" value={null} alert />
+        <SummaryTile icon={allergiesIconUrl} label="Allergies" value={allergies} alert />
       </div>
     </section>
   );
