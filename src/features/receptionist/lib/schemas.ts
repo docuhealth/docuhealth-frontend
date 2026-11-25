@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { toIsoDate } from "@/lib/date-input";
 import { ADULT_AGE } from "@/lib/format";
+import { isNigerianMobile, NIGERIAN_MOBILE_MESSAGE } from "@/lib/phone";
 import {
   type CancellationReason,
   cancellationReasonLabels,
@@ -13,6 +14,8 @@ import {
 } from "@/features/receptionist/api/schemas";
 
 const required = (message: string) => z.string().trim().min(1, message);
+/** A number the API will text a code to: Nigerian only. */
+const nigerianPhone = z.string().trim().refine(isNigerianMobile, NIGERIAN_MOBILE_MESSAGE);
 
 /** How many digits the emailed verification code has. */
 export const CODE_LENGTH = 6;
@@ -69,6 +72,7 @@ export const registerGuardianSchema = z
     firstName: required("Enter the guardian's first name"),
     lastName: required("Enter the guardian's last name"),
     email: z.union([z.literal(""), z.email("Enter a valid email address")]),
+    phone: nigerianPhone,
   })
   .refine(passwordsMatch.check, passwordsMatch.issue);
 

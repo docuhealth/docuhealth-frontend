@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { isThrottled, retryAfterSeconds } from "@/lib/api";
 
 /**
@@ -22,15 +22,15 @@ export function useResendCooldown() {
     return () => clearTimeout(timer);
   }, [secondsLeft]);
 
-  return {
-    secondsLeft,
-    started: () => setSecondsLeft(SHORTEST_WAIT),
-    refused: (error: unknown) => {
-      if (!isThrottled(error)) return false;
-      setSecondsLeft(retryAfterSeconds(error) ?? SHORTEST_WAIT);
-      return true;
-    },
-  };
+  // Stable, so a screen can start the wait from an effect.
+  const started = useCallback(() => setSecondsLeft(SHORTEST_WAIT), []);
+  const refused = useCallback((error: unknown) => {
+    if (!isThrottled(error)) return false;
+    setSecondsLeft(retryAfterSeconds(error) ?? SHORTEST_WAIT);
+    return true;
+  }, []);
+
+  return { secondsLeft, started, refused };
 }
 
 /** "Resend code in 1:05", for the button while it waits. */

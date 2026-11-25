@@ -37,6 +37,15 @@ export function IndividualSignUp() {
   const verifyCodeMutation = useVerifyPatientSignupCode();
   const completeSignupMutation = useCompletePatientSignup();
 
+  /** Both contacts are sent; `verify_by` names the one that gets the code and becomes the login. */
+  const contactOf = ({ contact }: IndividualInfoValues) => ({
+    phone: contact.phone.trim(),
+    email: contact.email.trim(),
+    verify_by: contact.method,
+  });
+  const typedContact = ({ contact }: IndividualInfoValues) =>
+    (contact.method === "phone" ? contact.phone : contact.email).trim();
+
   async function sendSignupCode(values: IndividualInfoValues) {
     const { destination } = await startSignupMutation.mutateAsync({
       firstname: values.firstName.trim(),
@@ -44,11 +53,9 @@ export function IndividualSignUp() {
       middlename: values.otherName.trim() || undefined,
       gender: values.gender,
       dob: values.dob,
-      email: values.email.trim(),
-      phone: values.phone.trim(),
-      verify_by: "email",
+      ...contactOf(values),
     });
-    setSentTo(destination ?? values.email.trim());
+    setSentTo(destination ?? typedContact(values));
   }
 
   async function handleStartSignup(values: IndividualInfoValues) {
@@ -64,11 +71,7 @@ export function IndividualSignUp() {
   async function handleVerifyCode(code: string) {
     if (!info) return;
     try {
-      const response = await verifyCodeMutation.mutateAsync({
-        email: info.email.trim(),
-        verify_by: "email",
-        code,
-      });
+      const response = await verifyCodeMutation.mutateAsync({ ...contactOf(info), code });
       setSignupToken(response.signup_token);
       setStep(3);
     } catch (error) {
@@ -87,7 +90,7 @@ export function IndividualSignUp() {
       });
       const session = buildSessionFromLoginResponse(response, {
         accountType: "patient",
-        identifier: info.email.trim(),
+        identifier: typedContact(info),
         fallbackName: `${info.firstName.trim()} ${info.lastName.trim()}`,
       });
       useAuthStore.getState().setSession(session);
@@ -107,10 +110,10 @@ export function IndividualSignUp() {
           </p>
         </AuthNotice>
         <div className="flex flex-col gap-3">
-          <Button asChild className="h-12 w-full">
+          <Button asChild className="h-12 w-full rounded-full">
             <Link to="/login">Log in</Link>
           </Button>
-          <Button asChild variant="outline" className="h-12 w-full bg-card">
+          <Button asChild variant="outline" className="h-12 w-full rounded-full bg-card">
             <Link to="/forgot-password">Reset password</Link>
           </Button>
         </div>
@@ -138,9 +141,10 @@ export function IndividualSignUp() {
     return (
       <VerifyCodeForm
         sentTo={sentTo}
+        channel={info.contact.method === "phone" ? "sms" : "email"}
         step={2}
         totalSteps={TOTAL_STEPS}
-        onChangeEmail={() => setStep(1)}
+        onEdit={() => setStep(1)}
         onVerified={handleVerifyCode}
         onResend={async () => {
           await sendSignupCode(info);

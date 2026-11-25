@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isNigerianMobile, NIGERIAN_MOBILE_MESSAGE } from "@/lib/phone";
 
 const email = z.email("Enter a valid email address");
 const phone = z
@@ -46,15 +47,15 @@ export type LoginValues = z.infer<typeof patientLoginSchema>;
 export const forgotPasswordSchema = z.object({
   identifier: z.string().trim().min(1, "Enter your email address").pipe(email),
 });
-/** A patient reset: their email, or their phone (the API texts the code to Nigerian numbers). */
+/** A patient reset: their email, or their Nigerian phone (the API texts the code to it). */
 export const patientForgotPasswordSchema = z.object({
   identifier: z
     .string()
     .trim()
     .min(1, "Enter your email address or phone number")
     .refine(
-      (val) => email.safeParse(val).success || phone.safeParse(val).success,
-      "Enter a valid email address or phone number",
+      (val) => email.safeParse(val).success || isNigerianMobile(val),
+      "Enter a valid email address, or a Nigerian phone number like 0803 123 4567",
     ),
 });
 export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
@@ -84,6 +85,34 @@ export const genderLabels = {
 } as const;
 const genders = ["male", "female"] as const;
 
+/**
+ * How a patient signing up is reached: both a Nigerian phone number and an email, both sent.
+ * `method` only says which one gets the code (`verify_by`) and becomes the login: the phone by
+ * default. Nested, so it's checked even while other fields are still wrong.
+ */
+const signupContactSchema = z
+  .object({
+    method: z.enum(["phone", "email"]),
+    phone: z.string().trim(),
+    email: z.string().trim(),
+  })
+  .superRefine((contact, context) => {
+    if (!isNigerianMobile(contact.phone)) {
+      context.addIssue({
+        code: "custom",
+        path: ["phone"],
+        message: contact.phone ? NIGERIAN_MOBILE_MESSAGE : "Enter your phone number",
+      });
+    }
+    if (!email.safeParse(contact.email).success) {
+      context.addIssue({
+        code: "custom",
+        path: ["email"],
+        message: contact.email ? "Enter a valid email address" : "Enter your email address",
+      });
+    }
+  });
+
 /** Step 1 of the individual sign-up. */
 export const individualInfoSchema = z.object({
   firstName: z.string().trim().min(1, "Enter your first name"),
@@ -98,8 +127,7 @@ export const individualInfoSchema = z.object({
       const parsed = new Date(`${value}T00:00:00`);
       return !Number.isNaN(parsed.getTime()) && parsed <= new Date();
     }, "Date of birth cannot be in the future"),
-  email,
-  phone,
+  contact: signupContactSchema,
   acceptTerms: z.literal(true, "Accept the Terms and Privacy Policy to continue"),
 });
 export type IndividualInfoValues = z.infer<typeof individualInfoSchema>;

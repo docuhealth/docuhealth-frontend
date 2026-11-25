@@ -110,9 +110,10 @@ export function PasswordReset({ audience }: { audience: keyof typeof copy }) {
     return (
       <VerifyCodeForm
         sentTo={identifier}
+        channel={identifier.includes("@") ? "email" : "sms"}
         title={allowPhone ? "Enter your code" : "Verify your email"}
         login={{ prompt: "Remember your password?", to: loginTo }}
-        onChangeEmail={() => setStep("identifier")}
+        onEdit={() => setStep("identifier")}
         onVerified={verifyCode}
         onResend={async () => {
           await forgotPasswordMutation.mutateAsync({

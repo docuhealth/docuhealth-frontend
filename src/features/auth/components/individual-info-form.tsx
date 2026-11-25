@@ -1,6 +1,6 @@
 import { CaretRightIcon, EnvelopeSimpleIcon, PhoneIcon } from "@phosphor-icons/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { DateInput } from "@/components/date-input";
 import { RequiredMark } from "@/components/required-mark";
 import { Button } from "@/components/ui/button";
@@ -24,10 +24,14 @@ import {
   type IndividualInfoValues,
 } from "@/features/auth/lib/schemas";
 import { LoginPrompt } from "@/features/auth/components/auth-header";
+import { NIGERIAN_MOBILE_PLACEHOLDER } from "@/lib/phone";
 
 const TODAY = new Date();
 
-/** Step 1 of the individual sign-up: who the patient is and how to reach them. */
+/**
+ * Step 1 of the individual sign-up: who the patient is, their phone number and email. The code
+ * goes to the phone (or, switched, the email), which becomes how they log in.
+ */
 export function IndividualInfoForm({
   step,
   totalSteps,
@@ -48,11 +52,15 @@ export function IndividualInfoForm({
         lastName: "",
         otherName: "",
         dob: "",
-        email: "",
-        phone: "",
+        contact: { method: "phone", phone: "", email: "" },
       },
   });
   const { errors, isSubmitting } = form.formState;
+  const method = useWatch({ control: form.control, name: "contact.method" });
+
+  function switchContact() {
+    form.setValue("contact.method", method === "phone" ? "email" : "phone");
+  }
 
   async function onSubmit(values: IndividualInfoValues) {
     await onContinue(values);
@@ -173,7 +181,35 @@ export function IndividualInfoForm({
             )}
           />
 
-          <Field data-invalid={!!errors.email}>
+          {/* Both are required and sent; the code goes to the chosen one (the phone first). */}
+          <Field data-invalid={!!errors.contact?.phone}>
+            <FieldLabel htmlFor="phone" className="gap-1">
+              Phone Number <RequiredMark />
+            </FieldLabel>
+            <InputGroup className="bg-card">
+              <InputGroupInput
+                id="phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel-national"
+                placeholder={NIGERIAN_MOBILE_PLACEHOLDER}
+                aria-required
+                aria-invalid={!!errors.contact?.phone}
+                {...form.register("contact.phone")}
+              />
+              <InputGroupAddon>
+                <PhoneIcon />
+              </InputGroupAddon>
+            </InputGroup>
+            <FieldError errors={[errors.contact?.phone]} />
+            {method === "phone" && (
+              <CodeGoesHere onSwitch={switchContact} switchLabel="Use email instead">
+                We’ll text your code to this number.
+              </CodeGoesHere>
+            )}
+          </Field>
+
+          <Field data-invalid={!!errors.contact?.email}>
             <FieldLabel htmlFor="email" className="gap-1">
               Email <RequiredMark />
             </FieldLabel>
@@ -184,35 +220,19 @@ export function IndividualInfoForm({
                 autoComplete="email"
                 placeholder="you@email.com"
                 aria-required
-                aria-invalid={!!errors.email}
-                {...form.register("email")}
+                aria-invalid={!!errors.contact?.email}
+                {...form.register("contact.email")}
               />
               <InputGroupAddon>
                 <EnvelopeSimpleIcon />
               </InputGroupAddon>
             </InputGroup>
-            <FieldError errors={[errors.email]} />
-          </Field>
-
-          <Field data-invalid={!!errors.phone}>
-            <FieldLabel htmlFor="phone" className="gap-1">
-              Phone Number <RequiredMark />
-            </FieldLabel>
-            <InputGroup className="bg-card">
-              <InputGroupInput
-                id="phone"
-                type="tel"
-                autoComplete="tel"
-                placeholder="+234-000-000-0000"
-                aria-required
-                aria-invalid={!!errors.phone}
-                {...form.register("phone")}
-              />
-              <InputGroupAddon>
-                <PhoneIcon />
-              </InputGroupAddon>
-            </InputGroup>
-            <FieldError errors={[errors.phone]} />
+            <FieldError errors={[errors.contact?.email]} />
+            {method === "email" && (
+              <CodeGoesHere onSwitch={switchContact} switchLabel="Use phone number instead">
+                We’ll email your code to this address.
+              </CodeGoesHere>
+            )}
           </Field>
 
           <Controller
@@ -258,7 +278,7 @@ export function IndividualInfoForm({
             )}
           />
 
-          <Button type="submit" loading={isSubmitting} className="mt-3 h-12 w-full">
+          <Button type="submit" loading={isSubmitting} className="mt-3 h-12 w-full rounded-full">
             Continue
             <CaretRightIcon data-icon="inline-end" />
           </Button>
@@ -266,5 +286,29 @@ export function IndividualInfoForm({
         </FieldGroup>
       </form>
     </div>
+  );
+}
+
+/** Says the code goes to this field, with a link to send it to the other one instead. */
+function CodeGoesHere({
+  children,
+  switchLabel,
+  onSwitch,
+}: {
+  children: string;
+  switchLabel: string;
+  onSwitch: () => void;
+}) {
+  return (
+    <p className="type-caption text-fg-caption">
+      {children}{" "}
+      <button
+        type="button"
+        onClick={onSwitch}
+        className="text-primary underline underline-offset-2"
+      >
+        {switchLabel}
+      </button>
+    </p>
   );
 }

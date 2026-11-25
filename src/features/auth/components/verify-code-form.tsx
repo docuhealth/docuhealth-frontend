@@ -1,4 +1,4 @@
-import { CaretRightIcon } from "@phosphor-icons/react";
+import { CaretRightIcon, ClockCounterClockwiseIcon, PencilSimpleIcon } from "@phosphor-icons/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { LinkProps } from "@tanstack/react-router";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
@@ -15,31 +15,36 @@ import { OTP_LENGTH, verifyCodeSchema, type VerifyCodeValues } from "@/features/
 import { formatWait, useResendCooldown } from "@/hooks/use-resend-cooldown";
 import { getErrorMessage } from "@/lib/api";
 
+const channelLabels = { sms: "SMS", email: "email" } as const;
+
 /**
- * Confirms an email address or phone number with the code we sent to it — a sign-up step, the
- * middle of a password reset, or admin email verification. The step bar shows only when `step`
- * and `totalSteps` are given. After a resend, or when the API says it's too soon, "Resend Code"
- * waits and counts down.
+ * Confirms a phone number or an email with the code we sent to it: a sign-up step, the middle of
+ * a password reset, or admin email verification. The step bar shows only when `step` and
+ * `totalSteps` are given. A code was just sent, so "Send again" counts down first (and again
+ * after each resend, or when the API says it's too soon); "Edit number" goes back to change it.
  */
 export function VerifyCodeForm({
   sentTo,
+  channel = "email",
   step,
   totalSteps,
   title = "Verify account",
   login = { prompt: "Already have an account?", to: "/login" },
-  onChangeEmail,
+  onEdit,
   onVerified,
   onResend,
 }: {
   /** Where the code went, as the API reports it (`a***@example.com`, `+234••••••1234`). */
   sentTo: string;
+  /** How it went: by text message or by email. */
+  channel?: keyof typeof channelLabels;
   step?: number;
   totalSteps?: number;
   title?: string;
   /** Prompt and target of the "Log in" link under the button. Pass `null` to hide. */
   login?: { prompt: string; to: LinkProps["to"] } | null;
-  /** Go back to the step where the email or phone was entered. */
-  onChangeEmail?: () => void;
+  /** Go back to the step where the number or email was entered. */
+  onEdit?: () => void;
   onVerified: (code: string) => void | Promise<void>;
   onResend?: () => void | Promise<void>;
 }) {
@@ -50,19 +55,22 @@ export function VerifyCodeForm({
   const { isSubmitting } = form.formState;
   const [isResending, setIsResending] = useState(false);
   const cooldown = useResendCooldown();
+  const { started } = cooldown;
+  const canResend = !!onResend;
 
   // The code is the only thing to do on this step, so start typing straight away.
   useEffect(() => form.setFocus("code"), [form]);
+  // A code was sent just before this step opened, so the next one waits.
+  useEffect(() => {
+    if (canResend) started();
+  }, [canResend, started]);
 
   async function onSubmit(values: VerifyCodeValues) {
     await onVerified(values.code);
   }
 
   async function resendCode() {
-    if (!onResend) {
-      toast.success(`We sent a new code to ${sentTo}.`);
-      return;
-    }
+    if (!onResend) return;
     try {
       setIsResending(true);
       await onResend();
@@ -75,6 +83,8 @@ export function VerifyCodeForm({
     }
   }
 
+  const waiting = cooldown.secondsLeft > 0;
+
   return (
     <div className="flex flex-col gap-10">
       {step !== undefined && totalSteps !== undefined && (
@@ -84,26 +94,10 @@ export function VerifyCodeForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8" noValidate>
         <AuthHeader
           title={title}
-          description={
-            <>
-              Enter the {OTP_LENGTH}-digit code we sent to {sentTo}.
-              {onChangeEmail && (
-                <>
-                  {" "}
-                  <button
-                    type="button"
-                    onClick={onChangeEmail}
-                    className="text-primary underline underline-offset-2"
-                  >
-                    Change
-                  </button>
-                </>
-              )}
-            </>
-          }
+          description={`Enter the ${OTP_LENGTH}-digit code sent by ${channelLabels[channel]} to ${sentTo}`}
         />
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-5">
           <Controller
             name="code"
             control={form.control}
@@ -129,7 +123,7 @@ export function VerifyCodeForm({
                         index={index}
                         placeholder="-"
                         aria-invalid={fieldState.invalid}
-                        className="h-18 flex-1 rounded-md border bg-card type-accent-h2 text-fg-heading first:rounded-l-md last:rounded-r-md"
+                        className="aspect-square h-auto max-h-18 flex-1 rounded-lg border bg-card type-accent-h2 text-fg-heading first:rounded-lg last:rounded-lg"
                       />
                     ))}
                   </InputOTPGroup>
@@ -139,27 +133,39 @@ export function VerifyCodeForm({
             )}
           />
 
-          <p className="text-center type-body-sm-regular text-muted-foreground">
-            Didn’t receive the code?{" "}
-            <button
-              type="button"
-              disabled={isResending || cooldown.secondsLeft > 0}
-              onClick={() => void resendCode()}
-              className="text-primary underline underline-offset-2 disabled:opacity-50"
-            >
-              {isResending
-                ? "Sending..."
-                : cooldown.secondsLeft > 0
-                  ? `Resend Code in ${formatWait(cooldown.secondsLeft)}`
-                  : "Resend Code"}
-            </button>
-          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 type-body-sm-regular text-fg-caption">
+            {onResend && (
+              <button
+                type="button"
+                disabled={isResending || waiting}
+                onClick={() => void resendCode()}
+                className="inline-flex items-center gap-1.5 transition-colors enabled:text-primary enabled:hover:underline disabled:cursor-default"
+              >
+                <ClockCounterClockwiseIcon className="size-4" aria-hidden />
+                {isResending
+                  ? "Sending…"
+                  : waiting
+                    ? `Send again in ${formatWait(cooldown.secondsLeft)}`
+                    : "Send again"}
+              </button>
+            )}
+            {onEdit && (
+              <button
+                type="button"
+                onClick={onEdit}
+                className="inline-flex items-center gap-1.5 transition-colors hover:text-fg-heading"
+              >
+                <PencilSimpleIcon className="size-4" aria-hidden />
+                {channel === "sms" ? "Edit number" : "Edit email"}
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col gap-4">
-          <Button type="submit" loading={isSubmitting} className="h-12 w-full">
-            Verify
-            <CaretRightIcon data-icon="inline-end" />
+          <Button type="submit" loading={isSubmitting} className="h-12 w-full rounded-full">
+            {isSubmitting ? "Verify" : "Continue"}
+            {!isSubmitting && <CaretRightIcon data-icon="inline-end" />}
           </Button>
           {login && <LoginPrompt prompt={login.prompt} to={login.to} />}
         </div>

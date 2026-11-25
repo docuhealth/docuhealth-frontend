@@ -211,6 +211,11 @@ with a code, password) and the top bar (name, greeting, log out). Check them onc
 - [ ] Mission, Vision, News, DocuHealth API, Privacy, Terms (patient and hospital tabs), API terms,
       Legal notice.
 - [ ] Patient sign-up and login; hospital registration (`hospital.` → Register).
+- [ ] Patient sign-up asks for a phone number (Nigerian: 0 and ten digits, e.g. 0803 123 4567;
+      anything else is refused with that example) and an email, both required. The code is texted
+      to the phone; **Use email instead** sends it to the email. The next step says "sent by SMS
+      to …" or "sent by email to …", with "Send again" counting down and "Edit number" (or "Edit
+      email") going back.
 - [ ] Sign-up's Terms and Privacy links open the right pages.
 - [ ] Every sign-up step has "Already have an account? Log in" under its button (the facility form:
       "Already registered your facility?").

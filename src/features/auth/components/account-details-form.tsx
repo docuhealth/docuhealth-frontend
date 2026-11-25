@@ -108,8 +108,8 @@ export function AccountDetailsForm({
             <FieldError errors={[errors.confirmPassword]} />
           </Field>
 
-          <Button type="submit" loading={isSubmitting} className="mt-3 h-12 w-full">
-            Register
+          <Button type="submit" loading={isSubmitting} className="mt-3 h-12 w-full rounded-full">
+            Create Account
             <CaretRightIcon data-icon="inline-end" />
           </Button>
           <LoginPrompt to="/login" />

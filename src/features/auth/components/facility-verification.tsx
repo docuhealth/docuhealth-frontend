@@ -174,7 +174,7 @@ export function FacilityVerification({
         totalSteps={TOTAL_STEPS}
         title="Verify admin email"
         login={null}
-        onChangeEmail={() => setStep("admin")}
+        onEdit={() => setStep("admin")}
         onVerified={handleVerifyAdminOtp}
         onResend={async () => {
           await sendAdminDetails(admin);

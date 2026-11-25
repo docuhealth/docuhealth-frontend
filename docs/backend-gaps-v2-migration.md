@@ -275,3 +275,12 @@ are the asks.
    allowed list. Please make sure that list has the v2 sites (`v2.docuhealthservices.net` and its
    `hospital.`, `admin.` subdomains), or facility applications, staff creation and arms from v2
    fail with "This link must point to a Docuhealth site."
+5. **Refresh docs don't match the API.** `POST /api/auth/refresh` is documented as taking
+   `{ "refresh": "<token>" }` and returning `access`. On staging (25 Nov) the login sets the refresh
+   token as an `HttpOnly` cookie (`refresh_token`), the refresh works with that cookie and an empty
+   body (200, `access_token`), and `{ "refresh": … }` in the body is refused (400). The app uses
+   the cookie; please fix the schema so nobody builds the body version.
+6. **Patient sign-up's last step.** The redesigned step 3 also asks for a home address and an
+   emergency contact, but `signup/complete` takes only `signup_token`, `nin` and `password`, and no
+   patient endpoint stores either (the profile update takes name and phone only). They're left out
+   of the screen until the API takes them; please say if and where they'll go.

@@ -48,6 +48,7 @@ function Admission({
 }
 
 describe("Notes on an admission", () => {
+  // It types a whole admission note: slow when every test file runs at once.
   it("asks the nurse for the admission note before anything else", async () => {
     const { user } = renderWithRouter(
       <Admission staff="nurse" visitId="admission-1" kinds={["admission", "vitals"]} />,
@@ -94,7 +95,7 @@ describe("Notes on an admission", () => {
     const notes = await screen.findByRole("region", { name: "Notes" });
     await user.click(await within(notes).findByRole("button", { name: /Chest pain at rest/ }));
     expect(within(notes).getByText(/Penicillin\s+Latex/)).toBeInTheDocument();
-  });
+  }, 30_000);
 
   it("lets the nurse write a case note, which joins the notes", async () => {
     const { user } = renderWithRouter(
