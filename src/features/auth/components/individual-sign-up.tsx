@@ -3,7 +3,6 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
-  buildSessionFromLoginResponse,
   useCompletePatientSignup,
   useStartPatientSignup,
   useVerifyPatientSignupCode,
@@ -16,7 +15,6 @@ import { IndividualInfoForm } from "@/features/auth/components/individual-info-f
 import { VerifyCodeForm } from "@/features/auth/components/verify-code-form";
 import type { AccountDetailsValues, IndividualInfoValues } from "@/features/auth/lib/schemas";
 import { errorCode, getErrorMessage } from "@/lib/api";
-import { getPostLoginDestination, useAuthStore } from "@/stores/auth-store";
 
 const TOTAL_STEPS = 3;
 
@@ -88,13 +86,8 @@ export function IndividualSignUp() {
         nin: details.nin,
         password: details.password,
       });
-      const session = buildSessionFromLoginResponse(response, {
-        accountType: "patient",
-        identifier: typedContact(info),
-        fallbackName: `${info.firstName.trim()} ${info.lastName.trim()}`,
-      });
-      useAuthStore.getState().setSession(session);
-      setHin(session.user.hin ?? String(response.hin ?? ""));
+      // The API signs them in, but they log in themselves next (a fresh start on the login page).
+      setHin(String(response.hin ?? response.user?.hin ?? ""));
     } catch (error) {
       toast.error(getErrorMessage(error));
     }
@@ -129,10 +122,7 @@ export function IndividualSignUp() {
           open={hin !== undefined}
           hin={hin ?? ""}
           loginWith={info.contact.method === "phone" ? "phone number" : "email"}
-          onDone={() => {
-            const destination = getPostLoginDestination(useAuthStore.getState().session);
-            void navigate({ to: destination });
-          }}
+          onDone={() => void navigate({ to: "/login" })}
         />
       </>
     );

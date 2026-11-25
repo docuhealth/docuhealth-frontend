@@ -149,7 +149,7 @@ describe("Patient sign-up", () => {
     );
   });
 
-  it("signs the new patient in, and sends them to their dashboard", async () => {
+  it("ends with the HIN and a way to the login page, without signing them in", async () => {
     const { user } = renderWithRouter(<IndividualSignUp />);
     await fillDetails(user);
     await fill(user, screen.getByLabelText(/Phone Number/), "0803 123 4567");
@@ -164,11 +164,10 @@ describe("Patient sign-up", () => {
     await fill(user, screen.getByLabelText(/Confirm Password/), "Password123!");
     await user.click(screen.getByRole("button", { name: "Create Account" }));
 
-    // signup/complete answers like login: the patient is signed in, not sent to log in.
     expect(
-      await screen.findByText(/you’re signed in\. Next time, log in with your phone number/),
+      await screen.findByText(/Log in with your phone number and the password you just set/),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Go to my dashboard" })).toBeInTheDocument();
-    expect(useAuthStore.getState().session).toMatchObject({ accountType: "patient" });
+    expect(screen.getByRole("button", { name: "Log in" })).toBeInTheDocument();
+    expect(useAuthStore.getState().session).toBeNull();
   });
 });
