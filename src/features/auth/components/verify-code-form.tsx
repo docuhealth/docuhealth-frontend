@@ -163,7 +163,7 @@ export function VerifyCodeForm({
         </div>
 
         <div className="flex flex-col gap-4">
-          <Button type="submit" loading={isSubmitting} className="h-12 w-full rounded-full">
+          <Button type="submit" loading={isSubmitting} className="h-12 w-full">
             {isSubmitting ? "Verify" : "Continue"}
             {!isSubmitting && <CaretRightIcon data-icon="inline-end" />}
           </Button>

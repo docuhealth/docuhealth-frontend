@@ -1,56 +1,33 @@
-import { SignOutIcon, UserCircleIcon } from "@phosphor-icons/react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import logoUrl from "@/assets/logos/logo.svg";
-import { Button } from "@/components/ui/button";
-import { useLogOut } from "@/hooks/use-log-out";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import {
+  PatientHeadingProvider,
+  PatientSidebar,
+  PatientTopBar,
+} from "@/features/patient/components/patient-shell";
+import { usePatient } from "@/features/patient/lib/use-patient";
 import { requireDashboard } from "@/lib/auth-guards";
-import { useAuthStore } from "@/stores/auth-store";
 
+/** The patient's dashboard (main site): sidebar, top bar and the current page. */
 export const Route = createFileRoute("/patient")({
   beforeLoad: () => requireDashboard("/patient"),
-  component: PatientDashboardPage,
+  component: PatientLayout,
 });
 
-function PatientDashboardPage() {
-  const session = useAuthStore((state) => state.session);
-  const logOut = useLogOut();
-
+function PatientLayout() {
+  const { name } = usePatient();
   return (
-    <div className="min-h-svh bg-background">
-      <title>Patient portal · DocuHealth</title>
-      <header className="border-b bg-card">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-8">
-          <Link to="/" className="flex items-center gap-2">
-            <img src={logoUrl} alt="" width={32} height={30} />
-            <span className="type-accent-h2 text-primary">DocuHealth</span>
-          </Link>
-          <Button variant="outline" size="sm" onClick={() => void logOut()}>
-            <SignOutIcon data-icon="inline-start" />
-            Log out
-          </Button>
-        </div>
-      </header>
-
-      <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:px-8">
-        <div className="flex items-start gap-4 rounded-xl border bg-card p-6">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <UserCircleIcon className="size-7" />
+    <SidebarProvider>
+      <PatientSidebar />
+      <SidebarInset className="min-w-0 bg-background">
+        <PatientHeadingProvider
+          render={(heading) => <PatientTopBar heading={heading} name={name} />}
+        >
+          <div className="flex-1 p-4 sm:p-6">
+            <Outlet />
           </div>
-          <div className="flex flex-col gap-1">
-            <h1 className="type-h3 text-fg-heading">
-              Welcome{session?.user.name ? `, ${session.user.name}` : ""}
-            </h1>
-            <p className="type-body-sm-regular text-muted-foreground">
-              Your DocuHealth patient account is active and verified.
-            </p>
-            {session?.user.hin && (
-              <p className="mt-2 type-body-sm text-fg-heading">
-                HIN: <span className="font-mono text-primary">{session.user.hin}</span>
-              </p>
-            )}
-          </div>
-        </div>
-      </main>
-    </div>
+        </PatientHeadingProvider>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

@@ -1,4 +1,5 @@
 import { Link, type LinkProps, useMatchRoute } from "@tanstack/react-router";
+import type { ComponentType } from "react";
 import logoUrl from "@/assets/logos/logo.svg";
 import helpIconUrl from "@/assets/svgs/help.svg";
 import logoutIconUrl from "@/assets/svgs/logout.svg";
@@ -19,8 +20,8 @@ import { useLogOut } from "@/hooks/use-log-out";
 export type NavItem = {
   to: LinkProps["to"];
   label: string;
-  /** URL of the link's icon (an SVG from `src/assets/svgs`). */
-  icon: string;
+  /** The link's icon: an SVG's URL (from `src/assets/svgs`) or an icon component (Phosphor). */
+  icon: string | ComponentType<{ className?: string }>;
   /** Unread count shown on the right. */
   badge?: number;
 };
@@ -32,14 +33,18 @@ const itemClass =
  * An SVG icon drawn in the text color, so it turns white on the active link whatever color the
  * file itself uses.
  */
-function NavIcon({ src }: { src: string }) {
+function NavIcon({ src }: { src: NavItem["icon"] }) {
+  if (typeof src !== "string") {
+    const Icon = src;
+    return <Icon className="size-6 shrink-0" />;
+  }
   const mask = `url("${src}") center / contain no-repeat`;
   return (
     <span aria-hidden className="size-6 shrink-0 bg-current" style={{ mask, WebkitMask: mask }} />
   );
 }
 
-/** A titled group of links in a `DashboardSidebar`. */
+/** A group of links in a `DashboardSidebar`; `label` titles it (leave it empty for none). */
 export type NavGroup = { label: string; items: NavItem[] };
 
 /**
@@ -50,10 +55,13 @@ export function DashboardSidebar({
   home,
   groups,
   help,
+  footerItems = [],
 }: {
   home: LinkProps["to"];
   groups: NavGroup[];
   help: LinkProps["to"];
+  /** Links at the bottom, above Help & Support (e.g. Settings). */
+  footerItems?: NavItem[];
 }) {
   const matchRoute = useMatchRoute();
   const { setOpenMobile } = useSidebar();
@@ -97,9 +105,11 @@ export function DashboardSidebar({
       <SidebarContent className="gap-4 px-2 pt-4">
         {groups.map((group) => (
           <SidebarGroup key={group.label}>
-            <SidebarGroupLabel className="mb-2 h-auto px-5 type-label text-fg-caption">
-              {group.label}
-            </SidebarGroupLabel>
+            {group.label && (
+              <SidebarGroupLabel className="mb-2 h-auto px-5 type-label text-fg-caption">
+                {group.label}
+              </SidebarGroupLabel>
+            )}
             <SidebarMenu className="gap-1">{group.items.map(renderItem)}</SidebarMenu>
           </SidebarGroup>
         ))}
@@ -107,6 +117,7 @@ export function DashboardSidebar({
 
       <SidebarFooter className="px-4 pb-6">
         <SidebarMenu className="gap-1">
+          {footerItems.map(renderItem)}
           {renderItem({ to: help, label: "Help & Support", icon: helpIconUrl })}
           <SidebarMenuItem>
             <SidebarMenuButton className={itemClass} onClick={() => void logOut()}>

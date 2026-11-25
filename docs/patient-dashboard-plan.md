@@ -45,6 +45,23 @@ HIN, search, notifications, avatar.
 `GET /api/patients/dashboard` is documented as returning a SOAP note, which doesn't fit a
 dashboard; it needs checking with a patient account.
 
+## Built (25 Nov)
+
+- Shell: sidebar (with Settings at the bottom), top bar with the page's title over the HIN or
+  counts, and a back link on detail pages. Sections without designs yet show "on its way".
+- Home: upcoming appointment (or "Nothing booked"), needs your attention (recent results,
+  medications, latest prescription; bills not available), health snapshot (BP, weight with the
+  change since the reading before, BMI; glucose not available).
+- Health: record search, documents (upload not available), facilities, health summary, and a
+  card per kind of record with counts.
+- Conditions (active = the latest visit's diagnosis) and their details; Allergies and Care plans
+  (empty: no patient API); Scan results by facility and their details (no images or report yet);
+  Visits (upcoming appointments, past visit summaries) and a visit's summary; Vital signs (latest
+  readings, earlier sets); Medications (current / past, dispensing and prescription dialogs).
+- Not yet: Trends (needs a two-series chart), lab results list, immunizations, the viewer,
+  and the sidebar's other sections.
+- Buttons use the usual shape, not the designs' pills.
+
 ## Needed to finish
 
 - A staging **patient** test account (none of ours is a patient), to read the real replies.

@@ -103,10 +103,10 @@ export function IndividualSignUp() {
           </p>
         </AuthNotice>
         <div className="flex flex-col gap-3">
-          <Button asChild className="h-12 w-full rounded-full">
+          <Button asChild className="h-12 w-full">
             <Link to="/login">Log in</Link>
           </Button>
-          <Button asChild variant="outline" className="h-12 w-full rounded-full bg-card">
+          <Button asChild variant="outline" className="h-12 w-full bg-card">
             <Link to="/forgot-password">Reset password</Link>
           </Button>
         </div>

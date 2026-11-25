@@ -225,3 +225,8 @@ export function formatFileSize(bytes: number) {
   const mb = bytes / 1_000_000;
   return `${mb < 10 ? Number(mb.toFixed(1)) : Math.round(mb)} MB`;
 }
+
+/** A count and its noun: "1 visit", "3 visits" (or `many`, e.g. "staff"). */
+export function plural(count: number, one: string, many = `${one}s`) {
+  return `${count} ${count === 1 ? one : many}`;
+}

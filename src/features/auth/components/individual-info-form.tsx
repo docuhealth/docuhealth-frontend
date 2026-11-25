@@ -278,7 +278,7 @@ export function IndividualInfoForm({
             )}
           />
 
-          <Button type="submit" loading={isSubmitting} className="mt-3 h-12 w-full rounded-full">
+          <Button type="submit" loading={isSubmitting} className="mt-3 h-12 w-full">
             Continue
             <CaretRightIcon data-icon="inline-end" />
           </Button>
