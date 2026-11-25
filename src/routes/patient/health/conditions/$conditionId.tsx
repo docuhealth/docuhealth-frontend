@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ConditionDetails } from "@/features/patient/components/condition-pages";
+import { ConditionDetails } from "@/features/patient/components/condition-details";
 
 export const Route = createFileRoute("/patient/health/conditions/$conditionId")({
   component: Page,

@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PatientComingSoon } from "@/features/patient/components/condition-pages";
+import { ComingSoonPage } from "@/features/patient/components/coming-soon-page";
 
 export const Route = createFileRoute("/patient/settings")({
   component: Page,
 });
 
 function Page() {
-  return <PatientComingSoon title="Settings" />;
+  return <ComingSoonPage title="Settings" />;
 }

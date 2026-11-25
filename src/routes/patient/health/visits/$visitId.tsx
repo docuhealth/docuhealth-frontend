@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { VisitSummaryPage } from "@/features/patient/components/visit-pages";
+import { VisitSummaryPage } from "@/features/patient/components/visit-summary-page";
 
 export const Route = createFileRoute("/patient/health/visits/$visitId")({
   component: Page,

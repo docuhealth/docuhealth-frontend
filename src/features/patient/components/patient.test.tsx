@@ -1,10 +1,11 @@
 import { screen, within } from "@testing-library/react";
 import { HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, it } from "vitest";
-import { ConditionsPage } from "@/features/patient/components/condition-pages";
+import { ConditionsPage } from "@/features/patient/components/conditions-page";
 import { PatientHealth } from "@/features/patient/components/patient-health";
 import { PatientHome } from "@/features/patient/components/patient-home";
-import { MedicationsPage, VisitsPage } from "@/features/patient/components/visit-pages";
+import { MedicationsPage } from "@/features/patient/components/medications-page";
+import { VisitsPage } from "@/features/patient/components/visits-page";
 import { env } from "@/env";
 import { server } from "@/mocks/node";
 import { useAuthStore } from "@/stores/auth-store";
