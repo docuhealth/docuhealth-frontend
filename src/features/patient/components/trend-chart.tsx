@@ -1,9 +1,6 @@
 import { useState } from "react";
-import type { TrendBucket } from "@/features/patient/lib/vitals";
+import type { TrendBucket, TrendSeries } from "@/features/patient/lib/vitals";
 import { cn } from "@/lib/utils";
-
-/** One series on the chart: its name and its bar color (a `bg-*` token class). */
-export type TrendSeries = { name: string; color: string };
 
 /** A round step for about four gridlines up to `max`: 1, 2, 2.5, 4 or 5 times a power of ten. */
 function niceStep(max: number) {

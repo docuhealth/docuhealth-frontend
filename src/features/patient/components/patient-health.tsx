@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import allergiesRecordIconUrl from "@/assets/svgs/allergies-record.svg";
 import carePlansIconUrl from "@/assets/svgs/careplans.svg";
@@ -13,6 +14,7 @@ import visitsIconUrl from "@/assets/svgs/visits.svg";
 import vitalSignsIconUrl from "@/assets/svgs/vital-signs.svg";
 import { Button } from "@/components/ui/button";
 import { allergiesQuery, carePlansQuery, healthProfileQuery } from "@/features/patient/api/pending";
+import { immunizationsQuery } from "@/features/patient/api/pending-immunizations";
 import { appointmentsQuery, drugsQuery, visitMetricsQuery } from "@/features/patient/api/queries";
 import { HealthSummary } from "@/features/patient/components/health-summary";
 import { HealthToolbar } from "@/features/patient/components/health-toolbar";
@@ -21,6 +23,7 @@ import { PageHeading } from "@/features/patient/components/page-heading";
 import { type RecordKind, RecordTile } from "@/features/patient/components/record-tile";
 import { attentionItems } from "@/features/patient/lib/attention";
 import { dated } from "@/features/patient/lib/dated";
+import { splitVaccines } from "@/features/patient/lib/immunizations";
 import { notYet } from "@/features/patient/lib/not-yet";
 import { conditionsOf, facilitiesOf, latestVitals, scansOf } from "@/features/patient/lib/records";
 import { usePatient } from "@/features/patient/lib/use-patient";
@@ -34,9 +37,12 @@ export function PatientHealth() {
   const appointments = useQuery(appointmentsQuery()).data;
   const drugs = useQuery(drugsQuery()).data;
   const metrics = useQuery(visitMetricsQuery()).data;
-  // TODO(api): blood group, genotype, documents, immunizations, allergies and care plans are
-  // pending records (api/pending.ts): demo data on the mock server, empty elsewhere.
+  // TODO(api): blood group, genotype, documents, allergies and care plans are pending records
+  // (api/pending.ts), and immunizations too (api/pending-immunizations.ts): demo data on the mock
+  // server, empty elsewhere.
   const profile = useQuery(healthProfileQuery()).data;
+  const vaccines = useQuery(immunizationsQuery()).data ?? [];
+  const dueVaccines = splitVaccines(vaccines).due.length;
   const allergies = (useQuery(allergiesQuery()).data ?? []).filter((allergy) => allergy.active);
   const carePlans = useQuery(carePlansQuery()).data ?? [];
   const activePlans = carePlans.filter((plan) => plan.status === "active");
@@ -60,6 +66,7 @@ export function PatientHealth() {
       icon: labResultIconUrl,
       detail: labCount ? plural(labCount, "result") : null,
       badge: newResults ? { label: `${newResults} new`, tone: "success" } : null,
+      to: "/patient/health/results",
     },
     {
       label: "Scan results",
@@ -82,10 +89,9 @@ export function PatientHealth() {
     {
       label: "Immunizations",
       icon: immunizationIconUrl,
-      detail: profile?.immunizations.doses ? plural(profile.immunizations.doses, "dose") : null,
-      badge: profile?.immunizations.due
-        ? { label: `${profile.immunizations.due} due`, tone: "warning" }
-        : null,
+      detail: vaccines.length ? `${vaccines.length} recorded` : null,
+      badge: dueVaccines ? { label: `${dueVaccines} due`, tone: "warning" } : null,
+      to: "/patient/health/immunizations",
     },
     {
       label: "Diagnoses & conditions",
@@ -166,8 +172,8 @@ export function PatientHealth() {
               : "No facilities connected yet"
           }
           action={
-            <Button variant="outline" className="h-10 px-5" onClick={notYet("The facilities list")}>
-              View all
+            <Button variant="outline" className="h-10 px-5" asChild>
+              <Link to="/patient/health/facilities">View all</Link>
             </Button>
           }
         />

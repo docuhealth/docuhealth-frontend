@@ -1,7 +1,11 @@
 import type { RequestHandler } from "msw";
 import { admissionHandlers } from "@/mocks/admissions";
 import { patientHandlers } from "@/mocks/patient";
+import { patientAppointmentHandlers } from "@/mocks/patient-appointments";
 import { patientPendingHandlers } from "@/mocks/patient-pending";
+import { patientHealthHandlers } from "@/mocks/patient-health";
+import { patientResultHandlers } from "@/mocks/patient-results";
+import { patientMessageHandlers } from "@/mocks/patient-messages";
 import { patientRecordHandlers } from "@/mocks/patient-records";
 import { auditLogHandlers } from "@/mocks/audit-logs";
 import { authHandlers } from "@/mocks/auth";
@@ -38,7 +42,11 @@ export const handlers: RequestHandler[] = [
   ...noteHandlers,
   ...pharmacyHandlers,
   ...patientHandlers,
+  ...patientAppointmentHandlers,
   ...patientPendingHandlers,
+  ...patientHealthHandlers,
+  ...patientResultHandlers,
+  ...patientMessageHandlers,
   ...patientRecordHandlers,
   ...staffHandlers,
 ];

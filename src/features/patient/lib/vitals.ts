@@ -159,7 +159,7 @@ const monthYear = new Intl.DateTimeFormat("en-GB", { month: "short", year: "nume
 const formatMonthYear = (at: string) => monthYear.format(new Date(at));
 
 /** The newest reading that has `key`, if any. */
-export function latestWith(readings: VitalReading[], key: VitalKey) {
+function latestWith(readings: VitalReading[], key: VitalKey) {
   return readings.find((reading) => vitalValue(reading, key) != null) ?? null;
 }
 
@@ -244,13 +244,69 @@ function chartValues(reading: VitalReading, key: VitalKey): number[] | null {
   return value == null ? null : [value];
 }
 
+/** One series on a trend chart: its name and its bar color (a `bg-*` token class). */
+export type TrendSeries = { name: string; color: string };
+
+/** One reading on a trend: when and where, its numbers (one per series) and how it sits. */
+export type TrendPoint = {
+  id: string;
+  at: string;
+  facility: string | null;
+  values: number[];
+  /** As the pages print it: "128/80", "13.8". */
+  value: string;
+  status: VitalStatus | null;
+};
+
 /**
- * A vital's readings for the chart, oldest first: the latest reading of each year (all, 5Y) or
- * of each month (1Y), for the periods that have one.
+ * Anything the Trends cards can chart: a vital sign, or a lab value over time. `points` are
+ * newest first.
  */
-export function trendBuckets(
-  readings: VitalReading[],
-  key: VitalKey,
+export type TrendMetric = {
+  label: string;
+  unit: string;
+  series: TrendSeries[];
+  band: { low: number; high: number } | null;
+  points: TrendPoint[];
+};
+
+/** A vital sign's readings as a trend. */
+export function vitalTrend(readings: VitalReading[], key: VitalKey): TrendMetric {
+  return {
+    label: vitalLabels[key],
+    unit: vitalUnits[key],
+    series:
+      key === "bloodPressure"
+        ? [
+            { name: "Systolic", color: "bg-info-500" },
+            { name: "Diastolic", color: "bg-warning-500" },
+          ]
+        : [{ name: vitalLabels[key], color: "bg-info-500" }],
+    band: targetRanges[key] ?? null,
+    points: readings.flatMap((reading) => {
+      const values = chartValues(reading, key);
+      return values
+        ? [
+            {
+              id: reading.id,
+              at: reading.at,
+              facility: reading.facility,
+              values,
+              value: vitalValue(reading, key)!,
+              status: vitalStatus(reading, key),
+            },
+          ]
+        : [];
+    }),
+  };
+}
+
+/**
+ * A trend's points for the chart, oldest first: the latest point of each year (all, 5Y) or of
+ * each month (1Y), for the periods that have one. `points` are newest first.
+ */
+export function pointBuckets(
+  points: TrendPoint[],
   period: TrendPeriod,
   now = new Date(),
 ): TrendBucket[] {
@@ -261,14 +317,13 @@ export function trendBuckets(
   if (period !== "all") from.setHours(0, 0, 0, 0);
 
   const buckets = new Map<string, TrendBucket>();
-  for (const reading of readings) {
-    const at = new Date(reading.at);
+  for (const point of points) {
+    const at = new Date(point.at);
     if (period !== "all" && at < from) continue;
-    const values = chartValues(reading, key);
-    if (!values) continue;
+    const { values } = point;
     const bucketKey =
       period === "1y" ? `${at.getFullYear()}-${at.getMonth()}` : String(at.getFullYear());
-    // Newest first, so the first reading in each bucket is its latest.
+    // Newest first, so the first point in each bucket is its latest.
     if (buckets.has(bucketKey)) continue;
     buckets.set(
       bucketKey,
@@ -285,12 +340,22 @@ export function trendBuckets(
   return [...buckets.values()].reverse();
 }
 
+/** A vital's readings for the chart: `pointBuckets` of its trend. */
+export function trendBuckets(
+  readings: VitalReading[],
+  key: VitalKey,
+  period: TrendPeriod,
+  now = new Date(),
+): TrendBucket[] {
+  return pointBuckets(vitalTrend(readings, key).points, period, now);
+}
+
 /**
  * The shaded band on a vital's chart, or null when it has none (weight, height). For blood
  * pressure it spans the diastolic ceiling to the systolic one (85–130): a reading in range has
  * its diastolic bar below the band and its systolic bar inside it.
  */
-export const targetRanges: Partial<Record<VitalKey, { low: number; high: number }>> = {
+const targetRanges: Partial<Record<VitalKey, { low: number; high: number }>> = {
   // One band for both series, as the design draws it: diastolic 80 up to systolic 140.
   bloodPressure: { low: 80, high: 140 },
   heartRate: { low: 60, high: 100 },

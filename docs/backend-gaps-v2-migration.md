@@ -330,3 +330,18 @@ states on staging and live (the mock dev server fills them with demo data).
    patient endpoint. `GET /api/patients/dashboard` returns one SOAP note; please say what it's for.
 8. **Condition status.** A diagnosis has no active / resolved status, ICD code or plain-language
    explanation, so the app treats the latest visit's diagnosis as active.
+9. **Patient appointments.** `POST /api/hospital-ops/appointments/book` is for receptionists.
+   Patients need to book (facility, department, reason, note, a free slot), see free slots per
+   day, reschedule (409 when the slot was taken meanwhile), cancel with a reason, and confirm
+   attendance. Also: departments and visit reasons per facility, the consultation fee, the
+   appointment's length, reminders, the clinician's role and photo, and the facility's address
+   and photo.
+10. **Messages.** No chat endpoint exists: conversations with unread counts, a conversation's
+    messages (with read state and shared records), sending, starting a chat, and the staff a
+    patient can message per facility and role. The sidebar's unread badge needs the count.
+11. **Lab test details.** Beyond item 3's values: reference ranges, specimen and its time, when
+    it was resulted, the lab's name, progress stages (collected, received, testing, ready),
+    amendments (what changed, why, by whom, and the original), word results (e.g. "Negative" with
+    the method), a plain-language explanation, and each value's history for the trend.
+12. **Facilities and immunizations.** A facility's location and photo; immunization records
+    (vaccine, doses with date, brand, batch, who gave them, where; the next dose due).

@@ -1,7 +1,12 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-const tags = { primary: "bg-primary", success: "bg-success-700" };
+const tags = {
+  primary: "bg-primary",
+  info: "bg-info-500",
+  success: "bg-success-700",
+  error: "bg-error-500",
+};
 
 /** A part of a visit summary: a colored tag ("Reason", "Note") over its text, `aside` beside it. */
 export function VisitNoteCard({

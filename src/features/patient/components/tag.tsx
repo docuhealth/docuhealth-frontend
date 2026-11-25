@@ -7,6 +7,7 @@ const tones = {
   info: "bg-info-100 text-info-700",
   neutral: "bg-line text-fg-body",
   brand: "bg-brand-50 text-primary",
+  error: "bg-error-100 text-error-700",
 };
 
 /** A short word on a tint, without a dot: "New", "Normal", "A little high". */

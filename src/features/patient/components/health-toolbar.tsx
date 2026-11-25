@@ -1,8 +1,8 @@
 import { MagnifyingGlassIcon } from "@phosphor-icons/react";
+import { Link } from "@tanstack/react-router";
 import timelineIconUrl from "@/assets/svgs/timeline.svg";
 import trendsIconUrl from "@/assets/svgs/trends.svg";
 import { Button } from "@/components/ui/button";
-import { notYet } from "@/features/patient/lib/not-yet";
 
 /** The Health page's search over the record kinds, and its Trends and Timeline buttons. */
 export function HealthToolbar({
@@ -25,22 +25,17 @@ export function HealthToolbar({
         />
       </label>
       <div className="grid grid-cols-2 gap-3 md:w-96">
-        {/* TODO(design): Trends and Timeline come with the next batch of screens. */}
-        <Button
-          variant="outline"
-          className="h-11 bg-card text-fg-heading"
-          onClick={notYet("Trends")}
-        >
-          <img src={trendsIconUrl} alt="" className="size-4.5" />
-          Trends
+        <Button variant="outline" className="h-11 bg-card text-fg-heading" asChild>
+          <Link to="/patient/health/trends">
+            <img src={trendsIconUrl} alt="" className="size-4.5" />
+            Trends
+          </Link>
         </Button>
-        <Button
-          variant="outline"
-          className="h-11 bg-card text-fg-heading"
-          onClick={notYet("Timeline")}
-        >
-          <img src={timelineIconUrl} alt="" className="size-4.5" />
-          Timeline
+        <Button variant="outline" className="h-11 bg-card text-fg-heading" asChild>
+          <Link to="/patient/health/timeline">
+            <img src={timelineIconUrl} alt="" className="size-4.5" />
+            Timeline
+          </Link>
         </Button>
       </div>
     </div>

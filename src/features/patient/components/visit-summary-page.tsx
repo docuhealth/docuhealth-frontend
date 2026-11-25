@@ -59,7 +59,7 @@ export function VisitSummaryPage({ visitId }: { visitId: string }) {
               ) : (
                 <>
                   {visit.complaint && (
-                    <VisitNoteCard icon={<StethoscopeIcon />} label="Reason" tone="primary">
+                    <VisitNoteCard icon={<StethoscopeIcon />} label="Reason" tone="info">
                       {visit.complaint}
                     </VisitNoteCard>
                   )}

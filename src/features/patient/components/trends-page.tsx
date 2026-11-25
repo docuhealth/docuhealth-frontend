@@ -8,12 +8,15 @@ import { PatientEmpty } from "@/features/patient/components/patient-empty";
 import { TrendLatestCard } from "@/features/patient/components/trend-latest-card";
 import { TrendReadingsCard } from "@/features/patient/components/trend-readings-card";
 import { VitalChips } from "@/features/patient/components/vital-chips";
-import type { VitalKey } from "@/features/patient/lib/vitals";
+import { type VitalKey, vitalKeys, vitalLabels, vitalTrend } from "@/features/patient/lib/vitals";
+
+const vitalOptions = vitalKeys.map((key) => ({ value: key, label: vitalLabels[key] }));
 
 /** One vital sign over time: pick it, see its latest reading, chart and readings. */
 export function TrendsPage() {
   const { data, isError } = useQuery(vitalsQuery());
   const [vital, setVital] = useState<VitalKey>("bloodPressure");
+  const metric = vitalTrend(data ?? [], vital);
 
   return (
     <div className="flex flex-col gap-6">
@@ -31,10 +34,10 @@ export function TrendsPage() {
         />
       ) : (
         <>
-          <VitalChips value={vital} onChange={setVital} />
+          <VitalChips label="Vital sign" value={vital} options={vitalOptions} onChange={setVital} />
           <div className="grid items-start gap-4 lg:grid-cols-[3fr_2fr]">
-            <TrendLatestCard readings={data} vital={vital} />
-            <TrendReadingsCard readings={data} vital={vital} />
+            <TrendLatestCard metric={metric} />
+            <TrendReadingsCard metric={metric} />
           </div>
         </>
       )}

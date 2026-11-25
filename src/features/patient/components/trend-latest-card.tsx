@@ -1,18 +1,8 @@
 import { HospitalIcon } from "@phosphor-icons/react";
 import { useState } from "react";
-import type { VitalReading } from "@/features/patient/api/schemas";
 import { TrendPeriodSwitch } from "@/features/patient/components/trend-period-switch";
-import { TrendChart, type TrendSeries } from "@/features/patient/components/trend-chart";
-import {
-  latestWith,
-  targetRanges,
-  type TrendPeriod,
-  trendBuckets,
-  type VitalKey,
-  vitalLabels,
-  vitalUnits,
-  vitalValue,
-} from "@/features/patient/lib/vitals";
+import { TrendChart } from "@/features/patient/components/trend-chart";
+import { pointBuckets, type TrendMetric, type TrendPeriod } from "@/features/patient/lib/vitals";
 import { formatDay } from "@/lib/format";
 
 const periods: { value: TrendPeriod; label: string }[] = [
@@ -27,25 +17,12 @@ const periodWords: Record<TrendPeriod, string> = {
   "5y": "in the last 5 years",
 };
 
-/** The vital's latest reading, and its history as a bar chart over the chosen period. */
-export function TrendLatestCard({
-  readings,
-  vital,
-}: {
-  readings: VitalReading[];
-  vital: VitalKey;
-}) {
+/** A trend's latest reading (a vital's or a lab value's), and its history as a bar chart. */
+export function TrendLatestCard({ metric }: { metric: TrendMetric }) {
   const [period, setPeriod] = useState<TrendPeriod>("all");
-  const latest = latestWith(readings, vital);
-  const buckets = trendBuckets(readings, vital, period);
-  const unit = vitalUnits[vital];
-  const series: TrendSeries[] =
-    vital === "bloodPressure"
-      ? [
-          { name: "Systolic", color: "bg-info-500" },
-          { name: "Diastolic", color: "bg-warning-500" },
-        ]
-      : [{ name: vitalLabels[vital], color: "bg-info-500" }];
+  const latest = metric.points[0];
+  const buckets = pointBuckets(metric.points, period);
+  const { unit } = metric;
 
   return (
     <section
@@ -61,8 +38,7 @@ export function TrendLatestCard({
       {latest ? (
         <div className="flex flex-col gap-1">
           <p className="type-accent-h1 text-fg-heading">
-            {vitalValue(latest, vital)}{" "}
-            <span className="type-accent-h4 text-fg-caption">{unit}</span>
+            {latest.value} <span className="type-accent-h4 text-fg-caption">{unit}</span>
           </p>
           <p className="flex items-center gap-1.5 type-caption text-fg-caption">
             <HospitalIcon className="size-3.5" aria-hidden />
@@ -71,17 +47,17 @@ export function TrendLatestCard({
         </div>
       ) : (
         <p className="type-body-sm-regular text-fg-caption">
-          No {vitalLabels[vital].toLowerCase()} readings yet.
+          No {metric.label.toLowerCase()} readings yet.
         </p>
       )}
       {buckets.length > 0 ? (
         <TrendChart
-          key={vital}
+          key={metric.label}
           buckets={buckets}
-          series={series}
-          band={targetRanges[vital] ?? null}
+          series={metric.series}
+          band={metric.band}
           unit={unit}
-          caption={`${vitalLabels[vital]} ${periodWords[period]}: the latest reading of each ${period === "1y" ? "month" : "year"}`}
+          caption={`${metric.label} ${periodWords[period]}: the latest reading of each ${period === "1y" ? "month" : "year"}`}
         />
       ) : (
         latest && (
