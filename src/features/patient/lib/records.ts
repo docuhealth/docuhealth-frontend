@@ -53,23 +53,30 @@ export function latestVitals(visits: VisitSummary[], pick: (vitals: Vitals) => u
   return { latest: readings[0] ?? null, previous: readings[1] ?? null };
 }
 
+/**
+ * How a reading sits, for a vitals note: the whole `label`, the words of it to color (`lead`, the
+ * rest stays grey: "**Just above** healthy"), and a tone (good, near the line, or worth watching).
+ */
+export type ReadingNote = { label: string; lead: string; tone: "good" | "near" | "watch" };
+
 /** Where a blood pressure reading sits, for the snapshot's note. */
-export function bloodPressureNote(reading: string | null) {
+export function bloodPressureNote(reading: string | null): ReadingNote | null {
   const [systolic, diastolic] = (reading ?? "").split("/").map(Number);
   if (!systolic || !diastolic) return null;
   if (systolic < 120 && diastolic < 80)
-    return { label: "Healthy blood pressure", tone: "good" } as const;
-  if (systolic < 130 && diastolic < 80) return { label: "Slightly raised", tone: "watch" } as const;
-  return { label: "Higher than healthy", tone: "watch" } as const;
+    return { label: "Healthy blood pressure", lead: "Healthy blood", tone: "good" };
+  if (systolic < 130 && diastolic < 80)
+    return { label: "Slightly raised", lead: "Slightly raised", tone: "near" };
+  return { label: "Higher than healthy", lead: "Higher", tone: "watch" };
 }
 
 /** Where a BMI sits, for the snapshot's note. */
-export function bmiNote(bmi: number | null) {
+export function bmiNote(bmi: number | null): ReadingNote | null {
   if (bmi == null) return null;
-  if (bmi < 18.5) return { label: "Below healthy", tone: "watch" } as const;
-  if (bmi < 25) return { label: "Healthy", tone: "good" } as const;
-  if (bmi < 30) return { label: "Just above healthy", tone: "watch" } as const;
-  return { label: "Above healthy", tone: "watch" } as const;
+  if (bmi < 18.5) return { label: "Below healthy", lead: "Below", tone: "near" };
+  if (bmi < 25) return { label: "Healthy", lead: "Healthy", tone: "good" };
+  if (bmi < 30) return { label: "Just above healthy", lead: "Just above", tone: "near" };
+  return { label: "Above healthy", lead: "Above", tone: "watch" };
 }
 
 /** The next appointment still to come (not cancelled or done), if any. */

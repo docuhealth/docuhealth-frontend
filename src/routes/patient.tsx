@@ -1,10 +1,8 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import {
-  PatientHeadingProvider,
-  PatientSidebar,
-  PatientTopBar,
-} from "@/features/patient/components/patient-shell";
+import { PatientHeadingProvider } from "@/features/patient/components/page-heading";
+import { PatientSidebar } from "@/features/patient/components/patient-sidebar";
+import { PatientTopBar } from "@/features/patient/components/patient-top-bar";
 import { usePatient } from "@/features/patient/lib/use-patient";
 import { requireDashboard } from "@/lib/auth-guards";
 

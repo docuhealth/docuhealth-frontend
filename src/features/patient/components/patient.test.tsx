@@ -1,9 +1,12 @@
 import { screen, within } from "@testing-library/react";
+import { HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, it } from "vitest";
 import { ConditionsPage } from "@/features/patient/components/condition-pages";
 import { PatientHealth } from "@/features/patient/components/patient-health";
 import { PatientHome } from "@/features/patient/components/patient-home";
 import { MedicationsPage, VisitsPage } from "@/features/patient/components/visit-pages";
+import { env } from "@/env";
+import { server } from "@/mocks/node";
 import { useAuthStore } from "@/stores/auth-store";
 import { renderWithRouter } from "@/test/render";
 
@@ -39,9 +42,25 @@ describe("Patient home", () => {
 
     const snapshot = screen.getByRole("region", { name: "Health Snapshot" });
     expect(within(snapshot).getByText("128/82")).toBeInTheDocument();
-    expect(within(snapshot).getByText("Higher than healthy")).toBeInTheDocument();
+    expect(snapshot).toHaveTextContent("Higher than healthy");
     // TODO(api): no glucose readings.
     expect(within(snapshot).getByText("Blood glucose")).toBeInTheDocument();
+  });
+});
+
+describe("Patient home, with nothing on record yet", () => {
+  it("says nothing is booked, all is caught up and there are no readings", async () => {
+    const empty = () => HttpResponse.json({ count: 0, next: null, previous: null, results: [] });
+    server.use(
+      http.get(`${env.VITE_API_URL}/api/records/summaries/:hin`, empty),
+      http.get(`${env.VITE_API_URL}/api/hospital-ops/appointments/mine`, empty),
+      http.get(`${env.VITE_API_URL}/api/pharmacy/patients/drug-records`, empty),
+    );
+    renderWithRouter(<PatientHome />);
+    expect(await screen.findByText("Nothing booked")).toBeInTheDocument();
+    expect(await screen.findByText("You’re all caught up")).toBeInTheDocument();
+    const snapshot = screen.getByRole("region", { name: "Health Snapshot" });
+    expect(within(snapshot).getAllByText("No reading yet")).toHaveLength(4);
   });
 });
 

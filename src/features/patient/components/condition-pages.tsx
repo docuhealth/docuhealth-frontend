@@ -12,7 +12,7 @@ import { useState } from "react";
 import { ListSkeleton } from "@/components/dashboard/skeletons";
 import { StatusPill } from "@/components/dashboard/status-pill";
 import { visitsQuery } from "@/features/patient/api/queries";
-import { PageHeading } from "@/features/patient/components/patient-shell";
+import { PageHeading } from "@/features/patient/components/page-heading";
 import {
   DetailRows,
   RecordList,

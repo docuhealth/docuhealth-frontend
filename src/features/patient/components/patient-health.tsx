@@ -20,16 +20,14 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Link, type LinkProps } from "@tanstack/react-router";
 import { type ComponentType, useState } from "react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { appointmentsQuery, drugsQuery, visitsQuery } from "@/features/patient/api/queries";
-import { PageHeading } from "@/features/patient/components/patient-shell";
+import { PageHeading } from "@/features/patient/components/page-heading";
 import { conditionsOf, facilitiesOf, latestVitals, scansOf } from "@/features/patient/lib/records";
+import { notYet } from "@/features/patient/lib/not-yet";
 import { usePatient } from "@/features/patient/lib/use-patient";
 import { formatDate, plural } from "@/lib/format";
 import { cn } from "@/lib/utils";
-
-const notYet = (what: string) => () => toast.info(`${what} isn’t available yet.`);
 
 type RecordCard = {
   label: string;
@@ -256,7 +254,10 @@ function SummaryTile({
 }) {
   return (
     <div
-      className={cn("flex items-center gap-3 rounded-lg p-4", alert ? "bg-error-100" : "bg-line")}
+      className={cn(
+        "flex items-center gap-3 rounded-lg p-4",
+        alert ? "bg-error-100" : "bg-brand-50",
+      )}
     >
       <Icon
         weight="fill"

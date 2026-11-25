@@ -166,6 +166,13 @@ export function formatShortDay(date: Date) {
   return dayMonth.format(date);
 }
 
+const shortDayMonth = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" });
+
+/** e.g. "15 Oct". */
+export function formatDayMonth(date: Date) {
+  return shortDayMonth.format(date);
+}
+
 /** How many digits a HIN has. */
 export const HIN_DIGITS = 11;
 

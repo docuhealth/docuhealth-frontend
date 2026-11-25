@@ -26,6 +26,7 @@
 
 @theme inline {
   --color-brand: var(--brand);
+  --color-brand-50: var(--brand-50);
   --color-brand-hover: var(--brand-hover);
   --color-brand-pressed: var(--brand-pressed);
   --color-footer-accent: var(--footer-accent);
@@ -36,6 +37,7 @@
   --color-divider: var(--divider);
   --color-surface: var(--surface);
   --color-warning-100: var(--warning-100);
+  --color-warning-300: var(--warning-300);
   --color-warning-500: var(--warning-500);
   --color-warning-700: var(--warning-700);
   --color-success-100: var(--success-100);
@@ -97,6 +99,7 @@
 :root {
   /* Brand */
   --brand: #3e4095;
+  --brand-50: #f4f4f9; /* Faint brand tint behind tiles, e.g. the patient's health summary */
   --brand-hover: #383a88;
   --brand-pressed: #2c2d6a;
   --footer-accent: #f2b544;
@@ -112,6 +115,7 @@
 
   /* Status: 100 = tint background, 500 = main, 700 = text on tint */
   --warning-100: #fff6e5;
+  --warning-300: #f3ba51; /* Bright badge fill, e.g. "Today" on the patient's appointment card */
   --warning-500: #e59700;
   --warning-700: #9a6100;
   --success-100: #e9f7ef;

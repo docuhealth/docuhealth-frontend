@@ -22,7 +22,7 @@ import {
 import { appointmentsQuery, drugsQuery, visitsQuery } from "@/features/patient/api/queries";
 import type { DrugRecord, Vitals } from "@/features/patient/api/schemas";
 import { PatientEmpty } from "@/features/patient/components/condition-pages";
-import { PageHeading } from "@/features/patient/components/patient-shell";
+import { PageHeading } from "@/features/patient/components/page-heading";
 import {
   DetailRows,
   RecordList,
