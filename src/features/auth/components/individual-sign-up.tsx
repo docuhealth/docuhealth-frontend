@@ -128,6 +128,7 @@ export function IndividualSignUp() {
         <AccountCreatedDialog
           open={hin !== undefined}
           hin={hin ?? ""}
+          loginWith={info.contact.method === "phone" ? "phone number" : "email"}
           onDone={() => {
             const destination = getPostLoginDestination(useAuthStore.getState().session);
             void navigate({ to: destination });

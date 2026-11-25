@@ -28,13 +28,16 @@ const nextStepSchema = z
   .optional()
   .transform((val) => val ?? null);
 
+/** An id or HIN the API may send as a string or a number; always a string here. */
+const idText = z.union([z.string(), z.number()]).transform(String);
+
 const actingAsContextSchema = z.object({
   type: z.enum(["self", "facility_staff", "proxy"]).optional(),
   as: z.enum(["self", "dependant", "proxy"]).optional(),
-  hin: z.string().optional(),
+  hin: idText.optional(),
   facility: z
     .object({
-      id: z.string(),
+      id: idText,
       name: z.string().optional(),
       type: z.string(),
     })
@@ -48,7 +51,7 @@ const actingAsContextSchema = z.object({
 });
 
 const authUserPayloadSchema = z.object({
-  id: z.string().optional(),
+  id: idText.optional(),
   sqid: z.string().optional(),
   firstname: z.string().optional(),
   lastname: z.string().optional(),

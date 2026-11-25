@@ -5,6 +5,7 @@ import { env } from "@/env";
 import { IndividualSignUp } from "@/features/auth/components/individual-sign-up";
 import { PasswordReset } from "@/features/auth/components/password-reset";
 import { server } from "@/mocks/node";
+import { useAuthStore } from "@/stores/auth-store";
 import { pickOption, renderWithRouter } from "@/test/render";
 
 type User = ReturnType<typeof renderWithRouter>["user"];
@@ -146,5 +147,28 @@ describe("Patient sign-up", () => {
       "href",
       "/forgot-password",
     );
+  });
+
+  it("signs the new patient in, and sends them to their dashboard", async () => {
+    const { user } = renderWithRouter(<IndividualSignUp />);
+    await fillDetails(user);
+    await fill(user, screen.getByLabelText(/Phone Number/), "0803 123 4567");
+    await fill(user, screen.getByLabelText(/Email/), "ada@example.com");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    await user.type(await screen.findByLabelText("Verification code"), "123456");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    await fill(user, await screen.findByRole("textbox", { name: /^NIN/ }), "12345678901");
+    await fill(user, screen.getByLabelText(/^Password/), "Password123!");
+    await fill(user, screen.getByLabelText(/Confirm Password/), "Password123!");
+    await user.click(screen.getByRole("button", { name: "Create Account" }));
+
+    // signup/complete answers like login: the patient is signed in, not sent to log in.
+    expect(
+      await screen.findByText(/you’re signed in\. Next time, log in with your phone number/),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Go to my dashboard" })).toBeInTheDocument();
+    expect(useAuthStore.getState().session).toMatchObject({ accountType: "patient" });
   });
 });

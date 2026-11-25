@@ -1,14 +1,20 @@
 import { CopyHinButton } from "@/components/copy-hin-button";
 import { SuccessDialog } from "@/components/success-dialog";
 
-/** Shown once sign-up succeeds. Only "Done" closes it, so the HIN can't be lost to a stray click. */
+/**
+ * Shown once sign-up succeeds: the patient is signed in, and "Done" takes them to their
+ * dashboard. Only "Done" closes it, so the HIN can't be lost to a stray click. `loginWith` names
+ * what they'll log in with next time (the contact their code went to).
+ */
 export function AccountCreatedDialog({
   open,
   hin,
+  loginWith,
   onDone,
 }: {
   open: boolean;
   hin: string;
+  loginWith: "phone number" | "email";
   onDone: () => void;
 }) {
   return (
@@ -16,8 +22,8 @@ export function AccountCreatedDialog({
       open={open}
       dismissible={false}
       title="Account Created!"
-      description="Account created successfully. You can log in anytime using your email and password."
-      primaryAction={{ label: "Done", onClick: onDone }}
+      description={`Your account is ready and you’re signed in. Next time, log in with your ${loginWith} and password.`}
+      primaryAction={{ label: "Go to my dashboard", onClick: onDone }}
     >
       <div className="rounded-md border border-info-100 bg-info-100/40 px-3 py-2.5 text-left">
         <p className="flex items-center gap-1 type-heading-sm-regular text-fg-heading">
