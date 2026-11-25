@@ -285,6 +285,50 @@ const page = <T>(items: T[]) => ({
   results: items,
 });
 
+// The patient's visit timeline (`GET /api/patients/visits`): a check-in for each summarised
+// visit, one more with no summary yet, and the appointments, newest first.
+const checkIn = (id: string, at: string, hospital: Facility, open = false) => ({
+  sqid: `checkin-${id}`,
+  status: open ? "nursing_active" : "closed",
+  hospital_info: hospital,
+  patient_info: patient,
+  created_at: at,
+  escalated_at: null,
+  closed_at: open ? null : at,
+});
+const checkIns = [
+  ...summaries.map((visit) =>
+    checkIn(String(visit.id), visit.created_at, visit.hospital_info as Facility),
+  ),
+  checkIn("no-summary", daysAgo(20, 14), luth),
+];
+const timeline = [
+  ...appointments.map((appointment) => ({
+    type: "appointment",
+    time: appointment.scheduled_time,
+    appointment,
+    check_in: null,
+  })),
+  ...checkIns.map((entry) => ({
+    type: "check-in",
+    time: entry.created_at,
+    appointment: null,
+    check_in: entry,
+  })),
+].sort((a, b) => b.time.localeCompare(a.time));
+
+const visitMetrics = {
+  total_visits: checkIns.length,
+  last_visit: summaries[0]!.created_at,
+  last_check_in: summaries[0]!.created_at,
+  upcoming_appointment: {
+    sqid: appointments[0]!.sqid,
+    status: "pending",
+    scheduled_time: appointments[0]!.scheduled_time,
+  },
+  patient_info: { ...patient, phone_num: "08031234567", email: "c@example.com", acct_type: null },
+};
+
 export const patientHandlers = [
   // Only the patient's own HIN (or a dependant's) answers; any other is a 404, as the API does.
   http.get(api("/api/records/summaries/:hin"), ({ params }) =>
@@ -295,4 +339,11 @@ export const patientHandlers = [
   http.get(api("/api/hospital-ops/appointments/mine"), () => HttpResponse.json(page(appointments))),
   http.get(api("/api/pharmacy/patients/drug-records"), () => HttpResponse.json(page(drugs))),
   http.get(api("/api/records/vital-signs/mine"), () => HttpResponse.json(page(readings))),
+  http.get(api("/api/patients/visits"), ({ request }) => {
+    const type = new URL(request.url).searchParams.get("type");
+    if (type === "check-ins") return HttpResponse.json(page(checkIns));
+    if (type === "appointments") return HttpResponse.json(page(appointments));
+    return HttpResponse.json(page(timeline));
+  }),
+  http.get(api("/api/patients/visit-metrics"), () => HttpResponse.json(visitMetrics)),
 ];

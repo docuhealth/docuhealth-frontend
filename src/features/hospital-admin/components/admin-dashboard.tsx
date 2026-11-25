@@ -29,7 +29,7 @@ export function AdminDashboard({
         period={period}
         onPeriodChange={onPeriodChange}
       />
-      <OverviewBanner stats={overview.stats} bannerUrl={profile.bannerUrl} />
+      <OverviewBanner stats={overview.stats} period={period} bannerUrl={profile.bannerUrl} />
       <div className="grid gap-6 xl:grid-cols-2">
         <StaffByRoleCard roles={overview.staffByRole} />
         <QueueCard />

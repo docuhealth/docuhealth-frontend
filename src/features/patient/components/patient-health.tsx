@@ -13,7 +13,7 @@ import visitsIconUrl from "@/assets/svgs/visits.svg";
 import vitalSignsIconUrl from "@/assets/svgs/vital-signs.svg";
 import { Button } from "@/components/ui/button";
 import { allergiesQuery, carePlansQuery, healthProfileQuery } from "@/features/patient/api/pending";
-import { appointmentsQuery, drugsQuery } from "@/features/patient/api/queries";
+import { appointmentsQuery, drugsQuery, visitMetricsQuery } from "@/features/patient/api/queries";
 import { HealthSummary } from "@/features/patient/components/health-summary";
 import { HealthToolbar } from "@/features/patient/components/health-toolbar";
 import { HealthTopCard } from "@/features/patient/components/health-top-card";
@@ -33,6 +33,7 @@ export function PatientHealth() {
   const visits = useVisits().data;
   const appointments = useQuery(appointmentsQuery()).data;
   const drugs = useQuery(drugsQuery()).data;
+  const metrics = useQuery(visitMetricsQuery()).data;
   // TODO(api): blood group, genotype, documents, immunizations, allergies and care plans are
   // pending records (api/pending.ts): demo data on the mock server, empty elsewhere.
   const profile = useQuery(healthProfileQuery()).data;
@@ -114,7 +115,17 @@ export function PatientHealth() {
     {
       label: "Visits",
       icon: visitsIconUrl,
-      detail: visits?.length ? plural(visits.length, "visit") : null,
+      // Every check-in and kept appointment, at any facility; else the visit summaries.
+      detail: metrics?.totalVisits
+        ? [
+            plural(metrics.totalVisits, "visit"),
+            metrics.lastVisit ? `last ${dated(metrics.lastVisit)}` : null,
+          ]
+            .filter(Boolean)
+            .join(" · ")
+        : visits?.length
+          ? plural(visits.length, "visit")
+          : null,
       to: "/patient/health/visits",
     },
   ];

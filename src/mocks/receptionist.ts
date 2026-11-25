@@ -172,6 +172,35 @@ const queue: ReceptionQueue["items"] = (
   waitMinutes,
 }));
 
+/** The phone number each queued patient registered with, for searching check-ins by phone. */
+const queuePhones = new Map(
+  queue.map(({ id }, index) => [id, `0805${String(1_234_560 + index * 7_919).padStart(7, "0")}`]),
+);
+
+/** When each queued patient checked in: their wait ago, when the mock loaded. */
+const queueCheckedInAt = new Map(
+  queue.map(({ id, waitMinutes }) => [
+    id,
+    new Date(Date.now() - waitMinutes * 60_000).toISOString(),
+  ]),
+);
+
+/** Check-ins already closed (the queue's, once checked out, join them), newest first. */
+const closedCheckIns: { sqid: string; name: string; hin: string; phone: string; at: string }[] = (
+  [
+    ["Adeola Williams", "12334567890", "08034567890", -1, "10:05"],
+    ["Amina Yusuf", "28492000002", "08034572334", -3, "09:20"],
+    ["Samuel Williams", "12334567891", "08034569001", -6, "11:45"],
+    ["Daniel Martins", "11734520984", "08021112233", -9, "08:50"],
+  ] as const
+).map(([name, hin, phone, days, time], index) => ({
+  sqid: `checkin-closed-${index + 1}`,
+  name,
+  hin,
+  phone,
+  at: at(days, time),
+}));
+
 /** `age` years old, with a birthday a month ago so the age shown stays `age`. */
 function bornYearsAgo(age: number) {
   const birth = new Date();
@@ -233,6 +262,7 @@ const registered: MockPatient[] = (
     lastCheckIn: latest ? { at: latest.checkedInAt, status: latest.status } : null,
     upcomingAppointment:
       visitCount > 0 ? { at: upcoming.toISOString(), department: "General Medicine" } : null,
+    totalVisits: visitCount,
     visits,
     dependentIds: dependents.map((entry) => {
       const [number, relationship = ""] = entry.split(":");
@@ -258,6 +288,7 @@ function newPatientRecord(id: string, hin: string, name: string, sex: Sex): Mock
     lastVisit: null,
     lastCheckIn: null,
     upcomingAppointment: null,
+    totalVisits: 0,
     visits: [],
     dependentIds: [],
   };
@@ -313,16 +344,67 @@ function readAppointment(appointment: Appointment) {
   };
 }
 
-/** Whether an appointment falls in the API's `timeframe`: today, after today, or before it. */
+/**
+ * Whether an appointment falls in the API's `timeframe`: today, tomorrow, later, or before today.
+ * The real `upcoming` starts after tomorrow; here it starts after today, as it did before the API
+ * had `tomorrow`, so the staff Appointments page's "Upcoming" tab still shows tomorrow's.
+ */
 function inTimeframe(at: string, timeframe: string | null) {
   const date = new Date(at);
   const start = new Date();
   start.setHours(0, 0, 0, 0);
-  const end = new Date(start.getTime() + 24 * 60 * 60_000);
+  const end = new Date(start.getTime() + DAY_MS);
   if (timeframe === "today") return date >= start && date < end;
+  if (timeframe === "tomorrow") return date >= end && date < new Date(end.getTime() + DAY_MS);
   if (timeframe === "upcoming") return date >= end;
   return date < start;
 }
+
+const DAY_MS = 24 * 60 * 60_000;
+
+const periods = ["day", "week", "month"] as const;
+type ApiPeriod = (typeof periods)[number];
+
+/** The API's `period` (a week starts on Monday), `offset` periods back, as ISO [start, end). */
+function periodSpan(period: ApiPeriod, offset = 0) {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  if (period === "day") start.setDate(start.getDate() - offset);
+  if (period === "week") start.setDate(start.getDate() - ((start.getDay() + 6) % 7) - 7 * offset);
+  if (period === "month") start.setMonth(start.getMonth() - offset, 1);
+  const end = new Date(start);
+  if (period === "day") end.setDate(end.getDate() + 1);
+  if (period === "week") end.setDate(end.getDate() + 7);
+  if (period === "month") end.setMonth(end.getMonth() + 1);
+  return [start.toISOString(), end.toISOString()] as const;
+}
+
+/** The request's `period`: `null` when left out (all time), or a 400 response when unknown. */
+function periodOf(request: Request): ApiPeriod | null | Response {
+  const value = new URL(request.url).searchParams.get("period");
+  if (value === null) return null;
+  return (
+    periods.find((period) => period === value) ??
+    HttpResponse.json({ period: "period must be 'day', 'week' or 'month'." }, { status: 400 })
+  );
+}
+
+/** How many appointments in `period` (`offset` periods back) pass `keep`; all time when `null`. */
+function appointmentsIn(
+  period: ApiPeriod | null,
+  offset = 0,
+  keep: (appointment: Appointment) => boolean = () => true,
+) {
+  if (!period) return appointments.filter(keep).length;
+  const [start, end] = periodSpan(period, offset);
+  return appointments.filter(
+    (appointment) => appointment.at >= start && appointment.at < end && keep(appointment),
+  ).length;
+}
+
+/** `(current - previous) / previous x 100` to 2 places, or `null` when there were none before. */
+const percentChange = (current: number, previous: number) =>
+  previous === 0 ? null : Math.round(((current - previous) / previous) * 10_000) / 100;
 
 /** `GET /api/patients/{hin}/details`, as the API returns it. */
 function readPatient(patient: MockPatient) {
@@ -434,9 +516,92 @@ export const receptionistHandlers = [
   }),
   http.post(api("/api/hospital-ops/check-ins/:sqid/close"), ({ params }) => {
     const index = queue.findIndex(({ id }) => id === params.sqid);
-    if (index === -1) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
-    queue.splice(index, 1);
+    const [entry] = index === -1 ? [] : queue.splice(index, 1);
+    if (!entry) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    closedCheckIns.unshift({
+      sqid: entry.id,
+      name: entry.patient.name,
+      hin: entry.patient.hin,
+      phone: queuePhones.get(entry.id) ?? "",
+      at: queueCheckedInAt.get(entry.id) ?? new Date().toISOString(),
+    });
     return new HttpResponse(null, { status: 200 });
+  }),
+  // Every check-in, newest first, closed ones included; search by name, HIN or phone.
+  http.get(api("/api/hospital-ops/patients-check-ins"), ({ request }) => {
+    const params = new URL(request.url).searchParams;
+    const page = Number(params.get("page") ?? 1);
+    const size = Number(params.get("size") ?? 10);
+    const rows = [
+      ...queue.map((entry) => ({
+        sqid: entry.id,
+        name: entry.patient.name,
+        hin: entry.patient.hin,
+        phone: queuePhones.get(entry.id) ?? "",
+        status: checkInStatusOf[entry.status],
+        at: queueCheckedInAt.get(entry.id) ?? new Date().toISOString(),
+      })),
+      ...closedCheckIns.map((checkIn) => ({ ...checkIn, status: "closed" })),
+    ]
+      .filter(({ name, hin, phone }) => matches(params.get("search"), name, hin, phone))
+      .sort((a, b) => b.at.localeCompare(a.at));
+    return HttpResponse.json({
+      count: rows.length,
+      next: null,
+      previous: null,
+      results: rows.slice((page - 1) * size, page * size).map((row) => ({
+        sqid: row.sqid,
+        patient_info: { sqid: `patient-${row.hin}`, hin: row.hin, ...splitName(row.name) },
+        status: row.status,
+        created_at: row.at,
+      })),
+    });
+  }),
+  http.get(api("/api/hospital-ops/operation-metrics"), ({ request }) => {
+    const period = periodOf(request);
+    if (period instanceof Response) return period;
+    const hourStart = new Date();
+    hourStart.setMinutes(0, 0, 0);
+    const thisHourFrom = hourStart.toISOString();
+    const lastHourFrom = new Date(hourStart.getTime() - 60 * 60_000).toISOString();
+    const checkInTimes = [
+      ...queueCheckedInAt.values(),
+      ...closedCheckIns.map((checkIn) => checkIn.at),
+    ];
+    const thisHour = checkInTimes.filter((time) => time >= thisHourFrom).length;
+    const lastHour = checkInTimes.filter(
+      (time) => time >= lastHourFrom && time < thisHourFrom,
+    ).length;
+    const booked = appointmentsIn(period);
+    return HttpResponse.json({
+      total_checkins: 1_240 + checkInTimes.length,
+      // The queue's pending check-ins all came in today, so they're in every period.
+      pending_checkins: queue.filter(({ status }) => status === "pending").length,
+      // A percentage against the hour before, despite the name.
+      check_ins_this_hour: { count: thisHour, change: percentChange(thisHour, lastHour) },
+      this_period_appointments: {
+        count: booked,
+        percent_change: period ? percentChange(booked, appointmentsIn(period, 1)) : null,
+      },
+    });
+  }),
+  http.get(api("/api/hospital-ops/appointments-overview"), ({ request }) => {
+    const period = periodOf(request);
+    if (period instanceof Response) return period;
+    const booked = appointmentsIn(period);
+    const cancelled = (offset: number) =>
+      appointmentsIn(period, offset, ({ status }) => status === "cancelled");
+    return HttpResponse.json({
+      appointments_booked: {
+        count: booked,
+        percent_change: period ? percentChange(booked, appointmentsIn(period, 1)) : null,
+      },
+      in_progress_appointments: appointmentsIn(period, 0, ({ status }) => status === "in_progress"),
+      cancelled_appointments: {
+        count: cancelled(0),
+        change: period ? cancelled(0) - cancelled(1) : null,
+      },
+    });
   }),
   // As the API does: a desk signup needs a date of birth, and says where the code went.
   http.post(api("/api/auth/signup/desk"), async ({ request }) => {

@@ -10,7 +10,7 @@ import { useState } from "react";
 import { PeriodSelect } from "@/components/dashboard/period-select";
 import { StatBanner } from "@/components/dashboard/stat-banner";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { Change, Figure } from "@/components/dashboard/figure";
+import { Change } from "@/components/dashboard/figure";
 import { Button } from "@/components/ui/button";
 import {
   receptionistProfileQuery,
@@ -23,8 +23,8 @@ import { RegisterPatientDialog } from "@/features/receptionist/components/regist
 import { greetingFor } from "@/lib/format";
 import type { Period } from "@/lib/period";
 
-/** What the total check-ins are compared with, for each period. */
-const previousPeriod = { today: "yesterday", week: "last 7 days", month: "last 30 days" };
+/** What the period's appointments are compared with. */
+const previousPeriod = { today: "yesterday", week: "last week", month: "last month" };
 
 /** The receptionist's home page: today's numbers, appointments and the queue. */
 export function ReceptionistDashboard({
@@ -80,27 +80,32 @@ export function ReceptionistDashboard({
         <StatCard
           icon={<UserIcon />}
           label="Total Check-ins"
-          value={<Figure value={overview.totalCheckIns} />}
-          note={<Change change={overview.totalCheckInsChange} since={previousPeriod[period]} />}
+          value={overview.totalCheckIns.toLocaleString("en-GB")}
+          // The API counts every check-in ever, whatever the period, with nothing to compare.
+          note="All time"
         />
         <StatCard
           icon={<ClockIcon />}
           label="Waiting in Queue"
-          value={overview.waitingInQueue}
+          // The API's suggested source: check-ins in the current clock hour.
+          value={overview.checkInsThisHour.count.toLocaleString("en-GB")}
           // A shorter queue is the good news here.
-          note={<Change change={overview.waitingInQueueChange} since="last hour" goodWhen="down" />}
+          note={
+            <Change change={overview.checkInsThisHour.change} since="last hour" goodWhen="down" />
+          }
         />
         <StatCard
           icon={<CalendarCheckIcon />}
           label="Checked In Today"
-          value={<Figure value={overview.checkedInToday} />}
-          note={<Change change={overview.checkedInTodayChange} since="yesterday" />}
+          // Check-ins in the period still waiting for a nurse; the API sends no change.
+          value={overview.pendingCheckIns.toLocaleString("en-GB")}
+          note="Waiting for a nurse"
         />
         <StatCard
           icon={<CalendarDotsIcon />}
           label="Today’s Appointments"
-          value={overview.appointmentsToday}
-          note={<Change change={overview.appointmentsTodayChange} since="yesterday" />}
+          value={overview.appointments.count.toLocaleString("en-GB")}
+          note={<Change change={overview.appointments.change} since={previousPeriod[period]} />}
         />
       </StatBanner>
 

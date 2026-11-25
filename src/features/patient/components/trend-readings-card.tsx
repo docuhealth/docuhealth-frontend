@@ -23,15 +23,13 @@ export function TrendReadingsCard({
           All readings
         </h2>
         {/* TODO(design): no page for a vital's full history yet. */}
-        {taken.length > SHOWN && (
-          <button
-            type="button"
-            onClick={notYet("Seeing every reading")}
-            className="type-caption-medium text-primary hover:underline"
-          >
-            See all
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={notYet("Seeing every reading")}
+          className="type-caption-semibold text-primary hover:underline"
+        >
+          See all
+        </button>
       </div>
       {taken.length === 0 ? (
         <p className="border-t px-4 py-6 text-center type-body-sm-regular text-fg-caption">

@@ -4,7 +4,9 @@ import { readMultipart } from "@/mocks/multipart";
 import { colleagues, hospitalTheme } from "@/mocks/staff";
 
 // The hospital admin's endpoints, faked with the real API's paths and shapes (as staging returns
-// them). The team lives in the staff mock, open check-ins in the receptionist's.
+// them, or as docs/backend-handoff-2026-11-25-dashboards.md shows them). The team lives in the
+// staff mock, check-ins (`?status=outpatient` and `/patients-check-ins`) in the receptionist's,
+// and patients' visits and guardians in the patient records mock.
 
 const api = (path: string) => `${env.VITE_API_URL}${path}`;
 
@@ -66,7 +68,7 @@ const doctors = [
 const receptionist = person("y4vRDgE", "Kemi", "Adewale", "receptionist");
 
 /** `patient_info`, as the API returns it. */
-const patients = (
+const adults = (
   [
     ["Yemi", "Ojo", "male", 52, "hmo"],
     ["Chioma", "Nwosu", "female", 48, "private"],
@@ -104,6 +106,54 @@ const patients = (
   };
 });
 
+/** `patient_info`; a dependant's has no `email` key. */
+type MockPatientInfo = {
+  dob: string;
+  gender: string;
+  phone_num: string;
+  firstname: string;
+  lastname: string;
+  middlename: string | null;
+  hin: string;
+  street: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  email?: string;
+  contact_email: string | null;
+  payment_provider: { type: string; provider: null; member_id: null; updated_at: string | null };
+};
+
+/** `dob` for someone `age` years old, with a birthday a month ago so the age shown stays `age`. */
+function bornYearsAgo(age: number) {
+  const birth = new Date(Date.now() - 30 * DAY);
+  birth.setFullYear(birth.getFullYear() - age);
+  return birth.toISOString().slice(0, 10);
+}
+
+/**
+ * Every patient on record: the adults, then Yemi Ojo's son, a dependant. A dependant has no login,
+ * so their `patient_info` has no `email` key at all.
+ */
+export const patients: MockPatientInfo[] = [
+  ...adults,
+  {
+    dob: bornYearsAgo(8),
+    gender: "male",
+    phone_num: "",
+    firstname: "Tobi",
+    lastname: "Ojo",
+    middlename: null,
+    hin: "7894623012343",
+    street: null,
+    city: null,
+    state: null,
+    country: null,
+    contact_email: null,
+    payment_provider: { type: "private", provider: null, member_id: null, updated_at: null },
+  },
+];
+
 const wardInfo = (index: number) => {
   const ward = pick(wards, index);
   return { sqid: ward.sqid, name: ward.name };
@@ -113,6 +163,34 @@ const bedInfo = (index: number, status: string) => ({
   status,
   sqid: `bed-${index + 1}`,
 });
+
+/** A nurse's latest vitals for `patient`, as admissions and open check-ins carry them. */
+const vitals = (at: string, patient: MockPatientInfo) => ({
+  sqid: `vitals-${patient.hin}`,
+  created_at: at,
+  blood_pressure: "120/80",
+  temp: 36.8,
+  resp_rate: 16,
+  heart_rate: 88,
+  height: null,
+  weight: null,
+  spo2: 98,
+  pain_score: null,
+  notes: null,
+  bmi: null,
+  patient_info: { ...patient, payment_provider: null },
+  staff_info: person("staff-3", "Heritech", "Riel", "nurse"),
+  hospital_info: { name: hospitalTheme.name, email: null, sqid: "pm9XGQd" },
+});
+const paracetamol = {
+  name: "Paracetamol",
+  route: "Oral",
+  quantity: 10,
+  frequency: "bd",
+  duration: { value: 5, rate: "days" },
+  allergies: [],
+  unit: null,
+};
 
 /** Rows of each list, latest first, as `GET /api/hospital-ops/patients?status=…` returns them. */
 const rows: Record<string, Record<string, unknown>[]> = {
@@ -126,13 +204,25 @@ const rows: Record<string, Record<string, unknown>[]> = {
     processed_by_info: receptionist,
     created_at: hoursAgo(hours),
     discharge_date: null,
+    latest_vitals: index % 3 === 2 ? null : vitals(hoursAgo(hours / 2), pick(patients, index)),
+    ongoing_medications: index % 2 === 0 ? [paracetamol] : [],
+    admission_note_info: null,
   })),
-  outpatient_discharge: [5, 30, 80, 120, 200, 330, 470].map((hours, index) => ({
-    sqid: `check-in-closed-${index + 1}`,
-    patient_info: pick(patients, 4 + index),
-    closed_by_info: pick(doctors, index + 1),
-    closed_at: hoursAgo(hours),
-  })),
+  outpatient_discharge: [
+    ...[5, 30, 80, 120, 200, 330, 470].map((hours, index) => ({
+      sqid: `check-in-closed-${index + 1}`,
+      patient_info: pick(patients, 4 + index),
+      closed_by_info: pick(doctors, index + 1),
+      closed_at: hoursAgo(hours),
+    })),
+    // A dependant's check-in, closed by the overnight job rather than a person.
+    {
+      sqid: "check-in-closed-8",
+      patient_info: pick(patients, 12),
+      closed_by_info: null,
+      closed_at: hoursAgo(520),
+    },
+  ],
   inpatient_discharge: (
     [
       [70, 107],
@@ -148,6 +238,26 @@ const rows: Record<string, Record<string, unknown>[]> = {
     discharge_date: hoursAgo(hours),
     ward_info: wardInfo(index + 2),
     bed_info: bedInfo(index + 3, "available"),
+    doctor_discharge_form: {
+      sqid: `discharge-form-${index + 1}`,
+      primary_diagnosis: "Malaria",
+      secondary_diagnosis: null,
+      comorbidities: null,
+      hospital_course_note: "Treated with antimalarials",
+      chief_complaint: "Fever",
+      treatment_plan: "Rest",
+      care_instructions: "Review in a week",
+      condition_at_discharge: "stable",
+      follow_up_clinic: "General Medicine",
+      follow_up_date: null,
+      follow_up_time: null,
+      follow_up_instructions: "Return if fever recurs",
+      pending_investigations: [],
+      completed_investigations: [],
+      discharged_by_info: pick(doctors, index),
+      created_at: hoursAgo(hours),
+    },
+    nurse_discharge_form: null,
   })),
 };
 
@@ -166,6 +276,108 @@ function page<T>(items: T[], request: Request) {
 function matches(search: string | null, ...values: string[]) {
   const term = search?.trim().toLowerCase();
   return !term || values.some((value) => value.toLowerCase().includes(term));
+}
+
+/**
+ * When the current `period` (`day`, `week` from Monday, or `month`) began, in UTC as the API
+ * counts it; `undefined` for all time (or a period the API doesn't know).
+ */
+function periodStart(period: string | null) {
+  const start = new Date();
+  start.setUTCHours(0, 0, 0, 0);
+  if (period === "day") return start;
+  if (period === "week") {
+    start.setUTCDate(start.getUTCDate() - ((start.getUTCDay() + 6) % 7));
+    return start;
+  }
+  if (period === "month") {
+    start.setUTCDate(1);
+    return start;
+  }
+  return undefined;
+}
+
+/** Each list's `period` filters on its own date. */
+const periodField: Record<string, string> = {
+  inpatient: "created_at",
+  outpatient_discharge: "closed_at",
+  inpatient_discharge: "discharge_date",
+};
+
+/** Figures for `period` (`none` for all time, when there's no change to report). */
+type ByPeriod<T> = Record<"day" | "week" | "month" | "none", T>;
+const byPeriod = <T>(figures: ByPeriod<T>, period: string | null): T =>
+  figures[period === "day" || period === "week" || period === "month" ? period : "none"];
+
+/** `GET /api/hospital-ops/patient-management/metrics`. */
+const checkInMetrics: ByPeriod<object> = {
+  day: {
+    total_checkins: 1_284,
+    new_checkins: { count: 6, change: 2 },
+    checkins_this_period: { count: 18, change: -3 },
+    returning_patients: 11,
+  },
+  week: {
+    total_checkins: 1_284,
+    new_checkins: { count: 31, change: 12 },
+    checkins_this_period: { count: 96, change: 14 },
+    returning_patients: 58,
+  },
+  month: {
+    total_checkins: 1_284,
+    new_checkins: { count: 120, change: -8 },
+    checkins_this_period: { count: 412, change: 37 },
+    returning_patients: 236,
+  },
+  none: {
+    total_checkins: 1_284,
+    new_checkins: { count: 702, change: null },
+    checkins_this_period: { count: 1_284, change: null },
+    returning_patients: 389,
+  },
+};
+
+/** Staff added in each timeframe, and the change on the one before. */
+const staffAdded: ByPeriod<{ count: number; change: number | null } | null> = {
+  day: { count: 0, change: -1 },
+  week: { count: 2, change: 1 },
+  month: { count: 4, change: 2 },
+  // All time: `count` is the whole team.
+  none: null,
+};
+
+/** The signed-in admin's own account, who added most of the team. */
+const admin = {
+  firstname: "Folake",
+  lastname: "Adeyemi",
+  email: "folake.adeyemi@luth.example.com",
+};
+
+/** The team on the API's `staff/{sqid}` endpoint: activity in `period`, and who added them. */
+function staffDetail(member: (typeof colleagues)[number], index: number, period: string | null) {
+  const scale = byPeriod({ day: 1, week: 4, month: 12, none: 40 }, period);
+  const clinical = member.role === "doctor" || member.role === "nurse";
+  return {
+    total_patients_seen: clinical ? scale * (2 + (index % 3)) : 0,
+    appointments_completed: member.role === "doctor" ? scale * (1 + (index % 2)) : 0,
+    follow_ups_requested: member.role === "doctor" ? Math.ceil(scale / 2) : 0,
+    staff_info: {
+      sqid: member.sqid,
+      firstname: member.firstname,
+      lastname: member.lastname,
+      role: member.role,
+      gender: member.gender,
+      joined_at: new Date(Date.now() - (30 + index * 23) * DAY).toISOString(),
+      email: member.email,
+      // The first was added before this was recorded; one by a DH admin, who has no name.
+      added_by_info:
+        index === 0
+          ? null
+          : index === 4
+            ? { firstname: null, lastname: null, email: "support@docuhealth.example.com" }
+            : admin,
+    },
+  };
 }
 
 const required = (...fields: string[]) =>
@@ -202,13 +414,57 @@ export const hospitalAdminHandlers = [
   // Open check-ins are the front desk's queue; the receptionist's mock answers those.
   http.get(api("/api/hospital-ops/patients"), ({ request }) => {
     const params = new URL(request.url).searchParams;
-    const list = rows[params.get("status") ?? ""];
+    const status = params.get("status") ?? "";
+    const list = rows[status];
     if (!list) return undefined;
+    const since = periodStart(params.get("period"));
     const matching = list.filter((row) => {
       const info = row.patient_info as (typeof patients)[number];
-      return matches(params.get("search"), `${info.firstname} ${info.lastname}`, info.hin);
+      const at = row[periodField[status] ?? ""];
+      return (
+        matches(params.get("search"), `${info.firstname} ${info.lastname}`, info.hin) &&
+        (!since || (typeof at === "string" && new Date(at) >= since))
+      );
     });
     return HttpResponse.json(page(matching, request));
+  }),
+  http.get(api("/api/hospital-ops/patient-management/metrics"), ({ request }) =>
+    HttpResponse.json(byPeriod(checkInMetrics, new URL(request.url).searchParams.get("period"))),
+  ),
+  http.get(api("/api/hospital-ops/administration-metrics"), ({ request }) => {
+    // The team plus the signed-in admin.
+    const totalStaff = colleagues.filter((member) => member.is_active).length + 1;
+    const added = byPeriod(staffAdded, new URL(request.url).searchParams.get("timeframe"));
+    return HttpResponse.json({
+      total_staff: totalStaff,
+      added_this_duration: added ?? { count: totalStaff, change: null },
+      administrators: 1,
+      // The hospital, and its lab, pharmacy and radiology unit.
+      total_facilities: 4,
+    });
+  }),
+  // Active staff per role, sorted by role, leaving out roles no one holds.
+  http.get(api("/api/hospital-ops/staff-role-counts"), () => {
+    const counts = new Map<string, number>([["doctor", 1]]); // The signed-in admin is a doctor.
+    for (const member of colleagues) {
+      if (member.is_active) counts.set(member.role, (counts.get(member.role) ?? 0) + 1);
+    }
+    return HttpResponse.json(
+      [...counts].sort(([a], [b]) => a.localeCompare(b)).map(([role, count]) => ({ role, count })),
+    );
+  }),
+  http.get(api("/api/hospital-ops/staff/:sqid"), ({ params, request }) => {
+    const index = colleagues.findIndex(({ sqid }) => sqid === params.sqid);
+    const member = colleagues[index];
+    if (!member) {
+      return HttpResponse.json(
+        { detail: "No StaffMembership matches the given query." },
+        { status: 404 },
+      );
+    }
+    return HttpResponse.json(
+      staffDetail(member, index, new URL(request.url).searchParams.get("period")),
+    );
   }),
   http.get(api("/api/patients/:hin/info"), ({ params }) => {
     const patient = patients.find(({ hin }) => hin === params.hin);

@@ -5,23 +5,26 @@ import { BannerPhotoMenu } from "@/features/hospital-admin/components/banner-pho
 import { StatBanner } from "@/components/dashboard/stat-banner";
 import { Figure } from "@/components/dashboard/figure";
 import { StatCard } from "@/components/dashboard/stat-card";
+import {
+  previousPeriodLabels,
+  thisPeriodLabels,
+} from "@/features/hospital-admin/lib/period-labels";
+import type { Period } from "@/lib/period";
 
 /**
  * The hospital's banner photo (the default one until the admin uploads their own) with the
- * headline staff and facility numbers over it.
+ * headline staff and facility numbers over it; staff added are counted over `period`.
  */
 export function OverviewBanner({
   stats,
+  period,
   bannerUrl,
 }: {
   stats: DashboardOverview["stats"];
+  period: Period;
   bannerUrl: string | null;
 }) {
-  // TODO(api): no joining dates yet, so no month-on-month change either.
-  const change =
-    stats.addedThisMonth === null || stats.addedLastMonth === null
-      ? null
-      : stats.addedThisMonth - stats.addedLastMonth;
+  const change = stats.addedChange;
 
   const cards: { icon: ReactNode; label: string; value: number | null; note: ReactNode }[] = [
     {
@@ -32,8 +35,8 @@ export function OverviewBanner({
     },
     {
       icon: <UserPlusIcon />,
-      label: "Added this month",
-      value: stats.addedThisMonth,
+      label: `Added ${thisPeriodLabels[period]}`,
+      value: stats.added,
       note:
         change === null ? (
           "Not available yet"
@@ -44,7 +47,7 @@ export function OverviewBanner({
             ) : (
               <span className="text-error-500">{-change} fewer</span>
             )}{" "}
-            vs last month
+            vs {previousPeriodLabels[period]}
           </>
         ),
     },

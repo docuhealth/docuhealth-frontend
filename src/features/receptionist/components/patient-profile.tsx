@@ -51,8 +51,6 @@ const coverageTones = {
 } as const satisfies Record<NonNullable<Profile["coverage"]>, string>;
 
 const DAY = 24 * 60 * 60 * 1000;
-/** How far back "Total visits" counts. */
-const RECENT_DAYS = 182;
 
 /** How many visits the history shows at a time. */
 const VISITS_PAGE_SIZE = 7;
@@ -80,9 +78,6 @@ export function PatientProfile({ patientId }: { patientId: string }) {
   const [booking, setBooking] = useState(false);
   const birth = new Date(patient.dateOfBirth);
   const isDependent = patient.proxies.length > 0;
-  const recentVisits = patient.visits.filter(
-    ({ checkedInAt }) => now.getTime() - new Date(checkedInAt).getTime() <= RECENT_DAYS * DAY,
-  ).length;
   const lastVisit = patient.lastVisit && formatDayAndTime(new Date(patient.lastVisit.at), now);
   const lastCheckIn = patient.lastCheckIn && new Date(patient.lastCheckIn.at);
   const upcoming = patient.upcomingAppointment && new Date(patient.upcomingAppointment.at);
@@ -131,8 +126,8 @@ export function PatientProfile({ patientId }: { patientId: string }) {
         <StatCard
           icon={<UserIcon />}
           label="Total visits"
-          value={recentVisits}
-          note="Visits in the last 6 months"
+          value={patient.totalVisits.toLocaleString("en-GB")}
+          note="Check-ins and appointments here"
         />
         <StatCard
           icon={<CalendarBlankIcon />}
@@ -140,7 +135,7 @@ export function PatientProfile({ patientId }: { patientId: string }) {
           value={lastVisit ? lastVisit.time : "N/A"}
           note={
             lastVisit && patient.lastVisit
-              ? `${lastVisit.day} · ${patient.lastVisit.department}`
+              ? [lastVisit.day, patient.lastVisit.department].filter(Boolean).join(" · ")
               : "No visit records to display"
           }
         />
@@ -150,7 +145,12 @@ export function PatientProfile({ patientId }: { patientId: string }) {
           value={lastCheckIn ? formatDayMonthTime(lastCheckIn) : "N/A"}
           note={
             lastCheckIn && patient.lastCheckIn
-              ? `${formatDayAndTime(lastCheckIn, now).day} · ${visitStatusLabels[patient.lastCheckIn.status]}`
+              ? [
+                  formatDayAndTime(lastCheckIn, now).day,
+                  patient.lastCheckIn.status && visitStatusLabels[patient.lastCheckIn.status],
+                ]
+                  .filter(Boolean)
+                  .join(" · ")
               : "No records to display"
           }
         />
@@ -162,7 +162,10 @@ export function PatientProfile({ patientId }: { patientId: string }) {
           }
           note={
             patient.upcomingAppointment
-              ? `${patient.upcomingAppointment.department} Department`
+              ? patient.upcomingAppointment.department
+                ? `${patient.upcomingAppointment.department} Department`
+                : // TODO(api): the department isn't returned.
+                  "Awaiting confirmation"
               : "No records to display"
           }
         />

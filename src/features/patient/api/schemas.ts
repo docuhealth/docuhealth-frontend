@@ -212,3 +212,50 @@ export const drugRecordSchema = z
     dispensedAt: drug.dispensed_at,
   }));
 export type DrugRecord = z.output<typeof drugRecordSchema>;
+
+/** A check-in at a facility, from the patient's visit timeline (`GET /api/patients/visits`). */
+const checkInSchema = z
+  .object({
+    sqid: z.string(),
+    status: optionalText,
+    hospital_info: facility,
+    created_at: z.string(),
+    closed_at: optionalText,
+  })
+  .transform((checkIn) => ({
+    id: checkIn.sqid,
+    at: checkIn.created_at,
+    facility: checkIn.hospital_info,
+    /** Still at the facility: not checked out yet. */
+    open: !checkIn.closed_at && checkIn.status !== "closed",
+    closedAt: checkIn.closed_at,
+  }));
+export type CheckIn = z.output<typeof checkInSchema>;
+
+/**
+ * One row of the patient's visit timeline: a check-in or an appointment, at its time (a booking
+ * at its scheduled time, so future ones come first).
+ */
+export const timelineEntrySchema = z.object({
+  type: z.enum(["appointment", "check-in"]),
+  time: z.string(),
+  appointment: appointmentSchema.nullish(),
+  check_in: checkInSchema.nullish(),
+});
+
+/** The patient's own visit numbers (`GET /api/patients/visit-metrics`). */
+export const visitMetricsSchema = z
+  .object({
+    total_visits: z.number(),
+    last_visit: optionalText,
+    last_check_in: optionalText,
+    upcoming_appointment: z
+      .object({ sqid: z.string(), status: optionalText, scheduled_time: z.string() })
+      .nullish(),
+  })
+  .transform((metrics) => ({
+    totalVisits: metrics.total_visits,
+    lastVisit: metrics.last_visit,
+    lastCheckIn: metrics.last_check_in,
+    upcomingAt: metrics.upcoming_appointment?.scheduled_time ?? null,
+  }));

@@ -119,21 +119,21 @@ export function StaffProfile({
         <StatCard
           icon={<UsersIcon />}
           label="Total patients seen"
-          value={<Figure value={stats?.patientsSeen ?? null} />}
-          note={stats ? periodName : NOT_YET}
+          value={<Figure value={stats.patientsSeen} />}
+          note={periodName}
         />
         <StatCard
           icon={<UserCheckIcon />}
           label="Appointments completed"
-          value={<Figure value={stats?.appointmentsCompleted ?? null} />}
-          note={stats ? "Under their ongoing care" : NOT_YET}
+          value={<Figure value={stats.appointmentsCompleted} />}
+          note={periodName}
         />
         <StatCard
           icon={<CalendarCheckIcon />}
           label={`Appointments ${period === "today" ? "today" : periodName.toLowerCase()}`}
-          value={<Figure value={stats?.appointments ?? null} />}
+          value={<Figure value={stats.appointments} />}
           note={
-            !stats
+            stats.appointments === null
               ? NOT_YET
               : stats.nextAppointmentAt
                 ? `Next at ${formatAppointment(new Date(stats.nextAppointmentAt))}`
@@ -143,8 +143,10 @@ export function StaffProfile({
         <StatCard
           icon={<CalendarBlankIcon />}
           label="Follow-ups requested"
-          value={<Figure value={stats?.followUpsRequested ?? null} />}
-          note={stats ? `${stats.followUpsPending} still pending` : NOT_YET}
+          value={<Figure value={stats.followUpsRequested} />}
+          note={
+            stats.followUpsPending === null ? periodName : `${stats.followUpsPending} still pending`
+          }
         />
       </StatGrid>
 

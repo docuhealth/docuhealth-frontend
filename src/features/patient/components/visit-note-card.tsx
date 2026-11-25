@@ -19,7 +19,7 @@ export function VisitNoteCard({
 }) {
   return (
     <section aria-label={label} className="rounded-xl border bg-card p-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3 border-b pb-3">
         <span
           className={cn(
             "inline-flex items-center gap-1 rounded-md px-2 py-0.5 type-caption-semibold text-white [&_svg]:size-3.5",

@@ -16,7 +16,10 @@ const words = {
   info: "text-fg-caption",
 };
 
-/** One vital sign's latest reading: its icon and name, value and unit, and a note if known. */
+/**
+ * One vital sign's latest reading: its icon and name on the card, and the value, unit and note on
+ * a grey panel inside it.
+ */
 export function VitalTile({
   vital,
   label,
@@ -31,25 +34,27 @@ export function VitalTile({
   note: VitalNote | null;
 }) {
   return (
-    <li className="flex flex-col gap-3 rounded-xl border bg-card p-4">
-      <span className="flex items-center gap-1.5 type-caption text-fg-caption">
-        <VitalIcon vital={vital} className="size-3.5 shrink-0" />
+    <li className="flex flex-col rounded-xl border bg-card p-1">
+      <span className="flex items-center gap-1.5 px-3 pt-2 pb-2.5 type-caption text-fg-caption">
+        <VitalIcon vital={vital} className="size-4 shrink-0" />
         {label}
       </span>
-      <p className="type-stat text-fg-heading">
-        {value ?? "—"}{" "}
-        {value != null && <span className="type-caption text-fg-caption">{unit}</span>}
-      </p>
-      <span className={cn("flex items-center gap-1.5 type-caption", words[note?.tone ?? "info"])}>
-        {note ? (
-          <>
-            <span aria-hidden className={cn("size-1.5 shrink-0 rounded-full", dots[note.tone])} />
-            {note.label}
-          </>
-        ) : (
-          value == null && "Not recorded"
-        )}
-      </span>
+      <div className="flex flex-1 flex-col gap-2.5 rounded-lg bg-surface px-3 py-3.5">
+        <p className="type-stat text-fg-heading">
+          {value ?? "—"}{" "}
+          {value != null && <span className="type-caption text-fg-caption">{unit}</span>}
+        </p>
+        <span className={cn("flex items-center gap-1.5 type-caption", words[note?.tone ?? "info"])}>
+          {note ? (
+            <>
+              <span aria-hidden className={cn("size-1.5 shrink-0 rounded-full", dots[note.tone])} />
+              {note.label}
+            </>
+          ) : (
+            value == null && "Not recorded"
+          )}
+        </span>
+      </div>
     </li>
   );
 }

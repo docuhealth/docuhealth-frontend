@@ -1,5 +1,10 @@
 import type { LabResult, VisitDetail } from "@/features/patient/api/pending";
-import type { Appointment, DrugRecord, VisitSummary } from "@/features/patient/api/schemas";
+import type {
+  Appointment,
+  CheckIn,
+  DrugRecord,
+  VisitSummary,
+} from "@/features/patient/api/schemas";
 import { formatDateCommaTime, formatDay } from "@/lib/format";
 
 // Working out the Visits screens from the patient's visit summaries, appointments and the
@@ -15,7 +20,8 @@ export const visitFilters: { value: VisitFilter; label: string }[] = [
   { value: "emergency", label: "Emergency" },
 ];
 
-export type VisitStatus = "booked" | "summary" | "no-summary" | "admitted" | "discharged";
+export type VisitStatus =
+  "booked" | "summary" | "no-summary" | "admitted" | "discharged" | "in-progress";
 
 /** One row of the Visits list: a booked appointment or a past visit. */
 export type VisitRow = {
@@ -91,12 +97,29 @@ function upcomingAppointments(appointments: Appointment[], now = new Date()) {
     .toSorted((a, b) => a.at.localeCompare(b.at));
 }
 
-/** The Visits list's rows: booked appointments (outpatient), then past visits newest first. */
+const sameDay = (a: string, b: string) => new Date(a).toDateString() === new Date(b).toDateString();
+
+/**
+ * Check-ins no visit summary covers (none from the same facility that day): the visit happened,
+ * but the facility wrote nothing up yet, or the patient is there now.
+ */
+function uncoveredCheckIns(checkIns: CheckIn[], visits: VisitSummary[]) {
+  return checkIns.filter(
+    (checkIn) =>
+      !visits.some((visit) => visit.facility === checkIn.facility && sameDay(visit.at, checkIn.at)),
+  );
+}
+
+/**
+ * The Visits list's rows: booked appointments (outpatient), then past visits newest first: the
+ * visit summaries, and check-ins (`GET /api/patients/visits`) that have no summary.
+ */
 export function visitRows(
   visits: VisitSummary[],
   appointments: Appointment[],
   details: VisitDetail[],
   now = new Date(),
+  checkIns: CheckIn[] = [],
 ): VisitRow[] {
   const upcoming = upcomingAppointments(appointments, now).map((appointment): VisitRow => ({
     id: `appointment-${appointment.id}`,
@@ -126,7 +149,32 @@ export function visitRows(
       visitId: visit.id,
     };
   });
-  return [...upcoming, ...past];
+  const checkedIn = uncoveredCheckIns(checkIns, visits).map(
+    (checkIn): { at: string; row: VisitRow } => ({
+      at: checkIn.at,
+      row: {
+        id: `check-in-${checkIn.id}`,
+        when: "past",
+        // TODO(api): check-ins don't say what kind of visit they were.
+        type: null,
+        title: checkIn.open ? "At the facility now" : "Visit",
+        line: [formatDateCommaTime(new Date(checkIn.at)), checkIn.facility]
+          .filter(Boolean)
+          .join(" · "),
+        status: checkIn.open ? "in-progress" : "no-summary",
+        facility: checkIn.facility,
+        visitId: null,
+      },
+    }),
+  );
+  if (!checkedIn.length) return [...upcoming, ...past];
+  const pastByTime = [
+    ...visits.map((visit, index) => ({ at: visit.at, row: past[index]! })),
+    ...checkedIn,
+  ]
+    .sort((a, b) => b.at.localeCompare(a.at))
+    .map((entry) => entry.row);
+  return [...upcoming, ...pastByTime];
 }
 
 /** The rows a chip shows: all of them, or one type (a lab visit counts only under "All"). */

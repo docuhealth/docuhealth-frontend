@@ -150,7 +150,6 @@ export function StaffManagement() {
               {data && (
                 <p className="type-caption text-fg-caption">
                   {plural(data.summary.staff, "staff", "staff")}
-                  {/* TODO(api): the admin count, once the API says who's an admin. */}
                   {data.summary.admins !== null && ` · ${plural(data.summary.admins, "admin")}`}
                 </p>
               )}

@@ -3,6 +3,8 @@ import { paginated, request } from "@/lib/api";
 import {
   appointmentSchema,
   drugRecordSchema,
+  timelineEntrySchema,
+  visitMetricsSchema,
   visitSummarySchema,
   vitalReadingSchema,
 } from "@/features/patient/api/schemas";
@@ -19,6 +21,8 @@ const patientKeys = {
   appointments: () => [...patientKeys.all, "appointments"] as const,
   drugs: () => [...patientKeys.all, "drugs"] as const,
   vitals: () => [...patientKeys.all, "vitals"] as const,
+  checkIns: () => [...patientKeys.all, "check-ins"] as const,
+  visitMetrics: () => [...patientKeys.all, "visit-metrics"] as const,
 };
 
 /** Every visit summary, newest first: diagnoses, vitals, lab tests, scans and drugs per visit. */
@@ -68,4 +72,29 @@ export const vitalsQuery = () =>
         params: PAGE,
       }),
     select: (page) => [...page.items].sort((a, b) => b.at.localeCompare(a.at)),
+  });
+
+/**
+ * The patient's check-ins at every facility, newest first, from their visit timeline. A check-in
+ * has no summary of its own; a visit summary from the same day and facility is its write-up.
+ */
+export const checkInsQuery = () =>
+  queryOptions({
+    queryKey: patientKeys.checkIns(),
+    queryFn: () =>
+      request(paginated(timelineEntrySchema), {
+        url: "/api/patients/visits",
+        params: PAGE,
+      }),
+    select: (page) =>
+      page.items
+        .flatMap((entry) => (entry.check_in ? [entry.check_in] : []))
+        .sort((a, b) => b.at.localeCompare(a.at)),
+  });
+
+/** The patient's visit numbers: how many, the last one, the next booking. */
+export const visitMetricsQuery = () =>
+  queryOptions({
+    queryKey: patientKeys.visitMetrics(),
+    queryFn: () => request(visitMetricsSchema, { url: "/api/patients/visit-metrics" }),
   });

@@ -39,6 +39,10 @@ import {
   patientListParams,
   tabFilters,
 } from "@/features/hospital-admin/lib/patient-filters";
+import {
+  previousPeriodLabels,
+  thisPeriodLabels,
+} from "@/features/hospital-admin/lib/period-labels";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { cn } from "@/lib/utils";
 
@@ -111,25 +115,25 @@ export function PatientManagement({
           icon={<UserIcon />}
           label="Total check-in"
           value={<Figure value={stats.totalCheckIns} />}
-          note="All patients on record"
+          note="All check-ins on record"
         />
         <StatCard
           icon={<UserPlusIcon />}
           label="New check-ins"
           value={<Figure value={stats.newCheckIns} />}
-          note={<Change by={stats.newCheckInsChange} since="last week" />}
+          note={<Change by={stats.newCheckInsChange} since={previousPeriodLabels[period]} />}
         />
         <StatCard
           icon={<CalendarCheckIcon />}
-          label="Check-ins this month"
-          value={<Figure value={stats.checkInsThisMonth} />}
-          note={<Change by={stats.checkInsThisMonthChange} since="yesterday" />}
+          label={`Check-ins ${thisPeriodLabels[period]}`}
+          value={<Figure value={stats.checkInsThisPeriod} />}
+          note={<Change by={stats.checkInsThisPeriodChange} since={previousPeriodLabels[period]} />}
         />
         <StatCard
           icon={<ArrowsClockwiseIcon />}
           label="Returning Patients"
           value={<Figure value={stats.returningPatients} />}
-          note="Visited before today"
+          note="Visited before"
         />
       </StatGrid>
 

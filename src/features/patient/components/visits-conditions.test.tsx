@@ -34,12 +34,13 @@ describe("Visits", () => {
   it("lists booked and past visits under their dividers, each with its tag", async () => {
     const { user } = renderWithRouter(<VisitsPage />);
     const past = await screen.findByRole("list", { name: "Past visits" });
-    expect(within(past).getAllByRole("listitem")).toHaveLength(8);
+    // Eight visit summaries, and one check-in with no summary yet.
+    expect(within(past).getAllByRole("listitem")).toHaveLength(9);
     expect(
       within(past).getByRole("link", { name: /Follow-up · Internal Medicine/ }),
     ).toHaveAttribute("href", "/patient/health/visits/7");
-    // The Reddington Lab visit shared nothing.
-    expect(within(past).getByText("No summary")).toBeInTheDocument();
+    // The Reddington Lab visit shared nothing, nor has the LUTH check-in been written up.
+    expect(within(past).getAllByText("No summary")).toHaveLength(2);
     expect(within(past).getAllByText("Summary")).toHaveLength(7);
 
     const upcoming = screen.getByRole("list", { name: "Upcoming visits" });
@@ -54,13 +55,29 @@ describe("Visits", () => {
     await user.click(screen.getByRole("button", { name: "LUTH" }));
     expect(
       within(screen.getByRole("list", { name: "Past visits" })).getAllByRole("listitem"),
-    ).toHaveLength(2);
+    ).toHaveLength(3); // Two visit summaries and the check-in with none.
+  });
+
+  it("switches to Upcoming / Past tabs", async () => {
+    const { user } = renderWithRouter(<VisitsPage />);
+    await screen.findByRole("list", { name: "Past visits" });
+    await user.click(screen.getByRole("button", { name: "Upcoming and past tabs" }));
+    expect(screen.queryByRole("button", { name: "Admissions" })).not.toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Upcoming visits" })).toBeInTheDocument();
+    expect(screen.queryByRole("list", { name: "Past visits" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("tab", { name: "Past (9)" }));
+    expect(
+      within(screen.getByRole("list", { name: "Past visits" })).getAllByRole("listitem"),
+    ).toHaveLength(9);
+    // Back to the list for the other tests: the layout is remembered on this device.
+    await user.click(screen.getByRole("button", { name: "One list, by type" }));
   });
 
   it("says there are no visits yet, keeping the chips", async () => {
     server.use(
       http.get(`${env.VITE_API_URL}/api/records/summaries/:hin`, empty),
       http.get(`${env.VITE_API_URL}/api/hospital-ops/appointments/mine`, empty),
+      http.get(`${env.VITE_API_URL}/api/patients/visits`, empty),
     );
     renderWithRouter(<VisitsPage />);
     expect(await screen.findByText("No visits yet")).toBeInTheDocument();

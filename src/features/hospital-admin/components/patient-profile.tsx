@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs } from "@/components/ui/tabs";
 import { patientDetailQuery } from "@/features/hospital-admin/api/queries";
 import {
+  appointmentStateLabels,
   coverageLabels,
   type PatientDetail,
   sexLabels,
@@ -27,6 +28,7 @@ import {
 } from "@/features/hospital-admin/api/schemas";
 import { CountTab, CountTabsList } from "@/components/dashboard/count-tabs";
 import { FilterSelect } from "@/components/dashboard/filter-select";
+import { LinkedPatients } from "@/features/hospital-admin/components/linked-patients";
 import { PersonAvatar } from "@/components/dashboard/person-avatar";
 import { InfoRow, ProfileCard } from "@/components/dashboard/profile-card";
 import { Figure } from "@/components/dashboard/figure";
@@ -40,9 +42,6 @@ const coverageTones = {
 } as const satisfies Record<NonNullable<PatientDetail["coverage"]>, string>;
 
 const DAY = 24 * 60 * 60 * 1000;
-
-/** For what the API doesn't send yet. TODO(api). */
-const NOT_YET = "Not available yet";
 
 /** How far back the check-in history goes. */
 const historyRanges = {
@@ -65,11 +64,8 @@ export function PatientProfile({ patientId }: { patientId: string }) {
   // When the page opened, for "Today" and the history's date range.
   const [now] = useState(() => new Date());
   const birth = patient.dateOfBirth ? new Date(patient.dateOfBirth) : null;
-  // TODO(api): the admin's patient endpoint has no visit history (or last visit, check-in or
-  // upcoming appointment), so those say "Not available yet" rather than "none".
-  const known = patient.visits !== null;
-  const visits = patient.visits ?? [];
-  const none = known ? "No records to display" : NOT_YET;
+  const { visits } = patient;
+  const none = "No records to display";
   const counts = {
     appointment: visits.filter(({ kind }) => kind === "appointment").length,
     check_in: visits.filter(({ kind }) => kind === "check_in").length,
@@ -114,13 +110,11 @@ export function PatientProfile({ patientId }: { patientId: string }) {
         <StatCard
           icon={<UserIcon />}
           label="Total visits"
-          value={<Figure value={known ? visits.length : null} />}
+          value={<Figure value={patient.totalVisits} />}
           note={
-            !known
-              ? NOT_YET
-              : visits.length === 0
-                ? "No visit records to display"
-                : `${plural(counts.appointment, "appointment")} · ${plural(counts.check_in, "check-in")}`
+            patient.totalVisits === 0
+              ? "No visit records to display"
+              : "Check-ins and attended appointments"
           }
         />
         <DateStat
@@ -128,7 +122,7 @@ export function PatientProfile({ patientId }: { patientId: string }) {
           label="Last Visit"
           at={patient.lastVisitAt}
           now={now}
-          none={known ? "No visit records to display" : NOT_YET}
+          none="No visit records to display"
         />
         <DateStat
           icon={<ClockIcon />}
@@ -165,19 +159,24 @@ export function PatientProfile({ patientId }: { patientId: string }) {
               {patient.address ?? "—"}
             </InfoRow>
             <InfoRow icon={<StethoscopeIcon />} label="Assigned Doctor">
+              {/* TODO(api): no endpoint says who the patient's doctor is. */}
               {patient.assignedDoctor ?? "—"}
             </InfoRow>
           </dl>
         </ProfileCard>
 
-        <CheckInHistory visits={visits} known={known} counts={counts} now={now} />
+        <CheckInHistory visits={visits} counts={counts} now={now} />
+
+        {patient.linked.patients.length > 0 && (
+          <LinkedPatients
+            relation={patient.linked.relation}
+            patients={patient.linked.patients}
+            now={now}
+          />
+        )}
       </div>
     </div>
   );
-}
-
-function plural(count: number, one: string) {
-  return `${count} ${count === 1 ? one : `${one}s`}`;
 }
 
 /** A stat card for when something happened: the day, then the time (or `none`). */
@@ -208,13 +207,10 @@ function DateStat({
 /** The patient's past appointments and check-ins, by kind and how far back. */
 function CheckInHistory({
   visits,
-  known,
   counts,
   now,
 }: {
-  visits: NonNullable<PatientDetail["visits"]>;
-  /** Whether the API sent the history at all. TODO(api). */
-  known: boolean;
+  visits: PatientDetail["visits"];
   counts: Record<VisitKind, number>;
   now: Date;
 }) {
@@ -260,15 +256,11 @@ function CheckInHistory({
           <span className="mb-3 grid size-12 place-content-center rounded-full bg-line text-fg-caption">
             <CalendarXIcon className="size-6" />
           </span>
-          <p className="type-h5">
-            {!known ? NOT_YET : visits.length === 0 ? "No visits yet" : "No visits found"}
-          </p>
+          <p className="type-h5">{visits.length === 0 ? "No visits yet" : "No visits found"}</p>
           <p className="type-body-sm-regular text-fg-caption">
-            {!known
-              ? "Visit history is waiting on the backend."
-              : visits.length === 0
-                ? "No visit records to display"
-                : "None match this tab and date range."}
+            {visits.length === 0
+              ? "No visit records to display"
+              : "None match this tab and date range."}
           </p>
         </div>
       ) : (
@@ -284,7 +276,13 @@ function CheckInHistory({
                 </span>
                 <div className="flex min-w-0 flex-1 flex-col">
                   <span className="type-body-sm-medium text-fg-heading">
-                    {visitKindLabels[visit.kind]} · {visitTypeLabels[visit.visitType]}
+                    {[
+                      visitKindLabels[visit.kind],
+                      visit.visitType && visitTypeLabels[visit.visitType],
+                      visit.state && appointmentStateLabels[visit.state],
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </span>
                   <span className="truncate type-body-sm-regular text-fg-caption">
                     {visit.seenBy ?? "No doctor recorded"}

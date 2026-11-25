@@ -2,34 +2,41 @@ import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { request } from "@/lib/api";
 import { NotAvailableYetError } from "@/lib/not-available";
 import { type Period } from "@/lib/period";
-import { staffRoleLabels, type StaffRole } from "@/lib/staff-profile";
 import {
+  administrationMetricsSchema,
+  checkInPageSchema,
   countOnlySchema,
   facilitySubscriptionSchema,
   type DashboardOverview,
+  guardianshipPageSchema,
   hospitalProfileSchema,
+  isOpenCheckIn,
   type PatientDetail,
   type PatientFilterOptions,
   patientInfoSchema,
   type PatientList,
   type PatientListParams,
+  patientManagementMetricsSchema,
   patientPageSchema,
   type PatientQueue,
-  type PatientStats,
   patientStatusOfTab,
   type PatientTab,
   patientTabLabels,
   type StaffDetail,
+  staffDetailSchema,
   type StaffFilter,
   type StaffList,
   type StaffMember,
   staffPageSchema,
+  staffRoleCountsSchema,
   subscriptionPlansSchema,
   toPatientDetail,
   toPatientVisit,
   toQueueEntry,
   toStaffDetail,
   toStaffMember,
+  visitMetricsSchema,
+  visitTimelinePageSchema,
   wardBedsSchema,
   type WardList,
   wardManagePageSchema,
@@ -69,53 +76,55 @@ export const hospitalProfileQuery = () =>
     queryFn: () => request(hospitalProfileSchema, { url: "/api/auth/staff/profile" }),
   });
 
+/** A dashboard period as the API names it (its `period`, or `timeframe` on some endpoints). */
+const apiPeriod = { today: "day", week: "week", month: "month" } as const satisfies Record<
+  Period,
+  string
+>;
+
 /** How many staff match `params`, e.g. one role. */
 const countStaff = (params: Record<string, string> = {}) =>
   request(countOnlySchema, { url: STAFF_URL, params: { ...params, page: 1, size: 1 } });
 
-/**
- * The overview's numbers: the team's size and its split by role. TODO(api): nothing says when
- * staff joined, who's an admin or how many facilities the hospital has, so those are null.
- */
+/** The headline staff and facility numbers, `added` counting staff added in `period`. */
+const administrationMetrics = (period?: Period) =>
+  request(administrationMetricsSchema, {
+    url: "/api/hospital-ops/administration-metrics",
+    params: { timeframe: period && apiPeriod[period] },
+  });
+
+/** The overview's numbers: the team's size, who joined in `period`, and its split by role. */
 export const dashboardOverviewQuery = (period: Period) =>
   queryOptions({
     queryKey: hospitalAdminKeys.overview(period),
     queryFn: async (): Promise<DashboardOverview> => {
-      const roles = Object.keys(staffRoleLabels) as StaffRole[];
-      const [totalStaff, ...byRole] = await Promise.all([
-        countStaff(),
-        ...roles.map((role) => countStaff({ role })),
+      const [stats, staffByRole] = await Promise.all([
+        administrationMetrics(period),
+        request(staffRoleCountsSchema, { url: "/api/hospital-ops/staff-role-counts" }),
       ]);
-      return {
-        stats: {
-          totalStaff,
-          addedThisMonth: null,
-          addedLastMonth: null,
-          administrators: null,
-          facilities: null,
-        },
-        staffByRole: roles.map((role, index) => ({ role, count: byRole[index] ?? 0 })),
-      };
+      return { stats, staffByRole };
     },
   });
 
 // Searches keep showing the previous results until the new ones arrive.
 
 /**
- * Patients checked in and not yet checked out, longest wait first. TODO(api): "outpatient"
- * includes patients already with the nurse or doctor.
+ * Patients checked in and not yet checked out, longest wait first. The API lists every check-in,
+ * newest first with closed ones included; the queue is only the open ones, so closed check-ins
+ * are dropped here (from the newest 50).
  */
 export const patientQueueQuery = (search: string) =>
   queryOptions({
     queryKey: hospitalAdminKeys.queue(search),
     queryFn: async (): Promise<PatientQueue> => {
-      const { results } = await request(patientPageSchema, {
-        url: PATIENTS_URL,
-        params: { status: "outpatient", search: search || undefined, page: 1, size: 50 },
+      const { items } = await request(checkInPageSchema, {
+        url: "/api/hospital-ops/patients-check-ins",
+        params: { search: search || undefined, page: 1, size: 50 },
       });
       const now = Date.now();
       return {
-        items: results
+        items: items
+          .filter(isOpenCheckIn)
           .map((row) => toQueueEntry(row, now))
           .sort((a, b) => b.waitMinutes - a.waitMinutes),
       };
@@ -147,11 +156,15 @@ export const staffListQuery = (search: string, page: number, filter: StaffFilter
     queryKey: hospitalAdminKeys.staff(search, page, filter),
     queryFn: async (): Promise<StaffList> => {
       if (filter === "admins") throw new NotAvailableYetError("Showing only admins");
-      const [members, staff] = await Promise.all([allStaff(search), countStaff()]);
+      const [members, staff, { administrators }] = await Promise.all([
+        allStaff(search),
+        countStaff(),
+        administrationMetrics(),
+      ]);
       const matching = filter === "all" ? members : members.filter((m) => m.status === filter);
       return {
         total: matching.length,
-        summary: { staff, admins: null },
+        summary: { staff, admins: administrators },
         page,
         pageSize: STAFF_PAGE_SIZE,
         items: matching.slice((page - 1) * STAFF_PAGE_SIZE, page * STAFF_PAGE_SIZE),
@@ -160,40 +173,37 @@ export const staffListQuery = (search: string, page: number, filter: StaffFilter
     placeholderData: keepPreviousData,
   });
 
-/** A staff member the API doesn't have (or this admin can't see). */
-class StaffNotFoundError extends Error {
-  constructor(id: string) {
-    super(`Staff member ${id} not found`);
-    this.name = "StaffNotFoundError";
-  }
-}
-
 /**
- * One staff member's profile. TODO(api): there's no endpoint for one member, so this finds them
- * in the team list; their activity, access and other details wait on the API.
+ * One staff member's profile and their activity in `period` (a 404 for someone this admin can't
+ * see). Their phone number and team status are only in the staff list, so that's read too.
  */
 export const staffDetailQuery = (id: string, period: Period) =>
   queryOptions({
     queryKey: hospitalAdminKeys.staffMember(id, period),
     queryFn: async (): Promise<StaffDetail> => {
-      const member = (await allStaff("")).find((candidate) => candidate.id === id);
-      if (!member) throw new StaffNotFoundError(id);
-      return toStaffDetail(member);
+      const [detail, team] = await Promise.all([
+        request(staffDetailSchema, {
+          url: `/api/hospital-ops/staff/${encodeURIComponent(id)}`,
+          params: { period: apiPeriod[period] },
+        }),
+        allStaff(""),
+      ]);
+      return toStaffDetail(
+        detail,
+        team.find((member) => member.id === id),
+      );
     },
   });
 
-/** Check-in numbers. TODO(api): no endpoint has them yet, so every figure is null. */
+/** Check-in numbers for `period`. */
 export const patientStatsQuery = (period: Period) =>
   queryOptions({
     queryKey: hospitalAdminKeys.patientStats(period),
-    queryFn: (): PatientStats => ({
-      totalCheckIns: null,
-      newCheckIns: null,
-      newCheckInsChange: null,
-      checkInsThisMonth: null,
-      checkInsThisMonthChange: null,
-      returningPatients: null,
-    }),
+    queryFn: () =>
+      request(patientManagementMetricsSchema, {
+        url: "/api/hospital-ops/patient-management/metrics",
+        params: { period: apiPeriod[period] },
+      }),
   });
 
 export const PATIENTS_PAGE_SIZE = 6;
@@ -203,10 +213,17 @@ function unsupportedFilter(params: PatientListParams) {
   if (params.ward !== "all") return "Filtering patients by ward";
   if (params.doctor !== "all") return "Filtering patients by doctor";
   if (params.visitType !== "all") return "Filtering patients by visit type";
-  if (params.date !== "anytime") return "Filtering patients by date";
   if (params.sort !== "latest") return "Sorting patients";
   return null;
 }
+
+/** The date filter as the API's `period`; each list filters on its own date. */
+const datePeriod = {
+  anytime: undefined,
+  today: "day",
+  week: "week",
+  month: "month",
+} as const satisfies Record<PatientListParams["date"], string | undefined>;
 
 const tabs = Object.keys(patientTabLabels) as PatientTab[];
 
@@ -222,6 +239,7 @@ export const patientListQuery = (params: PatientListParams) =>
           url: PATIENTS_URL,
           params: {
             status: patientStatusOfTab[params.tab],
+            period: datePeriod[params.date],
             search: params.search || undefined,
             page: params.page,
             size: PATIENTS_PAGE_SIZE,
@@ -271,14 +289,27 @@ export const patientFilterOptionsQuery = () =>
     },
   });
 
-/** A patient's profile; `id` is their HIN. */
+/** How many of a patient's visits, and of their guardians or dependants, the profile reads. */
+const PROFILE_LIST_SIZE = 100;
+
+/**
+ * A patient's profile, with their visits at this hospital and their guardians or dependants;
+ * `id` is their HIN.
+ */
 export const patientDetailQuery = (id: string) =>
   queryOptions({
     queryKey: hospitalAdminKeys.patient(id),
-    queryFn: async (): Promise<PatientDetail> =>
-      toPatientDetail(
-        await request(patientInfoSchema, { url: `/api/patients/${encodeURIComponent(id)}/info` }),
-      ),
+    queryFn: async (): Promise<PatientDetail> => {
+      const url = `/api/patients/${encodeURIComponent(id)}`;
+      const list = { page: 1, size: PROFILE_LIST_SIZE };
+      const [record, metrics, linked, visits] = await Promise.all([
+        request(patientInfoSchema, { url: `${url}/info` }),
+        request(visitMetricsSchema, { url: `${url}/visit-metrics` }),
+        request(guardianshipPageSchema, { url: `${url}/guardianship`, params: list }),
+        request(visitTimelinePageSchema, { url: `${url}/visits`, params: list }),
+      ]);
+      return toPatientDetail(record, metrics, linked.items, visits.items);
+    },
   });
 
 export const WARDS_PAGE_SIZE = 12;

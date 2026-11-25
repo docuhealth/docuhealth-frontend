@@ -70,7 +70,7 @@ describe("Patient health", () => {
     renderWithRouter(<PatientHealth />);
     expect(await screen.findByText("5 results")).toBeInTheDocument();
     expect(screen.getByText("1 current · 6 past")).toBeInTheDocument();
-    expect(screen.getByText("8 visits")).toBeInTheDocument();
+    expect(screen.getByText(/^9 visits · last /)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Diagnoses & conditions/ })).toHaveAttribute(
       "href",
       "/patient/health/conditions",

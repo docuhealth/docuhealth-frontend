@@ -1,6 +1,9 @@
 import { screen, within } from "@testing-library/react";
+import { HttpResponse, http } from "msw";
 import { describe, expect, it, vi } from "vitest";
 import { AppointmentsCalendar } from "@/features/receptionist/components/appointments-calendar";
+import { env } from "@/env";
+import { server } from "@/mocks/node";
 import { formatLongDate } from "@/lib/format";
 import { pickOption, renderWithProviders } from "@/test/render";
 
@@ -22,6 +25,51 @@ describe("AppointmentsCalendar", () => {
 
     await user.click(screen.getByRole("button", { name: "Next day" }));
     expect(onNavigate).toHaveBeenLastCalledWith({ date: expect.any(Date) });
+  });
+
+  it("shows the API's numbers for the current week", async () => {
+    let period: string | null = null;
+    server.use(
+      http.get(`${env.VITE_API_URL}/api/hospital-ops/appointments-overview`, ({ request }) => {
+        period = new URL(request.url).searchParams.get("period");
+        return HttpResponse.json({
+          appointments_booked: { count: 11, percent_change: -8.33 },
+          in_progress_appointments: 2,
+          cancelled_appointments: { count: 3, change: -1 },
+        });
+      }),
+    );
+    renderWithProviders(
+      <AppointmentsCalendar view="week" date={new Date()} onNavigate={() => {}} />,
+    );
+
+    const summary = await screen.findByLabelText("Summary");
+    expect(period).toBe("week");
+    const card = (label: string) =>
+      within(summary).getByText(label, { selector: "dt" }).nextElementSibling;
+    expect(card("Booked this week")).toHaveTextContent("11Down8.33%vs. last week");
+    expect(card("Checked in")).toHaveTextContent("22 of 11 appointments");
+    expect(card("Cancelled")).toHaveTextContent("3Down1 fewervs. last week");
+  });
+
+  it("counts another span's numbers from its appointments", async () => {
+    const requested = vi.fn();
+    server.use(
+      http.get(`${env.VITE_API_URL}/api/hospital-ops/appointments-overview`, () => {
+        requested();
+        return HttpResponse.json({}, { status: 500 });
+      }),
+    );
+    const lastMonth = new Date();
+    lastMonth.setMonth(lastMonth.getMonth() - 1, 15);
+    renderWithProviders(
+      <AppointmentsCalendar view="month" date={lastMonth} onNavigate={() => {}} />,
+    );
+
+    const summary = await screen.findByLabelText("Summary");
+    const booked = within(summary).getByText("Booked this month", { selector: "dt" });
+    expect(booked.nextElementSibling).toHaveTextContent(/^\d+Not available yet$/);
+    expect(requested).not.toHaveBeenCalled();
   });
 
   it("starts a new appointment by finding the patient, and can change them", async () => {

@@ -1,7 +1,7 @@
 import { Tag } from "@/features/patient/components/tag";
 import type { VisitStatus } from "@/features/patient/lib/visits";
 
-/** A visit row's tag: Booked, Summary, No summary, Admitted or Discharged. */
+/** A visit row's tag: Booked, Summary, No summary, In progress, Admitted or Discharged. */
 export function VisitStatusTag({ status }: { status: VisitStatus }) {
   switch (status) {
     case "booked":
@@ -12,6 +12,8 @@ export function VisitStatusTag({ status }: { status: VisitStatus }) {
       return <Tag tone="neutral">No summary</Tag>;
     case "admitted":
       return <Tag tone="warning">Admitted</Tag>;
+    case "in-progress":
+      return <Tag tone="info">In progress</Tag>;
     case "discharged":
       return <Tag tone="success">Discharged</Tag>;
   }

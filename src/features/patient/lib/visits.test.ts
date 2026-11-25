@@ -131,3 +131,34 @@ describe("visit helpers", () => {
     expect(labHeadline(null)).toBeNull();
   });
 });
+
+describe("visitRows with check-ins", () => {
+  const checkIn = (id: string, at: string, facility: string, open = false) => ({
+    id,
+    at,
+    facility,
+    open,
+    closedAt: open ? null : at,
+  });
+
+  it("adds check-ins no summary covers, newest first, and skips the ones that have one", () => {
+    const rows = visitRows(
+      [visit("7", { at: "2026-09-25T09:30:00", complaint: "Follow-up" })],
+      [],
+      [],
+      now,
+      [
+        // Same day and facility as visit 7: its summary covers it.
+        checkIn("c7", "2026-09-25T09:00:00", "ABC Hospital"),
+        checkIn("c1", "2026-09-28T14:00:00", "LUTH"),
+        checkIn("c2", "2026-09-30T08:00:00", "LUTH", true),
+      ],
+    );
+    expect(rows.map((row) => [row.id, row.status])).toEqual([
+      ["check-in-c2", "in-progress"],
+      ["check-in-c1", "no-summary"],
+      ["visit-7", "summary"],
+    ]);
+    expect(rows[1]).toMatchObject({ title: "Visit", visitId: null, type: null });
+  });
+});

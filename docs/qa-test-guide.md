@@ -91,27 +91,40 @@ with a code, password) and the top bar (name, greeting, log out). Check them onc
 
 ### Hospital admin
 
-- [ ] Dashboard: team size, staff by role, today's queue.
+- [ ] Dashboard: the four banner numbers (total staff, added this day / week / month with its
+      change, administrators, facilities) follow the period picker; staff by role; the queue
+      (open check-ins, longest wait first).
 - [ ] Staff Mgt.: search, On team / Removed, open a staff profile, remove and **Undo**, add staff
       (no password: the new member is emailed a temporary one, with a link to the hospital login).
 - [ ] Add Facility: type, the facility's name and address, and its admin.
-- [ ] Patient Mgt.: the four tabs with counts, search, open a patient profile.
+- [ ] Patient Mgt.: the four metric cards (total, new and this-period check-ins, returning
+      patients) follow the period; the four tabs with counts, search, the date filter; open a
+      patient profile: total visits, last visit and check-in, upcoming appointment, visit
+      history, and guardians or dependants.
+- [ ] Staff profile: patients seen, appointments completed, follow-ups requested, joined on,
+      added by.
 - [ ] Ward Mgt.: create a ward, rename or resize, delete, see beds.
 - [ ] Audit logs: list, lab and radiology downloads.
 - [ ] Wallet: subscription plans listed (never buy one).
 - [ ] Settings: change the banner photo.
-- **Known gaps:** admin access toggle, joining dates, facility count, check-in stats, patient
-  filters and sorting, staff activity, patient visit history, wallet balance ("Not available
-  yet").
+- **Known gaps:** admin access toggle, patient filters by ward / doctor / visit type and
+  sorting, visit type and "checked in by", staff ID and date of birth, assigned doctor, wallet
+  balance ("Not available yet").
 
 ### Receptionist
 
-- [ ] Dashboard: queue and today's appointments; check a patient out.
+- [ ] Dashboard: the four cards (total check-ins, waiting this hour vs last hour, waiting for a
+      nurse, appointments with their change) follow the period; the queue (search by name, HIN
+      or phone); check a patient out.
 - [ ] Patient Mgt.: HIN lookup, profile, **Check in**, register a patient (with date of birth),
       add a dependant.
-- [ ] Appointments: three tabs, search, calendar, open an appointment, book one.
+- [ ] Appointments: the cards (booked, checked in, cancelled, with changes) for this day /
+      week / month; Today / Tomorrow / Upcoming tabs, search, calendar, open an appointment,
+      book one.
+- [ ] A patient's profile: total visits, last visit and check-in, upcoming appointment,
+      payment type, visit history, dependants or guardians.
 - [ ] Admissions: Pending / Admitted / Rejected, search, admit, reject with a reason.
-- **Known gaps:** most overview figures, reschedule and cancel, follow-up requests, linking an
+- **Known gaps:** check-in reason, reschedule and cancel, follow-up requests, linking an
   existing child. **Booking** fails with `staff: This field is required.` until the backend
   changes it.
 

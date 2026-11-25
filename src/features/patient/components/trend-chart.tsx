@@ -5,11 +5,11 @@ import { cn } from "@/lib/utils";
 /** One series on the chart: its name and its bar color (a `bg-*` token class). */
 export type TrendSeries = { name: string; color: string };
 
-/** A round step for about four gridlines up to `max`: 1, 2, 2.5 or 5 times a power of ten. */
+/** A round step for about four gridlines up to `max`: 1, 2, 2.5, 4 or 5 times a power of ten. */
 function niceStep(max: number) {
   const raw = Math.max(max, 1) / 4;
   const power = 10 ** Math.floor(Math.log10(raw));
-  const step = [1, 2, 2.5, 5, 10].find((factor) => factor * power >= raw) ?? 10;
+  const step = [1, 2, 2.5, 4, 5, 10].find((factor) => factor * power >= raw) ?? 10;
   return step * power;
 }
 

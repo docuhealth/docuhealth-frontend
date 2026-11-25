@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { paginated } from "@/lib/api";
 import {
   type PatientRecord,
   patientRecordSchema,
@@ -66,10 +67,12 @@ export type HospitalProfile = z.infer<typeof hospitalProfileSchema>;
 export type DashboardOverview = {
   stats: {
     totalStaff: number;
-    addedThisMonth: number | null;
-    addedLastMonth: number | null;
-    administrators: number | null;
-    facilities: number | null;
+    /** Staff added in the period asked for. */
+    added: number;
+    /** `added` minus the period before's; `null` when there's nothing to compare with. */
+    addedChange: number | null;
+    administrators: number;
+    facilities: number;
   };
   staffByRole: { role: StaffRole; count: number }[];
 };
@@ -165,23 +168,24 @@ type Permission = keyof typeof permissionLabels;
 
 /**
  * One staff member's profile page: their record plus details, activity and access.
- * TODO(api): there's no endpoint for one member, so only the staff list's fields are filled.
+ * TODO(api): the API doesn't store a staff ID, date of birth or access roles.
  */
 export type StaffDetail = StaffMember & {
   /** e.g. "STF-00218" */
   staffCode: string | null;
   dateOfBirth: string | null;
-  /** Who added them, e.g. "Dr. Sarah Adeyemi"; `null` if unknown. */
+  /** Who added them, e.g. "Sarah Adeyemi" (or their email); `null` if unknown. */
   addedBy: string | null;
   /** Activity in the period asked for. */
   stats: {
     patientsSeen: number;
     appointmentsCompleted: number;
-    appointments: number;
+    /** TODO(api): appointments in the period, the next one and pending follow-ups aren't sent. */
+    appointments: number | null;
     nextAppointmentAt: string | null;
     followUpsRequested: number;
-    followUpsPending: number;
-  } | null;
+    followUpsPending: number | null;
+  };
   permissions: { permission: Permission; granted: boolean }[] | null;
 };
 
@@ -205,14 +209,20 @@ export const visitTypeLabels = {
 } as const;
 type VisitType = keyof typeof visitTypeLabels;
 
-/** Check-ins in the period asked for; each `change` is against the one before it. */
+/**
+ * Check-ins in the period asked for; each `change` is against the one before it (`null` when
+ * there's nothing to compare with).
+ */
 export type PatientStats = {
-  totalCheckIns: number | null;
-  newCheckIns: number | null;
+  /** Every check-in ever, whatever the period. */
+  totalCheckIns: number;
+  /** Check-ins that were the patient's first here. */
+  newCheckIns: number;
   newCheckInsChange: number | null;
-  checkInsThisMonth: number | null;
-  checkInsThisMonthChange: number | null;
-  returningPatients: number | null;
+  checkInsThisPeriod: number;
+  checkInsThisPeriodChange: number | null;
+  /** Patients (not check-ins) back after an earlier check-in. */
+  returningPatients: number;
 };
 
 type Patient = {
@@ -322,9 +332,16 @@ type Coverage = keyof typeof coverageLabels;
 export const visitKindLabels = { appointment: "Appointment", check_in: "Check-In" } as const;
 export type VisitKind = keyof typeof visitKindLabels;
 
+/** Where an appointment in a patient's history stands, when it isn't simply attended. */
+export const appointmentStateLabels = { upcoming: "Upcoming", cancelled: "Cancelled" } as const;
+type AppointmentState = keyof typeof appointmentStateLabels;
+
+/** A patient's guardian or dependant. */
+export type LinkedPatient = Omit<Patient, "avatarUrl"> & { lastVisitAt: string | null };
+
 /**
- * One patient's profile: who they are, their visits so far and what's coming up. TODO(api):
- * the admin's patient endpoint has no doctor, visits or appointments, so those are `null`.
+ * One patient's profile: who they are, their visits at this hospital and what's coming up.
+ * TODO(api): no endpoint says who their doctor is.
  */
 export type PatientDetail = Patient & {
   coverage: Coverage | null;
@@ -333,20 +350,28 @@ export type PatientDetail = Patient & {
   address: string | null;
   /** e.g. "Dr. Sarah Adeyemi"; `null` until one is assigned. */
   assignedDoctor: string | null;
+  /** Check-ins plus confirmed or completed appointments. */
+  totalVisits: number;
   lastVisitAt: string | null;
   lastCheckInAt: string | null;
   upcomingAppointmentAt: string | null;
-  /** Past appointments and check-ins, latest first. */
-  visits:
-    | {
-        id: string;
-        kind: VisitKind;
-        visitType: VisitType;
-        at: string;
-        /** Who saw them, e.g. "Dr. Tola Bello"; `null` if no one is recorded. */
-        seenBy: string | null;
-      }[]
-    | null;
+  /** Appointments (whatever their status, booked ones first) and check-ins, latest first. */
+  visits: {
+    id: string;
+    kind: VisitKind;
+    /** TODO(api): check-ins don't record a visit type; an appointment's is free text. */
+    visitType: VisitType | null;
+    at: string;
+    /** Who saw them, e.g. "Dr. Tola Bello"; `null` if no one is recorded. */
+    seenBy: string | null;
+    /** An appointment not yet held, or cancelled; `null` otherwise. */
+    state: AppointmentState | null;
+  }[];
+  /**
+   * The patient's guardians if they're a dependant, otherwise their dependants. TODO(api): the
+   * API doesn't say which; a patient with no email is read as a dependant (no login of their own).
+   */
+  linked: { relation: "guardians" | "dependants"; patients: LinkedPatient[] };
 };
 
 // ---------------------------------------------------------------------------------------------
@@ -379,15 +404,114 @@ export const toStaffMember = (member: z.infer<typeof staffMemberRead>): StaffMem
   isAdmin: null,
 });
 
-/** The member detail the staff list can't give. */
-export const toStaffDetail = (member: StaffMember): StaffDetail => ({
-  ...member,
-  staffCode: null,
-  dateOfBirth: null,
-  addedBy: null,
-  stats: null,
-  permissions: null,
+/** A role the app knows, or `null`. */
+const role = z
+  .string()
+  .nullish()
+  .transform((value) => (value && value in staffRoles ? (value as StaffRole) : null));
+
+/** `GET /api/hospital-ops/staff/{sqid}?period=…`: one member's activity in the period, and profile. */
+export const staffDetailSchema = z.object({
+  total_patients_seen: count,
+  appointments_completed: count,
+  follow_ups_requested: count,
+  staff_info: z.object({
+    sqid: z.string(),
+    firstname: text,
+    lastname: text,
+    role,
+    gender: optionalText,
+    joined_at: dateTime.nullish(),
+    email: text,
+    // `null` for staff added before this was recorded; a DH admin has an email but no name.
+    added_by_info: z.object({ firstname: text, lastname: text, email: text }).nullish(),
+  }),
 });
+
+/**
+ * One member's profile page. The member's own endpoint has no phone number or team status, so
+ * those come from their row in the staff list (`listed`), if it's there.
+ */
+export function toStaffDetail(
+  { staff_info: info, ...stats }: z.infer<typeof staffDetailSchema>,
+  listed: StaffMember | undefined,
+): StaffDetail {
+  const addedBy = info.added_by_info;
+  return {
+    id: info.sqid,
+    name: fullName(info.firstname, info.lastname) || info.email,
+    email: info.email,
+    phone: listed?.phone ?? "",
+    role: info.role,
+    avatarUrl: null,
+    addedAt: info.joined_at ?? null,
+    status: listed?.status ?? "on_team",
+    sex: info.gender ? sexOf(info.gender) : (listed?.sex ?? null),
+    isAdmin: null,
+    // TODO(api): not stored.
+    staffCode: null,
+    dateOfBirth: null,
+    addedBy: addedBy
+      ? fullName(addedBy.firstname, addedBy.lastname) || addedBy.email || null
+      : null,
+    stats: {
+      patientsSeen: stats.total_patients_seen,
+      appointmentsCompleted: stats.appointments_completed,
+      appointments: null,
+      nextAppointmentAt: null,
+      followUpsRequested: stats.follow_ups_requested,
+      followUpsPending: null,
+    },
+    permissions: null,
+  };
+}
+
+/** `GET /api/hospital-ops/administration-metrics?timeframe=…`: the overview's headline numbers. */
+export const administrationMetricsSchema = z
+  .object({
+    total_staff: count,
+    added_this_duration: z.object({ count: count, change: z.number().int().nullish() }),
+    administrators: count,
+    total_facilities: count,
+  })
+  .transform((metrics): DashboardOverview["stats"] => ({
+    totalStaff: metrics.total_staff,
+    added: metrics.added_this_duration.count,
+    addedChange: metrics.added_this_duration.change ?? null,
+    administrators: metrics.administrators,
+    facilities: metrics.total_facilities,
+  }));
+
+/**
+ * `GET /api/hospital-ops/staff-role-counts`: every role the app knows, with how many hold it. The
+ * API leaves out roles no one holds, so those are 0.
+ */
+export const staffRoleCountsSchema = z.array(z.object({ role, count: count })).transform((rows) =>
+  (Object.keys(staffRoles) as StaffRole[]).map((name) => ({
+    role: name,
+    count: rows.find((row) => row.role === name)?.count ?? 0,
+  })),
+);
+
+/** A count and its change against the period before (`null` without a period). */
+const countWithChange = z.object({ count: count, change: z.number().int().nullish() });
+
+/** `GET /api/hospital-ops/patient-management/metrics?period=…`: the check-in numbers. */
+export const patientManagementMetricsSchema = z
+  .object({
+    total_checkins: count,
+    new_checkins: countWithChange,
+    checkins_this_period: countWithChange,
+    returning_patients: count,
+  })
+  .transform((metrics): PatientStats => ({
+    totalCheckIns: metrics.total_checkins,
+    newCheckIns: metrics.new_checkins.count,
+    newCheckInsChange: metrics.new_checkins.change ?? null,
+    checkInsThisPeriod: metrics.checkins_this_period.count,
+    checkInsThisPeriodChange: metrics.checkins_this_period.change ?? null,
+    returningPatients: metrics.returning_patients,
+  }));
 
 /** Someone named on a record (`*_by_info`). */
 const person = z
@@ -410,7 +534,15 @@ const bed = z
   .nullish()
   .transform((info) => (info ? String(info.bed_number) : null));
 
-/** `GET /api/hospital-ops/patients?status=…`: a row of any of its four lists. */
+/**
+ * `GET /api/hospital-ops/patients?status=…`: a row of any of its four lists, read for the columns
+ * the tabs have. Each list sends its own fields: admissions (`inpatient`) their ward, bed, the
+ * doctor who asked for the bed, latest vitals, ongoing medications and admission note; open
+ * check-ins (`outpatient`) their nurse/doctor stage, latest vitals and any bed request;
+ * closed check-ins who closed them and when; discharges the ward, bed, who signed the discharge
+ * and the discharge forms. The vitals, medications, notes and forms have no column, so they
+ * aren't read. A dependant's `patient_info` has no `email` key.
+ */
 const patientRow = z.object({
   sqid: z.string(),
   status: optionalText,
@@ -502,14 +634,32 @@ export function toPatientVisit(tab: PatientTab, row: PatientRow, now: number): P
   }
 }
 
-/** `GET /api/hospital-ops/patients?status=outpatient`: open check-ins, for the queue card. */
+/**
+ * `GET /api/hospital-ops/patients-check-ins`: every check-in at the hospital, newest first,
+ * closed ones included.
+ */
+const checkInRow = z.object({
+  sqid: z.string(),
+  patient_info: z.object({ hin: text, firstname: text, lastname: text }),
+  /** pending, nursing_active, nursing_idle, doctor_idle, doctor_active, doctor_seen or closed. */
+  status: optionalText,
+  created_at: dateTime,
+});
+type CheckInRow = z.infer<typeof checkInRow>;
+
+export const checkInPageSchema = paginated(checkInRow);
+
+/** A check-in is closed once the patient has checked out. */
+export const isOpenCheckIn = (row: CheckInRow) => row.status !== "closed";
+
 function queueStatusOf(status: string | null): QueueStatus {
   if (!status || status === "pending") return "pending";
   if (status === "doctor_seen" || status === "closed") return "completed";
   return "in_progress";
 }
 
-export const toQueueEntry = (row: PatientRow, now: number): PatientQueue["items"][number] => ({
+/** An open check-in in the queue; the API has no wait time, so it's how long since check-in. */
+export const toQueueEntry = (row: CheckInRow, now: number): PatientQueue["items"][number] => ({
   id: row.sqid,
   patient: {
     name: fullName(row.patient_info.firstname, row.patient_info.lastname) || row.patient_info.hin,
@@ -517,7 +667,7 @@ export const toQueueEntry = (row: PatientRow, now: number): PatientQueue["items"
     avatarUrl: null,
   },
   status: queueStatusOf(row.status),
-  waitMinutes: row.created_at ? minutesSince(row.created_at, now) : 0,
+  waitMinutes: minutesSince(row.created_at, now),
 });
 
 /** `GET /api/hospital-ops/wards`: the hospital's wards. */
@@ -530,7 +680,98 @@ export const patientInfoSchema = z
   .object({ patient_info: patientRecordSchema })
   .transform(({ patient_info }) => patient_info);
 
-export const toPatientDetail = (patient: PatientRecord): PatientDetail => ({
+/** `GET /api/patients/{hin}/visit-metrics`: the patient's visits at this hospital. */
+export const visitMetricsSchema = z.object({
+  total_visits: count,
+  last_visit: dateTime.nullish(),
+  last_check_in: dateTime.nullish(),
+  upcoming_appointment: z.object({ scheduled_time: dateTime }).nullish(),
+  // `email` is null for a dependant; `acct_type` repeats the record's payment type.
+  patient_info: z.object({ email: optionalText }),
+});
+
+/** `GET /api/patients/{hin}/guardianship`: the patient's guardians or dependants. */
+export const guardianshipPageSchema = paginated(
+  z
+    .object({
+      hin: text,
+      firstname: text,
+      lastname: text,
+      dob: z.string().nullish(),
+      gender: optionalText,
+      last_visit: dateTime.nullish(),
+    })
+    .transform((linked): LinkedPatient => ({
+      id: linked.hin,
+      name: fullName(linked.firstname, linked.lastname) || linked.hin,
+      hin: linked.hin,
+      dateOfBirth: linked.dob ?? null,
+      sex: sexOf(linked.gender),
+      lastVisitAt: linked.last_visit ?? null,
+    })),
+);
+
+/** An appointment's free-text type ("follow-up", "Emergency") as a visit type, if it is one. */
+function visitTypeOf(type: string | null): VisitType | null {
+  const key = type?.toLowerCase().replace(/[\s-]+/g, "_");
+  return key && key in visitTypeLabels ? (key as VisitType) : null;
+}
+
+/**
+ * `GET /api/patients/{hin}/visits` (no `type`): the patient's appointments and check-ins here,
+ * latest first; an appointment sits at its scheduled time, so booked ones come first.
+ */
+export const visitTimelinePageSchema = paginated(
+  z
+    .object({
+      appointment: z
+        .object({
+          sqid: z.string(),
+          status: optionalText,
+          scheduled_time: dateTime,
+          staff: person,
+          type: optionalText,
+        })
+        .nullish(),
+      check_in: z.object({ sqid: z.string(), created_at: dateTime }).nullish(),
+    })
+    .transform(({ appointment, check_in }): PatientDetail["visits"][number] | null => {
+      if (appointment) {
+        return {
+          id: appointment.sqid,
+          kind: "appointment",
+          visitType: visitTypeOf(appointment.type),
+          at: appointment.scheduled_time,
+          seenBy: appointment.staff,
+          state:
+            appointment.status === "pending"
+              ? "upcoming"
+              : appointment.status === "cancelled"
+                ? "cancelled"
+                : null,
+        };
+      }
+      if (check_in) {
+        return {
+          id: check_in.sqid,
+          kind: "check_in",
+          visitType: null,
+          at: check_in.created_at,
+          // TODO(api): check-ins don't say who saw the patient.
+          seenBy: null,
+          state: null,
+        };
+      }
+      return null;
+    }),
+);
+
+export const toPatientDetail = (
+  patient: PatientRecord,
+  metrics: z.infer<typeof visitMetricsSchema>,
+  linked: LinkedPatient[],
+  visits: (PatientDetail["visits"][number] | null)[],
+): PatientDetail => ({
   id: patient.id,
   name: patient.name,
   hin: patient.hin,
@@ -542,10 +783,15 @@ export const toPatientDetail = (patient: PatientRecord): PatientDetail => ({
   email: patient.email,
   address: patient.address,
   assignedDoctor: null,
-  lastVisitAt: null,
-  lastCheckInAt: null,
-  upcomingAppointmentAt: null,
-  visits: null,
+  totalVisits: metrics.total_visits,
+  lastVisitAt: metrics.last_visit ?? null,
+  lastCheckInAt: metrics.last_check_in ?? null,
+  upcomingAppointmentAt: metrics.upcoming_appointment?.scheduled_time ?? null,
+  visits: visits.filter((visit) => visit !== null),
+  linked: {
+    relation: metrics.patient_info.email === null ? "guardians" : "dependants",
+    patients: linked,
+  },
 });
 
 // ---------------------------------------------------------------------------------------------

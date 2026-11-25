@@ -8,14 +8,16 @@ import {
   type AppointmentDetail,
   type AppointmentList,
   appointmentPageSchema,
+  appointmentsOverviewSchema,
   type CheckOutSummary,
+  checkInPageSchema,
   countOnlySchema,
-  outpatientPageSchema,
+  guardianshipPageSchema,
+  operationMetricsSchema,
   type PatientLookup,
   type PatientProfile,
   patientDetailsSchema,
   queueStatusOf,
-  type ReceptionOverview,
   type ReceptionQueue,
   receptionistProfileSchema,
   toAppointment,
@@ -23,6 +25,8 @@ import {
   toCalendarAppointment,
   toFoundPatient,
   toPatientProfile,
+  visitMetricsSchema,
+  visitTimelineSchema,
 } from "@/features/receptionist/api/schemas";
 
 // The front desk on the real API (docs/api/openapi.json). Where the API has no endpoint, filter or
@@ -45,9 +49,16 @@ export const receptionistKeys = {
 };
 
 const APPOINTMENTS_URL = "/api/hospital-ops/appointments";
-const OUTPATIENTS_URL = "/api/hospital-ops/patients";
 
-type Timeframe = "today" | "upcoming" | "history";
+/** The API's `timeframe`s: `upcoming` is after tomorrow, so they don't overlap. */
+type Timeframe = "history" | "today" | "tomorrow" | "upcoming";
+const timeframes: Timeframe[] = ["history", "today", "tomorrow", "upcoming"];
+
+/** The app's period → the API's `period` (the current day, Monday-to-Sunday week or month, UTC). */
+const apiPeriods = { today: "day", week: "week", month: "month" } as const satisfies Record<
+  Period,
+  string
+>;
 
 export const receptionistProfileQuery = () =>
   queryOptions({
@@ -55,35 +66,15 @@ export const receptionistProfileQuery = () =>
     queryFn: () => request(receptionistProfileSchema, { url: "/api/auth/staff/profile" }),
   });
 
-/**
- * The dashboard's numbers. TODO(api): the receptionist dashboard endpoint has none, so the queue
- * (open check-ins) and today's appointments are counted from their lists, and the rest is null.
- */
+/** The dashboard's numbers for `period`. */
 export const receptionOverviewQuery = (period: Period) =>
   queryOptions({
     queryKey: receptionistKeys.overview(period),
-    queryFn: async (): Promise<ReceptionOverview> => {
-      const [waitingInQueue, appointmentsToday] = await Promise.all([
-        request(countOnlySchema, {
-          url: OUTPATIENTS_URL,
-          params: { status: "outpatient", page: 1, size: 1 },
-        }),
-        request(countOnlySchema, {
-          url: APPOINTMENTS_URL,
-          params: { timeframe: "today", page: 1, size: 1 },
-        }),
-      ]);
-      return {
-        totalCheckIns: null,
-        totalCheckInsChange: null,
-        waitingInQueue,
-        waitingInQueueChange: null,
-        checkedInToday: null,
-        checkedInTodayChange: null,
-        appointmentsToday,
-        appointmentsTodayChange: null,
-      };
-    },
+    queryFn: () =>
+      request(operationMetricsSchema, {
+        url: "/api/hospital-ops/operation-metrics",
+        params: { period: apiPeriods[period] },
+      }),
   });
 
 /** Midnight `days` from today. */
@@ -100,12 +91,9 @@ function dayParams(day: AppointmentDay) {
     case "today":
       return { timeframe: "today" };
     case "tomorrow":
-      return {
-        timeframe: "upcoming",
-        scheduled_time_gte: startOfDay(1).toISOString(),
-        scheduled_time_lte: new Date(startOfDay(2).getTime() - 1).toISOString(),
-      };
+      return { timeframe: "tomorrow" };
     case "upcoming":
+      // The API's `upcoming` already starts after tomorrow; the bound keeps it to that anyway.
       return { timeframe: "upcoming", scheduled_time_gte: startOfDay(2).toISOString() };
   }
 }
@@ -141,7 +129,6 @@ export const appointmentListQuery = (day: AppointmentDay, search: string) =>
 
 /** Every appointment the API has between `from` and `to`, across the timeframes it spans. */
 async function appointmentsBetween(from: string, to: string) {
-  const timeframes: Timeframe[] = ["history", "today", "upcoming"];
   const pages = await Promise.all(
     timeframes.map((timeframe) =>
       request(appointmentPageSchema, {
@@ -156,21 +143,50 @@ async function appointmentsBetween(from: string, to: string) {
 }
 
 /**
+ * The API's `period` when `from`-`to` is the current day, week or month (the only spans
+ * `appointments-overview` answers for), else `null`. The calendar's weeks start on Sunday and
+ * its days are local, while the API's weeks start on Monday and its days are UTC, so the
+ * numbers can differ slightly at the edges.
+ */
+function currentPeriodOf(from: Date, to: Date) {
+  const now = Date.now();
+  if (now < from.getTime() || now >= to.getTime()) return null;
+  const days = Math.round((to.getTime() - from.getTime()) / 86_400_000);
+  return days <= 1 ? "day" : days <= 7 ? "week" : "month";
+}
+
+/**
  * Appointments from `from` up to `to` (ISO date-times) and their numbers, for the calendar.
- * TODO(api): no changes against the span before, and no slots.
+ * For the current day, week or month the numbers are the API's; for any other span they're
+ * counted from the appointments, with no change against the span before. TODO(api): no slots.
  */
 export const appointmentCalendarQuery = (from: string, to: string) =>
   queryOptions({
     queryKey: receptionistKeys.calendar(from, to),
     queryFn: async (): Promise<AppointmentCalendar> => {
-      const appointments = await appointmentsBetween(from, to);
+      const period = currentPeriodOf(new Date(from), new Date(to));
+      const [appointments, overview] = await Promise.all([
+        appointmentsBetween(from, to),
+        period
+          ? request(appointmentsOverviewSchema, {
+              url: "/api/hospital-ops/appointments-overview",
+              params: { period },
+            })
+          : null,
+      ]);
       return {
         summary: {
-          booked: appointments.length,
-          bookedChange: null,
-          checkedIn: appointments.filter(({ status }) => status === "completed").length,
-          cancelled: appointments.filter(({ status }) => status === "cancelled").length,
-          cancelledChange: null,
+          booked: overview?.booked ?? appointments.length,
+          bookedChange: overview?.bookedChange ?? null,
+          // TODO(api): the API's count is of appointments booked from a consultation that's
+          // still in progress; desk-booked ones never count. Other spans count completed ones.
+          checkedIn:
+            overview?.inProgress ??
+            appointments.filter(({ status }) => status === "completed").length,
+          cancelled:
+            overview?.cancelled ??
+            appointments.filter(({ status }) => status === "cancelled").length,
+          cancelledChange: overview?.cancelledChange ?? null,
           openSlots: null,
           totalSlots: null,
         },
@@ -197,7 +213,7 @@ export const appointmentDetailQuery = (id: string) =>
     queryKey: receptionistKeys.appointment(id),
     queryFn: async (): Promise<AppointmentDetail> => {
       const pages = await Promise.all(
-        (["today", "upcoming", "history"] as const).map((timeframe) =>
+        timeframes.map((timeframe) =>
           request(appointmentPageSchema, {
             url: APPOINTMENTS_URL,
             params: { timeframe, page: 1, size: 100 },
@@ -211,8 +227,9 @@ export const appointmentDetailQuery = (id: string) =>
   });
 
 /**
- * Patients checked in and not yet checked out, longest wait first. TODO(api): check-ins carry no
- * reason, and "outpatient" includes patients already with the nurse or doctor.
+ * Patients checked in and not yet checked out, longest wait first. Search matches a name, HIN or
+ * phone number. TODO(api): check-ins carry no reason, and the wait isn't returned (it's now
+ * minus check-in time).
  */
 export const receptionQueueQuery = (search: string) =>
   queryOptions({
@@ -222,26 +239,34 @@ export const receptionQueueQuery = (search: string) =>
   });
 
 async function fetchQueue(search: string): Promise<ReceptionQueue> {
-  const { results } = await request(outpatientPageSchema, {
-    url: OUTPATIENTS_URL,
-    params: { status: "outpatient", search: search || undefined, page: 1, size: 50 },
+  // TODO(api): the list has every check-in, closed ones too, with no status filter, so this
+  // reads the newest 100 and drops the closed ones here; open check-ins are the newest anyway.
+  const { items } = await request(checkInPageSchema, {
+    url: "/api/hospital-ops/patients-check-ins",
+    params: { search: search || undefined, page: 1, size: 100 },
   });
   const now = Date.now();
   return {
-    items: results
+    items: items
+      .filter((checkIn) => checkIn.status !== "closed")
       .map((checkIn) => ({
+        // The check-in's sqid, which checking out closes.
         id: checkIn.sqid,
         patient: {
+          // Profiles are addressed by HIN.
           id: checkIn.patient_info.hin,
-          name: `${checkIn.patient_info.firstname} ${checkIn.patient_info.lastname}`.trim(),
+          name:
+            `${checkIn.patient_info.firstname} ${checkIn.patient_info.lastname}`.trim() ||
+            checkIn.patient_info.hin,
           hin: checkIn.patient_info.hin,
           avatarUrl: null,
         },
         reason: "",
         status: queueStatusOf(checkIn.status),
-        waitMinutes: checkIn.created_at
-          ? Math.max(0, Math.round((now - new Date(checkIn.created_at).getTime()) / 60_000))
-          : 0,
+        waitMinutes: Math.max(
+          0,
+          Math.round((now - new Date(checkIn.created_at).getTime()) / 60_000),
+        ),
       }))
       .sort((a, b) => b.waitMinutes - a.waitMinutes),
   };
@@ -266,11 +291,26 @@ export const patientLookupQuery = (hin: string) =>
     },
   });
 
-/** A patient's profile; its `id` is their HIN. */
+/**
+ * A patient's profile; its `id` is their HIN. Their details, visit numbers, linked people and
+ * visits at this hospital. TODO(api): reads the first 100 linked people and visits.
+ */
 export const patientProfileQuery = (id: string) =>
   queryOptions({
     queryKey: receptionistKeys.patient(id),
-    queryFn: async (): Promise<PatientProfile> => toPatientProfile(await patientDetails(id)),
+    queryFn: async (): Promise<PatientProfile> => {
+      const path = `/api/patients/${encodeURIComponent(id)}`;
+      const [patient, metrics, linked, visits] = await Promise.all([
+        patientDetails(id),
+        request(visitMetricsSchema, { url: `${path}/visit-metrics` }),
+        request(guardianshipPageSchema, {
+          url: `${path}/guardianship`,
+          params: { page: 1, size: 100 },
+        }),
+        request(visitTimelineSchema, { url: `${path}/visits`, params: { page: 1, size: 100 } }),
+      ]);
+      return toPatientProfile(patient, metrics, linked.items, visits);
+    },
   });
 
 /**

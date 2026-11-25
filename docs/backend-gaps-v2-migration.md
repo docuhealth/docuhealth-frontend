@@ -135,6 +135,15 @@ endpoints existed. We matched every call they make against the staging API: of 4
 endpoint, 33 match partly (missing fields, filters or permissions) and 7 have no endpoint. These
 are the asks.
 
+**Settled by the 25 Nov dashboard handoff** (docs/backend-handoff-2026-11-25-dashboards.md, wired
+in the app): receptionist 1 (metrics), 2 (check-in list with HIN search), 10 (patient profile:
+visits, last visit and check-in, upcoming appointment, history); hospital admin 3 (one staff
+member), 5 (overview numbers), 6 (check-in stats), 9 (admin patient profile). Still open from
+those: the check-in reason, visit type, "checked in by", staff ID / date of birth, assigned
+doctor, and which way `guardianship` lists (guardians or dependants: the app guesses from a null
+email). Also: `operation-metrics`' `check_ins_this_hour` isn't the waiting queue, and
+`pending_checkins` isn't "checked in today", so those two cards need relabelling or new fields.
+
 ### Receptionist
 
 1. **Reception metrics.** Extend `GET /api/hospital-ops/dashboards/receptionist` (or add an endpoint) with `total_check_ins`, `checked_in_today`, `waiting_in_queue`, `appointments_today` and their changes against the previous period, taking `start_date/end_date` like `dashboards/hospital`.

@@ -1,7 +1,7 @@
-import { CalendarBlankIcon } from "@phosphor-icons/react";
+import { HospitalIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import type { VitalReading } from "@/features/patient/api/schemas";
-import { Segments } from "@/features/patient/components/patient-ui";
+import { TrendPeriodSwitch } from "@/features/patient/components/trend-period-switch";
 import { TrendChart, type TrendSeries } from "@/features/patient/components/trend-chart";
 import {
   latestWith,
@@ -56,7 +56,7 @@ export function TrendLatestCard({
         <h2 id="latest-reading" className="type-body-sm-medium text-fg-heading">
           Latest reading
         </h2>
-        <Segments label="Period" value={period} options={periods} onChange={setPeriod} />
+        <TrendPeriodSwitch value={period} options={periods} onChange={setPeriod} />
       </div>
       {latest ? (
         <div className="flex flex-col gap-1">
@@ -65,7 +65,7 @@ export function TrendLatestCard({
             <span className="type-accent-h4 text-fg-caption">{unit}</span>
           </p>
           <p className="flex items-center gap-1.5 type-caption text-fg-caption">
-            <CalendarBlankIcon className="size-3.5" aria-hidden />
+            <HospitalIcon className="size-3.5" aria-hidden />
             {[formatDay(new Date(latest.at)), latest.facility].filter(Boolean).join(" · ")}
           </p>
         </div>

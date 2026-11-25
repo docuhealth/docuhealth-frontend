@@ -291,7 +291,8 @@ export function trendBuckets(
  * its diastolic bar below the band and its systolic bar inside it.
  */
 export const targetRanges: Partial<Record<VitalKey, { low: number; high: number }>> = {
-  bloodPressure: { low: 85, high: 130 },
+  // One band for both series, as the design draws it: diastolic 80 up to systolic 140.
+  bloodPressure: { low: 80, high: 140 },
   heartRate: { low: 60, high: 100 },
   temperature: { low: 36.1, high: 37.2 },
   spo2: { low: 95, high: 100 },
