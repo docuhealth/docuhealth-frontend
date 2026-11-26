@@ -97,20 +97,6 @@ export const bookingOptionsQuery = () =>
     staleTime: 5 * 60_000,
   });
 
-const bookableStaffSchema = z.array(
-  z.object({ id: z.string(), name: z.string(), specialty: z.string().nullable() }),
-);
-
-/** Who the patient can book with at a facility (by its sqid): none off the mock server. */
-export const bookableStaffQuery = (facilityId: string) =>
-  queryOptions({
-    queryKey: appointmentKeys.staff(facilityId),
-    queryFn: () =>
-      pendingRequest(bookableStaffSchema, `/staff?facility=${encodeURIComponent(facilityId)}`, []),
-    enabled: !!facilityId,
-    staleTime: 5 * 60_000,
-  });
-
 /**
  * Off the mock server, with no free slots to read: every half hour from 8 AM to 4:30 PM, from
  * half an hour from now. The hospital confirms (or moves) the time anyway.

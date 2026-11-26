@@ -287,18 +287,48 @@ export const patientAppointmentHandlers = [
     });
   }),
 
+  // The hospitals and staff a patient can book with (docs/backend-handoff-2026-11-27-booking-
+  // discovery.md): every hospital lists the same demo doctors; LUTH has no one bookable.
+  http.get(`${env.VITE_API_URL}/api/auth/facilities/hospitals/public`, ({ request }) => {
+    const search = (new URL(request.url).searchParams.get("search") ?? "").toLowerCase();
+    const results = hospitals
+      .filter(({ name }) => name.toLowerCase().includes(search))
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(({ sqid, name, email }) => ({
+        sqid,
+        name,
+        email,
+        phone: null,
+        profile_image: null,
+        bg_image: null,
+      }));
+    return HttpResponse.json({ count: results.length, next: null, previous: null, results });
+  }),
+  http.get(`${env.VITE_API_URL}/api/hospital-ops/:hospital/staff`, ({ params, request }) => {
+    // `/api/hospital-ops/appointments/staff` is the staff's own appointments, not this list.
+    if (params.hospital === "appointments") return undefined;
+    if (!hospitals.some(({ sqid }) => sqid === params.hospital)) {
+      return HttpResponse.json({ detail: "No Facility matches the given query." }, { status: 404 });
+    }
+    const search = (new URL(request.url).searchParams.get("search") ?? "").toLowerCase();
+    const results =
+      params.hospital === "hosp-luth"
+        ? []
+        : bookableStaff
+            .filter((staff) =>
+              [staff.firstname, staff.lastname, staff.specialization ?? ""].some((part) =>
+                part.toLowerCase().includes(search),
+              ),
+            )
+            .sort((a, b) =>
+              `${a.firstname} ${a.lastname}`.localeCompare(`${b.firstname} ${b.lastname}`),
+            );
+    return HttpResponse.json({ count: results.length, next: null, previous: null, results });
+  }),
+
   // TODO(api): from here on, what the API doesn't have yet.
   http.get(pending(""), () => HttpResponse.json({ details })),
   http.get(pending("/options"), () => HttpResponse.json(options)),
-  http.get(pending("/staff"), () =>
-    HttpResponse.json(
-      bookableStaff.map((staff) => ({
-        id: staff.sqid,
-        name: `Dr. ${staff.firstname} ${staff.lastname}`,
-        specialty: staff.specialization,
-      })),
-    ),
-  ),
   http.get(pending("/slots"), ({ request }) => {
     const day = new URL(request.url).searchParams.get("day") ?? "";
     const date = new Date(`${day}T00:00`);

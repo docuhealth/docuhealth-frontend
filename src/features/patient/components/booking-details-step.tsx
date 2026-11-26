@@ -19,16 +19,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { bookingFacilitiesQuery } from "@/features/patient/api/appointments";
-import {
-  bookableStaffQuery,
-  bookingOptionsQuery,
-} from "@/features/patient/api/pending-appointments";
+import { bookableStaffQuery, bookingFacilitiesQuery } from "@/features/patient/api/appointments";
+import { bookingOptionsQuery } from "@/features/patient/api/pending-appointments";
 
 /**
  * Who to see, the department and what for are required only when there's something to choose
- * (checked on submit). TODO(api): off the mock server there are no staff, departments or reasons
- * to choose from yet.
+ * (checked on submit): a hospital always lists its staff, but TODO(api): off the mock server
+ * there are no departments or visit reasons to choose from yet.
  */
 const detailsSchema = z.object({
   facilityId: z.string().min(1, "Choose where you’d like to be seen"),
@@ -80,6 +77,11 @@ export function BookingDetailsStep({
   const choices = { staffId: staff, department: departments, reason: reasons };
 
   function submit(values: BookingFields) {
+    // A hospital with no one to book with can't be booked: say so here, not after picking a time.
+    if (noStaff) {
+      form.setError("facilityId", { message: "No one at this hospital can be booked yet." });
+      return;
+    }
     const missing = requiredChoices.filter(
       ([name]) => !values[name] && Object.keys(choices[name]).length > 0,
     );
@@ -165,7 +167,7 @@ export function BookingDetailsStep({
             staff,
             facilityId ? (staffLoading ? "Loading…" : "Select") : "Choose a facility first",
             noStaff
-              ? "Choosing who to see isn’t available yet, so this facility can’t be booked here."
+              ? "No one at this hospital can be booked yet. Try another hospital."
               : undefined,
           )}
           {Object.keys(departments).length > 0 &&

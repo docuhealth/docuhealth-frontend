@@ -264,9 +264,12 @@ except where said:
 
 1. **One appointment.** Still no `GET /api/hospital-ops/appointments/{sqid}` (receptionist item 5);
    the front desk's details dialog looks through the first 100 of each timeframe.
-2. **Patient booking.** No list of a hospital's staff that a patient can read (`GET /api/auth/staff`
-   is the caller's own facility), so patients can't choose whom to book with and can't book off
-   the mock server. No free slots, departments, visit reasons or fees either (patient item 9).
+2. ~~**Patient booking.**~~ Settled on 27 Nov (docs/backend-handoff-2026-11-27-booking-discovery.md):
+   patients pick from `GET /api/auth/facilities/hospitals/public` and
+   `GET /api/hospital-ops/{hospital}/staff`, then `POST …/request`, all wired. Still open: free time
+   slots (the backend says any future time can be booked for now, so the app suggests office-hour
+   times, 8:00–16:30), and a hospital's departments, visit reasons and fees (the app hides those
+   fields when there's nothing to choose).
 3. **Confirming attendance.** `POST …/{sqid}/confirm` is the front desk's; a patient has no way to
    say they'll come. The patient app's "Confirm attendance" says it isn't available yet.
 4. **Closing without staff.** `POST …/{sqid}/close` answers a `500` with no usable body when the

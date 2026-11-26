@@ -12,13 +12,20 @@ import { pickOption, renderWithRouter } from "@/test/render";
 
 // The API's appointments come from src/mocks/patient.ts (Dr. Isaac Adeyemi soon, Dr. Adaeze
 // Okafor in 20 days, a pending eye clinic visit at Reddington Hospital, and a cancelled one), and
-// booking, rescheduling and cancelling from src/mocks/patient-appointments.ts. The extras, who can
-// be booked and free times are TODO(api) and empty off the mock dev server, so they're handed to
-// the pending queries here.
+// booking, rescheduling and cancelling from src/mocks/patient-appointments.ts. A hospital's staff
+// list is set per test. The extras and free times are TODO(api) and empty off the mock dev server,
+// so they're handed to the pending queries here.
 const pending = vi.hoisted(() => ({
   extras: { details: [] } as unknown,
   slots: [] as string[],
-  staff: [] as { id: string; name: string; specialty: string | null }[],
+  /** `GET /api/hospital-ops/<hospital>/staff` rows. */
+  staff: [] as {
+    sqid: string;
+    firstname: string;
+    lastname: string;
+    role: string;
+    specialization: string | null;
+  }[],
 }));
 
 vi.mock("@/features/patient/api/pending-appointments", async (importOriginal) => {
@@ -32,10 +39,6 @@ vi.mock("@/features/patient/api/pending-appointments", async (importOriginal) =>
     slotsQuery: (facility: string, day: string) => ({
       ...actual.slotsQuery(facility, day),
       queryFn: () => Promise.resolve(pending.slots),
-    }),
-    bookableStaffQuery: (facility: string) => ({
-      ...actual.bookableStaffQuery(facility),
-      queryFn: () => Promise.resolve(pending.staff),
     }),
   };
 });
@@ -97,6 +100,16 @@ beforeEach(() => {
   pending.extras = { details: [] };
   pending.slots = [];
   pending.staff = [];
+  server.use(
+    http.get(`${env.VITE_API_URL}/api/hospital-ops/:hospital/staff`, () =>
+      HttpResponse.json({
+        count: pending.staff.length,
+        next: null,
+        previous: null,
+        results: pending.staff,
+      }),
+    ),
+  );
   useAuthStore.getState().setSession({
     accountType: "patient",
     actingAs: [{ as: "self" }],
@@ -160,7 +173,15 @@ describe("Appointments", () => {
 
   it("books at a facility with someone there, and says the facility will confirm it", async () => {
     pending.slots = ["10:30", "14:30"];
-    pending.staff = [{ id: "staff-bello", name: "Dr. Tunde Bello", specialty: "General Medicine" }];
+    pending.staff = [
+      {
+        sqid: "staff-bello",
+        firstname: "Tunde",
+        lastname: "Bello",
+        role: "doctor",
+        specialization: "General Medicine",
+      },
+    ];
     const sent = recordBody("post", "/api/hospital-ops/appointments/request");
     const { user } = renderWithRouter(<AppointmentsPage />);
     await user.click(await screen.findByRole("button", { name: "Book appointment" }));
@@ -197,27 +218,18 @@ describe("Appointments", () => {
     });
   });
 
-  // TODO(api): patients can't read a hospital's staff yet, so off the mock server there's no one
-  // to book with, and booking says so.
-  it("says booking isn't available yet when there's no one to choose", async () => {
-    pending.slots = ["10:30"];
+  it("won't go on when no one at the hospital can be booked", async () => {
     const { user } = renderWithRouter(<AppointmentsPage />);
     await user.click(await screen.findByRole("button", { name: "Book appointment" }));
     const details = await screen.findByRole("dialog", { name: "Book appointment" });
     await user.click(within(details).getByRole("combobox", { name: /Where would you like/ }));
     await pickOption("LUTH");
     expect(
-      await within(details).findByText(/Choosing who to see isn’t available yet/),
+      await within(details).findByText(/No one at this hospital can be booked yet. Try another/),
     ).toBeInTheDocument();
     await user.click(within(details).getByRole("button", { name: "Continue" }));
-
-    const time = await screen.findByRole("dialog", { name: "Pick a date and time" });
-    await user.click(within(time).getByRole("button", { name: "Next week" }));
-    await user.click(within(time).getByRole("button", { name: "10:30 AM" }));
-    await user.click(within(time).getByRole("button", { name: /^Confirm .*10:30 AM/ }));
-    expect(
-      await screen.findByText(/Choosing who to see isn’t available yet. It’s waiting/),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Book appointment" })).toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "Pick a date and time" })).not.toBeInTheDocument();
   });
 
   it("reschedules a confirmed one, which goes back to pending", async () => {

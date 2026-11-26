@@ -3,29 +3,77 @@ import { z } from "zod";
 import { appointmentExtrasQuery } from "@/features/patient/api/pending-appointments";
 import { appointmentsQuery } from "@/features/patient/api/queries";
 import { paginated, request } from "@/lib/api";
-import { NotAvailableYetError } from "@/lib/not-available";
 import { optionalText, text } from "@/lib/staff-profile";
 
 // Booking, rescheduling and cancelling on the real API (`/api/hospital-ops/appointments/…`; see
-// docs/backend-handoff-2026-11-26-appointments.md). Who the patient can be booked with, free
-// times, departments and fees are still TODO(api), in `pending-appointments.ts`.
+// docs/backend-handoff-2026-11-26-appointments.md), with the hospitals and staff a patient can
+// book with (docs/backend-handoff-2026-11-27-booking-discovery.md). Free times, departments and
+// fees are still TODO(api), in `pending-appointments.ts`.
 
 const APPOINTMENTS_URL = "/api/hospital-ops/appointments";
 
-/** `GET /api/auth/facilities/hospitals`: every hospital on DocuHealth, to book at. */
+/**
+ * `GET /api/auth/facilities/hospitals/public`: the active hospitals a patient can book at (not
+ * their lab, pharmacy or radiology units), by name. TODO(api): reads the first 100; the list
+ * takes `search`, for when there are more.
+ */
 export const bookingFacilitiesQuery = () =>
   queryOptions({
     queryKey: ["patient", "booking-facilities"] as const,
     queryFn: () =>
       request(paginated(z.object({ sqid: z.string(), name: text })), {
-        // TODO(api): reads the first 100 hospitals; there's no search or location to narrow them.
-        url: "/api/auth/facilities/hospitals",
+        url: "/api/auth/facilities/hospitals/public",
         params: { page: 1, size: 100 },
       }),
     select: ({ items }) =>
       items
         .map(({ sqid, name }) => ({ id: sqid, name: name || sqid }))
         .sort((a, b) => a.name.localeCompare(b.name)),
+    staleTime: 5 * 60_000,
+  });
+
+const roleLabels: Record<string, string> = {
+  doctor: "Doctor",
+  nurse: "Nurse",
+  receptionist: "Receptionist",
+  lab_scientist: "Lab scientist",
+  pharmacist: "Pharmacist",
+  radiologist: "Radiologist",
+  radiographer: "Radiographer",
+};
+
+const bookableStaffSchema = z.object({
+  sqid: z.string(),
+  firstname: text,
+  lastname: text,
+  role: optionalText,
+  specialization: optionalText,
+});
+
+/**
+ * `GET /api/hospital-ops/<hospital>/staff`: the people a patient can book with at a hospital
+ * (its lab, pharmacy and radiology units included), by first name. Everyone listed can be booked.
+ * TODO(api): reads the first 100; the list takes `search` (name or specialization).
+ */
+export const bookableStaffQuery = (facilityId: string) =>
+  queryOptions({
+    queryKey: ["patient", "booking-staff", facilityId] as const,
+    queryFn: () =>
+      request(paginated(bookableStaffSchema), {
+        url: `/api/hospital-ops/${encodeURIComponent(facilityId)}/staff`,
+        params: { page: 1, size: 100 },
+      }),
+    select: ({ items }) =>
+      items.map((person) => {
+        const name = [person.firstname, person.lastname].filter(Boolean).join(" ");
+        return {
+          id: person.sqid,
+          name: person.role === "doctor" ? `Dr. ${name}` : name,
+          specialty:
+            person.specialization || (person.role ? (roleLabels[person.role] ?? null) : null),
+        };
+      }),
+    enabled: !!facilityId,
     staleTime: 5 * 60_000,
   });
 
@@ -65,16 +113,15 @@ function useRefresh() {
 const sameTime = (a: string, b: string) => new Date(a).getTime() === new Date(b).getTime();
 
 /**
- * Book an appointment (`POST /request`); it starts `pending` until the hospital confirms it. The
- * reply has no sqid, so the patient's appointments are read again to find it. TODO(api): with no
- * list of a hospital's staff for patients, there's no one to choose off the mock server, and
- * booking says it isn't available yet.
+ * Book an appointment (`POST /request`) with someone from the hospital's staff list; it starts
+ * `pending` until the hospital confirms it. The reply has no sqid, so the patient's appointments
+ * are read again to find it.
  */
 export function useBookAppointment() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (booking: BookingRequest): Promise<Booked> => {
-      if (!booking.staffId) throw new NotAvailableYetError("Choosing who to see");
+      if (!booking.staffId) throw new Error("Choose who you’d like to see.");
       const booked = await request(bookingSchema, {
         method: "POST",
         url: `${APPOINTMENTS_URL}/request`,

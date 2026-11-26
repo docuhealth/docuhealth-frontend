@@ -296,7 +296,7 @@ export function useVerifyFacilityApplicationEmail() {
   });
 }
 
-export interface FacilityPartDetailsInput {
+interface FacilityPartDetailsInput {
   name: string;
   street: string;
   city: string;
