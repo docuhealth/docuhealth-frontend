@@ -35,12 +35,15 @@ export function buildSessionFromLoginResponse(
         ? "staff"
         : "patient"));
 
+  const email = payload.email || payload.user?.email || options.identifier || "";
+  // The full name when either part is there, else the email (as the API asks).
   const fullName =
-    payload.user?.name ??
-    ([payload.user?.firstname, payload.user?.lastname].filter(Boolean).join(" ") ||
-      options.fallbackName ||
-      options.identifier ||
-      "DocuHealth User");
+    [payload.firstname, payload.lastname].filter(Boolean).join(" ") ||
+    payload.user?.name ||
+    [payload.user?.firstname, payload.user?.lastname].filter(Boolean).join(" ") ||
+    options.fallbackName ||
+    email ||
+    "DocuHealth User";
 
   const hinValue = payload.hin ?? payload.user?.hin;
 
@@ -51,7 +54,7 @@ export function buildSessionFromLoginResponse(
     user: {
       id: payload.user?.sqid ?? payload.user?.id ?? "me",
       name: fullName,
-      email: payload.user?.email ?? options.identifier ?? "",
+      email,
       role:
         firstStaffContext?.staff_role ??
         firstStaffContext?.role ??

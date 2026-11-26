@@ -36,6 +36,44 @@ describe("restoreSession", () => {
     expect(session?.user.role).toBe("nurse");
   });
 
+  it("shows the name, or the email when the API has no name", async () => {
+    server.use(
+      http.get(me, () =>
+        HttpResponse.json({
+          data: {
+            role: "patient",
+            next_step: null,
+            acting_as: [{ as: "self" }],
+            email: "ada@example.com",
+            firstname: "Ada",
+            lastname: "Obi",
+          },
+        }),
+      ),
+    );
+    await restoreSession();
+    expect(useAuthStore.getState().session?.user).toMatchObject({
+      name: "Ada Obi",
+      email: "ada@example.com",
+    });
+
+    server.use(
+      http.get(me, () =>
+        HttpResponse.json({
+          data: {
+            role: "dhadmin",
+            next_step: null,
+            email: "ops@example.com",
+            firstname: "",
+            lastname: "",
+          },
+        }),
+      ),
+    );
+    await restoreSession();
+    expect(useAuthStore.getState().session?.user.name).toBe("ops@example.com");
+  });
+
   it("keeps a pending gate step, so the person is sent to it", async () => {
     server.use(
       http.get(me, () =>

@@ -414,11 +414,9 @@ a refused refresh logs out; logout calls `POST /api/auth/logout`; the password r
 
 Still open:
 
-1. ~~**"Who am I".**~~ Settled by `GET /api/auth/me` (26 Nov): the app asks it on start-up and
-   after NIN verification, and nothing about the login is saved in the browser any more. Still
-   missing: a **name** (neither login nor `/me` returns one). The patient's name now comes from
-   `visit-metrics`; staff names from their profile; a DocuHealth admin's top bar has no name to
-   show. Please add the name (and email) to `/me`.
+1. ~~**"Who am I".**~~ Settled by `GET /api/auth/me` (26 Nov), and since then `email`,
+   `firstname` and `lastname` on `/me` and login: the app shows the full name, or the email when
+   there's none (a DocuHealth admin, or a hospital admin before first login).
 2. **Mobile sign-in** isn't decided (no cookie jar, no `Authorization`). Nothing to do on the web.
 3. **One session per browser.** Logging in to any DocuHealth site (v1 included) replaces the
    session in every tab. QA has been told to use one browser profile per role.

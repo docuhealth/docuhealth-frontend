@@ -68,6 +68,11 @@ const loginPayloadCoreSchema = z.object({
   next_step: nextStepSchema,
   hin: z.union([z.string(), z.number()]).optional(),
   user: authUserPayloadSchema.optional(),
+  /** Who signed in (login and `/me`, 26 Nov). Names are `""` when unknown (a DocuHealth admin,
+   * or a hospital admin before first login): show the email then. */
+  email: z.string().nullish(),
+  firstname: z.string().nullish(),
+  lastname: z.string().nullish(),
   /** Only on a DocuHealth admin's login (`dhadmin`), which has no `acting_as` or `user`. */
   role: z.string().optional(),
 });

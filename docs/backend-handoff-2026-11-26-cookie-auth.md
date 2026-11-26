@@ -116,3 +116,34 @@ They start a session, so call `GET /api/auth/me` right after one of them if you 
 ## Dependencies
 
 It needs the cookie session already described in the earlier handoff: credentials on every call and refresh-and-retry on a 401. Login's response is unchanged.
+
+---
+
+# Follow-up: name and email on /me and login
+
+`GET /api/auth/me` now returns the signed-in person's `email`, `firstname` and `lastname`. The login response returns the same three fields, because `/me` and login always give the same `data`. You can show the user's name and email after a page reload without another call. Nothing else changed and nothing was removed.
+
+## Changed
+
+### `GET /api/auth/me`
+
+Three new fields in `data`:
+
+| Field       | Value                |
+| ----------- | -------------------- |
+| `email`     | The account's email. |
+| `firstname` | First name, or `""`. |
+| `lastname`  | Last name, or `""`.  |
+
+- Always present, never `null`. An empty name is `""`.
+- Names are blank for a DH admin, and for a hospital admin who has not finished first login. Fall back to `email` for display.
+- Existing fields (`role`, `acting_as`, `next_step`, role extras) are unchanged.
+
+### Login response
+
+`data` carries the same three fields with the same values. If you build the signed-in user from the login response, read them there. After a reload, read them from `/me`.
+
+## What to do
+
+1. Read `email`, `firstname` and `lastname` from `data` in the login and `/me` responses.
+2. Show the full name when either name is non-empty, otherwise show `email`.

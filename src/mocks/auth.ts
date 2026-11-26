@@ -114,9 +114,16 @@ export const authHandlers = [
       );
     }
 
-    // A DocuHealth admin logs in without an account type, as on staging: `role` and nothing else.
+    // A DocuHealth admin logs in without an account type, as on staging; like the API, they have
+    // no name, only the email.
     if (!body.account_type && scenario === "dhadmin") {
-      const data = { role: "dhadmin", next_step: null };
+      const data = {
+        role: "dhadmin",
+        next_step: null,
+        email: body.identifier ?? "",
+        firstname: "",
+        lastname: "",
+      };
       saveMockSession(data);
       return HttpResponse.json(data);
     }
@@ -132,6 +139,10 @@ export const authHandlers = [
         : null;
 
     const data = {
+      email: body.identifier ?? "user@docuhealth.example.com",
+      // A hospital admin who hasn't finished first login has no name yet.
+      firstname: staff.firstLogin ? "" : isStaff ? "Folake" : "Chinonso",
+      lastname: staff.firstLogin ? "" : isStaff ? "Adeyemi" : "Okafor",
       next_step: nextStep,
       acting_as: isStaff
         ? [
