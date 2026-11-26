@@ -82,8 +82,6 @@ export const authHandlers = [
     // A DocuHealth admin logs in without an account type, as on staging: `role` and nothing else.
     if (!body.account_type && scenario === "dhadmin") {
       return HttpResponse.json({
-        access_token: "mock-access-token",
-        refresh_token: "mock-refresh-token",
         role: "dhadmin",
         next_step: null,
       });
@@ -103,7 +101,6 @@ export const authHandlers = [
       status: "success",
       message: "Logged in successfully",
       data: {
-        access_token: "mock-access-token",
         next_step: nextStep,
         acting_as: isStaff
           ? [
@@ -131,7 +128,7 @@ export const authHandlers = [
   http.post(api("/api/auth/refresh"), () =>
     HttpResponse.json({
       status: "success",
-      data: { access_token: "mock-refreshed-access-token" },
+      data: {},
     }),
   ),
 
@@ -183,7 +180,6 @@ export const authHandlers = [
       status: "success",
       message: "Account created",
       data: {
-        access_token: "mock-access-token",
         hin: "1234567890123",
         next_step: null,
         acting_as: [{ type: "self" }],
@@ -206,7 +202,7 @@ export const authHandlers = [
     if (otp === WRONG_CODE) return invalidCode();
     return HttpResponse.json({
       status: "success",
-      data: { access_token: "mock-reset-token" },
+      data: {},
     });
   }),
 

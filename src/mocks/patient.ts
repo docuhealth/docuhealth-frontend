@@ -180,34 +180,75 @@ const summaries = [
   }),
 ];
 
+/** `HospitalAppointment`'s fields these leave alone. */
+const appointmentDefaults = {
+  note: null as string | null,
+  cancellation_reason: null as string | null,
+  reschedule_reason: null as string | null,
+  last_visited: null as string | null,
+  closed_at: null as string | null,
+};
+
 const appointments = [
   {
+    ...appointmentDefaults,
     id: 1,
     sqid: "appt-1",
     status: "confirmed",
     scheduled_time: soon(),
     type: "Follow-up",
-    note: null,
+    last_visited: daysAgo(5),
     staff: {
       sqid: "staff-isaac",
       firstname: "Isaac",
       lastname: "Adeyemi",
       role: "doctor",
       specialization: "Internal Medicine",
-    },
+    } as typeof okafor | null,
     hospital_info: abc,
-    closed_at: null,
   },
   {
+    ...appointmentDefaults,
     id: 2,
     sqid: "appt-2",
     status: "confirmed",
     scheduled_time: daysAhead(20, 10),
     type: "Follow-up",
-    note: null,
+    staff: okafor as typeof okafor | null,
+    hospital_info: abc,
+  },
+];
+type MockAppointment = (typeof appointments)[number];
+
+/**
+ * `GET /api/hospital-ops/appointments/mine`: the two above, plus ones the patient booked from the
+ * app: an eye clinic visit at Reddington Hospital still waiting for the hospital to confirm it,
+ * and a visit they cancelled. Booking, rescheduling and cancelling (src/mocks/patient-
+ * appointments.ts) change this in memory until the page reloads.
+ */
+export const myAppointments: MockAppointment[] = [
+  ...appointments,
+  {
+    ...appointmentDefaults,
+    id: 3,
+    sqid: "appt-eye",
+    status: "pending",
+    scheduled_time: daysAhead(5, 14),
+    type: "Follow-up",
+    note: "My eyes have been watering for two weeks.",
+    staff: null,
+    hospital_info: reddington,
+  },
+  {
+    ...appointmentDefaults,
+    id: 4,
+    sqid: "appt-past",
+    status: "cancelled",
+    scheduled_time: daysAgo(20),
+    type: "Follow-up",
+    cancellation_reason: "I can’t make that time",
     staff: okafor,
     hospital_info: abc,
-    closed_at: null,
   },
 ];
 
@@ -336,7 +377,9 @@ export const patientHandlers = [
       ? HttpResponse.json(page(summaries))
       : HttpResponse.json({ detail: "Not found." }, { status: 404 }),
   ),
-  http.get(api("/api/hospital-ops/appointments/mine"), () => HttpResponse.json(page(appointments))),
+  http.get(api("/api/hospital-ops/appointments/mine"), () =>
+    HttpResponse.json(page([...myAppointments].sort((a, b) => b.id - a.id))),
+  ),
   http.get(api("/api/pharmacy/patients/drug-records"), () => HttpResponse.json(page(drugs))),
   http.get(api("/api/records/vital-signs/mine"), () => HttpResponse.json(page(readings))),
   http.get(api("/api/patients/visits"), ({ request }) => {

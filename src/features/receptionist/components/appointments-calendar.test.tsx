@@ -96,8 +96,17 @@ describe("AppointmentsCalendar", () => {
     expect(await screen.findByLabelText(/Enter HIN/)).toHaveValue("123-345-678-90");
   });
 
-  // TODO(api): no reschedule endpoint yet, so the dialog says so instead of notifying the patient.
-  it("opens an appointment and says rescheduling isn't available yet", async () => {
+  it("opens an appointment and reschedules it, keeping the patient's note unless it changed", async () => {
+    let sent: unknown = null;
+    server.use(
+      // Records the request, then lets the mock API answer it.
+      http.patch(
+        `${env.VITE_API_URL}/api/hospital-ops/appointments/:sqid/reschedule`,
+        async ({ request }) => {
+          sent = await request.clone().json();
+        },
+      ),
+    );
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const { user } = renderWithProviders(
@@ -107,6 +116,7 @@ describe("AppointmentsCalendar", () => {
     await user.click(await screen.findByRole("button", { name: /Amina Yusuf, 10:00 AM/ }));
     const details = await screen.findByRole("dialog", { name: "Appointment Details" });
     expect(await within(details).findByText("Booked with")).toBeInTheDocument();
+    expect(within(details).getByText("Sarah Adeyemi")).toBeInTheDocument();
 
     await user.click(within(details).getByRole("button", { name: "Reschedule" }));
     const time = await screen.findByLabelText(/Time/);
@@ -114,13 +124,22 @@ describe("AppointmentsCalendar", () => {
     await user.type(time, "14:00");
     await user.click(screen.getByRole("button", { name: "Reschedule" }));
 
-    expect(
-      await screen.findByText(/Rescheduling appointments isn’t available yet/),
-    ).toBeInTheDocument();
+    const notified = await screen.findByRole("dialog", { name: "Patient Notified!" });
+    expect(notified).toHaveTextContent(/Appointment moved to .*2:00 PM/);
+    expect(notified).toHaveTextContent("Amina Yusuf has been notified.");
+    expect(sent).toEqual({ scheduled_time: expect.any(String) });
   });
 
-  // TODO(api): no cancel endpoint yet, so the reason is checked and then the dialog says so.
-  it("checks the cancellation reason, then says cancelling isn't available yet", async () => {
+  it("checks the cancellation reason, then cancels and sends it", async () => {
+    let sent: unknown = null;
+    server.use(
+      http.post(
+        `${env.VITE_API_URL}/api/hospital-ops/appointments/:sqid/cancel`,
+        async ({ request }) => {
+          sent = await request.clone().json();
+        },
+      ),
+    );
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const { user } = renderWithProviders(
@@ -141,7 +160,34 @@ describe("AppointmentsCalendar", () => {
     await user.click(within(dialog).getByRole("button", { name: "Cancel appointment" }));
 
     expect(
-      await screen.findByText(/Cancelling appointments isn’t available yet/),
+      await screen.findByText("Appointment cancelled. Halima Abubakar has been notified."),
+    ).toBeInTheDocument();
+    expect(sent).toEqual({ cancellation_reason: "Travelling that week" });
+  });
+
+  it("confirms a patient's pending booking with the staff member chosen", async () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const { user } = renderWithProviders(
+      <AppointmentsCalendar view="day" date={tomorrow} onNavigate={() => {}} />,
+    );
+
+    await user.click(await screen.findByRole("button", { name: /Kelechi Nnamdi/ }));
+    const details = await screen.findByRole("dialog", { name: "Appointment Details" });
+    const confirmed = (await within(details).findByText("Confirmed")).closest("div");
+    expect(confirmed).toHaveTextContent("Not yet");
+
+    await user.click(within(details).getByRole("button", { name: "Confirm" }));
+    const dialog = await screen.findByRole("dialog", { name: "Confirm appointment" });
+    // Who they booked with, to start with.
+    const staff = within(dialog).getByRole("combobox", { name: /Who they’ll see/ });
+    expect(await within(staff).findByText("Dr. Sarah Adeyemi · Doctor")).toBeInTheDocument();
+    await user.click(staff);
+    await pickOption("Dr. Grace Effiong · Doctor");
+    await user.click(within(dialog).getByRole("button", { name: "Confirm appointment" }));
+
+    expect(
+      await screen.findByText("Kelechi Nnamdi’s appointment is confirmed with Grace Effiong."),
     ).toBeInTheDocument();
   });
 
@@ -159,9 +205,7 @@ describe("AppointmentsCalendar", () => {
     expect(await screen.findByText("Booked with")).toBeInTheDocument();
   });
 
-  // TODO(api): the API requires the staff member it's with, which the design doesn't ask for, so
-  // booking shows the API's error until that changes.
-  it("starts booking from a free slot, and shows the API's error", async () => {
+  it("starts booking from a free slot, and asks who the patient will see", async () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const { user } = renderWithProviders(
@@ -178,9 +222,10 @@ describe("AppointmentsCalendar", () => {
 
     const details = await screen.findByRole("dialog", { name: "Appointment Details" });
     expect(within(details).getByLabelText(/Time/)).toHaveValue("14:30");
+    await user.click(within(details).getByRole("combobox", { name: /Who they’ll see/ }));
+    await pickOption("Dr. Grace Effiong · Doctor");
     await user.click(within(details).getByRole("button", { name: "Book Appointment" }));
-
-    expect(await screen.findByText("staff: This field is required.")).toBeInTheDocument();
+    expect(await screen.findByRole("dialog", { name: "Appointment booked!" })).toBeInTheDocument();
   });
 
   // TODO(api): desk signup requires a date of birth, which the design's form doesn't ask for, so

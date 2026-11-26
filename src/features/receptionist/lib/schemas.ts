@@ -82,22 +82,39 @@ export const registerPatientSteps = {
   2: ["code"],
 } as const;
 
-/** The Book Appointment dialog. `date` is "YYYY-MM-DD" and `time` "HH:MM", or "" until whole. */
+/** The appointment form's fields. `date` is "YYYY-MM-DD" and `time` "HH:MM", or "" until whole. */
+const appointmentFields = {
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a date as DD/MM/YYYY"),
+  time: z.string().regex(/^\d{2}:\d{2}$/, "Enter a time as HH:MM"),
+  note: z.string().trim().max(500, "Keep the note to 500 characters"),
+  /** The sqid of the staff member the patient will see; only booking asks. */
+  staff: z.string(),
+};
+
+/** The API only takes a time in the future. */
+function inTheFuture({ date, time }: { date: string; time: string }, context: z.RefinementCtx) {
+  const now = new Date();
+  if (date < toIsoDate(now)) {
+    context.addIssue({ code: "custom", path: ["date"], message: "Pick a date from today on" });
+  } else if (new Date(`${date}T${time}`) <= now) {
+    context.addIssue({ code: "custom", path: ["time"], message: "That time has passed" });
+  }
+}
+
+/** The Book Appointment dialog: the API needs who the patient will see. */
 export const bookAppointmentSchema = z
-  .object({
-    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a date as DD/MM/YYYY"),
-    time: z.string().regex(/^\d{2}:\d{2}$/, "Enter a time as HH:MM"),
-    note: z.string().trim().max(500, "Keep the note to 500 characters"),
-  })
-  .superRefine(({ date, time }, context) => {
-    const now = new Date();
-    if (date < toIsoDate(now)) {
-      context.addIssue({ code: "custom", path: ["date"], message: "Pick a date from today on" });
-    } else if (new Date(`${date}T${time}`) <= now) {
-      context.addIssue({ code: "custom", path: ["time"], message: "That time has passed" });
-    }
-  });
+  .object({ ...appointmentFields, staff: z.string().min(1, "Choose who they’ll see") })
+  .superRefine(inTheFuture);
 export type BookAppointmentValues = z.infer<typeof bookAppointmentSchema>;
+
+/** Rescheduling: a new time (and note); who they'll see stays as it is. */
+export const rescheduleAppointmentSchema = z.object(appointmentFields).superRefine(inTheFuture);
+
+/** Confirming a patient's booking: who will see them. */
+export const confirmAppointmentSchema = z.object({
+  staff: z.string().min(1, "Choose who they’ll see"),
+});
+export type ConfirmAppointmentValues = z.infer<typeof confirmAppointmentSchema>;
 
 /** The Cancel Appointment dialog: a reason, spelled out in `details` when it's "Other". */
 export const cancelAppointmentSchema = z

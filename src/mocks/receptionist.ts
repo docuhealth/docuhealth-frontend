@@ -1,6 +1,7 @@
 import { HttpResponse, http } from "msw";
 import { env } from "@/env";
 import { maskContact } from "@/mocks/auth";
+import { colleagues } from "@/mocks/staff";
 import type {
   AppointmentList,
   PatientProfile,
@@ -117,8 +118,43 @@ for (let days = -60; days <= 75; days++) {
 }
 appointments.sort((a, b) => a.at.localeCompare(b.at));
 
-/** What the calendar's chips leave out: set when booked, or made up from the patient. */
-const appointmentExtras = new Map<string, { note: string | null; bookedWith: string }>();
+type StaffRef = {
+  sqid: string;
+  firstname: string;
+  lastname: string;
+  role: string;
+  specialization: null;
+};
+
+/** Who appointments are with unless booked or confirmed with someone else: Dr. Sarah Adeyemi. */
+const defaultStaff: StaffRef = {
+  sqid: "staff-2",
+  firstname: "Sarah",
+  lastname: "Adeyemi",
+  role: "doctor",
+  specialization: null,
+};
+
+/**
+ * What the calendar's chips leave out, set when an appointment is booked, confirmed, moved or
+ * cancelled. Without an entry, an upcoming appointment is `pending` (waiting for the front desk
+ * to confirm it) and with Dr. Sarah Adeyemi.
+ */
+const appointmentExtras = new Map<
+  string,
+  {
+    note?: string | null;
+    staff?: StaffRef;
+    confirmed?: boolean;
+    cancellationReason?: string | null;
+    rescheduleReason?: string | null;
+  }
+>();
+const extrasOf = (id: string) => {
+  const found = appointmentExtras.get(id) ?? {};
+  appointmentExtras.set(id, found);
+  return found;
+};
 
 const femaleFirstNames = new Set(
   "Blessing Fatima Ngozi Sola Zainab Bisi Ruth Amina Halima Folasade Precious Joyce Grace Chiamaka Funmilayo Adaeze".split(
@@ -299,14 +335,18 @@ function matches(search: string | null, ...values: string[]) {
   return !term || values.some((value) => value.toLowerCase().includes(term));
 }
 
-/** The design's appointment status → the API's. */
-const apiStatusOf: Record<Appointment["status"], string> = {
+/** The design's appointment status → the API's; an upcoming one is pending until confirmed. */
+const apiStatuses: Record<Appointment["status"], string> = {
   upcoming: "pending",
   arrived: "confirmed",
   checked_in: "completed",
   in_progress: "confirmed",
   cancelled: "cancelled",
 };
+const apiStatusOf = (appointment: Appointment) =>
+  appointment.status === "upcoming" && appointmentExtras.get(appointment.id)?.confirmed
+    ? "confirmed"
+    : apiStatuses[appointment.status];
 
 const hospitalInfo = { name: "Lagos University Teaching Hospital", email: null, sqid: "pm9XGQd" };
 
@@ -322,9 +362,9 @@ function readAppointment(appointment: Appointment) {
   return {
     id: 0,
     sqid: appointment.id,
-    status: apiStatusOf[appointment.status],
+    status: apiStatusOf(appointment),
     scheduled_time: appointment.at,
-    staff: { sqid: "doctor-1", firstname: "Sarah", lastname: "Adeyemi", role: "doctor" },
+    staff: extras?.staff ?? defaultStaff,
     patient: {
       hin,
       ...splitName(appointment.patient.name),
@@ -336,8 +376,11 @@ function readAppointment(appointment: Appointment) {
         registeredPatient?.email ??
         `${appointment.patient.name.toLowerCase().replace(/\s+/g, ".")}@email.com`,
     },
-    note: extras ? extras.note : null,
+    note: extras?.note ?? null,
     type: appointment.reason,
+    cancellation_reason: extras?.cancellationReason ?? null,
+    reschedule_reason: extras?.rescheduleReason ?? null,
+    last_visited: null,
     hospital_info: hospitalInfo,
     closed_at: null,
     closed_by_info: null,
@@ -345,9 +388,8 @@ function readAppointment(appointment: Appointment) {
 }
 
 /**
- * Whether an appointment falls in the API's `timeframe`: today, tomorrow, later, or before today.
- * The real `upcoming` starts after tomorrow; here it starts after today, as it did before the API
- * had `tomorrow`, so the staff Appointments page's "Upcoming" tab still shows tomorrow's.
+ * Whether an appointment falls in the API's `timeframe`: today, tomorrow, after tomorrow
+ * (`upcoming`), or before today (`history`).
  */
 function inTimeframe(at: string, timeframe: string | null) {
   const date = new Date(at);
@@ -356,7 +398,7 @@ function inTimeframe(at: string, timeframe: string | null) {
   const end = new Date(start.getTime() + DAY_MS);
   if (timeframe === "today") return date >= start && date < end;
   if (timeframe === "tomorrow") return date >= end && date < new Date(end.getTime() + DAY_MS);
-  if (timeframe === "upcoming") return date >= end;
+  if (timeframe === "upcoming") return date >= new Date(end.getTime() + DAY_MS);
   return date < start;
 }
 
@@ -446,11 +488,178 @@ const signups = new Map<
   { firstname: string; lastname: string; gender: string; token?: string }
 >();
 
+const badRequest = (body: Record<string, unknown>) => HttpResponse.json(body, { status: 400 });
+const notFound = () =>
+  HttpResponse.json({ detail: "No Appointment matches the given query." }, { status: 404 });
+
+/** A staff member at the hospital, by sqid, as the appointment object names them. */
+function staffRefOf(sqid: string): StaffRef | undefined {
+  const member = colleagues.find((each) => each.sqid === sqid && each.is_active);
+  return (
+    member && {
+      sqid: member.sqid,
+      firstname: member.firstname,
+      lastname: member.lastname,
+      role: member.role,
+      specialization: null,
+    }
+  );
+}
+
+/** The API's errors for a `scheduled_time` that's missing or not in the future. */
+function scheduledTimeError(value: string | undefined) {
+  if (!value) return badRequest({ scheduled_time: ["This field is required."] });
+  if (new Date(value).getTime() <= Date.now()) {
+    return badRequest({ scheduled_time: ["Choose a time in the future."] });
+  }
+  return null;
+}
+
+/** Whether the request comes from a dashboard that books with itself (lab, radiology). */
+const fromOwnBookingDashboard = (request: Request) =>
+  /\/(radiologist|lab-scientist)(?:[/?#]|$)/.test(
+    request.referrer ? new URL(request.referrer).pathname : "",
+  );
+
 export const receptionistHandlers = [
+  // Book at the desk. The lab's and radiology's own booking is src/mocks/staff.ts's.
+  http.post(api("/api/hospital-ops/appointments/book"), async ({ request }) => {
+    if (fromOwnBookingDashboard(request)) return undefined;
+    // A copy, so the lab's and radiology's handler can still read the body if this one passes.
+    const body = (await request.clone().json()) as {
+      patient?: string;
+      staff?: string;
+      scheduled_time?: string;
+      type?: string | null;
+      note?: string | null;
+    };
+    const missing = (["patient", "staff", "scheduled_time"] as const).filter((key) => !body[key]);
+    if (missing.length > 0) {
+      return badRequest(
+        Object.fromEntries(missing.map((key) => [key, ["This field is required."]])),
+      );
+    }
+    const staff = staffRefOf(body.staff ?? "");
+    // Someone outside the front desk's staff list: the lab's or radiology's own booking (tests
+    // have no page to tell them apart), which src/mocks/staff.ts answers.
+    if (!staff) return undefined;
+    const patient = registered.find(({ hin }) => hin === body.patient);
+    if (!patient) {
+      return badRequest({ patient: [`Object with hin=${body.patient} does not exist.`] });
+    }
+    const timeError = scheduledTimeError(body.scheduled_time);
+    if (timeError) return timeError;
+    if (body.type && body.type.length > 20) {
+      return badRequest({ type: ["Ensure this field has no more than 20 characters."] });
+    }
+    const id = `appointment-${appointments.length + 1}`;
+    appointments.push({
+      id,
+      at: body.scheduled_time ?? "",
+      patient: { id: patient.id, name: patient.name, phone: patient.phone ?? "", avatarUrl: null },
+      reason: body.type ?? "Consultation",
+      status: "upcoming",
+    });
+    appointments.sort((a, b) => a.at.localeCompare(b.at));
+    appointmentExtras.set(id, { note: body.note ?? null, staff });
+    return HttpResponse.json(
+      {
+        staff_info: { ...staff, phone_num: null, email: null, gender: null, is_active: true },
+        patient_info: {
+          hin: patient.hin,
+          ...splitName(patient.name),
+          gender: patient.sex,
+          dob: patient.dateOfBirth,
+        },
+        type: body.type ?? null,
+        note: body.note ?? null,
+        scheduled_time: body.scheduled_time,
+        hospital: hospitalInfo.sqid,
+      },
+      { status: 201 },
+    );
+  }),
+  http.post(api("/api/hospital-ops/appointments/:sqid/confirm"), async ({ params, request }) => {
+    const appointment = appointments.find(({ id }) => id === params.sqid);
+    if (!appointment) return notFound();
+    if (apiStatusOf(appointment) !== "pending") {
+      return badRequest({ appointment: ["Only a pending appointment can be confirmed"] });
+    }
+    const { staff: sqid } = (await request.json()) as { staff?: string };
+    if (!sqid) return badRequest({ staff: ["This field is required."] });
+    const staff = staffRefOf(sqid);
+    if (!staff) return badRequest({ staff: ["Staff not found at this hospital."] });
+    Object.assign(extrasOf(appointment.id), { staff, confirmed: true });
+    return HttpResponse.json(readAppointment(appointment));
+  }),
+  // The front desk's appointments; any other (a patient's) goes on to src/mocks/patient.ts.
+  http.patch(
+    api("/api/hospital-ops/appointments/:sqid/reschedule"),
+    async ({ params, request }) => {
+      const appointment = appointments.find(({ id }) => id === params.sqid);
+      if (!appointment) return undefined;
+      const body = (await request.json()) as {
+        scheduled_time?: string;
+        reschedule_reason?: string | null;
+        type?: string | null;
+        note?: string | null;
+      };
+      if (!body.scheduled_time) {
+        return badRequest({ scheduled_time: ["This field is required."] });
+      }
+      if (new Date(body.scheduled_time).getTime() === new Date(appointment.at).getTime()) {
+        return badRequest({
+          scheduled_time: ["The appointment is already at this time. Choose a different time."],
+        });
+      }
+      const timeError = scheduledTimeError(body.scheduled_time);
+      if (timeError) return timeError;
+      if (appointment.status !== "upcoming") {
+        return badRequest({
+          appointment: ["Only a pending or confirmed appointment can be rescheduled"],
+        });
+      }
+      appointment.at = body.scheduled_time;
+      if (body.type) appointment.reason = body.type;
+      appointments.sort((a, b) => a.at.localeCompare(b.at));
+      const extras = extrasOf(appointment.id);
+      extras.rescheduleReason = body.reschedule_reason ?? null;
+      if ("note" in body) extras.note = body.note ?? null;
+      const read = readAppointment(appointment);
+      return HttpResponse.json({
+        type: read.type,
+        note: read.note,
+        scheduled_time: read.scheduled_time,
+        reschedule_reason: read.reschedule_reason,
+        sqid: read.sqid,
+        status: read.status,
+      });
+    },
+  ),
+  http.post(api("/api/hospital-ops/appointments/:sqid/cancel"), async ({ params, request }) => {
+    const appointment = appointments.find(({ id }) => id === params.sqid);
+    if (!appointment) return undefined;
+    if (appointment.status !== "upcoming") {
+      return badRequest({
+        appointment: ["Only a pending or confirmed appointment can be cancelled"],
+      });
+    }
+    const body = (await request.json().catch(() => ({}))) as { cancellation_reason?: string };
+    appointment.status = "cancelled";
+    extrasOf(appointment.id).cancellationReason = body.cancellation_reason ?? null;
+    const read = readAppointment(appointment);
+    return HttpResponse.json({
+      cancellation_reason: read.cancellation_reason,
+      reschedule_reason: read.reschedule_reason,
+      sqid: read.sqid,
+      status: read.status,
+    });
+  }),
+
   http.get(api("/api/hospital-ops/appointments"), ({ request }) => {
     const params = new URL(request.url).searchParams;
     const timeframe = params.get("timeframe");
-    if (!timeframe) {
+    if (!timeframe || !["today", "tomorrow", "upcoming", "history"].includes(timeframe)) {
       return HttpResponse.json({ timeframe: "This query parameter is required." }, { status: 400 });
     }
     const from = params.get("scheduled_time_gte");
@@ -463,12 +672,12 @@ export const receptionistHandlers = [
         inTimeframe(appointment.at, timeframe) &&
         (!from || appointment.at >= from) &&
         (!to || appointment.at <= to) &&
-        (!status || apiStatusOf[appointment.status] === status) &&
+        (!status || apiStatusOf(appointment) === status) &&
+        // As the API does: the patient's name or email, not their HIN or phone.
         matches(
           params.get("search"),
           appointment.patient.name,
-          appointment.patient.phone,
-          patientFacts(appointment.patient).hin,
+          readAppointment(appointment).patient.email,
         ),
     );
     return HttpResponse.json({

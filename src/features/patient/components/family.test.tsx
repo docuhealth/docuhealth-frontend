@@ -61,7 +61,6 @@ beforeEach(() => {
   resetFamilyMocks();
   navigate.mockClear();
   useAuthStore.getState().setSession({
-    accessToken: "token",
     accountType: "patient",
     actingAs: [{ as: "self" }],
     user: {

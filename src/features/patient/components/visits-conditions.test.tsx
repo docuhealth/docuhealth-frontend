@@ -17,7 +17,6 @@ const empty = () => HttpResponse.json({ count: 0, next: null, previous: null, re
 
 beforeEach(() => {
   useAuthStore.getState().setSession({
-    accessToken: "token",
     accountType: "patient",
     actingAs: [{ as: "self" }],
     user: {

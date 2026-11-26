@@ -9,7 +9,6 @@ import {
 import { RequiredMark } from "@/components/required-mark";
 import { Button } from "@/components/ui/button";
 import { slotsQuery } from "@/features/patient/api/pending-appointments";
-import { AppointmentConflictBanner } from "@/features/patient/components/appointment-conflict-banner";
 import {
   atTime,
   confirmLabel,
@@ -30,8 +29,8 @@ const chosen = "border-primary bg-brand-50 text-primary";
 
 /**
  * Booking, step 2 of 3 (or the only step when rescheduling): a week of days, the facility's free
- * times on the chosen one, and a button that books it. `conflict` is the time someone else just
- * took, if they did.
+ * times on the chosen one, and a button that books it. TODO(api): no free slots yet; off the mock
+ * server the times are office hours, and the facility confirms the one chosen.
  */
 export function BookingTimeStep({
   facility,
@@ -39,17 +38,15 @@ export function BookingTimeStep({
   description,
   progress,
   pending,
-  conflict,
   onBack,
   onSubmit,
 }: {
-  /** The facility whose free times to show. */
+  /** The facility (its sqid) whose free times to show. */
   facility: string;
   title: string;
   description: string;
   progress?: { step: number; total: number };
   pending: boolean;
-  conflict: string | null;
   onBack?: () => void;
   onSubmit: (at: Date) => void;
 }) {
@@ -97,7 +94,6 @@ export function BookingTimeStep({
     <>
       <FormDialogHeader title={title} description={description} progress={progress} />
       <FormDialogBody minHeight="24rem">
-        {conflict && <AppointmentConflictBanner time={conflict} />}
         <div className="flex items-center justify-between gap-3">
           <p className="flex gap-1 type-body-sm-medium text-fg-heading">
             {weekMonth(weekStart)} <RequiredMark />

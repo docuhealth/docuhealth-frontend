@@ -100,7 +100,6 @@ const urinalysis = report("4", "Urinalysis", {
 beforeEach(() => {
   pending.reports = [];
   useAuthStore.getState().setSession({
-    accessToken: "token",
     accountType: "patient",
     actingAs: [{ as: "self" }],
     user: {

@@ -5,7 +5,7 @@ import { type AppointmentView, mergeAppointments } from "@/features/patient/lib/
 
 /**
  * The patient's appointments with their extra details, soonest first: `undefined` while they
- * load. TODO(api): the extras and the ones booked here come from `pending-appointments.ts`.
+ * load. TODO(api): the extras come from `pending-appointments.ts`.
  */
 export function useAppointments(): { data: AppointmentView[] | undefined; isError: boolean } {
   const appointments = useQuery(appointmentsQuery());
@@ -15,7 +15,7 @@ export function useAppointments(): { data: AppointmentView[] | undefined; isErro
   // Without the extras (still loading, or failed) the API's appointments still show.
   if (!extras.data && !extras.isError) return { data: undefined, isError };
   return {
-    data: mergeAppointments(appointments.data, extras.data ?? { bookings: [], details: [] }),
+    data: mergeAppointments(appointments.data, extras.data ?? { details: [] }),
     isError,
   };
 }

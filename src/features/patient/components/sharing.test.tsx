@@ -127,7 +127,6 @@ beforeEach(() => {
   pending.people = [];
   pending.started = [];
   useAuthStore.getState().setSession({
-    accessToken: "token",
     accountType: "patient",
     actingAs: [{ as: "self" }],
     user: {

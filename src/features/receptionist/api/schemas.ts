@@ -1,7 +1,14 @@
 import { z } from "zod";
 import { paginated } from "@/lib/api";
 import { type PatientRecord, patientRecordSchema, sexOf } from "@/lib/patient-record";
-import { fullName, optionalText, staffProfileSchema, text } from "@/lib/staff-profile";
+import {
+  fullName,
+  optionalText,
+  staffMemberSchema,
+  staffProfileSchema,
+  staffRoleLabels,
+  text,
+} from "@/lib/staff-profile";
 
 const count = z.number().int().nonnegative();
 
@@ -99,7 +106,13 @@ const appointmentDetailSchema = appointmentSchema.extend({
   }),
   /** Who booked it in, e.g. "Front desk" or "Dr. Adebayo". */
   bookedWith: z.string(),
+  /** The sqid of the staff member it's with, or null on older appointments. */
+  staffId: z.string().nullable(),
+  /** Still `pending`: the front desk confirms it, naming who will see the patient. */
+  awaitingConfirmation: z.boolean(),
   note: z.string().nullable(),
+  cancellationReason: z.string().nullable(),
+  rescheduleReason: z.string().nullable(),
 });
 export type AppointmentDetail = z.infer<typeof appointmentDetailSchema>;
 
@@ -516,7 +529,9 @@ const appointmentRead = z.object({
   scheduled_time: dateTime,
   type: optionalText,
   note: optionalText,
-  staff: z.object({ firstname: text, lastname: text }).nullish(),
+  cancellation_reason: optionalText,
+  reschedule_reason: optionalText,
+  staff: z.object({ sqid: optionalText, firstname: text, lastname: text }).nullish(),
   patient: z.object({
     hin: text,
     firstname: text,
@@ -588,8 +603,29 @@ export const toAppointmentDetail = (appointment: AppointmentRead): AppointmentDe
   bookedWith: appointment.staff
     ? fullName(appointment.staff.firstname, appointment.staff.lastname)
     : "Front desk",
+  staffId: appointment.staff?.sqid ?? null,
+  awaitingConfirmation: appointment.status === "pending",
   note: appointment.note,
+  cancellationReason: appointment.cancellation_reason,
+  rescheduleReason: appointment.reschedule_reason,
 });
+
+/** `POST /api/hospital-ops/appointments/{sqid}/confirm`: the confirmed appointment. */
+export const confirmedAppointmentSchema = appointmentRead.transform(toAppointmentDetail);
+
+/**
+ * `GET /api/auth/staff`: the hospital's staff, for choosing who a patient will see. Active
+ * members with a clinical role only (not the front desk, nor an admin without a role).
+ */
+export const bookableStaffSchema = paginated(staffMemberSchema).transform(({ items }) =>
+  items
+    .filter(({ active, role }) => active && role !== null && role !== "receptionist")
+    .map(({ id, name, role }) => ({
+      id,
+      name: role === "doctor" ? `Dr. ${name}` : name,
+      role: role && staffRoleLabels[role],
+    })),
+);
 
 /** `GET /api/hospital-ops/operation-metrics`: the receptionist dashboard's numbers. */
 export const operationMetricsSchema = z

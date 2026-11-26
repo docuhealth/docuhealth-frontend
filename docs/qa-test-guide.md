@@ -21,8 +21,16 @@ rather than filing a bug: it's the backend's website allow-list (CORS), not the 
 ### Accounts
 
 Ask the team lead for the staging test accounts: one per role (hospital admin, receptionist,
-doctor, nurse, lab scientist, lab admin, pharmacist, radiologist, DocuHealth admin). Use one
-browser profile (or a private window) per role, or log out between roles.
+doctor, nurse, lab scientist, lab admin, pharmacist, radiologist, DocuHealth admin).
+
+**One login per browser.** Since 26 Nov the session is kept in the API's cookies, which every
+DocuHealth site in the same browser shares (patient, hospital, admin, and v1). Logging in as
+someone else replaces the session in every tab. To test two roles at once, use a separate browser
+profile for each (a private window counts as its own profile).
+
+**Sign-in checks:** log in, reload the page (you stay in), leave a tab for 10 minutes then click
+around (it renews by itself), log out (every tab is logged out on its next click), and reset a
+password (finish within 5 minutes of entering the code; after that it asks for a new code).
 
 ### Rules for staging data
 

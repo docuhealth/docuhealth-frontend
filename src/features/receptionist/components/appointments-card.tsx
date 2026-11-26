@@ -34,7 +34,7 @@ const noneOn = {
   upcoming: "No appointments coming up.",
 } as const satisfies Record<AppointmentDay, string>;
 
-/** Today's, tomorrow's and later appointments, searchable by name or phone number. */
+/** Today's, tomorrow's and later appointments, searchable by the patient's name or email. */
 export function AppointmentsCard() {
   const [day, setDay] = useState<AppointmentDay>("today");
   const [search, setSearch] = useState("");

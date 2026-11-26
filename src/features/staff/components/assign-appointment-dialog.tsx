@@ -54,32 +54,33 @@ function AssignForm({ appointment, onDone }: { appointment: Appointment; onDone:
   // When the form opened: no day before today can be picked.
   const [today] = useState(() => new Date());
   const at = new Date(appointment.at);
+  const defaultValues = {
+    doctor: "",
+    date: `${at.getFullYear()}-${pad(at.getMonth() + 1)}-${pad(at.getDate())}`,
+    time: `${pad(at.getHours())}:${pad(at.getMinutes())}`,
+    note: appointment.note ?? "",
+  };
   const form = useForm<AssignAppointmentValues>({
     resolver: zodResolver(assignAppointmentSchema),
-    defaultValues: {
-      doctor: "",
-      date: `${at.getFullYear()}-${pad(at.getMonth() + 1)}-${pad(at.getDate())}`,
-      time: `${pad(at.getHours())}:${pad(at.getMinutes())}`,
-      note: appointment.note ?? "",
-    },
+    defaultValues,
   });
   const { errors } = form.formState;
   const options = Object.fromEntries((doctors ?? []).map(({ id, name }) => [id, name]));
 
   function onSubmit({ doctor, date, time, note }: AssignAppointmentValues) {
+    const moved = date !== defaultValues.date || time !== defaultValues.time;
     assign.mutate(
       {
         id: appointment.id,
         doctorId: doctor,
-        at: new Date(`${date}T${time}`),
-        // TODO(api): the type isn't documented; v1 only ever sent `consultation`.
-        type: appointment.typeCode ?? "consultation",
-        note,
+        // Only what changed: the time and type stay as booked, and the note too unless edited.
+        at: moved ? new Date(`${date}T${time}`) : undefined,
+        note: note !== defaultValues.note ? note : undefined,
       },
       {
         onSuccess: () => {
           toast.success(
-            `${appointment.patient.name}’s appointment is with ${options[doctor] ?? "the doctor"}.`,
+            `${appointment.patient.name}’s appointment is with ${options[doctor] ?? "the doctor"}. It’s off your list now.`,
           );
           onDone();
         },

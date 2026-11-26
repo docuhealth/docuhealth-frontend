@@ -44,9 +44,14 @@ const drugs = [
   display_name: `${name} ${strength} ${dose_form}`,
 }));
 
-const hospitals = [
+/** Every hospital on DocuHealth: referrals go to them, and patients book at them. */
+export const hospitals = [
   { sqid: "hosp-ekiti", name: "Ekiti State Teaching Hospital", email: null },
   { sqid: "hosp-unth", name: "UNTH Enugu", email: null },
+  // The demo patient's hospitals (src/mocks/patient.ts).
+  { sqid: "hosp-abc", name: "ABC Hospital", email: "info@abc.example.com" },
+  { sqid: "hosp-red", name: "Reddington Hospital", email: "info@red.example.com" },
+  { sqid: "hosp-luth", name: "LUTH", email: "info@luth.example.com" },
 ];
 
 /** A ward with its free and taken beds, by number. */

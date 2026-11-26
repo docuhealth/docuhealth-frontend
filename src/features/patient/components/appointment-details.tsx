@@ -3,7 +3,6 @@ import { useState } from "react";
 import { ListSkeleton } from "@/components/dashboard/skeletons";
 import { Button } from "@/components/ui/button";
 import { AppointmentClinicianCard } from "@/features/patient/components/appointment-clinician-card";
-import { AppointmentConflictBanner } from "@/features/patient/components/appointment-conflict-banner";
 import { AppointmentFacts } from "@/features/patient/components/appointment-facts";
 import { AppointmentNote } from "@/features/patient/components/appointment-note";
 import { AppointmentStatusTag } from "@/features/patient/components/appointment-status-tag";
@@ -65,7 +64,6 @@ export function AppointmentDetails({ appointmentId }: { appointmentId: string })
 
 function AppointmentScreen({ appointment }: { appointment: AppointmentView }) {
   const [dialog, setDialog] = useState<"cancel" | "reschedule" | "book" | null>(null);
-  const [conflict, setConflict] = useState<string | null>(null);
   const open = isOpen(appointment);
   const visit = visitLine(appointment);
   const line = open
@@ -102,14 +100,7 @@ function AppointmentScreen({ appointment }: { appointment: AppointmentView }) {
               >
                 Cancel booking
               </Button>
-              <Button
-                onClick={() => {
-                  setConflict(null);
-                  setDialog("reschedule");
-                }}
-              >
-                Reschedule
-              </Button>
+              <Button onClick={() => setDialog("reschedule")}>Reschedule</Button>
             </>
           ) : (
             <Button onClick={() => setDialog("book")}>Book again</Button>
@@ -117,7 +108,12 @@ function AppointmentScreen({ appointment }: { appointment: AppointmentView }) {
         </div>
       </section>
 
-      {conflict && <AppointmentConflictBanner time={conflict} />}
+      {open && appointment.status === "pending" && (
+        <AppointmentNote tone="info" title="Waiting for the facility">
+          {appointment.facility ?? "The facility"} will confirm this appointment
+          {appointment.rescheduleReason ? "’s new time" : ""} and who you’ll see.
+        </AppointmentNote>
+      )}
 
       {open ? (
         <div className="grid gap-6 lg:grid-cols-[3fr_2fr]">
@@ -141,6 +137,8 @@ function AppointmentScreen({ appointment }: { appointment: AppointmentView }) {
                   ["Time", timeLine(appointment)],
                   ["Visit", visit],
                   ["Facility", placeLine(appointment)],
+                  ["Your note", appointment.note],
+                  ["Why it moved", appointment.rescheduleReason],
                 ]}
               />
             </section>
@@ -181,16 +179,22 @@ function AppointmentScreen({ appointment }: { appointment: AppointmentView }) {
         onOpenChange={(next) => !next && setDialog(null)}
         reschedule={
           dialog === "reschedule"
-            ? { id: appointment.id, facility: appointment.facility }
+            ? {
+                id: appointment.id,
+                facility: appointment.facility,
+                facilityId: appointment.facilityId,
+              }
             : undefined
         }
-        onConflict={dialog === "reschedule" ? setConflict : undefined}
       />
     </>
   );
 }
 
-/** A past or cancelled appointment's summary. TODO(api): no cancellation details yet. */
+/**
+ * A past or cancelled appointment's summary. The reason is the API's; TODO(api): when it was
+ * cancelled and any fee aren't recorded yet.
+ */
 function summaryOf(appointment: AppointmentView): [string, string | null][] {
   const { cancellation } = appointment;
   const facts: [string, string | null][] = [
@@ -203,7 +207,7 @@ function summaryOf(appointment: AppointmentView): [string, string | null][] {
   return [
     ...facts,
     ["Cancelled", cancellation ? formatDateDotTime(new Date(cancellation.at)) : null],
-    ["Reason", cancellation?.reason ?? null],
+    ["Reason", appointment.cancellationReason],
     [
       "Fee",
       cancellation?.fee == null

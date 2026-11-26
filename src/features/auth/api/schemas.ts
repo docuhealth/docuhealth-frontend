@@ -62,8 +62,8 @@ const authUserPayloadSchema = z.object({
   role: z.string().optional(),
 });
 
+// The session is the httpOnly cookies the reply sets; the body carries no token any more.
 const loginPayloadCoreSchema = z.object({
-  access_token: z.string(),
   acting_as: z.array(actingAsContextSchema).default([]),
   next_step: nextStepSchema,
   hin: z.union([z.string(), z.number()]).optional(),
@@ -89,15 +89,8 @@ export const verifySignupCodeResponseSchema = unwrapEnvelope(
   }),
 );
 
-export const forgotPasswordVerifyResponseSchema = unwrapEnvelope(
-  z.object({
-    access_token: z.string().optional(),
-    reset_token: z.string().optional(),
-    token: z.string().optional(),
-  }),
-).transform((inner) => ({
-  resetToken: inner.access_token ?? inner.reset_token ?? inner.token ?? null,
-}));
+/** A right reset code: the reply sets a 5-minute access cookie and says nothing we need. */
+export const forgotPasswordVerifyResponseSchema = z.unknown();
 
 const facilityTypeApiSchema = z.enum([
   "hospital",

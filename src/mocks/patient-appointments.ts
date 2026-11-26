@@ -1,14 +1,17 @@
 import { HttpResponse, http } from "msw";
 import { env } from "@/env";
+import { hospitals } from "@/mocks/doctor-orders";
+import { myAppointments } from "@/mocks/patient";
 
-const api = (path: string) => `${env.VITE_API_URL}/api/pending/patient/appointments${path}`;
+const api = (path: string) => `${env.VITE_API_URL}${path}`;
+const pending = (path: string) => api(`/api/pending/patient/appointments${path}`);
 
-// TODO(api): demo data and actions for the patient's appointments beyond what the API serves
-// (src/features/patient/api/pending-appointments.ts). Only the mock dev server asks for these.
-// "appt-1" and "appt-2" are the demo patient's appointments in src/mocks/patient.ts; the
-// bookings here are ones the patient made themselves: a pending eye clinic at Reddington Hospital
-// and a cancelled visit in the past. Booking, rescheduling, cancelling and confirming change this
-// in memory until the page reloads. 9:00 AM is always "just taken", to show that error.
+// The patient's booking, rescheduling and cancelling, with the real API's paths, shapes and errors
+// (docs/backend-handoff-2026-11-26-appointments.md), on the appointments in src/mocks/patient.ts.
+// TODO(api): and the demo data for what the API doesn't give patients yet
+// (src/features/patient/api/pending-appointments.ts): each appointment's extras, who can be booked
+// at a hospital, departments, reasons and free slots, and confirming attendance. Only the mock
+// dev server asks for those.
 
 const daysAgo = (days: number, hour = 10, minute = 0) => {
   const date = new Date();
@@ -16,42 +19,25 @@ const daysAgo = (days: number, hour = 10, minute = 0) => {
   date.setHours(hour, minute, 0, 0);
   return date.toISOString();
 };
-const daysAhead = (days: number, hour = 10, minute = 0) => daysAgo(-days, hour, minute);
 
 const reminders = [
   { before: "1 day before", channels: "Push and SMS" },
   { before: "2 hours before", channels: "Push" },
 ];
 
-const facilities = [
-  {
-    id: "hosp-abc",
-    name: "ABC Hospital",
-    area: "Ikeja",
-    address: "14 Obafemi Awolowo Way, Ikeja, Lagos",
-    fee: 15000,
-  },
-  {
-    id: "hosp-red",
-    name: "Reddington Hospital",
+/** Where the demo patient's hospitals are, and what a visit costs. */
+const places = {
+  "hosp-abc": { area: "Ikeja", address: "14 Obafemi Awolowo Way, Ikeja, Lagos", fee: 15000 },
+  "hosp-red": {
     area: "Ikeja",
     address: "12 Idowu Martins Street, Victoria Island, Lagos",
     fee: 20000,
   },
-  {
-    id: "hosp-luth",
-    name: "LUTH",
-    area: "Idi-Araba",
-    address: "Ishaga Road, Idi-Araba, Lagos",
-    fee: 8000,
-  },
-];
-const [abc, reddington] = facilities as [(typeof facilities)[number], (typeof facilities)[number]];
+  "hosp-luth": { area: "Idi-Araba", address: "Ishaga Road, Idi-Araba, Lagos", fee: 8000 },
+} as Record<string, { area: string; address: string; fee: number } | undefined>;
 
 type Detail = {
   appointmentId: string;
-  status: string | null;
-  at: string | null;
   department: string | null;
   reason: string | null;
   clinicianRole: string | null;
@@ -63,93 +49,51 @@ type Detail = {
   minutes: number | null;
   fee: number | null;
   reminders: { before: string; channels: string }[];
-  cancellation: {
-    at: string;
-    reason: string | null;
-    fee: number | null;
-    sentTo: string | null;
-  } | null;
+  cancellation: { at: string; fee: number | null; sentTo: string | null } | null;
 };
 
-const detail = (
-  appointmentId: string,
-  facility: (typeof facilities)[number],
-  fields: Partial<Detail>,
-): Detail => ({
-  appointmentId,
-  status: null,
-  at: null,
-  department: null,
-  reason: null,
-  clinicianRole: null,
-  clinicianPhoto: null,
-  facilityArea: facility.area,
-  facilityAddress: facility.address,
-  facilityPhoto: null,
-  clinic: "Clinic 3",
-  minutes: 30,
-  fee: facility.fee,
-  reminders,
-  cancellation: null,
-  ...fields,
-});
-
-type Booking = {
-  id: string;
-  status: string | null;
-  at: string;
-  type: string | null;
-  clinician: { name: string; specialty: string | null } | null;
-  facility: string | null;
+const detail = (appointmentId: string, facilityId: string, fields: Partial<Detail>): Detail => {
+  const place = places[facilityId];
+  return {
+    appointmentId,
+    department: null,
+    reason: null,
+    clinicianRole: null,
+    clinicianPhoto: null,
+    facilityArea: place?.area ?? null,
+    facilityAddress: place?.address ?? null,
+    facilityPhoto: null,
+    clinic: place ? "Clinic 3" : null,
+    minutes: 30,
+    fee: place?.fee ?? null,
+    reminders,
+    cancellation: null,
+    ...fields,
+  };
 };
-
-const bookings: Booking[] = [
-  {
-    id: "appt-eye",
-    status: "pending",
-    at: daysAhead(5, 14, 30),
-    type: "Follow-up",
-    clinician: null,
-    facility: reddington.name,
-  },
-  {
-    id: "appt-past",
-    status: "cancelled",
-    at: daysAgo(20, 10),
-    type: "Follow-up",
-    clinician: { name: "Dr. Adaeze Okafor", specialty: "Internal Medicine" },
-    facility: abc.name,
-  },
-];
 
 const details: Detail[] = [
-  detail("appt-1", abc, {
+  detail("appt-1", "hosp-abc", {
     department: "Internal Medicine",
     reason: "Blood pressure review",
     clinicianRole: "Consultant Physician",
   }),
-  detail("appt-2", abc, {
+  detail("appt-2", "hosp-abc", {
     department: "Internal Medicine",
     reason: "Blood pressure review",
     clinicianRole: "Consultant Physician",
   }),
-  detail("appt-eye", reddington, { department: "Ophthalmology", reason: "Eye check" }),
-  detail("appt-past", abc, {
+  detail("appt-eye", "hosp-red", { department: "Ophthalmology", reason: "Eye check" }),
+  detail("appt-past", "hosp-abc", {
     department: "Internal Medicine",
     reason: "Check-up",
     clinicianRole: "Consultant Physician",
     // The confirmation went by SMS to the demo patient's phone.
-    cancellation: {
-      at: daysAgo(36, 9, 14),
-      reason: "I can’t make that time",
-      fee: 0,
-      sentTo: "•••• 4821",
-    },
+    cancellation: { at: daysAgo(36, 9, 14), fee: 0, sentTo: "•••• 4821" },
   }),
 ];
 
 const options = {
-  facilities: facilities.map(({ id, name, area }) => ({ id, name, area })),
   departments: [
     "General Practice",
     "Internal Medicine",
@@ -161,36 +105,201 @@ const options = {
   reasons: ["Check-up", "Follow-up", "New symptoms", "Test results", "Prescription refill"],
 };
 
+/** Who a patient can book with, at any hospital: the doctors the demo patient knows, and a GP. */
+const bookableStaff = [
+  {
+    sqid: "staff-okafor",
+    firstname: "Adaeze",
+    lastname: "Okafor",
+    role: "doctor",
+    specialization: "Internal Medicine",
+  },
+  {
+    sqid: "staff-isaac",
+    firstname: "Isaac",
+    lastname: "Adeyemi",
+    role: "doctor",
+    specialization: "Internal Medicine",
+  },
+  {
+    sqid: "staff-bello",
+    firstname: "Tunde",
+    lastname: "Bello",
+    role: "doctor",
+    specialization: "General Medicine",
+  },
+];
+
 const TIMES = ["09:00", "09:30", "10:30", "11:00", "11:30", "12:30", "13:00", "14:30"];
-const TAKEN = "09:00";
 
-const taken = () =>
-  HttpResponse.json(
-    { code: "slot_taken", message: "That time is no longer free." },
-    { status: 409 },
-  );
-const isTaken = (at: string) => {
-  const date = new Date(at);
-  const time = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
-  return time === TAKEN;
-};
+const badRequest = (body: Record<string, unknown>) => HttpResponse.json(body, { status: 400 });
+const notFound = () =>
+  HttpResponse.json({ detail: "No Appointment matches the given query." }, { status: 404 });
 
-const detailOf = (id: string) => details.find((each) => each.appointmentId === id);
-
-/** The detail for `id`, made if it's an appointment this file didn't know about. */
-function ensureDetail(id: string) {
-  let found = detailOf(id);
-  if (!found) {
-    found = detail(id, abc, {});
-    details.push(found);
+/** The API's errors for a `scheduled_time` that's missing or not in the future. */
+function scheduledTimeError(value: string | undefined) {
+  if (!value) return badRequest({ scheduled_time: ["This field is required."] });
+  if (new Date(value).getTime() <= Date.now()) {
+    return badRequest({ scheduled_time: ["Choose a time in the future."] });
   }
-  return found;
+  return null;
 }
 
+const isOpen = (status: string) => status === "pending" || status === "confirmed";
+
 export const patientAppointmentHandlers = [
-  http.get(api(""), () => HttpResponse.json({ bookings, details })),
-  http.get(api("/options"), () => HttpResponse.json(options)),
-  http.get(api("/slots"), ({ request }) => {
+  // Book from the app: always the signed-in patient, always `pending`.
+  http.post(api("/api/hospital-ops/appointments/request"), async ({ request }) => {
+    const body = (await request.json()) as {
+      hospital?: string;
+      staff?: string;
+      scheduled_time?: string;
+      type?: string | null;
+      note?: string | null;
+    };
+    const missing = (["hospital", "staff", "scheduled_time"] as const).filter((key) => !body[key]);
+    if (missing.length > 0) {
+      return badRequest(
+        Object.fromEntries(missing.map((key) => [key, ["This field is required."]])),
+      );
+    }
+    const hospital = hospitals.find(({ sqid }) => sqid === body.hospital);
+    if (!hospital) {
+      return badRequest({ hospital: [`Object with sqid=${body.hospital} does not exist.`] });
+    }
+    const staff = bookableStaff.find(({ sqid }) => sqid === body.staff);
+    if (!staff) return badRequest({ staff: ["Staff not found at this hospital."] });
+    const timeError = scheduledTimeError(body.scheduled_time);
+    if (timeError) return timeError;
+    if (body.type && body.type.length > 20) {
+      return badRequest({ type: ["Ensure this field has no more than 20 characters."] });
+    }
+    const id = Math.max(...myAppointments.map((each) => each.id)) + 1;
+    const sqid = `appt-${id}`;
+    myAppointments.push({
+      id,
+      sqid,
+      status: "pending",
+      scheduled_time: body.scheduled_time ?? "",
+      type: body.type ?? "Consultation",
+      note: body.note ?? null,
+      cancellation_reason: null,
+      reschedule_reason: null,
+      last_visited: null,
+      closed_at: null,
+      staff,
+      hospital_info: { name: hospital.name, sqid: hospital.sqid, email: hospital.email ?? "" },
+    });
+    details.push(detail(sqid, hospital.sqid, { reason: body.type ?? null }));
+    // As the API does: no sqid or status.
+    return HttpResponse.json(
+      {
+        staff_info: {
+          sqid: staff.sqid,
+          firstname: staff.firstname,
+          lastname: staff.lastname,
+          phone_num: null,
+          role: staff.role,
+          email: null,
+          gender: null,
+          is_active: true,
+        },
+        patient_info: {
+          hin: "1234567890123",
+          firstname: "Chinonso",
+          lastname: "Okafor",
+          gender: "male",
+          dob: null,
+        },
+        type: body.type ?? null,
+        note: body.note ?? null,
+        scheduled_time: body.scheduled_time,
+        hospital: hospital.sqid,
+      },
+      { status: 201 },
+    );
+  }),
+
+  // The patient's own (the front desk's are src/mocks/receptionist.ts's). A confirmed one goes
+  // back to pending, for the hospital to confirm the new time.
+  http.patch(
+    api("/api/hospital-ops/appointments/:sqid/reschedule"),
+    async ({ params, request }) => {
+      const appointment = myAppointments.find(({ sqid }) => sqid === params.sqid);
+      if (!appointment) return notFound();
+      const body = (await request.json()) as {
+        scheduled_time?: string;
+        reschedule_reason?: string | null;
+        type?: string | null;
+        note?: string | null;
+      };
+      if (
+        body.scheduled_time &&
+        new Date(body.scheduled_time).getTime() === new Date(appointment.scheduled_time).getTime()
+      ) {
+        return badRequest({
+          scheduled_time: ["The appointment is already at this time. Choose a different time."],
+        });
+      }
+      const timeError = scheduledTimeError(body.scheduled_time);
+      if (timeError) return timeError;
+      if (!isOpen(appointment.status)) {
+        return badRequest({
+          appointment: ["Only a pending or confirmed appointment can be rescheduled"],
+        });
+      }
+      Object.assign(appointment, {
+        scheduled_time: body.scheduled_time,
+        status: "pending",
+        reschedule_reason: body.reschedule_reason ?? null,
+        ...(body.type !== undefined && { type: body.type }),
+        ...(body.note !== undefined && { note: body.note }),
+      });
+      return HttpResponse.json({
+        type: appointment.type,
+        note: appointment.note,
+        scheduled_time: appointment.scheduled_time,
+        reschedule_reason: appointment.reschedule_reason,
+        sqid: appointment.sqid,
+        status: appointment.status,
+      });
+    },
+  ),
+
+  http.post(api("/api/hospital-ops/appointments/:sqid/cancel"), async ({ params, request }) => {
+    const appointment = myAppointments.find(({ sqid }) => sqid === params.sqid);
+    if (!appointment) return notFound();
+    if (!isOpen(appointment.status)) {
+      return badRequest({
+        appointment: ["Only a pending or confirmed appointment can be cancelled"],
+      });
+    }
+    const body = (await request.json().catch(() => ({}))) as { cancellation_reason?: string };
+    appointment.status = "cancelled";
+    appointment.cancellation_reason = body.cancellation_reason ?? null;
+    const found = details.find((each) => each.appointmentId === appointment.sqid);
+    if (found) found.cancellation = { at: new Date().toISOString(), fee: 0, sentTo: "•••• 4821" };
+    return HttpResponse.json({
+      cancellation_reason: appointment.cancellation_reason,
+      reschedule_reason: appointment.reschedule_reason,
+      sqid: appointment.sqid,
+      status: appointment.status,
+    });
+  }),
+
+  // TODO(api): from here on, what the API doesn't have yet.
+  http.get(pending(""), () => HttpResponse.json({ details })),
+  http.get(pending("/options"), () => HttpResponse.json(options)),
+  http.get(pending("/staff"), () =>
+    HttpResponse.json(
+      bookableStaff.map((staff) => ({
+        id: staff.sqid,
+        name: `Dr. ${staff.firstname} ${staff.lastname}`,
+        specialty: staff.specialization,
+      })),
+    ),
+  ),
+  http.get(pending("/slots"), ({ request }) => {
     const day = new URL(request.url).searchParams.get("day") ?? "";
     const date = new Date(`${day}T00:00`);
     // Closed on Sundays.
@@ -200,63 +309,10 @@ export const patientAppointmentHandlers = [
       TIMES.filter((time) => new Date(`${day}T${time}`).getTime() > now + 30 * 60_000),
     );
   }),
-
-  http.post(api(""), async ({ request }) => {
-    const body = (await request.json()) as {
-      facilityId: string;
-      department: string;
-      reason: string;
-      at: string;
-    };
-    if (isTaken(body.at)) return taken();
-    const facility = facilities.find((each) => each.id === body.facilityId) ?? abc;
-    const appointment: Booking = {
-      id: `appt-${Date.now()}`,
-      status: "pending",
-      at: body.at,
-      type: body.reason,
-      clinician: null,
-      facility: facility.name,
-    };
-    const booked = detail(appointment.id, facility, {
-      department: body.department,
-      reason: body.reason,
-    });
-    bookings.push(appointment);
-    details.push(booked);
-    return HttpResponse.json({ appointment, detail: booked }, { status: 201 });
-  }),
-
-  http.post(api("/:id/reschedule"), async ({ params, request }) => {
-    const { at } = (await request.json()) as { at: string };
-    if (isTaken(at)) return taken();
-    const id = String(params.id);
-    const found = ensureDetail(id);
-    found.at = at;
-    const booking = bookings.find((each) => each.id === id);
-    if (booking) booking.at = at;
-    const appointment = booking ?? {
-      id,
-      status: "confirmed",
-      at,
-      type: null,
-      clinician: null,
-      facility: abc.name,
-    };
-    return HttpResponse.json({ appointment, detail: found });
-  }),
-
-  http.post(api("/:id/cancel"), async ({ params, request }) => {
-    const { reason } = (await request.json()) as { reason: string | null };
-    const found = ensureDetail(String(params.id));
-    found.status = "cancelled";
-    found.cancellation = { at: new Date().toISOString(), reason, fee: 0, sentTo: "•••• 4821" };
-    return HttpResponse.json(found);
-  }),
-
-  http.post(api("/:id/confirm"), ({ params }) => {
-    const found = ensureDetail(String(params.id));
-    found.status = "confirmed";
-    return HttpResponse.json(found);
+  http.post(pending("/:id/confirm"), ({ params }) => {
+    const appointment = myAppointments.find(({ sqid }) => sqid === params.id);
+    if (!appointment) return notFound();
+    appointment.status = "confirmed";
+    return HttpResponse.json({ detail: "Attendance confirmed." });
   }),
 ];

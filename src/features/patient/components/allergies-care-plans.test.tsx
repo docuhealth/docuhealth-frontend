@@ -90,7 +90,6 @@ beforeEach(() => {
   pending.allergies = [];
   pending.carePlans = [];
   useAuthStore.getState().setSession({
-    accessToken: "token",
     accountType: "patient",
     actingAs: [{ as: "self" }],
     user: {

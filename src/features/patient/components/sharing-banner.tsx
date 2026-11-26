@@ -9,7 +9,7 @@ export function SharingBanner({ onShare }: { onShare: () => void }) {
       className="flex flex-col gap-4 rounded-xl bg-primary bg-[radial-gradient(circle_at_85%_50%,color-mix(in_oklch,var(--brand),white_18%),transparent_50%)] px-6 py-6 text-primary-foreground sm:flex-row sm:items-center sm:justify-between"
     >
       <div className="flex flex-col gap-1.5">
-        <h2 id="sharing-banner-title" className="type-h3">
+        <h2 id="sharing-banner-title" className="type-h3 text-white">
           Share your record securely
         </h2>
         <p className="type-body-sm-regular text-primary-foreground/80">

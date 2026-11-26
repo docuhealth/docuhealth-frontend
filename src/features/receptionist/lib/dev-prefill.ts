@@ -43,6 +43,8 @@ export const devPrefill = enabled
         date: toIsoDate(tomorrow),
         time: "10:30",
         note: "Review blood test results.",
+        // Dr. Sarah Adeyemi in the mock data.
+        staff: "staff-2",
       } satisfies BookAppointmentValues,
       // A new guardian (look up 999-999-999-99 to reach "No guardian found"); 123456 verifies.
       registerGuardian: {

@@ -10,7 +10,6 @@ import {
 
 function session(overrides: Partial<Session> = {}): Session {
   return {
-    accessToken: "t",
     accountType: "patient",
     user: { id: "u", name: "U", email: "u@example.com", role: "patient" },
     ...overrides,

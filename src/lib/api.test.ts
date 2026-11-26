@@ -23,59 +23,93 @@ describe("request", () => {
     expect(error.message).toContain("GET /thing");
   });
 
-  it("refreshes the token once on 401 and retries", async () => {
-    useAuthStore.getState().setSession({
-      accessToken: "old",
-      refreshToken: "r",
-      user: { id: "u", name: "U", email: "u@example.com", role: "member" },
-    });
+  const user = { id: "u", name: "U", email: "u@example.com", role: "member" };
+  const refreshUrl = `${env.VITE_API_URL}/api/auth/refresh`;
+
+  it("sends X-Requested-With on writes only, and never an Authorization header", async () => {
+    const seen: { method: string; requested: string | null; auth: string | null }[] = [];
+    const record = ({ request }: { request: Request }) => {
+      seen.push({
+        method: request.method,
+        requested: request.headers.get("X-Requested-With"),
+        auth: request.headers.get("Authorization"),
+      });
+      return HttpResponse.json({});
+    };
+    server.use(http.get(url, record), http.post(url, record), http.patch(url, record));
+    await request(z.unknown(), { url: "/thing" });
+    await request(z.unknown(), { method: "POST", url: "/thing", data: {} });
+    await request(z.unknown(), { method: "PATCH", url: "/thing", data: {} });
+    expect(seen).toEqual([
+      { method: "GET", requested: null, auth: null },
+      { method: "POST", requested: "XMLHttpRequest", auth: null },
+      { method: "PATCH", requested: "XMLHttpRequest", auth: null },
+    ]);
+  });
+
+  it("renews the session once on a 401 and retries, sharing one refresh between calls", async () => {
+    useAuthStore.getState().setSession({ user });
+    let renewed = false;
+    let refreshes = 0;
     server.use(
-      http.post(`${env.VITE_API_URL}/api/auth/refresh`, () =>
-        HttpResponse.json({ data: { access_token: "mock-access" } }),
-      ),
-      http.get(url, ({ request }) =>
-        request.headers.get("Authorization") === "Bearer mock-access"
-          ? HttpResponse.json({ id: "1" })
-          : new HttpResponse(null, { status: 401 }),
+      http.post(refreshUrl, ({ request }) => {
+        refreshes += 1;
+        expect(request.headers.get("X-Requested-With")).toBe("XMLHttpRequest");
+        renewed = true;
+        return HttpResponse.json({ data: {} });
+      }),
+      // The access cookie: expired until the refresh renews it.
+      http.get(url, () =>
+        renewed ? HttpResponse.json({ id: "1" }) : new HttpResponse(null, { status: 401 }),
       ),
     );
-    await expect(request(z.object({ id: z.string() }), { url: "/thing" })).resolves.toEqual({
-      id: "1",
-    });
-    expect(useAuthStore.getState().session?.accessToken).toBe("mock-access");
+    const schema = z.object({ id: z.string() });
+    await expect(
+      Promise.all([request(schema, { url: "/thing" }), request(schema, { url: "/thing" })]),
+    ).resolves.toEqual([{ id: "1" }, { id: "1" }]);
+    expect(refreshes).toBe(1);
+    expect(useAuthStore.getState().session).not.toBeNull();
+  });
+
+  it("ends the session when the refresh is refused", async () => {
+    useAuthStore.getState().setSession({ user });
+    server.use(
+      http.post(refreshUrl, () => HttpResponse.json({ detail: "Expired" }, { status: 401 })),
+      http.get(url, () => new HttpResponse(null, { status: 401 })),
+    );
+    await expect(request(z.unknown(), { url: "/thing" })).rejects.toBeDefined();
+    expect(useAuthStore.getState().session).toBeNull();
   });
 
   it("refreshes for the staff profile too (under /api/auth/), but not for a failed login", async () => {
-    useAuthStore.getState().setSession({
-      accessToken: "old",
-      refreshToken: "r",
-      user: { id: "u", name: "U", email: "u@example.com", role: "member" },
-    });
+    useAuthStore.getState().setSession({ user });
+    let refreshes = 0;
+    let renewed = false;
     const profile = `${env.VITE_API_URL}/api/auth/staff/profile`;
     server.use(
-      http.post(`${env.VITE_API_URL}/api/auth/refresh`, () =>
-        HttpResponse.json({ data: { access_token: "fresh" } }),
-      ),
-      http.get(profile, ({ request }) =>
-        request.headers.get("Authorization") === "Bearer fresh"
-          ? HttpResponse.json({ id: "me" })
-          : new HttpResponse(null, { status: 401 }),
+      http.post(refreshUrl, () => {
+        refreshes += 1;
+        renewed = true;
+        return HttpResponse.json({ data: {} });
+      }),
+      http.get(profile, () =>
+        renewed ? HttpResponse.json({ id: "me" }) : new HttpResponse(null, { status: 401 }),
       ),
       http.post(`${env.VITE_API_URL}/api/auth/login`, () =>
-        HttpResponse.json({ detail: "Invalid login credentials." }, { status: 401 }),
+        HttpResponse.json({ detail: "Incorrect login details." }, { status: 401 }),
       ),
     );
     await expect(
       request(z.object({ id: z.string() }), { url: "/api/auth/staff/profile" }),
     ).resolves.toEqual({ id: "me" });
+    expect(refreshes).toBe(1);
 
-    useAuthStore.getState().setTokens({ accessToken: "stale" });
     const login = await request(z.unknown(), { method: "POST", url: "/api/auth/login" }).catch(
       (error: unknown) => error,
     );
-    expect(getErrorMessage(login)).toBe("Invalid login credentials.");
+    expect(getErrorMessage(login)).toBe("Incorrect login details.");
     // A wrong password doesn't trigger a refresh.
-    expect(useAuthStore.getState().session?.accessToken).toBe("stale");
+    expect(refreshes).toBe(1);
   });
 });
 

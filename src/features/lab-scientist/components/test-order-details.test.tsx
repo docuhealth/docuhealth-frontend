@@ -90,7 +90,6 @@ describe("TestOrderDetails", () => {
   describe("as the lab's admin", () => {
     function signInAsLabAdmin() {
       useAuthStore.getState().setSession({
-        accessToken: "token",
         accountType: "staff",
         actingAs: [
           {

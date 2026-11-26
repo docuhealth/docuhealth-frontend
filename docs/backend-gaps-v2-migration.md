@@ -6,7 +6,7 @@ dashboard is connected; the newest are at the bottom.
 
 | #   | Issue                                                                 | Severity                  | Endpoint(s)                           |
 | --- | --------------------------------------------------------------------- | ------------------------- | ------------------------------------- |
-| 1   | CORS now allows no origin at all (it used to allow localhost:5173)    | Blocker                   | All endpoints                         |
+| 1   | ~~CORS blocks the v2 sites~~ Fixed on 26 Nov                          | Settled                   | All endpoints                         |
 | 2   | Staging still serves Django debug pages (incl. the URL list)          | High (security)           | All endpoints                         |
 | 3   | 15 GET endpoints have no response schema in the OpenAPI doc           | Medium                    | Dashboards, charts, events and more   |
 | 4   | Old `api/hospitals/*` paths are gone: is production the same?         | Needs an answer           | `api/hospitals/*` → `api/auth/staff…` |
@@ -17,6 +17,11 @@ dashboard is connected; the newest are at the bottom.
 ---
 
 ## 1. CORS: the v2 test site and subdomains are still blocked
+
+> **Fixed (checked 26 Nov 2026).** Staging now answers the preflight for
+> `https://v2.docuhealthservices.net`, `https://hospital.v2.docuhealthservices.net` and
+> `http://localhost:5173` with `Access-Control-Allow-Credentials: true`, allows the
+> `X-Requested-With` header and exposes `Retry-After`. The history below is kept for reference.
 
 Reported on 18 Nov, still open on 21 Nov, and worse on
 24 Nov 2026: the staging API now returns no `Access-Control-Allow-Origin` for **any** origin we
@@ -144,17 +149,23 @@ doctor, and which way `guardianship` lists (guardians or dependants: the app gue
 email). Also: `operation-metrics`' `check_ins_this_hour` isn't the waiting queue, and
 `pending_checkins` isn't "checked in today", so those two cards need relabelling or new fields.
 
+**Settled by the 26 Nov appointments handoff** (docs/backend-handoff-2026-11-26-appointments.md,
+wired in the app): receptionist 4 (reschedule and cancel), 7 (booking needs `staff`: the booking
+dialog now asks who the patient will see, and pending bookings can be confirmed with someone);
+doctor and nurse 28 (assign); patient 9 (booking, rescheduling and cancelling). Still open from
+those, listed under "Appointments: still open (26 Nov)" at the end of this section.
+
 ### Receptionist
 
 1. **Reception metrics.** Extend `GET /api/hospital-ops/dashboards/receptionist` (or add an endpoint) with `total_check_ins`, `checked_in_today`, `waiting_in_queue`, `appointments_today` and their changes against the previous period, taking `start_date/end_date` like `dashboards/hospital`.
 2. **Reception queue.** Add a receptionist-readable check-in list (or confirm `hospital-ops/patients?status=outpatient` is meant for this) with `reason`/visit purpose and a `status` that says waiting vs with nurse vs with doctor. Allow searching by HIN.
 3. **Check-out permission.** Confirm a receptionist may `POST /api/hospital-ops/check-ins/{sqid}/close`, or add a receptionist check-out endpoint.
-4. **Appointment reschedule and cancel.** Add `POST /api/hospital-ops/appointments/{sqid}/reschedule {scheduled_time, note}` and `…/cancel {reason, details}` for receptionists, notifying the patient. Or confirm the receptionist may use `PATCH …/{sqid}/assign` for rescheduling.
-5. **Single appointment.** Add `GET /api/hospital-ops/appointments/{sqid}`.
+4. ~~**Appointment reschedule and cancel.**~~ Settled by the appointments handoff (26 Nov): `PATCH …/{sqid}/reschedule {scheduled_time, reschedule_reason?, type?, note?}` and `POST …/{sqid}/cancel {cancellation_reason?}`, wired in the appointment details dialog (the note is sent only when it changed). Whether the patient is notified isn't said.
+5. **Single appointment.** Add `GET /api/hospital-ops/appointments/{sqid}`. Still open after the 26 Nov handoff: the details dialog finds an appointment by reading the first 100 of each timeframe.
 6. **Appointment ↔ check-in link.** Add arrived/checked-in state on appointments (or a `check_in` reference) so the UI's `arrived/checked_in/in_progress` statuses have a source.
-7. **Booking without choosing staff.** Make `staff` optional on `appointments/book` (front-desk/unassigned booking). The redesigned booking dialog has no doctor picker (design kept as is), so front-desk booking fails with `staff: This field is required.` until then.
+7. ~~**Booking without choosing staff.**~~ Answered by the appointments handoff (26 Nov): `staff` is required. The booking dialog now asks who the patient will see (the hospital's active clinical staff, from `GET /api/auth/staff`), and a pending appointment can be confirmed with someone (`POST …/{sqid}/confirm {staff}`).
 8. **Slots.** Hospital appointment capacity (`open_slots`, `total_slots` for a date range) for the calendar summary, or the design drops those numbers.
-9. **Search by HIN** on `GET /api/hospital-ops/appointments` (and a `patient=<hin>` filter), so a profile can show the upcoming appointment.
+9. **Search by HIN** on `GET /api/hospital-ops/appointments` (and a `patient=<hin>` filter), so a profile can show the upcoming appointment. Still open: the 26 Nov handoff says `search` is the patient's name or email only.
 10. **Front-desk patient profile.** A receptionist patient endpoint (or extend `/api/patients/{hin}/details`) with `last_visit {at, department}`, `last_check_in {at, status}`, `upcoming_appointment`, `assigned_doctor`, visit history (check-ins + appointments, with in/out times), `dependants[]` and `proxies[]` (with relationship, dob, gender, last visit), and a photo URL.
 11. **Doctor follow-up requests.** An endpoint for doctors to request a follow-up appointment and for the front desk to list (per patient) and confirm/cancel them. Nothing exists today.
 12. **Link an existing patient as a dependant** (`POST /api/patients/{hin}/dependants` with an existing child HIN), and clarify what `confirmed_by` should contain (enum?).
@@ -244,7 +255,33 @@ email). Also: `operation-metrics`' `check_ins_this_hour` isn't the waiting queue
 25. **Doctor dashboard.** `GET /api/hospital-ops/dashboards/doctor` has no response schema (it returns `summary.total_*{value, increase}` and `charts.admissions_overview/discharged_patients` by month), and doesn't say which period `increase` compares with, or how `start_date`/`end_date` change it. The nurse dashboard returns only the theme and the nurse's profile, so the nurse overview stays as it is.
 26. **Doctor discharge form.** `condition_at_discharge` is free text (the UI sends v1's `stable/improved/unchanged/deteriorated/deceased`); the follow-up rules are undocumented (v1 found: `follow_up_clinic` must be `null` at this hospital; with no follow-up, no date, time or instructions may be sent). Please add an enum and document the rules.
 27. **Discharge checklist.** The `nurse_in_patient_discharge` execute body is undocumented (see 16), and it needs `admission_id`, which task rows don't carry (see 15), so the Tasks page sends the nurse to the patient's page to record it.
-28. **Assigning appointments.** `PATCH /api/hospital-ops/appointments/{sqid}/assign` doesn't list the `type` values (v1 only sent `consultation`; the UI keeps the appointment's own type), nor who may assign.
+28. ~~**Assigning appointments.**~~ Settled by the appointments handoff (26 Nov): every field is optional (`doctor_id`, `scheduled_time`, `type`, `note`), only the nurse the appointment is booked with may assign, and it then leaves their lists. The nurse's Assign dialog now sends the doctor, and the time and note only when they changed.
+
+### Appointments: still open (26 Nov)
+
+From the appointments handoff (docs/backend-handoff-2026-11-26-appointments.md), wired in the app
+except where said:
+
+1. **One appointment.** Still no `GET /api/hospital-ops/appointments/{sqid}` (receptionist item 5);
+   the front desk's details dialog looks through the first 100 of each timeframe.
+2. **Patient booking.** No list of a hospital's staff that a patient can read (`GET /api/auth/staff`
+   is the caller's own facility), so patients can't choose whom to book with and can't book off
+   the mock server. No free slots, departments, visit reasons or fees either (patient item 9).
+3. **Confirming attendance.** `POST …/{sqid}/confirm` is the front desk's; a patient has no way to
+   say they'll come. The patient app's "Confirm attendance" says it isn't available yet.
+4. **Closing without staff.** `POST …/{sqid}/close` answers a `500` with no usable body when the
+   appointment has no staff member (older ones). The app shows its own message; please return a
+   `400` (`{"appointment": ["…"]}`) instead.
+5. **`timeframe` errors.** A missing or unknown `timeframe` on `GET /` and `GET /staff` is a `400`
+   with a plain string (`{"timeframe": "This query parameter is required."}`), not DRF's list, and
+   the same message for a wrong value. Please make it a list and say which values are allowed.
+6. **Search.** `search` on the appointment lists is the patient's name or email, not their HIN or
+   phone (receptionist item 9). The staff Appointments page now says "name or email".
+7. **Booking by the lab and radiology.** `POST …/book` is the front desk's only, but the lab
+   scientist's and radiologist's dashboards book patients in with themselves through it (a `403`
+   on staging). Please let them, or say which endpoint they should use.
+8. **Who's told.** The handoff doesn't say whether the patient is notified when the front desk
+   reschedules, cancels or confirms; the receptionist's "Patient Notified!" message assumes so.
 
 ### Pharmacy
 
@@ -330,12 +367,17 @@ states on staging and live (the mock dev server fills them with demo data).
    patient endpoint. `GET /api/patients/dashboard` returns one SOAP note; please say what it's for.
 8. **Condition status.** A diagnosis has no active / resolved status, ICD code or plain-language
    explanation, so the app treats the latest visit's diagnosis as active.
-9. **Patient appointments.** `POST /api/hospital-ops/appointments/book` is for receptionists.
-   Patients need to book (facility, department, reason, note, a free slot), see free slots per
-   day, reschedule (409 when the slot was taken meanwhile), cancel with a reason, and confirm
-   attendance. Also: departments and visit reasons per facility, the consultation fee, the
-   appointment's length, reminders, the clinician's role and photo, and the facility's address
-   and photo.
+9. **Patient appointments.** ~~Booking, rescheduling and cancelling~~ are settled by the
+   appointments handoff (26 Nov) and wired: `POST …/request`, `PATCH …/{sqid}/reschedule` (a
+   confirmed one goes back to pending, and the app says the facility will confirm the new time)
+   and `POST …/{sqid}/cancel` with the chosen reason. Facilities come from
+   `GET /api/auth/facilities/hospitals` (please confirm patients may call it). Still missing: the
+   list of a hospital's staff a patient can choose from (without it, booking can't be done off the
+   mock server: the app says so), free slots per day (the app offers office hours instead and the
+   facility confirms), confirming attendance (confirm is the front desk's), departments and visit
+   reasons per facility, the consultation fee, the appointment's length, reminders, the
+   clinician's role and photo, the facility's address and photo, and when an appointment was
+   cancelled and any fee.
 10. **Messages.** No chat endpoint exists: conversations with unread counts, a conversation's
     messages (with read state and shared records), sending, starting a chat, and the staff a
     patient can message per facility and role. The sidebar's unread badge needs the count.
@@ -360,3 +402,21 @@ states on staging and live (the mock dev server fills them with demo data).
     ("Mrs."); and a dependant's photo, due vaccines and growth (weight, height, BMI with
     percentiles) have no source. `GET /api/patients/guardianship` (25 Nov handoff) isn't in the
     published schema yet.
+
+### Cookie sessions (26 Nov handoff, wired in the app)
+
+Wired: no token is stored or sent; every call sends credentials and every write sends
+`X-Requested-With`; one shared refresh-and-retry on a 401 (tabs take turns through a Web Lock);
+a refused refresh logs out; logout calls `POST /api/auth/logout`; the password reset uses the
+5-minute cookie (and sends the person back for a new code when it runs out); `dev:staging` proxies
+`/api` and relaxes the cookies' `Secure` flag on localhost only. This settles one-time-codes item 1
+(`Retry-After` is now exposed) and replaces item 5 (refresh is now cookie-only).
+
+Still open:
+
+1. **"Who am I".** After a reload the app can't ask who is signed in, so it keeps the non-secret
+   login reply (role, `next_step`, `acting_as`, name) in the browser's storage, as the handoff
+   suggests. Please add the planned endpoint; the app will then check the session on load instead.
+2. **Mobile sign-in** isn't decided (no cookie jar, no `Authorization`). Nothing to do on the web.
+3. **One session per browser.** Logging in to any DocuHealth site (v1 included) replaces the
+   session in every tab. QA has been told to use one browser profile per role.

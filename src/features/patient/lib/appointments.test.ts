@@ -26,13 +26,16 @@ const okafor: Appointment = {
   status: "confirmed",
   at: at(18),
   type: "Follow-up",
+  note: null,
+  cancellationReason: null,
+  rescheduleReason: null,
+  lastVisited: null,
   clinician: { name: "Dr. Adaeze Okafor", specialty: "Internal Medicine" },
   facility: "ABC Hospital",
+  facilityId: "hosp-abc",
 };
 const detail = (appointmentId: string, fields: Partial<AppointmentDetail>): AppointmentDetail => ({
   appointmentId,
-  status: null,
-  at: null,
   department: null,
   reason: null,
   clinicianRole: null,
@@ -49,46 +52,50 @@ const detail = (appointmentId: string, fields: Partial<AppointmentDetail>): Appo
 });
 
 const [view] = mergeAppointments([okafor], {
-  bookings: [],
   details: [detail("a", { facilityArea: "Ikeja", department: "Internal Medicine" })],
 });
-const eye = mergeAppointments([], {
-  bookings: [
+const eye = mergeAppointments(
+  [
     {
+      ...okafor,
       id: "b",
       status: "pending",
       at: at(22, 14),
-      type: "Follow-up",
       clinician: null,
       facility: "Reddington Hospital",
+      facilityId: "hosp-red",
     },
   ],
-  details: [detail("b", { department: "Ophthalmology", reason: "Eye check" })],
-})[0]!;
+  { details: [detail("b", { department: "Ophthalmology", reason: "Eye check" })] },
+)[0]!;
 
 describe("mergeAppointments", () => {
-  it("adds the extras and the patient's own changes, soonest first", () => {
+  it("adds the extras and the API's reasons, soonest first", () => {
     const list = mergeAppointments(
       [
-        { ...okafor, at: at(25) },
-        { ...okafor, id: "c", at: at(20) },
+        {
+          ...okafor,
+          status: "cancelled",
+          at: at(25),
+          cancellationReason: "Feeling better",
+        },
+        { ...okafor, id: "c", at: at(20), rescheduleReason: "Moved to the afternoon" },
       ],
-      {
-        bookings: [
-          { ...okafor, id: "c" },
-          { ...okafor, id: "d", at: at(19) },
-        ],
-        details: [detail("a", { status: "cancelled", at: at(30) })],
-      },
+      { details: [detail("a", { clinic: "Clinic 3" })] },
     );
-    expect(list.map((each) => each.id)).toEqual(["d", "c", "a"]);
-    expect(list[2]).toMatchObject({ status: "cancelled", at: at(30) });
+    expect(list.map((each) => each.id)).toEqual(["c", "a"]);
+    expect(list[0]).toMatchObject({ rescheduleReason: "Moved to the afternoon", clinic: null });
+    expect(list[1]).toMatchObject({
+      status: "cancelled",
+      cancellationReason: "Feeling better",
+      clinic: "Clinic 3",
+    });
   });
 
   it("takes an appointment with no status as pending", () => {
-    expect(
-      mergeAppointments([{ ...okafor, status: null }], { bookings: [], details: [] })[0]?.status,
-    ).toBe("pending");
+    expect(mergeAppointments([{ ...okafor, status: null }], { details: [] })[0]?.status).toBe(
+      "pending",
+    );
   });
 });
 
@@ -101,7 +108,7 @@ describe("splitAppointments", () => {
         { ...okafor, id: "older", at: at(5) },
         { ...okafor, id: "cancelled", status: "cancelled", at: at(25) },
       ],
-      { bookings: [], details: [] },
+      { details: [] },
     );
     const { upcoming, past } = splitAppointments(list, now);
     expect(upcoming.map((each) => each.id)).toEqual(["today"]);

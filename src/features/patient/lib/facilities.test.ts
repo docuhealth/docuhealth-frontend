@@ -31,8 +31,13 @@ const booking: Appointment = {
   status: "confirmed",
   at: "2026-11-02T10:00:00",
   type: null,
+  note: null,
+  cancellationReason: null,
+  rescheduleReason: null,
+  lastVisited: null,
   clinician: null,
   facility: "Reddington Hospital",
+  facilityId: "hosp-red",
 };
 
 describe("facilityViews", () => {

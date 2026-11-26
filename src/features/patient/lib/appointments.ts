@@ -15,6 +15,10 @@ export type AppointmentView = {
   at: string;
   /** "Follow-up". */
   type: string | null;
+  /** The booking's note: the reason for the visit, in the patient's words. */
+  note: string | null;
+  cancellationReason: string | null;
+  rescheduleReason: string | null;
   department: string | null;
   /** What it's for, e.g. "Eye check". */
   reason: string | null;
@@ -25,6 +29,8 @@ export type AppointmentView = {
     photo: string | null;
   } | null;
   facility: string | null;
+  /** The hospital's sqid. */
+  facilityId: string | null;
   /** "ABC Hospital, Ikeja". */
   facilityLabel: string | null;
   facilityAddress: string | null;
@@ -36,17 +42,13 @@ export type AppointmentView = {
   cancellation: AppointmentDetail["cancellation"];
 };
 
-/**
- * The API's appointments and the ones booked here, each with its extra details (the patient's
- * own change of status or time wins until the API reports it), soonest first.
- */
+/** The API's appointments, each with its extra details, soonest first. */
 export function mergeAppointments(
   appointments: Appointment[],
   extras: AppointmentExtras,
 ): AppointmentView[] {
-  const known = new Set(appointments.map((appointment) => appointment.id));
   const details = new Map(extras.details.map((detail) => [detail.appointmentId, detail]));
-  return [...appointments, ...extras.bookings.filter((booking) => !known.has(booking.id))]
+  return appointments
     .map((appointment) => {
       const detail = details.get(appointment.id);
       const facilityLabel = appointment.facility
@@ -55,9 +57,12 @@ export function mergeAppointments(
       return {
         id: appointment.id,
         // TODO(api): an appointment without a status is taken as waiting for the facility.
-        status: detail?.status ?? appointment.status ?? "pending",
-        at: detail?.at ?? appointment.at,
+        status: appointment.status ?? "pending",
+        at: appointment.at,
         type: appointment.type,
+        note: appointment.note,
+        cancellationReason: appointment.cancellationReason,
+        rescheduleReason: appointment.rescheduleReason,
         department: detail?.department ?? null,
         reason: detail?.reason ?? null,
         clinician: appointment.clinician && {
@@ -66,6 +71,7 @@ export function mergeAppointments(
           photo: detail?.clinicianPhoto ?? null,
         },
         facility: appointment.facility,
+        facilityId: appointment.facilityId,
         facilityLabel,
         facilityAddress: detail?.facilityAddress ?? null,
         facilityPhoto: detail?.facilityPhoto ?? null,
@@ -77,6 +83,37 @@ export function mergeAppointments(
       } satisfies AppointmentView;
     })
     .sort((a, b) => a.at.localeCompare(b.at));
+}
+
+/** A just-booked appointment, from what the booking said, until the list has it. */
+export function bookedView(booked: {
+  id: string | null;
+  at: string;
+  facility: string | null;
+  facilityId: string | null;
+}): AppointmentView {
+  return {
+    id: booked.id ?? "",
+    status: "pending",
+    at: booked.at,
+    type: null,
+    note: null,
+    cancellationReason: null,
+    rescheduleReason: null,
+    department: null,
+    reason: null,
+    clinician: null,
+    facility: booked.facility,
+    facilityId: booked.facilityId,
+    facilityLabel: booked.facility,
+    facilityAddress: null,
+    facilityPhoto: null,
+    clinic: null,
+    minutes: null,
+    fee: null,
+    reminders: [],
+    cancellation: null,
+  };
 }
 
 const startOfDay = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());

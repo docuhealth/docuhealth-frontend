@@ -21,6 +21,18 @@ export default defineConfig(({ mode }) => {
                 changeOrigin: true,
                 secure: true,
                 cookieDomainRewrite: "",
+                // The session cookies are `Secure; SameSite=None` for the real sites. Through this
+                // proxy they're first-party on http://localhost, where Safari refuses `Secure`
+                // cookies, so they're stored as plain `SameSite=Lax` ones here (dev server only).
+                configure: (proxy) => {
+                  proxy.on("proxyRes", (response) => {
+                    const cookies = response.headers["set-cookie"];
+                    if (!cookies) return;
+                    response.headers["set-cookie"] = cookies.map((cookie) =>
+                      cookie.replace(/;\s*Secure/gi, "").replace(/SameSite=None/gi, "SameSite=Lax"),
+                    );
+                  });
+                },
               },
             },
           }

@@ -104,7 +104,6 @@ const demo = {
 beforeEach(() => {
   pending.billing = { bills: [], payments: [] };
   useAuthStore.getState().setSession({
-    accessToken: "token",
     accountType: "patient",
     actingAs: [{ as: "self" }],
     user: {

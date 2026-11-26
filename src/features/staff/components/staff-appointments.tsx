@@ -33,7 +33,11 @@ import { formatDayAndTime } from "@/lib/format";
 import { EmptyState } from "@/components/empty-state";
 import { ListSkeleton } from "@/components/dashboard/skeletons";
 
-const timeframes = Object.keys(appointmentTimeframeLabels) as AppointmentTimeframe[];
+/** The hospital's list has a Tomorrow tab; a member's own has none (its Upcoming starts tomorrow). */
+const timeframesOf = {
+  mine: ["today", "upcoming", "history"],
+  hospital: ["today", "tomorrow", "upcoming", "history"],
+} as const satisfies Record<AppointmentParams["scope"], AppointmentTimeframe[]>;
 
 const statusTones = {
   pending: "warning",
@@ -44,6 +48,7 @@ const statusTones = {
 
 const emptyIn = {
   today: "No appointments today.",
+  tomorrow: "No appointments tomorrow.",
   upcoming: "No upcoming appointments.",
   history: "No past appointments.",
 } as const satisfies Record<AppointmentTimeframe, string>;
@@ -105,7 +110,7 @@ export function StaffAppointments({
           <SearchField
             size="lg"
             label="Search appointments"
-            placeholder="Search by patient name or HIN"
+            placeholder="Search by patient name or email"
             value={search}
             onChange={resetPage(setSearch)}
             className="@3xl:w-80"
@@ -135,7 +140,7 @@ export function StaffAppointments({
         >
           {/* Ruled edge to edge, past the card's padding. */}
           <CountTabsList className="-mx-4 w-auto px-4">
-            {timeframes.map((value) => (
+            {timeframesOf[scope].map((value) => (
               <CountTab
                 key={value}
                 value={value}

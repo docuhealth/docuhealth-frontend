@@ -40,7 +40,6 @@ export function buildSessionFromLoginResponse(
   const hinValue = payload.hin ?? payload.user?.hin;
 
   return {
-    accessToken: payload.access_token,
     accountType: inferredAccountType,
     nextStep: payload.next_step,
     actingAs: payload.acting_as,
@@ -203,17 +202,16 @@ export function useVerifyForgotPasswordOtp() {
 
 export interface ResetPasswordInput {
   new_password: string;
-  resetToken?: string | null;
 }
 
 export function useResetPassword() {
   return useMutation({
-    mutationFn: ({ new_password, resetToken }: ResetPasswordInput) =>
+    // Sent with the 5-minute access cookie the verified code set; no token in the app.
+    mutationFn: (data: ResetPasswordInput) =>
       request(messageResponseSchema, {
         method: "PATCH",
         url: "/api/auth/reset-password",
-        data: { new_password },
-        headers: resetToken ? { Authorization: `Bearer ${resetToken}` } : undefined,
+        data,
       }),
   });
 }

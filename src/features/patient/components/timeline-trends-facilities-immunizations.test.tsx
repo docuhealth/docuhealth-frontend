@@ -109,7 +109,6 @@ beforeEach(() => {
   pending.labHistory = [];
   pending.facilities = [];
   useAuthStore.getState().setSession({
-    accessToken: "token",
     accountType: "patient",
     actingAs: [{ as: "self" }],
     user: {

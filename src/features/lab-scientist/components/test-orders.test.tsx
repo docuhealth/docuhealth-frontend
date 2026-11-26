@@ -35,7 +35,6 @@ describe("TestOrders", () => {
 
     it("adds a Result Approval tab of the orders with results to approve (as in v1)", async () => {
       useAuthStore.getState().setSession({
-        accessToken: "token",
         accountType: "staff",
         actingAs: [
           {

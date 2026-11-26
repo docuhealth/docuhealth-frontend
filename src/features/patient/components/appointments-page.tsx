@@ -105,7 +105,11 @@ export function AppointmentsPage() {
                 confirming={confirm.isPending && confirm.variables === appointment.id}
                 onReschedule={() =>
                   setBooking({
-                    reschedule: { id: appointment.id, facility: appointment.facility },
+                    reschedule: {
+                      id: appointment.id,
+                      facility: appointment.facility,
+                      facilityId: appointment.facilityId,
+                    },
                   })
                 }
                 onConfirm={() =>

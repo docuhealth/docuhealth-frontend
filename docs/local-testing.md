@@ -23,7 +23,10 @@ Use Chrome or Edge (they open `*.localhost` without extra setup).
 - **`dev:staging`** forwards every API call through your computer to staging, so it works even
   when staging's website allow-list (CORS) blocks the live site. Log in with the staging test
   accounts (from the team lead; they aren't in the repo). Same data and rules as the live site:
-  shared, test patients only, never buy a plan.
+  shared, test patients only, never buy a plan. It's also what makes sign-in work locally: the
+  session is in the API's cookies, which a browser keeps for `localhost` only when the calls go
+  through this forwarding (the dev server relaxes their `Secure` flag so Safari keeps them too).
+  One login per browser: use a separate browser profile per role.
 - **`dev`** never touches a server: the fake API lives in the browser (`src/mocks/`). Safe for
   trying every write action. Settings are in `.env.local` (`VITE_ENABLE_MOCKS=true`).
 

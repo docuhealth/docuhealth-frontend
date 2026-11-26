@@ -1,4 +1,5 @@
 import { type LinkProps, useNavigate } from "@tanstack/react-router";
+import { isAxiosError } from "axios";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -55,7 +56,6 @@ export function PasswordReset({ audience }: { audience: keyof typeof copy }) {
   const navigate = useNavigate();
   const [step, setStep] = useState<"identifier" | "code" | "password">("identifier");
   const [identifier, setIdentifier] = useState("");
-  const [resetToken, setResetToken] = useState<string | null>(null);
 
   const forgotPasswordMutation = useForgotPassword();
   const verifyOtpMutation = useVerifyForgotPasswordOtp();
@@ -77,12 +77,12 @@ export function PasswordReset({ audience }: { audience: keyof typeof copy }) {
 
   async function verifyCode(code: string) {
     try {
-      const response = await verifyOtpMutation.mutateAsync({
+      // A right code sets a 5-minute access cookie that the new password is sent with.
+      await verifyOtpMutation.mutateAsync({
         identifier,
         otp: code,
         account_type: accountType ?? undefined,
       });
-      setResetToken(response.resetToken);
       setStep("password");
     } catch (error) {
       toast.error(getErrorMessage(error));
@@ -91,13 +91,16 @@ export function PasswordReset({ audience }: { audience: keyof typeof copy }) {
 
   async function resetPassword(values: ResetPasswordValues) {
     try {
-      await resetPasswordMutation.mutateAsync({
-        new_password: values.password,
-        resetToken,
-      });
+      await resetPasswordMutation.mutateAsync({ new_password: values.password });
       toast.success("Password updated. Log in with your new password.");
       await navigate({ to: loginTo });
     } catch (error) {
+      if (isAxiosError(error) && error.response?.status === 401) {
+        // The code's cookie lasts 5 minutes.
+        toast.error("That took longer than 5 minutes. Ask for a new code and try again.");
+        setStep("identifier");
+        return;
+      }
       toast.error(getErrorMessage(error));
     }
   }

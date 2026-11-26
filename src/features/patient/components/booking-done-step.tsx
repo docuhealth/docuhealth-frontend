@@ -7,16 +7,22 @@ import { RelatedRow } from "@/features/patient/components/related-row";
 import { type AppointmentView, longDate, timeLine } from "@/features/patient/lib/appointments";
 import { formatNaira } from "@/features/patient/lib/lab-results";
 
-/** Booking, done: when and where, the fee, and the reminders that will go out. */
+/**
+ * Booking, done: when and where, the fee, and the reminders that will go out. A new booking, or
+ * a moved one (`pending`), waits for the facility to confirm it, and this says so.
+ */
 export function BookingDoneStep({
   appointment,
   rescheduled,
+  pending,
   onView,
 }: {
   appointment: AppointmentView;
   rescheduled: boolean;
+  pending: boolean;
   onView: () => void;
 }) {
+  const facility = appointment.facility ?? "The facility";
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <header className="relative flex flex-col items-center gap-3 px-6 pt-6 text-center">
@@ -40,7 +46,9 @@ export function BookingDoneStep({
           {rescheduled ? "You’re rescheduled!" : "You’re booked!"}
         </DialogTitle>
         <DialogDescription className="max-w-80 type-body-sm-regular text-fg-caption">
-          We’ve sent the details by SMS. We’ll remind you the day before.
+          {pending
+            ? `${facility} will confirm ${rescheduled ? "the new time" : "your appointment"}. Until then it shows as pending.`
+            : "Your appointment is at the new time."}
         </DialogDescription>
       </header>
 

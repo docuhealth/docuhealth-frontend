@@ -27,6 +27,7 @@ import {
   cancellationReasonLabels,
 } from "@/features/receptionist/api/schemas";
 import { AppointmentForm } from "@/features/receptionist/components/appointment-form";
+import { ConfirmAppointmentForm } from "@/features/receptionist/components/confirm-appointment-form";
 import { StatusTag } from "@/features/receptionist/components/status-tag";
 import { PatientSummary } from "@/components/dashboard/patient-summary";
 import { devPrefill } from "@/features/receptionist/lib/dev-prefill";
@@ -49,7 +50,8 @@ const reasons = Object.keys(cancellationReasonLabels) as CancellationReason[];
 /**
  * "Appointment Details" for the appointment `appointmentId` (open while it's set): who, when
  * and why. One still to come can be rescheduled, or cancelled with a reason; either way
- * "Patient Notified!" follows.
+ * "Patient Notified!" follows. A pending one (most are patients' bookings from the app) can be
+ * confirmed, naming who will see the patient.
  */
 export function AppointmentDetailsDialog({
   appointmentId,
@@ -71,6 +73,10 @@ export function AppointmentDetailsDialog({
             onCancelled={({ patient }) => {
               onClose();
               setNotice(<>Appointment cancelled. {patient.name} has been notified.</>);
+            }}
+            onConfirmed={({ patient, bookedWith }) => {
+              onClose();
+              toast.success(`${patient.name}’s appointment is confirmed with ${bookedWith}.`);
             }}
             onRescheduled={({ at, patient }) => {
               onClose();
@@ -99,14 +105,16 @@ export function AppointmentDetailsDialog({
 function AppointmentDetails({
   id,
   onCancelled,
+  onConfirmed,
   onRescheduled,
 }: {
   id: string;
   onCancelled: (appointment: AppointmentDetail) => void;
+  onConfirmed: (appointment: AppointmentDetail) => void;
   onRescheduled: (appointment: AppointmentDetail) => void;
 }) {
   const { data: appointment, isPending, isError } = useQuery(appointmentDetailQuery(id));
-  const [step, setStep] = useState<"details" | "reschedule" | "cancel">("details");
+  const [step, setStep] = useState<"details" | "reschedule" | "cancel" | "confirm">("details");
 
   if (isPending || isError) {
     return (
@@ -137,6 +145,15 @@ function AppointmentDetails({
       />
     );
   }
+  if (step === "confirm") {
+    return (
+      <ConfirmAppointmentForm
+        appointment={appointment}
+        onBack={() => setStep("details")}
+        onConfirmed={onConfirmed}
+      />
+    );
+  }
   if (step === "cancel") {
     return (
       <CancelForm
@@ -151,6 +168,7 @@ function AppointmentDetails({
       appointment={appointment}
       onReschedule={() => setStep("reschedule")}
       onCancel={() => setStep("cancel")}
+      onConfirm={() => setStep("confirm")}
     />
   );
 }
@@ -159,10 +177,12 @@ function Summary({
   appointment,
   onReschedule,
   onCancel,
+  onConfirm,
 }: {
   appointment: AppointmentDetail;
   onReschedule: () => void;
   onCancel: () => void;
+  onConfirm: () => void;
 }) {
   const at = new Date(appointment.at);
   // Only an appointment still to come can be moved or called off.
@@ -193,10 +213,28 @@ function Summary({
             <dt>Booked with</dt>
             <dd>{appointment.bookedWith}</dd>
           </div>
+          {appointment.status === "upcoming" && (
+            <div>
+              <dt>Confirmed</dt>
+              <dd>{appointment.awaitingConfirmation ? "Not yet" : "Yes"}</dd>
+            </div>
+          )}
           {appointment.note && (
             <div>
               <dt>Note</dt>
               <dd className="wrap-anywhere">{appointment.note}</dd>
+            </div>
+          )}
+          {appointment.rescheduleReason && (
+            <div>
+              <dt>Why it moved</dt>
+              <dd className="wrap-anywhere">{appointment.rescheduleReason}</dd>
+            </div>
+          )}
+          {appointment.status === "cancelled" && appointment.cancellationReason && (
+            <div>
+              <dt>Why it was cancelled</dt>
+              <dd className="wrap-anywhere">{appointment.cancellationReason}</dd>
             </div>
           )}
         </dl>
@@ -213,13 +251,32 @@ function Summary({
             >
               Cancel appointment
             </Button>
-            <Button
-              className="h-11 gap-2 px-5 type-heading-sm has-data-[icon=inline-end]:pr-4"
-              onClick={onReschedule}
-            >
-              Reschedule
-              <CaretRightIcon data-icon="inline-end" />
-            </Button>
+            {appointment.awaitingConfirmation ? (
+              <>
+                <Button
+                  variant="outline"
+                  className="h-11 bg-card px-5 type-heading-sm text-fg-heading"
+                  onClick={onReschedule}
+                >
+                  Reschedule
+                </Button>
+                <Button
+                  className="h-11 gap-2 px-5 type-heading-sm has-data-[icon=inline-end]:pr-4"
+                  onClick={onConfirm}
+                >
+                  Confirm
+                  <CaretRightIcon data-icon="inline-end" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                className="h-11 gap-2 px-5 type-heading-sm has-data-[icon=inline-end]:pr-4"
+                onClick={onReschedule}
+              >
+                Reschedule
+                <CaretRightIcon data-icon="inline-end" />
+              </Button>
+            )}
           </div>
         </footer>
       )}
@@ -251,15 +308,19 @@ function RescheduleForm({
           date: toIsoDate(at),
           time: `${String(at.getHours()).padStart(2, "0")}:${String(at.getMinutes()).padStart(2, "0")}`,
           note: appointment.note ?? "",
+          staff: appointment.staffId ?? "",
         }}
         submitLabel="Reschedule"
         pending={reschedule.isPending}
         onBack={onBack}
         backLabel="Cancel"
-        onSubmit={(change) =>
+        onSubmit={({ at, note }) =>
           reschedule.mutate(
-            { id: appointment.id, ...change },
-            { onSuccess: onRescheduled, onError: (error) => toast.error(getErrorMessage(error)) },
+            { id: appointment.id, at, note, previousNote: appointment.note },
+            {
+              onSuccess: () => onRescheduled({ ...appointment, at }),
+              onError: (error) => toast.error(getErrorMessage(error)),
+            },
           )
         }
       />
@@ -288,7 +349,10 @@ function CancelForm({
     cancel.mutate(
       // The details only mean something alongside "Other".
       { id: appointment.id, reason, details: reason === "other" ? details : "" },
-      { onSuccess: onCancelled, onError: (error) => toast.error(getErrorMessage(error)) },
+      {
+        onSuccess: () => onCancelled(appointment),
+        onError: (error) => toast.error(getErrorMessage(error)),
+      },
     );
   }
 

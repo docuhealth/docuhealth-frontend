@@ -9,6 +9,7 @@ import {
   type AppointmentList,
   appointmentPageSchema,
   appointmentsOverviewSchema,
+  bookableStaffSchema,
   type CheckOutSummary,
   checkInPageSchema,
   countOnlySchema,
@@ -46,6 +47,7 @@ export const receptionistKeys = {
   patientLookup: (hin: string) => [...receptionistKeys.all, "patient-lookup", hin] as const,
   patient: (id: string) => [...receptionistKeys.all, "patient", id] as const,
   checkOut: (queueId: string) => [...receptionistKeys.all, "check-out", queueId] as const,
+  staff: () => [...receptionistKeys.all, "staff"] as const,
 };
 
 const APPOINTMENTS_URL = "/api/hospital-ops/appointments";
@@ -64,6 +66,17 @@ export const receptionistProfileQuery = () =>
   queryOptions({
     queryKey: receptionistKeys.profile(),
     queryFn: () => request(receptionistProfileSchema, { url: "/api/auth/staff/profile" }),
+  });
+
+/**
+ * Who a patient can be booked with: the hospital's active clinical staff. TODO(api): reads the
+ * first 100 members.
+ */
+export const bookableStaffQuery = () =>
+  queryOptions({
+    queryKey: receptionistKeys.staff(),
+    queryFn: () => request(bookableStaffSchema, { url: "/api/auth/staff", params: { size: 100 } }),
+    staleTime: 5 * 60_000,
   });
 
 /** The dashboard's numbers for `period`. */
@@ -205,7 +218,7 @@ class AppointmentNotFoundError extends Error {
 }
 
 /**
- * One appointment. TODO(api): there's no endpoint for one, so this looks through the latest of
+ * One appointment. TODO(api): there's no endpoint for one, so this looks through the first 100 of
  * each timeframe for it.
  */
 export const appointmentDetailQuery = (id: string) =>

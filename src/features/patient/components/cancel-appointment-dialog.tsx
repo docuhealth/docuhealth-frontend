@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useCancelAppointment } from "@/features/patient/api/pending-appointments";
+import { useCancelAppointment } from "@/features/patient/api/appointments";
 import {
   type AppointmentView,
   type CancelReason,
@@ -18,7 +18,7 @@ import {
 } from "@/features/patient/lib/appointments";
 import { getErrorMessage } from "@/lib/api";
 
-/** "Cancel appointment?", with an optional reason. TODO(api): see `pending-appointments.ts`. */
+/** "Cancel appointment?", with an optional reason, which the facility sees. */
 export function CancelAppointmentDialog({
   appointment,
   open,

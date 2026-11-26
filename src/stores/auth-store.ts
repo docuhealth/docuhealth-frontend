@@ -45,9 +45,12 @@ type User = {
   phone?: string | null;
 };
 
+/**
+ * Who is signed in, from the login reply. Not a credential: the session itself is the API's
+ * httpOnly cookies, which the app never sees. Kept (in localStorage) because there's no "who am
+ * I" endpoint yet to restore the role, gates and contexts after a reload. TODO(api).
+ */
 export type Session = {
-  accessToken: string;
-  refreshToken?: string;
   accountType?: AccountKind;
   nextStep?: NextStep;
   actingAs?: ActingAsEntry[];
@@ -57,7 +60,6 @@ export type Session = {
 type AuthState = {
   session: Session | null;
   setSession: (session: Session) => void;
-  setTokens: (tokens: { accessToken: string; refreshToken?: string }) => void;
   setNextStep: (nextStep: NextStep) => void;
   clearSession: () => void;
 };
@@ -67,13 +69,17 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       session: null,
       setSession: (session) => set({ session }),
-      setTokens: (tokens) =>
-        set((state) => (state.session ? { session: { ...state.session, ...tokens } } : state)),
       setNextStep: (nextStep) =>
         set((state) => (state.session ? { session: { ...state.session, nextStep } } : state)),
       clearSession: () => set({ session: null }),
     }),
-    { name: "auth" },
+    {
+      name: "auth",
+      // Version 2: cookie sessions. Sessions saved before held tokens that no longer work, so
+      // they're dropped and the person logs in again once.
+      version: 2,
+      migrate: () => ({ session: null }),
+    },
   ),
 );
 

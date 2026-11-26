@@ -158,6 +158,11 @@ export type VisitSummary = z.output<typeof visitSummarySchema>;
 
 const appointmentStatuses = ["pending", "confirmed", "cancelled", "completed"] as const;
 
+/**
+ * `HospitalAppointment`, from `GET /api/hospital-ops/appointments/mine` and the visit timeline.
+ * `note` is the reason for the visit; `last_visited` the time of the patient's latest completed
+ * appointment before this one.
+ */
 export const appointmentSchema = z
   .object({
     sqid: z.string(),
@@ -165,16 +170,25 @@ export const appointmentSchema = z
     scheduled_time: z.string(),
     type: optionalText,
     note: optionalText,
+    cancellation_reason: optionalText,
+    reschedule_reason: optionalText,
+    last_visited: optionalText,
     staff: clinician,
-    hospital_info: facility,
+    hospital_info: z.object({ name: text, sqid: optionalText }).nullish(),
   })
   .transform((appointment) => ({
     id: appointment.sqid,
     status: appointment.status ?? null,
     at: appointment.scheduled_time,
     type: appointment.type,
+    note: appointment.note,
+    cancellationReason: appointment.cancellation_reason,
+    rescheduleReason: appointment.reschedule_reason,
+    lastVisited: appointment.last_visited,
     clinician: appointment.staff,
-    facility: appointment.hospital_info,
+    facility: appointment.hospital_info?.name || null,
+    /** The hospital's sqid, which booking and free times go by. */
+    facilityId: appointment.hospital_info?.sqid ?? null,
   }));
 export type Appointment = z.output<typeof appointmentSchema>;
 

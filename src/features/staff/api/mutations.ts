@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { staffKeys } from "@/features/staff/api/queries";
-import { anyResponseSchema } from "@/features/staff/api/schemas";
+import { anyResponseSchema, closedAppointmentSchema } from "@/features/staff/api/schemas";
 import type { ChangePasswordValues, EditProfileValues } from "@/features/staff/lib/schemas";
 import { request } from "@/lib/api";
 
@@ -58,20 +59,42 @@ export function useChangePassword() {
   });
 }
 
-/** Mark an appointment done; it moves out of Today/Upcoming. */
+/**
+ * The API answers a 500 when the appointment has no staff member (older appointments may not);
+ * the front desk has to confirm it with someone first.
+ */
+const NO_STAFF_MESSAGE =
+  "This appointment isn’t booked with anyone, so it can’t be marked as seen yet. Ask the front desk to confirm it with a staff member.";
+
+/**
+ * Mark an appointment as seen (`completed`); it moves out of Today/Upcoming. Only staff of the
+ * booked member's role may, and the API's own message says so.
+ */
 export function useCloseAppointment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) =>
-      request(anyResponseSchema, {
-        method: "POST",
-        url: `/api/hospital-ops/appointments/${encodeURIComponent(id)}/close`,
-      }),
+    mutationFn: async (id: string) => {
+      try {
+        return await request(closedAppointmentSchema, {
+          method: "POST",
+          url: `/api/hospital-ops/appointments/${encodeURIComponent(id)}/close`,
+        });
+      } catch (error) {
+        // TODO(api): a 500 with no usable body when the appointment has no staff member.
+        if (isAxiosError(error) && error.response?.status === 500) {
+          throw new Error(NO_STAFF_MESSAGE, { cause: error });
+        }
+        throw error;
+      }
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: staffKeys.all }),
   });
 }
 
-/** Give an appointment to a doctor, at a date and time (the nurse's, from their appointments). */
+/**
+ * The nurse gives an appointment booked with them to a doctor, optionally at another time or
+ * with another note (each sent only when it changed). It then leaves the nurse's lists.
+ */
 export function useAssignAppointment() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -79,19 +102,23 @@ export function useAssignAppointment() {
       id,
       doctorId,
       at,
-      type,
       note,
     }: {
       id: string;
       doctorId: string;
-      at: Date;
-      type: string;
-      note: string;
+      /** A new time, or undefined to keep it. */
+      at?: Date;
+      /** A new note, or undefined to keep it. */
+      note?: string;
     }) =>
       request(anyResponseSchema, {
         method: "PATCH",
         url: `/api/hospital-ops/appointments/${encodeURIComponent(id)}/assign`,
-        data: { doctor_id: doctorId, scheduled_time: at.toISOString(), type, note },
+        data: {
+          doctor_id: doctorId,
+          ...(at && { scheduled_time: at.toISOString() }),
+          ...(note !== undefined && { note }),
+        },
       }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: staffKeys.all }),
   });

@@ -62,12 +62,17 @@ type StaffAccount = {
   is_active: boolean;
 };
 
-function accountFor(request: Request): StaffAccount {
+/** The dashboard the request comes from, if its referrer says. */
+function dashboardOf(request: Request) {
   const match =
     /\/(radiologist|lab-scientist|admin|receptionist|pharmacy|doctor|nurse)(?:[/?#]|$)/.exec(
       request.referrer ? new URL(request.referrer).pathname : "",
     );
-  return accounts[(match?.[1] as Dashboard | undefined) ?? "receptionist"];
+  return match?.[1] as Dashboard | undefined;
+}
+
+function accountFor(request: Request): StaffAccount {
+  return accounts[dashboardOf(request) ?? "receptionist"];
 }
 
 /** `GET /api/auth/staff/profile` as the API returns it. */
@@ -120,13 +125,22 @@ const appointments = (
     [3, "14:00", "Fatima", "Bello", "review", "confirmed"],
     [-1, "10:00", "Chinonso", "Okafor", "consultation", "completed"],
     [-4, "12:00", "Amina", "Yusuf", "follow_up", "cancelled"],
+    // An older booking with no staff member: closing it is the API's 500.
+    [2, "09:30", "Grace", "Okon", "consultation", "confirmed"],
   ] as const
 ).map(([days, time, firstname, lastname, type, status], index) => ({
   id: 300 + index,
   sqid: `appointment-${index + 1}`,
-  status,
+  status: status as string,
   scheduled_time: at(days, time),
-  staff: { sqid: "staff-1", firstname: "Raphael", lastname: "Jonnas", role: "doctor" },
+  staff: (firstname === "Grace"
+    ? null
+    : { sqid: "staff-1", firstname: "Raphael", lastname: "Jonnas", role: "doctor" }) as {
+    sqid: string;
+    firstname: string;
+    lastname: string;
+    role: string;
+  } | null,
   patient: {
     firstname,
     lastname,
@@ -135,8 +149,8 @@ const appointments = (
     phone_num: `+23480${String(12_345_678 + index).slice(0, 8)}`,
   },
   last_visited: null,
-  note: null,
-  type,
+  note: null as string | null,
+  type: type as string | null,
   hospital_info: hospital,
   closed_at: status === "completed" ? at(days, "13:00") : null,
   closed_by_info: null as null | {
@@ -167,16 +181,27 @@ function inTimeframe(scheduled: string, timeframe: string | null) {
   return new Date(scheduled) < new Date() && day !== today;
 }
 
+/** Appointments nurses have given to a doctor, by who gave them: they leave the nurse's list. */
+const handedOver = new Map<string, string>();
+
 function listAppointments({ request }: { request: Request }) {
   const params = new URL(request.url).searchParams;
+  const timeframe = params.get("timeframe");
+  // As the API does: a plain string, not a list, and no `tomorrow` here.
+  if (!timeframe || !["today", "upcoming", "history"].includes(timeframe)) {
+    return HttpResponse.json({ timeframe: "This query parameter is required." }, { status: 400 });
+  }
+  const me = accountFor(request);
   const search = params.get("search")?.toLowerCase() ?? "";
   const from = params.get("scheduled_time_gte");
   const to = params.get("scheduled_time_lte");
   const matching = appointments.filter(
     (appointment) =>
-      inTimeframe(appointment.scheduled_time, params.get("timeframe")) &&
+      handedOver.get(appointment.sqid) !== me.sqid &&
+      inTimeframe(appointment.scheduled_time, timeframe) &&
+      // The patient's name (or email, which the mock doesn't have), not their HIN.
       (!search ||
-        `${appointment.patient.firstname} ${appointment.patient.lastname} ${appointment.patient.hin}`
+        `${appointment.patient.firstname} ${appointment.patient.lastname}`
           .toLowerCase()
           .includes(search)) &&
       (!from || appointment.scheduled_time >= from) &&
@@ -184,6 +209,9 @@ function listAppointments({ request }: { request: Request }) {
   );
   return HttpResponse.json(page(matching, request));
 }
+
+const notFound = () =>
+  HttpResponse.json({ detail: "No Appointment matches the given query." }, { status: 404 });
 
 /** Codes the mock always rejects, to try the error path. */
 const WRONG_CODE = "000000";
@@ -237,6 +265,8 @@ export const staffHandlers = [
     return HttpResponse.json(page(matching, request));
   }),
   http.get(api("/api/hospital-ops/appointments/staff"), listAppointments),
+  // The lab's and radiology's booking with themselves. TODO(api): the API lets only the front desk
+  // book (a 403 for anyone else), so these dashboards' booking fails on staging.
   http.post(api("/api/hospital-ops/appointments/book"), async ({ request }) => {
     const body = (await request.json()) as {
       patient: string;
@@ -286,41 +316,80 @@ export const staffHandlers = [
       { status: 201 },
     );
   }),
+  // Every field is optional; once given to a doctor, it leaves the nurse's list (a second call
+  // from them is a 404).
   http.patch(api("/api/hospital-ops/appointments/:sqid/assign"), async ({ params, request }) => {
+    const me = accountFor(request);
     const appointment = appointments.find(({ sqid }) => sqid === params.sqid);
-    if (!appointment) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    if (!appointment || handedOver.get(appointment.sqid) === me.sqid) return notFound();
     const body = (await request.json()) as {
       doctor_id?: string;
       scheduled_time?: string;
-      note?: string;
-      type?: string;
+      note?: string | null;
+      type?: string | null;
     };
-    if (!body.doctor_id || !body.scheduled_time) {
-      return HttpResponse.json(
-        { [body.doctor_id ? "scheduled_time" : "doctor_id"]: ["This field is required."] },
-        { status: 400 },
-      );
-    }
-    const doctor = colleagues.find(
-      ({ sqid, role }) => sqid === body.doctor_id && role === "doctor",
-    );
-    if (!doctor) return HttpResponse.json({ doctor_id: ["Not a doctor here."] }, { status: 400 });
-    Object.assign(appointment, {
-      scheduled_time: body.scheduled_time,
-      note: body.note || null,
-      staff: {
+    if (body.doctor_id) {
+      const doctor = colleagues.find(({ sqid }) => sqid === body.doctor_id);
+      if (!doctor) {
+        return HttpResponse.json(
+          { doctor_id: [`Object with sqid=${body.doctor_id} does not exist.`] },
+          { status: 400 },
+        );
+      }
+      if (doctor.role !== "doctor" || !doctor.is_active) {
+        return HttpResponse.json(
+          { doctor_id: ["Doctor not found at this hospital."] },
+          { status: 400 },
+        );
+      }
+      appointment.staff = {
         sqid: doctor.sqid,
         firstname: doctor.firstname,
         lastname: doctor.lastname,
         role: doctor.role,
-      },
+      };
+      handedOver.set(appointment.sqid, me.sqid);
+    }
+    if (body.scheduled_time) appointment.scheduled_time = body.scheduled_time;
+    if ("note" in body) appointment.note = body.note ?? null;
+    if ("type" in body) appointment.type = body.type ?? null;
+    return HttpResponse.json({
+      note: appointment.note,
+      type: appointment.type,
+      scheduled_time: appointment.scheduled_time,
     });
-    return HttpResponse.json(body);
   }),
+  // The API's errors, whose shapes vary. In tests no dashboard is asking, so anyone may close any
+  // appointment there.
   http.post(api("/api/hospital-ops/appointments/:sqid/close"), ({ params, request }) => {
     const me = accountFor(request);
     const appointment = appointments.find(({ sqid }) => sqid === params.sqid);
-    if (!appointment) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    if (!appointment) return notFound();
+    if (appointment.status === "completed") {
+      return HttpResponse.json(
+        { appointment: ["This appointment is already closed."] },
+        { status: 400 },
+      );
+    }
+    if (appointment.status === "cancelled") {
+      return HttpResponse.json(
+        { appointment: ["A cancelled appointment cannot be closed"] },
+        { status: 400 },
+      );
+    }
+    // TODO(api): the real API fails with a 500 and an HTML page here.
+    if (!appointment.staff) {
+      return new HttpResponse("<h1>Server Error (500)</h1>", {
+        status: 500,
+        headers: { "Content-Type": "text/html" },
+      });
+    }
+    if (dashboardOf(request) && appointment.staff.role !== me.role) {
+      return HttpResponse.json(
+        { detail: "Only staff of the same role can close this appointment." },
+        { status: 403 },
+      );
+    }
     Object.assign(appointment, {
       status: "completed",
       closed_at: new Date().toISOString(),
@@ -331,7 +400,7 @@ export const staffHandlers = [
         role: me.role,
       },
     });
-    return HttpResponse.json({ detail: "Appointment closed." });
+    return HttpResponse.json({ detail: "Appointment closed successfully." });
   }),
 ];
 

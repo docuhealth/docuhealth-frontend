@@ -13,7 +13,6 @@ import { renderWithRouter } from "@/test/render";
 
 beforeEach(() => {
   useAuthStore.getState().setSession({
-    accessToken: "token",
     accountType: "patient",
     actingAs: [{ as: "self" }],
     user: {

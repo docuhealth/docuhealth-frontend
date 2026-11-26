@@ -6,6 +6,8 @@ import { receptionistKeys } from "@/features/receptionist/api/queries";
 import {
   anyResponseSchema,
   type CancellationReason,
+  cancellationReasonLabels,
+  confirmedAppointmentSchema,
   createdDependantSchema,
   type DependentLinked,
   type GuardianVerification,
@@ -130,44 +132,110 @@ export function useRegisterPatient() {
   });
 }
 
+const appointmentUrl = (id: string, action: string) =>
+  `/api/hospital-ops/appointments/${encodeURIComponent(id)}/${action}`;
+
 /**
- * Book a patient in at `at` (ISO). Refreshes every receptionist query. TODO(api): the API requires
- * the staff member the appointment is with, which the design doesn't ask for, so it refuses until
- * that's optional or the dialog asks.
+ * Book a patient (`patientId`, their HIN) in at `at` (ISO) with the staff member `staffId`. The
+ * appointment starts `pending`. Refreshes every receptionist query.
  */
 export function useBookAppointment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ patientId, at, note }: { patientId: string; at: string; note: string }) =>
+    mutationFn: ({
+      patientId,
+      staffId,
+      at,
+      note,
+    }: {
+      patientId: string;
+      staffId: string;
+      at: string;
+      note: string;
+    }) =>
       request(anyResponseSchema, {
         method: "POST",
         url: "/api/hospital-ops/appointments/book",
-        data: { patient: patientId, scheduled_time: at, note: note || null },
+        data: { patient: patientId, staff: staffId, scheduled_time: at, note: note || undefined },
       }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: receptionistKeys.all }),
   });
 }
 
-/** Move an appointment, telling the patient. TODO(api): no endpoint for the front desk yet. */
-export function useRescheduleAppointment() {
+/**
+ * Confirm a pending appointment (most are patients' bookings from the app), naming the staff
+ * member who will see the patient. Refreshes every receptionist query.
+ */
+export function useConfirmAppointment() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async (_change: { id: string; at: string; note: string }) => {
-      throw new NotAvailableYetError("Rescheduling appointments");
-    },
+    mutationFn: ({ id, staffId }: { id: string; staffId: string }) =>
+      request(confirmedAppointmentSchema, {
+        method: "POST",
+        url: appointmentUrl(id, "confirm"),
+        data: { staff: staffId },
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: receptionistKeys.all }),
   });
 }
 
-/** Cancel an appointment, saying why. TODO(api): no endpoint yet. */
-export function useCancelAppointment() {
+/**
+ * Move an appointment to `at` (ISO); its status stays as it is. The note is sent only when it
+ * changed, since sending it replaces the patient's reason for the visit. Refreshes every
+ * receptionist query.
+ */
+export function useRescheduleAppointment() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async (_cancellation: {
+    mutationFn: ({
+      id,
+      at,
+      note,
+      previousNote,
+    }: {
+      id: string;
+      at: string;
+      note: string;
+      previousNote: string | null;
+    }) =>
+      request(anyResponseSchema, {
+        method: "PATCH",
+        url: appointmentUrl(id, "reschedule"),
+        data: { scheduled_time: at, ...(note !== (previousNote ?? "") && { note }) },
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: receptionistKeys.all }),
+  });
+}
+
+/**
+ * Cancel an appointment, saying why: the reason's label, or the details for "Other". Refreshes
+ * every receptionist query.
+ */
+export function useCancelAppointment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      reason,
+      details,
+    }: {
       id: string;
       reason: CancellationReason;
       details: string;
-    }) => {
-      throw new NotAvailableYetError("Cancelling appointments");
-    },
+    }) =>
+      request(anyResponseSchema, {
+        method: "POST",
+        url: appointmentUrl(id, "cancel"),
+        data: {
+          cancellation_reason:
+            reason === "other" && details ? details : cancellationReasonLabels[reason],
+        },
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: receptionistKeys.all }),
   });
 }
 

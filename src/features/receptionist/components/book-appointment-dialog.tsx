@@ -23,8 +23,8 @@ type Patient = {
 type Slot = { date: string; time: string };
 
 /**
- * "Appointment Details" modal: the front desk picks a date and time (and an optional note) to
- * book `patient` in. Without a `patient`, it starts with "Find patient", looking them up by
+ * "Appointment Details" modal: the front desk picks who `patient` will see, a date and time (and
+ * an optional note) to book them in. Without a `patient`, it starts with "Find patient", looking them up by
  * HIN (step 1 of 2), or registering a walk-in no one has on file.
  * Once it's booked, "Appointment booked!" takes its place.
  */
@@ -150,9 +150,10 @@ function BookAppointmentForm({
     <AppointmentForm
       patient={patient}
       defaultValues={{
-        ...(devPrefill?.bookAppointment ?? { date: "", time: "", note: "" }),
+        ...(devPrefill?.bookAppointment ?? { date: "", time: "", note: "", staff: "" }),
         ...slot,
       }}
+      askStaff
       submitLabel="Book Appointment"
       pending={book.isPending}
       patientAction={
@@ -167,9 +168,9 @@ function BookAppointmentForm({
           </Button>
         )
       }
-      onSubmit={({ at, note }) =>
+      onSubmit={({ at, note, staff }) =>
         book.mutate(
-          { patientId: patient.id, at, note },
+          { patientId: patient.id, staffId: staff, at, note },
           { onSuccess: onBooked, onError: (error) => toast.error(getErrorMessage(error)) },
         )
       }

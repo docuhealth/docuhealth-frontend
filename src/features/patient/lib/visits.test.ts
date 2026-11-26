@@ -40,8 +40,13 @@ const appointment: Appointment = {
   status: "confirmed",
   at: "2026-12-15T10:00:00",
   type: "Follow-up",
+  note: null,
+  cancellationReason: null,
+  rescheduleReason: null,
+  lastVisited: null,
   clinician: { name: "Dr. Adaeze Okafor", specialty: "Internal Medicine" },
   facility: "ABC Hospital",
+  facilityId: "hosp-abc",
 };
 
 describe("visit rows", () => {

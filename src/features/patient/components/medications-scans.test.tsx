@@ -88,7 +88,6 @@ beforeEach(() => {
   pending.medications = [];
   pending.reports = [];
   useAuthStore.getState().setSession({
-    accessToken: "token",
     accountType: "patient",
     actingAs: [{ as: "self" }],
     user: {

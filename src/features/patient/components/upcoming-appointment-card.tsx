@@ -69,12 +69,17 @@ export function UpcomingAppointmentCard({
                 <CaretRightIcon data-icon="inline-end" />
               </Link>
             </Button>
-            {/* TODO(api): patients can't reschedule yet; see pending-appointments.ts. */}
             <Button
               variant="outline"
               className="h-10 min-w-40 border-white/30 bg-white/10 px-5 text-white hover:bg-white/20 hover:text-white"
               onClick={() =>
-                setBooking({ reschedule: { id: appointment.id, facility: appointment.facility } })
+                setBooking({
+                  reschedule: {
+                    id: appointment.id,
+                    facility: appointment.facility,
+                    facilityId: appointment.facilityId,
+                  },
+                })
               }
             >
               <ArrowsClockwiseIcon data-icon="inline-start" />
@@ -88,7 +93,6 @@ export function UpcomingAppointmentCard({
           <p className="type-body-sm-regular text-white/80">
             Need to see a doctor? Book a visit in minutes.
           </p>
-          {/* TODO(api): patients can't book yet; see pending-appointments.ts. */}
           <Button
             className="h-10 w-full max-w-66 bg-card text-primary hover:bg-card/90"
             onClick={() => setBooking({})}

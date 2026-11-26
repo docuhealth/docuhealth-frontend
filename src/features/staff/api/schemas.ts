@@ -18,9 +18,14 @@ export const appointmentStatusLabels = {
 } as const;
 export type AppointmentStatus = keyof typeof appointmentStatusLabels;
 
-/** The Appointments tabs, as the API's `timeframe`. */
+/**
+ * The Appointments tabs, as the API's `timeframe`. The hospital's list (`GET /`) has `tomorrow`
+ * too, and its `upcoming` starts after tomorrow; a member's own (`GET /staff`) has no `tomorrow`,
+ * and its `upcoming` starts after today.
+ */
 export const appointmentTimeframeLabels = {
   today: "Today",
+  tomorrow: "Tomorrow",
   upcoming: "Upcoming",
   history: "Past",
 } as const;
@@ -57,8 +62,6 @@ const appointmentSchema = z
     status: appointment.status,
     // e.g. "follow_up" → "Follow up".
     type: appointment.type && sentenceCase(appointment.type.replaceAll("_", " ")),
-    /** The API's own type, e.g. `consultation`, kept when the appointment is reassigned. */
-    typeCode: appointment.type,
     note: appointment.note,
     patient: {
       name: fullName(appointment.patient.firstname, appointment.patient.lastname),
@@ -72,6 +75,9 @@ const appointmentSchema = z
 export type Appointment = z.infer<typeof appointmentSchema>;
 
 export const appointmentListSchema = paginated(appointmentSchema);
+
+/** `POST …/close`: `{detail: "Appointment closed successfully."}` (Swagger shows no body). */
+export const closedAppointmentSchema = z.object({ detail: z.string().nullish() });
 
 /** Replies to writes whose body the app doesn't use. */
 export const anyResponseSchema = z.unknown();

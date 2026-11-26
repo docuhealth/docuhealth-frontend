@@ -14,6 +14,7 @@ import {
 /**
  * An appointment in the list: its date tile, who and where, when, its status, and what the
  * patient can do: reschedule a confirmed one, confirm they'll come to a pending one.
+ * TODO(api): confirming attendance has no patient endpoint (see `pending-appointments.ts`).
  */
 export function AppointmentCard({
   appointment,
