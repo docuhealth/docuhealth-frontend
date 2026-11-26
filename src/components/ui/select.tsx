@@ -56,6 +56,45 @@ function SelectTrigger({
   );
 }
 
+/**
+ * Lets the menu scroll inside a modal dialog. The menu is portaled to `<body>`, outside the
+ * dialog, and the dialog's scroll lock cancels wheel and touch scrolling outside itself, so the
+ * menu wouldn't move. When a scroll gesture over the menu was cancelled, scroll it by hand.
+ * Outside a dialog nothing is cancelled and the browser scrolls it as usual.
+ */
+function scrollPastModalLock(menu: HTMLElement | null) {
+  if (!menu) return;
+  const afterOthers = (event: Event, scroll: () => void) =>
+    // Checked once every listener (the lock's included) has seen the event.
+    setTimeout(() => {
+      if (event.defaultPrevented) scroll();
+    }, 0);
+  let lastY = 0;
+  const onWheel = (event: WheelEvent) =>
+    afterOthers(event, () => {
+      menu.scrollTop += event.deltaY;
+    });
+  const onTouchStart = (event: TouchEvent) => {
+    lastY = event.touches[0]?.clientY ?? 0;
+  };
+  const onTouchMove = (event: TouchEvent) => {
+    const y = event.touches[0]?.clientY ?? lastY;
+    const moved = lastY - y;
+    lastY = y;
+    afterOthers(event, () => {
+      menu.scrollTop += moved;
+    });
+  };
+  menu.addEventListener("wheel", onWheel, { passive: true });
+  menu.addEventListener("touchstart", onTouchStart, { passive: true });
+  menu.addEventListener("touchmove", onTouchMove, { passive: true });
+  return () => {
+    menu.removeEventListener("wheel", onWheel);
+    menu.removeEventListener("touchstart", onTouchStart);
+    menu.removeEventListener("touchmove", onTouchMove);
+  };
+}
+
 function SelectContent({
   className,
   children,
@@ -88,6 +127,7 @@ function SelectContent({
       >
         {/* At most about seven options tall (less on a short screen); longer lists scroll. */}
         <SelectPrimitive.Popup
+          ref={scrollPastModalLock}
           data-slot="select-content"
           data-align-trigger={alignItemWithTrigger}
           className={cn(
