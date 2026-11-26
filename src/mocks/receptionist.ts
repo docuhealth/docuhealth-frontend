@@ -338,6 +338,9 @@ function matches(search: string | null, ...values: string[]) {
 /** The design's appointment status → the API's; an upcoming one is pending until confirmed. */
 const apiStatuses: Record<Appointment["status"], string> = {
   upcoming: "pending",
+  pending: "pending",
+  confirmed: "confirmed",
+  past: "pending",
   arrived: "confirmed",
   checked_in: "completed",
   in_progress: "confirmed",

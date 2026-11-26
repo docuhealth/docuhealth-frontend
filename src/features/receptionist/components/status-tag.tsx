@@ -3,6 +3,9 @@ import { cn } from "@/lib/utils";
 
 const statusTones = {
   upcoming: "bg-line text-fg-caption",
+  pending: "bg-warning-100 text-warning-700",
+  confirmed: "bg-info-100 text-info-500",
+  past: "bg-line text-fg-caption",
   arrived: "bg-success-100 text-success-700",
   checked_in: "bg-success-100 text-success-500",
   in_progress: "bg-info-100 text-info-500",

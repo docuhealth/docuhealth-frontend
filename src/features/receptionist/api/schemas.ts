@@ -50,6 +50,9 @@ export type AppointmentDay = keyof typeof appointmentDayLabels;
 
 export const appointmentStatusLabels = {
   upcoming: "Upcoming",
+  pending: "Pending",
+  confirmed: "Confirmed",
+  past: "Past",
   arrived: "Arrived",
   checked_in: "Checked In",
   in_progress: "In-Progress",
@@ -553,15 +556,17 @@ export const appointmentPageSchema = z.object({
 export const countOnlySchema = z.object({ count: count }).transform(({ count }) => count);
 
 /**
- * The API's appointment status → the design's. TODO(api): appointments don't record arrival or
- * check-in, so "Arrived" and "In-Progress" never show; a completed one shows as "Checked In".
+ * The API's appointment status → the design's. Completed becomes "Checked In", cancelled stays
+ * "Cancelled", and open appointments ("pending" / "confirmed") whose scheduled time has passed
+ * show as "Past" instead of "Pending" / "Confirmed".
  */
-const statusOfAppointment: Record<string, AppointmentStatus> = {
-  pending: "upcoming",
-  confirmed: "upcoming",
-  completed: "checked_in",
-  cancelled: "cancelled",
-};
+function statusOf(status: string, scheduledTime: string, now = Date.now()): AppointmentStatus {
+  if (status === "completed") return "checked_in";
+  if (status === "cancelled") return "cancelled";
+  if (new Date(scheduledTime).getTime() < now) return "past";
+  if (status === "confirmed") return "confirmed";
+  return "pending";
+}
 
 export const toAppointment = (appointment: AppointmentRead): Appointment => ({
   id: appointment.sqid,
@@ -572,9 +577,9 @@ export const toAppointment = (appointment: AppointmentRead): Appointment => ({
     phone: appointment.patient.phone_num ?? "",
     avatarUrl: null,
   },
-  // TODO(api): no reason field; the type ("consultation") stands in.
-  reason: appointment.type ? sentence(appointment.type) : "Appointment",
-  status: statusOfAppointment[appointment.status] ?? "upcoming",
+  // Fall back to the booking note when no appointment type is set.
+  reason: appointment.type ? sentence(appointment.type) : appointment.note?.trim() || "Appointment",
+  status: statusOf(appointment.status, appointment.scheduled_time),
 });
 
 export const toCalendarAppointment = (appointment: AppointmentRead): CalendarAppointment => {

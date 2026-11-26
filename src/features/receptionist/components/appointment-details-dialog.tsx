@@ -187,7 +187,11 @@ function Summary({
   const at = new Date(appointment.at);
   // Only an appointment still to come can be moved or called off.
   const [openedAt] = useState(() => new Date());
-  const manageable = appointment.status === "upcoming" && at > openedAt;
+  const isOpenStatus =
+    appointment.status === "upcoming" ||
+    appointment.status === "pending" ||
+    appointment.status === "confirmed";
+  const manageable = isOpenStatus && at > openedAt;
 
   return (
     <>
@@ -213,7 +217,7 @@ function Summary({
             <dt>Booked with</dt>
             <dd>{appointment.bookedWith}</dd>
           </div>
-          {appointment.status === "upcoming" && (
+          {(isOpenStatus || appointment.status === "past") && (
             <div>
               <dt>Confirmed</dt>
               <dd>{appointment.awaitingConfirmation ? "Not yet" : "Yes"}</dd>

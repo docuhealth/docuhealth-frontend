@@ -6,6 +6,9 @@ import { cn } from "@/lib/utils";
 /** Green once the patient's here, blue while they're expected, struck through if cancelled. */
 const chipTones = {
   upcoming: "border-info-500/30 bg-info-100 text-info-500",
+  pending: "border-warning-500/30 bg-warning-100 text-warning-700",
+  confirmed: "border-info-500/30 bg-info-100 text-info-500",
+  past: "border-line bg-surface text-fg-caption",
   arrived: "border-success-500/30 bg-success-100 text-success-700",
   checked_in: "border-success-500/30 bg-success-100 text-success-700",
   in_progress: "border-success-500/30 bg-success-100 text-success-700",
