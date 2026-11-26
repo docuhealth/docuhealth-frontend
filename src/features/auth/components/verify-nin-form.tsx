@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useVerifyOwnNin } from "@/features/auth/api/mutations";
+import { fetchSession } from "@/features/auth/api/session";
 import { AuthHeader } from "@/features/auth/components/auth-header";
 import { devPrefill } from "@/features/auth/lib/dev-prefill";
 import {
@@ -37,7 +38,12 @@ export function VerifyNinForm() {
   async function onSubmit(values: VerifyNinValues) {
     try {
       await verifyNinMutation.mutateAsync({ nin: values.nin });
-      useAuthStore.getState().setNextStep(null);
+      // Verifying starts a fresh session; read it back for the full details (`acting_as`).
+      try {
+        useAuthStore.getState().setSession(await fetchSession());
+      } catch {
+        useAuthStore.getState().setNextStep(null);
+      }
       toast.success("NIN verified successfully.");
       const destination = getPostLoginDestination(useAuthStore.getState().session);
       await navigate({ to: destination });

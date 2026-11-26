@@ -65,3 +65,54 @@ Safari does not accept `Secure` cookies on `http://localhost`.
 ## Flag: mobile app
 
 A native app has no browser cookie jar, and the Authorization header is not accepted. How mobile signs in is not decided yet. Do not start the mobile sign-in work until the backend confirms.
+
+---
+
+# Follow-up: who am I (GET /api/auth/me)
+
+**Summary.** There is a new endpoint that tells the app who is signed in. It returns the same `role`, `acting_as` and `next_step` that login returns, so the app can restore its state after a page reload. This replaces any workaround that kept the login data in your own storage. It uses the cookie session from the earlier handoff, so it needs credentials on the call, and nothing else changes.
+
+## New: `GET /api/auth/me`
+
+- **Call it with credentials** (`credentials: "include"` or `withCredentials: true`). It is a GET, so it needs no `X-Requested-With` header and no body.
+- **Success is 200:**
+
+```json
+{ "data": { "role": "…", "acting_as": [ … ], "next_step": null, … }, "status": "success" }
+```
+
+- `data` is exactly what login returns in its `data`. Use the same code to read both.
+- The envelope is slightly different from login: there is no `detail` field.
+- **No cookie, or an expired one, is 401.** Do the usual: `POST /api/auth/refresh` once, then call `/me` again. If the refresh fails, go to the login page.
+- **It works for an account with a required `next_step`.** Use it to send the user to that step (`nin_not_verified` or `admin_details_required`). Every other endpoint refuses such an account until the step is done, but this one does not.
+- **It is read fresh each time.** If a staff member's membership has ended, `acting_as` comes back empty. Decide what the app shows in that case.
+- **It does not refresh the session.** It sets no cookies and does not extend the 5-minute access cookie, so it is not a keep-alive.
+
+## Changed: loading the app and route guards
+
+On app load, and after a reload:
+
+1. `GET /api/auth/me`.
+2. On 200, store `role`, `acting_as` and `next_step` in app state and route from them.
+3. On 401, `POST /api/auth/refresh`, then retry `/me` once.
+4. If that fails too, show the login page.
+
+Remove the code that saved the login `data` in local storage to survive a reload.
+
+## Changed: after sign-up, upgrade and NIN verify
+
+These calls still return only `role` and `next_step`, as before:
+
+- `POST /api/auth/signup/complete`
+- `POST /api/auth/signup/upgrade/complete`
+- `POST /api/auth/nin/verify`
+
+They start a session, so call `GET /api/auth/me` right after one of them if you need the rest, such as `acting_as`.
+
+## Not included yet
+
+- **No name.** `/me` does not return the person's name, and neither does login. More fields will be added later. Do not build on a name coming from this call.
+
+## Dependencies
+
+It needs the cookie session already described in the earlier handoff: credentials on every call and refresh-and-retry on a 401. Login's response is unchanged.

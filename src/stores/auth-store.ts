@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 const accountKinds = ["patient", "staff"] as const;
 type AccountKind = (typeof accountKinds)[number];
@@ -46,9 +45,9 @@ type User = {
 };
 
 /**
- * Who is signed in, from the login reply. Not a credential: the session itself is the API's
- * httpOnly cookies, which the app never sees. Kept (in localStorage) because there's no "who am
- * I" endpoint yet to restore the role, gates and contexts after a reload. TODO(api).
+ * Who is signed in, from the login reply or `GET /api/auth/me`. Not a credential: the session is
+ * the API's httpOnly cookies, which the app never sees. Held in memory only; on start-up the app
+ * asks `/me` again (features/auth/api/session.ts).
  */
 export type Session = {
   accountType?: AccountKind;
@@ -64,24 +63,13 @@ type AuthState = {
   clearSession: () => void;
 };
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      session: null,
-      setSession: (session) => set({ session }),
-      setNextStep: (nextStep) =>
-        set((state) => (state.session ? { session: { ...state.session, nextStep } } : state)),
-      clearSession: () => set({ session: null }),
-    }),
-    {
-      name: "auth",
-      // Version 2: cookie sessions. Sessions saved before held tokens that no longer work, so
-      // they're dropped and the person logs in again once.
-      version: 2,
-      migrate: () => ({ session: null }),
-    },
-  ),
-);
+export const useAuthStore = create<AuthState>()((set) => ({
+  session: null,
+  setSession: (session) => set({ session }),
+  setNextStep: (nextStep) =>
+    set((state) => (state.session ? { session: { ...state.session, nextStep } } : state)),
+  clearSession: () => set({ session: null }),
+}));
 
 /** Type guard for staff `acting_as` entries (supports both nested `facility` and flat `facility_staff` shapes). */
 function isStaffActingAs(entry: ActingAsEntry): entry is StaffActingAs {
@@ -163,8 +151,12 @@ export function getPostLoginDestination(
     const role = staffEntry?.staff_role ?? staffEntry?.role ?? session.user.role;
     const facilityType = staffEntry?.facility?.type ?? staffEntry?.facility_type ?? "hospital";
     const hospitalAdmin = staffEntry?.is_admin && facilityType === "hospital";
-    // A hospital's own account (no staff entry) and its admins run the hospital.
-    if (!staffEntry || hospitalAdmin) return "/hospital/admin";
+    // An old hospital account (role "hospital", no staff entry) and the hospital's admins run it.
+    if (hospitalAdmin || (!staffEntry && session.user.role === "hospital")) {
+      return "/hospital/admin";
+    }
+    // No facility at all: the membership has ended (`/me` reads it fresh).
+    if (!staffEntry) return "/hospital/no-dashboard";
     // Anyone else gets their role's dashboard, never the admin's.
     return roleDashboards[role] ?? "/hospital/no-dashboard";
   }

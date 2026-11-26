@@ -6,6 +6,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { env } from "@/env";
+import { restoreSession } from "@/features/auth/api/session";
 import { queryClient, router } from "@/router";
 
 if (env.VITE_SENTRY_DSN) {
@@ -28,6 +29,8 @@ async function enableMocks() {
 }
 
 await enableMocks();
+// Who is signed in (GET /api/auth/me), before any route guard runs.
+await restoreSession();
 
 createRoot(document.getElementById("root")!, {
   onUncaughtError: Sentry.reactErrorHandler(),

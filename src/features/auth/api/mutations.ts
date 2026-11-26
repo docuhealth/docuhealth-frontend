@@ -28,7 +28,12 @@ export function buildSessionFromLoginResponse(
   const isDocuHealthAdmin = payload.role === DOCUHEALTH_ADMIN_ROLE;
   const inferredAccountType: AccountType | undefined = isDocuHealthAdmin
     ? undefined
-    : (options.accountType ?? (firstStaffContext ? "staff" : "patient"));
+    : (options.accountType ??
+      // A staff login says "hospital" (an old hospital account) or "hospital_staff", even when
+      // its facility list is empty because the membership has ended.
+      (firstStaffContext || payload.role === "hospital" || payload.role === "hospital_staff"
+        ? "staff"
+        : "patient"));
 
   const fullName =
     payload.user?.name ??

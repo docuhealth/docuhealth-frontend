@@ -65,6 +65,37 @@ const accountExists = () =>
 const identifierRequired = () =>
   HttpResponse.json({ identifier: ["This field is required."] }, { status: 400 });
 
+/**
+ * The mock server's "cookie": what the last login returned, so `GET /api/auth/me` can answer
+ * after a reload, as the real API does from its session cookie. Kept in sessionStorage: the mock
+ * runs in the page, so its memory is gone after a reload. Mock only.
+ */
+const MOCK_SESSION = "docuhealth-mock-session";
+
+function mockSession(): Record<string, unknown> | null {
+  try {
+    const saved = sessionStorage.getItem(MOCK_SESSION);
+    return saved ? (JSON.parse(saved) as Record<string, unknown>) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveMockSession(data: Record<string, unknown> | null) {
+  try {
+    if (data) sessionStorage.setItem(MOCK_SESSION, JSON.stringify(data));
+    else sessionStorage.removeItem(MOCK_SESSION);
+  } catch {
+    // Storage blocked: `/me` answers 401 and the app asks to log in.
+  }
+}
+
+/** Marks the mock session's gate step done (NIN verified, first login completed). */
+function clearMockNextStep() {
+  const session = mockSession();
+  if (session) saveMockSession({ ...session, next_step: null });
+}
+
 export const authHandlers = [
   http.post(api("/api/auth/login"), async ({ request }) => {
     const body = (await request.json()) as {
@@ -81,10 +112,9 @@ export const authHandlers = [
 
     // A DocuHealth admin logs in without an account type, as on staging: `role` and nothing else.
     if (!body.account_type && scenario === "dhadmin") {
-      return HttpResponse.json({
-        role: "dhadmin",
-        next_step: null,
-      });
+      const data = { role: "dhadmin", next_step: null };
+      saveMockSession(data);
+      return HttpResponse.json(data);
     }
 
     const isStaff = body.account_type === "staff";
@@ -97,32 +127,41 @@ export const authHandlers = [
         ? "nin_not_verified"
         : null;
 
-    return HttpResponse.json({
-      status: "success",
-      message: "Logged in successfully",
-      data: {
-        next_step: nextStep,
-        acting_as: isStaff
-          ? [
-              {
-                type: "facility_staff",
-                facility_sqid: "hosp_mock_1",
-                facility_type: "hospital",
-                role: staff.role,
-                is_admin: staff.isAdmin,
-              },
-            ]
-          : [{ type: "self" }],
-        user: {
-          sqid: "usr_mock_1",
-          firstname: isStaff ? "Folake" : "Chinonso",
-          lastname: isStaff ? "Adeyemi" : "Okafor",
-          email: body.identifier ?? "user@docuhealth.example.com",
-          hin: isStaff ? null : "1234567890123",
-          role: isStaff ? staff.role : "patient",
-        },
+    const data = {
+      next_step: nextStep,
+      acting_as: isStaff
+        ? [
+            {
+              type: "facility_staff",
+              facility_sqid: "hosp_mock_1",
+              facility_type: "hospital",
+              role: staff.role,
+              is_admin: staff.isAdmin,
+            },
+          ]
+        : [{ type: "self" }],
+      user: {
+        sqid: "usr_mock_1",
+        firstname: isStaff ? "Folake" : "Chinonso",
+        lastname: isStaff ? "Adeyemi" : "Okafor",
+        email: body.identifier ?? "user@docuhealth.example.com",
+        hin: isStaff ? null : "1234567890123",
+        role: isStaff ? staff.role : "patient",
       },
-    });
+    };
+    saveMockSession(data);
+    return HttpResponse.json({ status: "success", message: "Logged in successfully", data });
+  }),
+
+  // Who is signed in: the last login's reply, or 401 when there's no session.
+  http.get(api("/api/auth/me"), () => {
+    const data = mockSession();
+    return data
+      ? HttpResponse.json({ status: "success", data })
+      : HttpResponse.json(
+          { detail: "Authentication credentials were not provided." },
+          { status: 401 },
+        );
   }),
 
   http.post(api("/api/auth/refresh"), () =>
@@ -132,17 +171,20 @@ export const authHandlers = [
     }),
   ),
 
-  http.post(api("/api/auth/logout"), () =>
-    HttpResponse.json({ status: "success", message: "Logged out" }),
-  ),
+  http.post(api("/api/auth/logout"), () => {
+    saveMockSession(null);
+    return HttpResponse.json({ status: "success", detail: "Logged out" });
+  }),
 
-  http.post(api("/api/auth/nin/verify"), () =>
-    HttpResponse.json({ status: "success", message: "NIN verified successfully" }),
-  ),
+  http.post(api("/api/auth/nin/verify"), () => {
+    clearMockNextStep();
+    return HttpResponse.json({ status: "success", message: "NIN verified successfully" });
+  }),
 
-  http.post(api("/api/auth/first-login"), () =>
-    HttpResponse.json({ status: "success", message: "Admin profile completed" }),
-  ),
+  http.post(api("/api/auth/first-login"), () => {
+    clearMockNextStep();
+    return HttpResponse.json({ status: "success", message: "Admin profile completed" });
+  }),
 
   http.post(api("/api/auth/signup"), async ({ request }) => {
     const body = (await request.json()) as {

@@ -6,7 +6,7 @@ import { fullName, optionalText, text } from "@/lib/staff-profile";
 // (`GET /api/records/summaries/{hin}`), appointments (`GET /api/hospital-ops/appointments/mine`)
 // and drug records (`GET /api/pharmacy/patients/drug-records`). TODO(api): much of the design
 // has no source yet (allergies, blood group, genotype, immunizations, documents, bills, scan
-// images and status); see docs/patient-dashboard-plan.md. These parsers are from the schema
+// images and status); see docs/backend-gaps-v2-migration.md ("Patient dashboard"). These parsers are from the schema
 // only: no patient test account has shown a real reply yet.
 
 const facility = z
@@ -266,8 +266,19 @@ export const visitMetricsSchema = z
     upcoming_appointment: z
       .object({ sqid: z.string(), status: optionalText, scheduled_time: z.string() })
       .nullish(),
+    patient_info: z
+      .object({
+        firstname: optionalText,
+        lastname: optionalText,
+        hin: z.union([z.string(), z.number()]).nullish(),
+      })
+      .nullish(),
   })
   .transform((metrics) => ({
+    /** The patient's name and HIN: login and `/me` don't send a name. */
+    name:
+      fullName(metrics.patient_info?.firstname ?? "", metrics.patient_info?.lastname ?? "") || null,
+    hin: metrics.patient_info?.hin != null ? String(metrics.patient_info.hin) : null,
     totalVisits: metrics.total_visits,
     lastVisit: metrics.last_visit,
     lastCheckIn: metrics.last_check_in,

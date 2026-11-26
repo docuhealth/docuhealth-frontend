@@ -107,3 +107,16 @@ allergies, care plans, immunizations, documents, bills, booking, messages…) sh
 (25 Nov)" section exist. Family & proxy is wired on the real API (dependants, proxies, requests).
 Bills & payments and Sharing & privacy are built on pending data. Health personnel, Settings and
 Help have no design yet.
+
+## Before launch
+
+From the migration plan (removed 26 Nov; every phase is done):
+
+- **Click-through per role on staging.** Done at the API level (every role's reads answer with
+  that role's account); still needs a person to click through each dashboard in a browser, signed
+  in as each role, following [qa-test-guide.md](qa-test-guide.md).
+- **Playwright end-to-end tests.** 17 of 45 passed on 24 Nov: the login and sign-up specs predate
+  the 13 Nov redesign, and the admin and receptionist specs predate the new screens and mock data.
+  They need rewriting to today's screens; CI's e2e job fails until then.
+- **Production settings.** Vercel needs `VITE_API_URL` (the production API),
+  `VITE_ROOT_DOMAIN=docuhealthservices.net`, and optionally `VITE_SENTRY_DSN`.

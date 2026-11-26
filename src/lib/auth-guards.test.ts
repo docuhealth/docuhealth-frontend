@@ -61,6 +61,21 @@ describe("getPostLoginDestination", () => {
     expect(getPostLoginDestination(staff("physiotherapist", true))).toBe("/hospital/admin");
   });
 
+  it("sends an old hospital account to the admin's, and staff with no facility left nowhere", () => {
+    const user = (role: string) => ({ id: "u", name: "U", email: "u@example.com", role });
+    expect(
+      getPostLoginDestination(
+        session({ accountType: "staff", actingAs: [], user: user("hospital") }),
+      ),
+    ).toBe("/hospital/admin");
+    // `/me` reads the membership fresh: once it has ended, `acting_as` is empty.
+    expect(
+      getPostLoginDestination(
+        session({ accountType: "staff", actingAs: [], user: user("hospital_staff") }),
+      ),
+    ).toBe("/hospital/no-dashboard");
+  });
+
   it("sends an arm's admin to the arm's dashboard, as staging's lab admin logs in", () => {
     const labAdmin = session({
       accountType: "staff",

@@ -64,8 +64,9 @@ Log in with a real staging account. The local URLs, demo logins and how demo mod
 [`docs/qa-test-guide.md`](docs/qa-test-guide.md).
 
 The backend's OpenAPI schema is the reference for every feature's `api/` folder. `npm run
-api:schema` saves it to `docs/api/` (`openapi.json`, plus `endpoints.md` to grep). The migration
-from v1 is tracked in `docs/v2-migration-plan.md`.
+api:schema` saves it to `docs/api/` (`openapi.json`, plus `endpoints.md` to grep). What each
+dashboard still waits on is in `docs/dashboard-audit-2026-11-25.md`, and what the backend still owes
+in `docs/backend-gaps-v2-migration.md`.
 
 ## Scripts
 
