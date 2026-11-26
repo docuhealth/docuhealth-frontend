@@ -287,7 +287,195 @@ function findItem(orderId: unknown, itemId: unknown, allowed: Item["status"][], 
   return { order, item };
 }
 
+type Reference = {
+  sqid: string;
+  age: string;
+  gender: string;
+  pregnancy_status: string;
+  min_ref_range: number;
+  max_ref_range: number;
+};
+type TestDetails = {
+  sqid: string;
+  created_at: string;
+  test_sqid: string;
+  result_format: string;
+  unit: string;
+  critical_low: number;
+  critical_high: number;
+  turnaround_time: string;
+  references: Reference[];
+};
+
+/**
+ * The details the lab has saved for the catalogue's tests (`LabTestDetails`). The catalogue
+ * itself (`GET /api/lab/lab-tests`, sqids `test-fbc`…) is the doctor's mock (src/mocks/doctor-orders.ts).
+ */
+const testDetails: TestDetails[] = [
+  {
+    sqid: "details-fbc",
+    created_at: "2026-10-02T09:15:00Z",
+    test_sqid: "test-fbc",
+    result_format: "numeric",
+    unit: "grams_per_deciliter",
+    critical_low: 7,
+    critical_high: 20,
+    turnaround_time: "1 day",
+    references: [
+      {
+        sqid: "ref-fbc-1",
+        age: "adults",
+        gender: "male",
+        pregnancy_status: "not_pregnant",
+        min_ref_range: 13,
+        max_ref_range: 17,
+      },
+      {
+        sqid: "ref-fbc-2",
+        age: "adults",
+        gender: "female",
+        pregnancy_status: "not_pregnant",
+        min_ref_range: 12,
+        max_ref_range: 15.5,
+      },
+    ],
+  },
+  {
+    sqid: "details-fbg",
+    created_at: "2026-10-05T11:40:00Z",
+    test_sqid: "test-fbg",
+    result_format: "numeric",
+    unit: "milligrams_per_deciliter",
+    critical_low: 40,
+    critical_high: 400,
+    turnaround_time: "4 hours",
+    references: [
+      {
+        sqid: "ref-fbg-1",
+        age: "adults",
+        gender: "all",
+        pregnancy_status: "not_pregnant",
+        min_ref_range: 70,
+        max_ref_range: 100,
+      },
+    ],
+  },
+];
+
+type DetailsBody = Partial<Omit<TestDetails, "references">> & {
+  references?: Omit<Reference, "sqid">[];
+};
+
+const withReferenceIds = (references: Omit<Reference, "sqid">[], prefix: string) =>
+  references.map((range, index) => ({ ...range, sqid: `${prefix}-ref-${index + 1}` }));
+
+/** The lab as a facility: its name, address and phone, which its admin corrects. */
+const labFacility = {
+  name: "LUTH Central Laboratory",
+  street: "Idi-Araba, Mushin",
+  city: "Lagos",
+  state: "Lagos",
+  country: "Nigeria",
+  phone: "08031234567",
+};
+
+/**
+ * The lab admin's facility endpoints. The hospital admin's mock answers these paths in dev
+ * (it's registered first), so tests that need the lab's version add these with `server.use`.
+ */
+export const labFacilityHandlers = [
+  http.get(api("/api/auth/facility"), () =>
+    HttpResponse.json({
+      id: 41,
+      email: "relam@luthlab.example.com",
+      hospital_profile: {
+        name: labFacility.name,
+        street: labFacility.street,
+        city: labFacility.city,
+        state: labFacility.state,
+        country: labFacility.country,
+        subscription: "active",
+        theme: "",
+      },
+    }),
+  ),
+  http.patch(api("/api/auth/facility/branding"), async ({ request }) => {
+    const body = new URLSearchParams(await request.text());
+    for (const field of ["name", "street", "city", "state", "country", "phone"] as const) {
+      const value = body.get(field);
+      if (value !== null) labFacility[field] = value;
+    }
+    if (!labFacility.name.trim()) {
+      return HttpResponse.json({ name: ["This field may not be blank."] }, { status: 400 });
+    }
+    return HttpResponse.json({ ...labFacility, bg_image: null, profile_image: null });
+  }),
+];
+
 export const labScientistHandlers = [
+  http.get(api("/api/lab/lab-tests-details"), ({ request }) => {
+    const params = new URL(request.url).searchParams;
+    const page = Number(params.get("page") ?? 1);
+    const size = Number(params.get("size") ?? 10);
+    return HttpResponse.json({
+      count: testDetails.length,
+      next: page * size < testDetails.length ? `?page=${page + 1}` : null,
+      previous: null,
+      results: testDetails.slice((page - 1) * size, page * size),
+    });
+  }),
+  http.post(api("/api/lab/lab-tests-details/create"), async ({ request }) => {
+    const body = (await request.json()) as DetailsBody;
+    if (!body.test_sqid) {
+      return HttpResponse.json({ test_sqid: ["This field is required."] }, { status: 400 });
+    }
+    if (testDetails.some(({ test_sqid }) => test_sqid === body.test_sqid)) {
+      return HttpResponse.json(
+        { detail: "This test already has details for your laboratory." },
+        { status: 400 },
+      );
+    }
+    const sqid = `details-${body.test_sqid}`;
+    const created: TestDetails = {
+      sqid,
+      created_at: new Date().toISOString(),
+      test_sqid: body.test_sqid,
+      result_format: body.result_format ?? "numeric",
+      unit: body.unit ?? "milligrams_per_deciliter",
+      critical_low: body.critical_low ?? 0,
+      critical_high: body.critical_high ?? 0,
+      turnaround_time: body.turnaround_time ?? "1 day",
+      references: withReferenceIds(body.references ?? [], sqid),
+    };
+    testDetails.push(created);
+    return HttpResponse.json(created, { status: 201 });
+  }),
+  http.patch(api("/api/lab/lab-tests-details/:sqid"), async ({ params, request }) => {
+    const details = testDetails.find(({ sqid }) => sqid === params.sqid);
+    if (!details) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    const { references, ...changes } = (await request.json()) as DetailsBody;
+    // As the API does: ranges sent replace the saved ones.
+    Object.assign(
+      details,
+      changes,
+      references && { references: withReferenceIds(references, details.sqid) },
+    );
+    return HttpResponse.json(details);
+  }),
+  // The lab in its old shape; its `contacts` are phone numbers.
+  http.get(api("/api/lab/profile"), () =>
+    HttpResponse.json({
+      sqid: "lab-luth",
+      name: labFacility.name,
+      logo: null,
+      address: [labFacility.street, labFacility.city, labFacility.state, labFacility.country].join(
+        ", ",
+      ),
+      contacts: labFacility.phone ? [labFacility.phone] : [],
+      hospital_info: hospital.name,
+      created_at: "2026-01-12T08:00:00Z",
+    }),
+  ),
   http.get(api("/api/lab/dashboard"), () => {
     const items = orders.flatMap((order) => order.items);
     const at = (...statuses: Item["status"][]) =>

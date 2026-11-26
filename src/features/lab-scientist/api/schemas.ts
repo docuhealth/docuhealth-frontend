@@ -461,3 +461,170 @@ export const appointmentPageSchema = z
 
 /** Replies to writes whose body the app doesn't use. */
 export const anyResponseSchema = z.unknown();
+
+// The test catalogue: every test DocuHealth knows (`GET /api/lab/lab-tests`), and the details the
+// lab's admin saves for the ones the lab runs (`/api/lab/lab-tests-details`). TODO(api): neither
+// has a price, so the catalogue can't show or set what a test costs.
+
+export const resultFormatLabels = {
+  numeric: "Numeric",
+  positive_or_negative: "Positive / Negative",
+  present_or_absent: "Present / Absent",
+  // The API's name for free text.
+  test: "Text",
+} as const;
+
+export const unitLabels = {
+  milligrams_per_deciliter: "mg/dL",
+  millimoles_per_liter: "mmol/L",
+  grams_per_deciliter: "g/dL",
+  grams_per_liter: "g/L",
+  micromoles_per_liter: "µmol/L",
+  milli_international_units_per_liter: "mIU/L",
+  micro_international_units_per_milliliter: "µIU/mL",
+} as const;
+
+export const ageGroupLabels = { adults: "Adults", teens: "Teens", children: "Children" } as const;
+export const referenceGenderLabels = { all: "All", male: "Male", female: "Female" } as const;
+export const pregnancyLabels = {
+  not_pregnant: "Not pregnant",
+  first_trimester: "1st trimester",
+  second_trimester: "2nd trimester",
+  third_trimester: "3rd trimester",
+} as const;
+
+const keyOf = <T extends Record<string, string>>(labels: T) =>
+  z.enum(Object.keys(labels) as [keyof T & string, ...(keyof T & string)[]]);
+
+const reference = z
+  .object({
+    age: keyOf(ageGroupLabels),
+    gender: keyOf(referenceGenderLabels),
+    pregnancy_status: keyOf(pregnancyLabels),
+    min_ref_range: z.coerce.number(),
+    max_ref_range: z.coerce.number(),
+  })
+  .transform((range) => ({
+    age: range.age,
+    gender: range.gender,
+    pregnancy: range.pregnancy_status,
+    min: range.min_ref_range,
+    max: range.max_ref_range,
+  }));
+
+/** `LabTestDetails`: how the lab reports one test. */
+const testDetails = z
+  .object({
+    sqid: z.string(),
+    test_sqid: z.string(),
+    result_format: keyOf(resultFormatLabels),
+    unit: keyOf(unitLabels),
+    critical_low: z.coerce.number(),
+    critical_high: z.coerce.number(),
+    turnaround_time: text,
+    references: z.array(reference).catch([]),
+  })
+  .transform((details) => ({
+    id: details.sqid,
+    testId: details.test_sqid,
+    resultFormat: details.result_format,
+    unit: details.unit,
+    criticalLow: details.critical_low,
+    criticalHigh: details.critical_high,
+    /** As the admin wrote it, e.g. "2 days". */
+    turnaround: details.turnaround_time,
+    references: details.references,
+  }));
+export type TestDetails = z.output<typeof testDetails>;
+
+/** Every page of `GET /api/lab/lab-tests-details`, as the details of each test. */
+export const testDetailsPageSchema = z.object({
+  next: z.string().nullish(),
+  results: z.array(testDetails),
+});
+
+export const testCategoriesSchema = z
+  .object({ results: z.array(z.object({ sqid: z.string(), name: text })) })
+  .transform(({ results }) => results.map(({ sqid, name }) => ({ id: sqid, name })));
+
+/** A test in DocuHealth's catalogue (`LabTest`), with the lab's details when it has set it up. */
+const catalogueTest = z
+  .object({
+    sqid: z.string(),
+    name: text,
+    category: z.object({ sqid: z.string(), name: text }).nullish(),
+    turnaround_hours: z.number().int().nullish(),
+    parameters: z.array(z.object({ name: text })).catch([]),
+    // The lab's saved details, which the list carries too; the details list is the one relied on.
+    additional_details: z.unknown().optional(),
+  })
+  .transform((test) => ({
+    id: test.sqid,
+    name: test.name,
+    category: test.category ? { id: test.category.sqid, name: test.category.name } : null,
+    /** The catalogue's usual turnaround, before the lab sets its own. */
+    defaultTurnaroundHours: test.turnaround_hours ?? null,
+    parameters: test.parameters.map(({ name }) => name),
+    details: testDetails
+      .nullable()
+      .catch(null)
+      .parse(test.additional_details ?? null),
+  }));
+export type CatalogueTest = z.output<typeof catalogueTest>;
+
+/** A page of `GET /api/lab/lab-tests`. */
+export const catalogueTestPageSchema = z.object({
+  count: z.number().int().nonnegative(),
+  results: z.array(catalogueTest),
+});
+
+/** "24 hours" → "1 day"; the catalogue gives whole hours. */
+export function turnaroundFromHours(hours: number) {
+  if (hours >= 24 && hours % 24 === 0) {
+    const days = hours / 24;
+    return `${days} ${days === 1 ? "day" : "days"}`;
+  }
+  return `${hours} ${hours === 1 ? "hour" : "hours"}`;
+}
+
+// The lab's own details, for its admin: `GET /api/auth/facility` has the name and address in
+// parts (what `PATCH /api/auth/facility/branding` takes), `GET /api/lab/profile` the contacts.
+
+/** `FacilityInfo`: the admin's facility (for a lab admin, the lab). */
+export const facilityInfoSchema = z
+  .object({
+    hospital_profile: z.object({
+      name: text,
+      street: text,
+      city: text,
+      state: text,
+      country: text,
+    }),
+  })
+  .transform(({ hospital_profile }) => hospital_profile);
+
+/** `LabProfile`: the lab in its old shape; its `contacts` are phone numbers. */
+export const labFacilityProfileSchema = z
+  .object({
+    contacts: z
+      .unknown()
+      .transform((contacts) =>
+        Array.isArray(contacts)
+          ? contacts.filter((entry): entry is string => typeof entry === "string" && !!entry.trim())
+          : [],
+      ),
+    logo: z
+      .unknown()
+      .transform((logo) =>
+        typeof logo === "string"
+          ? logo || null
+          : logo && typeof logo === "object" && "url" in logo && typeof logo.url === "string"
+            ? logo.url
+            : null,
+      ),
+  })
+  .transform(({ contacts, logo }) => ({ phone: contacts[0] ?? null, logoUrl: logo }));
+
+/** The Lab details card's model. */
+export type LabDetails = z.output<typeof facilityInfoSchema> &
+  z.output<typeof labFacilityProfileSchema>;

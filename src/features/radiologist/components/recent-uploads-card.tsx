@@ -28,7 +28,10 @@ const noneIn = {
   month: "Nothing uploaded this month.",
 } as const satisfies Record<Period, string>;
 
-/** Scan results uploaded in the period, newest first, and whether each went through. */
+/**
+ * Scan results uploaded in the period, newest first, and whether each went through. "Today" lists
+ * each patient scanned in the last 24 hours once, with their latest scan.
+ */
 export function RecentUploadsCard() {
   const [period, setPeriod] = useState<Period>("week");
   const { data, isError } = useQuery(recentUploadsQuery(period));
@@ -84,7 +87,11 @@ export function RecentUploadsCard() {
                 </div>
               </TableCell>
               <TableCell className={columns.status}>
-                <UploadStatusTag status={upload.status} />
+                {upload.status ? (
+                  <UploadStatusTag status={upload.status} />
+                ) : (
+                  <span className="type-caption text-fg-caption">—</span>
+                )}
               </TableCell>
               <TableCell className={`${columns.action} text-right`}>
                 <OpenButton

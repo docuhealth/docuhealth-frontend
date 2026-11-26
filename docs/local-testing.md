@@ -50,7 +50,9 @@ Any password works. The part of the email before `@` picks the role:
 On sign-up, desk registration and password reset, two more emails try the code rules:
 `exists@test.com` already has an account (after the code you're sent to log in, or at the desk
 told to look the patient up by HIN), and `wait@test.com` is refused a second code, so "Resend
-Code" counts down.
+Code" counts down. `old@test.com` also has an account, from an old (v1) sign-up it never
+finished: sign-up offers "Finish an earlier sign-up", and on `/verify-account` (also linked from
+the patient login) code `123456` finishes it; any other code is refused.
 
 ## What's different in demo mode
 

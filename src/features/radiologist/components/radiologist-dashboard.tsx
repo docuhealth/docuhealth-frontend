@@ -66,7 +66,11 @@ export function RadiologistDashboard({
           icon={<CheckmarkCircleIcon />}
           label="Completed Scan"
           value={overview.completedScans.toLocaleString("en-GB")}
-          note="All completed so far"
+          note={
+            overview.completedScansSpan === "month"
+              ? "Carried out this month"
+              : "All completed so far"
+          }
         />
         <StatCard
           icon={<ClockIcon />}

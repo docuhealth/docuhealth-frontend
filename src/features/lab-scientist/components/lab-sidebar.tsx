@@ -2,6 +2,7 @@ import appointmentIconUrl from "@/assets/svgs/appointment.svg";
 import auditIconUrl from "@/assets/svgs/audit.svg";
 import dashboardIconUrl from "@/assets/svgs/dashboard.svg";
 import healthIconUrl from "@/assets/svgs/health.svg";
+import labResultIconUrl from "@/assets/svgs/lab-result.svg";
 import labIconUrl from "@/assets/svgs/lab.svg";
 import messagesIconUrl from "@/assets/svgs/messages.svg";
 import settingsIconUrl from "@/assets/svgs/settings.svg";
@@ -27,6 +28,12 @@ export function LabSidebar({ unreadMessages }: { unreadMessages: number }) {
       items: [
         { to: "/hospital/lab-scientist", label: "Overview", icon: dashboardIconUrl },
         { to: "/hospital/lab-scientist/test-orders", label: "Test orders", icon: labIconUrl },
+        // Everyone reads it; the lab's admin also adds and edits its tests.
+        {
+          to: "/hospital/lab-scientist/test-catalogue",
+          label: "Test catalogue",
+          icon: labResultIconUrl,
+        },
         {
           to: "/hospital/lab-scientist/appointments",
           label: "Appointments",

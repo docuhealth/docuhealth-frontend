@@ -60,6 +60,12 @@ export const patientForgotPasswordSchema = z.object({
 });
 export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
 
+/** Finishing an old (v1) sign-up: the email it was started with (the old sign-up was email-only). */
+export const oldSignupEmailSchema = z.object({
+  email: z.string().trim().min(1, "Enter your email address").pipe(email),
+});
+export type OldSignupEmailValues = z.infer<typeof oldSignupEmailSchema>;
+
 export const resetPasswordSchema = z
   .object({
     password: newPassword,

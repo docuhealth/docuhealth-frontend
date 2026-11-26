@@ -102,3 +102,98 @@ export const returnResultsSchema = z.object({
     "Keep the note to 1,000 characters",
   ),
 });
+
+const decimal = z
+  .string()
+  .trim()
+  .regex(/^-?\d+(\.\d+)?$/, "Enter a number");
+
+export const turnaroundUnitLabels = {
+  minutes: "Minute(s)",
+  hours: "Hour(s)",
+  days: "Day(s)",
+} as const;
+type TurnaroundUnit = keyof typeof turnaroundUnitLabels;
+
+const referenceRangeSchema = z
+  .object({
+    age: z.enum(["adults", "teens", "children"]),
+    gender: z.enum(["all", "male", "female"]),
+    pregnancy: z.enum(["not_pregnant", "first_trimester", "second_trimester", "third_trimester"]),
+    min: decimal,
+    max: decimal,
+  })
+  .refine(({ min, max }) => Number(min) <= Number(max), {
+    path: ["max"],
+    message: "Make this at least the minimum",
+  });
+
+/**
+ * The Add test and Edit test dialogs: which test (when adding), how its result is given, how
+ * long it takes, its panic limits and its reference ranges (at least one).
+ */
+export const testDetailsSchema = z
+  .object({
+    category: z.string(),
+    testId: z.string().min(1, "Pick a test"),
+    resultFormat: z.enum(["numeric", "positive_or_negative", "present_or_absent", "test"]),
+    unit: z.enum([
+      "milligrams_per_deciliter",
+      "millimoles_per_liter",
+      "grams_per_deciliter",
+      "grams_per_liter",
+      "micromoles_per_liter",
+      "milli_international_units_per_liter",
+      "micro_international_units_per_milliliter",
+    ]),
+    turnaround: z
+      .string()
+      .trim()
+      .regex(/^[1-9]\d{0,3}$/, "Enter a whole number from 1"),
+    turnaroundUnit: z.enum(["minutes", "hours", "days"]),
+    criticalLow: decimal,
+    criticalHigh: decimal,
+    references: z.array(referenceRangeSchema).min(1, "Add a reference range"),
+  })
+  .refine(({ criticalLow, criticalHigh }) => Number(criticalLow) < Number(criticalHigh), {
+    path: ["criticalHigh"],
+    message: "Make this higher than the critical low",
+  });
+export type TestDetailsValues = z.infer<typeof testDetailsSchema>;
+export type ReferenceRangeValues = TestDetailsValues["references"][number];
+
+export const newReferenceRange = (): ReferenceRangeValues => ({
+  age: "adults",
+  gender: "all",
+  pregnancy: "not_pregnant",
+  min: "",
+  max: "",
+});
+
+/** "2 days", as the API keeps it, from the dialog's number and unit. */
+export function turnaroundText(value: string, unit: TurnaroundUnit) {
+  const count = Number(value);
+  const word = { minutes: "minute", hours: "hour", days: "day" }[unit];
+  return `${count} ${count === 1 ? word : `${word}s`}`;
+}
+
+/** The dialog's number and unit from what the API keeps ("1 day", "24 hours", "30 min"). */
+export function parseTurnaround(text: string): { value: string; unit: TurnaroundUnit } {
+  const [value = "", word = ""] = text.trim().split(/\s+/);
+  const unit = /^min/i.test(word) ? "minutes" : /^h/i.test(word) ? "hours" : "days";
+  return { value: /^\d+$/.test(value) ? value : "1", unit };
+}
+
+/** The Lab details dialog: the lab's name, address and phone, as its admin corrects them. */
+export const labDetailsSchema = z.object({
+  name: required("Enter the lab’s name").max(255, "Keep the name to 255 characters"),
+  street: required("Enter the street address").max(120, "Keep this to 120 characters"),
+  city: required("Enter the city").max(20, "Keep this to 20 characters"),
+  state: required("Enter the state").max(20, "Keep this to 20 characters"),
+  country: required("Enter the country").max(20, "Keep this to 20 characters"),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^(\+?\d[\d\s-]{6,18}\d)?$/, "Enter a phone number, e.g. 08012345678"),
+});
+export type LabDetailsValues = z.infer<typeof labDetailsSchema>;

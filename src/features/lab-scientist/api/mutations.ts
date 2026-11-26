@@ -1,11 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { labKeys, labProfileQuery } from "@/features/lab-scientist/api/queries";
 import { anyResponseSchema, type TestOrder } from "@/features/lab-scientist/api/schemas";
-import type {
-  BookTestValues,
-  RejectOrderValues,
-  SampleCollectionValues,
-  UploadResultValues,
+import {
+  type BookTestValues,
+  type LabDetailsValues,
+  type RejectOrderValues,
+  type SampleCollectionValues,
+  type TestDetailsValues,
+  turnaroundText,
+  type UploadResultValues,
 } from "@/features/lab-scientist/lib/schemas";
 import { request } from "@/lib/api";
 
@@ -209,5 +212,73 @@ export function useLogResultDownload() {
       if (failed) throw failed.reason;
     },
     onError: (error) => console.warn("Couldn’t log the results download", error),
+  });
+}
+
+/**
+ * The lab's admin saves how the lab reports a test: created the first time (`detailsId` null),
+ * changed after that. Reference ranges sent replace the saved ones. Refreshes the catalogue.
+ */
+export function useSaveTestDetails() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      detailsId,
+      values,
+    }: {
+      detailsId: string | null;
+      values: TestDetailsValues;
+    }) => {
+      const data = {
+        result_format: values.resultFormat,
+        unit: values.unit,
+        critical_low: Number(values.criticalLow),
+        critical_high: Number(values.criticalHigh),
+        turnaround_time: turnaroundText(values.turnaround, values.turnaroundUnit),
+        references: values.references.map((range) => ({
+          age: range.age,
+          gender: range.gender,
+          pregnancy_status: range.pregnancy,
+          min_ref_range: Number(range.min),
+          max_ref_range: Number(range.max),
+        })),
+      };
+      return detailsId
+        ? request(anyResponseSchema, {
+            method: "PATCH",
+            url: `/api/lab/lab-tests-details/${encodeURIComponent(detailsId)}`,
+            data,
+          })
+        : request(anyResponseSchema, {
+            method: "POST",
+            url: "/api/lab/lab-tests-details/create",
+            data: { test_sqid: values.testId, ...data },
+          });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: labKeys.catalogue() }),
+  });
+}
+
+/**
+ * The lab's admin corrects the lab's name, address and phone. `PATCH /api/auth/facility/branding`
+ * is where the API keeps a facility's details for its admin (the lab is a facility of its own);
+ * it takes the address in parts, unlike the older `/api/lab/update-profile`. Form-encoded, as
+ * the endpoint takes no JSON.
+ */
+export function useUpdateLabDetails() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (values: LabDetailsValues) =>
+      request(anyResponseSchema, {
+        method: "PATCH",
+        url: "/api/auth/facility/branding",
+        data: new URLSearchParams(values),
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: labKeys.labDetails() });
+      return queryClient.invalidateQueries({ queryKey: labKeys.profile() });
+    },
   });
 }

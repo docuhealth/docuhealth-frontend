@@ -422,3 +422,26 @@ Still open:
 2. **Mobile sign-in** isn't decided (no cookie jar, no `Authorization`). Nothing to do on the web.
 3. **One session per browser.** Logging in to any DocuHealth site (v1 included) replaces the
    session in every tab. QA has been told to use one browser profile per role.
+
+### v1 features carried over (26 Nov)
+
+Wired in v2 from the API v1 used: the lab's test set-up (`lab-tests-details`), the lab's details
+(read from `/api/auth/facility` and `/api/lab/profile`, saved through
+`/api/auth/facility/branding`), the radiologist's monthly scan count
+(`radiology/activity-chart-data`) and recent patients (`radiology/patients/recents`), opening one
+care record (`records/events/{sqid}`), and finishing an old v1 sign-up (`auth/resend-otp`,
+`auth/signup/verify-otp`). What they still lack:
+
+1. **Lab tests have no price.** Neither `lab-tests` nor `lab-tests-details` carries one, so the
+   catalogue can't show or set what a test costs. `lab-tests-details` can't be filtered by test
+   either (the app reads every page).
+2. **A lab's own email and logo** can be written through `facility/branding` but not read back.
+3. **Radiology:** `activity-chart-data` and `patients/recents` have no response schema;
+   `activity-chart-data` is by month only (no day or week); `recents` has no scan type or result
+   status (the app looks them up in the latest orders).
+4. **Care records:** `records/events/{sqid}` has no response schema and its `record` is untyped;
+   please confirm the `record_type` names (admission, lab order, drug order) and that the
+   timeline's event `sqid` is what this endpoint takes.
+5. **Old sign-ups:** `signup/verify-otp` is documented as returning only `{ email }`, so the app
+   sends the person to log in afterwards; if it starts a session, say so. Please also say whether
+   a too-early `resend-otp` is a 429 or a silent 200.

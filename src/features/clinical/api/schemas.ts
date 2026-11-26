@@ -188,6 +188,8 @@ export const patientInfoSchema = z
 
 /** What each kind of record is called on the timeline. */
 const recordTypeLabels: Record<string, string> = {
+  admission: "Admission",
+  admission_request: "Admission request",
   admission_note: "Admission note",
   care_plan: "Care plan",
   case_note: "Case note",
@@ -198,7 +200,10 @@ const recordTypeLabels: Record<string, string> = {
   input_record: "Fluid intake",
   output_record: "Fluid output",
   iv_fluid_record: "IV fluid",
+  lab_test_order: "Lab test order",
   lab_test_result: "Lab result",
+  nursing_assessment: "Nursing assessment",
+  drug_order: "Drug order",
   scan_result: "Scan result",
   procedure_record: "Procedure",
   progress_note: "Progress note",
@@ -243,7 +248,7 @@ function textOf(value: unknown): string | null {
 }
 
 /** An untyped record's fields worth reading, as label and value, in the order sent. */
-function recordDetails(record: Record<string, unknown>) {
+export function recordDetails(record: Record<string, unknown>) {
   return Object.entries(record).flatMap(([key, value]) => {
     if (hiddenKeys.has(key) || key.endsWith("_info") || key.endsWith("_at")) return [];
     const shown = textOf(value);
@@ -257,11 +262,12 @@ export type VisitRecord = {
   title: string;
   at: string;
   by: string | null;
-  /** The record's fields, as label and value, in the order the API sends them. */
-  details: { label: string; value: string }[];
 };
 
-/** `WorkflowRecordEvent`: one record made during the visit (TODO(api): its `record` is untyped). */
+/**
+ * `WorkflowRecordEvent`: one record made during the visit. Its `record` is untyped (TODO(api)), so
+ * the record is read in full from its event when it's opened (`recordEventSchema`).
+ */
 export const visitRecordPageSchema = z.object({
   count: count,
   results: z.array(
@@ -271,7 +277,6 @@ export const visitRecordPageSchema = z.object({
         record_type: text,
         created_at: dateTime,
         staff_info: personSchema,
-        record: z.record(z.string(), z.unknown()).nullish(),
       })
       .transform((event): VisitRecord => ({
         id: event.sqid,
@@ -279,7 +284,6 @@ export const visitRecordPageSchema = z.object({
         title: recordTypeLabels[event.record_type] ?? sentence(event.record_type),
         at: event.created_at,
         by: event.staff_info,
-        details: recordDetails(event.record ?? {}),
       })),
   ),
 });

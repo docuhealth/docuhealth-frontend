@@ -3,13 +3,20 @@ import { request } from "@/lib/api";
 import type { Period } from "@/lib/period";
 import {
   appointmentPageSchema,
+  type CatalogueTest,
+  catalogueTestPageSchema,
+  facilityInfoSchema,
   type FoundPatient,
+  labFacilityProfileSchema,
   labDashboardSchema,
   labOrderPageSchema,
   labOrderSchema,
   labProfileSchema,
   type PendingApprovals,
   type TestAppointments,
+  testCategoriesSchema,
+  type TestDetails,
+  testDetailsPageSchema,
   type TestRecordList,
   type TestRecordParams,
   type TestTab,
@@ -27,6 +34,11 @@ export const labKeys = {
   appointments: (period: Period) => [...labKeys.all, "appointments", period] as const,
   orders: () => [...labKeys.all, "orders"] as const,
   testOrder: (id: string) => [...labKeys.all, "test-order", id] as const,
+  /** Every page of the catalogue, so a saved test refreshes them all. */
+  catalogue: () => [...labKeys.all, "catalogue"] as const,
+  cataloguePage: (params: CatalogueParams) => [...labKeys.catalogue(), params] as const,
+  testCategories: () => [...labKeys.all, "test-categories"] as const,
+  labDetails: () => [...labKeys.all, "lab-details"] as const,
 };
 
 export const labProfileQuery = () =>
@@ -212,4 +224,84 @@ export const testOrderQuery = (id: string) =>
     queryKey: labKeys.testOrder(id),
     queryFn: () =>
       request(labOrderSchema, { url: `/api/lab/test-orders/${encodeURIComponent(id)}` }),
+  });
+
+/** What the test catalogue shows: a category's ("" for every one) tests matching a search. */
+export type CatalogueParams = { search: string; category: string; page: number; pageSize: number };
+
+export const TEST_CATALOGUE_PAGE_SIZE = 10;
+
+/** Pages of the lab's saved test details read at most, at 100 a page. */
+const MAX_DETAIL_PAGES = 10;
+
+/**
+ * The details the lab has saved, every page of them. TODO(api): the list can't be asked for
+ * given tests, so it's read whole; a `test` filter (or the details on `GET /api/lab/lab-tests`,
+ * which carries `additional_details` but untyped) would save it.
+ */
+async function allTestDetails() {
+  const details: TestDetails[] = [];
+  for (let page = 1; page <= MAX_DETAIL_PAGES; page++) {
+    const { results, next } = await request(testDetailsPageSchema, {
+      url: "/api/lab/lab-tests-details",
+      params: { page, size: 100 },
+    });
+    details.push(...results);
+    if (!next) break;
+  }
+  return details;
+}
+
+/**
+ * A page of DocuHealth's test catalogue, each test with the details the lab saved for it (`null`
+ * until the lab's admin sets it up).
+ */
+export const testCatalogueQuery = (params: CatalogueParams) =>
+  queryOptions({
+    queryKey: labKeys.cataloguePage(params),
+    queryFn: async (): Promise<{ total: number; items: CatalogueTest[] }> => {
+      const [page, details] = await Promise.all([
+        request(catalogueTestPageSchema, {
+          url: "/api/lab/lab-tests",
+          params: {
+            search: params.search || undefined,
+            category: params.category || undefined,
+            page: params.page,
+            size: params.pageSize,
+          },
+        }),
+        allTestDetails(),
+      ]);
+      const byTest = new Map(details.map((entry) => [entry.testId, entry]));
+      return {
+        total: page.count,
+        items: page.results.map((test) => ({
+          ...test,
+          details: byTest.get(test.id) ?? test.details,
+        })),
+      };
+    },
+    placeholderData: keepPreviousData,
+  });
+
+/** The catalogue's categories (Haematology, Biochemistry…), for its filter and the Add dialog. */
+export const testCategoriesQuery = () =>
+  queryOptions({
+    queryKey: labKeys.testCategories(),
+    queryFn: () =>
+      request(testCategoriesSchema, { url: "/api/lab/test-categories", params: { size: 100 } }),
+    staleTime: Infinity,
+  });
+
+/** The lab's name, address and phone, for its admin to correct. */
+export const labDetailsQuery = () =>
+  queryOptions({
+    queryKey: labKeys.labDetails(),
+    queryFn: async () => {
+      const [facility, profile] = await Promise.all([
+        request(facilityInfoSchema, { url: "/api/auth/facility" }),
+        request(labFacilityProfileSchema, { url: "/api/lab/profile" }),
+      ]);
+      return { ...facility, ...profile };
+    },
   });

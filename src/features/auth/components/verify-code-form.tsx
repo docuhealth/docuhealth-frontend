@@ -33,6 +33,7 @@ export function VerifyCodeForm({
   onEdit,
   onVerified,
   onResend,
+  codeJustSent = true,
 }: {
   /** Where the code went, as the API reports it (`a***@example.com`, `+234••••••1234`). */
   sentTo: string;
@@ -47,6 +48,11 @@ export function VerifyCodeForm({
   onEdit?: () => void;
   onVerified: (code: string) => void | Promise<void>;
   onResend?: () => void | Promise<void>;
+  /**
+   * A code was sent just before this step opened, so "Send again" waits first. False when the
+   * person already had a code from earlier, so they can ask for one straight away.
+   */
+  codeJustSent?: boolean;
 }) {
   const form = useForm<VerifyCodeValues>({
     resolver: zodResolver(verifyCodeSchema),
@@ -62,8 +68,8 @@ export function VerifyCodeForm({
   useEffect(() => form.setFocus("code"), [form]);
   // A code was sent just before this step opened, so the next one waits.
   useEffect(() => {
-    if (canResend) started();
-  }, [canResend, started]);
+    if (canResend && codeJustSent) started();
+  }, [canResend, codeJustSent, started]);
 
   async function onSubmit(values: VerifyCodeValues) {
     await onVerified(values.code);

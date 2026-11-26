@@ -24,6 +24,7 @@ import { Route as TermsAndConditionsRouteImport } from './routes/terms-and-condi
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
+import { Route as AuthVerifyAccountRouteImport } from './routes/_auth/verify-account'
 import { Route as AuthVerifyNinRouteImport } from './routes/_auth/verify-nin'
 import { Route as AdminAuthRouteImport } from './routes/admin/_auth'
 import { Route as AdminDashboardRouteImport } from './routes/admin/_dashboard'
@@ -84,6 +85,7 @@ import { Route as HospitalLabScientistHelpRouteImport } from './routes/hospital/
 import { Route as HospitalLabScientistMessagesRouteImport } from './routes/hospital/lab-scientist/messages'
 import { Route as HospitalLabScientistPersonnelRouteImport } from './routes/hospital/lab-scientist/personnel'
 import { Route as HospitalLabScientistSettingsRouteImport } from './routes/hospital/lab-scientist/settings'
+import { Route as HospitalLabScientistTestCatalogueRouteImport } from './routes/hospital/lab-scientist/test-catalogue'
 import { Route as HospitalNurseIndexRouteImport } from './routes/hospital/nurse/index'
 import { Route as HospitalNurseAppointmentsRouteImport } from './routes/hospital/nurse/appointments'
 import { Route as HospitalNurseEncountersRouteImport } from './routes/hospital/nurse/encounters'
@@ -233,6 +235,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthVerifyAccountRoute = AuthVerifyAccountRouteImport.update({
+  id: '/verify-account',
+  path: '/verify-account',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthVerifyNinRoute = AuthVerifyNinRouteImport.update({
@@ -546,6 +553,12 @@ const HospitalLabScientistSettingsRoute =
   HospitalLabScientistSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => HospitalLabScientistRoute,
+  } as any)
+const HospitalLabScientistTestCatalogueRoute =
+  HospitalLabScientistTestCatalogueRouteImport.update({
+    id: '/test-catalogue',
+    path: '/test-catalogue',
     getParentRoute: () => HospitalLabScientistRoute,
   } as any)
 const HospitalNurseIndexRoute = HospitalNurseIndexRouteImport.update({
@@ -999,6 +1012,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
+  '/verify-account': typeof AuthVerifyAccountRoute
   '/verify-nin': typeof AuthVerifyNinRoute
   '/admin': typeof AdminDashboardRouteWithChildren
   '/agent/$': typeof AgentSplatRoute
@@ -1054,6 +1068,7 @@ export interface FileRoutesByFullPath {
   '/hospital/lab-scientist/messages': typeof HospitalLabScientistMessagesRoute
   '/hospital/lab-scientist/personnel': typeof HospitalLabScientistPersonnelRoute
   '/hospital/lab-scientist/settings': typeof HospitalLabScientistSettingsRoute
+  '/hospital/lab-scientist/test-catalogue': typeof HospitalLabScientistTestCatalogueRoute
   '/hospital/nurse/appointments': typeof HospitalNurseAppointmentsRoute
   '/hospital/nurse/encounters': typeof HospitalNurseEncountersRoute
   '/hospital/nurse/handovers': typeof HospitalNurseHandoversRoute
@@ -1149,6 +1164,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
+  '/verify-account': typeof AuthVerifyAccountRoute
   '/verify-nin': typeof AuthVerifyNinRoute
   '/admin': typeof AdminDashboardIndexRoute
   '/agent/$': typeof AgentSplatRoute
@@ -1196,6 +1212,7 @@ export interface FileRoutesByTo {
   '/hospital/lab-scientist/messages': typeof HospitalLabScientistMessagesRoute
   '/hospital/lab-scientist/personnel': typeof HospitalLabScientistPersonnelRoute
   '/hospital/lab-scientist/settings': typeof HospitalLabScientistSettingsRoute
+  '/hospital/lab-scientist/test-catalogue': typeof HospitalLabScientistTestCatalogueRoute
   '/hospital/nurse/appointments': typeof HospitalNurseAppointmentsRoute
   '/hospital/nurse/encounters': typeof HospitalNurseEncountersRoute
   '/hospital/nurse/handovers': typeof HospitalNurseHandoversRoute
@@ -1293,6 +1310,7 @@ export interface FileRoutesById {
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
+  '/_auth/verify-account': typeof AuthVerifyAccountRoute
   '/_auth/verify-nin': typeof AuthVerifyNinRoute
   '/admin/_auth': typeof AdminAuthRouteWithChildren
   '/admin/_dashboard': typeof AdminDashboardRouteWithChildren
@@ -1349,6 +1367,7 @@ export interface FileRoutesById {
   '/hospital/lab-scientist/messages': typeof HospitalLabScientistMessagesRoute
   '/hospital/lab-scientist/personnel': typeof HospitalLabScientistPersonnelRoute
   '/hospital/lab-scientist/settings': typeof HospitalLabScientistSettingsRoute
+  '/hospital/lab-scientist/test-catalogue': typeof HospitalLabScientistTestCatalogueRoute
   '/hospital/nurse/appointments': typeof HospitalNurseAppointmentsRoute
   '/hospital/nurse/encounters': typeof HospitalNurseEncountersRoute
   '/hospital/nurse/handovers': typeof HospitalNurseHandoversRoute
@@ -1447,6 +1466,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/register'
+    | '/verify-account'
     | '/verify-nin'
     | '/admin'
     | '/agent/$'
@@ -1502,6 +1522,7 @@ export interface FileRouteTypes {
     | '/hospital/lab-scientist/messages'
     | '/hospital/lab-scientist/personnel'
     | '/hospital/lab-scientist/settings'
+    | '/hospital/lab-scientist/test-catalogue'
     | '/hospital/nurse/appointments'
     | '/hospital/nurse/encounters'
     | '/hospital/nurse/handovers'
@@ -1597,6 +1618,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/register'
+    | '/verify-account'
     | '/verify-nin'
     | '/admin'
     | '/agent/$'
@@ -1644,6 +1666,7 @@ export interface FileRouteTypes {
     | '/hospital/lab-scientist/messages'
     | '/hospital/lab-scientist/personnel'
     | '/hospital/lab-scientist/settings'
+    | '/hospital/lab-scientist/test-catalogue'
     | '/hospital/nurse/appointments'
     | '/hospital/nurse/encounters'
     | '/hospital/nurse/handovers'
@@ -1740,6 +1763,7 @@ export interface FileRouteTypes {
     | '/_auth/forgot-password'
     | '/_auth/login'
     | '/_auth/register'
+    | '/_auth/verify-account'
     | '/_auth/verify-nin'
     | '/admin/_auth'
     | '/admin/_dashboard'
@@ -1796,6 +1820,7 @@ export interface FileRouteTypes {
     | '/hospital/lab-scientist/messages'
     | '/hospital/lab-scientist/personnel'
     | '/hospital/lab-scientist/settings'
+    | '/hospital/lab-scientist/test-catalogue'
     | '/hospital/nurse/appointments'
     | '/hospital/nurse/encounters'
     | '/hospital/nurse/handovers'
@@ -2012,6 +2037,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof AuthRegisterRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/verify-account': {
+      id: '/_auth/verify-account'
+      path: '/verify-account'
+      fullPath: '/verify-account'
+      preLoaderRoute: typeof AuthVerifyAccountRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/verify-nin': {
@@ -2432,6 +2464,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/hospital/lab-scientist/settings'
       preLoaderRoute: typeof HospitalLabScientistSettingsRouteImport
+      parentRoute: typeof HospitalLabScientistRoute
+    }
+    '/hospital/lab-scientist/test-catalogue': {
+      id: '/hospital/lab-scientist/test-catalogue'
+      path: '/test-catalogue'
+      fullPath: '/hospital/lab-scientist/test-catalogue'
+      preLoaderRoute: typeof HospitalLabScientistTestCatalogueRouteImport
       parentRoute: typeof HospitalLabScientistRoute
     }
     '/hospital/nurse/': {
@@ -2973,6 +3012,7 @@ interface AuthRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
+  AuthVerifyAccountRoute: typeof AuthVerifyAccountRoute
   AuthVerifyNinRoute: typeof AuthVerifyNinRoute
 }
 
@@ -2980,6 +3020,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
+  AuthVerifyAccountRoute: AuthVerifyAccountRoute,
   AuthVerifyNinRoute: AuthVerifyNinRoute,
 }
 
@@ -3205,6 +3246,7 @@ interface HospitalLabScientistRouteChildren {
   HospitalLabScientistMessagesRoute: typeof HospitalLabScientistMessagesRoute
   HospitalLabScientistPersonnelRoute: typeof HospitalLabScientistPersonnelRoute
   HospitalLabScientistSettingsRoute: typeof HospitalLabScientistSettingsRoute
+  HospitalLabScientistTestCatalogueRoute: typeof HospitalLabScientistTestCatalogueRoute
   HospitalLabScientistIndexRoute: typeof HospitalLabScientistIndexRoute
   HospitalLabScientistTestOrdersOrderIdRoute: typeof HospitalLabScientistTestOrdersOrderIdRoute
   HospitalLabScientistTestOrdersIndexRoute: typeof HospitalLabScientistTestOrdersIndexRoute
@@ -3217,6 +3259,8 @@ const HospitalLabScientistRouteChildren: HospitalLabScientistRouteChildren = {
   HospitalLabScientistMessagesRoute: HospitalLabScientistMessagesRoute,
   HospitalLabScientistPersonnelRoute: HospitalLabScientistPersonnelRoute,
   HospitalLabScientistSettingsRoute: HospitalLabScientistSettingsRoute,
+  HospitalLabScientistTestCatalogueRoute:
+    HospitalLabScientistTestCatalogueRoute,
   HospitalLabScientistIndexRoute: HospitalLabScientistIndexRoute,
   HospitalLabScientistTestOrdersOrderIdRoute:
     HospitalLabScientistTestOrdersOrderIdRoute,

@@ -26,6 +26,8 @@ const copy = {
     identifierPlaceholder: "you@example.com, +234..., or HIN",
     forgotPasswordTo: "/forgot-password",
     signUp: { prompt: "New to DocuHealth?", linkText: "Create an account", to: "/register" },
+    // Only patients had the old (v1) sign-up that can be left unfinished.
+    finishSignUpTo: "/verify-account",
   },
   hospital: {
     title: "Log in to your facility",
@@ -39,6 +41,7 @@ const copy = {
       linkText: "Register your facility",
       to: "/hospital/register",
     },
+    finishSignUpTo: null,
   },
   // DocuHealth's own admins: no account type (the API wants none for them), no sign-up.
   dhadmin: {
@@ -49,6 +52,7 @@ const copy = {
     identifierPlaceholder: "you@docuhealthservices.net",
     forgotPasswordTo: "/admin/forgot-password",
     signUp: null,
+    finishSignUpTo: null,
   },
 } satisfies Record<
   string,
@@ -60,6 +64,7 @@ const copy = {
     identifierPlaceholder: string;
     forgotPasswordTo: LinkProps["to"];
     signUp: { prompt: string; linkText: string; to: LinkProps["to"] } | null;
+    finishSignUpTo: LinkProps["to"] | null;
   }
 >;
 
@@ -73,6 +78,7 @@ export function LoginForm({ audience }: { audience: keyof typeof copy }) {
     identifierPlaceholder,
     forgotPasswordTo,
     signUp,
+    finishSignUpTo,
   } = copy[audience];
   const navigate = useNavigate();
   const loginMutation = useLogin();
@@ -162,6 +168,14 @@ export function LoginForm({ audience }: { audience: keyof typeof copy }) {
           >
             Log in
           </Button>
+          {finishSignUpTo && (
+            <p className="text-center type-caption text-muted-foreground">
+              Started signing up before?{" "}
+              <Link to={finishSignUpTo} className="text-primary hover:underline">
+                Finish it
+              </Link>
+            </p>
+          )}
         </FieldGroup>
       </form>
     </div>

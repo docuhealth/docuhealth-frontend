@@ -37,6 +37,8 @@ const radiologyOverviewSchema = z.object({
   /** Requested and not started yet. */
   pendingOrders: count,
   completedScans: count,
+  /** What `completedScans` covers: this calendar month, or every scan so far. */
+  completedScansSpan: z.enum(["month", "all"]),
   scansInProgress: count,
 });
 export type RadiologyOverview = z.infer<typeof radiologyOverviewSchema>;
@@ -115,7 +117,8 @@ const recentUploadsSchema = z.object({
       uploadedAt: z.iso.datetime(),
       patient: patientSchema.pick({ id: true, name: true }),
       scanType: z.string(),
-      status: enumOf(uploadStatusLabels),
+      /** `null` when the upload's report isn't among the latest completed scans. */
+      status: enumOf(uploadStatusLabels).nullable(),
     }),
   ),
 });
@@ -508,6 +511,49 @@ export const radiologyPatientsSchema = z
       const { sex: _sex, ...rest } = toPatient(patient);
       return { ...rest, phone: null, email: null };
     }),
+  );
+
+const monthKeys = [
+  "JAN",
+  "FEB",
+  "MAR",
+  "APR",
+  "MAY",
+  "JUN",
+  "JUL",
+  "AUG",
+  "SEP",
+  "OCT",
+  "NOV",
+  "DEC",
+] as const;
+
+/**
+ * `GET /api/radiology/activity-chart-data`: scans carried out in each month of this year, January
+ * first, from `{JAN: 4, FEB: 7, …}`. TODO(api): no response schema, so a month that's missing or
+ * isn't a count reads as 0.
+ */
+export const scanActivitySchema = z
+  .record(z.string(), z.unknown())
+  .transform((months) => monthKeys.map((key) => count.catch(0).parse(months[key] ?? 0)));
+
+/**
+ * `GET /api/radiology/patients/recents`: patients with a scan result uploaded here in the last 24
+ * hours, most recently scanned first.
+ */
+export const recentRadiologyPatientPageSchema = z
+  .object({
+    count: count,
+    results: z.array(
+      z.object({ hin: z.string(), firstname: text, lastname: text, scanned_at: dateTime }),
+    ),
+  })
+  .transform(({ results }) =>
+    results.map((patient) => ({
+      hin: patient.hin,
+      name: fullName(patient.firstname, patient.lastname) || patient.hin,
+      scannedAt: patient.scanned_at,
+    })),
   );
 
 /** Replies to writes whose body the app doesn't use. */

@@ -348,6 +348,42 @@ export const radiologistHandlers = [
       results: results.slice(0, size),
     });
   }),
+  // Scans carried out each month this year (each report counts once), keyed "JAN" to "DEC".
+  http.get(api("/api/radiology/activity-chart-data"), () => {
+    const keys = "JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC".split(" ");
+    const year = new Date().getFullYear();
+    const counts = Object.fromEntries(keys.map((key) => [key, 0]));
+    for (const result of items.flatMap((item) => item.results)) {
+      const at = new Date(result.created_at);
+      if (at.getFullYear() === year) counts[keys[at.getMonth()]!]! += 1;
+    }
+    return HttpResponse.json(counts);
+  }),
+  // Patients whose scan result went up in the last 24 hours, most recently scanned first.
+  http.get(api("/api/radiology/patients/recents"), ({ request }) => {
+    const params = new URL(request.url).searchParams;
+    const size = Number(params.get("size") ?? 10);
+    const since = Date.now() - 24 * HOUR;
+    const latest = new Map<string, { patient: Patient; at: string }>();
+    for (const item of items) {
+      for (const result of item.results) {
+        if (new Date(result.created_at).getTime() < since) continue;
+        const seen = latest.get(item.patient.hin);
+        if (!seen || seen.at < result.created_at) {
+          latest.set(item.patient.hin, { patient: item.patient, at: result.created_at });
+        }
+      }
+    }
+    const results = [...latest.values()]
+      .sort((a, b) => b.at.localeCompare(a.at))
+      .map(({ patient, at }) => ({ ...patient, scanned_at: at }));
+    return HttpResponse.json({
+      count: results.length,
+      next: null,
+      previous: null,
+      results: results.slice(0, size),
+    });
+  }),
   // Records that a report left the system (downloaded or printed); there's no body.
   http.post(api("/api/radiology/audit-logs/:resultSqid/downloads"), ({ params }) => {
     const known = items.some((item) => item.results.some(({ sqid }) => sqid === params.resultSqid));

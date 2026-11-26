@@ -1,6 +1,7 @@
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { request } from "@/lib/api";
 import { keepPreviousPage } from "@/lib/keep-previous-page";
+import { recordEventSchema } from "@/features/clinical/api/event-schemas";
 import {
   type Chart,
   chartPageSchema,
@@ -31,6 +32,7 @@ export const clinicalKeys = {
     [...clinicalKeys.all, "fluid-balance", admissionId] as const,
   records: (kind: Visit["kind"], id: string, page: number) =>
     [...clinicalKeys.all, "records", kind, id, page] as const,
+  event: (id: string, type: string) => [...clinicalKeys.all, "event", id, type] as const,
 };
 
 const PATIENTS_URL = "/api/hospital-ops/patients";
@@ -108,6 +110,16 @@ export const visitRecordsQuery = (kind: Visit["kind"], id: string, page: number)
       return { total: count, items: results };
     },
     placeholderData: keepPreviousData,
+  });
+
+/** One record from the timeline, in full: `id` is the event's sqid, `type` its `record_type`. */
+export const recordEventQuery = (id: string, type: string) =>
+  queryOptions({
+    queryKey: clinicalKeys.event(id, type),
+    queryFn: () =>
+      request(recordEventSchema(type), {
+        url: `/api/records/events/${encodeURIComponent(id)}`,
+      }),
   });
 
 export const CHART_PAGE_SIZE = 10;

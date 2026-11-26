@@ -1,22 +1,19 @@
+import { CaretRightIcon } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { TablePagination } from "@/components/dashboard/table-pagination";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { RECORDS_PAGE_SIZE, visitRecordsQuery } from "@/features/clinical/api/queries";
-import type { Visit } from "@/features/clinical/api/schemas";
+import type { Visit, VisitRecord } from "@/features/clinical/api/schemas";
+import { RecordEventDialog } from "@/features/clinical/components/record-event-dialog";
 import { formatDayAndTime } from "@/lib/format";
 
 /**
  * Everything recorded during the visit (notes, vitals, results, drugs, discharge forms), newest
- * first; each opens to show what was recorded.
+ * first; each opens in a dialog to show the record in full.
  */
 export function VisitRecords({ visit }: { visit: Pick<Visit, "id" | "kind"> }) {
   const [page, setPage] = useState(1);
+  const [open, setOpen] = useState<VisitRecord | null>(null);
   const { data, isError } = useQuery(visitRecordsQuery(visit.kind, visit.id, page));
   // When the page opened, for "Today" and "Yesterday".
   const [now] = useState(() => new Date());
@@ -38,42 +35,28 @@ export function VisitRecords({ visit }: { visit: Pick<Visit, "id" | "kind"> }) {
 
   return (
     <div className="flex flex-col">
-      <Accordion type="multiple" className="flex flex-col">
+      <ul className="flex flex-col divide-y">
         {data?.items.map((record) => {
           const { day, time } = formatDayAndTime(new Date(record.at), now);
           return (
-            <AccordionItem key={record.id} value={record.id}>
-              <AccordionTrigger className="gap-3 py-3.5 hover:no-underline">
-                <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
+            <li key={record.id}>
+              <button
+                type="button"
+                onClick={() => setOpen(record)}
+                className="flex w-full items-center gap-3 rounded-md py-3.5 text-left outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50"
+              >
+                <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
                   <span className="type-body-sm-medium text-fg-heading">{record.title}</span>
                   <span className="type-caption text-fg-caption">
                     {[record.by, `${day}, ${time}`].filter(Boolean).join(" · ")}
                   </span>
                 </span>
-              </AccordionTrigger>
-              <AccordionContent>
-                {record.details.length === 0 ? (
-                  <p className="pb-2 type-body-sm-regular text-fg-caption">No details recorded.</p>
-                ) : (
-                  <dl className="flex flex-col divide-y rounded-lg border">
-                    {record.details.map(({ label, value }) => (
-                      <div
-                        key={label}
-                        className="grid gap-1 px-4 py-2.5 sm:grid-cols-[12rem_1fr] sm:gap-3"
-                      >
-                        <dt className="type-body-sm-regular text-fg-caption">{label}</dt>
-                        <dd className="type-body-sm-regular break-words whitespace-pre-line text-fg-heading">
-                          {value}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                )}
-              </AccordionContent>
-            </AccordionItem>
+                <CaretRightIcon aria-hidden className="size-4 shrink-0 text-fg-caption" />
+              </button>
+            </li>
           );
         })}
-      </Accordion>
+      </ul>
       {data && data.total > RECORDS_PAGE_SIZE && (
         <TablePagination
           page={page}
@@ -82,6 +65,7 @@ export function VisitRecords({ visit }: { visit: Pick<Visit, "id" | "kind"> }) {
           onPageChange={setPage}
         />
       )}
+      <RecordEventDialog record={open} onClose={() => setOpen(null)} />
     </div>
   );
 }

@@ -170,6 +170,47 @@ export function useCompletePatientSignup() {
   });
 }
 
+export interface SendOldSignupCodeInput {
+  email: string;
+  /** A DocuHealth link the API puts in the email. */
+  verify_url?: string;
+}
+
+/**
+ * Only for someone who started the old (v1) sign-up and never finished: emails a code to finish
+ * it. The API answers the same 200 for any email, and a resend that comes too soon is a 429.
+ */
+export function useSendOldSignupCode() {
+  return useMutation({
+    mutationFn: (data: SendOldSignupCodeInput) =>
+      request(messageResponseSchema, {
+        method: "POST",
+        url: "/api/auth/resend-otp",
+        data,
+      }),
+  });
+}
+
+export interface VerifyOldSignupCodeInput {
+  email: string;
+  otp: string;
+}
+
+/**
+ * Finishes an old (v1) sign-up with its emailed code. A wrong, expired or used code is a 400 on
+ * `code`. The reply only echoes the email: it doesn't sign the person in.
+ */
+export function useVerifyOldSignupCode() {
+  return useMutation({
+    mutationFn: (data: VerifyOldSignupCodeInput) =>
+      request(messageResponseSchema, {
+        method: "POST",
+        url: "/api/auth/signup/verify-otp",
+        data,
+      }),
+  });
+}
+
 export interface ForgotPasswordInput {
   /** An email, or for a patient account a phone number in any common form. */
   identifier: string;

@@ -147,6 +147,35 @@ describe("Patient sign-up", () => {
       "href",
       "/forgot-password",
     );
+    // An email may have an old (v1) sign-up left unfinished.
+    expect(screen.getByRole("link", { name: "Finish an earlier sign-up" })).toHaveAttribute(
+      "href",
+      "/verify-account?email=exists%40example.com",
+    );
+  });
+
+  it("only offers to finish an earlier sign-up for an email, not a phone", async () => {
+    server.use(
+      http.post(`${env.VITE_API_URL}/api/auth/signup/verify-code`, () =>
+        HttpResponse.json(
+          { code: "account_exists", detail: "An account already uses this contact." },
+          { status: 409 },
+        ),
+      ),
+    );
+    const { user } = renderWithRouter(<IndividualSignUp />);
+    await fillDetails(user);
+    await fill(user, screen.getByLabelText(/Phone Number/), "0803 123 4567");
+    await fill(user, screen.getByLabelText(/Email/), "ada@example.com");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    await user.type(await screen.findByLabelText("Verification code"), "123456");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    expect(await screen.findByText("You already have an account")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Log in" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Reset password" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Finish an earlier sign-up" })).toBeNull();
   });
 
   it("ends with the HIN and a way to the login page, without signing them in", async () => {

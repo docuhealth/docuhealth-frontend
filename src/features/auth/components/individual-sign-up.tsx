@@ -21,7 +21,8 @@ const TOTAL_STEPS = 3;
 /**
  * The individual sign-up flow; keeps each step's answers while the user moves between steps.
  * The API answers step 1 the same whether or not the contact has an account; only the right code
- * tells (409 `account_exists`), and then the person is sent to log in or reset their password.
+ * tells (409 `account_exists`), and then the person is sent to log in or reset their password,
+ * or, for an email, to finish an old (v1) sign-up they never completed.
  */
 export function IndividualSignUp() {
   const navigate = useNavigate();
@@ -93,13 +94,16 @@ export function IndividualSignUp() {
     }
   }
 
-  if (step === "exists") {
+  if (step === "exists" && info) {
+    // The old sign-up was email-only, so only an email can have one left unfinished.
+    const byEmail = info.contact.method === "email";
     return (
       <div className="flex flex-col gap-8">
         <AuthNotice icon={<UserCircleCheckIcon />} title="You already have an account">
           <p className="type-body-sm-regular text-muted-foreground">
             {sentTo} already belongs to a DocuHealth account. Log in, or reset your password if
             you’ve forgotten it.
+            {byEmail && " If you started signing up before and didn’t finish, finish that sign-up."}
           </p>
         </AuthNotice>
         <div className="flex flex-col gap-3">
@@ -109,6 +113,13 @@ export function IndividualSignUp() {
           <Button asChild variant="outline" className="h-12 w-full bg-card">
             <Link to="/forgot-password">Reset password</Link>
           </Button>
+          {byEmail && (
+            <Button asChild variant="ghost" className="h-12 w-full">
+              <Link to="/verify-account" search={{ email: info.contact.email.trim() }}>
+                Finish an earlier sign-up
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     );

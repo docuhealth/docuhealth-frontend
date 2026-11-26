@@ -35,6 +35,7 @@ function recordsOf(visit: string) {
       staff_info: heritech,
       record: {
         sqid: `${visit}-vitals-record`,
+        created_at: hoursAgo(1),
         blood_pressure: "120/80",
         temp: 36.8,
         heart_rate: 72,
@@ -70,6 +71,13 @@ function page<T>(items: T[], request: Request) {
   };
 }
 
+/** The record behind one of a visit's events (`{visit}-vitals`, `{visit}-note`), as the API sends it. */
+function eventRecord(sqid: string) {
+  const visit = sqid.replace(/-(vitals|note)$/, "");
+  const event = recordsOf(visit).find((record) => record.sqid === sqid);
+  return event && { ...event.record, created_at: event.created_at, staff_info: event.staff_info };
+}
+
 export const clinicalHandlers = [
   http.get(api("/api/records/admissions/:sqid/records"), ({ params, request }) =>
     HttpResponse.json(page(recordsOf(String(params.sqid)), request)),
@@ -77,4 +85,9 @@ export const clinicalHandlers = [
   http.get(api("/api/records/check-ins/:sqid/records"), ({ params, request }) =>
     HttpResponse.json(page(recordsOf(String(params.sqid)).slice(0, 1), request)),
   ),
+  http.get(api("/api/records/events/:sqid"), ({ params }) => {
+    const record = eventRecord(String(params.sqid));
+    if (!record) return HttpResponse.json({ detail: "Not found." }, { status: 404 });
+    return HttpResponse.json(record);
+  }),
 ];

@@ -8,6 +8,8 @@ import {
   type RecentUploads,
   radiologistProfileSchema,
   radiologyPatientsSchema,
+  recentRadiologyPatientPageSchema,
+  scanActivitySchema,
   type ScanOrder,
   type ScanRecordList,
   type ScanRecordParams,
@@ -62,18 +64,25 @@ async function countAll() {
 }
 
 /**
- * The overview's numbers, counted from each tab. TODO(api): the items can't be filtered by date,
- * so these are every order so far, whatever `period` says.
+ * The overview's numbers, counted from each tab. For "This Month", completed scans are the
+ * month's from the activity chart. TODO(api): the items can't be filtered by date, so the rest
+ * are every order so far, whatever `period` says.
  */
 export const radiologyOverviewQuery = (period: Period) =>
   queryOptions({
     queryKey: radiologistKeys.overview(period),
     queryFn: async (): Promise<RadiologyOverview> => {
-      const counts = await countAll();
+      const [counts, monthly] = await Promise.all([
+        countAll(),
+        period === "month"
+          ? request(scanActivitySchema, { url: "/api/radiology/activity-chart-data" })
+          : null,
+      ]);
       return {
         imagingRequests: counts.pending + counts.in_progress + counts.completed + counts.rejected,
         pendingOrders: counts.pending,
-        completedScans: counts.completed,
+        completedScans: monthly ? (monthly[new Date().getMonth()] ?? 0) : counts.completed,
+        completedScansSpan: monthly ? "month" : "all",
         scansInProgress: counts.in_progress,
       };
     },
@@ -125,29 +134,62 @@ function startOfToday() {
 /** How far back each period reaches, for the uploads card. */
 const periodBack = { today: 1, week: 7, month: 31 } as const satisfies Record<Period, number>;
 
+/** The latest completed scans, for their scan type and report status. */
+async function latestCompleted() {
+  const { results } = await request(scanOrderItemPageSchema, {
+    url: ITEMS_URL,
+    params: { status: "completed", page: 1, size: 50 },
+  });
+  return results.flatMap((item) => (item.result ? [{ ...item, result: item.result }] : []));
+}
+
+const uploadStatusOf = (item: { resultStatus: string | null }) =>
+  uploadStatusOfResult[item.resultStatus ?? ""] ?? "processing";
+
 /**
- * Reports uploaded in `period`, newest first: completed scans and their latest report's review
- * status. TODO(api): no date filter or upload ordering on the items, so it reads the latest
- * completed scans and keeps those in the period.
+ * Reports uploaded in `period`, newest first, with their review status. "Today" is the patients
+ * whose result went up in the last 24 hours, each with their latest report's scan and status
+ * (found among the latest completed scans). TODO(api): for a week or month there's no date filter
+ * or upload ordering on the items, so it reads the latest completed scans and keeps those in the
+ * period.
  */
 export const recentUploadsQuery = (period: Period) =>
   queryOptions({
     queryKey: radiologistKeys.uploads(period),
     queryFn: async (): Promise<RecentUploads> => {
+      if (period === "today") {
+        const [patients, completed] = await Promise.all([
+          request(recentRadiologyPatientPageSchema, {
+            url: "/api/radiology/patients/recents",
+            params: { page: 1, size: 50 },
+          }),
+          latestCompleted(),
+        ]);
+        return {
+          items: patients.map((patient) => {
+            const latest = completed
+              .filter((item) => item.patient.hin === patient.hin)
+              .sort((a, b) => b.result.uploadedAt.localeCompare(a.result.uploadedAt))[0];
+            return {
+              id: latest?.id ?? `patient-${patient.hin}`,
+              uploadedAt: patient.scannedAt,
+              patient: { id: patient.hin, name: patient.name },
+              scanType: latest?.scanType ?? "Scan result",
+              status: latest ? uploadStatusOf(latest) : null,
+            };
+          }),
+        };
+      }
       const since = Date.now() - periodBack[period] * 24 * 60 * 60_000;
-      const { results } = await request(scanOrderItemPageSchema, {
-        url: ITEMS_URL,
-        params: { status: "completed", page: 1, size: 50 },
-      });
-      const items = results.flatMap((item) =>
-        item.result && new Date(item.result.uploadedAt).getTime() >= since
+      const items = (await latestCompleted()).flatMap((item) =>
+        new Date(item.result.uploadedAt).getTime() >= since
           ? [
               {
                 id: item.id,
                 uploadedAt: item.result.uploadedAt,
                 patient: { id: item.patient.id, name: item.patient.name },
                 scanType: item.scanType,
-                status: uploadStatusOfResult[item.resultStatus ?? ""] ?? "processing",
+                status: uploadStatusOf(item),
               },
             ]
           : [],

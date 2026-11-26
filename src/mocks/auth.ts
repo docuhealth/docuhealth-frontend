@@ -20,13 +20,17 @@ const staffScenarios: Record<string, { role: string; isAdmin: boolean; firstLogi
 /** Codes (OTP) the mock always rejects, to try the error path. */
 const WRONG_CODE = "000000";
 
+/** The code that finishes an `old@…` email's unfinished old (v1) sign-up. */
+const OLD_SIGNUP_CODE = "123456";
+
 /** As the API does: a wrong, expired or used code is a field error on `code`. */
 const invalidCode = () => HttpResponse.json({ code: ["Invalid OTP"] }, { status: 400 });
 
 /**
  * Sign-up scenarios, by the contact's first part, as for login: `exists@…` already has an
- * account (the right code answers 409 `account_exists`), and `wait@…` is refused a second code
- * (429 with `Retry-After`) until the page reloads.
+ * account (the right code answers 409 `account_exists`), `old@…` too, but from an old (v1)
+ * sign-up it never finished (`/verify-account` finishes it with code 123456), and `wait@…` is
+ * refused a second code (429 with `Retry-After`) until the page reloads.
  */
 const selfSignups = new Set<string>();
 const codesSent = new Set<string>();
@@ -210,11 +214,27 @@ export const authHandlers = [
     const contact = (body.verify_by === "phone" ? body.phone : body.email) ?? "";
     if (!selfSignups.has(contact)) return undefined;
     if (body.code === WRONG_CODE) return invalidCode();
-    if (contact.toLowerCase().startsWith("exists@")) return accountExists();
+    if (/^(exists|old)@/i.test(contact)) return accountExists();
     return HttpResponse.json({
       status: "success",
       data: { signup_token: "mock-signup-token" },
     });
+  }),
+
+  // Finishing an old (v1) sign-up: the same 200 for any email, as the API does.
+  http.post(api("/api/auth/resend-otp"), async ({ request }) => {
+    const { email } = (await request.json()) as { email?: string };
+    if (!email) return HttpResponse.json({ email: ["This field is required."] }, { status: 400 });
+    const refused = tooSoon(email);
+    if (refused) return refused;
+    return HttpResponse.json({ email });
+  }),
+
+  // Only an `old@…` email has an unfinished old sign-up, and only its code 123456 finishes it.
+  http.post(api("/api/auth/signup/verify-otp"), async ({ request }) => {
+    const { email, otp } = (await request.json()) as { email?: string; otp?: string };
+    if (!email?.toLowerCase().startsWith("old@") || otp !== OLD_SIGNUP_CODE) return invalidCode();
+    return HttpResponse.json({ email });
   }),
 
   http.post(api("/api/auth/signup/complete"), () =>
