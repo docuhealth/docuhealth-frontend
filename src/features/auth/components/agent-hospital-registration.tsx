@@ -42,7 +42,6 @@ export function AgentHospitalRegistration({ onDone }: { onDone: () => void }) {
         login_url: absoluteUrl("/hospital/login"),
         admins: [
           {
-            part: details.facilityType,
             email: adminDetails.email.trim(),
             profile: {
               firstname: adminDetails.firstName.trim(),

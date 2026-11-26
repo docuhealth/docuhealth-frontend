@@ -130,20 +130,32 @@ export type FacilityApplicationSubmitted = z.infer<typeof facilityApplicationSub
 
 export const applicationPartSavedSchema = unwrapEnvelope(
   z.object({
-    application: z.string(),
-    part: z.string(),
     facility_type: facilityTypeApiSchema,
-    saved: z.boolean(),
+    email: z.string().optional(),
     email_verified: z.boolean().optional(),
+    firstname: z.string().optional(),
+    lastname: z.string().optional(),
+    role: staffRoleApiSchema.optional(),
+    name: z.string().nullable().optional(),
+    facility_email: z.string().nullable().optional(),
+    phone: z.string().nullable().optional(),
+    street: z.string().nullable().optional(),
+    city: z.string().nullable().optional(),
+    state: z.string().nullable().optional(),
+    country: z.string().nullable().optional(),
   }),
 );
 
 export const facilityRegisteredSchema = unwrapEnvelope(
   z.object({
     sqid: z.string(),
-    facility_type: facilityTypeApiSchema,
+    type: facilityTypeApiSchema.optional(),
+    facility_type: facilityTypeApiSchema.optional(),
     name: z.string(),
-    official_email: z.string(),
+    email: z.string().nullable().optional(),
+    official_email: z.string().nullable().optional(),
+    status: z.string().optional(),
+    parts: z.string().optional(),
     code: z.string().optional(),
     is_verified: z.boolean().optional(),
     created_at: z.string().optional(),

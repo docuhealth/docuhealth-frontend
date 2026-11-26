@@ -296,6 +296,16 @@ export function useVerifyFacilityApplicationEmail() {
   });
 }
 
+export interface FacilityPartDetailsInput {
+  name: string;
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  email: string;
+  phone?: string;
+}
+
 export interface SetFacilityApplicationAdminInput {
   application: string;
   token: string;
@@ -308,8 +318,10 @@ export interface SetFacilityApplicationAdminInput {
     specialization?: string;
     gender?: "male" | "female";
   };
-  facility_type?: FacilityTypeApi;
-  part?: FacilityTypeApi;
+  /** Only for an observation facility (`"laboratory"` or `"radiology"`). Omit for a single facility. */
+  facility_type?: "laboratory" | "radiology";
+  /** Only for an observation facility: that sub-unit's own name, address and contact details. */
+  part?: FacilityPartDetailsInput;
 }
 
 export function useSetFacilityApplicationAdmin() {
@@ -327,7 +339,8 @@ export interface VerifyFacilityApplicationAdminCodeInput {
   application: string;
   token: string;
   code: string;
-  facility_type?: FacilityTypeApi;
+  /** Only for an observation facility (`"laboratory"` or `"radiology"`). Omit for a single facility. */
+  facility_type?: "laboratory" | "radiology";
 }
 
 export function useVerifyFacilityApplicationAdminCode() {
@@ -385,7 +398,6 @@ export interface RegisterFacilityByAgentInput {
   country: string;
   login_url: string;
   admins: Array<{
-    part?: FacilityTypeApi;
     email: string;
     profile: {
       firstname: string;
@@ -395,6 +407,10 @@ export interface RegisterFacilityByAgentInput {
       specialization?: string;
       gender?: "male" | "female";
     };
+    /** Only for an observation facility (`"laboratory"` or `"radiology"`). Omit for a single facility. */
+    facility_type?: "laboratory" | "radiology";
+    /** Only for an observation facility: that sub-unit's own name, address and contact details. */
+    part?: FacilityPartDetailsInput;
   }>;
 }
 

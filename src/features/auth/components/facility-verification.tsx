@@ -72,8 +72,6 @@ export function FacilityVerification({
       application,
       token,
       email: values.email.trim(),
-      facility_type: facilityType,
-      part: facilityType,
       profile: {
         firstname: values.firstName.trim(),
         lastname: values.lastName.trim(),
@@ -105,7 +103,6 @@ export function FacilityVerification({
         application,
         token,
         code,
-        facility_type: facilityType,
       });
       setStep("documents");
     } catch (error) {

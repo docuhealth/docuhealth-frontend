@@ -322,26 +322,26 @@ export const authHandlers = [
 
   http.post(api("/api/auth/facility-applications/admin"), async ({ request }) => {
     const body = (await request.json()) as {
-      application?: string;
       email?: string;
       facility_type?: string;
+      profile?: { firstname?: string; lastname?: string; role?: string };
     };
     const isSameEmail = body.email === "info@stnicholas.example.com";
     return HttpResponse.json({
       status: "success",
       data: {
-        application: body.application ?? "fapp_mock_1",
-        part: body.facility_type ?? "hospital",
         facility_type: body.facility_type ?? "hospital",
-        saved: true,
+        email: body.email ?? "admin@stnicholas.example.com",
         email_verified: isSameEmail,
+        firstname: body.profile?.firstname ?? "Tunde",
+        lastname: body.profile?.lastname ?? "Adeyemi",
+        role: body.profile?.role ?? "doctor",
       },
     });
   }),
 
   http.post(api("/api/auth/facility-applications/admin/verify"), async ({ request }) => {
     const body = (await request.json()) as {
-      application?: string;
       facility_type?: string;
       code?: string;
     };
@@ -349,11 +349,12 @@ export const authHandlers = [
     return HttpResponse.json({
       status: "success",
       data: {
-        application: body.application ?? "fapp_mock_1",
-        part: body.facility_type ?? "hospital",
         facility_type: body.facility_type ?? "hospital",
-        saved: true,
+        email: "admin@stnicholas.example.com",
         email_verified: true,
+        firstname: "Tunde",
+        lastname: "Adeyemi",
+        role: "doctor",
       },
     });
   }),
